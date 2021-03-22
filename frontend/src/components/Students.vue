@@ -1,6 +1,8 @@
 <template>
   <div>
     <h1 class="name">Seng302 Students</h1>
+
+    <h1 class="name">{{ this.test}}</h1>
     <section class="studentapp">
       <div v-if="loading">
         <h1 class="loading">Loading...</h1>
@@ -120,6 +122,7 @@ const Students = {
   data: function () {
     return {
       students: [],
+      test: 'testing123',
       newStudent: "",
       editedStudent: null,
       visibility: "all",

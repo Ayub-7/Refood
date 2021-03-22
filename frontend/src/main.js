@@ -28,10 +28,18 @@
 /**
  * Main entry point for your Vue app
  */
-import Vue from 'vue'
-import App from './App'
+import "bootstrap/dist/css/bootstrap.min.css"
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import App from './App.vue';
+import Login from "@/components/Login";
+import Register from "./components/Register";
+import Users from "@/components/Users.vue";
+import Search from "@/components/Search.vue";
 
 Vue.config.productionTip = false
+
+
 
 import VueLogger from 'vuejs-logger';
 
@@ -46,10 +54,24 @@ const options = {
 };
 
 Vue.use(VueLogger, options);
+Vue.use(VueRouter);
+
+const routes = [
+  {path: '/Login', component: Login},
+  {path: '/', component: Register},
+  {path: '/Users', component: Users},
+  {path: '/Search', component: Search},
+
+];
+
+const router = new VueRouter({
+  routes,
+  mode: 'history'
+});
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  components: { App },
-  template: '<App/>'
+  router,
+  render: h => h(App)
 });
