@@ -25,17 +25,6 @@ public class Product {
     private Date created;
     // images when we get to it.
 
+    protected Product() { }
 
-    public Product(String id, long businessId, String name, String description, double recommendedRetailPrice) {
-        this.id = id;
-        this.businessId = businessId;
-        this.name = name;
-        this.description = description;
-        this.recommendedRetailPrice = recommendedRetailPrice;
-        this.created = new Date();
-    }
-
-    public Product() {
-
-    }
 }
