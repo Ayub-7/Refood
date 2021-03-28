@@ -106,14 +106,14 @@ export default {
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
      * @param id user id to be made admin.
      */
-    makeUserAdmin: async(key, value, description) =>
-        instance.post('/users/{id}/makeAdmin', {key, value, description}),
+    makeUserAdmin: async(id, value, description) =>
+        instance.post('/users/{id}/makeAdmin', {id, value, description}),
 
 
     /**
      * Method (frontend) to let a DGAA user revoke GAA admin status from another user. Reverts the user back to USER role.
      * @param id user id to revoke admin user role.
      */
-    revokeUserAdmin: async(key, value, description) =>
-    instance.post('/users/{id}/revokeAdmin', {key, value, description}),
+    revokeUserAdmin: async(id, value, description) =>
+    instance.post('/users/{id}/revokeAdmin', {id, value, description}),
 }

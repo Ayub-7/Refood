@@ -79,7 +79,7 @@
           <td>{{ user.email }}</td>
           <td v-if="isDGAA" >{{ user.isAdmin }}</td>
           <td v-if="isDGAA">
-            <input type="checkbox"  v-model="user.isAdmin">
+            <input type="checkbox"  v-model="user.isAdmin" @click="toggleAdmin(user)">
           </td>
         </tr>
 
@@ -170,6 +170,22 @@ const Search = {
      */
 
     checkDGAA: function () {
+      this.isDGAA = true;
+    },
+
+    /**
+     * makes the checkuser an administrator
+     * if they are already, revoke privledges...
+     */
+
+    toggleAdmin: function (currentUser) {
+      if (currentUser.isAdmin == false) {
+        //currentUser.id = true;
+        api.makeUserAdmin(currentUser.id, true, "");
+        //console.log("admin true"+currentUser.id+currentUser.firstName)
+      } else {
+        api.revokeUserAdmin(currentUser.id, false, "");
+      }
       this.isDGAA = true;
     },
 
