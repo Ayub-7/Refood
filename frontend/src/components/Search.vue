@@ -67,6 +67,7 @@
 
         </tr>
 
+
         <tr v-for="user in filteredUsers.slice(userSearchIndexMin, userSearchIndexMax)"
             v-bind:href="user.id"
             :key="user.id">
@@ -77,7 +78,9 @@
           <td> {{ user.homeAddress }} </td>
           <td>{{ user.email }}</td>
           <td v-if="isDGAA" >{{ user.isAdmin }}</td>
-          <td v-if="isDGAA" >{{ user.toggleAdmin }}</td>
+          <td v-if="isDGAA">
+            <input type="checkbox"  v-model="user.isAdmin">
+          </td>
         </tr>
 
         <!-- If search query returns more than 10 users then this should be active -->
@@ -114,7 +117,7 @@ const Search = {
       resultTrack: "",
       userSearchIndexMin: 0,
       userSearchIndexMax: 10,
-      isDGAA: true,
+      isDGAA: false,
     };
   },
 
@@ -128,6 +131,9 @@ const Search = {
    * remove when test back end works well...
  */
   mounted() {
+    //todo: check if the logged in user is a DGAA or not
+    this.checkDGAA();
+
     api
         .searchQuery()
         .then((response) => {
@@ -163,10 +169,8 @@ const Search = {
      *
      */
 
-    isDGAA: function () {
-
-
-      return true;
+    checkDGAA: function () {
+      this.isDGAA = true;
     },
 
     /**
@@ -189,9 +193,12 @@ const Search = {
 
           //first check if a or b contains any numbers or whitespace
           //before capitalzation to avoid errors
-          if ( !(/[^a-zA-Z]/.test(aField) && (/[^a-zA-Z]/.test(bField))) ) {
-            aField = aField.toUpperCase();
-            bField = bField.toUpperCase();
+          //also check if boolean
+          if (!(typeof aField === "boolean" || typeof bField === "boolean")) {
+            if ( !(/[^a-zA-Z]/.test(aField) && (/[^a-zA-Z]/.test(bField))) ) {
+              aField = aField.toUpperCase();
+              bField = bField.toUpperCase();
+            }
           }
 
 
@@ -333,10 +340,10 @@ export default Search;
   color: #fff;
   background: linear-gradient(to right, #9C27B0, #E040FB);
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
   font-family: 'Ubuntu', sans-serif;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
