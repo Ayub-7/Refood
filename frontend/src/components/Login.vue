@@ -30,11 +30,11 @@
 import api from "../Api";
 import Vue from "vue"
 import VueSimpleAlert from "vue-simple-alert";
-let passwordHash = require('password-hash');
+//let passwordHash = require('password-hash');
 
 Vue.use(VueSimpleAlert);
-const data = require('../testUser.json');
-const users = data.users;
+//const data = require('../testUser.json');
+//const users = data.users;
 const Login = {
   name: "Login",
   data: function () {
@@ -79,36 +79,47 @@ const Login = {
      * Sends the login request to the backend by calling the login function from the API.
      */
     loginSubmit: function() {
-      var user_id = 0;
-      var isRegistered = false;
-      var isVerified = false;
-      var token = null;
-      for (var user of users) {
-        if (this.email == user.email){
-          if (passwordHash.verify(this.password, user.hashedPassword)) {
-            isVerified = true;
-            user_id = user.id;
-          }
-          isRegistered = true;
-        }
-      }
-      if(isVerified == true){
-        token = Buffer.from(`${this.username}:${this.password}`, 'utf8').toString('base64')
-      }
-      api.login(this.Email, this.password, token)
+    /**
+     *     "email": "wtilsley0@rakuten.co.jp",
+     *     "password": "zWkb3AeLn3lc"
+     */
+      api.login(this.email, this.password)
       .then((response) => {
-        if (isVerified == true) {
-          this.$log.debug("Login successful!", response.data)
-          window.location.replace("http://localhost:9500/Users?id=" + user_id);
-        } else if (isRegistered == true) {
-          this.$alert("Incorrect username or password!");
-          this.$log.debug("Login unsuccessful!", response.data);
-        } else {
-            this.$alert("You aren't registered You must register.");
-          }
-        }).catch((error) => {
-        this.$log.debug("Login unsuccessful!", error)
-      });
+        console.log(response);
+        window.location.replace("http://localhost:9500/Users?id=" + response.data.userId);
+      })
+
+
+      // var user_id = 0;
+      // var isRegistered = false;
+      // var isVerified = false;
+      // var token = null;
+      // for (var user of users) {
+      //   if (this.email == user.email){
+      //     if (passwordHash.verify(this.password, user.hashedPassword)) {
+      //       isVerified = true;
+      //       user_id = user.id;
+      //     }
+      //     isRegistered = true;
+      //   }
+      // }
+      // if(isVerified == true){
+      //   token = Buffer.from(`${this.username}:${this.password}`, 'utf8').toString('base64')
+      // }
+      // api.login(this.Email, this.password, token)
+      // .then((response) => {
+      //   if (isVerified == true) {
+      //     this.$log.debug("Login successful!", response.data)
+      //     window.location.replace("http://localhost:9500/Users?id=" + user_id);
+      //   } else if (isRegistered == true) {
+      //     this.$alert("Incorrect username or password!");
+      //     this.$log.debug("Login unsuccessful!", response.data);
+      //   } else {
+      //       this.$alert("You aren't registered You must register.");
+      //     }
+      //   }).catch((error) => {
+      //   this.$log.debug("Login unsuccessful!", error)
+      // });
     }
   },
 
