@@ -36,6 +36,7 @@ import Login from "@/components/Login";
 import Register from "./components/Register";
 import Users from "@/components/Users.vue";
 import Search from "@/components/Search.vue";
+import Business from "@/components/Business.vue";
 
 Vue.config.productionTip = false
 
@@ -61,6 +62,7 @@ const routes = [
   {path: '/', component: Register},
   {path: '/Users', component: Users},
   {path: '/Search', component: Search},
+  {path: '/business', component: Business},
 
 ];
 
