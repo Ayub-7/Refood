@@ -21,8 +21,8 @@
 
     <main>
       <nav id="business-navbar">
-        <router-link class="header-item" to="/business">Products</router-link>
-        <router-link class="header-item" to="/business/administrators">Administrators</router-link>
+        <router-link class="business-nav-item" to="/business">Products</router-link>
+        <router-link class="business-nav-item" to="/business/administrators">Administrators</router-link>
       </nav>
       <div id="content">
         <!-- Sub Navigation Bar -->
@@ -59,7 +59,6 @@ export default {
 #business-name {
   grid-row: 1;
   grid-column: 1;
-  direction: rtl;
 
   color: black;
   font-size: 24px;
@@ -109,18 +108,26 @@ export default {
   text-align: right;
   font-size: 18px;
 
-  padding-top: 2em;
+  padding-top: 1em;
+  padding-bottom: 1em;
 
   border-radius: 1em 1em 0 0;
   box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
 }
 
-.header-item {
+.business-nav-item {
   text-align: center;
-  margin: auto;
+  width: 76%;
+  color: rgb(38, 50, 56);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
 
-  padding-left: 1em;
-  padding-right: 1em;
+  background-color: #dbe0dd;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin: auto 20px 27px 5px;
 }
 
 main {
