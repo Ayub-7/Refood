@@ -108,9 +108,13 @@ const Users = {
     }
   },
 
-  mounted() {
-    
-    api.getUserFromID(this.$route.query.id)
+  mounted: function () {
+    console.log('yoo')
+    let userId = this.$store.state.userId
+    if(this.$store.state.viewingUserId != null) {
+      userId = this.$store.state.viewingUserId
+    }
+    api.getUserFromID(userId)
     .then((response) => {
       console.log(response.data);
       this.user = response.data;

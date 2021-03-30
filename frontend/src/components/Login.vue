@@ -16,7 +16,7 @@
 
       <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
       <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
-      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" href="/login">Sign in</button>
+      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
       <button type="button" class="forgotPassword">Forgot Password?</button>
     </div>
   </form>
@@ -79,14 +79,12 @@ const Login = {
      * Sends the login request to the backend by calling the login function from the API.
      */
     loginSubmit: function() {
-    /**
-     *     "email": "wtilsley0@rakuten.co.jp",
-     *     "password": "zWkb3AeLn3lc"
-     */
       api.login(this.email, this.password)
       .then((response) => {
-        console.log(response);
-        window.location.replace("http://localhost:9500/Users?id=" + response.data.userId);
+        this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
+
+        //LOAD USER PAGE, USING ROUTER
+        this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
       })
 
 

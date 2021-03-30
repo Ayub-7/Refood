@@ -7,10 +7,18 @@
             <router-link class="title" to="/">Register</router-link>
           </th>
           <th>
-            <router-link class="title" to="/Login">Login</router-link>
+            <router-link class="title" to="/login">Login</router-link>
           </th>
           <th>
-            <router-link class="title" to="/Search">Search</router-link>
+            <router-link class="title" to="/search">Search</router-link>
+          </th>
+          <th>
+            <router-link :to="{name: 'UserPage', params: {id: this.$store.state.userId}}" v-if="this.$store.state.userId != null" class="title">Profile</router-link>
+          </th>
+          <th>
+            <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
+            <span @click="$store.commit('setUserId', null)" class="title">Logout</span>
+            </router-link>
           </th>
         </tr>
       </table>
@@ -26,7 +34,7 @@
 <script>
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
-
+// @click="goToUserPage()"
 //import Students from "./components/Students";
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -44,6 +52,12 @@ const app = {
   data: () => {
     return {};
   },
+  
+  // methods: {
+  //   goToUserPage: function() {
+  //     this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
+  //   }
+  // },
 };
 
 // make the 'app' available
