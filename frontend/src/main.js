@@ -63,7 +63,8 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     userId: null,
-    viewingUserId: null
+    viewingUserId: null,
+    userRole: null
   },
 
   mutations: {
@@ -73,7 +74,11 @@ const store = new Vuex.Store({
 
     setviewUserId (state, newUserId) {
       state.viewingUserId = newUserId;
-    }
+    },
+
+    setUserRole (state, newUserRole) {
+      state.userRole = newUserRole;
+    },
   }
 })
 

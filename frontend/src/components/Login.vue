@@ -82,7 +82,7 @@ const Login = {
       api.login(this.email, this.password)
       .then((response) => {
         this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
-
+        this.$store.commit('setUserRole', response.data.role);
         //LOAD USER PAGE, USING ROUTER
         this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
       })

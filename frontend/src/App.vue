@@ -17,11 +17,13 @@
           </th>
           <th>
             <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
-            <span @click="$store.commit('setUserId', null)" class="title">Logout</span>
+            <span @click="$store.commit('setUserId', null); $store.commit('setUserRole', null)" class="title">Logout</span>
             </router-link>
+
           </th>
         </tr>
       </table>
+      <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
     </div>
 
     <router-view></router-view>
@@ -52,12 +54,7 @@ const app = {
   data: () => {
     return {};
   },
-  
-  // methods: {
-  //   goToUserPage: function() {
-  //     this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
-  //   }
-  // },
+
 };
 
 // make the 'app' available
@@ -66,10 +63,26 @@ export default app;
 
 <style scoped>
 
+.dgaa {
+  color: rgb(38, 50, 56);
+  background: #dbe0dd;
+  text-align: center;
+  font-size: 23px;
+  right: 0px;
+  font-weight: 600;
+  position: relative;
+  border-radius: 20px;
+  width: 100px;
+  font-family: 'Ubuntu', sans-serif;
+}
+
 .topbar {
-  padding-bottom: 20px;
+  padding-bottom: 25px;
+  display: flex;
+  flex-direction: row;
   padding-top: 20px;
   background: linear-gradient(to right, #9C27B0, #E040FB);
+  border: 2px solid rgba(0, 0, 0, 0.02);
 }
 
 .title {
@@ -96,4 +109,5 @@ export default app;
 [v-cloak] {
   display: none;
 }
+
 </style>
