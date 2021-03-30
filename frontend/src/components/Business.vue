@@ -1,19 +1,35 @@
 <template>
-  <div id="container">
-    <div id="business-header">Cool Business</div>
 
-    <div id="business-info-container">
-      <div id="business-type">Accommodation and Food Services</div>
-      <div id="created-date">Created 2021-03-29</div>
-      <div id="address">
-        <div id="street-address">123 Real Street</div>
-        <div id="city">Christchurch</div>
-        <div id="region">Canterbury</div>
-        <div id="country">New New Zealandia</div>
-        <div id="postcode">8888</div>
+  <div id="container">
+    <!-- Left Side Business Information Panel -->
+    <div id="business-container">
+      <div id="business-name">Cool Business</div>
+
+      <div id="info-container">
+        <div id="business-type">Accommodation and Food Services</div>
+        <div id="created-date">Created 2021-03-29</div>
+        <div id="address">
+          <div id="street-address">123 Real Street</div>
+          <div id="city">Christchurch</div>
+          <div id="region">Canterbury</div>
+          <div id="country">New New Zealandia</div>
+          <div id="postcode">8888</div>
+        </div>
+        <div id="description">Very long description about this very cool business. Very long description about this very cool business. Very long description about this very cool business.</div>
       </div>
-      <div id="description">Very long description about this very cool business.</div>
     </div>
+
+    <main>
+      <nav id="business-navbar">
+        <router-link class="header-item" to="/business">Products</router-link>
+        <router-link class="header-item" to="/business/administrators">Administrators</router-link>
+      </nav>
+      <div id="content">
+        <!-- Sub Navigation Bar -->
+        <router-view></router-view>
+      </div>
+    </main>
+
 
   </div>
 </template>
@@ -29,33 +45,41 @@ export default {
 #container {
   display: grid;
   grid-template-columns: 25% 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto;
+}
 
+/* Business Info Panel on left side */
+#business-container {
   margin: 1em auto;
   border-radius: 1.5em;
   box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F3EBF6;
 }
 
-#business-header {
+#business-name {
   grid-row: 1;
-  grid-column:  1 / 3; /* Column span 2 columns */
+  grid-column: 1;
+  direction: rtl;
 
   color: black;
   font-size: 24px;
   padding: 1em;
 }
 
-#business-info-container {
+
+#info-container {
   grid-column: 1;
   grid-row: 2;
 
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(2, auto) repeat(2, 1fr);
+  grid-template-rows: repeat(3, auto) repeat(1, 1fr);
   grid-row-gap: 1em;
 
   padding-left: 2em;
+  padding-bottom: 2em;
+  padding-right: 2em;
+
 }
 
 #business-type {
@@ -76,6 +100,34 @@ export default {
 #description {
   grid-row: 4;
 
+}
+
+#business-navbar {
+  grid-column: 2;
+  grid-row: 1;
+
+  text-align: right;
+  font-size: 18px;
+
+  padding-top: 2em;
+
+  border-radius: 1em 1em 0 0;
+  box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
+}
+
+.header-item {
+  text-align: center;
+  margin: auto;
+
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+main {
+  margin: 1em 0 1em 1em;
+  border-radius: 1.5em;
+  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+  background-color: #F3EBF6;
 }
 
 </style>
