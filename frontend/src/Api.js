@@ -99,7 +99,7 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: () => instance.get(`users`),
+    searchQuery: (query) => instance.post(`/users/search`, {query}),
 
 
     /**
@@ -107,7 +107,7 @@ export default {
      * @param id user id to be made admin.
      */
     makeUserAdmin: async(id, value, description) =>
-        instance.post('/users/{id}/makeAdmin', {id, value, description}),
+        instance.post('/users/'+id+'/makeAdmin', {id, value, description}),
 
 
     /**
