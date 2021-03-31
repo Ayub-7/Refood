@@ -20,18 +20,19 @@
     </div>
 
     <main>
+      <!-- Sub Navigation Bar -->
       <nav id="business-navbar">
         <router-link class="business-nav-item" to="/business">Products</router-link>
         <router-link class="business-nav-item" to="/business/administrators">Administrators</router-link>
       </nav>
+
       <div id="content">
-        <!-- Sub Navigation Bar -->
         <router-view></router-view>
       </div>
+
     </main>
-
-
   </div>
+
 </template>
 
 <script>
@@ -61,10 +62,9 @@ export default {
   grid-column: 1;
 
   color: black;
-  font-size: 24px;
+  font-size: 26px;
   padding: 1em;
 }
-
 
 #info-container {
   grid-column: 1;
@@ -73,7 +73,7 @@ export default {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto) repeat(1, 1fr);
-  grid-row-gap: 1em;
+  grid-row-gap: 2em;
 
   padding-left: 2em;
   padding-bottom: 2em;
@@ -81,9 +81,14 @@ export default {
 
 }
 
+#business-type #created-date #address {
+
+}
+
 #business-type {
   grid-column: 1;
   grid-row: 1;
+  font-size: 18px;
 }
 
 #created-date {
@@ -105,15 +110,18 @@ export default {
   grid-column: 2;
   grid-row: 1;
 
-  text-align: right;
   font-size: 18px;
 
   padding-top: 1em;
   padding-bottom: 1em;
 
-  border-radius: 1em 1em 0 0;
   box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
+  border-radius: 1em;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+
 }
+
+/* Right Hand Content Side. */
 
 .business-nav-item {
   text-align: center;

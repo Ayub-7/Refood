@@ -1,6 +1,8 @@
 <template>
   <ul id="administrators-list">
     <admin-card/>
+    <admin-card/>
+    <admin-card/>
   </ul>
 </template>
 
@@ -8,8 +10,10 @@
 import Vue from "vue";
 
 Vue.component('admin-card', {
-  template: '<li class="card"><div class="admin-name">Elon Musk</div></li>'
-})
+  template: `<li class="card">
+                <div class="admin-name">Elon Musk</div>
+              </li>`
+});
 
 export default {
   name: "BusinessAdministrators"
@@ -24,11 +28,13 @@ export default {
 
 /* Card CSS */
 .card {
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);;
-  background: rgba(255, 255, 255, .8);
-}
+  max-width: 40%;
 
+  background-color: #e7e7e7;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin: auto 20px 27px 5px;
+}
 
 </style>
