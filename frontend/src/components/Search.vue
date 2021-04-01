@@ -53,13 +53,13 @@
             </button>
           </th>
 
-          <th  v-if="isDGAA">
+          <th  v-if="this.$store.state.userRole == 'DGAA'">
             <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
               Is Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
 
-          <th  v-if="isDGAA">
+          <th  v-if="this.$store.state.userRole == 'DGAA'">
             <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
               Toggle Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
@@ -77,8 +77,8 @@
           <td> {{ user.lastName }} </td>
           <td> {{ user.homeAddress }} </td>
           <td>{{ user.email }}</td>
-          <td v-if="isDGAA" >{{ user.isAdmin }}</td>
-          <td v-if="isDGAA">
+          <td v-if="this.$store.state.userRole == 'DGAA'" >{{ user.isAdmin }}</td>
+          <td v-if="this.$store.state.userRole == 'DGAA'">
             <input type="checkbox"  v-model="user.isAdmin" @click="toggleAdmin(user)">
           </td>
         </tr>
@@ -116,8 +116,7 @@ const Search = {
       enableTable: false,
       resultTrack: "",
       userSearchIndexMin: 0,
-      userSearchIndexMax: 10,
-      isDGAA: false,
+      userSearchIndexMax: 10
     };
   },
 
@@ -131,9 +130,6 @@ const Search = {
    * remove when test back end works well...
  */
   mounted() {
-    //todo: check if the logged in user is a DGAA or not
-    this.checkDGAA();
-
     api
         .searchQuery()
         .then((response) => {
@@ -162,15 +158,6 @@ const Search = {
       } else {
         this.errors.push("Please enter input the user you want to search for");
       }
-    },
-
-    /**
-     * Checks if DGAA user is logged in. If so, display two additional columns
-     *
-     */
-
-    checkDGAA: function () {
-      this.isDGAA = true;
     },
 
     /**
