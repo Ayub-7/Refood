@@ -46,11 +46,7 @@ export default {
      * @param token Authentication token added to API request header
      * @returns {Promise<AxiosResponse<any>>}
      */
-    login: (Email, password, token) => instance.post('login', {Email, password}, {
-      headers: {
-          'Authorization': `Basic ${token}`
-      },
-    }),
+    login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
 
   // user POST create new user account data
     /**
@@ -76,7 +72,7 @@ export default {
      * @param userId The user's unique ID number
      * @returns {Promise<AxiosResponse<any>>}
      */
-    getUserFromID: (userId) => instance.get(`users/${userId}`),
+    getUserFromID: (userId) => instance.get(`users/${userId}`, {withCredentials: true}),
 
     /**
      * Get all users from the database.

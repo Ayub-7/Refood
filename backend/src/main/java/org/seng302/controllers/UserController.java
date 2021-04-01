@@ -85,7 +85,7 @@ public class UserController {
 
         if (existingUser != null) {
             if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
-                UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId());
+                UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
                 session.setAttribute("user", existingUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));

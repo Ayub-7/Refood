@@ -31,7 +31,9 @@
 import "bootstrap/dist/css/bootstrap.min.css"
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import Vuex from 'vuex';
 import App from './App.vue';
+
 import Login from "@/components/Login";
 import Register from "./components/Register";
 import Users from "@/components/Users.vue";
@@ -55,12 +57,37 @@ const options = {
 
 Vue.use(VueLogger, options);
 Vue.use(VueRouter);
+Vue.use(Vuex);
+
+//Store data used to maintain state in program
+const store = new Vuex.Store({
+  state: {
+    userId: null,
+    viewingUserId: null,
+    userRole: null
+  },
+
+  mutations: {
+    setUserId (state, newUserId) {
+      state.userId = newUserId;
+    },
+
+    setviewUserId (state, newUserId) {
+      state.viewingUserId = newUserId;
+    },
+
+    setUserRole (state, newUserRole) {
+      state.userRole = newUserRole;
+    },
+  }
+})
+
 
 const routes = [
-  {path: '/Login', component: Login},
+  {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
-  {path: '/Users', component: Users},
-  {path: '/Search', component: Search},
+  {name: 'UserPage', path: '/users/:id', component: Users},
+  {path: '/search', component: Search},
 
 ];
 
@@ -73,5 +100,6 @@ const router = new VueRouter({
 new Vue({
   el: '#app',
   router,
+  store: store,
   render: h => h(App)
 });

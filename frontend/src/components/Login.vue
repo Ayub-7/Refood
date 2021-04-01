@@ -16,7 +16,7 @@
 
       <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
       <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
-      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" href="/login">Sign in</button>
+      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
       <button type="button" class="forgotPassword">Forgot Password?</button>
     </div>
   </form>
@@ -30,11 +30,11 @@
 import api from "../Api";
 import Vue from "vue"
 import VueSimpleAlert from "vue-simple-alert";
-let passwordHash = require('password-hash');
+//let passwordHash = require('password-hash');
 
 Vue.use(VueSimpleAlert);
-const data = require('../testUser.json');
-const users = data.users;
+//const data = require('../testUser.json');
+//const users = data.users;
 const Login = {
   name: "Login",
   data: function () {
@@ -79,36 +79,45 @@ const Login = {
      * Sends the login request to the backend by calling the login function from the API.
      */
     loginSubmit: function() {
-      var user_id = 0;
-      var isRegistered = false;
-      var isVerified = false;
-      var token = null;
-      for (var user of users) {
-        if (this.email == user.email){
-          if (passwordHash.verify(this.password, user.hashedPassword)) {
-            isVerified = true;
-            user_id = user.id;
-          }
-          isRegistered = true;
-        }
-      }
-      if(isVerified == true){
-        token = Buffer.from(`${this.username}:${this.password}`, 'utf8').toString('base64')
-      }
-      api.login(this.Email, this.password, token)
+      api.login(this.email, this.password)
       .then((response) => {
-        if (isVerified == true) {
-          this.$log.debug("Login successful!", response.data)
-          window.location.replace("http://localhost:9500/Users?id=" + user_id);
-        } else if (isRegistered == true) {
-          this.$alert("Incorrect username or password!");
-          this.$log.debug("Login unsuccessful!", response.data);
-        } else {
-            this.$alert("You aren't registered You must register.");
-          }
-        }).catch((error) => {
-        this.$log.debug("Login unsuccessful!", error)
-      });
+        this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
+        this.$store.commit('setUserRole', response.data.role);
+        //LOAD USER PAGE, USING ROUTER
+        this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
+      })
+
+
+      // var user_id = 0;
+      // var isRegistered = false;
+      // var isVerified = false;
+      // var token = null;
+      // for (var user of users) {
+      //   if (this.email == user.email){
+      //     if (passwordHash.verify(this.password, user.hashedPassword)) {
+      //       isVerified = true;
+      //       user_id = user.id;
+      //     }
+      //     isRegistered = true;
+      //   }
+      // }
+      // if(isVerified == true){
+      //   token = Buffer.from(`${this.username}:${this.password}`, 'utf8').toString('base64')
+      // }
+      // api.login(this.Email, this.password, token)
+      // .then((response) => {
+      //   if (isVerified == true) {
+      //     this.$log.debug("Login successful!", response.data)
+      //     window.location.replace("http://localhost:9500/Users?id=" + user_id);
+      //   } else if (isRegistered == true) {
+      //     this.$alert("Incorrect username or password!");
+      //     this.$log.debug("Login unsuccessful!", response.data);
+      //   } else {
+      //       this.$alert("You aren't registered You must register.");
+      //     }
+      //   }).catch((error) => {
+      //   this.$log.debug("Login unsuccessful!", error)
+      // });
     }
   },
 
