@@ -31,14 +31,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
+import org.seng302.models.Product;
 import org.seng302.models.User;
 import org.seng302.repositories.BusinessRepository;
+import org.seng302.repositories.ProductRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.SchedAdminCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 
 /**
@@ -51,6 +55,7 @@ public class MainApplicationRunner implements ApplicationRunner {
   private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
   private UserRepository userRepository;
   private BusinessRepository businessRepository;
+  @Autowired private ProductRepository productRepository;
   private SchedAdminCheck schedAdminCheck;
 
 
@@ -113,6 +118,16 @@ public class MainApplicationRunner implements ApplicationRunner {
     businessRepository.save(b1);
     businessRepository.save(b2);
 
-  }
+    // Test Data for Products
+    Product p1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", 14.69, new Date());
+    Product p2 = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", 43.66, new Date());
+    Product p3 = new Product("55-9986232", 2, "Seedlings", "Buckwheat, Organic", 1.26, new Date());
+    Product p4 = new Product("12-5088639", 2, "Foam Cup", "6 Oz", 55.2, new Date());
 
+    productRepository.save(p1);
+    productRepository.save(p2);
+    productRepository.save(p3);
+    productRepository.save(p4);
+
+  }
 }
