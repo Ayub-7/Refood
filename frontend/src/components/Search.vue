@@ -130,17 +130,6 @@ const Search = {
    * remove when test back end works well...
  */
   mounted() {
-    api
-        .searchQuery()
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.users = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load users";
-        })
-        .finally(() => (this.loading = false));
   },
 
 
@@ -155,6 +144,19 @@ const Search = {
       if (this.searchbar.length > 0) {
         this.enableTable = true;
         this.resultTrack = this.searchbar;
+        console.log(this.searchbar);
+        api
+            .searchQuery(this.searchbar)
+            .then((response) => {
+              console.log(response.data);
+              this.$log.debug("Data loaded: ", response.data);
+              this.users = response.data;
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+              this.error = "Failed to load users";
+            })
+            .finally(() => (this.loading = false));
       } else {
         this.errors.push("Please enter input the user you want to search for");
       }
