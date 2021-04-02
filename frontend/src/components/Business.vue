@@ -1,21 +1,21 @@
 <template>
 
-  <div id="container">
+  <div id="container" v-if="this.business != null">
     <!-- Left Side Business Information Panel -->
     <div id="business-container">
-      <div id="business-name">Cool Business</div>
+      <div id="business-name"  >{{ business.name }}</div>
 
       <div id="info-container">
-        <div id="business-type">Accommodation and Food Services</div>
-        <div id="created-date">Created 2021-03-29</div>
+        <div id="business-type">{{ business.businessType }}</div>
+        <div id="created-date">Created {{ business.created }}</div>
         <div id="address">
-          <div id="street-address">123 Real Street</div>
-          <div id="city">Christchurch</div>
-          <div id="region">Canterbury</div>
-          <div id="country">New New Zealandia</div>
+          <div id="street-address">{{ business.address }}</div> <!-- Change this soon when address is changed. -->
+          <div id="city">Placeholder City</div>
+          <div id="region">Placeholder Region</div>
+          <div id="country">Placeholder Country</div>
           <div id="postcode">8888</div>
         </div>
-        <div id="description">Very long description about this very cool business. Very long description about this very cool business. Very long description about this very cool business.</div>
+        <div id="description">{{ business.description }}</div>
       </div>
     </div>
 
@@ -35,11 +35,34 @@
 
 </template>
 
+
 <script>
-export default {
-  name: "Business"
+import api from "@/Api";
+
+const Business = {
+  name: "Business",
+
+  // App's initial state.
+  data: function() {
+    return {
+      business: null
+    };
+  },
+
+  // Executes before component creation.
+  mounted() {
+    api.getBusinessFromId(this.$route.params.id)
+      .then((res) => {
+        this.business = res.data;
+        console.log(this.business);
+      })
+  }
+
 }
+
+export default Business
 </script>
+
 
 <style scoped>
 

@@ -64,7 +64,7 @@ const routes = [
   {path: '/Users', component: Users},
   {path: '/Search', component: Search},
   {
-    path: '/business',
+    path: '/business/:id',
     component: Business,
     children: [
         {
