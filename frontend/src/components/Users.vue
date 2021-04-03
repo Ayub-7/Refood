@@ -56,7 +56,7 @@
           <div class="form-row">
           <div class="form-group col-md-6">
             <label>Date registered</label>
-            <p type="text" class="form-control" placeholder="Date of Registration" name="registerdate"> {{ user.registerDate.toString()}}</p>
+            <p type="text" class="form-control" placeholder="Date of Registration" name="registerdate"> {{ user.created.toString()}}</p>
           </div>
             <div class="form-group col-md-6">
               <label>Phone Number</label>
@@ -108,11 +108,16 @@ const Users = {
     }
   },
 
-  mounted() {
-    api.getUserFromID(this.$route.query.id)
+  mounted: function () {
+    console.log('yoo')
+    let userId = this.$store.state.userId
+    if(this.$store.state.viewingUserId != null) {
+      userId = this.$store.state.viewingUserId
+    }
+    api.getUserFromID(userId)
     .then((response) => {
+      console.log(response.data);
       this.user = response.data;
-      console.log(this.user)
     })
   },
 
