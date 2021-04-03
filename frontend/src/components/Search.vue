@@ -53,13 +53,13 @@
             </button>
           </th>
 
-          <th  v-if="this.$store.state.userRole == 'DGAA'">
+          <th  v-if="isDGAA">
             <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
               Is Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
 
-          <th  v-if="this.$store.state.userRole == 'DGAA'">
+          <th  v-if="isDGAA">
             <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
               Toggle Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
@@ -68,7 +68,7 @@
         </tr>
 
 
-        <tr v-for="user in filteredUsers.slice(userSearchIndexMin, userSearchIndexMax)"
+        <tr v-for="user in users.slice(userSearchIndexMin, userSearchIndexMax)"
             v-bind:href="user.id"
             :key="user.id">
           <td><a v-bind:href="'/Users?id='+ user.id">{{ user.id }}</a></td>
@@ -77,9 +77,9 @@
           <td> {{ user.lastName }} </td>
           <td> {{ user.homeAddress }} </td>
           <td>{{ user.email }}</td>
-          <td v-if="this.$store.state.userRole == 'DGAA'" >{{ user.isAdmin }}</td>
-          <td v-if="this.$store.state.userRole == 'DGAA'">
-            <input type="checkbox"  v-model="user.isAdmin" @click="toggleAdmin(user)">
+          <td v-if="isDGAA" >{{ user.role }}</td>
+          <td v-if="isDGAA">
+            <input type="checkbox" @click="toggleAdmin(user)">
           </td>
         </tr>
 
@@ -116,7 +116,8 @@ const Search = {
       enableTable: false,
       resultTrack: "",
       userSearchIndexMin: 0,
-      userSearchIndexMax: 10
+      userSearchIndexMax: 10,
+      isDGAA: false
     };
   },
 
@@ -130,6 +131,14 @@ const Search = {
    * remove when test back end works well...
  */
   mounted() {
+    console.log(this.$store.state.userRole)
+    console.log(this.$store.state.userId)
+    console.log(this.$store.state.viewingUserId)
+
+    if (this.$store.state.userRole == 'DGAA') {
+      this.isDGAA = true;
+    }
+    this.isDGAA = true;
   },
 
 
@@ -168,14 +177,15 @@ const Search = {
      */
 
     toggleAdmin: function (currentUser) {
-      if (currentUser.isAdmin == false) {
+      if (currentUser.role == 'USER') {
         //currentUser.id = true;
-        api.makeUserAdmin(currentUser.id, true, "");
+        api.makeUserAdmin(currentUser.id);
+        currentUser.role = 'GAA'
         //console.log("admin true"+currentUser.id+currentUser.firstName)
-      } else {
-        api.revokeUserAdmin(currentUser.id, false, "");
+      } else if (currentUser.role == 'GAA') {
+        api.revokeUserAdmin(currentUser.id);
+        currentUser.role = 'USER'
       }
-      this.isDGAA = true;
     },
 
     /**

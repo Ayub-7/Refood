@@ -64,8 +64,8 @@ export default {
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: async(firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
-  instance.post('users', {firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate}),
+    createUser: async(firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, registerDate) =>
+  instance.post('users', {firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, registerDate}),
 
     /**
      * Get a specific user via their unique ID number
@@ -95,15 +95,14 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: (query) => instance.post(`/users/search`, {query}),
-
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
      * @param id user id to be made admin.
      */
     makeUserAdmin: async(id) =>
-        instance.post('/users/'+id+'/makeAdmin'),
+        instance.put('/users/'+id+'/makeAdmin',{},{withCredentials: true}),
 
 
     /**
@@ -111,5 +110,5 @@ export default {
      * @param id user id to revoke admin user role.
      */
     revokeUserAdmin: async(id) =>
-    instance.post('/users/'+id+'/revokeAdmin'),
+    instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
 }
