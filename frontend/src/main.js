@@ -59,18 +59,20 @@ Vue.use(VueLogger, options);
 Vue.use(VueRouter);
 
 const routes = [
-  {path: '/Login', component: Login},
+  {path: '/login', component: Login},
   {path: '/', component: Register},
-  {path: '/Users', component: Users},
-  {path: '/Search', component: Search},
+  {path: '/users/:id', component: Users},
+  {path: '/search', component: Search},
   {
-    path: '/business/:id',
+    path: '/businesses/:id',
+    name: 'Business',
     component: Business,
     children: [
-        {
-          path: 'administrators',
-          component: BusinessAdministrators
-        }
+          {
+            path: 'administrators',
+            name: 'BusinessAdministrators',
+            component: BusinessAdministrators,
+          }
         ]
   },
 

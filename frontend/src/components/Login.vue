@@ -97,10 +97,10 @@ const Login = {
       }
       api.login(this.Email, this.password, token)
       .then((response) => {
-        if (isVerified == true) {
+        if (isVerified === true) {
           this.$log.debug("Login successful!", response.data)
-          window.location.replace("http://localhost:9500/Users?id=" + user_id);
-        } else if (isRegistered == true) {
+          this.$router.push({path: `/users/${user_id}`});
+        } else if (isRegistered === true) {
           this.$alert("Incorrect username or password!");
           this.$log.debug("Login unsuccessful!", response.data);
         } else {

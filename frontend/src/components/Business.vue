@@ -7,7 +7,7 @@
 
       <div id="info-container">
         <div id="business-type">{{ business.businessType }}</div>
-        <div id="created-date">Created {{ business.created }}</div>
+        <div id="created-date">Created {{ business.created.split(' ')[0] }}</div>
         <div id="address">
           <div id="street-address">{{ business.address }}</div> <!-- Change this soon when address is changed. -->
           <div id="city">Placeholder City</div>
@@ -22,8 +22,8 @@
     <main>
       <!-- Sub Navigation Bar -->
       <nav id="business-navbar">
-        <router-link class="business-nav-item" to="/business">Products</router-link>
-        <router-link class="business-nav-item" to="/business/administrators">Administrators</router-link>
+        <router-link class="business-nav-item" :to="{name: `Business`, params:{id: business.id}}">Products</router-link>
+        <router-link class="business-nav-item" :to="{name: `BusinessAdministrators`}">Administrators</router-link>
       </nav>
 
       <div id="content">
@@ -31,6 +31,11 @@
       </div>
 
     </main>
+  </div>
+  <!-- 406 Error: Business with given Id does not exist. -->
+  <div id="error" v-else>
+    <div id="error-header"> Error 406 </div>
+    <div id="error-description" style="font-size: 16px"> This business could not be found :( </div>
   </div>
 
 </template>
@@ -45,22 +50,24 @@ const Business = {
   // App's initial state.
   data: function() {
     return {
-      business: null
+      business: null,
+      adminList: null
     };
   },
 
   // Executes before component creation.
-  mounted() {
-    api.getBusinessFromId(this.$route.params.id)
+    mounted() {
+      api.getBusinessFromId(this.$route.params.id)
       .then((res) => {
         this.business = res.data;
+        this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
         console.log(this.business);
       })
   }
 
 }
 
-export default Business
+export default Business;
 </script>
 
 
@@ -68,15 +75,38 @@ export default Business
 
 #container {
   display: grid;
-  grid-template-columns: 25% 1fr;
+  grid-template-columns: 1fr 3fr;
   grid-template-rows: auto auto;
+  grid-column-gap: 1em;
+}
+
+/* For when the screen gets too narrow - mainly for mobile view */
+@media screen and (max-width: 700px) {
+  #container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  #business-container {
+    grid-row: 1;
+  }
+
+  main {
+    grid-row: 2;
+  }
+
+  #business-navbar {
+    align-content: center;
+  }
+
 }
 
 /* Business Info Panel on left side */
 #business-container {
-  margin: 1em auto;
+  margin: 1em 0 1em 0;
   border-radius: 1.5em;
-  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F3EBF6;
 }
 
@@ -104,10 +134,6 @@ export default Business
 
 }
 
-#business-type #created-date #address {
-
-}
-
 #business-type {
   grid-column: 1;
   grid-row: 1;
@@ -129,6 +155,7 @@ export default Business
 
 }
 
+/* Right Hand Content Side. */
 #business-navbar {
   grid-column: 2;
   grid-row: 1;
@@ -144,28 +171,49 @@ export default Business
 
 }
 
-/* Right Hand Content Side. */
 
 .business-nav-item {
   text-align: center;
-  width: 76%;
   color: rgb(38, 50, 56);
+
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1px;
+  text-decoration: none;
 
-  background-color: #dbe0dd;
   padding: 10px 20px;
-  border-radius: 20px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin: auto 20px 27px 5px;
+  margin: 10px;
+
+  background: #dbe0dd linear-gradient(to right, #a2ccb6 0%, #fceeb5 50%, #ee786e 100%);
+  background-size: 500%;
+  border: none;
+  border-radius: 5rem;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+
 }
 
 main {
-  margin: 1em 0 1em 1em;
+  margin: 1em 0 1em 0;
   border-radius: 1.5em;
-  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F3EBF6;
 }
+
+
+/* Error 406 Styling */
+#error {
+  text-align: center;
+  padding: 0 1em 1em 1em;
+
+  margin: 1em 0 1em 0;
+  border-radius: 1.5em;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  background-color: #F3EBF6;
+}
+#error-header {
+  font-size: 48px;
+  padding: 0.75em 1em 1em 1em;
+}
+
 
 </style>

@@ -7,10 +7,10 @@
             <router-link class="title" to="/">Register</router-link>
           </th>
           <th>
-            <router-link class="title" to="/Login">Login</router-link>
+            <router-link class="title" to="/login">Login</router-link>
           </th>
           <th>
-            <router-link class="title" to="/Search">Search</router-link>
+            <router-link class="title" to="/search">Search</router-link>
           </th>
         </tr>
       </table>
