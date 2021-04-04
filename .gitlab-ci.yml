@@ -36,8 +36,6 @@ junit:
 #     - cd backend
 #     - ./gradlew cucumber
 
-Run Jest (Javascript) tests
-Uncomment after Jest workshop (at the latest)
 jest:
   stage: test
   cache:
