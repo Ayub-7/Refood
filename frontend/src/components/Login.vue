@@ -28,11 +28,11 @@
 
 <script>
 import api from "../Api";
-import Vue from "vue"
-import VueSimpleAlert from "vue-simple-alert";
+//import Vue from "vue"
+//import VueSimpleAlert from "vue-simple-alert";
 //let passwordHash = require('password-hash');
 
-Vue.use(VueSimpleAlert);
+
 //const data = require('../testUser.json');
 //const users = data.users;
 const Login = {
@@ -54,7 +54,7 @@ const Login = {
      * @param e
      * @returns {boolean} True if it matches what is stored in the backend; otherwise, false.
      */
-    checkForm: function(e) {
+    checkForm: function() {
       this.errors = [];
 
       if (!this.email) {
@@ -73,25 +73,26 @@ const Login = {
       if (this.email && this.password) {
         return true;
       }
-      e.preventDefault();
     },
 
     /**
      * Sends the login request to the backend by calling the login function from the API.
      */
     loginSubmit: function() {
-      api.login(this.email, this.password)
-      .then((response) => {
-        this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
-        this.$store.commit('setUserRole', response.data.role);
-        //LOAD USER PAGE, USING ROUTER
-        this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
-      }).catch(err => {
-        if(err.response) { //Catch bad request
-          this.$alert("Incorrect username or password!");
-          this.email = this.password = null;
-        }
-      })
+      if(this.errors.length == 0){
+        api.login(this.email, this.password)
+        .then((response) => {
+          this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
+          this.$store.commit('setUserRole', response.data.role);
+          //LOAD USER PAGE, USING ROUTER
+          this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
+        }).catch(err => {
+          if(err.response) { //Catch bad request
+            this.email = this.password = null;
+            this.errors.push('Incorrect email or password')
+          }
+        })
+      }
     }
   },
 
