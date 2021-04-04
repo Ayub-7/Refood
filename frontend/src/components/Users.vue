@@ -62,6 +62,14 @@
               <label>Phone Number</label>
               <p type="text" class="form-control" placeholder="Phone Number" name="phonenumber"> {{ user.phoneNumber }}</p>
             </div>
+            <div class="form-group col-md-6">
+            <label>Businesses</label>
+              <ul>
+                <li v-for="business in businesses" :key="business" @click="goToBusinessPage(business)" style="cursor: pointer; color: #8C55AA;">
+                  {{business.name}}
+                </li>
+              </ul>
+            </div>
           </div>
           </div>
 
@@ -76,15 +84,7 @@
 
 <script>
 var moment = require('moment');
-/*
-Vue.component('todo-item2', {
-  // The todo-item component now accepts a
-  // "prop", which is like a custom attribute.
-  // This prop is called todo.
-  props: ['todo'],
-  template: '<li>{{ todo.text }}</li>'
-})
-*/
+
 
 import api from "@/Api";
 
@@ -92,7 +92,8 @@ const Users = {
   name: "Profile",
   data: function () {
     return {
-      user: null
+      user: null,
+      businesses: []
     };
   },
   methods: {
@@ -105,8 +106,14 @@ const Users = {
       let timeString = duration._data.years / -1 + " years and " + duration._data.months / -1 + " months";
 
       return timeString;
+    },
+
+    
+    goToBusinessPage: function(business) {
+      this.$router.push({path: `/businesses/${business.id}`})
     }
   },
+
 
   mounted: function () {
     let userId = this.$route.params.id
@@ -118,6 +125,45 @@ const Users = {
       console.log(response.data);
       this.user = response.data;
     })
+
+    //THIS CODE NEEDS TO BE UNCOMMENTED WHEN BUSINESS API CALLS IS SETUP
+    // for(let business of this.user.businessesAdministered) {
+    //   api.getBusinessFromId(business)
+    //   .then((response) => {
+    //     this.businesses.push(response);
+    //   })
+    // }
+
+    //Sample business to display
+    this.businesses = [
+        {
+        "id": 1,
+        "administrators": [
+            {
+                "id": 9,
+                "firstName": "Joete",
+                "middleName": "YEP",
+                "lastName": "Stopps",
+                "nickname": "Multi-layered",
+                "bio": "responsive capacity",
+                "email": "jstopps7@flickr.com",
+                "dateOfBirth": "1984-10-14",
+                "phoneNumber": "+36 694 564 9090",
+                "homeAddress": "34 Mendota Avenue",
+                "created": "2021-04-04 02:42:54",
+                "role": "USER",
+                "businessesAdministered": [
+                    1
+                ]
+            }
+        ],
+        "name": "Business1",
+        "description": "Test Business 1",
+        "address": "123 Test Street",
+        "businessType": "Accommodation and Food Services",
+        "created": "2021-04-04 02:42:55"
+      }
+    ]
   },
 
 }
