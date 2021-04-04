@@ -51,12 +51,17 @@ export default BusinessAdministrators;
 .card {
   max-width: 40%;
 
-  background-color: #F5F5F5;
+  background-color: transparent;
   padding: 10px 20px;
   border-radius: 20px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: auto 20px 27px 5px;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+
+}
+
+.card:hover {
+  box-shadow: 0 0.5em 1em rgba(0,1,1,.25);
 }
 
 .admin-name {

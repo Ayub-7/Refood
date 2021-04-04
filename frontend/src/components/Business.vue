@@ -42,7 +42,7 @@
 
 
 <script>
-import api from "@/Api";
+import api from "../Api";
 
 const Business = {
   name: "Business",
@@ -107,7 +107,7 @@ export default Business;
   margin: 1em 0 1em 0;
   border-radius: 1.5em;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F3EBF6;
+  background-color: #F5F5F5;
 }
 
 #business-name {
@@ -156,6 +156,13 @@ export default Business;
 }
 
 /* Right Hand Content Side. */
+main {
+  margin: 1em 0 1em 0;
+  border-radius: 1.5em;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  background-color: #F5F5F5;
+}
+
 #business-navbar {
   grid-column: 2;
   grid-row: 1;
@@ -171,11 +178,9 @@ export default Business;
 
 }
 
-
 .business-nav-item {
   text-align: center;
-  color: rgb(38, 50, 56);
-
+  color: black;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1px;
@@ -184,19 +189,15 @@ export default Business;
   padding: 10px 20px;
   margin: 10px;
 
-  background: #dbe0dd linear-gradient(to right, #a2ccb6 0%, #fceeb5 50%, #ee786e 100%);
+  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
   background-size: 500%;
   border: none;
   border-radius: 5rem;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-
 }
 
-main {
-  margin: 1em 0 1em 0;
-  border-radius: 1.5em;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F3EBF6;
+.business-nav-item:hover {
+  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
 }
 
 
