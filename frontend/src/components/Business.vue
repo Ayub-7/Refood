@@ -55,14 +55,23 @@ const Business = {
     };
   },
 
-  // Executes before component creation.
-    mounted() {
+  methods: {
+    getBusiness: function() {
       api.getBusinessFromId(this.$route.params.id)
-      .then((res) => {
-        this.business = res.data;
-        this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
-        console.log(this.business);
-      })
+        .then((res) => {
+          this.business = res.data;
+          this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
+          console.log(this.business);
+        })
+        .catch((error) => {
+          throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+        })
+    }
+  },
+
+  mounted() {
+    // Retrieve business info.
+    this.getBusiness();
   }
 
 }
