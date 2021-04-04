@@ -35,6 +35,7 @@ import Vuex from 'vuex';
 import App from './App.vue';
 
 import Login from "@/components/Login";
+import BusinessRegister from "@/components/BusinessRegister";
 import Register from "./components/Register";
 import Users from "@/components/Users.vue";
 import Search from "@/components/Search.vue";
@@ -86,6 +87,7 @@ const store = new Vuex.Store({
 
 
 const routes = [
+  {path: '/businesslike', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
