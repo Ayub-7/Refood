@@ -32,6 +32,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Vuex from 'vuex';
+import createPersistedState from "vuex-persistedstate";
 import App from './App.vue';
 
 import Login from "@/components/Login";
@@ -64,6 +65,11 @@ Vue.use(Vuex);
 
 //Store data used to maintain state in program
 const store = new Vuex.Store({
+
+  plugins: [createPersistedState({
+    storage: window.sessionStorage,
+  })],
+
   state: {
     userId: null,
     viewingUserId: null,
