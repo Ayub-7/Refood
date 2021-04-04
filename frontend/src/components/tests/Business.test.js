@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import Business from '../Business';
-//import {getBusinessFromId} from '../../Api';
-//jest.mock('../../Api');
+import {getBusiness} from '../../Api';
 
 let wrapper;
 
@@ -57,6 +56,8 @@ afterEach(() => {
 });
 
 describe('Business tests', () => {
+    const getBusinessMethod = jest.spyOn(Business.methods, 'getBusiness');
+    getBusinessMethod.mockResolvedValue(mockBusiness);
 
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
