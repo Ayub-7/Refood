@@ -114,6 +114,7 @@ const Users = {
     }
   },
 
+<<<<<<< HEAD
 
   mounted: function () {
     let userId = this.$route.params.id
@@ -121,9 +122,17 @@ const Users = {
     //   userId = this.$store.state.viewingUserId
     // }
     api.getUserFromID(userId)
+=======
+  mounted() {
+    api.getUserFromID(this.$route.params.id)
+>>>>>>> U5-Business-Accounts
     .then((response) => {
       console.log(response.data);
       this.user = response.data;
+<<<<<<< HEAD
+=======
+      console.log(this.user);
+>>>>>>> U5-Business-Accounts
     })
 
     //THIS CODE NEEDS TO BE UNCOMMENTED WHEN BUSINESS API CALLS IS SETUP

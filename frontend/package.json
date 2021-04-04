@@ -61,13 +61,34 @@
     "> 1%",
     "last 2 versions"
   ],
+
   "jest": {
-    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "vue"
+    ],
+    "transform": {
+      ".*\\.(vue)$": "vue-jest",
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+    },
+    "testURL": "http://localhost/",
+    "testEnvironment": "jsdom",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/components/*.{js,vue}",
+      "!**/node_modules/**"
+    ],
+    "coverageReporters": [
+      "html",
+      "text-summary"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ],
     "testResultsProcessor": "jest-sonar-reporter"
   },
+
   "jestSonar": {
     "reportPath": "coverage",
     "reportFile": "test-reporter.xml",

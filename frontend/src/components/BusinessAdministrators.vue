@@ -1,23 +1,44 @@
 <template>
   <ul id="administrators-list">
-    <admin-card/>
-    <admin-card/>
-    <admin-card/>
+    <admin-card v-for="user in admins" :key="user.id" v-bind:user="user"/>
   </ul>
 </template>
 
 <script>
 import Vue from "vue";
 
+// Administrator's Card
 Vue.component('admin-card', {
   template: `<li class="card">
-                <div class="admin-name">Elon Musk</div>
-              </li>`
+                <button class="admin-name" @click="navigateToUser(user.id)">{{user.firstName}} {{user.middleName}} {{user.lastName}}</button>
+              </li>`,
+
+  props: ['user'],
+
+  methods: {
+    navigateToUser: function(id) {
+      this.$router.push({path: `/users/${id}`})
+    }
+
+  }
 });
 
-export default {
-  name: "BusinessAdministrators"
+const BusinessAdministrators = {
+  name: "BusinessAdministrators",
+
+  data: function() {
+    return {
+      admins: null
+    }
+  },
+
+  mounted() {
+    this.admins = this.$parent.adminList;
+  },
+
 }
+
+export default BusinessAdministrators;
 </script>
 
 <style scoped>
@@ -30,11 +51,21 @@ export default {
 .card {
   max-width: 40%;
 
-  background-color: #e7e7e7;
+  background-color: transparent;
   padding: 10px 20px;
   border-radius: 20px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: auto 20px 27px 5px;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+
+}
+
+.card:hover {
+  box-shadow: 0 0.5em 1em rgba(0,1,1,.25);
+}
+
+.admin-name {
+  align-content: start;
 }
 
 </style>

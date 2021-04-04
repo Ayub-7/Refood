@@ -11,6 +11,7 @@
           </th>
           <th>
             <router-link class="title" to="/search">Search</router-link>
+<<<<<<< HEAD
           </th>
           <th>
             <router-link :to="{name: 'UserPage', params: {id: this.$store.state.userId}}" v-if="this.$store.state.userId != null" class="title">Profile</router-link>
@@ -20,6 +21,8 @@
             <span @click="$store.commit('setUserId', null); $store.commit('setUserRole', null)" class="title">Logout</span>
             </router-link>
 
+=======
+>>>>>>> U5-Business-Accounts
           </th>
         </tr>
       </table>

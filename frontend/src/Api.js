@@ -97,4 +97,14 @@ export default {
      */
     searchQuery: () => instance.get(`users`),
 
+
+    // ------ BUSINESSES
+
+    /**
+     * Retrieve a single business with their unique id.
+     * @param businessId the unique id of the business.
+     * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
+     */
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`)
+
 }
