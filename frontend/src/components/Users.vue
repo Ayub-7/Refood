@@ -109,11 +109,10 @@ const Users = {
   },
 
   mounted: function () {
-    console.log('yoo')
-    let userId = this.$store.state.userId
-    if(this.$store.state.viewingUserId != null) {
-      userId = this.$store.state.viewingUserId
-    }
+    let userId = this.$route.params.id
+    // if(this.$store.state.viewingUserId != null) {
+    //   userId = this.$store.state.viewingUserId
+    // }
     api.getUserFromID(userId)
     .then((response) => {
       console.log(response.data);
