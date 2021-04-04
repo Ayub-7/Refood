@@ -92,15 +92,9 @@ const store = new Vuex.Store({
 
 
 const routes = [
-<<<<<<< HEAD
-  {name: 'LoginPage', path: '/login', component: Login},
-  {path: '/', component: Register},
-  {name: 'UserPage', path: '/users/:id', component: Users},
-=======
   {path: '/login', component: Login},
   {path: '/', component: Register},
   {path: '/users/:id', component: Users},
->>>>>>> U5-Business-Accounts
   {path: '/search', component: Search},
   {
     path: '/businesses/:id',

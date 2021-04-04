@@ -108,71 +108,33 @@ const Users = {
       return timeString;
     },
 
-    
+    /**
+     * Sends user to business page after clicking on business link
+     * @param business business who's page will be loaded
+     */    
     goToBusinessPage: function(business) {
       this.$router.push({path: `/businesses/${business.id}`})
     }
   },
 
-<<<<<<< HEAD
 
   mounted: function () {
     let userId = this.$route.params.id
-    // if(this.$store.state.viewingUserId != null) {
-    //   userId = this.$store.state.viewingUserId
-    // }
+
+    //Search user 
     api.getUserFromID(userId)
-=======
-  mounted() {
-    api.getUserFromID(this.$route.params.id)
->>>>>>> U5-Business-Accounts
     .then((response) => {
       console.log(response.data);
       this.user = response.data;
-<<<<<<< HEAD
-=======
-      console.log(this.user);
->>>>>>> U5-Business-Accounts
-    })
 
-    //THIS CODE NEEDS TO BE UNCOMMENTED WHEN BUSINESS API CALLS IS SETUP
-    // for(let business of this.user.businessesAdministered) {
-    //   api.getBusinessFromId(business)
-    //   .then((response) => {
-    //     this.businesses.push(response);
-    //   })
-    // }
-
-    //Sample business to display
-    this.businesses = [
-        {
-        "id": 1,
-        "administrators": [
-            {
-                "id": 9,
-                "firstName": "Joete",
-                "middleName": "YEP",
-                "lastName": "Stopps",
-                "nickname": "Multi-layered",
-                "bio": "responsive capacity",
-                "email": "jstopps7@flickr.com",
-                "dateOfBirth": "1984-10-14",
-                "phoneNumber": "+36 694 564 9090",
-                "homeAddress": "34 Mendota Avenue",
-                "created": "2021-04-04 02:42:54",
-                "role": "USER",
-                "businessesAdministered": [
-                    1
-                ]
-            }
-        ],
-        "name": "Business1",
-        "description": "Test Business 1",
-        "address": "123 Test Street",
-        "businessType": "Accommodation and Food Services",
-        "created": "2021-04-04 02:42:55"
+      //In response, get all user businesses using API
+      for(let business of this.user.businessesAdministered) {
+        api.getBusinessFromId(business)
+        .then((response) => {
+          this.businesses.push(response.data); //gets pushed to list of all user businesses
+        })
       }
-    ]
+    })
   },
 
 }

@@ -94,26 +94,6 @@ const Login = {
           }
         })
       }
-<<<<<<< HEAD
-=======
-      if(isVerified == true){
-        token = Buffer.from(`${this.username}:${this.password}`, 'utf8').toString('base64')
-      }
-      api.login(this.Email, this.password, token)
-      .then((response) => {
-        if (isVerified === true) {
-          this.$log.debug("Login successful!", response.data)
-          this.$router.push({path: `/users/${user_id}`});
-        } else if (isRegistered === true) {
-          this.$alert("Incorrect username or password!");
-          this.$log.debug("Login unsuccessful!", response.data);
-        } else {
-            this.$alert("You aren't registered You must register.");
-          }
-        }).catch((error) => {
-        this.$log.debug("Login unsuccessful!", error)
-      });
->>>>>>> U5-Business-Accounts
     }
   },
 
