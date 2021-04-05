@@ -2,7 +2,10 @@
   <!-- -->
   <div id="body" v-if="this.$store.state.userId != null">
   <div class="main">
-      <h1 id="pagetitle"> Home </h1>
+      <span id="welcomeHeader">
+       <h1 id="pageTitle"> Welcome, {{this.userFirstName}}! </h1>
+       <h1 id="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Go to profile</h1>
+      </span>
       <!-- Example Content class -->
       <div class="content">
           <!-- Example post or story on home page -->
@@ -14,14 +17,32 @@
 </template>
 
 <script>
-//import api from "../Api";
+import api from "../Api";
 const Homepage = {
-  name: "Homepage",
-  data: function () {
-    return {}
-  },
+    name: "Homepage",
+    data: function () {
+        return {
+            userFirstName: null
+        }
+    },
 
-  methods: {}
+    methods: {
+        getUserDetails: function(userId) {
+            api.getUserFromID(userId)
+                .then((response) => {
+                    this.userFirstName = `${response.data.firstName}`
+                })
+        },
+
+        goToProfilePage: function() {
+            this.$router.push({path: `/users/${this.$store.state.userId}`});
+        }
+    },
+
+    mounted: function () {
+        let userId = this.$store.state.userId
+        this.getUserDetails(userId);
+    },
   
 }
 export default Homepage;
@@ -33,15 +54,27 @@ export default Homepage;
   font-family: 'Ubuntu', sans-serif;
 }
 
-#pagetitle {
+#pageTitle {
   text-align: center;
   background-color: #E1BEE7;
   border-radius: 0.5em;
+  float: left;
+  width: 90%;
+}
+
+#profileLink {
+    background-color: #E1BEE7;
+    text-align: center;
+    font-size: 20px;
+    border-radius: 0.5em;
+    float: right;
+    width: 10%;
+    box-shadow: 0px 0px 2px 2px #323232;
 }
 
 .content {
     text-align: center;
-    padding-top: 3em;
+    padding-top: 5em;
 
 }
 
