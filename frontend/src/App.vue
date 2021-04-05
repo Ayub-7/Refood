@@ -9,7 +9,9 @@
           <th>
             <router-link class="title" to="/login">Login</router-link>
           </th>
-
+          <th>
+            <router-link class="title" to="/businesslike">Register Business</router-link>
+          </th>
           <th>
             <router-link class="title" to="/search">Search</router-link>
           </th>
