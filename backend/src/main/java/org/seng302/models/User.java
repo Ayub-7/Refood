@@ -12,6 +12,7 @@ import org.seng302.utilities.Encrypter;
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
@@ -41,7 +42,7 @@ public class User {
 
     @ManyToMany(mappedBy = "administrators")
     @JsonSerialize(using = BusinessesAdministeredListSerializer.class)
-    private Set<Business> businessesAdministered;
+    private List<Business> businessesAdministered;
 
 
     protected User() {}

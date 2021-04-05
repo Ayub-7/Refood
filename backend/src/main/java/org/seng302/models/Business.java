@@ -7,9 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
@@ -17,12 +15,18 @@ import java.util.Set;
 public class Business {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
+
     @ManyToMany
     @JoinTable(name = "BUSINESS_ADMINS",
                     joinColumns = @JoinColumn(name="BUSINESS_ID"),
                     inverseJoinColumns = @JoinColumn(name="USER_ID"))
-    private Set<User> administrators = new HashSet<>();
+    private List<User> administrators = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name="USER_ID")
+    private User primaryAdministrator;
+
     private String name;
     private String description;
     private String address;
@@ -54,6 +58,7 @@ public class Business {
      */
     public void createBusiness(User owner) {
         this.administrators.add(owner);
+        this.primaryAdministrator = owner;
         this.created = new Date();
     }
 }

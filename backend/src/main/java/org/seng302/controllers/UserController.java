@@ -104,13 +104,15 @@ public class UserController {
      * Prints out the current user session/authentication details into console.
      */
     @GetMapping("/checksession")
-    public void checksession(HttpServletRequest req, HttpSession session) {
+    public ResponseEntity<String> checksession(HttpServletRequest req, HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("--------------------------------------------------");
-        System.out.println("PRINCIPAL: " + auth.getPrincipal());
-        System.out.println("CREDS: " + auth.getCredentials());
-        System.out.println("DETAILS: " + auth.getDetails());
-        System.out.println("AUTH: " + auth.getAuthorities());
+        String info = "--------------------------------------------------" +
+                "\nPRINCIPAL: " + auth.getPrincipal() +
+                "\nCREDS: " + auth.getCredentials() +
+                "\nDETAILS: " + auth.getDetails() +
+                "\nAUTH: " + auth.getAuthorities();
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_PLAIN).body(info);
 
     }
 
