@@ -82,8 +82,9 @@
 import api from "../Api";
 import axios from "axios"
 var passwordHash = require('password-hash');
-const data = require('../testUser.json');
-const users = data.users;
+// const data = require('../testUser.json');
+// const users = data.users;
+// Need to somehow access the users database to check params.
 
 const Register = {
   name: "Register",
@@ -231,7 +232,11 @@ const Register = {
         api.createUser(this.firstname, this.lastname, this.middlename, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, this.homeaddress, hashedPassword, today.toLocaleDateString())
       .then((response) => {
         this.$log.debug("New item created:", response.data);
-        window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
+        // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
+        this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
+        this.$store.commit('setUserRole', response.data.role);
+        //LOAD USER PAGE, USING ROUTER
+        this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
       }).catch((error) => {
         this.$log.debug("Error Status:", error)
       });
