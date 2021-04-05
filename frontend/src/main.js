@@ -42,6 +42,7 @@ import Users from "@/components/Users.vue";
 import Search from "@/components/Search.vue";
 import Business from "@/components/Business.vue";
 import BusinessAdministrators from "@/components/BusinessAdministrators";
+import Homepage from "@/components/Homepage"
 
 Vue.config.productionTip = false
 
@@ -93,6 +94,7 @@ const store = new Vuex.Store({
 
 
 const routes = [
+  {path: '/home', component: Homepage},
   {path: '/businesslike', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
