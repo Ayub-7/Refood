@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import Business from '../Business';
-import {getBusiness} from '../../Api';
 
 let wrapper;
 

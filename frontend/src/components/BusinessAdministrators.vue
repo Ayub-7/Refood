@@ -55,7 +55,7 @@ export default BusinessAdministrators;
   padding: 10px 20px;
   border-radius: 20px;
   border: 2px solid rgba(0, 0, 0, 0.02);
-  margin: auto 20px 27px 5px;
+  margin: 1em 0 1em 0;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 
 }
@@ -65,7 +65,8 @@ export default BusinessAdministrators;
 }
 
 .admin-name {
-  align-content: start;
+  align-content: center;
 }
+
 
 </style>

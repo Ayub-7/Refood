@@ -34,6 +34,7 @@ import VueRouter from 'vue-router';
 import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import App from './App.vue';
+import VueLogger from 'vuejs-logger';
 
 import Login from "@/components/Login";
 import Register from "./components/Register";
@@ -45,8 +46,6 @@ import BusinessAdministrators from "@/components/BusinessAdministrators";
 Vue.config.productionTip = false
 
 
-
-import VueLogger from 'vuejs-logger';
 
 const options = {
   isEnabled: true,

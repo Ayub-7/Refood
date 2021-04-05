@@ -84,7 +84,7 @@ export default Business;
 
 #container {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr 1fr 3fr 1fr;
   grid-template-rows: auto auto;
   grid-column-gap: 1em;
 }
@@ -113,6 +113,9 @@ export default Business;
 
 /* Business Info Panel on left side */
 #business-container {
+  grid-column: 2;
+  grid-row: 1;
+
   margin: 1em 0 1em 0;
   border-radius: 1.5em;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
@@ -166,6 +169,9 @@ export default Business;
 
 /* Right Hand Content Side. */
 main {
+  grid-column: 3;
+  grid-row: 1;
+
   margin: 1em 0 1em 0;
   border-radius: 1.5em;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);

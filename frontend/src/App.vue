@@ -26,7 +26,10 @@
       <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
     </div>
 
-    <router-view></router-view>
+    <div id="view">
+      <router-view></router-view>
+    </div>
+
     <footer class="info">
       <h4>REFOOD 2021</h4>
     </footer>
@@ -63,6 +66,10 @@ export default app;
 
 <style scoped>
 
+#view {
+
+}
+
 .dgaa {
   color: rgb(38, 50, 56);
   background: #dbe0dd;
@@ -77,12 +84,13 @@ export default app;
 }
 
 .topbar {
-  padding-bottom: 25px;
+  padding-bottom: 20px;
   display: flex;
   flex-direction: row;
   padding-top: 20px;
+  max-width: 65%;
+  margin: 0 auto 0 auto;
   background: linear-gradient(to right, #9C27B0, #E040FB);
-  border: 2px solid rgba(0, 0, 0, 0.02);
 }
 
 .title {
@@ -93,12 +101,10 @@ export default app;
   letter-spacing: 1px;
   background: #dbe0dd;
   padding: 10px 20px;
-  border: none;
   border-radius: 20px;
   outline: none;
   box-sizing: border-box;
   border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
   margin-left: 5px;
   margin-right: 20px;
   text-align: center;

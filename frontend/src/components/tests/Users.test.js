@@ -69,6 +69,8 @@ beforeEach(() => {
         methods: {},
     });
     wrapper.setData({user: mockUser})
+    const getUserMethod = jest.spyOn(Users.methods, 'getUserInfo');
+    getUserMethod.mockResolvedValue(mockUser);
     //wrapper.setData({businesses: mockBusinesses})
 });
 
