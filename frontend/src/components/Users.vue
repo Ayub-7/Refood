@@ -3,7 +3,7 @@
     <h3 class="title text-center">Profiles</h3>
     <div
          v-bind:user="user"
-         :key="user.id">
+         :key="user.id" v-if ="user != null">
       <form class="profile">
         <div class="profile-text-inner">
 
@@ -14,7 +14,7 @@
             </div>
             <div class="form-group col-md-6">
               <label>Member Since</label>
-              <p type="text" class="form-control" placeholder="Full Name" name="memberTime"> {{ calculateDuration(user.registerDate)}}</p>
+              <p type="text" class="form-control" placeholder="Full Name" name="memberTime"> {{ calculateDuration(user.created)}}</p>
             </div>
           </div>
 
@@ -62,10 +62,10 @@
               <label>Phone Number</label>
               <p type="text" class="form-control" placeholder="Phone Number" name="phonenumber"> {{ user.phoneNumber }}</p>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-6" v-if="businesses.length > 0" id='businessNames'>
             <label>Businesses</label>
               <ul>
-                <li v-for="business in businesses" :key="business" @click="goToBusinessPage(business)" style="cursor: pointer; color: #8C55AA;">
+                <li id ="business" v-for="(business, index) in businesses" :key="index" @click="goToBusinessPage(business)" style="cursor: pointer; color: #8C55AA;">
                   {{business.name}}
                 </li>
               </ul>
@@ -86,7 +86,7 @@
 var moment = require('moment');
 
 
-import api from "@/Api";
+import api from "../Api";
 
 const Users = {
   name: "Profile",
@@ -102,7 +102,6 @@ const Users = {
       const today = new Date(TimeElapsed);
       let fromTime = moment(registerDate).diff(today);
       let duration = moment.duration(fromTime);
-      console.log(duration)
       let timeString = duration._data.years / -1 + " years and " + duration._data.months / -1 + " months";
 
       return timeString;
@@ -114,27 +113,44 @@ const Users = {
      */    
     goToBusinessPage: function(business) {
       this.$router.push({path: `/businesses/${business.id}`})
+    },
+
+    /**
+     * Performs a get request to get user info to display on page
+     * @param userId ID of user that is currently being viewed
+     */  
+
+    getUserInfo: function(userId) {
+
+      api.getUserFromID(userId) //Get user data
+      .then((response) => {
+        let user = response.data;
+        let userBusinesses = []
+
+        for(let business of user.businessesAdministered) { //Get business info to display as link
+          api.getBusinessFromId(business)
+          .then((response) => {
+            userBusinesses.push(response.data); //gets pushed to list of all user businesses
+          }).catch((err) => {
+            throw new Error(`Error trying to retrieve business info from id: ${err}`);
+          })
+
+        }
+        //Set properties
+        this.businesses = userBusinesses;
+        this.user = user;
+        }).catch((err) => {
+          throw new Error(`Error trying to get user info from id: ${err}`);
+      })
     }
+
   },
 
 
   mounted: function () {
+    //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
-
-    //Search user 
-    api.getUserFromID(userId)
-    .then((response) => {
-      console.log(response.data);
-      this.user = response.data;
-
-      //In response, get all user businesses using API
-      for(let business of this.user.businessesAdministered) {
-        api.getBusinessFromId(business)
-        .then((response) => {
-          this.businesses.push(response.data); //gets pushed to list of all user businesses
-        })
-      }
-    })
+    this.user = this.getUserInfo(userId);
   },
 
 }

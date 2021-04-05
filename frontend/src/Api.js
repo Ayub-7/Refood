@@ -64,7 +64,7 @@ export default {
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: async(firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
+    createUser: (firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
   instance.post('users', {firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate}),
 
     /**
