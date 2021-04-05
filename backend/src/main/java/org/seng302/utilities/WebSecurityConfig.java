@@ -18,7 +18,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * Configuration of web security - sets the rules on what user can go where.
      * @param http security configurer.
-     * @throws Exception
+     * @throws Exception when configuration fails.
      */
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
@@ -29,10 +29,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/checksession").authenticated()
+                .antMatchers("/checksession").permitAll()
                 .antMatchers(HttpMethod.POST, "/login", "/users").permitAll()
                 .antMatchers(HttpMethod.GET, "/users/search*").authenticated()
                 .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin").hasRole("DGAA")
+                .antMatchers(HttpMethod.PUT, "/businesses/{id}/*").authenticated()
                 .anyRequest().permitAll()
 
                 .and()
