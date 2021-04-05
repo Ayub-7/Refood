@@ -1,9 +1,11 @@
 <template>
-  <!-- <h1> Basic Login Form</h1> -->
+  <!-- -->
   <div id="body">
   <div class="main">
       <h1 id="pagetitle"> Home </h1>
+      <!-- Example Content class -->
       <div class="content">
+          <!-- Example post or story on home page -->
           <h2 class="contentHeader">Header</h2>
           <p class="contentBody">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sit amet sem magna. Nullam vestibulum condimentum laoreet. Integer et velit semper, blandit tellus ut, viverra ipsum. Aenean egestas dictum maximus. Curabitur egestas neque ex, eget laoreet ex blandit vel. Nullam ut augue nec odio hendrerit luctus accumsan in erat. Donec viverra congue laoreet. Mauris non eleifend ex. Pellentesque scelerisque sodales augue in sodales. Aenean sed tellus a enim mollis mollis. Nunc lobortis eros sit amet ligula mollis placerat.</p>
       </div>
