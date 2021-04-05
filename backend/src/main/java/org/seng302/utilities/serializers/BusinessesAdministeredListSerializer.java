@@ -1,4 +1,4 @@
-package org.seng302.utilities;
+package org.seng302.utilities.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
