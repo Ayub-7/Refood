@@ -1,19 +1,15 @@
 package org.seng302.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.seng302.models.requests.NewUserRequest;
-import org.seng302.utilities.BusinessesAdministeredListSerializer;
 import org.seng302.utilities.Encrypter;
 
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
@@ -21,7 +17,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     
     private String firstName;
     private String middleName;
@@ -41,7 +37,6 @@ public class User {
     private Role role;
 
     @ManyToMany(mappedBy = "administrators")
-    @JsonSerialize(using = BusinessesAdministeredListSerializer.class)
     private List<Business> businessesAdministered;
 
 
@@ -96,8 +91,8 @@ public class User {
 
     /**
      * Alternative constructor with just the barebones fields required. Used to create a DGAA.
-     * @param email
-     * @param password
+     * @param email unique identifier to login with.
+     * @param password to login with - to be hashed.
      * @param role designated website role of user.
      */
     public User(String email, String password, Role role) throws NoSuchAlgorithmException {

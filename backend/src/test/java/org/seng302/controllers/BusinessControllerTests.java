@@ -87,7 +87,7 @@ public class BusinessControllerTests {
         UserIdRequest userIdReq = new UserIdRequest(user.getId());
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        Mockito.when(userRepository.getOne(user.getId())).thenReturn(user);
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
 
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
                 .contentType("application/json").sessionAttr("user", ownerUser)
@@ -95,7 +95,7 @@ public class BusinessControllerTests {
                 .andExpect(status().isOk());
 
         // Attempt to make owner admin.
-        Mockito.when(userRepository.getOne(ownerUser.getId())).thenReturn(ownerUser);
+        Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(ownerUser);
         UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
                 .contentType("application/json")
@@ -134,7 +134,7 @@ public class BusinessControllerTests {
         UserIdRequest adminUserIdReq = new UserIdRequest(adminUser.getId());
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        Mockito.when(userRepository.getOne(adminUserIdReq.getUserId())).thenReturn(adminUser);
+        Mockito.when(userRepository.findUserById(adminUserIdReq.getUserId())).thenReturn(adminUser);
 
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
@@ -143,7 +143,7 @@ public class BusinessControllerTests {
                 .andExpect(status().isOk());
 
         // Attempt to remove primary admin's rights.
-        Mockito.when(userRepository.getOne(ownerUser.getId())).thenReturn(ownerUser);
+        Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(ownerUser);
         UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")

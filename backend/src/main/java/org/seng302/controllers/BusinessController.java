@@ -49,7 +49,6 @@ public class BusinessController {
      * Post request mapping to create a new Business
      * @param req Request body
      * @return ResponseEntity
-     * @throws JsonProcessingException
      */
     @PostMapping("/businesses")
     public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) {
@@ -94,11 +93,11 @@ public class BusinessController {
         }
 
         // 403 if user making request is not primary admin or DGAA.
-        if (!business.getPrimaryAdministrator().getId().equals(owner.getId()) && !owner.getRole().equals(Role.DGAA)) {
+        if (business.getPrimaryAdministrator().getId() != (owner.getId()) && !owner.getRole().equals(Role.DGAA)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        User userToAdmin = userRepository.getOne(userId);
+        User userToAdmin = userRepository.findUserById(userId);
         if (userToAdmin == null || business.getAdministrators().contains(userToAdmin)) { // 400 if user is non-existent or is already admin.
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -119,13 +118,13 @@ public class BusinessController {
         }
 
         // 403 if user making request is not primary admin or DGAA.
-        if (!business.getPrimaryAdministrator().getId().equals(currentUser.getId()) && !currentUser.getRole().equals(Role.DGAA)) {
+        if (business.getPrimaryAdministrator().getId() != (currentUser.getId()) && !currentUser.getRole().equals(Role.DGAA)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        User userToRevoke = userRepository.getOne(userId);
+        User userToRevoke = userRepository.findUserById(userId);
         // 400 if user is non-existent, is not an admin, or is the primary admin.
-        if (userToRevoke == null || !business.getAdministrators().contains(userToRevoke) || business.getPrimaryAdministrator().getId().equals(userToRevoke.getId())) {
+        if (userToRevoke == null || !business.getAdministrators().contains(userToRevoke) || business.getPrimaryAdministrator().getId() == userToRevoke.getId()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
