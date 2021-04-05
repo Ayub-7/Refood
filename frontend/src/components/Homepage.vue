@@ -1,6 +1,6 @@
 <template>
   <!-- -->
-  <div id="body">
+  <div id="body" v-if="this.$store.state.userId != null">
   <div class="main">
       <h1 id="pagetitle"> Home </h1>
       <!-- Example Content class -->
