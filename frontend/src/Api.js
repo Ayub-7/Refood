@@ -52,20 +52,20 @@ export default {
     /**
      * Create a new user by storing their data to the database
      * @param firstName Their firstname
-     * @param lastName Their lastname
      * @param middleName Their middlename (OPTIONAL)
+     * @param lastName Their lastname
      * @param nickname Their nickname (OPTIONAL)
      * @param bio Their bio (OPTIONAL)
      * @param email Their email
      * @param dateOfBirth Their date of birth
      * @param phoneNumber Their phone
      * @param homeAddress Their home address
-     * @param hashedPassword Their password hashed using password-hash library
+     * @param password Their password hashed using password-hash library
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: async(firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
-  instance.post('users', {firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate}),
+    createUser: async(firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword) =>
+  instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword}),
 
     /**
      * Get a specific user via their unique ID number

@@ -126,6 +126,8 @@ public class UserController {
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             if (isValidUser(user)) {
                 User newUser = new User(user);
+                System.out.println(user.getPassword());
+                System.out.println(newUser.getPassword());
                 userRepository.save(newUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
@@ -140,6 +142,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }
+        System.out.println("Bad email");
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
