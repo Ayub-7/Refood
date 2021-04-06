@@ -74,7 +74,6 @@ export default Homepage;
   float: right;
   border-radius: 0.5em;
   box-shadow: 1px 3px 7px #6e666f;
-  transition: box-shadow 0.3s;
 }
 
 
