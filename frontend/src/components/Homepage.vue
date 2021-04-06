@@ -2,10 +2,10 @@
   <!-- -->
   <div id="body" v-if="this.$store.state.userId != null">
   <div class="main">
-      <span id="welcomeHeader">
-       <h1 id="pageTitle"> Welcome, {{this.userFirstName}}! </h1>
-       <h1 id="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Go to profile</h1>
-      </span>
+      <h1 id="welcomeHeader">
+       <span id="pageTitle"> Welcome, {{this.userFirstName}}! </span>
+       <span id="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Profile Page</span>
+      </h1>
       <!-- Example Content class -->
       <div class="content">
           <!-- Example post or story on home page -->
@@ -54,43 +54,47 @@ export default Homepage;
 #body {
   background-color: #F3EBF6;
   font-family: 'Ubuntu', sans-serif;
+
+}
+
+#welcomeHeader {
+  background-color: #E1BEE7;
+  border-radius: 0.5em;
+  padding: 10px;
 }
 
 #pageTitle {
-  text-align: center;
-  background-color: #E1BEE7;
-  border-radius: 0.5em;
-  float: left;
-  width: 90%;
+  margin-left: 25%;
 }
 
 #profileLink {
-    background-color: #E1BEE7;
-    text-align: center;
-    font-size: 20px;
-    border-radius: 0.5em;
-    float: right;
-    width: 10%;
-    box-shadow: 0px 0px 2px 2px #323232;
+  font-size: 80%;
+  padding: 5px;
+  background: #f6cffc;
+  float: right;
+  border-radius: 0.5em;
+  box-shadow: 1px 3px 7px #6e666f;
+  transition: box-shadow 0.3s;
 }
 
+
 .content {
-    text-align: center;
-    padding-top: 5em;
+  text-align: center;
+  padding-top: 5em;
 
 }
 
 .contentHeader {
-    background: #E1BEE7;
-    margin-left: 100px;
-    margin-right: 100px;
-    border-radius: 0.5em;
+  background: #E1BEE7;
+  margin-left: 100px;
+  margin-right: 100px;
+  border-radius: 0.5em;
 }
 
 .contentBody {
-    font-size: 15px;
-    margin-left: 2em;
-    margin-right: 2em;
+  font-size: 15px;
+  margin-left: 2em;
+  margin-right: 2em;
 }
 
 
