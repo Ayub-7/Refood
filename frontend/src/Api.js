@@ -97,4 +97,14 @@ export default {
      */
     searchQuery: () => instance.get(`users`),
 
+    /**
+     * Create a new business by storin their data in the database
+     * @param name business name
+     * @param description business description
+     * @param address business address
+     * @param businessType business type
+     */
+    createBusiness: async(name, description, address, businessType) => 
+    instance.post('businesses', {name, description, address, businessType}),
+
 }

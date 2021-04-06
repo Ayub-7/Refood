@@ -73,7 +73,9 @@ const store = new Vuex.Store({
   state: {
     userId: null,
     viewingUserId: null,
-    userRole: null
+    userRole: null,
+    businessId: null,
+    businessName: null,
   },
 
   mutations: {
@@ -88,6 +90,15 @@ const store = new Vuex.Store({
     setUserRole (state, newUserRole) {
       state.userRole = newUserRole;
     },
+
+    setBusinessId (state, newBusinessId) {
+      state.businessId = newBusinessId;
+    },
+
+    setBusinessName (state, newBusinessName) {
+      state.businessName = newBusinessName;
+    },
+
   }
 })
 
@@ -97,17 +108,24 @@ const routes = [
   {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
+  {name: 'BusinessPage', path: '/businesses/:id', component: Business,
+  children: [
+    {
+      path: 'administrators',
+      component: BusinessAdministrators
+    }
+    ]},
   {path: '/search', component: Search},
-  {
-    path: '/business',
-    component: Business,
-    children: [
-        {
-          path: 'administrators',
-          component: BusinessAdministrators
-        }
-        ]
-  },
+  // {
+  //   path: '/business',
+  //   component: Business,
+  //   children: [
+  //       {
+  //         path: 'administrators',
+  //         component: BusinessAdministrators
+  //       }
+  //       ]
+  // },
 
 ];
 
