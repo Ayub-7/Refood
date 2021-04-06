@@ -27,16 +27,18 @@ const Homepage = {
     },
 
     methods: {
-        getUserDetails: function(userId) {
-            api.getUserFromID(userId)
-                .then((response) => {
-                    this.userFirstName = `${response.data.firstName}`
-                })
-        },
+      getUserDetails: function(userId) {
+        api.getUserFromID(userId)
+          .then((response) => {
+            this.userFirstName = `${response.data.firstName}`
+          }).catch((err) => {
+            throw new Error(`Error trying to get user info from id: ${err}`)
+          })
+      },
 
-        goToProfilePage: function() {
-            this.$router.push({path: `/users/${this.$store.state.userId}`});
-        }
+      goToProfilePage: function() {
+          this.$router.push({path: `/users/${this.$store.state.userId}`});
+      }
     },
 
     mounted: function () {
