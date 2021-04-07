@@ -51,7 +51,6 @@ const Login = {
     },
     /**
      * Checks if the username and password match on what is stored in the backend.
-     * @param e
      * @returns {boolean} True if it matches what is stored in the backend; otherwise, false.
      */
     checkForm: function() {
@@ -165,7 +164,7 @@ form#login-form {
   margin-bottom: 27px;
   font-family: 'Ubuntu', sans-serif;
 }
-#username:focus, #password:focus {
+#email:focus, #password:focus {
   border: 2px solid rgba(0, 0, 0, 0.18) !important;
 }
 

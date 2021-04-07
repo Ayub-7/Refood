@@ -71,21 +71,33 @@ const store = new Vuex.Store({
   state: {
     userId: null,
     viewingUserId: null,
-    userRole: null
+    userRole: null,
+    userPrimaryBusinesses: []
   },
 
   mutations: {
+    resetState (state) {
+      state.userId = null;
+      state.viewingUserId = null;
+      state.userRole = null;
+      state.userPrimaryBusinesses = [];
+    },
+
     setUserId (state, newUserId) {
       state.userId = newUserId;
     },
 
-    setviewUserId (state, newUserId) {
+    setViewUserId (state, newUserId) {
       state.viewingUserId = newUserId;
     },
 
     setUserRole (state, newUserRole) {
       state.userRole = newUserRole;
     },
+
+    setUserPrimaryBusinesses (state, newBusinesses) {
+      state.userPrimaryBusinesses = newBusinesses;
+    }
   }
 })
 

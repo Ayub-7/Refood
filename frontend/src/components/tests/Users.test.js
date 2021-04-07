@@ -1,5 +1,6 @@
-import { shallowMount } from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Users from '../Users';
+import Vuex from 'vuex';
 
 
 let wrapper;
@@ -25,31 +26,32 @@ const mockUser = {
 
 const mockBusinesses = [
     {
-        "id": 1,
+        "id": 2,
         "administrators": [
             {
-                "id": 9,
-                "firstName": "Joete",
+                "id": 5,
+                "firstName": "Rayna",
                 "middleName": "YEP",
-                "lastName": "Stopps",
-                "nickname": "Multi-layered",
-                "bio": "responsive capacity",
-                "email": "jstopps7@flickr.com",
-                "dateOfBirth": "1984-10-14",
-                "phoneNumber": "+36 694 564 9090",
-                "homeAddress": "34 Mendota Avenue",
-                "created": "2021-04-05 00:11:04",
+                "lastName": "Dalgety",
+                "nickname": "Universal",
+                "bio": "zero tolerance task-force",
+                "email": "rdalgety3@ocn.ne.jp",
+                "dateOfBirth": "2006-03-30",
+                "phoneNumber": "+7 684 622 5902",
+                "homeAddress": "44 Ramsey Court",
+                "created": "2021-04-07 01:09:35",
                 "role": "USER",
                 "businessesAdministered": [
-                    1
+                    2
                 ]
             }
         ],
-        "name": "Business1",
-        "description": "Test Business 1",
-        "address": "123 Test Street",
-        "businessType": "Accommodation and Food Services",
-        "created": "2021-04-05 00:11:04"
+        "name": "Business2",
+        "primaryAdministratorId": 5,
+        "description": "Test Business 2",
+        "address": "23 Testing Avenue",
+        "businessType": "Retail Trade",
+        "created": "2021-04-07 01:09:35"
     }
 ]
 
@@ -59,19 +61,31 @@ const $route = {
     }
 };
 
-
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 beforeEach(() => {
+    const store = new Vuex.Store({
+        state: {
+            userId: mockUser.id,
+            userPrimaryBusinesses: mockBusinesses
+        },
+    });
+
     wrapper = shallowMount(Users, {
+        localVue,
         propsData: {},
         mocks: {$route},
         stubs: ['router-link', 'router-view'],
         methods: {},
+        store
     });
     wrapper.setData({user: mockUser})
     const getUserMethod = jest.spyOn(Users.methods, 'getUserInfo');
     getUserMethod.mockResolvedValue(mockUser);
     //wrapper.setData({businesses: mockBusinesses})
+
+
 });
 
 afterEach(() => {
@@ -79,16 +93,33 @@ afterEach(() => {
 });
 
 describe('User profile page tests', () => {
-
     test('Check calculateDuration is called', () => {
         wrapper.vm.calculateDuration = jest.fn();
-
         expect(typeof(wrapper.vm.calculateDuration)).toBeCalled;
     });
 
     test('User info loads successfully', () => {
-        expect(wrapper.find('#body-profile').exists()).toBe(true)
+        expect(wrapper.find('#container').exists()).toBe(true)
     });
+
+    test('addUserToBusiness function is called', async () => {
+        wrapper.vm.addUserToBusiness = jest.fn();
+        const openModalMethod = jest.spyOn(Users.methods, 'openModal')
+        openModalMethod.mockImplementation(() => {
+            wrapper.vm.showModal = true;
+        });
+
+        expect(wrapper.find('#option-add-to-business').exists()).toBe(true);
+        wrapper.find('#option-add-to-business').trigger('click');
+
+        await wrapper.vm.$nextTick(); // lets the wrapper go through the v-for loop.
+
+        expect(wrapper.find('#add-user').exists()).toBe(true);
+        wrapper.find('#add-user').trigger('click');
+
+        expect(wrapper.vm.addUserToBusiness).toBeCalled();
+    })
+
 });
 
 
@@ -98,22 +129,19 @@ describe('Business link tests with businesses', () =>  {
     });
 
     test('Business names load successfully', () => {
-        expect(wrapper.find('#businessNames').exists()).toBe(true)
+        expect(wrapper.find('.card').exists()).toBe(true);
     });
 
-    test('goToBusinessPage function gets called', () => {
+    test('goToBusinessPage function gets called',  () => {
         wrapper.vm.goToBusinessPage = jest.fn();
-        const businessButton = wrapper.find('#business')
-        businessButton.trigger('click');
+        wrapper.find('.card').trigger('click');
         expect(wrapper.vm.goToBusinessPage).toBeCalled();
-
 
     })
 })
 
-
 describe('Business link tests without businesses', () =>  {
     test('Business names don\'t appear', () => {
-        expect(wrapper.find('#businessNames').exists()).toBe(false)
+        expect(wrapper.find('#card').exists()).toBe(false)
     });
 })

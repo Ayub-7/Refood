@@ -13,6 +13,7 @@ import java.util.List;
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id") // Forces any nested user objects to only use id to prevent recursion.
 public class User {
 
     @Id

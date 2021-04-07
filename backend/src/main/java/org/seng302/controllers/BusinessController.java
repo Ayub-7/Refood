@@ -82,7 +82,7 @@ public class BusinessController {
      * @return a response entity with the appropriate status code.
      */
     @PutMapping("/businesses/{id}/makeAdministrator")
-    public ResponseEntity<String> makeUserAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
+    public ResponseEntity<String> makeUserBusinessAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
         long userId = userIdRequest.getUserId();
         User owner = (User) session.getAttribute("user");
 
@@ -108,7 +108,7 @@ public class BusinessController {
     }
 
     @PutMapping("/businesses/{id}/removeAdministrator")
-    public ResponseEntity<String> removeUserAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
+    public ResponseEntity<String> removeUserBusinessAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
         long userId = userIdRequest.getUserId();
         User currentUser = (User) session.getAttribute("user");
         Business business = businessRepository.findBusinessById(id);

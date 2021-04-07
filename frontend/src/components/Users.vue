@@ -1,105 +1,150 @@
 <template>
-  <div id="container" v-if="this.user != null">
+  <div>
+    <div id="container" v-if="this.user != null">
 
-    <div id="options-bar">
+      <!-- Far left side options menu-->
+      <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <div class="options-card"> Add to Business </div>
-    </div>
-
-    <div id="name-container">
-      <div id="full-name"> {{ this.user.firstName }} {{ this.user.middleName }} {{ this.user.lastName }} </div>
-      <div id="nickname"> {{ this.user.nickname }} </div>
-    </div>
-
-    <!-- Left Profile Side -->
-    <div id="profile">
-      <div id="bio" class="sub-container">
-        <div class="sub-header">Bio</div>
-        {{ this.user.bio }}
+        <div class="options-card" id="option-add-to-business" v-if="this.$store.state.userPrimaryBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
       </div>
 
-      <div class="sub-container" id="info-container">
-        <div id="created">
-          <div class="sub-header">Member Since</div>
-          {{ this.user.created.split(' ')[0] }}
-          <div style="font-size: 12px">{{ calculateDuration(user.registerDate) }}</div>
-
-        </div>
-        <div id="email">
-          <div class="sub-header">Email</div>
-          {{ this.user.email }}
-        </div>
-        <div id="birthDate">
-          <div class="sub-header">Date of Birth</div>
-          {{ this.user.dateOfBirth }}
-        </div>
-        <div id="address">
-          <div class="sub-header">Home Address</div>
-          {{ this.user.homeAddress }}
-        </div>
-        <div id="phonenumber">
-          <div class="sub-header">Phone Number</div>
-          {{ this.user.phoneNumber }}
-        </div>
+      <div id="name-container">
+        <div id="full-name"> {{ this.user.firstName }} {{ this.user.middleName }} {{ this.user.lastName }} </div>
+        <div id="nickname"> {{ this.user.nickname }} </div>
       </div>
 
-    </div>
+      <!-- Left Profile Side -->
+      <div id="profile">
+        <div id="bio" class="sub-container">
+          <div class="sub-header">Bio</div>
+          {{ this.user.bio }}
+        </div>
 
-    <!-- Right Content Side -->
-    <main>
-      <ul id="business-list">
-        <business-card v-for="business in businesses" :key="business.id" v-bind:business="business"/>
-      </ul>
-    </main>
+        <div class="sub-container" id="info-container">
+          <div id="created">
+            <div class="sub-header">Member Since</div>
+            {{ this.user.created.split(' ')[0] }}
+            <div style="font-size: 12px">{{ calculateDuration(user.registerDate) }}</div>
+
+          </div>
+          <div id="email">
+            <div class="sub-header">Email</div>
+            {{ this.user.email }}
+          </div>
+          <div id="birthDate">
+            <div class="sub-header">Date of Birth</div>
+            {{ this.user.dateOfBirth }}
+          </div>
+          <div id="address">
+            <div class="sub-header">Home Address</div>
+            {{ this.user.homeAddress }}
+          </div>
+          <div id="phonenumber">
+            <div class="sub-header">Phone Number</div>
+            {{ this.user.phoneNumber }}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Content Side -->
+      <main>
+        <ul id="business-list">
+          <li class="card" v-for="business in businesses" :key="business.id" v-bind:business="business" @click="goToBusinessPage(business)">
+            <div class="card-name">{{ business.name }}</div>
+            <div class="card-type">{{ business.businessType }}</div>
+            <div class="card-description">{{ business.description }}</div>
+          </li>
+        </ul>
+      </main>
+  </div>
+
+    <!-- Add user to business as admin modal -->
+    <Modal v-if="showModal">
+      <div slot="header">
+        Add user to business:
+      </div>
+
+      <div slot="body">
+          <select class="business-dropdown" v-model="selectedBusiness">
+            <option v-for="business in this.$store.state.userPrimaryBusinesses" :key="business.id" v-bind:business="business" v-bind:value="business">{{business.name}}</option>
+          </select>
+      </div>
+
+      <div id="modal-footer" slot="footer">
+        <button class="modal-cancel-button" @click="closeModal">
+          Cancel
+        </button>
+        <button class="modal-ok-button" id="add-user" @click="addUserToBusiness">
+          Add
+        </button>
+      </div>
+    </Modal>
 
   </div>
 </template>
 
 
-
-
 <script>
+import Modal from "./Modal";
+import api from "../Api";
 const moment = require('moment');
-import Vue from "vue";
-import api from "@/Api";
-
-Vue.component('business-card', {
-  template: ` <li class="card" @click="goToBusinessPage(business)">
-                  <div class="card-name">{{ business.name }}</div>
-                  <div class="card-type">{{ business.businessType }}</div>
-                  <div class="card-description">{{ business.description }}</div>
-               </li>`,
-
-  props: ['business'],
-
-  methods: {
-    /**
-     * Sends user to business page after clicking on business link
-     * @param business business who's page will be loaded
-     */
-    goToBusinessPage: function(business) {
-      this.$router.push({path: `/businesses/${business.id}`})
-    },
-  }
-
-});
 
 const Users = {
   name: "Profile",
+  components: {Modal},
   data: function () {
     return {
       user: null,
-      businesses: []
+      businesses: [],
+
+      showOptions: false,
+
+      showModal: false,
+      selectedBusiness: null
     };
   },
 
   methods: {
+    /**
+     * Show the modal box.
+     * Having a separate function to just open the modal is good for testing.
+     */
+    openModal: function() {
+      this.showModal = true;
+    },
+
+    /**
+     * Close the pop-up box with no consequences.
+     */
+    closeModal: function() {
+      this.showModal = false;
+    },
+
+    /**
+     * Called when the pop-up box has the OK button pressed. Add the user to the given business as an admin.
+     */
+    addUserToBusiness: function() {
+      api.makeUserBusinessAdmin(this.selectedBusiness.id, this.user.id)
+        .then((res) => {
+          if (res.status === 200) {
+            this.businesses.push(this.selectedBusiness);
+            this.closeModal();
+          }
+          else {
+            console.log(`Client error: failed to add user to business: status ${res.status}`) ;
+          }
+        })
+        .catch((error) => {
+          throw new Error(`Error trying to add user to business: ${error}`);
+        });
+    },
+
     calculateDuration: function(registerDate) {
       const TimeElapsed = Date.now();
       const today = new Date(TimeElapsed);
       let fromTime = moment(registerDate).diff(today);
       let duration = moment.duration(fromTime);
-      console.log(duration)
 
       let timeString = "(";
       if ((duration._data.years / -1) > 1) timeString += duration._data.years / -1 + " years ";
@@ -114,21 +159,29 @@ const Users = {
      * Performs a get request to get user info to display on page
      * @param userId ID of user that is currently being viewed
      */
-
     getUserInfo: function(userId) {
-
       api.getUserFromID(userId) //Get user data
           .then((response) => {
             this.user = response.data;
             this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-            console.log(this.businesses);
+
+            if (response.data.id === this.$store.state.userId) {
+              this.$store.commit('setUserPrimaryBusinesses', this.businesses.filter(b => b.primaryAdministratorId === this.user.id));
+            }
+
+            console.log(this.user);
           }).catch((err) => {
         throw new Error(`Error trying to get user info from id: ${err}`);
       });
+    },
 
-
-
-    }
+    /**
+     * Redirects the browser to the business page that was pressed on.
+     * @param business id to redirect to.
+     */
+    goToBusinessPage: function(business) {
+      this.$router.push({path: `/businesses/${business.id}`})
+    },
 
   },
 
@@ -137,6 +190,7 @@ const Users = {
     let userId = this.$route.params.id
     this.user = this.getUserInfo(userId);
   },
+
 }
 
 export default Users;
@@ -264,7 +318,7 @@ main {
   grid-row: 2;
 
   border-radius: 1.5em;
-  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   margin: 1em 0 1em 0;
   padding: 0;
   background-color: #F5F5F5;
@@ -317,8 +371,6 @@ main {
   padding: 0.5em 0 0.5em 0;
 }
 
-
-
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {
   #container {
@@ -353,6 +405,61 @@ main {
   }
 
 }
+
+
+/* Make User Admin Popup Box */
+.business-dropdown {
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  text-decoration: none;
+
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 5rem;
+  border: none;
+  background: linear-gradient(to right, #9C27B0, #E040FB);
+  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+}
+
+option {
+  color: black;
+}
+
+#modal-footer {
+  margin: auto;
+}
+
+
+.modal-ok-button {
+  text-align: center;
+  color: black;
+
+  width: 100px;
+  margin: 0 1em;
+  padding: 10px 20px;
+  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
+  background-size: 500%;
+  border: none;
+  border-radius: 5rem;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+
+}
+
+.modal-cancel-button {
+  text-align: center;
+  color: black;
+
+  width: 100px;
+  margin: 0 1em;
+  padding: 10px 20px;
+  background: #dbe0dd linear-gradient(to left, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
+  background-size: 500%;
+  border: none;
+  border-radius: 5rem;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+
 
 
 </style>

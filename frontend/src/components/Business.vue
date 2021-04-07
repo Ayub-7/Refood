@@ -89,28 +89,6 @@ export default Business;
   grid-column-gap: 1em;
 }
 
-/* For when the screen gets too narrow - mainly for mobile view */
-@media screen and (max-width: 700px) {
-  #container {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-  }
-
-  #business-container {
-    grid-row: 1;
-  }
-
-  main {
-    grid-row: 2;
-  }
-
-  #business-navbar {
-    align-content: center;
-  }
-
-}
-
 /* Business Info Panel on left side */
 #business-container {
   grid-column: 2;
@@ -213,6 +191,33 @@ main {
 
 .business-nav-item:hover {
   box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
+}
+
+/* For when the screen gets too narrow - mainly for mobile view */
+@media screen and (max-width: 700px) {
+  #container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+
+    margin: auto;
+    padding: 0 2em;
+  }
+
+  #business-container {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  main {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  #business-navbar {
+    align-content: center;
+  }
+
 }
 
 

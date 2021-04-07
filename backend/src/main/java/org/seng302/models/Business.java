@@ -14,8 +14,8 @@ import java.util.*;
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name") // Forces any nested business objects to only use name to prevent recursion.
-@JsonPropertyOrder({"id", "administrators", "primaryAdministratorId"}) // force json property order to match api.
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id") // Forces any nested business objects to only use name to prevent recursion.
+@JsonPropertyOrder({"id", "administrators", "name", "primaryAdministratorId"}) // force json property order to match api.
 public class Business {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

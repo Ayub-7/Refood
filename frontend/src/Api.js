@@ -105,6 +105,22 @@ export default {
      * @param businessId the unique id of the business.
      * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
      */
-    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`)
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`),
+
+    /**
+     * Put request to make a user a business administrator (not primary).
+     * @param businessId unique identifier of the business.
+     * @param userId unique identifier of the user.
+     * @returns {Promise<AxiosResponse<any>>} a response with a OK if it is successful.
+     */
+    makeUserBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/makeAdministrator`, {userId}, {withCredentials: true}),
+
+    /**
+     * Put request to remove administrator rights to a business.
+     * @param businessId business identifier to remove rights to.
+     * @param userId user identifier to remove the rights from.
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
+    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true})
 
 }

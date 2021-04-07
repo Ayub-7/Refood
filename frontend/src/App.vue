@@ -17,7 +17,7 @@
           </th>
           <th>
             <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
-            <span @click="$store.commit('setUserId', null); $store.commit('setUserRole', null)" class="title">Logout</span>
+            <span @click="$store.commit('resetState')" class="title">Logout</span>
             </router-link>
 
           </th>
