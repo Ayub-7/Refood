@@ -35,6 +35,7 @@ import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import App from './App.vue';
 import VueLogger from 'vuejs-logger';
+import Vuesax from 'vuesax';
 
 import Login from "@/components/Login";
 import Register from "./components/Register";
@@ -45,7 +46,7 @@ import BusinessAdministrators from "@/components/BusinessAdministrators";
 
 Vue.config.productionTip = false
 
-
+import 'vuesax/dist/vuesax.css'
 
 const options = {
   isEnabled: true,
@@ -60,6 +61,7 @@ const options = {
 Vue.use(VueLogger, options);
 Vue.use(VueRouter);
 Vue.use(Vuex);
+Vue.use(Vuesax);
 
 //Store data used to maintain state in program
 const store = new Vuex.Store({

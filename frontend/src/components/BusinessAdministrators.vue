@@ -28,11 +28,14 @@ const BusinessAdministrators = {
      */
     removeUserAsAdmin: function(user) {
       api.removeUserAsBusinessAdmin(this.$route.params.id, user.id)
-      .then((res) => {
+      .then(() => {
         this.admins = this.admins.filter((admin) => admin.id !== user.id);
-        console.log(`successful removal. Status ${res.status}.`);
+        this.$vs.notify({title:`Successfully removed user`, text:`${user.firstName} was removed as an administrator.`, color:'success'});
       })
       .catch((error) => {
+        if (error.response.status === 400) {
+          this.$vs.notify({title:`Failed to remove user`, text:`${user.firstName} is the primary administrator.`, color:'danger'});
+        }
         throw new Error(`ERROR trying to remove user as admin: ${error}`);
       });
     },

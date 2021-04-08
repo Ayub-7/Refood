@@ -72,10 +72,10 @@
       </div>
 
       <div id="modal-footer" slot="footer">
-        <button class="modal-cancel-button" @click="closeModal">
+        <button class="modal-cancel-button" @click="closeModal()">
           Cancel
         </button>
-        <button class="modal-ok-button" id="add-user" @click="addUserToBusiness">
+        <button class="modal-ok-button" id="add-user" @click="addUserToBusiness()">
           Add
         </button>
       </div>
@@ -126,17 +126,19 @@ const Users = {
      */
     addUserToBusiness: function() {
       api.makeUserBusinessAdmin(this.selectedBusiness.id, this.user.id)
-        .then((res) => {
-          if (res.status === 200) {
-            this.businesses.push(this.selectedBusiness);
-            this.closeModal();
-          }
-          else {
-            console.log(`Client error: failed to add user to business: status ${res.status}`) ;
-          }
+        .then(() => {
+          // 200 code.
+          this.businesses.push(this.selectedBusiness);
+          this.$vs.notify({title:`Added user to ${this.selectedBusiness.name}`, text:`Successfully added ${this.user.firstName} as an administrator.`, color:'success'});
+          this.closeModal();
         })
         .catch((error) => {
-          throw new Error(`Error trying to add user to business: ${error}`);
+          if (error.response.status === 400) {
+            this.$vs.notify({title:`Failed to add user to ${this.selectedBusiness.name}`, text:`${this.user.firstName} is already an administrator.`, color:'danger'});
+          }
+          else {
+            throw new Error(`Error trying to add user to business: ${error.response.status}`);
+          }
         });
     },
 

@@ -40,7 +40,7 @@
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 // @click="goToUserPage()"
-//import Students from "./components/Students";
+
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
