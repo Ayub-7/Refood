@@ -104,7 +104,7 @@ const store = new Vuex.Store({
 
 
 const routes = [
-  {path: '/businesslike', component: BusinessRegister},
+  {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
