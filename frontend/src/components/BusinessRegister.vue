@@ -18,6 +18,7 @@
             <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Business Address" name="businessAddress" v-model="businessAddress" required></textarea>
             <div v-if="suggestionsActive">
               <ul class="addressSuggestion">Suggestions:
+
                 <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
                   {{address}}
               </li>
