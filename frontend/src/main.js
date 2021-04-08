@@ -38,6 +38,7 @@ import VueLogger from 'vuejs-logger';
 import Vuesax from 'vuesax';
 
 import Login from "@/components/Login";
+import BusinessRegister from "@/components/BusinessRegister";
 import Register from "./components/Register";
 import Users from "@/components/Users.vue";
 import Search from "@/components/Search.vue";
@@ -106,8 +107,10 @@ const store = new Vuex.Store({
 
 const routes = [
   {path: '/login', component: Login},
+  {path: '/businesslike', component: BusinessRegister},
+  {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
-  {path: '/users/:id', component: Users},
+  {name: 'UserPage', path: '/users/:id', component: Users},
   {path: '/search', component: Search},
   {
     path: '/businesses/:id',

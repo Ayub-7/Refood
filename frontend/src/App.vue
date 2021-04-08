@@ -10,6 +10,9 @@
             <router-link class="title" to="/login">Login</router-link>
           </th>
           <th>
+            <router-link class="title" to="/businesslike">Register a Business</router-link>
+          </th>
+          <th>
             <router-link class="title" to="/search">Search</router-link>
           </th>
           <th>
@@ -39,6 +42,7 @@
 <script>
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
+import businessRegister from "@/components/BusinessRegister";
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -50,7 +54,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register
+    Login, Register, businessRegister
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
