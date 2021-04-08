@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>12/36</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>6/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>3/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>12/36</span>
             </div>
         
             
@@ -421,21 +421,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -450,29 +447,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -675,22 +675,22 @@
             &lt;li v-for="error in errors" v-bind:key="error"&gt;{{ error }}&lt;/li&gt;
           &lt;/ul&gt;
         &lt;/div&gt;
+        &lt;form @submit="checkForm" method="post"&gt;
         &lt;div class="form-row"&gt;
           &lt;div class="form-group col-md-6"&gt;
             &lt;input type="text" class="form-control" placeholder="Enter Name of Business" name="businessName"  v-model="businessName"&gt;
           &lt;/div&gt;
 &nbsp;
-&nbsp;
-            &lt;div class="form-group col-md-6"&gt;
-              &lt;textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Business Address" name="businessAddress" v-model="businessAddress" required&gt;&lt;/textarea&gt;
-              &lt;div v-if="suggestionsActive"&gt;
-                &lt;ul class="addressSuggestion"&gt;Suggestions:
-                  &lt;li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address"&gt;
-                    {{address}}
-                &lt;/li&gt;
-                &lt;/ul&gt;
-              &lt;/div&gt;
+          &lt;div class="form-group col-md-6"&gt;
+            &lt;textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Business Address" name="businessAddress" v-model="businessAddress" required&gt;&lt;/textarea&gt;
+            &lt;div v-if="suggestionsActive"&gt;
+              &lt;ul class="addressSuggestion"&gt;Suggestions:
+                &lt;li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address"&gt;
+                  {{address}}
+              &lt;/li&gt;
+              &lt;/ul&gt;
             &lt;/div&gt;
+          &lt;/div&gt;
 &nbsp;
           &lt;!-- &lt;div class="form-group col-md-6"&gt;
             &lt;input type="text" class="form-control" placeholder="Enter Business Address" name="Address" v-model="businessAddress"&gt;
@@ -718,25 +718,25 @@
           &lt;div class="form-group col-md-6"&gt;
             &lt;button type="button" class="register-button" @click="checkForm(); createBusinessInfo()"&gt;Register&lt;/button&gt;
           &lt;/div&gt;
-&nbsp;
         &lt;/div&gt;
+        &lt;/form&gt;
       &lt;/div&gt;
   &lt;/div&gt;
 &lt;/template&gt;
 &nbsp;
 &lt;script&gt;
-<span class="cstat-no" title="statement not covered" >import api from "../Api";</span>
-<span class="cstat-no" title="statement not covered" >import axios from "axios"</span>
-<span class="cstat-no" title="statement not covered" >import Vue from 'vue';</span>
-<span class="cstat-no" title="statement not covered" >import Dropdown from 'bp-vuejs-dropdown';</span>
+import api from "../Api";
+import axios from "axios"
+//import Vue from 'vue';
+//import Dropdown from 'bp-vuejs-dropdown';
 &nbsp;
 // global
-<span class="cstat-no" title="statement not covered" >Vue.use(Dropdown);</span>
+//Vue.use(Dropdown);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >const Register = {</span>
-  name: "Register",
-<span class="fstat-no" title="function not covered" >  data: function () {</span>
-<span class="cstat-no" title="statement not covered" >    return {</span>
+const BusinessRegister = {
+  name: "BusinessRegister",
+  data: function () {
+    return {
       errors: [],
       businessName: null,
       businessAddress: null,
@@ -753,30 +753,30 @@
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
      * is in the wrong format.
      */
-<span class="fstat-no" title="function not covered" >    checkForm: function() {</span>
-<span class="cstat-no" title="statement not covered" >      this.errors = [];</span>
+    checkForm: function() {
+      this.errors = [];
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!this.businesName) {</span>
-<span class="cstat-no" title="statement not covered" >        this.errors.push("Please enter your business name!");</span>
+      if (!this.businessName) {
+        this.errors.push("Please enter your business name!");
       }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!this.businesAddress) {</span>
-<span class="cstat-no" title="statement not covered" >        this.errors.push("Please enter your business address!");</span>
+<span class="missing-if-branch" title="else path not taken" >E</span>      if (!this.businessAddress) {
+        this.errors.push("Please enter your business address!");
       }
-<span class="cstat-no" title="statement not covered" >        if (!this.businesType) {</span>
-<span class="cstat-no" title="statement not covered" >        this.errors.push("Please enter a business type!");</span>
+      if (!this.businessType) {
+        this.errors.push("Please enter a business type!");
       }
     },
 &nbsp;
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
-<span class="fstat-no" title="function not covered" >    createBusinessInfo: function() {</span>
+    createBusinessInfo: function() {
 &nbsp;
       //Use createUser function of API to POST user data to backend
       //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
       //https://www.npmjs.com/package/json-server
-<span class="cstat-no" title="statement not covered" >      if(this.errors.length == 0){</span>
+<span class="missing-if-branch" title="if path not taken" >I</span>      if(this.errors.length == 0){
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >        api.createBusiness(this.businessName, this.description, this.businessAddress, this.businessType)</span></span>
       .then((response) =&gt; {
 <span class="cstat-no" title="statement not covered" >        this.$log.debug("New business created:", response.data);</span>
@@ -843,7 +843,7 @@
   },
 &nbsp;
 }
-export default Register;
+export default BusinessRegister;
 &nbsp;
 &lt;/script&gt;
 &nbsp;
@@ -976,7 +976,7 @@ export default Register;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Apr 08 2021 14:32:03 GMT+1200 (New Zealand Standard Time)
+                at Thu Apr 08 2021 15:05:20 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

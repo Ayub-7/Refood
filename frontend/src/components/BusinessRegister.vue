@@ -60,11 +60,11 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import Vue from 'vue';
-import Dropdown from 'bp-vuejs-dropdown';
+//import Vue from 'vue';
+//import Dropdown from 'bp-vuejs-dropdown';
 
 // global
-Vue.use(Dropdown);
+//Vue.use(Dropdown);
 
 const BusinessRegister = {
   name: "BusinessRegister",
