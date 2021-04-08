@@ -68,7 +68,7 @@
             <div class="form-group col-md-6">
               <label>Already registered? </label>
               <router-link to="/Login">
-              <button type="button" class="loginButton" href="/login">Login</button>
+              <button type="button" class="loginButton" to="/login">Login</button>
               </router-link>
             </div>
           </div>
