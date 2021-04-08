@@ -231,7 +231,7 @@ const Register = {
         api.createUser(this.firstname, this.lastname, this.middlename, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, this.homeaddress, hashedPassword, today.toLocaleDateString())
       .then((response) => {
         this.$log.debug("New item created:", response.data);
-        window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
+        this.$router.push({path: `/users/${response.data.id}`});
       }).catch((error) => {
         this.$log.debug("Error Status:", error)
       });

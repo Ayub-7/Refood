@@ -16,7 +16,7 @@
 
       <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
       <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
-      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" href="/login">Sign in</button>
+      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
       <button type="button" class="forgotPassword">Forgot Password?</button>
     </div>
   </form>
@@ -28,13 +28,13 @@
 
 <script>
 import api from "../Api";
-import Vue from "vue"
-import VueSimpleAlert from "vue-simple-alert";
-let passwordHash = require('password-hash');
+//import Vue from "vue"
+//import VueSimpleAlert from "vue-simple-alert";
+//let passwordHash = require('password-hash');
 
-Vue.use(VueSimpleAlert);
-const data = require('../testUser.json');
-const users = data.users;
+
+//const data = require('../testUser.json');
+//const users = data.users;
 const Login = {
   name: "Login",
   data: function () {
@@ -51,13 +51,9 @@ const Login = {
     },
     /**
      * Checks if the username and password match on what is stored in the backend.
-     * @param e
      * @returns {boolean} True if it matches what is stored in the backend; otherwise, false.
      */
-    checkForm: function(e) {
-      if (this.email && this.password) {
-        return true;
-      }
+    checkForm: function() {
       this.errors = [];
 
       if (!this.email) {
@@ -69,46 +65,34 @@ const Login = {
       if (!this.password) {
         this.errors.push('Password required.');
       }
-      else if(this.password.length < 8){
-        this.errors.push('Password must be 8 characters long.');
+      // else if(this.password.length < 8){
+      //   this.errors.push('Password must be 8 characters long.');
+      // }
+
+      if (this.email && this.password) {
+        return true;
       }
-      e.preventDefault();
     },
 
     /**
      * Sends the login request to the backend by calling the login function from the API.
      */
     loginSubmit: function() {
-      var user_id = 0;
-      var isRegistered = false;
-      var isVerified = false;
-      var token = null;
-      for (var user of users) {
-        if (this.email == user.email){
-          if (passwordHash.verify(this.password, user.hashedPassword)) {
-            isVerified = true;
-            user_id = user.id;
+      if(this.errors.length == 0){
+        api.login(this.email, this.password)
+        .then((response) => {
+          this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
+          this.$store.commit('setUserRole', response.data.role);
+          //LOAD USER PAGE, USING ROUTER
+          this.$router.push({path: `/users/${response.data.userId}`});
+
+        }).catch(err => {
+          if(err.response) { //Catch bad request
+            this.email = this.password = null;
+            this.errors.push('Incorrect email or password')
           }
-          isRegistered = true;
-        }
+        })
       }
-      if(isVerified == true){
-        token = Buffer.from(`${this.username}:${this.password}`, 'utf8').toString('base64')
-      }
-      api.login(this.Email, this.password, token)
-      .then((response) => {
-        if (isVerified == true) {
-          this.$log.debug("Login successful!", response.data)
-          window.location.replace("http://localhost:9500/Users?id=" + user_id);
-        } else if (isRegistered == true) {
-          this.$alert("Incorrect username or password!");
-          this.$log.debug("Login unsuccessful!", response.data);
-        } else {
-            this.$alert("You aren't registered You must register.");
-          }
-        }).catch((error) => {
-        this.$log.debug("Login unsuccessful!", error)
-      });
     }
   },
 
@@ -180,7 +164,7 @@ form#login-form {
   margin-bottom: 27px;
   font-family: 'Ubuntu', sans-serif;
 }
-#username:focus, #password:focus {
+#email:focus, #password:focus {
   border: 2px solid rgba(0, 0, 0, 0.18) !important;
 }
 

@@ -7,16 +7,29 @@
             <router-link class="title" to="/">Register</router-link>
           </th>
           <th>
-            <router-link class="title" to="/Login">Login</router-link>
+            <router-link class="title" to="/login">Login</router-link>
           </th>
           <th>
-            <router-link class="title" to="/Search">Search</router-link>
+            <router-link class="title" to="/search">Search</router-link>
+          </th>
+          <th>
+            <router-link :to="{path: `/users/${this.$store.state.userId}`}" v-if="this.$store.state.userId != null" class="title">Profile</router-link>
+          </th>
+          <th>
+            <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
+            <span @click="$store.commit('resetState')" class="title">Logout</span>
+            </router-link>
+
           </th>
         </tr>
       </table>
+      <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
     </div>
 
-    <router-view></router-view>
+    <div id="view">
+      <router-view></router-view>
+    </div>
+
     <footer class="info">
       <h4>REFOOD 2021</h4>
     </footer>
@@ -26,8 +39,8 @@
 <script>
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
+// @click="goToUserPage()"
 
-//import Students from "./components/Students";
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
@@ -44,6 +57,7 @@ const app = {
   data: () => {
     return {};
   },
+
 };
 
 // make the 'app' available
@@ -52,9 +66,30 @@ export default app;
 
 <style scoped>
 
+#view {
+
+}
+
+.dgaa {
+  color: rgb(38, 50, 56);
+  background: #dbe0dd;
+  text-align: center;
+  font-size: 23px;
+  right: 0px;
+  font-weight: 600;
+  position: relative;
+  border-radius: 20px;
+  width: 100px;
+  font-family: 'Ubuntu', sans-serif;
+}
+
 .topbar {
   padding-bottom: 20px;
+  display: flex;
+  flex-direction: row;
   padding-top: 20px;
+  max-width: 65%;
+  margin: 0 auto 0 auto;
   background: linear-gradient(to right, #9C27B0, #E040FB);
 }
 
@@ -66,12 +101,10 @@ export default app;
   letter-spacing: 1px;
   background: #dbe0dd;
   padding: 10px 20px;
-  border: none;
   border-radius: 20px;
   outline: none;
   box-sizing: border-box;
   border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
   margin-left: 5px;
   margin-right: 20px;
   text-align: center;
@@ -82,4 +115,5 @@ export default app;
 [v-cloak] {
   display: none;
 }
+
 </style>

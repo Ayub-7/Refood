@@ -46,11 +46,7 @@ export default {
      * @param token Authentication token added to API request header
      * @returns {Promise<AxiosResponse<any>>}
      */
-    login: (Email, password, token) => instance.post('login', {Email, password}, {
-      headers: {
-          'Authorization': `Basic ${token}`
-      },
-    }),
+    login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
 
   // user POST create new user account data
     /**
@@ -68,7 +64,7 @@ export default {
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: async(firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
+    createUser: (firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
   instance.post('users', {firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate}),
 
     /**
@@ -76,7 +72,7 @@ export default {
      * @param userId The user's unique ID number
      * @returns {Promise<AxiosResponse<any>>}
      */
-    getUserFromID: (userId) => instance.get(`users/${userId}`),
+    getUserFromID: (userId) => instance.get(`users/${userId}`, {withCredentials: true}),
 
     /**
      * Get all users from the database.
@@ -100,5 +96,31 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     searchQuery: () => instance.get(`users`),
+
+
+    // ------ BUSINESSES
+
+    /**
+     * Retrieve a single business with their unique id.
+     * @param businessId the unique id of the business.
+     * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
+     */
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`),
+
+    /**
+     * Put request to make a user a business administrator (not primary).
+     * @param businessId unique identifier of the business.
+     * @param userId unique identifier of the user.
+     * @returns {Promise<AxiosResponse<any>>} a response with a OK if it is successful.
+     */
+    makeUserBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/makeAdministrator`, {userId}, {withCredentials: true}),
+
+    /**
+     * Put request to remove administrator rights to a business.
+     * @param businessId business identifier to remove rights to.
+     * @param userId user identifier to remove the rights from.
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
+    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true})
 
 }
