@@ -54,9 +54,10 @@ public class BusinessController {
 
         if (isValidBusiness(business)) {
             businessRepository.save(business);
-
+            System.out.println("Valid business");
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
+            System.out.println(owner.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -67,6 +68,6 @@ public class BusinessController {
      * @return True if business is valid, else returns False
      */
     public boolean isValidBusiness(Business business) {
-        return (business.getName() != null && business.getDescription() != null && business.getBusinessType() != null);
+        return (business.getName() != null && business.getBusinessType() != null);
     }
 }
