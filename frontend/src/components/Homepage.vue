@@ -1,9 +1,26 @@
 <template>
   <!-- -->
   <div id="body" v-if="this.$store.state.userId != null">
+      <!-- Header of page, contains link to user profile and welcome message with user's first name -->
       <div id="welcomeHeader">
-       <h1 id="pageTitle"> Welcome, {{this.userFirstName}}! </h1>
-       <h1 id="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Profile Page</h1>
+       <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
+       <h1 id="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Go to profile</h1>
+      </div>
+
+      <div id="page-container">
+        <!-- Activity feed THINGS WILL LATER BE PLACE IN THESE FIELDS, JUST SAMPLE AT THE MOMENT -->
+        <div class="content-container">
+          <h2>Content Header</h2>
+          <p class="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean in facilisis ligula. Maecenas suscipit at magna vel maximus. Nunc in imperdiet erat. Aenean semper leo tellus, vestibulum interdum tortor aliquet a. Interdum et malesuada fames ac ante ipsum primis in faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam feugiat dolor consequat erat bibendum, sit amet condimentum lectus lacinia.</p>
+        </div>
+        <div id="userinfo-container">
+          <!-- Things like user businesses, business inventory etc. -->
+          <h2>User/Business Info</h2>
+          <div id="userinfo-content">
+            <h3>Inventory</h3>
+          </div>
+        </div>
+
       </div>
   </div>
 </template>
@@ -19,6 +36,10 @@ const Homepage = {
     },
 
     methods: {
+      /**
+       * Gets user info from backend and sets userFirstname property (for welcome message)
+       * @param userId ID of user who is currently viewing page.
+       */
       getUserDetails: function(userId) {
         api.getUserFromID(userId)
           .then((response) => {
@@ -27,15 +48,19 @@ const Homepage = {
             throw new Error(`Error trying to get user info from id: ${err}`)
           })
       },
-
+      
+      /**
+       * Pushes users profile onto router
+       */
       goToProfilePage: function() {
-          this.$router.push({path: `/users/${this.$store.state.userId}`});
+        this.$router.push({path: `/users/${this.$store.state.userId}`});
       }
     },
 
     mounted: function () {
-        let userId = this.$store.state.userId
-        this.getUserDetails(userId);
+      //Retrieve userId and load user details
+      let userId = this.$store.state.userId
+      this.getUserDetails(userId);
     },
   
 }
@@ -44,7 +69,6 @@ export default Homepage;
 
 <style scoped>
 #body {
-  display: grid;
   /* background-color: #F3EBF6; */
   font-family: 'Ubuntu', sans-serif;
   padding: 3em;
@@ -52,29 +76,108 @@ export default Homepage;
 
 #welcomeHeader {
   display: grid;
-  grid-template-columns: 80% 1fr;
+  grid-template-columns: 85% 1fr;
   text-align: center;
   background-color: #F3EBF6;
+  border-radius: 20px;
 }
 
 #pageTitle {
   border-radius: 10px;
   background-color: #F3EBF6;
-  font-size: 60px
+  font-size: 50px
 
 }
 
 #profileLink {
-  border-radius: 10px;
+  border-radius: 30px;
   background-color: #f3e3f9;
-  margin-left: 5px;
+  margin-right: 10px;
+  margin-top: 5px;
   font-size: 30px;
   padding-top: 5%;
   box-shadow: 0px 3px 8px#cfcfcf;
 }
 
 
+#page-container {
+  display: grid;
+  grid-template-columns: 60% 1fr;
+  margin-top: 20px;
 
+}
+
+.content-container {
+  grid-column: 1;
+  text-align: center;
+  background: #F3EBF6;
+  border-radius: 30px;
+  margin-bottom: 30px;
+}
+
+.content {
+  background: #f3e3f9;
+  padding: 1em;
+  margin: 1em;
+  font-size: 20px;
+  border-radius: 30px;
+}
+
+#userinfo-container {
+  text-align: center;
+  background: #F3EBF6;
+  margin-left: 10px;
+  border-radius: 30px;
+  grid-row: 1;
+  grid-column: 2;
+}
+
+#userinfo-content {
+  font-size: 20px
+}
+
+@media screen and (max-width: 700px) {
+  #welcomeHeader {
+    grid-template-columns: 1fr;
+  }
+  
+  #page-container {
+    grid-template-columns: 1fr;
+  }
+
+  #container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+
+    margin: auto;
+    padding: 0 2em;
+  }
+
+  #pageTitle {
+    font-size: 30px;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #profileLink {
+    margin-right: 0px;
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  #userinfo-container {
+    grid-column: 1;
+    grid-row: 3;
+    margin-bottom: 20px;
+  }
+
+  .content-container {
+    grid-column: 1;
+    grid-row: 4
+  }
+
+}
 
 
 
