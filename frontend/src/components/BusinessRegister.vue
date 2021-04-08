@@ -43,11 +43,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import Dropdown from 'bp-vuejs-dropdown';
-
-// global
-Vue.use(Dropdown);
 
 export default {
 name: "BusinessRegister"
@@ -61,7 +56,6 @@ name: "BusinessRegister"
 .dropdown {
   cursor: pointer;
   border-radius: 5em;
-  color: #fff;
   background: linear-gradient(to right, #9C27B0, #E040FB);
   border: 0;
   padding-left: 40px;
@@ -114,13 +108,11 @@ name: "BusinessRegister"
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd;}
 
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {display: block;}
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
 
 .form-group col-md-6{
   color: rgb(38, 50, 56);

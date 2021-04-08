@@ -28,7 +28,7 @@
 /**
  * Main entry point for your Vue app
  */
-import "bootstrap/dist/css/bootstrap.min.css"
+
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Vuex from 'vuex';
@@ -48,6 +48,7 @@ import BusinessAdministrators from "@/components/BusinessAdministrators";
 Vue.config.productionTip = false
 
 import 'vuesax/dist/vuesax.css'
+import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
 
 const options = {
   isEnabled: true,
