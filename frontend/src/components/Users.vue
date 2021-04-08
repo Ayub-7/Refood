@@ -72,10 +72,10 @@
       </div>
 
       <div id="modal-footer" slot="footer">
-        <button class="modal-cancel-button" @click="closeModal()">
+        <button class="modal-button modal-cancel-button" @click="closeModal()">
           Cancel
         </button>
-        <button class="modal-ok-button" id="add-user" @click="addUserToBusiness()">
+        <button class="modal-button modal-ok-button" id="add-user" @click="addUserToBusiness()">
           Add
         </button>
       </div>
@@ -432,6 +432,9 @@ option {
   margin: auto;
 }
 
+.modal-button:hover {
+  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
+}
 
 .modal-ok-button {
   text-align: center;

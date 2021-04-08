@@ -74,9 +74,17 @@ export default {
 
 .modal-header {
   font-size: 18px;
+  text-align: center;
+  padding: 1em 0;
 }
 
 .modal-body {
+  text-align: center;
+  padding: 1em 0;
+}
+
+.modal-footer {
+  padding: 1em 0;
   text-align: center;
 }
 
