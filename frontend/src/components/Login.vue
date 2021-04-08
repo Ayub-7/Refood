@@ -88,6 +88,7 @@ const Login = {
           this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
         }).catch(err => {
           if(err.response) { //Catch bad request
+            console.log(err.response.message)
             this.email = this.password = null;
             this.errors.push('Incorrect email or password')
           }

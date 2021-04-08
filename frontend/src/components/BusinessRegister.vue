@@ -8,22 +8,22 @@
             <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
           </ul>
         </div>
+        <form @submit="checkForm" method="post">
         <div class="form-row">
           <div class="form-group col-md-6">
             <input type="text" class="form-control" placeholder="Enter Name of Business" name="businessName"  v-model="businessName">
           </div>
 
-
-            <div class="form-group col-md-6">
-              <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Business Address" name="businessAddress" v-model="businessAddress" required></textarea>
-              <div v-if="suggestionsActive">
-                <ul class="addressSuggestion">Suggestions:
-                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
-                    {{address}}
-                </li>
-                </ul>
-              </div>
+          <div class="form-group col-md-6">
+            <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Business Address" name="businessAddress" v-model="businessAddress" required></textarea>
+            <div v-if="suggestionsActive">
+              <ul class="addressSuggestion">Suggestions:
+                <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
+                  {{address}}
+              </li>
+              </ul>
             </div>
+          </div>
 
           <!-- <div class="form-group col-md-6">
             <input type="text" class="form-control" placeholder="Enter Business Address" name="Address" v-model="businessAddress">
@@ -51,8 +51,8 @@
           <div class="form-group col-md-6">
             <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
           </div>
-
         </div>
+        </form>
       </div>
   </div>
 </template>
@@ -66,8 +66,8 @@ import Dropdown from 'bp-vuejs-dropdown';
 // global
 Vue.use(Dropdown);
 
-const Register = {
-  name: "Register",
+const BusinessRegister = {
+  name: "BusinessRegister",
   data: function () {
     return {
       errors: [],
@@ -89,14 +89,14 @@ const Register = {
     checkForm: function() {
       this.errors = [];
 
-      if (!this.businesName) {
+      if (!this.businessName) {
         this.errors.push("Please enter your business name!");
       }
 
-      if (!this.businesAddress) {
+      if (!this.businessAddress) {
         this.errors.push("Please enter your business address!");
       }
-        if (!this.businesType) {
+      if (!this.businessType) {
         this.errors.push("Please enter a business type!");
       }
     },
@@ -176,7 +176,7 @@ const Register = {
   },
 
 }
-export default Register;
+export default BusinessRegister;
 
 </script>
 
