@@ -51,7 +51,7 @@ describe('Homepage tests', () => {
     test('User\'s first name is shown', () => {
         const nameTitle = wrapper.find("#pageTitle")
 
-        expect(nameTitle.text()).toBe(`Welcome, ${mockUser.firstName}!`);
+        expect(nameTitle.text().includes(wrapper.vm.userFirstName)).toBe(true);
     });  
 
 
