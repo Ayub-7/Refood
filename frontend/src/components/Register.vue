@@ -158,11 +158,11 @@ const Register = {
         this.errors.push("Please enter your home address!");
       }
 
-      if (this.middlename.length > 20) {
+      if (this.middlename !== null && this.middlename.length > 20) {
         this.errors.push("Middle name is too long!");
       }
 
-      if (this.nickname.length > 20) {
+      if (this.nickname !== null && this.nickname.length > 20) {
         this.errors.push("Nickname is too long!");
       }
 
