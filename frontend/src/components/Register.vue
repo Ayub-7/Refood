@@ -224,7 +224,6 @@ const Register = {
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
         var hashedPassword = passwordHash.generate(this.password);
-        console.log(hashedPassword);
         api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, this.homeaddress, hashedPassword)
       .then((response) => {
         this.$log.debug("New item created:", response.data);
@@ -235,6 +234,7 @@ const Register = {
         this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
       }).catch((error) => {
         if(error.response){
+          console.log(this.errors);
           console.log(error.response.status);
           console.log(error.response.message);
           this.errors.push("Email already in use");
