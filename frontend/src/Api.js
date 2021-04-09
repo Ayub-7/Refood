@@ -46,6 +46,8 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
+
+    logout: () => instance.delete('/logout', {withCredentials: true}),
     
     /**
      * Check user session using JSESSIONID
@@ -137,5 +139,7 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
      */
     removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true})
+
+
 
 }

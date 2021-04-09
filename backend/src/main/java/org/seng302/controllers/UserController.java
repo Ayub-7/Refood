@@ -2,6 +2,9 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.seng302.MainApplicationRunner;
 import org.seng302.finders.UserFinder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.hibernate.annotations.Filter;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +42,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -50,6 +55,7 @@ import java.util.regex.Pattern;
 public class UserController {
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
     @Autowired
     private UserRepository userRepository;
@@ -86,6 +92,7 @@ public class UserController {
             if (loginRequest.getPassword().equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
                 session.setAttribute("user", existingUser);
+                logger.info(existingUser.getBusinessesAdministered());
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -98,21 +105,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+//    @DeleteMapping("/logout")
+//    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth != null) {
+//            new SecurityContextLogoutHandler().logout(request, response, auth);
+//        }
+//        return ResponseEntity.status(HttpStatus.OK).build();
+//    }
+
     /**
      * THIS NEEDS TO BE REMOVED AT SOME POINT - HERE FOR TESTING PURPOSES.
      * Prints out the current user session/authentication details into console.
      */
     @GetMapping("/checksession")
-    public ResponseEntity<String> checksession(HttpServletRequest req, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String info = "--------------------------------------------------" +
-                "\nPRINCIPAL: " + auth.getPrincipal() +
-                "\nCREDS: " + auth.getCredentials() +
-                "\nDETAILS: " + auth.getDetails() +
-                "\nAUTH: " + auth.getAuthorities();
-
-        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_PLAIN).body(info);
-
+    public ResponseEntity<User> checksession(HttpServletRequest req, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
 

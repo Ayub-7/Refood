@@ -3,6 +3,7 @@ package org.seng302.models;
 import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.utilities.Encrypter;
 
@@ -37,7 +38,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToMany(mappedBy = "administrators")
+    @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
     private List<Business> businessesAdministered;
 
 

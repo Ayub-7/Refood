@@ -22,7 +22,7 @@
             </th>
             <th>
               <router-link :to="{path: '/login'}" class="title">
-              <span class="title">Logout</span>
+                <span class="title" @click="logout()">Logout</span>
               </router-link>
 
             </th>
@@ -76,6 +76,16 @@ const app = {
       api.checkSession()
       .then(() => {
         this.userLoggedIn = true
+      })
+    },
+
+    logout: function() {
+      api.logout()
+      .then(() => {
+        console.log('logged out.');
+      })
+      .catch((error) => {
+        console.log(error);
       })
     },
 
