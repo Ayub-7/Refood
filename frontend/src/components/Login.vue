@@ -83,8 +83,8 @@ const Login = {
         .then((response) => {
           this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
           this.$store.commit('setUserRole', response.data.role);
-          //LOAD USER PAGE, USING ROUTER
-          this.$router.push({path: `/users/${response.data.userId}`});
+          // REDIRECT TO HOME PAGE
+          this.$router.push({path: `/`});
 
         }).catch(err => {
           if(err.response) { //Catch bad request

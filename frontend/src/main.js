@@ -37,6 +37,7 @@ import App from './App.vue';
 import VueLogger from 'vuejs-logger';
 import Vuesax from 'vuesax';
 
+import Home from "./components/Home.vue"
 import Login from "@/components/Login";
 import BusinessRegister from "@/components/BusinessRegister";
 import Register from "./components/Register";
@@ -118,10 +119,11 @@ const store = new Vuex.Store({
 
 
 const routes = [
+  {path: '/', component: Home},
   {path: '/login', component: Login},
   {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
-  {path: '/', component: Register},
+  {path: '/Register', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {path: '/search', component: Search},
   {
