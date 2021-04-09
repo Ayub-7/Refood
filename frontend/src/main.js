@@ -76,6 +76,8 @@ const store = new Vuex.Store({
     userId: null,
     viewingUserId: null,
     userRole: null,
+    businessId: null,
+    businessName: null,
     userPrimaryBusinesses: []
   },
 
@@ -101,14 +103,23 @@ const store = new Vuex.Store({
 
     setUserPrimaryBusinesses (state, newBusinesses) {
       state.userPrimaryBusinesses = newBusinesses;
-    }
+    },
+
+    setBusinessId (state, newBusinessId) {
+      state.businessId = newBusinessId;
+    },
+
+    setBusinessName (state, newBusinessName) {
+      state.businessName = newBusinessName;
+    },
+
   }
 })
 
 
 const routes = [
   {path: '/login', component: Login},
-  {path: '/businesslike', component: BusinessRegister},
+  {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
