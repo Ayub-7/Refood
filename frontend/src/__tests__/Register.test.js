@@ -30,7 +30,7 @@ beforeEach(() => {
     wrapper = shallowMount(Register, {
         propsData: {},
         mocks: {},
-        stubs: {},
+        stubs: ['router-link', 'router-view'],
         methods: {},
         store,
         localVue,
