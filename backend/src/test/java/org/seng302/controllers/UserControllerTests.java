@@ -8,9 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.seng302.TestApplication;
+import org.seng302.models.Address;
 import org.seng302.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -35,9 +36,10 @@ public class UserControllerTests {
 
     @Test
     public void registration() throws Exception {
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         User user = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
-                "1999-04-27", "+64 3 555 0129", "4 Rountree Street, Upper Riccarton", "1337-H%nt3r2");
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
 
         String userString = mapper.writeValueAsString(user);
 

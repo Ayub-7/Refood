@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.hibernate.annotations.Filter;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -14,19 +12,15 @@ import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
-import org.seng302.utilities.SchedAdminCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.firewall.RequestRejectedException;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,7 +59,7 @@ public class UserController {
      * Get request mapping for get user information by Id
      * @param id the user's id in the database
      * @return ResponseEntity
-     * @throws JsonProcessingException
+     * @throws JsonProcessingException when
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<String> getUser(@PathVariable String id) throws JsonProcessingException {

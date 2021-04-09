@@ -7,7 +7,6 @@ import org.seng302.TestApplication;
 import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
-import org.seng302.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,10 +28,8 @@ public class BusinessRepositoryTests {
     private BusinessRepository businessRepository;
 
 
-    private Business business;
-
     @BeforeEach
-    void setUp() throws NoSuchAlgorithmException {
+    void setUp() {
         assertThat(businessRepository).isNotNull();
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         Address a2 = new Address("620","Sutherland Lane","Dalai", null,"China", null);

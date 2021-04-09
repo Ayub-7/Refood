@@ -37,7 +37,11 @@
           </div>
           <div id="address">
             <div class="sub-header">Home Address</div>
-            {{ this.user.homeAddress }}
+              <div id="street-address">{{ user.homeAddress.streetNumber }} {{ user.homeAddress.streetName }}</div>
+              <div id="city">{{ user.homeAddress.city }}</div>
+              <div id="region">{{ user.homeAddress.region }}</div>
+              <div id="country">{{ user.homeAddress.country }}</div>
+              <div id="postcode">{{ user.homeAddress.postcode }}</div>
           </div>
           <div id="phonenumber">
             <div class="sub-header">Phone Number</div>
@@ -280,7 +284,6 @@ export default Users;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto) repeat(1, 1fr);
   grid-row-gap: 1em;
-
 }
 
 .sub-header {
@@ -298,7 +301,6 @@ export default Users;
 #bio {
   grid-column: 1;
   grid-row: 2;
-
 }
 
 #info-container {

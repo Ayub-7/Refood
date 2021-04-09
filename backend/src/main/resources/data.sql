@@ -1,4 +1,5 @@
 INSERT INTO address (street_number, street_name, city, region, country, postcode) VALUES
+    /* 25 addresses */
     ('44', 'Menomonie Way', 'Zhashkiv', null, 'Ukraine', null),
     ('8120', 'GroverJunction', 'Cimarelang', null, 'Indonesia', null),
     ('5305', 'Melrose Drive', 'Sidon', null, 'Lebanon', null),
@@ -28,6 +29,7 @@ INSERT INTO address (street_number, street_name, city, region, country, postcode
 
 
 INSERT INTO user (first_name, middle_name, last_name, nickname, email, bio, date_of_birth, phone_number, password, created, role, address_id) VALUES
+    /* 20 users */
     ('Wilma', 'Janet', 'Sails', 'Open-architected', 'jsails0@go.com', 'Profit-focused scalable moratorium', '1989-02-28', '+57 242 190 0153', 't146MwLm', '2020-08-07T11:35:52Z', 'USER', 1),
     ('Karrie', 'Salvatore', 'Loyley', 'local area network', 'sloyley1@wordpress.com', 'Quality-focused next generation synergy', '1995-11-06', '+48 864 927 4819', 'VhLBH0', '2020-05-01T13:25:12Z', 'USER', 2),
     ('Felice', 'Tabbitha', 'Jaeggi', 'intranet', 'tjaeggi2@independent.co.uk', 'Managed foreground budgetary management', '1976-12-06', '+1 659 270 1003', '7o3x3SS', '2020-12-25T06:40:59Z', 'USER', 3),
@@ -52,12 +54,13 @@ INSERT INTO user (first_name, middle_name, last_name, nickname, email, bio, date
     ('Pamella', 'Maighdiln', 'Poupard', 'Persevering', 'mpoupardj@bluehost.com', 'Grass-roots asymmetric success', '1992-09-17', '+963 350 483 0624', 'Uq9LpBxyeQ', '2021-04-02T20:24:58Z', 'USER', 20);
 
 
-INSERT INTO business (name, description, created, user_id, business_type) VALUES
-    ('Dabshots', 'Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.', '2020-05-18T21:06:11Z', 1, 'CHARITABLE ORGANISATION'),
-    ('Layo', 'Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.', '2020-08-25T22:22:19Z', 2, 'ACCOMMODATION_AND_FOOD_SERVICES'),
-    ('Skinder', 'Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', '2020-09-11T20:50:50Z', 3, 'RETAIL_TRADE'),
-    ('Skiptube', 'Phasellus in felis.', '2020-10-18T10:30:14Z', 4, 'RETAIL_TRADE'),
-    ('Photojam', 'Praesent blandit. Nam nulla.', '2020-05-23T08:21:22Z', 5, 'RETAIL_TRADE');
+INSERT INTO business (name, description, created, user_id, business_type, address_id) VALUES
+    /* 5 businesses */
+    ('Dabshots', 'Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.', '2020-05-18T21:06:11Z', 1, 'CHARITABLE_ORGANISATION', 21),
+    ('Layo', 'Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.', '2020-08-25T22:22:19Z', 2, 'ACCOMMODATION_AND_FOOD_SERVICES', 22),
+    ('Skinder', 'Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', '2020-09-11T20:50:50Z', 3, 'RETAIL_TRADE', 23),
+    ('Skiptube', 'Phasellus in felis.', '2020-10-18T10:30:14Z', 4, 'RETAIL_TRADE', 24),
+    ('Photojam', 'Praesent blandit. Nam nulla.', '2020-05-23T08:21:22Z', 5, 'RETAIL_TRADE', 25);
 
 
 INSERT INTO business_admins (business_id, user_id) VALUES
@@ -69,6 +72,7 @@ INSERT INTO business_admins (business_id, user_id) VALUES
 
 
 INSERT INTO product (id, name, description, recommended_retail_price, created, business_id) VALUES
+    /* 20 products */
     ('WAUEH98E37A680027', 'Wine - White, Pinot Grigio', 'integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero non mattis pulvinar', 51.63, '2021-01-27T16:07:14Z', 2),
     ('WAUVT64B54N722288', 'Pastry - Cheese Baked Scones', 'amet erat nulla tempus vivamus', 19.88, '2021-03-05T14:36:54Z', 1),
     ('KNDJT2A29D7324794', 'Beef - Ground Lean Fresh', 'vestibulum ante ipsum primis in faucibus', 59.43, '2021-02-06T20:17:16Z', 3),
