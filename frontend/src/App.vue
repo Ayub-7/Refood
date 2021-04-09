@@ -4,7 +4,10 @@
       <table>
         <tr>
           <th>
-            <router-link class="title" to="/">Register</router-link>
+            <router-link class="title" to="/">Home</router-link>
+          </th>
+          <th>
+            <router-link class="title" to="/Register">Register</router-link>
           </th>
           <th>
             <router-link class="title" to="/login">Login</router-link>
