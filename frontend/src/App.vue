@@ -15,18 +15,21 @@
           <th>
             <router-link class="title" to="/search">Search</router-link>
           </th>
-          <th>
-            <router-link :to="{path: `/users/${this.$store.state.userId}`}" v-if="this.$store.state.userId != null" class="title">Profile</router-link>
-          </th>
-          <th>
-            <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
-            <span @click="$store.commit('resetState')" class="title">Logout</span>
-            </router-link>
+          <!-- Display if user is logged in -->
+          <div id='loggedIn' v-if="checkLoggedIn()">
+            <th>
+              <router-link :to="{path: `/users/1`}" class="title">Profile</router-link>
+            </th>
+            <th>
+              <router-link :to="{path: '/login'}" class="title">
+              <span class="title">Logout</span>
+              </router-link>
 
-          </th>
+            </th>
+          </div>
         </tr>
       </table>
-      <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
+      <!-- <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2> -->
     </div>
 
     <div id="view">
@@ -43,6 +46,7 @@
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
+import api from "./Api";
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -59,9 +63,31 @@ const app = {
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
-    return {};
+    return {
+      userLoggedIn: true
+    };
   },
 
+  methods: {
+    /**
+     * Get user session by calling backend /checksession endpoint
+     */
+    getSession: function() {
+      api.checkSession()
+      .then(() => {
+        this.userLoggedIn = true
+      })
+    },
+
+    /**
+     * Function that calls check session and returns what the current login state is.
+     */
+    checkLoggedIn: function() {
+      this.getSession();
+      return this.userLoggedIn;
+    }
+
+  },
 };
 
 // make the 'app' available

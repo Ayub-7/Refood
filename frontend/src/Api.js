@@ -41,12 +41,17 @@ const instance = axios.create({
 export default {
     /**
      * Attempt to authenticate a user account with a username and password
-     * @param username The user's username input
+     * @param email The user's email input
      * @param password The user's password input
-     * @param token Authentication token added to API request header
      * @returns {Promise<AxiosResponse<any>>}
      */
     login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
+    
+    /**
+     * Check user session using JSESSIONID
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    checkSession: () => instance.get('checksession', {withCredentials: true}),
 
   // user POST create new user account data
     /**
