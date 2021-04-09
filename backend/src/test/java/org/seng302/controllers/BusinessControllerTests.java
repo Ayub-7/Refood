@@ -1,7 +1,5 @@
 package org.seng302.controllers;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.http.HttpStatus.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
 import org.seng302.models.User;
@@ -57,14 +56,15 @@ public class BusinessControllerTests {
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
-        ownerUser = new User("Rayna", "YEP", "Dalgety", "Universal", "zero tolerance task-force" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902","44 Ramsey Court","ATQWJM");
+        ownerUser = new User("Rayna", "YEP", "Dalgety", "Universal", "zero tolerance task-force" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ATQWJM");
         ownerUser.setId(1L);
-        user = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530","16 Raven Parkway","ItqVNvM2JBA");
+        user = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ItqVNvM2JBA");
         user.setId(2L);
-        adminUser = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784","2860 Clyde Gallagher Alley","HGD0nAJNjSD");
+        adminUser = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"HGD0nAJNjSD");
         adminUser.setId(3L);
 
-        business = new Business("Business1", "Test Business 1", "123 Test Street", BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
+        business = new Business("Business1", "Test Business 1", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
         business.setId(1L);
         business.createBusiness(ownerUser);
         business.getAdministrators().add(adminUser);

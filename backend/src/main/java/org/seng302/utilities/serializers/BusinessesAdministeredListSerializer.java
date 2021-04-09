@@ -8,7 +8,6 @@ import org.seng302.models.Business;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Custom serializer to turn the set of Business objects found in User.businessesAdministered

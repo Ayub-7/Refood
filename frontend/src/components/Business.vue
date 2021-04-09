@@ -2,21 +2,35 @@
 
   <div id="container" v-if="this.business != null">
     <!-- Left Side Business Information Panel -->
-    <div id="business-container">
+    <div id="business-name-container">
       <div id="business-name"  >{{ business.name }}</div>
+      <div id="business-type">{{ business.businessType }}</div>
+    </div>
 
-      <div id="info-container">
-        <div id="business-type">{{ business.businessType }}</div>
-        <div id="created-date">Created {{ business.created.split(' ')[0] }}</div>
-        <div id="address">
-          <div id="street-address">{{ business.address }}</div> <!-- Change this soon when address is changed. -->
-          <div id="city">Placeholder City</div>
-          <div id="region">Placeholder Region</div>
-          <div id="country">Placeholder Country</div>
-          <div id="postcode">8888</div>
-        </div>
-        <div id="description">{{ business.description }}</div>
+    <div id="business-container">
+      <div id="description" class="sub-container">
+        <div class="sub-header">Description</div>
+        {{ business.description }}
       </div>
+
+      <div id="info-container" class="sub-container">
+
+        <div id="created-date">
+          <div class="sub-header">Created</div>
+          {{ business.created.split(' ')[0] }}
+        </div>
+
+        <div id="address">
+          <div class="sub-header">Address</div>
+          <div id="street-address">{{ business.address.streetNumber }} {{ business.address.streetName }}</div>
+          <div id="city">{{ business.address.city }}</div>
+          <div id="region">{{ business.address.region }}</div>
+          <div id="country">{{ business.address.country }}</div>
+          <div id="postcode">{{ business.address.postcode }}</div>
+        </div>
+
+      </div>
+
     </div>
 
     <main>
@@ -89,66 +103,82 @@ export default Business;
   grid-column-gap: 1em;
 }
 
-/* Business Info Panel on left side */
-#business-container {
-  grid-column: 2;
+/* Top Business Name Container */
+#business-name-container {
+  grid-column: 2 / 4;
   grid-row: 1;
 
-  margin: 1em 0 1em 0;
-  border-radius: 1.5em;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+  text-align: center;
+  background-color: transparent;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin: 8px 0 0 0;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
 #business-name {
-  grid-row: 1;
-  grid-column: 1;
-
-  color: black;
-  font-size: 26px;
-  padding: 1em;
+  font-size: 32px;
+  padding: 0.5em 0 0.5em 0;
 }
 
-#info-container {
-  grid-column: 1;
+#business-type {
+  font-size: 16px;
+  padding: 0 0 0.5em 0;
+}
+
+/* Business Info Panel on left side */
+#business-container {
+  grid-column: 2;
   grid-row: 2;
 
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto) repeat(1, 1fr);
-  grid-row-gap: 2em;
-
-  padding-left: 2em;
-  padding-bottom: 2em;
-  padding-right: 2em;
-
+  grid-row-gap: 1em;
 }
 
-#business-type {
+.sub-container {
+  padding: 2em;
+  border-radius: 1.5em;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  background-color: #F5F5F5;
+}
+
+.sub-header {
+  font-size: 12px;
+  color: gray;
+}
+
+#description {
+  grid-row: 2;
+}
+
+#info-container {
   grid-column: 1;
-  grid-row: 1;
-  font-size: 18px;
+  grid-row: 3;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(1, auto) repeat(1, 1fr);
+  grid-row-gap: 2em;
+
 }
 
 #created-date {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 1;
 }
 
 #address {
-  grid-row: 3;
+  grid-row: 2;
   height: fit-content;
-}
-
-#description {
-  grid-row: 4;
-
 }
 
 /* Right Hand Content Side. */
 main {
   grid-column: 3;
-  grid-row: 1;
+  grid-row: 2;
 
   margin: 1em 0 1em 0;
   border-radius: 1.5em;
@@ -198,20 +228,25 @@ main {
   #container {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
 
     margin: auto;
     padding: 0 2em;
   }
 
-  #business-container {
+  #business-name-container {
     grid-column: 1;
     grid-row: 1;
   }
 
-  main {
+  #business-container {
     grid-column: 1;
     grid-row: 2;
+  }
+
+  main {
+    grid-column: 1;
+    grid-row: 3;
   }
 
   #business-navbar {

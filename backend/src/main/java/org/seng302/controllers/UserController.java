@@ -2,9 +2,9 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.hibernate.annotations.Filter;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -16,14 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.firewall.RequestRejectedException;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +47,7 @@ import java.util.regex.Pattern;
 public class UserController {
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
     @Autowired
     private UserRepository userRepository;
@@ -61,7 +59,7 @@ public class UserController {
      * Get request mapping for get user information by Id
      * @param id the user's id in the database
      * @return ResponseEntity
-     * @throws JsonProcessingException
+     * @throws JsonProcessingException when
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<String> getUser(@PathVariable String id) throws JsonProcessingException {
@@ -69,6 +67,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
+            logger.info(user.getHomeAddress());
             String userJson = mapper.writeValueAsString(user);
             return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(userJson);
         }
