@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.seng302.TestApplication;
+import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
 import org.seng302.models.User;
@@ -33,8 +34,10 @@ public class BusinessRepositoryTests {
     @BeforeEach
     void setUp() throws NoSuchAlgorithmException {
         assertThat(businessRepository).isNotNull();
-        Business b1 = new Business("Business1", "Test Business 1", "123 Test Street", BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-        Business b2 = new Business("Business2", "Test Business 2", "23 Testing Avenue", BusinessType.RETAIL_TRADE);
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
+        Address a2 = new Address("620","Sutherland Lane","Dalai", null,"China", null);
+        Business b1 = new Business("Business1", "Test Business 1", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+        Business b2 = new Business("Business2", "Test Business 2", a2, BusinessType.RETAIL_TRADE);
         businessRepository.save(b1);
         businessRepository.save(b2);
     }

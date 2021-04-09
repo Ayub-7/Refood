@@ -28,7 +28,11 @@ public class User {
     private String email;
     private String dateOfBirth;
     private String phoneNumber;
-    private String homeAddress;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    private Address homeAddress;
+
     @JsonIgnore
     private String password;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -56,7 +60,7 @@ public class User {
      * @param homeAddress current address of the user.
      * @param password (encrypted) password of user.
      */
-    public User(String firstName, String middleName, String lastName, String nickname, String bio, String email, String dateOfBirth, String phoneNumber, String homeAddress, String password) throws NoSuchAlgorithmException {
+    public User(String firstName, String middleName, String lastName, String nickname, String bio, String email, String dateOfBirth, String phoneNumber, Address homeAddress, String password) throws NoSuchAlgorithmException {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;

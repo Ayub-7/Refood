@@ -29,10 +29,7 @@ package org.seng302;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.models.Business;
-import org.seng302.models.BusinessType;
-import org.seng302.models.Product;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.seng302.repositories.UserRepository;
@@ -56,6 +53,7 @@ public class MainApplicationRunner implements ApplicationRunner {
   private UserRepository userRepository;
   private BusinessRepository businessRepository;
   @Autowired private ProductRepository productRepository;
+
   private SchedAdminCheck schedAdminCheck;
 
 
@@ -80,20 +78,21 @@ public class MainApplicationRunner implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) throws Exception {
     logger.info("Startup application with {}", args);
-
+    schedAdminCheck.fixedRateSched();
 
    // Test data for our user
-    User u1 = new User("Wileen", "YEP", "Tilsley","Diverse", "hybrid orchestration","wtilsley0@rakuten.co.jp","1921-10-08","+86 815 603 3959","32 Little Fleur Trail", "zWkb3AeLn3lc");
-    User u11 = new User("Wileen", "YEP", "Backgammon","Diverse", "hybrid orchestration","wileenbackgammon@rakuten.co.jp","1921-10-08","+86 815 603 3959","32 Little Fleur Trail", "asda3142sadf");
-    User u2 = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784","2860 Clyde Gallagher Alley","HGD0nAJNjSD");
-    User u3 = new User("Leticia", "YEP", "Semorad","Synergistic", "dynamic paradigm", "lsemorad2@flavors.me","1978-06-08","+86 485 752 9506","6148 Pepper Wood Place","Tkzr7qcTOQpk");
-    User u4 = new User("Rayna", "YEP", "Dalgety", "Universal", "zero tolerance task-force" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902","44 Ramsey Court","ATQWJM");
-    User u5 = new User("Edyth", "YEP", "Dory","Balanced", "solution-oriented info-mediaries", "edory4@163.com","1997-04-10","+255 972 389 7556","053 Mifflin Plaza","8pUKhQV0bgg1");
-    User u6 = new User("Raquela", "YEP", "Haylands", "Future-proofed", "24/7 workforce", "rhaylands5@shutterfly.com","2004-10-06","+86 944 435 8212","49 Atwood Parkway","zfKjrTU1");
-    User u7 = new User("Dynah", "YEP", "Goter", "Profound", "responsive solution", "dgoter6@nasa.gov","1994-02-06","+33 271 150 3057","1022 Donald Avenue","XQx7szwPR");
-    User u8 = new User("Joete", "YEP", "Stopps", "Multi-layered","responsive capacity","jstopps7@flickr.com","1984-10-14","+36 694 564 9090","34 Mendota Avenue","KlbUWrQ");
-    User u9 = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530","16 Raven Parkway","ItqVNvM2JBA");
-    User u0 = new User("Roxy", "YEP", "Rossbrook", "Organic","multi-state algorithm", "rrossbrook9@xrea.com","1957-06-30","+86 966 207 4419","5 Fair Oaks Parkway","JNXPLa");
+    Address address = new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080");
+    User u1 = new User("Wileen", "YEP", "Tilsley","Diverse", "hybrid orchestration","wtilsley0@rakuten.co.jp","1921-10-08","+86 815 603 3959", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"), "zWkb3AeLn3lc");
+    User u11 = new User("Wileen", "YEP", "Backgammon","Diverse", "hybrid orchestration","wileenbackgammon@rakuten.co.jp","1921-10-08","+86 815 603 3959", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"), "asda3142sadf");
+    User u2 = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"HGD0nAJNjSD");
+    User u3 = new User("Leticia", "YEP", "Semorad","Synergistic", "dynamic paradigm", "lsemorad2@flavors.me","1978-06-08","+86 485 752 9506", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"Tkzr7qcTOQpk");
+    User u4 = new User("Rayna", "YEP", "Dalgety", "Universal", "zero tolerance task-force" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ATQWJM");
+    User u5 = new User("Edyth", "YEP", "Dory","Balanced", "solution-oriented info-mediaries", "edory4@163.com","1997-04-10","+255 972 389 7556", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"8pUKhQV0bgg1");
+    User u6 = new User("Raquela", "YEP", "Haylands", "Future-proofed", "24/7 workforce", "rhaylands5@shutterfly.com","2004-10-06","+86 944 435 8212", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"zfKjrTU1");
+    User u7 = new User("Dynah", "YEP", "Goter", "Profound", "responsive solution", "dgoter6@nasa.gov","1994-02-06","+33 271 150 3057", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"XQx7szwPR");
+    User u8 = new User("Joete", "YEP", "Stopps", "Multi-layered","responsive capacity","jstopps7@flickr.com","1984-10-14","+36 694 564 9090", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"KlbUWrQ");
+    User u9 = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ItqVNvM2JBA");
+    User u0 = new User("Roxy", "YEP", "Rossbrook", "Organic","multi-state algorithm", "rrossbrook9@xrea.com","1957-06-30","+86 966 207 4419", new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"JNXPLa");
 
     userRepository.save(u1);
     userRepository.save(u11);
@@ -107,11 +106,11 @@ public class MainApplicationRunner implements ApplicationRunner {
     userRepository.save(u9);
     userRepository.save(u0);
 
-    schedAdminCheck.fixedRateSched();
-
+    Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
+    Address a2 = new Address("620","Sutherland Lane","Dalai", null,"China", null);
     // Test data for businesses
-    Business b1 = new Business("Business1", "Test Business 1", "123 Test Street", BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-    Business b2 = new Business("Business2", "Test Business 2", "23 Testing Avenue", BusinessType.RETAIL_TRADE);
+    Business b1 = new Business("Business1", "Test Business 1", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+    Business b2 = new Business("Business2", "Test Business 2", a2, BusinessType.RETAIL_TRADE);
     b1.createBusiness(u8);
     b2.createBusiness(u4);
 
