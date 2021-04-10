@@ -2,7 +2,6 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Register from '../components/Register';
 import api from '../Api'
-import {verify} from "password-hash";
 
 let wrapper;
 let store;
@@ -182,67 +181,6 @@ describe('Register error checking', () => {
         expect(wrapper.vm.errors.length).toBe(1);
     })
 
-// test("Checks that it won't register an email that is already registered", () => {
-//        wrapper.vm.firstname = 'Omar';
-//        wrapper.vm.lastname = 'Sheta';
-//        wrapper.vm.middlename = 'Hany Mohamed Ahmed';
-//        wrapper.vm.nickname = 'Bababooey';
-//        wrapper.vm.bio = "Rammstein rocks bro!";
-//        wrapper.vm.email = "angelinenewton@digitalus.com";
-//        wrapper.vm.password = "Potato1!";
-//        wrapper.vm.confirm_password = "Potato1!";
-//        wrapper.vm.dateofbirth = new Date().setUTCFullYear(1998, 4, 1);
-//        wrapper.vm.phonenumber = 6969696969;
-//        wrapper.vm.homeaddress = "420 Borat Street, Almaty, Great Nation of Kazakhstan";
-//        const registerBtn = wrapper.find('.register-button');
-//        registerBtn.trigger('click');
-//        expect(wrapper.vm.errors.length).toBe(1);
-//    });
 
-   test("Checks that the password hashes and is not stored in plain text", () => {
-       wrapper.vm.firstname = 'Omar';
-       wrapper.vm.lastname = 'Sheta';
-       wrapper.vm.middlename = 'Hany Mohamed Ahmed';
-       wrapper.vm.nickname = 'Bababooey';
-       wrapper.vm.bio = "Rammstein rocks bro!";
-       wrapper.vm.email = "angelinenewton@digitalus.com";
-       wrapper.vm.password = "Potato1!";
-       wrapper.vm.confirm_password = "Potato1!";
-       wrapper.vm.dateofbirth = new Date().setUTCFullYear(1998, 4, 1);
-       wrapper.vm.phonenumber = 6969696969;
-       wrapper.vm.homeaddress = "420 Borat Street, Almaty, Great Nation of Kazakhstan";
-       const registerBtn = wrapper.find('.register-button');
-       registerBtn.trigger('click');
-       console.log(wrapper);
-       console.log("Potato1!");
-       console.log(wrapper.vm.password);
-       expect(verify("Potato1!", wrapper.vm.createUserInfo().hashedPassword)).toBeTruthy();
-   });
-
-   // test("Checks that a successful registration takes the user to their profile", () => {
-   //     wrapper.vm.firstName = 'Omar';
-   //     wrapper.vm.lastName = 'Sheta';
-   //     wrapper.vm.middlename = 'Hany Mohamed Ahmed';
-   //     wrapper.vm.bio = "Rammstein rocks bro!";
-   //     wrapper.vm.email = "wtilsley0@rakuten.co.jp";
-   //     wrapper.vm.password = "Potato1!";
-   //     wrapper.vm.confirmPassword = "Potato1!";
-   //     wrapper.vm.dateofbirth = new Date().setUTCFullYear(1998, 4, 1);
-   //     wrapper.vm.phonenum = 6969696969;
-   //     wrapper.vm.address = "420 Borat Street, Almaty, Great Nation of Kazakhstan";
-   // });
-   //
-   // test("Checks that the data of the user does not vanish if backend turns off", () => {
-   //     wrapper.vm.firstName = 'Omar';
-   //     wrapper.vm.lastName = 'Sheta';
-   //     wrapper.vm.middlename = 'Hany Mohamed Ahmed';
-   //     wrapper.vm.bio = "Rammstein rocks bro!";
-   //     wrapper.vm.email = "wtilsley0@rakuten.co.jp";
-   //     wrapper.vm.password = "Potato1!";
-   //     wrapper.vm.confirmPassword = "Potato1!";
-   //     wrapper.vm.dateofbirth = new Date().setUTCFullYear(1998, 4, 1);
-   //     wrapper.vm.phonenum = 6969696969;
-   //     wrapper.vm.address = "420 Borat Street, Almaty, Great Nation of Kazakhstan";
-   // });
 
 });
