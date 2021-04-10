@@ -1,8 +1,8 @@
 package org.seng302.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,10 +14,11 @@ import java.util.Date;
 @IdClass(ProductId.class)
 public class Product {
 
+    // Composite key of product id & business id.
     @Id
     private String id;
-    @JsonIgnore
     @Id
+    @JsonIgnore
     private long businessId;
 
     private String name;
