@@ -17,7 +17,6 @@
     "bp-vuejs-dropdown": "^2.1.1",
     "core-js": "^3.8.3",
     "moment": "^2.29.1",
-    "password-hash": "^1.2.2",
     "router": "^1.3.5",
     "serve": "^11.3.2",
     "vue": "^2.6.12",
