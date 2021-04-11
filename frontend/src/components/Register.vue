@@ -1,56 +1,19 @@
 <template>
-    <div class="card" id="body">
-      <h3 class="card-header text-center">Create a ReFood Account</h3>
-      <div class="card-body">
-        <div v-if="errors.length > 0">
-          <b>Please correct the following error(s):</b>
-          <ul>
-            <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-          </ul>
-        </div>
-        <form @submit="checkForm" action="/something" method="post" novalidate="true">
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter First name" name="firstname" v-model="firstname" required>
-            </div>
+    <div class="card">
+      <h3 class="card-header">Create a ReFood Account</h3>
+        <form @submit="checkForm" novalidate="true">
+          <input type="text" id="firstname" class="form-control" placeholder="Enter First name" name="firstname" v-model="firstname" required>
+          <input type="text" id="lastname" class="form-control" placeholder="Enter Last name" name="lastname" v-model="lastname" required>
+          <input type="email" id="email" class="form-control" placeholder="Enter Email" name="email" v-model="email" required>
+          <input type="text" class="form-control" placeholder="Enter Middle name" name="middlename" v-model="middlename">
+          <input type="text" class="form-control" placeholder="Enter Nick Name" name="nickname" v-model="nickname">
 
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter Middle name" name="middlename" v-model="middlename">
-            </div>
-
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter Last name" name="lastname" v-model="lastname" required>
-            </div>
-
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter Nick Name" name="nickname" v-model="nickname">
-            </div>
-
-            <div class="form-group col-md-6">
-              <textarea type="text" class="form-control" placeholder="Enter Bio" name="bio" v-model="bio"></textarea>
-            </div>
-
-            <div class="form-group col-md-6">
-              <input type="email" class="form-control" placeholder="Enter Email" name="email" v-model="email" required>
-            </div>
-
-            <div class="form-group col-md-6">
-              <input type="password" class="form-control" placeholder="Enter your password" name="password" v-model="password" required>
-            </div>
-
-            <div class="form-group col-md-6">
-              <input type="password" class="form-control" placeholder="Confirm your password" name="confirm_password" v-model="confirm_password" required>
-            </div>
-
-            <div class="form-group col-md-6">
-              <input type="date" class="form-control" placeholder="Enter DoB" name="dateofbirth" v-model="dateofbirth" required>
-            </div>
-
-            <div class="form-group col-md-6">
-              <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
-            </div>
-
-            <div class="form-group col-md-6">
+          <input type="password" class="form-control" placeholder="Enter your password" name="password" v-model="password" required>
+          <input type="password" class="form-control" placeholder="Confirm your password" name="confirm_password" v-model="confirm_password" required>
+          <input type="date" class="form-control" placeholder="Enter DoB" name="dateofbirth" v-model="dateofbirth" required>
+          <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
+          <textarea type="text" id="bio" class="form-control" placeholder="Enter Bio" name="bio" v-model="bio"></textarea>
+            <div class="form-group ">
               <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
               <div v-if="suggestionsActive">
                 <ul class="addressSuggestion">Suggestions:
@@ -61,19 +24,18 @@
               </div>
             </div>
 
-            <div class="form-group col-md-6">
+
+            <div class="form-group ">
               <button type="button" class="register-button" @click="checkForm(); createUserInfo()">Register</button>
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group ">
               <label>Already registered? </label>
               <router-link to="/Login">
               <button type="button" class="loginButton" to="/login">Login</button>
               </router-link>
             </div>
-          </div>
         </form>
-      </div>
     </div>
 </template>
 
@@ -222,6 +184,7 @@ const Register = {
       //Use createUser function of API to POST user data to backend
       //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
       //https://www.npmjs.com/package/json-server
+      console.log(this.errors);
       if(this.errors.length == 0){
         var hashedPassword = passwordHash.generate(this.password);
         console.log(hashedPassword);
@@ -274,7 +237,7 @@ const Register = {
         this.suggestionsActive = true;
         //Make call to photon API using value from address field, take only values that are houses
         axios.get(`https://photon.komoot.io/api/?q=${this.homeaddress}&osm_tag=:house`)
-        .then(response => {     
+        .then(response => {
           //Pass response into filter function which also pushes info to potential addresses
           this.potentialAddresses = []
           this.filterAddressInfo(response);
@@ -296,19 +259,13 @@ const Register = {
 export default Register;
 </script>
 <style scoped>
-/**
-Registration form's background styling
- */
-.card-body {
-  background-color: white;
-}
 
 /**
 Address suggestion list's styling
  */
 .addressSuggestion {
-  text-align: center; 
-  padding-right: 40px; 
+  text-align: center;
+  padding-right: 40px;
   border-radius: 30px;
   color: white;
 
@@ -335,12 +292,8 @@ Register button's styling
   color: #fff;
   background: #3B5998;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
+  padding: 10px 40px;
+  margin: 2em;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
@@ -354,73 +307,97 @@ Login button's styling
   color: #fff;
   background: #3B5998;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  padding: 10px 40px;
   font-family: 'Ubuntu', sans-serif;
   margin-left: 10%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
 
-/*
-
- */
-.form-group col-md-6{
-  color: rgb(38, 50, 56);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
-
 .card {
-  background-color: #FFFFFF;
-  width: 700px;
-  height: 750px;
+  font-family: 'Ubuntu', sans-serif;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-row-gap: 1em;
+
+  max-width: 50%;
+  background-color: white;
   margin: 1em auto;
-  border-radius: 2.5em;
-  outline: none;
-  border: none;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
 
-#body {
-  background-color: white;
-  font-family: 'Ubuntu', sans-serif;
-}
 .card-header {
-  font-family: 'Ubuntu', sans-serif;
+  grid-row: 1;
+  grid-column: 1;
+
+  text-align: center;
   font-weight: bold;
-  font-size: 23px;
+  font-size: 24px;
   color: #3B5998;
+
+  margin: 0;
+  padding: 0.5em 0;
 }
+
+form {
+  grid-row: 2;
+  grid-column: 1;
+
+  margin: auto;
+  text-align: center;
+
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: repeat(6, auto);
+}
+
 .form-control {
-  width: 76%;
+  width: 75%;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1px;
   background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
   border-radius: 20px;
   outline: none;
   box-sizing: border-box;
   border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
-  margin-left: 46px;
   text-align: center;
-  margin-bottom: 27px;
   font-family: 'Ubuntu', sans-serif;
+
+  padding: 10px 20px;
+  margin: 0.5em 2em;
+
 }
+
+#firstname {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#lastname {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#email {
+  align-self: center;
+  grid-column: 1 / 3;
+  grid-row: 3;
+  margin: 0.5em auto;
+}
+
+#bio {
+  grid-column: 1 / 3;
+  grid-row: 6;
+  margin: 0.5em auto;
+}
+
+
+
+
 </style>
