@@ -108,10 +108,10 @@ public class UserController {
     }
 
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpSession session) {
-       session.invalidate();
-       return ResponseEntity.status(HttpStatus.OK).build();
+    @PostMapping("/logoutuser")
+    public ResponseEntity<String> logoutUser(HttpServletRequest req, HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.OK).build();
    }
 
 

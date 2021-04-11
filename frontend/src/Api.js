@@ -48,7 +48,7 @@ export default {
      */
     login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
 
-    logout: () => instance.post('logout', {}, {withCredentials: true}),
+    logout: () => instance.post('logoutuser', [], {withCredentials: true}),
 
     checkSession: () => instance.get('checksession', {withCredentials: true}),
 
