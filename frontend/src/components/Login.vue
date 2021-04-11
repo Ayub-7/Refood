@@ -107,6 +107,7 @@ export default Login;
 #body {
   background-color: white;
   font-family: 'Ubuntu', sans-serif;
+
 }
 
 .main {
