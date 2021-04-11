@@ -86,6 +86,8 @@ const Login = {
           //LOAD USER PAGE, USING ROUTER
           this.$router.push({path: `/users/${response.data.userId}`});
 
+          this.$store.commit('setUserRole', response.data.role);
+
         }).catch(err => {
           if(err.response) { //Catch bad request
             console.log(err.response.message)

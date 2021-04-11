@@ -232,6 +232,8 @@ const Register = {
         // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
         this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
         this.$store.commit('setUserRole', response.data.role);
+        this.$store.commit('setUserName', response.data.firstName + " " + response.data.middleName + " " + response.data.lastName); //store the user's name in the program state to be displayed on the top right of the page
+
         //LOAD USER PAGE, USING ROUTER
         this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
         //this.$router.push({path: `/users/${response.data.id}`});

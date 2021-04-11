@@ -175,7 +175,9 @@ const Users = {
               this.$store.commit('setUserPrimaryBusinesses', this.businesses.filter(b => b.primaryAdministratorId === this.user.id));
             }
 
-            console.log(this.user);
+            //update thumbnail user name and associated businesses, if any
+            this.$store.commit('setUserName', response.data.firstName + " " + response.data.middleName + " " + response.data.lastName); //store the user's name in the program state to be displayed on the top right of the page
+            this.$store.commit('setUserAssociatedBusinesses', this.businesses);
           }).catch((err) => {
         throw new Error(`Error trying to get user info from id: ${err}`);
       });

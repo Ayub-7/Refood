@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="main" >
+
     <div class="topbar">
       <table>
         <tr>
@@ -22,13 +23,28 @@
             <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
             <span @click="$store.commit('resetState')" class="title">Logout</span>
             </router-link>
-
           </th>
         </tr>
       </table>
-      <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
+      <span class="userName">
+        <div style="  display: flex;  justify-content: right; text-align: right">
+          <div>
+            <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
+              <div v-if="this.$store.state.userName">
+                {{this.$store.state.userName}}
+              </div>
+              <div v-if="this.$store.state.userAssociatedBusinesses.length > 0">
+                <div v-for="user in this.$store.state.userAssociatedBusinesses"
+                     v-bind:href="user.id"
+                     :key="user.id">
+                  <div>{{ user.name }} </div>
+                </div>
+              </div>
+          </div>
+          <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">
+        </div>
+      </span>
     </div>
-
     <div id="view">
       <router-view></router-view>
     </div>
@@ -73,6 +89,25 @@ export default app;
 
 }
 
+.userName {
+  width: 76%;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  background: #385898;
+  /*padding: 10px 20px;*/
+  border-radius: 20px;
+  outline: none;
+  box-sizing: border-box;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin-left: 5px;
+  margin-right: 20px;
+  margin-bottom: 27px;
+  font-family: 'Ubuntu', sans-serif;
+  padding-top: 20px;
+  text-align: right
+}
 .dgaa {
   color: rgb(38, 50, 56);
   background: #dbe0dd;
@@ -92,8 +127,9 @@ export default app;
 }
 
 .topbar {
-  padding-bottom: 20px;
   display: flex;
+  justify-content: space-around;
+  padding-bottom: 20px;
   top:-30px;
   /*flex-direction: row;*/
   padding-top: 20px;
