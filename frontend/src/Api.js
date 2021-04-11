@@ -45,15 +45,13 @@ export default {
      * @param password The user's password input
      * @returns {Promise<AxiosResponse<any>>}
      */
-    login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
-
-    logout: () => instance.delete('/logout', {withCredentials: true}),
+    login: (email, password) => instance.post('login', {email, password}),
     
     /**
      * Check user session using JSESSIONID
      * @returns {Promise<AxiosResponse<any>>}
      */
-    checkSession: () => instance.get('checksession', {withCredentials: true}),
+    checkSession: () => instance.post('checksession'),
 
   // user POST create new user account data
     /**
@@ -71,7 +69,7 @@ export default {
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: async(firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password) =>
+    createUser: (firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password) =>
   instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password}),
 
     /**
@@ -111,7 +109,7 @@ export default {
      * @param address business address
      * @param businessType business type
      */
-    createBusiness: async(name, description, address, businessType) =>
+    createBusiness: (name, description, address, businessType) =>
     instance.post('businesses', {name, description, address, businessType}),
 
 
@@ -139,7 +137,5 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
      */
     removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true})
-
-
 
 }

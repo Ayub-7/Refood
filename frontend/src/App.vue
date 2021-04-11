@@ -3,12 +3,15 @@
     <div class="topbar">
       <table>
         <tr>
+          <div id='loggedIn' v-if="getLoggedInUser() == null">
           <th>
             <router-link class="title" to="/">Register</router-link>
           </th>
           <th>
             <router-link class="title" to="/login">Login</router-link>
           </th>
+          </div>
+          <div v-else>
           <th>
             <router-link class="title" to="/businesses">Register a Business</router-link>
           </th>
@@ -16,13 +19,13 @@
             <router-link class="title" to="/search">Search</router-link>
           </th>
           <!-- Display if user is logged in -->
-          <div id='loggedIn' v-if="checkLoggedIn()">
+          
             <th>
-              <router-link :to="{path: `/users/1`}" class="title">Profile</router-link>
+              <router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link>
             </th>
             <th>
               <router-link :to="{path: '/login'}" class="title">
-                <span class="title" @click="logout()">Logout</span>
+                <span class="title" @click="logoutUser()">Logout</span>
               </router-link>
 
             </th>
@@ -35,7 +38,6 @@
     <div id="view">
       <router-view></router-view>
     </div>
-
     <footer class="info">
       <h4>REFOOD 2021</h4>
     </footer>
@@ -46,7 +48,7 @@
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
-import api from "./Api";
+import {store, mutations} from "./store"
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -64,39 +66,24 @@ const app = {
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
     return {
-      userLoggedIn: true
+      
     };
   },
-
   methods: {
     /**
-     * Get user session by calling backend /checksession endpoint
+     * Method used to get the current logged in user to use inside template
+     * @returns {int} userId of current logged in user
      */
-    getSession: function() {
-      api.checkSession()
-      .then(() => {
-        this.userLoggedIn = true
-      })
-    },
-
-    logout: function() {
-      api.logout()
-      .then(() => {
-        console.log('logged out.');
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+    getLoggedInUser() {
+      return store.loggedInUserId;
     },
 
     /**
-     * Function that calls check session and returns what the current login state is.
+     * Calls the logout function which removes loggedInUserId
      */
-    checkLoggedIn: function() {
-      this.getSession();
-      return this.userLoggedIn;
+    logoutUser() {
+      mutations.userLogout();
     }
-
   },
 };
 

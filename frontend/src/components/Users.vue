@@ -3,10 +3,10 @@
     <div id="container" v-if="this.user != null">
 
       <!-- Far left side options menu-->
-      <div id="options-bar">
+      <!-- <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
         <div class="options-card" id="option-add-to-business" v-if="this.$store.state.userPrimaryBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
-      </div>
+      </div> -->
 
       <div id="name-container">
         <div id="full-name"> {{ this.user.firstName }} {{ this.user.middleName }} {{ this.user.lastName }} </div>
@@ -89,6 +89,8 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
+import {store, mutations} from "../store";
+
 
 const Users = {
   name: "Profile",
@@ -164,16 +166,18 @@ const Users = {
     getUserInfo: function(userId) {
       api.getUserFromID(userId) //Get user data
           .then((response) => {
-            this.user = response.data;
-            this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
+            if(store.loggedInUserId != null) {
+              this.user = response.data;
+              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
 
-            if (response.data.id === this.$store.state.userId) {
-              this.$store.commit('setUserPrimaryBusinesses', this.businesses.filter(b => b.primaryAdministratorId === this.user.id));
+              if (response.data.id === store.loggedInUserId) {
+                mutations.setUserPrimaryBusinesses(this.businesses.filter(b => b.primaryAdministratorId === this.user.id));
+              }
+            } else {
+              this.$router.push({path: "/login"}); //If user not logged in send to login page
             }
-
-            console.log(this.user);
           }).catch((err) => {
-        throw new Error(`Error trying to get user info from id: ${err}`);
+            throw new Error(`Error trying to get user info from id: ${err}`);
       });
     },
 

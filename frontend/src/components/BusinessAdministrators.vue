@@ -10,9 +10,11 @@
 
 <script>
 import api from "../Api";
+import {store} from "../store"
 
 const BusinessAdministrators = {
   name: "BusinessAdministrators",
+
 
   data: function() {
     return {
@@ -52,7 +54,7 @@ const BusinessAdministrators = {
      * @returns {boolean} true if the user is the primary admin, else false.
      */
     isPrimaryAdmin: function() {
-      return this.$store.state.userId === this.primaryAdminId;
+      return store.loggedInUserId === this.primaryAdminId;
     },
 
     /**
