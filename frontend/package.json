@@ -15,6 +15,7 @@
     "axios": "^0.21.1",
     "bp-vuejs-dropdown": "^2.1.1",
     "core-js": "^3.8.3",
+    "lodash.sortby": "^4.7.0",
     "material-icons": "^0.6.0",
     "moment": "^2.29.1",
     "password-hash": "^1.2.2",

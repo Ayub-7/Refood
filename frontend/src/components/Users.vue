@@ -5,7 +5,7 @@
       <!-- Far left side options menu-->
       <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <div class="options-card" id="option-add-to-business" v-if="getBusinessesFromStore().length >= 1" @click="openModal()"> Add to Business </div>
+        <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
       </div>
 
       <div id="name-container">
@@ -67,7 +67,7 @@
 
       <div slot="body">
           <select class="business-dropdown" v-model="selectedBusiness">
-            <option v-for="business in getBusinessesFromStore()" :key="business.id" v-bind:business="business" v-bind:value="business">{{business.name}}</option>
+            <option v-for="business in this.userViewingBusinesses" :key="business.id" v-bind:business="business" v-bind:value="business">{{business.name}}</option>
           </select>
       </div>
 
@@ -99,7 +99,7 @@ const Users = {
     return {
       user: null,
       businesses: [],
-
+      userViewingBusinesses: [],
       showOptions: false,
 
       showModal: false,
@@ -123,10 +123,6 @@ const Users = {
       this.showModal = false;
     },
 
-    getBusinessesFromStore: function() {
-      console.log(store.userPrimaryBusinesses)
-      return store.userPrimaryBusinesses;
-    },
     /**
      * Called when the pop-up box has the OK button pressed. Add the user to the given business as an admin.
      */
@@ -176,6 +172,7 @@ const Users = {
 
               if (response.data.id === store.loggedInUserId) {
                 mutations.setUserPrimaryBusinesses(this.businesses.filter(b => b.primaryAdministratorId === this.user.id));
+                this.userViewingBusinesses = store.userPrimaryBusinesses;
               }
             } else {
               this.$router.push({path: "/login"}); //If user not logged in send to login page
@@ -198,6 +195,7 @@ const Users = {
   mounted: function () {
   //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
+    
     this.user = this.getUserInfo(userId);
   },
 
