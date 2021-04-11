@@ -151,3 +151,12 @@ new Vue({
   store: store,
   render: h => h(App)
 });
+
+new Vue({
+  el: '#myApp',
+  data () {
+    return {
+      toggle: true
+    }
+  },
+})

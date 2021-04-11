@@ -38,7 +38,6 @@
     </footer>
   </div>
 </template>
-
 <script>
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
