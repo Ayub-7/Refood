@@ -312,7 +312,7 @@ Address suggestion list's styling
   border-radius: 30px;
   color: white;
 
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: white;
 }
 
 .address {
@@ -333,7 +333,7 @@ Register button's styling
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -352,7 +352,7 @@ Login button's styling
   cursor: pointer;
   border-radius: 2em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -396,14 +396,14 @@ Login button's styling
 }
 
 #body {
-  background-color: #F3EBF6;
+  background-color: white;
   font-family: 'Ubuntu', sans-serif;
 }
 .card-header {
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
-  color: #8C55AA;
+  color: #3B5998;
 }
 .form-control {
   width: 76%;

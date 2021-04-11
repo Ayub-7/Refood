@@ -1,7 +1,7 @@
 <template>
-  <div class="card" id="body">
+  <div class="main" id="body">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="profile">
+    <form class="main1">
       <div class="profile-text-inner">
         <h3 class="title text-center">Search for users</h3>
         <div class="form-row">
@@ -252,23 +252,29 @@ export default Search;
 </script>
 
 <style scoped>
+
+.main1{
+  top:-100px;
+}
+
 .title {
   padding-top: 40px;
-  color: #8C55AA;
+  color: #3B5998;
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
 }
 
-.card {
+.main {
   background-color: white;
+  top: 1px;
 }
 
 .searchButton {
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -296,6 +302,8 @@ export default Search;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
 
+
+
 .displaying {
   padding-top: 15px;
 }
@@ -305,13 +313,14 @@ export default Search;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
   padding-bottom: 10px;
   padding-top: 10px;
   font-family: 'Ubuntu', sans-serif;
+  margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }

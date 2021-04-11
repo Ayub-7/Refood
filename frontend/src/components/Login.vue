@@ -103,7 +103,7 @@ export default Login;
 
 <style scoped>
 #body {
-  background-color: #F3EBF6;
+  background-color: white;
   font-family: 'Ubuntu', sans-serif;
 }
 
@@ -118,7 +118,7 @@ export default Login;
 
 .sign {
   padding-top: 40px;
-  color: #8C55AA;
+  color: #385898;
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
@@ -173,7 +173,7 @@ form#login-form {
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -186,7 +186,7 @@ form#login-form {
 }
 .forgotPassword {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #E1BEE7;
+  color: #3B5998;
   padding-top: 15px;
 }
 a {

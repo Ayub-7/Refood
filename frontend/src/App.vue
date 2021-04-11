@@ -1,5 +1,5 @@
 <template>
-  <div id="app" >
+  <div id="app" class="main" >
     <div class="topbar">
       <table>
         <tr>
@@ -87,24 +87,31 @@ export default app;
   font-family: 'Ubuntu', sans-serif;
 }
 
+.main{
+  top: -110px;
+
+}
+
 .topbar {
   padding-bottom: 20px;
   display: flex;
-  flex-direction: row;
+  top:-30px;
+  /*flex-direction: row;*/
   padding-top: 20px;
-  max-width: 65%;
-  margin: 0 auto 0 auto;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  max-width: 100%;
+  max-height: 100%;
+  /*margin: 0 auto 0 auto;*/
+  background: #385898;
 }
 
 .title {
   width: 76%;
-  color: rgb(38, 50, 56);
+  color: white;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1px;
-  background: #dbe0dd;
-  padding: 10px 20px;
+  background: #385898;
+  /*padding: 10px 20px;*/
   border-radius: 20px;
   outline: none;
   box-sizing: border-box;
