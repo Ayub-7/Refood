@@ -2,39 +2,35 @@
     <div class="card">
       <h3 class="card-header">Create a ReFood Account</h3>
         <form @submit="checkForm" novalidate="true">
-          <input type="text" id="firstname" class="form-control" placeholder="Enter First name" name="firstname" v-model="firstname" required>
-          <input type="text" id="lastname" class="form-control" placeholder="Enter Last name" name="lastname" v-model="lastname" required>
-          <input type="email" id="email" class="form-control" placeholder="Enter Email" name="email" v-model="email" required>
-          <input type="text" class="form-control" placeholder="Enter Middle name" name="middlename" v-model="middlename">
-          <input type="text" class="form-control" placeholder="Enter Nick Name" name="nickname" v-model="nickname">
+          <input type="text" id="firstname" class="form-control" placeholder="First name" name="firstname" v-model="firstname" required>
+          <input type="text" id="lastname" class="form-control" placeholder="Last name" name="lastname" v-model="lastname" required>
+          <input type="email" id="email" class="form-control" placeholder="Email" name="email" v-model="email" required>
+          <input type="text" id="middlename" class="form-control" placeholder="Middle name" name="middlename" v-model="middlename">
+          <input type="text" id="nickname" class="form-control" placeholder="Nick Name" name="nickname" v-model="nickname">
 
-          <input type="password" class="form-control" placeholder="Enter your password" name="password" v-model="password" required>
-          <input type="password" class="form-control" placeholder="Confirm your password" name="confirm_password" v-model="confirm_password" required>
-          <input type="date" class="form-control" placeholder="Enter DoB" name="dateofbirth" v-model="dateofbirth" required>
-          <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
-          <textarea type="text" id="bio" class="form-control" placeholder="Enter Bio" name="bio" v-model="bio"></textarea>
-            <div class="form-group ">
-              <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
-              <div v-if="suggestionsActive">
-                <ul class="addressSuggestion">Suggestions:
-                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
-                    {{address}}
-                </li>
-                </ul>
-              </div>
-            </div>
+          <input type="password" id="password" class="form-control" placeholder="Password" name="password" v-model="password" required>
+          <input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" name="confirm_password" v-model="confirm_password" required>
+          <input type="date" id="date-of-birth" class="form-control" name="dateofbirth" v-model="dateofbirth" required>
+          <input type="tel" id="phonenumber" class="form-control" placeholder="Phone number" name="phonenumber" v-model="phonenumber">
+          <textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></textarea>
+          <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
 
+          <div v-if="suggestionsActive">
+            <ul class="addressSuggestion">Suggestions:
+              <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
+                {{address}}
+            </li>
+            </ul>
+          </div>
 
-            <div class="form-group ">
-              <button type="button" class="register-button" @click="checkForm(); createUserInfo()">Register</button>
-            </div>
+          <button type="button" class="register-button" @click="checkForm(); createUserInfo()">Register</button>
 
-            <div class="form-group ">
-              <label>Already registered? </label>
-              <router-link to="/Login">
-              <button type="button" class="loginButton" to="/login">Login</button>
-              </router-link>
-            </div>
+          <div id="login-container">
+            <label>Already registered? </label>
+            <router-link to="/login">
+            <button type="button" class="login-button">Login</button>
+            </router-link>
+          </div>
         </form>
     </div>
 </template>
@@ -301,17 +297,17 @@ Register button's styling
 /*
 Login button's styling
  */
-.loginButton {
+.login-button {
   cursor: pointer;
   border-radius: 2em;
   color: #fff;
   background: #3B5998;
   border: 0;
   padding: 10px 40px;
-  font-family: 'Ubuntu', sans-serif;
-  margin-left: 10%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+
+  margin: 0.5em;
 }
 
 .card {
@@ -322,7 +318,7 @@ Login button's styling
   grid-template-rows: auto auto auto;
   grid-row-gap: 1em;
 
-  max-width: 50%;
+  max-width: 650px;
   background-color: white;
   margin: 1em auto;
   padding: 0.5em 0 0.5em 0;
@@ -357,7 +353,6 @@ form {
 }
 
 .form-control {
-  width: 75%;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1px;
@@ -370,7 +365,7 @@ form {
   font-family: 'Ubuntu', sans-serif;
 
   padding: 10px 20px;
-  margin: 0.5em 2em;
+  margin: 0.5em;
 
 }
 
@@ -388,16 +383,56 @@ form {
   align-self: center;
   grid-column: 1 / 3;
   grid-row: 3;
-  margin: 0.5em auto;
 }
 
 #bio {
   grid-column: 1 / 3;
   grid-row: 6;
-  margin: 0.5em auto;
 }
 
+#login-container {
+  grid-column: 2;
+}
 
+#login-container label {
+  margin: auto;
+}
+
+@media screen and (max-width: 700px) {
+  .card {
+    max-width: 80%;
+
+  }
+
+  form {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(11, auto);
+    margin: 0 5em;
+  }
+
+  .form-control {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  #email {
+    grid-column: 1;
+  }
+
+  #bio {
+    grid-column: 1;
+  }
+
+  .register-button {
+    grid-column: 1;
+  }
+
+  #login-container {
+    grid-column: 1;
+  }
+
+}
 
 
 </style>
