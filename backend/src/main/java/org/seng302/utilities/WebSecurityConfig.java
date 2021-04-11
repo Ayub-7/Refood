@@ -29,13 +29,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/checksession").permitAll()
-                .antMatchers(HttpMethod.POST, "/login", "/users", "/businesses").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/login", "/users", "/businesses").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/search*").authenticated()
-                .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin").hasRole("DGAA")
-                .antMatchers(HttpMethod.PUT, "/businesses/{id}/*").authenticated() // covers admin, products.
-                .antMatchers(HttpMethod.GET, "/businesses/{id}/products").authenticated() // covers admin, products.
+                .antMatchers(HttpMethod.GET, "/users/*").authenticated()
+                .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "users/{id}/revokeAdmin").hasRole("DGAA")
+                .antMatchers("/businesses", "/businesses/*", "/businesses/*/*").authenticated() // covers main business endpoints, admin, products.
                 .anyRequest().permitAll()
 
                 .and()

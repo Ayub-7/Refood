@@ -1,5 +1,6 @@
 package org.seng302.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -7,15 +8,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.UserFinder;
 import org.seng302.models.Address;
+import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.responses.UserIdResponse;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = TestApplication.class)
@@ -24,10 +34,14 @@ public class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
+    @InjectMocks
     private UserController userController;
-
-    private final ObjectMapper mapper = new ObjectMapper();
+    @MockBean
+    private UserRepository userRepository;
+    @MockBean
+    private UserFinder userFinder;
+    @Autowired
+    private ObjectMapper mapper;
 
 
     @BeforeEach
@@ -35,21 +49,55 @@ public class UserControllerTests {
     }
 
     @Test
-    public void registration() throws Exception {
-        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
+    public void testSuccessfulRegistration() throws Exception {
+        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
                 "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
 
-        String userString = mapper.writeValueAsString(user);
 
-        mockMvc.perform(post("/users")
-                        .contentType("application/json")
-                        .content(userString)).andExpect(status().is(200));
+        Mockito.when(userRepository.findUserByEmail(user.getEmail())).thenReturn(null);
+        MvcResult result = mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user)))
+                .andReturn();
 
-        mockMvc.perform(post("/users")
-                .contentType("application/json")).andExpect(status().is(400));
+        assert result.getResponse().getStatus() == HttpStatus.CREATED.value();
+        user.setId(0);
+        user.setRole(Role.USER);
+        UserIdResponse expectedUserIdResponse = new UserIdResponse(user);
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(expectedUserIdResponse));
 
     }
 
+    @Test
+    public void testBadRegistration() throws Exception {
+        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
+        User existingUser = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+
+        Mockito.when(userRepository.findUserByEmail(existingUser.getEmail())).thenReturn(existingUser);
+        mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(existingUser)))
+                .andExpect(status().isConflict());
+
+        User missingFieldsUser = new User(null, null, null, null, null, "testmail@mail.com", null, null, null, null);
+        Mockito.when(userRepository.findUserByEmail(missingFieldsUser.getEmail())).thenReturn(null);
+        mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(missingFieldsUser)))
+                .andExpect(status().isBadRequest());
+
+        User noEmailUser = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", null,
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserByEmail(noEmailUser.getEmail())).thenReturn(null);
+        mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(noEmailUser)))
+                .andExpect(status().isBadRequest());
+
+    }
 }

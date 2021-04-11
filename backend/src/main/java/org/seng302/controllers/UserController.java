@@ -74,7 +74,7 @@ public class UserController {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
         if (existingUser != null) {
             if (loginRequest.getPassword().equals(existingUser.getPassword())) {
-                UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
+                UserIdResponse userIdResponse = new UserIdResponse(existingUser);
                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
@@ -117,14 +117,12 @@ public class UserController {
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             if (isValidUser(user)) {
                 User newUser = new User(user);
-                System.out.println(user.getPassword());
-                System.out.println(newUser.getPassword());
                 userRepository.save(newUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
-                UserIdResponse res = new UserIdResponse(newUser.getId());
+                UserIdResponse res = new UserIdResponse(newUser);
                 String jsonString = mapper.writeValueAsString(res);
 
                 return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
