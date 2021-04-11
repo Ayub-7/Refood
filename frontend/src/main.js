@@ -90,6 +90,7 @@ const store = new Vuex.Store({
       state.userRole = null;
       state.userName = null;
       state.userPrimaryBusinesses = [];
+      state.userAssociatedBusinesses = [];
     },
 
     setUserId (state, newUserId) {

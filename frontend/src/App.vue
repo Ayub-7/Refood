@@ -26,7 +26,7 @@
           </th>
         </tr>
       </table>
-      <span class="userName">
+      <span class="userName" v-if="this.$store.state.userName">
         <div style="  display: flex;  justify-content: right; text-align: right">
           <div>
             <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
