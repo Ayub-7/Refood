@@ -49,6 +49,7 @@ import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
 import {store, mutations} from "./store"
+import api from "./Api"
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -82,8 +83,20 @@ const app = {
      * Calls the logout function which removes loggedInUserId
      */
     logoutUser() {
-      mutations.userLogout();
+      api.logout()
+      .then(() => {
+        mutations.userLogout();
+      })
     }
+  },
+
+
+  beforeMount() {
+    api.checkSession()
+    .then((response) => {
+      console.log(response)
+      mutations.setUserLoggedIn(response.data.id, response.data.role);
+    })
   },
 };
 

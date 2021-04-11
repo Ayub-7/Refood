@@ -41,17 +41,16 @@ const instance = axios.create({
 export default {
     /**
      * Attempt to authenticate a user account with a username and password
-     * @param email The user's email input
+     * @param username The user's username input
      * @param password The user's password input
+     * @param token Authentication token added to API request header
      * @returns {Promise<AxiosResponse<any>>}
      */
-    login: (email, password) => instance.post('login', {email, password}),
-    
-    /**
-     * Check user session using JSESSIONID
-     * @returns {Promise<AxiosResponse<any>>}
-     */
-    checkSession: () => instance.post('checksession'),
+    login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
+
+    logout: () => instance.post('logout', {}, {withCredentials: true}),
+
+    checkSession: () => instance.get('checksession', {withCredentials: true}),
 
   // user POST create new user account data
     /**
@@ -69,7 +68,7 @@ export default {
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: (firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password) =>
+    createUser: async(firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password) =>
   instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password}),
 
     /**
@@ -109,7 +108,7 @@ export default {
      * @param address business address
      * @param businessType business type
      */
-    createBusiness: (name, description, address, businessType) =>
+    createBusiness: async(name, description, address, businessType) =>
     instance.post('businesses', {name, description, address, businessType}),
 
 

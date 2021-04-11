@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.seng302.utilities.serializers.PrimaryAdministratorSerializer;
 
 import javax.persistence.*;
@@ -36,7 +35,11 @@ public class Business {
 
     private String name;
     private String description;
-    private String address;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    private Address address;
+
     @Enumerated(EnumType.STRING)
     private BusinessType businessType;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -51,7 +54,7 @@ public class Business {
      * @param address   Business address
      * @param businessType  The type of business
      */
-    public Business(String name, String description, String address, BusinessType businessType) {
+    public Business(String name, String description, Address address, BusinessType businessType) {
         this.name = name;
         this.description = description;
         this.address = address;

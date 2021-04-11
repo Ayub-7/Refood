@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.MainApplicationRunner;
 import org.seng302.finders.UserFinder;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.hibernate.annotations.Filter;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -19,15 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.firewall.RequestRejectedException;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +35,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -67,7 +59,7 @@ public class UserController {
      * Get request mapping for get user information by Id
      * @param id the user's id in the database
      * @return ResponseEntity
-     * @throws JsonProcessingException
+     * @throws JsonProcessingException when
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<String> getUser(@PathVariable String id) throws JsonProcessingException {
@@ -75,6 +67,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
+            logger.info(user.getHomeAddress());
             String userJson = mapper.writeValueAsString(user);
             return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(userJson);
         }
@@ -92,7 +85,6 @@ public class UserController {
             if (loginRequest.getPassword().equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
                 session.setAttribute("user", existingUser);
-                logger.info(existingUser.getBusinessesAdministered());
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -105,15 +97,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-//    @DeleteMapping("/logout")
-//    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        if (auth != null) {
-//            new SecurityContextLogoutHandler().logout(request, response, auth);
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).build();
-//    }
-
     /**
      * THIS NEEDS TO BE REMOVED AT SOME POINT - HERE FOR TESTING PURPOSES.
      * Prints out the current user session/authentication details into console.
@@ -123,6 +106,14 @@ public class UserController {
         User user = (User) session.getAttribute("user");
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpSession session) {
+       session.invalidate();
+       return ResponseEntity.status(HttpStatus.OK).build();
+   }
+
 
 
     /**

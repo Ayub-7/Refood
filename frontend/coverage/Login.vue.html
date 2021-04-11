@@ -288,25 +288,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -317,20 +298,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -342,10 +310,42 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -489,6 +489,7 @@
 &nbsp;
 &lt;script&gt;
 <span class="cstat-no" title="statement not covered" >import api from "../Api";</span>
+<span class="cstat-no" title="statement not covered" >import {mutations} from "../store"</span>
 //import Vue from "vue"
 //import VueSimpleAlert from "vue-simple-alert";
 //let passwordHash = require('password-hash');
@@ -512,7 +513,6 @@
     },
     /**
      * Checks if the username and password match on what is stored in the backend.
-     * @param e
      * @returns {boolean} True if it matches what is stored in the backend; otherwise, false.
      */
 <span class="fstat-no" title="function not covered" >    checkForm: function() {</span>
@@ -543,10 +543,10 @@
 <span class="cstat-no" title="statement not covered" >      if(this.errors.length == 0){</span>
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >        api.login(this.email, this.password)</span></span>
         .then((response) =&gt; {
-<span class="cstat-no" title="statement not covered" >          this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls</span>
-<span class="cstat-no" title="statement not covered" >          this.$store.commit('setUserRole', response.data.role);</span>
           //LOAD USER PAGE, USING ROUTER
-<span class="cstat-no" title="statement not covered" >          this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})</span>
+<span class="cstat-no" title="statement not covered" >          mutations.setUserLoggedIn(response.data.userId, response.data.role);</span>
+<span class="cstat-no" title="statement not covered" >          this.$router.push({path: `/users/${response.data.userId}`});</span>
+&nbsp;
 <span class="fstat-no" title="function not covered" >        }).catch(err =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >          if(err.response) { //Catch bad request</span>
 <span class="cstat-no" title="statement not covered" >            console.log(err.response.message)</span>
@@ -626,7 +626,7 @@ form#login-form {
   margin-bottom: 27px;
   font-family: 'Ubuntu', sans-serif;
 }
-#username:focus, #password:focus {
+#email:focus, #password:focus {
   border: 2px solid rgba(0, 0, 0, 0.18) !important;
 }
 &nbsp;
@@ -667,7 +667,7 @@ a {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Apr 08 2021 15:05:20 GMT+1200 (New Zealand Standard Time)
+                at Sun Apr 11 2021 16:07:15 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
