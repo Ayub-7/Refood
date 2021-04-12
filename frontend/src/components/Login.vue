@@ -3,9 +3,7 @@
   <div id="body">
   <div class="main">
     <p class="sign" align="center">Sign in</p>
-  <form id="login-form">
-    <div class="container">
-
+  <form id="login-form" >
       <div v-if="errors.length">
         <b>Please correct the following error(s):</b>
       <ul>
@@ -16,9 +14,9 @@
 
       <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
       <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
+
       <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
-      <button type="button" class="forgotPassword">Forgot Password?</button>
-    </div>
+      <div type="button" class="forgotPassword">Forgot Password?</div>
   </form>
   </div>
   </div>
@@ -194,6 +192,7 @@ form#login-form {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
   color: #3B5998;
   padding-top: 15px;
+  text-align: center;
 }
 a {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
