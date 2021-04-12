@@ -50,11 +50,11 @@
               <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-6" >
               <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
-              <div v-if="suggestionsActive">
-                <ul class="addressSuggestion" id="myApp">Suggestions:
-                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); toggle = !toggle" class="address">
+              <div v-if="suggestionsActive" >
+                <ul class="addressSuggestion" >Suggestions:
+                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); deleteItem()" class="address">
                     {{address}}
                 </li>
                 </ul>
@@ -76,7 +76,6 @@
       </div>
     </div>
 </template>
-<script src="https://unpkg.com/vue@2.5.3/dist/vue.js"></script>
 <script>
 
 import api from "../Api";
@@ -261,6 +260,8 @@ const Register = {
     getAddressFromPhoton : function() {
       let minNumberOfCharacters = 3
 
+
+
       if(this.homeaddress.length >= minNumberOfCharacters) {
         this.suggestionsActive = true;
         //Make call to photon API using value from address field, take only values that are houses
@@ -273,6 +274,12 @@ const Register = {
       } else {
         this.suggestionsActive = false; //Hide address suggestions
       }
+    },
+    /**
+     * Sets potential addresses to an empty list once a user has clicked an address
+     */
+    deleteItem: function() {
+      this.potentialAddresses = [];
     },
 
     /**
