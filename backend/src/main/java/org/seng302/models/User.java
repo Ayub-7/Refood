@@ -41,7 +41,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToMany(mappedBy = "administrators")
+    @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
     private List<Business> businessesAdministered;
 
 

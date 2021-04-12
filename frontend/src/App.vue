@@ -4,26 +4,33 @@
     <div class="topbar">
       <table>
         <tr>
+          <div id='loggedIn' v-if="getLoggedInUser() == null">
           <th>
             <router-link class="title" to="/">Register</router-link>
           </th>
           <th>
             <router-link class="title" to="/login">Login</router-link>
           </th>
+          </div>
+          <div v-else>
           <th>
             <router-link class="title" to="/businesses">Register a Business</router-link>
           </th>
           <th>
             <router-link class="title" to="/search">Search</router-link>
           </th>
-          <th>
-            <router-link :to="{path: `/users/${this.$store.state.userId}`}" v-if="this.$store.state.userId != null" class="title">Profile</router-link>
-          </th>
-          <th>
-            <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
-            <span @click="$store.commit('resetState')" class="title">Logout</span>
-            </router-link>
-          </th>
+          <!-- Display if user is logged in -->
+
+            <th>
+              <router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link>
+            </th>
+            <th>
+              <router-link :to="{path: '/login'}" class="title">
+                <span class="title" @click="logoutUser()">Logout</span>
+              </router-link>
+
+            </th>
+          </div>
         </tr>
       </table>
       <span class="userName" v-if="this.$store.state.userName">
@@ -48,7 +55,6 @@
     <div id="view">
       <router-view></router-view>
     </div>
-
     <footer class="info">
       <h4>REFOOD 2021</h4>
     </footer>
@@ -58,6 +64,8 @@
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
+import {store, mutations} from "./store"
+import api from "./Api"
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -74,9 +82,38 @@ const app = {
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
-    return {};
+    return {
+
+    };
+  },
+  methods: {
+    /**
+     * Method used to get the current logged in user to use inside template
+     * @returns {int} userId of current logged in user
+     */
+    getLoggedInUser() {
+      return store.loggedInUserId;
+    },
+
+    /**
+     * Calls the logout function which removes loggedInUserId
+     */
+    logoutUser() {
+      api.logout()
+      .then(() => {
+        mutations.userLogout();
+      })
+    }
   },
 
+
+  beforeMount() {
+    api.checkSession()
+    .then((response) => {
+      console.log(response)
+      mutations.setUserLoggedIn(response.data.id, response.data.role);
+    })
+  },
 };
 
 // make the 'app' available

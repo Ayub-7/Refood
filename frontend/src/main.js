@@ -31,8 +31,6 @@
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Vuex from 'vuex';
-import createPersistedState from "vuex-persistedstate";
 import App from './App.vue';
 import VueLogger from 'vuejs-logger';
 import Vuesax from 'vuesax';
@@ -62,71 +60,7 @@ const options = {
 
 Vue.use(VueLogger, options);
 Vue.use(VueRouter);
-Vue.use(Vuex);
 Vue.use(Vuesax);
-
-//Store data used to maintain state in program
-const store = new Vuex.Store({
-
-  plugins: [createPersistedState({
-    storage: window.sessionStorage,
-  })],
-
-  state: {
-    userId: null,
-    viewingUserId: null,
-    userRole: null,
-    userName: null,
-    businessId: null,
-    businessName: null,
-    userPrimaryBusinesses: [],
-    userAssociatedBusinesses: []
-  },
-
-  mutations: {
-    resetState (state) {
-      state.userId = null;
-      state.viewingUserId = null;
-      state.userRole = null;
-      state.userName = null;
-      state.userPrimaryBusinesses = [];
-      state.userAssociatedBusinesses = [];
-    },
-
-    setUserId (state, newUserId) {
-      state.userId = newUserId;
-    },
-
-    setUserName (state, newUserName) {
-      state.userName = newUserName;
-    },
-
-    setViewUserId (state, newUserId) {
-      state.viewingUserId = newUserId;
-    },
-
-    setUserRole (state, newUserRole) {
-      state.userRole = newUserRole;
-    },
-
-    setUserPrimaryBusinesses (state, newBusinesses) {
-      state.userPrimaryBusinesses = newBusinesses;
-    },
-    setUserAssociatedBusinesses (state, associatedBusinesses) {
-      state.userAssociatedBusinesses = associatedBusinesses;
-    },
-
-    setBusinessId (state, newBusinessId) {
-      state.businessId = newBusinessId;
-    },
-
-    setBusinessName (state, newBusinessName) {
-      state.businessName = newBusinessName;
-    },
-
-  }
-})
-
 
 const routes = [
   {path: '/login', component: Login},
@@ -159,7 +93,6 @@ const router = new VueRouter({
 new Vue({
   el: '#app',
   router,
-  store: store,
   render: h => h(App)
 });
 

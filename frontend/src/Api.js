@@ -48,6 +48,10 @@ export default {
      */
     login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
 
+    logout: () => instance.post('logoutuser', [], {withCredentials: true}),
+
+    checkSession: () => instance.get('checksession', {withCredentials: true}),
+
   // user POST create new user account data
     /**
      * Create a new user by storing their data to the database
