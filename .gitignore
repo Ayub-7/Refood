@@ -6,7 +6,7 @@ build/
 !**/src/test/**
 dist/
 node_modules/
-frontend/coverage/
+coverage/
 
 ### STS ###
 .apt_generated
