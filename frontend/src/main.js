@@ -95,12 +95,3 @@ new Vue({
   router,
   render: h => h(App)
 });
-
-new Vue({
-  el: '#myApp',
-  data () {
-    return {
-      toggle: true
-    }
-  },
-})

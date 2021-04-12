@@ -33,22 +33,23 @@
           </div>
         </tr>
       </table>
-      <span class="userName" v-if="this.$store.state.userName">
+      <span class="userName" v-if="getLoggedInUser()">
         <div style="  display: flex;  justify-content: right; text-align: right">
           <div>
-            <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
-              <div v-if="this.$store.state.userName">
-                {{this.$store.state.userName}}
+            <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
+              <div v-if="getLoggedInUser()">
+                {{getLoggedInUser()}}
               </div>
-              <div v-if="this.$store.state.userAssociatedBusinesses.length > 0">
-                <div v-for="user in this.$store.state.userAssociatedBusinesses"
+              <div v-if="getUserBusinesses() > 0">
+                <div v-for="user in getUserBusinesses()"
                      v-bind:href="user.id"
                      :key="user.id">
                   <div>{{ user.name }} </div>
                 </div>
               </div>
           </div>
-          <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">
+          <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
+          <p>profile pic</p>
         </div>
       </span>
     </div>
@@ -95,6 +96,13 @@ const app = {
       return store.loggedInUserId;
     },
 
+    getUserRole(){
+      return store.role;
+    },
+
+    getUserBusinesses(){
+      return store.userPrimaryBusinesses;
+    },
     /**
      * Calls the logout function which removes loggedInUserId
      */

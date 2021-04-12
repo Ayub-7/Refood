@@ -4,6 +4,7 @@ import Vue from 'vue';
 export const store = Vue.observable({
     loggedInUserId: null,
     role: null,
+    //userName: null,
     userPrimaryBusinesses: [],
 
 });
