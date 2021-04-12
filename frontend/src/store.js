@@ -6,7 +6,8 @@ export const store = Vue.observable({
     role: null,
     userName: null,
     userPrimaryBusinesses: [],
-
+    actingAsBusinessId: null,
+    actingAsBusinessName: null
 });
 
 
@@ -59,5 +60,10 @@ export const mutations = {
 
     setUserPrimaryBusinesses(newBusinesses) {
         store.userPrimaryBusinesses = newBusinesses;
+    },
+
+    setActingAsBusiness(businessId, businessName){
+        store.businessId = businessId;
+        store.businessName = businessName;
     }
 }

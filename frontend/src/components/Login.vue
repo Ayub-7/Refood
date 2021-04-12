@@ -85,6 +85,7 @@ const Login = {
           //LOAD USER PAGE, USING ROUTER
           mutations.setUserLoggedIn(response.data.userId, response.data.role);
           mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+          console.log(response.data.businessesAdministered);
           this.$router.push({path: `/users/${response.data.userId}`});
 
 

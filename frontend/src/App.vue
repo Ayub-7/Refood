@@ -40,11 +40,11 @@
               <div v-if="getUserName()">
                 {{getUserName()}}
               </div>
-              <div v-if="getUserBusinesses() > 0">
-                <div v-for="user in getUserBusinesses()"
-                     v-bind:href="user.id"
-                     :key="user.id">
-                  <div>{{ user.name }} </div>
+              <div v-if="getUserBusinesses()">
+                <div v-for="business in getUserBusinesses()"
+                     v-bind:href="business.id"
+                     :key="business.id">
+                  <div>{{ business.name }} </div>
                 </div>
               </div>
           </div>
@@ -123,6 +123,7 @@ const app = {
     .then((response) => {
       mutations.setUserLoggedIn(response.data.id, response.data.role);
       mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+      console.log(response.data.businessesAdministered);
       mutations.setUserName(response.data.firstName + " " + response.data.lastName);
     })
   },
