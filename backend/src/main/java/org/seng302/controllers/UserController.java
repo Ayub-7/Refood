@@ -154,7 +154,7 @@ public class UserController {
      */
     @GetMapping("/users/search")
     public  ResponseEntity<String> searchUser(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
-
+        System.out.println("search called");
         List<User> users = userFinder.queryByName(query);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
     }
