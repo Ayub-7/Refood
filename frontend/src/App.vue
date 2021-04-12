@@ -118,8 +118,8 @@ const app = {
   beforeMount() {
     api.checkSession()
     .then((response) => {
-      console.log(response)
       mutations.setUserLoggedIn(response.data.id, response.data.role);
+      mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
     })
   },
 };
