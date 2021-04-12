@@ -80,8 +80,7 @@
 
 import api from "../Api";
 import axios from "axios"
-import main from "../main.js";
-import {store, mutations} from "../store"
+import {mutations} from "../store"
 // const data = require('../testUser.json');
 // const users = data.users;
 // Need to somehow access the users database to check params.
@@ -222,7 +221,6 @@ const Register = {
         // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
         mutations.setUserLoggedIn(response.data.userId, response.data.role)
         mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-
         //LOAD USER PAGE, USING ROUTER
         this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
       }).catch((error) => {
