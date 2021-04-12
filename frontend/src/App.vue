@@ -33,12 +33,12 @@
           </div>
         </tr>
       </table>
-      <span class="userName" v-if="getLoggedInUser()">
+      <span class="userName" v-if="getUserName()">
         <div style="  display: flex;  justify-content: right; text-align: right">
           <div>
             <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
-              <div v-if="getLoggedInUser()">
-                {{getLoggedInUser()}}
+              <div v-if="getUserName()">
+                {{getUserName()}}
               </div>
               <div v-if="getUserBusinesses() > 0">
                 <div v-for="user in getUserBusinesses()"
@@ -99,6 +99,9 @@ const app = {
     getUserRole(){
       return store.role;
     },
+    getUserName(){
+      return store.userName;
+    },
 
     getUserBusinesses(){
       return store.userPrimaryBusinesses;
@@ -120,6 +123,7 @@ const app = {
     .then((response) => {
       console.log(response)
       mutations.setUserLoggedIn(response.data.id, response.data.role);
+      mutations.setUserName(response.data.firstName + " " + response.data.lastName);
     })
   },
 };
