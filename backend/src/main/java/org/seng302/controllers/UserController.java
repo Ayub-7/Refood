@@ -82,7 +82,7 @@ public class UserController {
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest req, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
         if (existingUser != null) {
-            if (loginRequest.getPassword().equals(existingUser.getPassword())) {
+            if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
                 session.setAttribute("user", existingUser);
 
