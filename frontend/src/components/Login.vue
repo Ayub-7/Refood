@@ -84,9 +84,9 @@ const Login = {
         .then((response) => {
           //LOAD USER PAGE, USING ROUTER
           mutations.setUserLoggedIn(response.data.userId, response.data.role);
+          mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
           this.$router.push({path: `/users/${response.data.userId}`});
 
-          this.$store.commit('setUserRole', response.data.role);
 
         }).catch(err => {
           if(err.response) { //Catch bad request

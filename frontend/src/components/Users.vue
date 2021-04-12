@@ -93,7 +93,7 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
-import {store, mutations} from "../store";
+import {store} from "../store";
 
 
 const Users = {
@@ -170,14 +170,13 @@ const Users = {
     getUserInfo: function(userId) {
       api.getUserFromID(userId) //Get user data
           .then((response) => {
+            if(store.userPrimaryBusinesses != null){
+              this.userViewingBusinesses = store.userPrimaryBusinesses;
+            }
+            console.log(this.userViewingBusinesses)
             if(store.loggedInUserId != null) {
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-
-              if (response.data.id === store.loggedInUserId) {
-                mutations.setUserPrimaryBusinesses(this.businesses.filter(b => b.primaryAdministratorId === this.user.id));
-                this.userViewingBusinesses = store.userPrimaryBusinesses;
-              }
             } else {
               this.$router.push({path: "/login"}); //If user not logged in send to login page
             }
@@ -203,7 +202,6 @@ const Users = {
   mounted: function () {
   //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
-
     this.user = this.getUserInfo(userId);
   },
 
