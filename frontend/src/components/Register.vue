@@ -260,6 +260,8 @@ const Register = {
     getAddressFromPhoton : function() {
       let minNumberOfCharacters = 3
 
+
+
       if(this.homeaddress.length >= minNumberOfCharacters) {
         this.suggestionsActive = true;
         //Make call to photon API using value from address field, take only values that are houses
