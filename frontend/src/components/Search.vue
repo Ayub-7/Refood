@@ -75,7 +75,7 @@
           <td>{{ user.firstName }} </td>
           <td> {{ user.middleName }} </td>
           <td> {{ user.lastName }} </td>
-          <td> {{ user.homeAddress }} </td>
+          <td> {{ user.homeAddress}}</td>
           <td>{{ user.email }}</td>
           <td v-if="isDGAA" >{{ user.role }}</td>
           <td v-if="isDGAA">
@@ -101,6 +101,7 @@
 
 <script>
 import api from "../Api";
+import {store} from "../store"
 
 const Search = {
   name: "Search",
@@ -131,18 +132,17 @@ const Search = {
    * remove when test back end works well...
  */
   mounted() {
-    console.log(this.$store.state.userRole)
-    console.log(this.$store.state.userId)
-    console.log(this.$store.state.viewingUserId)
-
-    if (this.$store.state.userRole == 'DGAA') {
+    if ( this.getUserRole() === 'DGAA') {
       this.isDGAA = true;
     }
-    this.isDGAA = true;
   },
 
 
   methods: {
+    getUserRole: function () {
+      return store.role;
+    },
+
     /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
@@ -160,6 +160,7 @@ const Search = {
               console.log(response.data);
               this.$log.debug("Data loaded: ", response.data);
               this.users = response.data;
+              this.filteredUsers = response.data;
             })
             .catch((error) => {
               this.$log.debug(error);
