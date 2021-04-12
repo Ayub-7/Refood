@@ -159,11 +159,11 @@ const Register = {
         this.errors.push("Please enter your home address!");
       }
 
-      if (this.middlename.length > 20) {
+      if (this.middlename !== null && this.middlename.length > 20) {
         this.errors.push("Middle name is too long!");
       }
 
-      if (this.nickname.length > 20) {
+      if (this.nickname !== null && this.nickname.length > 20) {
         this.errors.push("Nickname is too long!");
       }
 
@@ -185,14 +185,6 @@ const Register = {
       var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
     },
-    // emailUsed: function (email) {
-    //   for (var user of users) {
-    //     if (email == user.email){
-    //       return true;
-    //     }
-    //   }
-    //   return false;
-    // },
 
     /**
      * Checks if the inputted phone number is in the right format using a Regular Expression to check it.
@@ -224,9 +216,7 @@ const Register = {
       //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
-        var hashedPassword = passwordHash.generate(this.password);
-        console.log(hashedPassword);
-        api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, this.homeaddress, hashedPassword)
+        api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, this.homeaddress, this.password)
       .then((response) => {
         this.$log.debug("New item created:", response.data);
         // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
@@ -236,7 +226,6 @@ const Register = {
 
         //LOAD USER PAGE, USING ROUTER
         this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
-        //this.$router.push({path: `/users/${response.data.id}`});
       }).catch((error) => {
         if(error.response){
           console.log(error.response.status);
