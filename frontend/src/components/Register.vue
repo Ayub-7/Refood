@@ -50,11 +50,11 @@
               <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-6" >
               <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
               <div v-if="suggestionsActive">
                 <ul class="addressSuggestion" id="myApp">Suggestions:
-                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); setAddressText(toText(address)); toggle = !toggle" class="address">
+                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); setAddressText(toText(address)); deleteItem()" class="address">
                     {{toText(address)}}
                 </li>
                 </ul>
@@ -76,7 +76,6 @@
       </div>
     </div>
 </template>
-<script src="https://unpkg.com/vue@2.5.3/dist/vue.js"></script>
 <script>
 
 import api from "../Api";
@@ -274,6 +273,12 @@ const Register = {
       } else {
         this.suggestionsActive = false; //Hide address suggestions
       }
+    },
+    /**
+     * Sets potential addresses to an empty list once a user has clicked an address
+     */
+    deleteItem: function() {
+      this.potentialAddresses = [];
     },
 
     toText : function(address){

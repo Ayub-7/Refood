@@ -53,6 +53,19 @@
               Email<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
+
+          <th  v-if="isDGAA">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
+              Is Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+
+          <th  v-if="isDGAA">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
+              Toggle Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+
         </tr>
 
         <tr v-for="user in filteredUsers.slice(userSearchIndexMin, userSearchIndexMax)"
@@ -62,8 +75,12 @@
           <td>{{ user.firstName }} </td>
           <td> {{ user.middleName }} </td>
           <td> {{ user.lastName }} </td>
-          <td> {{ user.homeAddress }} </td>
+          <td> {{ user.homeAddress}}</td>
           <td>{{ user.email }}</td>
+          <td v-if="isDGAA" >{{ user.role }}</td>
+          <td v-if="isDGAA">
+            <input type="checkbox" @click="toggleAdmin(user)">
+          </td>
         </tr>
 
         <!-- If search query returns more than 10 users then this should be active -->
@@ -84,6 +101,7 @@
 
 <script>
 import api from "../Api";
+import {store} from "../store"
 
 const Search = {
   name: "Search",
@@ -99,7 +117,8 @@ const Search = {
       enableTable: false,
       resultTrack: "",
       userSearchIndexMin: 0,
-      userSearchIndexMax: 10
+      userSearchIndexMax: 10,
+      isDGAA: false
     };
   },
 
@@ -113,21 +132,17 @@ const Search = {
    * remove when test back end works well...
  */
   mounted() {
-    api
-        .searchQuery()
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.users = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load users";
-        })
-        .finally(() => (this.loading = false));
+    if ( this.getUserRole() === 'DGAA') {
+      this.isDGAA = true;
+    }
   },
 
 
   methods: {
+    getUserRole: function () {
+      return store.role;
+    },
+
     /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
@@ -138,8 +153,39 @@ const Search = {
       if (this.searchbar.length > 0) {
         this.enableTable = true;
         this.resultTrack = this.searchbar;
+        console.log(this.searchbar);
+        api
+            .searchQuery(this.searchbar)
+            .then((response) => {
+              console.log(response.data);
+              this.$log.debug("Data loaded: ", response.data);
+              this.users = response.data;
+              this.filteredUsers = response.data;
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+              this.error = "Failed to load users";
+            })
+            .finally(() => (this.loading = false));
       } else {
         this.errors.push("Please enter input the user you want to search for");
+      }
+    },
+
+    /**
+     * makes the checkuser an administrator
+     * if they are already, revoke privledges...
+     */
+
+    toggleAdmin: function (currentUser) {
+      if (currentUser.role == 'USER') {
+        //currentUser.id = true;
+        api.makeUserAdmin(currentUser.id);
+        currentUser.role = 'GAA'
+        //console.log("admin true"+currentUser.id+currentUser.firstName)
+      } else if (currentUser.role == 'GAA') {
+        api.revokeUserAdmin(currentUser.id);
+        currentUser.role = 'USER'
       }
     },
 
@@ -163,9 +209,12 @@ const Search = {
 
           //first check if a or b contains any numbers or whitespace
           //before capitalzation to avoid errors
-          if ( !(/[^a-zA-Z]/.test(aField) && (/[^a-zA-Z]/.test(bField))) ) {
-            aField = aField.toUpperCase();
-            bField = bField.toUpperCase();
+          //also check if boolean
+          if (!(typeof aField === "boolean" || typeof bField === "boolean")) {
+            if ( !(/[^a-zA-Z]/.test(aField) && (/[^a-zA-Z]/.test(bField))) ) {
+              aField = aField.toUpperCase();
+              bField = bField.toUpperCase();
+            }
           }
 
 

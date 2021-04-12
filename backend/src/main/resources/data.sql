@@ -53,6 +53,7 @@ INSERT INTO user (first_name, middle_name, last_name, nickname, email, bio, date
     ('Adan', 'Rickey', 'McGilvra', 'Inverse', 'rmcgilvrai@opera.com', 'Public-key static archive', '2003-01-21', '+48 366 279 7985', 'qjMGWWf', '2020-12-17T02:16:35Z', 'USER', 19),
     ('Pamella', 'Maighdiln', 'Poupard', 'Persevering', 'mpoupardj@bluehost.com', 'Grass-roots asymmetric success', '1992-09-17', '+963 350 483 0624', 'Uq9LpBxyeQ', '2021-04-02T20:24:58Z', 'USER', 20);
 
+UPDATE user SET password = HASH('SHA256', password);
 
 INSERT INTO business (name, description, created, user_id, business_type, address_id) VALUES
     /* 5 businesses */
