@@ -80,8 +80,8 @@
 
 import api from "../Api";
 import axios from "axios"
-import main from "../main.js";
-import {store, mutations} from "../store"
+//import main from "../main.js";
+import {mutations} from "../store"
 // const data = require('../testUser.json');
 // const users = data.users;
 // Need to somehow access the users database to check params.

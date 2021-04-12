@@ -55,13 +55,13 @@
           </th>
 
           <th  v-if="isDGAA">
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 5)">
               Is Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
 
           <th  v-if="isDGAA">
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 4)">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 6)">
               Toggle Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
@@ -108,7 +108,7 @@ const Search = {
   data: function() {
     return {
       errors: [],
-      toggle: [1,1,1,1,1,1],
+      toggle: [1,1,1,1,1,1,1,1],
       searchbar: "",
       searchbarResults: "",
       users: [],
@@ -203,11 +203,18 @@ const Search = {
 
       if (this.filteredUsers) {
         this.filteredUsers.sort(function(a, b) {
-
           var aField = a[JSONField];
           var bField = b[JSONField];
 
-          //first check if a or b contains any numbers or whitespace
+          //first check if null
+          if(aField == null) {
+            return 1;
+          }
+          if(bField == null) {
+            return -1;
+          }
+
+          //check if a or b contains any numbers or whitespace
           //before capitalzation to avoid errors
           //also check if boolean
           if (!(typeof aField === "boolean" || typeof bField === "boolean")) {
