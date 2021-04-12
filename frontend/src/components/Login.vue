@@ -28,6 +28,7 @@
 
 <script>
 import api from "../Api";
+import {mutations} from "../store"
 //import Vue from "vue"
 //import VueSimpleAlert from "vue-simple-alert";
 //let passwordHash = require('password-hash');
@@ -81,10 +82,11 @@ const Login = {
       if(this.errors.length == 0){
         api.login(this.email, this.password)
         .then((response) => {
-          this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
-          this.$store.commit('setUserRole', response.data.role);
           //LOAD USER PAGE, USING ROUTER
+          mutations.setUserLoggedIn(response.data.userId, response.data.role);
+          mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
           this.$router.push({path: `/users/${response.data.userId}`});
+
 
         }).catch(err => {
           if(err.response) { //Catch bad request

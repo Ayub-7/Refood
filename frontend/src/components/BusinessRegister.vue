@@ -63,6 +63,7 @@ import api from "../Api";
 import axios from "axios"
 //import Vue from 'vue';
 //import Dropdown from 'bp-vuejs-dropdown';
+import {store} from "../store"
 
 // global
 //Vue.use(Dropdown);
@@ -114,9 +115,9 @@ const BusinessRegister = {
         api.createBusiness(this.businessName, this.description, this.businessAddress, this.businessType)
       .then((response) => {
         this.$log.debug("New business created:", response.data);
-        this.$store.commit('setBusinessId', response.data.businessId); //Store user info into program state, used for later calls
-        this.$store.commit('setBusinessName', response.data.businessName);
-         this.$router.push({name: 'BusinessPage', params: {id: this.$store.state.businessId}})
+        // this.$store.commit('setBusinessId', response.data.businessId); //Store user info into program state, used for later calls
+        // this.$store.commit('setBusinessName', response.data.businessName);
+         this.$router.push({path: `/users/${store.loggedInUserId}`});
       }).catch((error) => {
         if(error.response){
           console.log(error.response.status);
