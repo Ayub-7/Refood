@@ -2,18 +2,18 @@
     <div class="card">
       <h3 class="card-header">Create a ReFood Account</h3>
         <form @submit="checkForm" novalidate="true">
-          <vs-input :danger="(firstname.length < 2)" danger-text="The password does not meet the standards" :success="(firstname.length >= 2)" class="form2" type="text" placeholder="First name" v-model="firstname" required/>
-          <input type="text" id="lastname" class="form-control" placeholder="Last name" name="lastname" v-model="lastname" required>
-          <input type="email" id="email" class="form-control" placeholder="Email" name="email" v-model="email" required>
-          <vs-input type="text" class="form2" placeholder="Middle name" v-model="middlename"/>
-          <input type="text" id="nickname" class="form-control" placeholder="Nick Name" name="nickname" v-model="nickname">
+          <vs-input :danger="(firstname.length < 2)" danger-text="The password does not meet the standards" :success="(firstname.length >= 2)" class="form-control" id="firstname" type="text" placeholder="First name" v-model="firstname" required/>
+          <vs-input type="text" class="form-control" placeholder="Middle name" v-model="middlename"/>
+          <vs-input type="text" id="lastname" class="form-control" placeholder="Last name" name="lastname" v-model="lastname" required/>
+          <vs-input type="text" id="nickname" class="form-control" placeholder="Nick Name" name="nickname" v-model="nickname"/>
+          <vs-input type="email" id="email" class="form-control" placeholder="Email" name="email" v-model="email" required/>
 
-          <input type="password" id="password" class="form-control" placeholder="Password" name="password" v-model="password" required>
-          <input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" name="confirm_password" v-model="confirm_password" required>
-          <input type="date" id="date-of-birth" class="form-control" name="dateofbirth" v-model="dateofbirth" required>
-          <input type="tel" id="phonenumber" class="form-control" placeholder="Phone number" name="phonenumber" v-model="phonenumber">
-          <textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></textarea>
-          <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
+          <vs-input type="password" id="password" class="form-control" placeholder="Password" name="password" v-model="password" required/>
+          <vs-input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" name="confirm_password" v-model="confirm_password" required/>
+          <vs-input type="date" id="date-of-birth" class="form-control" name="dateofbirth" v-model="dateofbirth" required/>
+          <vs-input type="tel" id="phonenumber" class="form-control" placeholder="Phone number" name="phonenumber" v-model="phonenumber"/>
+          <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
+          <vs-textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Home Address" name="homeaddress" v-model="homeaddress" required></vs-textarea>
 
           <div v-if="suggestionsActive">
             <ul class="addressSuggestion">Suggestions:
@@ -363,27 +363,15 @@ form {
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
   border-radius: 20px;
   outline: none;
   box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
   text-align: center;
   font-family: 'Ubuntu', sans-serif;
 
   padding: 10px 20px;
   margin: 0.5em;
 
-}
-
-.form2 {
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  text-align: center;
-  font-family: 'Ubuntu', sans-serif;
-
-  padding: 10px 20px;
 }
 
 #firstname {
