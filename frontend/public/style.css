@@ -147,7 +147,7 @@ h1.loading {
 .main {
   position: relative;
   z-index: 2;
-  border-top: 1px solid #e6e6e6;
+  width: auto;
 }
 
 label[for="toggle-all"] {
@@ -399,10 +399,6 @@ html .clear-checked:active {
   .filters {
     bottom: 10px;
   }
-}
-
-body {
-  padding-top: 100px;
 }
 
 .error {

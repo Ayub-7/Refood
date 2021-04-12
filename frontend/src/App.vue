@@ -170,10 +170,6 @@ export default app;
   font-family: 'Ubuntu', sans-serif;
 }
 
-.main{
-  top: -110px;
-
-}
 
 .topbar {
   display: flex;
