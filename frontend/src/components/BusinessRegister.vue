@@ -1,60 +1,27 @@
 <template>
-  <div class="card" id="body">
-    <h3 class="card-header text-center">Create a ReFood Business Account</h3>
-    <div class="card-body">
-      <div v-if="errors.length > 0">
-          <b>Please correct the following error(s):</b>
-          <ul>
-            <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-          </ul>
-        </div>
-        <form @submit="checkForm" method="post">
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <input type="text" class="form-control" placeholder="Enter Name of Business" name="businessName"  v-model="businessName">
+  <div class="card">
+    <h3 class="card-header">Create a ReFood Business Account</h3>
+      <form>
+          <vs-input id="business-name" type="text" class="form-control" label="Business Name" v-model="businessName"/>
+
+          <vs-select width="75%" id="business-type" class="form-control" label="Select Business Type" v-model="businessType">
+            <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
+          </vs-select>
+
+          <vs-textarea type="text" class="form-control text-areas" label="Business Address" @input="getAddressFromPhoton()" autocomplete='nope' v-model="businessAddress" required/>
+          <div v-if="suggestionsActive">
+            <ul class="addressSuggestion">Suggestions:
+
+              <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
+                {{address}}
+            </li>
+            </ul>
           </div>
 
-          <div class="form-group col-md-6">
-            <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Business Address" name="businessAddress" v-model="businessAddress" required></textarea>
-            <div v-if="suggestionsActive">
-              <ul class="addressSuggestion">Suggestions:
+          <vs-textarea type="text" class="form-control text-areas" label="Business Description" name="Description" v-model="description"/>
 
-                <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
-                  {{address}}
-              </li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- <div class="form-group col-md-6">
-            <input type="text" class="form-control" placeholder="Enter Business Address" name="Address" v-model="businessAddress">
-          </div> -->
-
-          <div class="form-group col-md-6">
-            <textarea type="text" class="form-control" placeholder="Enter Business Description" name="Description" v-model="description"></textarea>
-          </div>
-
-          <!-- <div class="form-group col-md-6">
-            <input type="tel" class="form-control" placeholder="Enter Business Phone number" name="phonenumber" v-model="phonenumber">
-          </div> -->
-
-          <form class="dropdown">
-            <label class="label"> Select Business Type :   </label>
-            <select class="select" name="type" v-model="businessType">
-              <option value = "Accommodation and Food Services" >Accommodation and Food Services</option>
-              <option value = "Retail Trade">Retail Trade</option>
-              <option value = " Charitable organisation">Charitable organisation</option>
-              <option value = "Non-profit organisation">Non-profit organisation</option>
-            </select>
-          </form>
-
-
-          <div class="form-group col-md-6">
-            <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
-          </div>
-        </div>
-        </form>
-      </div>
+          <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
+      </form>
   </div>
 </template>
 
@@ -62,16 +29,14 @@
 import api from "../Api";
 import axios from "axios"
 //import Vue from 'vue';
-//import Dropdown from 'bp-vuejs-dropdown';
 import {store} from "../store"
-
-// global
-//Vue.use(Dropdown);
 
 const BusinessRegister = {
   name: "BusinessRegister",
   data: function () {
     return {
+      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
+
       errors: [],
       businessName: null,
       businessAddress: null,
@@ -82,7 +47,6 @@ const BusinessRegister = {
     };
   },
   methods:{
-
     /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
@@ -183,126 +147,85 @@ export default BusinessRegister;
 </script>
 
 <style scoped>
-/* Dropdown Button */
-
-.label{
-  color: white;
-}
-
-.dropdown {
-  cursor: pointer;
-  border-radius: 5em;
-  background: #3B5998;
-  border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
-
-  margin-left: 50%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
 
 .register-button {
+  margin: 1em auto;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
   background: #3B5998;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  padding: 10px 40px;
   font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
-  margin-bottom: 100%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
-/* The container <div> - needed to position the dropdown content */
-
-
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  margin-left: 80px;
-  margin-right: 80px;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-/* Links inside the dropdown */
-.dropdown-content a {
-  color: black;
-  padding: 3px 6px;
-  text-decoration: none;
-  display: block;
-}
-
-/* Change color of dropdown links on hover */
-
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {display: block;}
-
-/* Change the background color of the dropdown button when the dropdown content is shown */
-
-.form-group col-md-6{
-  color: rgb(38, 50, 56);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
 
 .card {
-  background-color: #FFFFFF;
-  width: 700px;
-  height: 400px;
+  max-width: 650px;
+  background-color: white;
   margin: 1em auto;
-  border-radius: 2.5em;
-  outline: none;
-  border: none;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  grid-row-gap: 1em;
+
 }
 
 .card-header {
-  font-family: 'Ubuntu', sans-serif;
+  grid-row: 1;
+
+  text-align: center;
   font-weight: bold;
-  font-size: 23px;
+  font-size: 24px;
   color: #3B5998;
+
+  margin: 0;
+  padding: 1em 0;
+
+}
+
+form {
+  grid-row: 2;
+
+  margin: 0 4em;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(5, auto);
+  grid-row-gap: 4px;
+
 }
 
 .form-control {
-  width: 76%;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 5px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
-  margin-left: 46px;
   text-align: center;
-  margin-bottom: 27px;
   font-family: 'Ubuntu', sans-serif;
+  margin: 0.5em auto;
+  width: 75%;
+
+}
+
+#business-name {
+  padding: 0;
+}
+
+.text-areas {
+  width: 75%;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+@media screen and (max-width: 600px) {
+  .card {
+    width: 90%;
+  }
 }
 
 </style>
