@@ -115,7 +115,6 @@ public class UserController {
    }
 
 
-
     /**
      * This method inserts a new user into the user repository
      * @param user Body of request in API specific format
@@ -123,10 +122,11 @@ public class UserController {
      */
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException {
-
+        
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             if (isValidUser(user)) {
                 User newUser = new User(user);
+                System.out.println(user.getHomeAddress());
                 System.out.println(user.getPassword());
                 System.out.println(newUser.getPassword());
                 userRepository.save(newUser);
