@@ -138,27 +138,4 @@ public class BusinessController {
         businessRepository.save(business);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-    @PostMapping("/businesses/{id}/products")
-    public ResponseEntity<String> createProduct(@PathVariable long id, @RequestBody NewProductRequest newProductRequest, HttpSession session) throws JsonProcessingException {
-        Business business = businessRepository.findBusinessById(id);
-        ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
-        System.out.println(adminIds);
-        User currentUser = (User) session.getAttribute("user");
-
-        for (User administrator : business.getAdministrators()) {
-            System.out.println(currentUser.equals(administrator));
-        }
-        System.out.println(currentUser.getId());
-        if (business == null) { // Business does not exist
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        } else if (!(adminIds.contains(currentUser.getId()) || currentUser.getRole().equals(Role.DGAA))) { // User is not authorized to add products
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } else { // User is authorized
-
-            return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(newProductRequest));
-        }
-    }
-
-
 }
