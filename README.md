@@ -1,4 +1,4 @@
-# Seng302 Example Project
+# ReFood
 
 Basic project template using `gradle`, `npm`, `Spring Boot`, `Vue.js` and `Gitlab CI`.
 
