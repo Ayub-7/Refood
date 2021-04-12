@@ -2,10 +2,10 @@
     <div class="card">
       <h3 class="card-header">Create a ReFood Account</h3>
         <form @submit="checkForm" novalidate="true">
-          <input type="text" id="firstname" class="form-control" placeholder="First name" name="firstname" v-model="firstname" required>
+          <vs-input :danger="(firstname.length < 2)" danger-text="The password does not meet the standards" :success="(firstname.length >= 2)" class="form2" type="text" placeholder="First name" v-model="firstname" required/>
           <input type="text" id="lastname" class="form-control" placeholder="Last name" name="lastname" v-model="lastname" required>
           <input type="email" id="email" class="form-control" placeholder="Email" name="email" v-model="email" required>
-          <input type="text" id="middlename" class="form-control" placeholder="Middle name" name="middlename" v-model="middlename">
+          <vs-input type="text" class="form2" placeholder="Middle name" v-model="middlename"/>
           <input type="text" id="nickname" class="form-control" placeholder="Nick Name" name="nickname" v-model="nickname">
 
           <input type="password" id="password" class="form-control" placeholder="Password" name="password" v-model="password" required>
@@ -49,7 +49,7 @@ const Register = {
   data: function () {
     return {
       errors: [],
-      firstname: null,
+      firstname: "",
       middlename: null,
       lastname: null,
       nickname: null,
@@ -61,10 +61,17 @@ const Register = {
       phonenumber: null,
       homeaddress: null,
       potentialAddresses: [],
-      suggestionsActive: false
+      suggestionsActive: false,
     };
   },
   methods:{
+    /*test: function() {
+      if (this.firstname.length < 5) {
+        this.danger = false;
+      }
+      return true;
+    },
+    */
 
     /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
@@ -104,7 +111,7 @@ const Register = {
 
       if (!this.confirm_password && this.password) {
         this.errors.push("Please confirm your password!");
-      } else if (!(this.password === this.confirm_password)) {
+      } else if (this.password !== this.confirm_password) {
         this.errors.push("Your confirmed password does not match!");
       }
 
@@ -369,6 +376,16 @@ form {
 
 }
 
+.form2 {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-align: center;
+  font-family: 'Ubuntu', sans-serif;
+
+  padding: 10px 20px;
+}
+
 #firstname {
   grid-column: 1;
   grid-row: 1;
@@ -434,5 +451,26 @@ form {
 
 }
 
-
+vs-input:invalid,
+textarea:invalid {
+  border-color: black ;
+}
+input:optional,
+textarea:optional {
+  border-color: gray;
+}
+input:focus:invalid,
+textarea:focus:invalid {
+  background: lightpink;
+  background-size: 25px;
+}
+input:required:focus:valid,
+textarea:required:focus:valid {
+  border-color: green;
+  background: mediumseagreen;
+}
+input:required:valid,
+textarea:required:valid {
+  border-color: green;
+}
 </style>
