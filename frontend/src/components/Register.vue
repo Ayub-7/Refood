@@ -153,6 +153,8 @@ const Register = {
 
       if (!this.dateofbirth) {
         this.errors.push("Please enter your date of birth");
+      } else if (this.getAge(this.dateofbirth) < 13) {
+        this.errors.push("Sorry, you are not old enough to join ReFood.")
       }
 
       if (!this.homeaddress) {
@@ -280,8 +282,19 @@ const Register = {
      */
     setAddress: function(address) {
       this.homeaddress = address
+    },
+
+    /**
+     * Returns the years since the user was born. No rounding is done in the function.
+     * @param enteredDate The user's birthdate
+     * @returns {number} The user's age in years.
+     */
+    getAge: function(enteredDate) {
+      var years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
+      return years;
     }
   },
+
 
 }
 export default Register;
