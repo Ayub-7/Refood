@@ -1,5 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
+import Vuesax from 'vuesax';
 import Register from '../components/Register';
 import api from '../Api'
 
@@ -10,6 +11,7 @@ let mutations;
 let state;
 const localVue = createLocalVue();
 localVue.use(Vuex);
+localVue.use(Vuesax);
 
 
 beforeEach(() => {
