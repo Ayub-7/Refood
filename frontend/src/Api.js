@@ -131,6 +131,7 @@ export default {
      * @param userId user identifier to remove the rights from.
      * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
      */
-    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true})
+    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true}),
 
+    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true})
 }

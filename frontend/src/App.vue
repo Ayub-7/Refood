@@ -16,6 +16,9 @@
             <router-link class="title" to="/search">Search</router-link>
           </th>
           <th>
+            <router-link class="title" to="/ProductCatalogue">ProductCatalogue</router-link>
+          </th>
+          <th>
             <router-link :to="{path: `/users/${this.$store.state.userId}`}" v-if="this.$store.state.userId != null" class="title">Profile</router-link>
           </th>
           <th>
@@ -43,6 +46,8 @@
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
+import ProductCatalogue from "@/components/ProductCatalogue";
+
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -54,7 +59,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister
+    Login, Register, BusinessRegister, ProductCatalogue
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
