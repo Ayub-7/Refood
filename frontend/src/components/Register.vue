@@ -81,7 +81,6 @@
 
 import api from "../Api";
 import axios from "axios"
-import main from "../main.js";
 import {store, mutations} from "../store"
 // const data = require('../testUser.json');
 // const users = data.users;
