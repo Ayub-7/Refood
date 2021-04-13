@@ -3,40 +3,77 @@
     <h3 class="card-header">Create a ReFood Account</h3>
     <form @submit="checkForm" novalidate="true">
       <div id="firstname">
-        <vs-input :danger="(firstname.length < 2)"
-                  danger-text="The password does not meet the standards"
-                  :success="(firstname.length >= 2)"
+        <vs-input :danger="(errors.includes(firstname))"
+                  danger-text="Firstname must be between 2 and 20 letters."
+                  :success="(firstname.length >= 2 && firstname.length < 20)"
                   class="form-control"
                   type="text"
                   placeholder="First name *"
                   v-model="firstname"
-                  required/>      </div>
+                  required/>
+      </div>
       <div id="middlename">
       <vs-input type="text" class="form-control" placeholder="Middle name" v-model="middlename"/>
       </div>
       <div id="lastname">
-      <vs-input :danger="(lastname.length < 2)"
-                danger-text="The password does not meet the standards"
-                :success="(lastname.length >= 2)"
+      <vs-input :danger="(errors.includes(lastname))"
+                danger-text="Lastname must be between 2 and 20 letters."
+                :success="(lastname.length >= 2 && lastname.length < 20)"
                 type="text"
                 class="form-control"
                 placeholder="Last name *"
+                v-model="lastname"
                 required/>
       </div>
       <div id="nickname">
       <vs-input type="text" class="form-control" placeholder="Nick Name" name="nickname" v-model="nickname"/>
       </div>
       <div id="email">
-        <vs-input type="email" class="form-control" placeholder="Email" name="email" v-model="email" required/>
+        <vs-input type="email"
+                  class="form-control"
+                  placeholder="Email *"
+                  :danger="errors.includes(email)"
+                  danger-text="Invalid email."
+                  :success="validEmail(email)"
+                  name="email"
+                  v-model="email"
+                  required/>
       </div>
       <div id="phonenumber">
         <vs-input type="tel" class="form-control" placeholder="Phone number" name="phonenumber" v-model="phonenumber"/>
       </div>
-      <vs-input type="password" id="password" class="form-control" placeholder="Password" name="password" v-model="password" required/>
-      <vs-input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" name="confirm_password" v-model="confirm_password" required/>
-      <vs-input type="date" id="date-of-birth" class="form-control" name="dateofbirth" v-model="dateofbirth" required/>
+      <vs-input type="password"
+                id="password"
+                class="form-control"
+                placeholder="Password *"
+                :danger="errors.includes(password)"
+                danger-text="Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
+                :success="validPassword(password)"
+                name="password"
+                v-model="password"
+                required/>
+      <vs-input type="password"
+                id="confirm-password"
+                class="form-control"
+                placeholder="Confirm Password *"
+                :danger="errors.includes(confirm_password)"
+                danger-text="Password invalid"
+                :success="(confirm_password===password && confirm_password.length !== 0)"
+                name="confirm_password"
+                v-model="confirm_password"
+                required/>
+      <vs-input type="date"
+                id="date-of-birth"
+                class="form-control"
+                name="dateofbirth"
+                v-model="dateofbirth"
+                :danger="errors.includes(dateofbirth)"
+                danger-text="Enter date of birth"
+                :success="(dateofbirth!=null)"
+                label="Date of birth *"
+                required/>
       <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
-      <vs-textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Home Address" name="homeaddress" v-model="homeaddress" required></vs-textarea>
+      <vs-textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Home Address *" name="homeaddress" v-model="homeaddress" required></vs-textarea>
 
       <div v-if="suggestionsActive">
         <ul class="addressSuggestion">Suggestions:
@@ -78,8 +115,8 @@
         nickname: null,
         bio: null,
         email: null,
-        password: null,
-        confirm_password: null,
+        password: "",
+        confirm_password: "",
         dateofbirth: null,
         phonenumber: null,
         homeaddress: null,
@@ -103,43 +140,29 @@
        */
       checkForm: function() {
         this.errors = [];
-
-        if (!this.firstname) {
-          this.errors.push("First name required!");
-        } else if (this.firstname.length > 20) {
-          this.errors.push("First name is too long!");
-        } else if (this.firstname.length < 2) {
-          this.errors.push("First name is too short!");
+        console.log(this.errors);
+        if (this.firstname.length < 2 || this.firstname.length > 20) {
+          this.errors.push(this.firstname);
         }
 
-        if (!this.lastname) {
-          this.errors.push("Last name required!");
-        } else if (this.lastname.length > 20) {
-          this.errors.push("Last name is too long!");
-        } else if (this.lastname.length < 2) {
-          this.errors.push("Last name is too short!");
+        if (this.lastname.length < 2 || this.lastname.length > 20) {
+          this.errors.push(this.lastname);
         }
 
-        if (!this.email) {
-          this.errors.push("Email is required!");
-        } else if (!this.validEmail(this.email)) {
-          this.errors.push("Please enter a valid email!");
+        if (!this.validEmail(this.email)) {
+          this.errors.push(this.email);
         }
 
-        if (!this.password) {
-          this.errors.push("Please enter your password!");
-        } else if (!this.validPassword(this.password)) {
-          this.errors.push("Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character");
+        if (!this.validPassword(this.password)) {
+          this.errors.push(this.password);
         }
 
-        if (!this.confirm_password && this.password) {
-          this.errors.push("Please confirm your password!");
-        } else if (this.password !== this.confirm_password) {
-          this.errors.push("Your confirmed password does not match!");
+        if (this.confirm_password.length == 0 || this.password !== this.confirm_password) {
+          this.errors.push(this.confirm_password);
         }
 
         if (!this.dateofbirth) {
-          this.errors.push("Please enter your date of birth");
+          this.errors.push("dateofbirth");
         }
 
         if (!this.homeaddress) {
