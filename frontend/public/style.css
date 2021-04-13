@@ -480,5 +480,5 @@ body {
   border-top: 2px solid black;
 }
 #topBar {
-  height: 55px;
+  height: auto;
 }

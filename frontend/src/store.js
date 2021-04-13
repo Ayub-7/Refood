@@ -48,6 +48,10 @@ export const mutations = {
 
     userLogout() {
         store.loggedInUserId = null;
+        store.userName = null;
+        store.userPrimaryBusinesses = null;
+        store.actingAsBusinessId = null;
+        store.actingAsBusinessName = null;
     },
 
     setUserRole(role) {
@@ -63,7 +67,12 @@ export const mutations = {
     },
 
     setActingAsBusiness(businessId, businessName){
-        store.businessId = businessId;
-        store.businessName = businessName;
+        store.actingAsBusinessId = businessId;
+        store.actingAsBusinessName = businessName;
+    },
+
+    setActingAsUser(){
+        store.actingAsBusinessId = null;
+        store.actingAsBusinessName = null;
     }
 }

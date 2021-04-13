@@ -3,9 +3,7 @@
   <div id="body">
   <div class="main">
     <p class="sign" align="center">Sign in</p>
-  <form id="login-form">
-    <div class="container">
-
+  <form id="login-form" >
       <div v-if="errors.length">
         <b>Please correct the following error(s):</b>
       <ul>
@@ -16,9 +14,9 @@
 
       <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
       <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
+
       <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
-      <button type="button" class="forgotPassword">Forgot Password?</button>
-    </div>
+      <div type="button" class="forgotPassword">Forgot Password?</div>
   </form>
   </div>
   </div>
@@ -28,7 +26,7 @@
 
 <script>
 import api from "../Api";
-import {mutations, store} from "../store"
+import {mutations} from "../store"
 //import Vue from "vue"
 //import VueSimpleAlert from "vue-simple-alert";
 //let passwordHash = require('password-hash');
@@ -82,7 +80,7 @@ const Login = {
           //LOAD USER PAGE, USING ROUTER
           mutations.setUserLoggedIn(response.data.userId, response.data.role);
           //mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
-          this.getUserInfo(response.data.userId);
+          //this.getUserInfo(response.data.userId);
           //console.log(response.data.businessesAdministered);
           this.$router.push({path: `/users/${response.data.userId}`});
 
@@ -96,18 +94,18 @@ const Login = {
         })
       }
     },
-    getUserInfo: function(userId) {
-      api.getUserFromID(userId) //Get user data
-          .then((response) => {
-            if(store.loggedInUserId != null) {
-              this.user = response.data;
-              mutations.setUserPrimaryBusinesses(this.user.businessesAdministered);
-              mutations.setUserName(this.user.firstName + " " + this.user.lastName);
-            }
-          }).catch((err) => {
-        throw new Error(`Error trying to get user info from id: ${err}`);
-      });
-    },
+    // getUserInfo: function(userId) {
+    //   api.getUserFromID(userId) //Get user data
+    //       .then((response) => {
+    //         if(store.loggedInUserId != null) {
+    //           this.user = response.data;
+    //           mutations.setUserPrimaryBusinesses(this.user.businessesAdministered);
+    //           mutations.setUserName(this.user.firstName + " " + this.user.lastName);
+    //         }
+    //       }).catch((err) => {
+    //     throw new Error(`Error trying to get user info from id: ${err}`);
+    //   });
+    // },
   },
 
 }
@@ -205,6 +203,7 @@ form#login-form {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
   color: #3B5998;
   padding-top: 15px;
+  text-align: center;
 }
 a {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);

@@ -10,14 +10,15 @@
             <li><router-link class="title" to="/login">Login</router-link></li>
           </div>
           <div v-else>
-            <li><router-link class="title" to="/businesses">Register a Business</router-link></li>
+            <li v-if="getActingAsUserId() == null"><router-link class="title" to="/businesses">Register a Business</router-link></li>
             <li><router-link class="title" to="/search">Search</router-link></li>
-            <li><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
+            <li v-if="getActingAsUserId() == null"><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
+            <li v-if="getActingAsUserId() != null"><router-link :to="{path: `/businesses/${getActingAsUserId()}`}" class="title">Business Profile</router-link></li>
             <li><router-link :to="{path: '/login'}" class="title">
                 <span class="title" @click="logoutUser()">Logout</span>
               </router-link></li>
             <div class="userDetail">
-              <ActingAs />
+              <ActingAs/>
             </div>
           </div>
         </ul>
@@ -65,6 +66,17 @@ const app = {
      */
     getLoggedInUser() {
       return store.loggedInUserId;
+    },
+
+    getActingAsUserId(){
+      return store.actingAsBusinessId;
+    },
+
+    // getUserRole() {
+    //   return store.role;
+    // },
+    getPrimaryBusinesses(){
+      return store.userPrimaryBusinesses;
     },
     /**
      * Calls the logout function which removes loggedInUserId
