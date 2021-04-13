@@ -44,6 +44,7 @@ import Users from "@/components/Users.vue";
 import Search from "@/components/Search.vue";
 import Business from "@/components/Business.vue";
 import BusinessAdministrators from "@/components/BusinessAdministrators";
+import ProductCatalogue from "@/components/ProductCatalogue";
 
 Vue.config.productionTip = false
 
@@ -124,6 +125,7 @@ const routes = [
   {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {path: '/search', component: Search},
+  {path: '/ProductCatalogue', component: ProductCatalogue},
   {
     path: '/businesses/:id',
     name: 'Business',
