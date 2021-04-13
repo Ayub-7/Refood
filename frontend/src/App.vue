@@ -24,7 +24,7 @@
         <div style="  display: flex;  justify-content: right; text-align: right">
           <div>
             <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
-              <div v-if="getUserName()">
+              <div v-if="getUserName() != null">
                 {{getUserName()}}
               </div>
               <div v-if="getUserBusinesses() > 0">

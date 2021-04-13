@@ -93,7 +93,7 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
-import {store} from "../store";
+import {mutations, store} from "../store";
 
 
 const Users = {
@@ -184,6 +184,8 @@ const Users = {
             //update thumbnail user name and associated businesses, if any
             // this.$store.commit('setUserName', response.data.firstName + " " + response.data.middleName + " " + response.data.lastName); //store the user's name in the program state to be displayed on the top right of the page
             // this.$store.commit('setUserAssociatedBusinesses', this.businesses);
+            mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+            mutations.setUserPrimaryBusinesses(this.businesses);
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`);
       });
