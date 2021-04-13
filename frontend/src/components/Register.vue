@@ -8,12 +8,18 @@
                   :success="(firstname.length >= 2 && firstname.length < 20)"
                   class="form-control"
                   type="text"
-                  placeholder="First name *"
+                  label-placeholder="First name *"
                   v-model="firstname"
                   required/>
       </div>
       <div id="middlename">
-      <vs-input type="text" class="form-control" placeholder="Middle name" v-model="middlename"/>
+      <vs-input type="text"
+                class="form-control"
+                label-placeholder="Middle name"
+                :danger="middlename.length>20"
+                danger-text="Middlename must be less that 20 characters"
+                :success="middlename.length > 0 && middlename.length < 20"
+                v-model="middlename"/>
       </div>
       <div id="lastname">
       <vs-input :danger="(errors.includes(lastname))"
@@ -21,33 +27,46 @@
                 :success="(lastname.length >= 2 && lastname.length < 20)"
                 type="text"
                 class="form-control"
-                placeholder="Last name *"
+                label-placeholder="Last name *"
                 v-model="lastname"
                 required/>
       </div>
       <div id="nickname">
-      <vs-input type="text" class="form-control" placeholder="Nick Name" name="nickname" v-model="nickname"/>
+      <vs-input type="text"
+                class="form-control"
+                label-placeholder="Nick Name"
+                :danger="nickname.length>20"
+                danger-text="Nickname must be less that 20 characters"
+                :success="nickname.length > 0 && nickname.length < 20"
+                name="nickname"
+                v-model="nickname"/>
       </div>
       <div id="email">
         <vs-input type="email"
                   class="form-control"
-                  placeholder="Email *"
+                  label-placeholder="Email *"
                   :danger="errors.includes(email)"
                   danger-text="Invalid email."
                   :success="validEmail(email)"
-                  name="email"
                   v-model="email"
                   required/>
       </div>
       <div id="phonenumber">
-        <vs-input type="tel" class="form-control" placeholder="Phone number" name="phonenumber" v-model="phonenumber"/>
+        <vs-input type="tel"
+                  class="form-control"
+                  label-placeholder="Phone number"
+                  :danger="phonenumber !== null && phonenumber.length>0 && errors.includes(phonenumber)"
+                  danger-text="Invalid phone number."
+                  :success="validPhoneNum(phonenumber)"
+                  name="phonenumber"
+                  v-model="phonenumber"/>
       </div>
       <vs-input type="password"
                 id="password"
                 class="form-control"
-                placeholder="Password *"
+                label-placeholder="Password *"
                 :danger="errors.includes(password)"
-                danger-text="Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
+                danger-text="Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character."
                 :success="validPassword(password)"
                 name="password"
                 v-model="password"
@@ -55,9 +74,9 @@
       <vs-input type="password"
                 id="confirm-password"
                 class="form-control"
-                placeholder="Confirm Password *"
+                label-placeholder="Confirm Password *"
                 :danger="errors.includes(confirm_password)"
-                danger-text="Password invalid"
+                danger-text="Confirmed password invalid."
                 :success="(confirm_password===password && confirm_password.length !== 0)"
                 name="confirm_password"
                 v-model="confirm_password"
@@ -69,7 +88,7 @@
                 v-model="dateofbirth"
                 :danger="errors.includes(dateofbirth)"
                 danger-text="Enter date of birth"
-                :success="(dateofbirth!=null)"
+                :success="(dateofbirth.length!==0)"
                 label="Date of birth *"
                 required/>
       <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
@@ -110,14 +129,14 @@
       return {
         errors: [],
         firstname: "",
-        middlename: null,
+        middlename: "",
         lastname: "",
-        nickname: null,
+        nickname: "",
         bio: null,
-        email: null,
+        email: "",
         password: "",
         confirm_password: "",
-        dateofbirth: null,
+        dateofbirth: "",
         phonenumber: null,
         homeaddress: null,
         potentialAddresses: [],
@@ -140,7 +159,6 @@
        */
       checkForm: function() {
         this.errors = [];
-        console.log(this.errors);
         if (this.firstname.length < 2 || this.firstname.length > 20) {
           this.errors.push(this.firstname);
         }
@@ -161,30 +179,20 @@
           this.errors.push(this.confirm_password);
         }
 
-        if (!this.dateofbirth) {
-          this.errors.push("dateofbirth");
+        if (this.dateofbirth.length !== 0) {
+          this.errors.push(this.dateofbirth);
         }
 
         if (!this.homeaddress) {
           this.errors.push("Please enter your home address!");
         }
 
-        if (this.middlename.length > 20) {
-          this.errors.push("Middle name is too long!");
+        if (this.phonenumber !== null && this.phonenumber !== "" && !this.validPhoneNum(this.phonenumber)) {
+          this.errors.push(this.phonenumber);
         }
 
-        if (this.nickname.length > 20) {
-          this.errors.push("Nickname is too long!");
-        }
-
-        if (!this.validPhoneNum(this.phonenumber)) {
-          this.errors.push("Invalid phone number!");
-        } else if (this.phonenumber.length > 13) {
-          this.errors.push("The phone number you inputted is too long!");
-        } else if (this.phonenumber.length < 3) {
-          this.errors.push("The phone number you inputted is too short!");
-        }
       },
+
 
       /**
        * The function ensures that the inputted email is in the right email format using a Regular Expression to check it.
