@@ -17,7 +17,7 @@
 
       <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
       <div type="button" class="forgotPassword">Forgot Password?</div>
-  </form>
+  </form>2
   </div>
   </div>
 </template>
@@ -78,6 +78,7 @@ const Login = {
         api.login(this.email, this.password)
         .then((response) => {
           //LOAD USER PAGE, USING ROUTER
+          console.log(response.data);
           mutations.setUserLoggedIn(response.data.userId, response.data.role);
           //mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
           //this.getUserInfo(response.data.userId);

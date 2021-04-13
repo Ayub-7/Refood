@@ -1,22 +1,28 @@
 <template>
   <div class="userInfo">
-        <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
+        <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
         <ul class="actInfo" v-if="getActingAsBusinessName() == null">
           <li class="user" >
             Logged in as {{getUserRole()}} {{getUserName()}}
           </li>
-          <li class="business" v-for="business in getPrimaryBusinesses()"
-               v-bind:href="business.id"
-               :key="business.id" @click="setActingAsBusinessId(business.id, business.name)">
-            <p>{{ business.name }} </p>
+          <li>
+            <form class="dropdown">
+              <label class="label"> Select Business to act as:  </label>
+              <select class="select" name="acting" v-model="buss" @click="setActingAsBusinessId(buss) ; Redirect()">
+                <option  v-for="business in getPrimaryBusinesses()"
+                        v-bind:href="business.id"
+                        :key="business.id" >{{ business.name}}</option>
+              </select>
+            </form>
           </li>
+
         </ul>
       <ul class="actInfo" v-else>
         <li class="business" >
           Logged in as BUSINESS: {{getActingAsBusinessName()}}
         </li>
         <li class="user" @click="setActingAsUser()">
-          <p>{{ getUserName() }} </p>
+          <p>Act As User: {{ getUserName() }} </p>
         </li>
         </ul>
       <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
@@ -31,6 +37,7 @@ const actingAs =  {
 name: "actingAs",
   data: function () {
     return {
+      buss:null,
       actingAsBusinessId: null,
       actingAsBusinessName: null,
     }
@@ -48,12 +55,18 @@ name: "actingAs",
       return store.userPrimaryBusinesses;
     },
 
-    setActingAsBusinessId(businessId, businessName){
+    setActingAsBusinessId(businessName){
+      //console.log("hi");
+      const businessId = mutations.getIdByName(businessName);
       mutations.setActingAsBusiness(businessId, businessName)
+    },
+    Redirect() {
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}`});
     },
 
     setActingAsUser(){
       mutations.setActingAsUser();
+      this.$router.push({path: `/users/${store.loggedInUserId}`});
     },
 
     getActingAsBusinessName(){

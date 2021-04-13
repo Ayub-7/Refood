@@ -54,6 +54,13 @@ export const mutations = {
         store.actingAsBusinessName = null;
     },
 
+    getIdByName(name) {
+        for (const names of store.userPrimaryBusinesses){
+            if (names.name === name){
+                return names.id;
+            }
+        }
+    },
     setUserRole(role) {
         store.role = role;
     },
