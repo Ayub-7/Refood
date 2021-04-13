@@ -3,8 +3,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <form class="main1">
       <div class="profile-text-inner">
-        <h3 class="title text-center">{{this.business}} Products</h3>
-      </div>
+        <h1 class="title text-center" style="font-size: 40px">{{this.business}} Products</h1>
+
+        <div style="margin: 50px;">
+          <h2 class="title" style="margin-bottom: 20px">Sort By: </h2>
+          <select v-model="selected">
+            <option disabled value="">Please select one</option>
+            <option @click="sortByName($event, 'id', 0);">ID</option>
+            <option @click="sortByName($event, 'name', 1);">Product Name</option>
+            <option @click="sortByName($event, 'description', 2);" >Description</option>
+            <option @click="sortByName($event, 'recommendedRetailPrice', 3);" >Recommended Retail Price</option>
+            <option @click="sortByName($event, 'created', 4);" >Date Created</option>
+          </select>
+        </div>
+        </div>
 
 
       <div>
@@ -12,7 +24,7 @@
         entries within the page by matching the search field to the product's firstname, middlename or lastname -->
         <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-        <table class="profile-text-inner" style="border-spacing: 0px 50px">
+        <table class="profile-text-inner" style="border-spacing: 0px 20px">
         <tr>
 
           <th>
@@ -21,22 +33,22 @@
             </button>
           </th>
           <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'name', 0);">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'name', 1);">
               Product Name <i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
           <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'description', 1);">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'description', 2);">
               Description<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
           <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'recommendedRetailPrice', 2)">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'recommendedRetailPrice', 3)">
               Recommended Retail Price<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
           <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'created', 3)">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'created', 4)">
               Date Created<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
@@ -77,7 +89,7 @@ const Search = {
   data: function() {
     return {
       errors: [],
-      toggle: [1,1,1,1,1,1,1,1],
+      toggle: [1,1,1,1,1],
       searchbar: "",
       searchbarResults: "",
       products: [],
