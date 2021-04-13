@@ -35,8 +35,9 @@
                 </div>
               </div>
           </div>
-          <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
-          <p>profile pic</p>
+          <vs-avatar size="large" style="margin-left: 10px">
+            {{getUserName().match(/[A-Z]/g).join('')}}
+          </vs-avatar>
         </div>
     </div>
     </div>
@@ -52,8 +53,11 @@
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
-import {store, mutations} from "./store"
-import api from "./Api"
+import {store, mutations} from "./store";
+import api from "./Api";
+import 'vuesax';
+import 'vuesax/dist/vuesax.css';
+
 // @click="goToUserPage()"
 
 // Vue app instance
