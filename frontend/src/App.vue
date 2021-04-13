@@ -16,29 +16,12 @@
             <li><router-link :to="{path: '/login'}" class="title">
                 <span class="title" @click="logoutUser()">Logout</span>
               </router-link></li>
+            <div class="userDetail">
+              <ActingAs />
+            </div>
           </div>
         </ul>
       </div>
-
-    <div class="userInfo" v-if="getUserName()">
-        <div style="  display: flex;  justify-content: right; text-align: right">
-          <div>
-            <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
-              <div v-if="getUserName()">
-                {{getUserName()}}
-              </div>
-              <div v-if="getUserBusinesses()">
-                <div v-for="business in getUserBusinesses()"
-                     v-bind:href="business.id"
-                     :key="business.id">
-                  <div>{{ business.name }} </div>
-                </div>
-              </div>
-          </div>
-          <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
-          <p>profile pic</p>
-        </div>
-    </div>
     </div>
     <div id="view">
       <router-view></router-view>
@@ -50,8 +33,9 @@
 </template>
 <script>
 import Register from "./components/Register";
-import Login from "@/components/Login.vue";
-import BusinessRegister from "@/components/BusinessRegister";
+import ActingAs from "./components/ActingAs";
+import Login from "./components/Login";
+import BusinessRegister from "./components/BusinessRegister";
 import {store, mutations} from "./store"
 import api from "./Api"
 // @click="goToUserPage()"
@@ -65,7 +49,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister
+    Login, Register, BusinessRegister, ActingAs
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
@@ -81,17 +65,6 @@ const app = {
      */
     getLoggedInUser() {
       return store.loggedInUserId;
-    },
-
-    getUserRole(){
-      return store.role;
-    },
-    getUserName(){
-      return store.userName;
-    },
-
-    getUserBusinesses(){
-      return store.userPrimaryBusinesses;
     },
     /**
      * Calls the logout function which removes loggedInUserId
@@ -126,7 +99,6 @@ const app = {
     .then((response) => {
       mutations.setUserLoggedIn(response.data.id, response.data.role);
       mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
-      console.log(response.data.businessesAdministered);
       mutations.setUserName(response.data.firstName + " " + response.data.lastName);
     })
   },
@@ -142,36 +114,6 @@ export default app;
 
 }
 
-.userInfo {
-  color: white;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: #385898;
-  /*padding: 10px 20px;*/
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-left: 5px;
-  margin-right: 20px;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-  padding-top: 20px;
-  text-align: right
-}
-.dgaa {
-  color: rgb(38, 50, 56);
-  background: #dbe0dd;
-  text-align: center;
-  font-size: 23px;
-  right: 0px;
-  font-weight: 600;
-  position: relative;
-  border-radius: 20px;
-  width: 100px;
-  font-family: 'Ubuntu', sans-serif;
-}
 
 .main{
   top: -110px;

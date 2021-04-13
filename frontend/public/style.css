@@ -430,6 +430,14 @@ body {
   width: 70%;
   position: relative;
   margin-top: 22px;
+  width: 75%;
+}
+.userDetail {
+  float: right;
+  width: 20%;
+  color: white;
+  display: block;
+
 }
 
 .topbar #navLinks li {
@@ -438,7 +446,7 @@ body {
 
 .topbar #navLinks .bar {
   list-style-type: none;
-
+  width: 75%;
 }
 
 @media only screen and (max-width: 700px) {
@@ -455,6 +463,7 @@ body {
 
   .topbar #navLinks li {
     display: block;
+
   }
 
   .navButton {

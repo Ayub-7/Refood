@@ -28,7 +28,7 @@
 
 <script>
 import api from "../Api";
-import {mutations} from "../store"
+import {mutations, store} from "../store"
 //import Vue from "vue"
 //import VueSimpleAlert from "vue-simple-alert";
 //let passwordHash = require('password-hash');
@@ -66,9 +66,6 @@ const Login = {
       if (!this.password) {
         this.errors.push('Password required.');
       }
-      // else if(this.password.length < 8){
-      //   this.errors.push('Password must be 8 characters long.');
-      // }
 
       if (this.email && this.password) {
         return true;
@@ -84,8 +81,9 @@ const Login = {
         .then((response) => {
           //LOAD USER PAGE, USING ROUTER
           mutations.setUserLoggedIn(response.data.userId, response.data.role);
-          mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
-          console.log(response.data.businessesAdministered);
+          //mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+          this.getUserInfo(response.data.userId);
+          //console.log(response.data.businessesAdministered);
           this.$router.push({path: `/users/${response.data.userId}`});
 
 
@@ -97,7 +95,19 @@ const Login = {
           }
         })
       }
-    }
+    },
+    getUserInfo: function(userId) {
+      api.getUserFromID(userId) //Get user data
+          .then((response) => {
+            if(store.loggedInUserId != null) {
+              this.user = response.data;
+              mutations.setUserPrimaryBusinesses(this.user.businessesAdministered);
+              mutations.setUserName(this.user.firstName + " " + this.user.lastName);
+            }
+          }).catch((err) => {
+        throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
   },
 
 }
