@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h3 class="card-header">Create a ReFood Business Account</h3>
-      <form>
+      <form autocomplete="off">
           <vs-input id="business-name"
                     :danger="this.errors.includes('businessName')"
                     type="text"
@@ -31,13 +31,20 @@
             <vs-input v-model="postcode" class="form-control" label-placeholder="Postcode"></vs-input>
           </div>
           <div id="city">
-            <vs-input v-model="city" class="form-control" label-placeholder="City"></vs-input>
+            <!-- If wanting to test/check suggested item tiles, remove blur. -->
+            <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label-placeholder="City"></vs-input>
+            <ul v-if="this.suggestCities" class="suggested-box">
+              <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+            </ul>
           </div>
           <div id="region">
             <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
           </div>
           <div id="country">
-            <vs-input :danger="this.errors.includes('country')" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+            <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+            <ul v-if="this.suggestCountries" class="suggested-box">
+              <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+            </ul>
           </div>
         </div>
 
@@ -51,7 +58,6 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-//import Vue from 'vue';
 import {store} from "../store"
 
 const BusinessRegister = {
@@ -72,15 +78,19 @@ const BusinessRegister = {
 
       description: "",
       businessType: null,
-      potentialAddresses: [],
-      suggestionsActive: false
+
+      suggestCities: false,
+      suggestedCities: [],
+
+      suggestCountries: false,
+      suggestedCountries: [],
+      minNumberOfCharacters: 3
     };
   },
   methods:{
     /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
-     * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
-     * is in the wrong format.
+     * Pushes name of error into an array, and display notification have errors exist.
      */
     checkForm: function() {
       this.errors = [];
@@ -92,10 +102,14 @@ const BusinessRegister = {
       if (this.country.length === 0) {
         this.errors.push('country');
       }
+
       if (!this.businessType) {
         this.errors.push('businessType');
       }
-      this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'})
+
+      if (this.errors.length >= 1) {
+        this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
+      }
 
     },
 
@@ -103,73 +117,89 @@ const BusinessRegister = {
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
     createBusinessInfo: function() {
+      // Use createUser function of API to POST user data to backend
+      if(this.errors.length === 0) {
+        let businessAddress = {
+          streetNumber: this.streetNumber,
+          streetName: this.streetAddress,
+          city: this.city,
+          region: this.region,
+          country: this.country,
+          postcode: this.postcode,
+        };
 
-      //Use createUser function of API to POST user data to backend
-      //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
-      //https://www.npmjs.com/package/json-server
-      if(this.errors.length === 0){
-        api.createBusiness(this.businessName, this.description, this.businessAddress, this.businessType)
-      .then((response) => {
-        this.$log.debug("New business created:", response.data);
-        // this.$store.commit('setBusinessId', response.data.businessId); //Store user info into program state, used for later calls
-        // this.$store.commit('setBusinessName', response.data.businessName);
-         this.$router.push({path: `/users/${store.loggedInUserId}`});
-      }).catch((error) => {
-        if(error.response){
-          console.log(error.response.status);
-          console.log(error.response.message);
-          this.errors.push("Business name already in use");
-        }
-        this.$log.debug("Error Status:", error)
-      });
+      api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
+        .then((response) => {
+          this.$log.debug("New business created:", response.data);
+          this.$router.push({path: `/users/${store.loggedInUserId}`});
+        }).catch((error) => {
+          if(error.response) {
+            console.log(error.response.status);
+            console.log(error.response.message);
+            this.errors.push("Access token is missing/invalid");
+          }
+          this.$log.debug("Error Status:", error)
+        });
     }},
 
     /**
-     * Function that filters response from photon API and pushes the address to potentialAddresses, The photon API response contains
-     * undefined values which have to be filtered.
-     * @param response Response from photon API containing address information
+     * Retrieve a list of suggested cities using the photon open api.
      */
-    filterAddressInfo : function(response) {
-      //Filters response from photon API and pushes information to potentialAddresses
-      let addressesShown = 5;
-      let addressList = response.data.features
-          for (let address of addressList) {
-            let addressDetails = address.properties;
-            //Filter null values and make sure not too many addresses are pushed
-            if(addressDetails.housenumber != null && addressDetails.street != null && addressDetails.city != null && this.potentialAddresses.length <= addressesShown) {
-              this.potentialAddresses.push(`${addressDetails.housenumber} ${addressDetails.street}, ${addressDetails.city}`);
-            }
-          }
+    getCitiesFromPhoton: function() {
+      if (this.city.length >= this.minNumberOfCharacters) {
 
-    },
-
-    /**
-     * Performs a GET request to the photon API using values from address input field,
-     * also handles the showing and hiding of the suggestion bar
-     */
-    getAddressFromPhoton : function() {
-      let minNumberOfCharacters = 3
-
-      if(this.businessAddress.length >= minNumberOfCharacters) {
-        this.suggestionsActive = true;
-        //Make call to photon API using value from address field, take only values that are houses
-        axios.get(`https://photon.komoot.io/api/?q=${this.businessAddress}&osm_tag=:house`)
-        .then(response => {
-          //Pass response into filter function which also pushes info to potential addresses
-          this.potentialAddresses = []
-          this.filterAddressInfo(response);
-        })
-      } else {
-        this.suggestionsActive = false; //Hide address suggestions
+        this.suggestCities = true;
+        axios.get(`https://photon.komoot.io/api/?q=${this.city}&osm_tag=place:city&lang=en`)
+            .then( res => {
+              this.suggestedCities = res.data.features.map(location => location.properties.name);
+              this.suggestedCities = this.suggestedCities.filter(city => city != null);
+            })
+            .catch( error => {
+              console.log("Error with getting cities from photon." + error);
+            });
+      }
+      else {
+        this.suggestCities = false;
       }
     },
 
     /**
-     * Sets address field when address in suggestions is clicked
+     * Set the city as the new city.
+     * @param selectedCity string to set as the new city.
      */
-    setAddress: function(address) {
-      this.businessAddress = address
-    }
+    setCity: function(selectedCity) {
+      this.city = selectedCity;
+      this.suggestCities = false;
+    },
+
+    /**
+     * Retrieve a list of suggested countries using the photon open api.
+     */
+    getCountriesFromPhoton: function() {
+      if (this.country.length >= this.minNumberOfCharacters) {
+
+        this.suggestCountries = true;
+        axios.get(`https://photon.komoot.io/api/?q=${this.country}&osm_tag=place:country&lang=en`)
+          .then( res => {
+            this.suggestedCountries = res.data.features.map(location => location.properties.country);
+          })
+          .catch( error => {
+            console.log("Error with getting countries from photon." + error);
+          });
+      }
+      else {
+        this.suggestCountries = false;
+      }
+    },
+
+    /**
+     * Set the country as the new country.
+     * @param selectedCountry the country string to set as.
+     */
+    setCountry: function(selectedCountry) {
+        this.country = selectedCountry;
+        this.suggestCountries = false;
+    },
 
   },
 
@@ -179,6 +209,28 @@ export default BusinessRegister;
 </script>
 
 <style scoped>
+
+.suggested-box {
+  position: absolute;
+  display: inline-block;
+  list-style: none;
+  width: 225px;
+}
+
+.suggested-item {
+  cursor: pointer;
+  position: relative;
+  margin: 0 0 0 1em;
+
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  padding: 0.5em 1em;
+  background: white;
+  z-index: 99;
+}
+
+.suggested-item:hover {
+  background: lightgray;
+}
 
 .register-button {
   margin: 1em auto;
