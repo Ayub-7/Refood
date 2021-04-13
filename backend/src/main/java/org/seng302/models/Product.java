@@ -3,10 +3,12 @@ package org.seng302.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.seng302.models.requests.NewProductRequest;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 @Data
@@ -39,4 +41,12 @@ public class Product {
         this.created = created;
     }
 
+    public Product(NewProductRequest newProductRequest, Long businessId) {
+        this.id = newProductRequest.getId();
+        this.businessId = businessId;
+        this.name = newProductRequest.getName();
+        this.description = newProductRequest.getDescription();
+        this. recommendedRetailPrice = newProductRequest.getRecommendedRetailPrice();
+        this.created = new Date();
+    }
 }

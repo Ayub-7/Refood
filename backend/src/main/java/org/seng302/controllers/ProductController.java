@@ -53,26 +53,74 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
-    @PostMapping("/businesses/{id}/products")
-    public ResponseEntity<String> createProduct(@PathVariable long id, @RequestBody NewProductRequest newProductRequest, HttpSession session) throws JsonProcessingException {
-        Business business = businessRepository.findBusinessById(id);
-        ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
-        System.out.println(adminIds);
-        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
-        for (User administrator : business.getAdministrators()) {
-            System.out.println(currentUser.equals(administrator));
-        }
-        System.out.println(currentUser.getId());
+    /**
+     * Creates a new product and adds it to the product catalogue of the current acting business
+     * Authentication is required, user must be a business admin or a default global admin
+     * @param id unique identifier of the business
+     * @param req the request body for the new product object
+     * @param session http session which holds the authenticated user
+     * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
+     * @throws JsonProcessingException
+     */
+    @PostMapping("/businesses/{id}/products")
+    public ResponseEntity<String> createProduct(@PathVariable long id, @RequestBody NewProductRequest req, HttpSession session) {
+        Business business = businessRepository.findBusinessById(id);
+
         if (business == null) { // Business does not exist
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        } else if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } else { // User is authorized
+        } else {
+            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
-            return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(newProductRequest));
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else { // User is authorized
+                ArrayList checkProduct = isValidProduct(req, business);
+                boolean isValid = (Boolean) checkProduct.get(0);
+                String errorMessage = (String) checkProduct.get(1);
+                if (isValid) {
+                    Product newProduct = new Product(req, business.getId());
+                    productRepository.save(newProduct);
+                    return ResponseEntity.status(HttpStatus.CREATED).build();
+                }
+                else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+                }
+            }
         }
     }
 
+    /**
+     * Checks the product request body to ensure all fields are valid
+     * @param product The product to be created, includes id, name, description and price
+     * @param business The business that is creating the product
+     * @return True if all fields are valid, otherwise false
+     */
+    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business) {
+        boolean isValid = true;
+        String errorMessage = null;
+
+
+        System.out.println(product.getRecommendedRetailPrice());
+        if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
+            errorMessage = "A product already exists with this ID";
+            isValid = false;
+        } else if (product.getName() == null || product.getName() == "") {
+            errorMessage = "Product name can not be empty";
+            isValid = false;
+        } else if (product.getDescription() == null || product.getDescription() == "") {
+            errorMessage = "Product description can not be empty";
+            isValid = false;
+        } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
+            errorMessage = "Product recommended retail price must be at least 0";
+            isValid = false;
+        }
+
+        ArrayList returnObjects = new ArrayList();
+        returnObjects.add(isValid);
+        returnObjects.add(errorMessage);
+        return returnObjects;
+    }
 
 }
