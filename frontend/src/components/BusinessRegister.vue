@@ -2,23 +2,46 @@
   <div class="card">
     <h3 class="card-header">Create a ReFood Business Account</h3>
       <form>
-          <vs-input id="business-name" type="text" class="form-control" label="Business Name" v-model="businessName"/>
+          <vs-input id="business-name"
+                    :danger="this.errors.includes('businessName')"
+                    type="text"
+                    class="form-control"
+                    label-placeholder="Business Name (Required)"
+                    v-model="businessName"/>
 
-          <vs-select width="75%" id="business-type" class="form-control" label="Select Business Type" v-model="businessType">
+          <vs-select
+              width="90%"
+              id="business-type"
+              :danger="this.errors.includes('businessType')"
+              class="form-control"
+              label="Select Business Type (Required)"
+              v-model="businessType"
+              autocomplete >
             <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
           </vs-select>
 
-          <vs-textarea type="text" class="form-control text-areas" label="Business Address" @input="getAddressFromPhoton()" autocomplete='nope' v-model="businessAddress" required/>
-          <div v-if="suggestionsActive">
-            <ul class="addressSuggestion">Suggestions:
-
-              <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
-                {{address}}
-            </li>
-            </ul>
+        <div id="address-container">
+          <div id="street-number">
+            <vs-input v-model="streetNumber" class="form-control" label-placeholder="Street Number"></vs-input>
           </div>
+          <div id="street-address">
+            <vs-input v-model="streetAddress" class="form-control" label-placeholder="Street Address"></vs-input>
+          </div>
+          <div id="postcode">
+            <vs-input v-model="postcode" class="form-control" label-placeholder="Postcode"></vs-input>
+          </div>
+          <div id="city">
+            <vs-input v-model="city" class="form-control" label-placeholder="City"></vs-input>
+          </div>
+          <div id="region">
+            <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
+          </div>
+          <div id="country">
+            <vs-input :danger="this.errors.includes('country')" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+          </div>
+        </div>
 
-          <vs-textarea type="text" class="form-control text-areas" label="Business Description" name="Description" v-model="description"/>
+          <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
 
           <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
       </form>
@@ -38,9 +61,16 @@ const BusinessRegister = {
       availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
 
       errors: [],
-      businessName: null,
-      businessAddress: null,
-      description: null,
+      businessName: "",
+
+      streetNumber: "",
+      streetAddress: "",
+      postcode: "",
+      city: "",
+      region: "",
+      country: "",
+
+      description: "",
       businessType: null,
       potentialAddresses: [],
       suggestionsActive: false
@@ -55,16 +85,18 @@ const BusinessRegister = {
     checkForm: function() {
       this.errors = [];
 
-      if (!this.businessName) {
-        this.errors.push("Please enter your business name!");
+      if (this.businessName.length === 0) {
+        this.errors.push('businessName');
       }
 
-      if (!this.businessAddress) {
-        this.errors.push("Please enter your business address!");
+      if (this.country.length === 0) {
+        this.errors.push('country');
       }
       if (!this.businessType) {
-        this.errors.push("Please enter a business type!");
+        this.errors.push('businessType');
       }
+      this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'})
+
     },
 
     /**
@@ -75,7 +107,7 @@ const BusinessRegister = {
       //Use createUser function of API to POST user data to backend
       //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
       //https://www.npmjs.com/package/json-server
-      if(this.errors.length == 0){
+      if(this.errors.length === 0){
         api.createBusiness(this.businessName, this.description, this.businessAddress, this.businessType)
       .then((response) => {
         this.$log.debug("New business created:", response.data);
@@ -203,13 +235,9 @@ form {
 }
 
 .form-control {
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  text-align: center;
   font-family: 'Ubuntu', sans-serif;
-  margin: 0.5em auto;
-  width: 75%;
+  margin: 0.25em auto;
+  width: 90%;
 
 }
 
@@ -217,9 +245,52 @@ form {
   padding: 0;
 }
 
+#address-container {
+  display: grid;
+  grid-template-columns: repeat(2, 2fr) repeat(3, 3fr);
+  grid-template-rows: repeat(3, auto);
+
+}
+
+vs-input {
+  margin: 0;
+}
+
+#street-number {
+  grid-row: 1;
+  grid-column: 1 / 3;
+}
+
+#street-address {
+  grid-row: 1;
+  grid-column: 3 / 6;
+}
+
+#city {
+  grid-row: 2;
+  grid-column: 3 / 6;
+}
+
+#region {
+  grid-row: 3;
+  grid-column: 1 / 3;
+}
+
+#country {
+  grid-row: 3;
+  grid-column: 3 / 6;
+}
+
+#postcode {
+  grid-row: 2;
+  grid-column: 1 / 3;
+}
+
 .text-areas {
-  width: 75%;
+  margin-top: 1em;
+  width: 90%;
   font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
 }
 
 @media screen and (max-width: 600px) {

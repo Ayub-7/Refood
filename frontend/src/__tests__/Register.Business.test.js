@@ -1,6 +1,8 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Business from '../components/BusinessRegister';
+import Vuesax from 'vuesax';
+
 import api from '../Api'
 
 let wrapper;
@@ -10,6 +12,11 @@ let mutations;
 let state;
 const localVue = createLocalVue();
 localVue.use(Vuex);
+localVue.use(Vuesax);
+
+let $vs = {
+    notify: jest.fn()
+}
 
 beforeEach(() => {
     actions = {
@@ -28,7 +35,7 @@ beforeEach(() => {
     });
     wrapper = shallowMount(Business, {
         propsData: {},
-        mocks: {},
+        mocks: {$vs},
         stubs: {},
         methods: {},
         store,

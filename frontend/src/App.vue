@@ -50,8 +50,8 @@
 </template>
 <script>
 import Register from "./components/Register";
-import Login from "@/components/Login.vue";
-import BusinessRegister from "@/components/BusinessRegister";
+import Login from "./components/Login.vue";
+import BusinessRegister from "./components/BusinessRegister";
 import {store, mutations} from "./store"
 import api from "./Api"
 // @click="goToUserPage()"
