@@ -55,12 +55,23 @@
         <vs-input type="tel"
                   class="form-control"
                   label-placeholder="Phone number"
-                  :danger="phonenumber !== null && phonenumber.length>0 && errors.includes(phonenumber)"
+                  :danger="phonenumber.length>0 && errors.includes(phonenumber)"
                   danger-text="Invalid phone number."
                   :success="validPhoneNum(phonenumber)"
                   name="phonenumber"
                   v-model="phonenumber"/>
       </div>
+      <vs-input type="date"
+                id="date-of-birth"
+                class="form-control"
+                name="dateofbirth"
+                v-model="dateofbirth"
+                :danger="errors.includes(dateofbirth)"
+                danger-text="Enter date of birth"
+                :success="(dateofbirth.length!==0)"
+                label="Date of birth *"
+                required/>
+      <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
       <vs-input type="password"
                 id="password"
                 class="form-control"
@@ -81,19 +92,34 @@
                 name="confirm_password"
                 v-model="confirm_password"
                 required/>
-      <vs-input type="date"
-                id="date-of-birth"
-                class="form-control"
-                name="dateofbirth"
-                v-model="dateofbirth"
-                :danger="errors.includes(dateofbirth)"
-                danger-text="Enter date of birth"
-                :success="(dateofbirth.length!==0)"
-                label="Date of birth *"
-                required/>
-      <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
-      <vs-textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Home Address *" name="homeaddress" v-model="homeaddress" required></vs-textarea>
-
+      <div id="address-field">
+        <label for="address-field" class="label-control">Address *</label>
+        <div id="street-number">
+          <vs-input v-model="streetNumber" class="address-form-control" label-placeholder="Street Number" size="small"></vs-input>
+        </div>
+        <div id="street-address">
+          <vs-input v-model="streetAddress" class="address-form-control" label-placeholder="Street Address" size="small"></vs-input>
+        </div>
+        <div id="postcode">
+          <vs-input v-model="postcode" class="address-form-control" label-placeholder="Postcode" size="small"></vs-input>
+        </div>
+        <div id="city">
+          <!-- If wanting to test/check suggested item tiles, remove blur. -->
+          <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="address-form-control" label-placeholder="City" size="small"></vs-input>
+          <ul v-if="this.suggestCities" class="suggested-box">
+            <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+          </ul>
+        </div>
+        <div id="region">
+          <vs-input v-model="region" class="address-form-control" label-placeholder="Region" size="small"></vs-input>
+        </div>
+        <div id="country">
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="address-form-control" label-placeholder="Country *" size="small"></vs-input>
+          <ul v-if="this.suggestCountries" class="suggested-box">
+            <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+          </ul>
+        </div>
+      </div>
       <div v-if="suggestionsActive">
         <ul class="addressSuggestion">Suggestions:
           <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
@@ -137,10 +163,25 @@
         password: "",
         confirm_password: "",
         dateofbirth: "",
-        phonenumber: null,
-        homeaddress: null,
+        phonenumber: "",
         potentialAddresses: [],
         suggestionsActive: false,
+
+        streetNumber: "",
+        streetAddress: "",
+        postcode: "",
+        city: "",
+        region: "",
+        country: "",
+
+        suggestCities: false,
+        suggestedCities: [],
+
+        suggestCountries: false,
+        suggestedCountries: [],
+        minNumberOfCharacters: 3
+
+
       };
     },
     methods:{
@@ -179,12 +220,12 @@
           this.errors.push(this.confirm_password);
         }
 
-        if (this.dateofbirth.length !== 0) {
+        if (this.dateofbirth.length === 0) {
           this.errors.push(this.dateofbirth);
         }
 
-        if (!this.homeaddress) {
-          this.errors.push("Please enter your home address!");
+        if (this.country.length === 0) {
+          this.errors.push('country');
         }
 
         if (this.phonenumber !== null && this.phonenumber !== "" && !this.validPhoneNum(this.phonenumber)) {
@@ -309,10 +350,65 @@
        */
       setAddress: function(address) {
         this.homeaddress = address
-      }
-    },
+      },
 
-  }
+      getCitiesFromPhoton: function() {
+        if (this.city.length >= this.minNumberOfCharacters) {
+
+          this.suggestCities = true;
+          axios.get(`https://photon.komoot.io/api/?q=${this.city}&osm_tag=place:city&lang=en`)
+                  .then( res => {
+                    this.suggestedCities = res.data.features.map(location => location.properties.name);
+                    this.suggestedCities = this.suggestedCities.filter(city => city != null);
+                  })
+                  .catch( error => {
+                    console.log("Error with getting cities from photon." + error);
+                  });
+        }
+          else {
+            this.suggestCities = false;
+          }
+        },
+
+        /**
+         * Set the city as the new city.
+         * @param selectedCity string to set as the new city.
+         */
+        setCity: function(selectedCity) {
+          this.city = selectedCity;
+          this.suggestCities = false;
+        },
+
+        /**
+         * Retrieve a list of suggested countries using the photon open api.
+         */
+        getCountriesFromPhoton: function() {
+          if (this.country.length >= this.minNumberOfCharacters) {
+
+            this.suggestCountries = true;
+            axios.get(`https://photon.komoot.io/api/?q=${this.country}&osm_tag=place:country&lang=en`)
+                    .then( res => {
+                      this.suggestedCountries = res.data.features.map(location => location.properties.country);
+                    })
+                    .catch( error => {
+                      console.log("Error with getting countries from photon." + error);
+                    });
+          }
+          else {
+            this.suggestCountries = false;
+          }
+        },
+
+        /**
+         * Set the country as the new country.
+         * @param selectedCountry the country string to set as.
+         */
+        setCountry: function(selectedCountry) {
+          this.country = selectedCountry;
+          this.suggestCountries = false;
+        },
+      }
+    }
   export default Register;
 </script>
 <style scoped>
@@ -423,9 +519,29 @@
     text-align: center;
     font-family: 'Ubuntu', sans-serif;
 
-    padding: 10px 20px;
+    padding: 3px 10px;
     margin: 0.5em;
 
+  }
+
+  .address-form-control {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    text-align: center;
+    font-family: 'Ubuntu', sans-serif;
+
+    margin: 0.5em;
+
+  }
+
+  .label-control {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
   }
 
   vs-input {
@@ -451,6 +567,7 @@
     grid-column: 2;
     grid-row: 2;
   }
+
   #email {
     grid-column: 1;
     grid-row: 3;
@@ -461,6 +578,15 @@
     grid-row: 6;
   }
 
+  #address-field {
+    grid-column: 1 / 3;
+    display: grid;
+    padding: 0px;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(3, auto);
+  }
+
+
   #login-container {
     grid-column: 2;
   }
@@ -468,6 +594,38 @@
   #login-container label {
     margin: auto;
   }
+
+  #street-number {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  #street-address {
+    grid-row: 1;
+    grid-column: 4;
+  }
+
+  #city {
+    grid-row: 2;
+    grid-column: 4;
+  }
+
+  #region {
+    grid-row: 3;
+    grid-column: 1;
+  }
+
+  #country {
+    grid-row: 3;
+    grid-column: 4;
+  }
+
+  #postcode {
+    grid-row: 2;
+    grid-column: 1 / 3;
+  }
+
+
 
   @media screen and (max-width: 700px) {
     .card {
