@@ -2,10 +2,12 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.coyote.Response;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.NewBusinessRequest;
+import org.seng302.models.requests.NewProductRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @RestController
 public class BusinessController {
@@ -53,7 +57,6 @@ public class BusinessController {
     @PostMapping("/businesses")
     public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) {
         Business business = new Business(req.getName(), req.getDescription(), req.getAddress(), req.getBusinessType());
-        System.out.println("hello");
         User owner = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         business.createBusiness(owner);
 
@@ -134,5 +137,4 @@ public class BusinessController {
         businessRepository.save(business);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 }

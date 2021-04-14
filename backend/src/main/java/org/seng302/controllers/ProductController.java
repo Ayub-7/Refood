@@ -1,20 +1,24 @@
 package org.seng302.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.Business;
 import org.seng302.models.Product;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST controller with product related endpoints.
@@ -24,6 +28,8 @@ public class ProductController {
 
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Retrieves all of the products in the business' product catalogue.
@@ -46,5 +52,75 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
+
+    /**
+     * Creates a new product and adds it to the product catalogue of the current acting business
+     * Authentication is required, user must be a business admin or a default global admin
+     * @param id unique identifier of the business
+     * @param req the request body for the new product object
+     * @param session http session which holds the authenticated user
+     * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
+     * @throws JsonProcessingException
+     */
+    @PostMapping("/businesses/{id}/products")
+    public ResponseEntity<String> createProduct(@PathVariable long id, @RequestBody NewProductRequest req, HttpSession session) {
+        Business business = businessRepository.findBusinessById(id);
+
+        if (business == null) { // Business does not exist
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        } else {
+            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else { // User is authorized
+                ArrayList checkProduct = isValidProduct(req, business);
+                boolean isValid = (Boolean) checkProduct.get(0);
+                String errorMessage = (String) checkProduct.get(1);
+                if (isValid) {
+                    Product newProduct = new Product(req, business.getId());
+                    productRepository.save(newProduct);
+                    return ResponseEntity.status(HttpStatus.CREATED).build();
+                }
+                else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks the product request body to ensure all fields are valid
+     * @param product The product to be created, includes id, name, description and price
+     * @param business The business that is creating the product
+     * @return True if all fields are valid, otherwise false
+     */
+    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business) {
+        boolean isValid = true;
+        String errorMessage = null;
+
+        if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
+            errorMessage = "A product already exists with this ID";
+            isValid = false;
+        } else if (product.getId() == null || product.getId() == "") {
+            errorMessage = "Product id can not be empty";
+            isValid = false;
+        } else if (product.getName() == null || product.getName() == "") {
+            errorMessage = "Product name can not be empty";
+            isValid = false;
+        } else if (product.getDescription() == null || product.getDescription() == "") {
+            errorMessage = "Product description can not be empty";
+            isValid = false;
+        } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
+            errorMessage = "Product recommended retail price must be at least 0";
+            isValid = false;
+        }
+
+        ArrayList returnObjects = new ArrayList();
+        returnObjects.add(isValid);
+        returnObjects.add(errorMessage);
+        return returnObjects;
+    }
 
 }

@@ -66,6 +66,11 @@ INSERT INTO business (name, description, created, user_id, business_type, addres
 
 
 INSERT INTO business_admins (business_id, user_id) VALUES
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
     (3, 7),
     (5, 9),
     (4, 6),
