@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.67% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/9</span>
+                <span class='fraction'>7/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>0/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">42.86% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>3/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">50% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>3/6</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">66.67% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/9</span>
+                <span class='fraction'>7/14</span>
             </div>
         
             
@@ -251,7 +251,19 @@
 <a name='L192'></a><a href='#L192'>192</a>
 <a name='L193'></a><a href='#L193'>193</a>
 <a name='L194'></a><a href='#L194'>194</a>
-<a name='L195'></a><a href='#L195'>195</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -279,6 +291,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -294,12 +307,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -447,7 +471,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;template&gt;
   &lt;!-- --&gt;
-  &lt;div id="body" v-if="this.$store.state.userId != null"&gt;
+  &lt;div id="body" v-if="this.userLoggedIn == true"&gt;
       &lt;!-- Header of page, contains link to user profile and welcome message with user's first name --&gt;
       &lt;div id="welcomeHeader"&gt;
        &lt;h1 id="pageTitle"&gt; Welcome to your home page, {{this.userFirstName}}! &lt;/h1&gt;
@@ -474,11 +498,13 @@
 &nbsp;
 &lt;script&gt;
 import api from "../Api";
+import {store} from "../store"
 const Homepage = {
     name: "Homepage",
     data: function () {
         return {
-            userFirstName: null
+            userFirstName: null,
+            userLoggedIn: false
         }
     },
 &nbsp;
@@ -491,22 +517,32 @@ const Homepage = {
 <span class="fstat-no" title="function not covered" >        api.getUserFromID(userId)</span>
           .then((response) =&gt; {
 <span class="cstat-no" title="statement not covered" >            this.userFirstName = `${response.data.firstName}`</span>
+<span class="cstat-no" title="statement not covered" >            this.userLoggedIn = true;</span>
 <span class="fstat-no" title="function not covered" >          }).catch((err) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >            throw new Error(`Error trying to get user info from id: ${err}`)</span>
           })
       },
-      
+&nbsp;
+      /**
+       * Gets the logged in users id
+       */
+<span class="fstat-no" title="function not covered" >      getLoggedInUserId: function() {</span>
+<span class="cstat-no" title="statement not covered" >        let user = store.loggedInUserId;</span>
+<span class="cstat-no" title="statement not covered" >        this.userLoggedIn = user ? true : false; //check if user null or not</span>
+<span class="cstat-no" title="statement not covered" >        return store.loggedInUserId;</span>
+      },
+&nbsp;
       /**
        * Pushes users profile onto router
        */
 <span class="fstat-no" title="function not covered" >      goToProfilePage: function() {</span>
-<span class="cstat-no" title="statement not covered" >        this.$router.push({path: `/users/${this.$store.state.userId}`});</span>
+<span class="cstat-no" title="statement not covered" >        this.$router.push({path: `/users/${this.getLoggedInUserId()}`});</span>
       }
     },
 &nbsp;
     mounted: function () {
       //Retrieve userId and load user details
-      let userId = this.$store.state.userId
+      let userId = store.loggedInUserId;
       this.getUserDetails(userId);
     },
   
@@ -646,7 +682,7 @@ a {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Apr 08 2021 16:59:40 GMT+1200 (New Zealand Standard Time)
+                at Wed Apr 14 2021 18:02:19 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

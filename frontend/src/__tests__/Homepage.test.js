@@ -49,6 +49,10 @@ afterEach(() => {
 });
 
 describe('Homepage tests', () => {
+    beforeEach(() => {
+        wrapper.vm.userLoggedIn = true;
+    });
+
     test('User\'s first name is shown', () => {
         const nameTitle = wrapper.find("#pageTitle")
 
@@ -67,13 +71,8 @@ describe('Homepage tests', () => {
 });
 
 describe('Home page tests without user in state', () => {
-    beforeEach(() => {
-        wrapper.vm.store.loggedInUserId = null;
-        getLoggedInUserIdMethod.mockResolvedValue(null);
-    });
 
     test('Page not loaded if no user logged in', () => {
-        expect(wrapper.vm.store.loggedInUserId).toBeFalsy();
         expect(wrapper.find("#body").exists()).toBe(false)
     })
 })

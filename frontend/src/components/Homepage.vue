@@ -1,6 +1,6 @@
 <template>
   <!-- -->
-  <div id="body" v-if="getLoggedInUserId() != null">
+  <div id="body" v-if="this.userLoggedIn == true">
       <!-- Header of page, contains link to user profile and welcome message with user's first name -->
       <div id="welcomeHeader">
        <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
@@ -32,7 +32,8 @@ const Homepage = {
     name: "Homepage",
     data: function () {
         return {
-            userFirstName: null
+            userFirstName: null,
+            userLoggedIn: false
         }
     },
 
@@ -45,6 +46,7 @@ const Homepage = {
         api.getUserFromID(userId)
           .then((response) => {
             this.userFirstName = `${response.data.firstName}`
+            this.userLoggedIn = true;
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`)
           })
@@ -54,6 +56,8 @@ const Homepage = {
        * Gets the logged in users id
        */
       getLoggedInUserId: function() {
+        let user = store.loggedInUserId;
+        this.userLoggedIn = user ? true : false; //check if user null or not
         return store.loggedInUserId;
       },
 
@@ -67,7 +71,7 @@ const Homepage = {
 
     mounted: function () {
       //Retrieve userId and load user details
-      let userId = store.loggedInUserId
+      let userId = store.loggedInUserId;
       this.getUserDetails(userId);
     },
   

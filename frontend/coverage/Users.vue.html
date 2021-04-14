@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.78% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/36</span>
+                <span class='fraction'>19/38</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.46% </span>
+                <span class="strong">41.67% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/13</span>
+                <span class='fraction'>5/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.78% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>19/36</span>
+                <span class='fraction'>19/38</span>
             </div>
         
             
@@ -529,10 +529,11 @@
 <a name='L470'></a><a href='#L470'>470</a>
 <a name='L471'></a><a href='#L471'>471</a>
 <a name='L472'></a><a href='#L472'>472</a>
-<a name='L473'></a><a href='#L473'>473</a>
-<a name='L474'></a><a href='#L474'>474</a>
-<a name='L475'></a><a href='#L475'>475</a>
-<a name='L476'></a><a href='#L476'>476</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L473'></a><a href='#L473'>473</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -702,15 +703,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -729,20 +735,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1047,7 +1040,11 @@
           &lt;/div&gt;
           &lt;div id="address"&gt;
             &lt;div class="sub-header"&gt;Home Address&lt;/div&gt;
-            {{ this.user.homeAddress }}
+              &lt;div id="street-address"&gt;{{ user.homeAddress.streetNumber }} {{ user.homeAddress.streetName }}&lt;/div&gt;
+              &lt;div id="city"&gt;{{ user.homeAddress.city }}&lt;/div&gt;
+              &lt;div id="region"&gt;{{ user.homeAddress.region }}&lt;/div&gt;
+              &lt;div id="country"&gt;{{ user.homeAddress.country }}&lt;/div&gt;
+              &lt;div id="postcode"&gt;{{ user.homeAddress.postcode }}&lt;/div&gt;
           &lt;/div&gt;
           &lt;div id="phonenumber"&gt;
             &lt;div class="sub-header"&gt;Phone Number&lt;/div&gt;
@@ -1076,9 +1073,9 @@
       &lt;/div&gt;
 &nbsp;
       &lt;div slot="body"&gt;
-          &lt;select class="business-dropdown" v-model="selectedBusiness"&gt;
-            &lt;option v-for="business in this.userViewingBusinesses" :key="business.id" v-bind:business="business" v-bind:value="business"&gt;{{business.name}}&lt;/option&gt;
-          &lt;/select&gt;
+          &lt;vs-select class="business-dropdown" v-model="selectedBusiness"&gt;
+            &lt;vs-select-item v-for="business in userViewingBusinesses" :key="business.id" :text="business.name" :value="business"/&gt;
+          &lt;/vs-select&gt;
       &lt;/div&gt;
 &nbsp;
       &lt;div id="modal-footer" slot="footer"&gt;
@@ -1099,7 +1096,7 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
-import {store, mutations} from "../store";
+import {mutations, store} from "../store";
 &nbsp;
 &nbsp;
 const Users = {
@@ -1176,17 +1173,22 @@ const Users = {
     getUserInfo: function(userId) {
 <span class="fstat-no" title="function not covered" >      api.getUserFromID(userId) //Get user data</span>
           .then((response) =&gt; {
+<span class="cstat-no" title="statement not covered" >            if(store.userPrimaryBusinesses != null){</span>
+<span class="cstat-no" title="statement not covered" >              this.userViewingBusinesses = store.userPrimaryBusinesses;</span>
+            }
+<span class="cstat-no" title="statement not covered" >            console.log(this.userViewingBusinesses)</span>
 <span class="cstat-no" title="statement not covered" >            if(store.loggedInUserId != null) {</span>
 <span class="cstat-no" title="statement not covered" >              this.user = response.data;</span>
 <span class="cstat-no" title="statement not covered" >              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >              if (response.data.id === store.loggedInUserId) {</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >                mutations.setUserPrimaryBusinesses(this.businesses.filter(b =&gt; b.primaryAdministratorId === this.user.id));</span></span>
-<span class="cstat-no" title="statement not covered" >                this.userViewingBusinesses = store.userPrimaryBusinesses;</span>
-              }
             } else {
 <span class="cstat-no" title="statement not covered" >              this.$router.push({path: "/login"}); //If user not logged in send to login page</span>
             }
+&nbsp;
+            //update thumbnail user name and associated businesses, if any
+            // this.$store.commit('setUserName', response.data.firstName + " " + response.data.middleName + " " + response.data.lastName); //store the user's name in the program state to be displayed on the top right of the page
+            // this.$store.commit('setUserAssociatedBusinesses', this.businesses);
+<span class="cstat-no" title="statement not covered" >            mutations.setUserName(response.data.firstName + " " + response.data.lastName);</span>
+<span class="cstat-no" title="statement not covered" >            mutations.setUserPrimaryBusinesses(this.businesses);</span>
 <span class="fstat-no" title="function not covered" >          }).catch((err) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >            throw new Error(`Error trying to get user info from id: ${err}`);</span>
       });
@@ -1205,7 +1207,6 @@ const Users = {
   mounted: function () {
   //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
-    
     this.user = this.getUserInfo(userId);
   },
 &nbsp;
@@ -1296,7 +1297,6 @@ export default Users;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto) repeat(1, 1fr);
   grid-row-gap: 1em;
-&nbsp;
 }
 &nbsp;
 .sub-header {
@@ -1314,7 +1314,6 @@ export default Users;
 #bio {
   grid-column: 1;
   grid-row: 2;
-&nbsp;
 }
 &nbsp;
 #info-container {
@@ -1427,21 +1426,12 @@ main {
 &nbsp;
 /* Make User Admin Popup Box */
 .business-dropdown {
-  color: #FFFFFF;
   text-align: center;
   font-size: 14px;
   text-decoration: none;
 &nbsp;
   width: 100%;
   padding: 12px 16px;
-  border-radius: 5rem;
-  border: none;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-&nbsp;
-option {
-  color: black;
 }
 &nbsp;
 #modal-footer {
@@ -1490,7 +1480,7 @@ option {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Apr 12 2021 11:00:16 GMT+1200 (New Zealand Standard Time)
+                at Wed Apr 14 2021 18:02:19 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

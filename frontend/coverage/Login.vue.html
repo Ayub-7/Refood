@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.57% </span>
+                <span class="strong">66.67% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/23</span>
+                <span class='fraction'>16/24</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.57% </span>
+                <span class="strong">66.67% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/23</span>
+                <span class='fraction'>16/24</span>
             </div>
         
             
@@ -258,9 +258,12 @@
 <a name='L199'></a><a href='#L199'>199</a>
 <a name='L200'></a><a href='#L200'>200</a>
 <a name='L201'></a><a href='#L201'>201</a>
-<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -345,12 +348,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -464,9 +474,7 @@
   &lt;div id="body"&gt;
   &lt;div class="main"&gt;
     &lt;p class="sign" align="center"&gt;Sign in&lt;/p&gt;
-  &lt;form id="login-form"&gt;
-    &lt;div class="container"&gt;
-&nbsp;
+  &lt;form id="login-form" &gt;
       &lt;div v-if="errors.length"&gt;
         &lt;b&gt;Please correct the following error(s):&lt;/b&gt;
       &lt;ul&gt;
@@ -477,9 +485,9 @@
 &nbsp;
       &lt;input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required&gt;
       &lt;input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required&gt;
+&nbsp;
       &lt;button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users"&gt;Sign in&lt;/button&gt;
-      &lt;button type="button" class="forgotPassword"&gt;Forgot Password?&lt;/button&gt;
-    &lt;/div&gt;
+      &lt;div type="button" class="forgotPassword"&gt;Forgot Password?&lt;/div&gt;
   &lt;/form&gt;
   &lt;/div&gt;
   &lt;/div&gt;
@@ -545,7 +553,9 @@ const Login = {
         .then((response) =&gt; {
           //LOAD USER PAGE, USING ROUTER
 <span class="cstat-no" title="statement not covered" >          mutations.setUserLoggedIn(response.data.userId, response.data.role);</span>
-<span class="cstat-no" title="statement not covered" >          this.$router.push({path: `/users/${response.data.userId}`});</span>
+<span class="cstat-no" title="statement not covered" >          mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);</span>
+<span class="cstat-no" title="statement not covered" >          this.$router.push({path: `/home`});</span>
+&nbsp;
 &nbsp;
 <span class="fstat-no" title="function not covered" >        }).catch(err =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >          if(err.response) { //Catch bad request</span>
@@ -562,10 +572,14 @@ const Login = {
 export default Login;
 &lt;/script&gt;
 &nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
 &lt;style scoped&gt;
 #body {
-  background-color: #F3EBF6;
+  background-color: white;
   font-family: 'Ubuntu', sans-serif;
+&nbsp;
 }
 &nbsp;
 .main {
@@ -579,7 +593,7 @@ export default Login;
 &nbsp;
 .sign {
   padding-top: 40px;
-  color: #8C55AA;
+  color: #385898;
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
@@ -634,7 +648,7 @@ form#login-form {
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -647,8 +661,9 @@ form#login-form {
 }
 .forgotPassword {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #E1BEE7;
+  color: #3B5998;
   padding-top: 15px;
+  text-align: center;
 }
 a {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
@@ -667,7 +682,7 @@ a {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Apr 12 2021 11:00:16 GMT+1200 (New Zealand Standard Time)
+                at Wed Apr 14 2021 18:02:19 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
