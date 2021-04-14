@@ -101,9 +101,7 @@ public class ProductController {
         boolean isValid = true;
         String errorMessage = null;
 
-
-        System.out.println(product.getRecommendedRetailPrice());
-        if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
+        if (product.getId() == null || product.getId() == "" || productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
             errorMessage = "A product already exists with this ID";
             isValid = false;
         } else if (product.getName() == null || product.getName() == "") {
