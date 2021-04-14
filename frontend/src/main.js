@@ -35,18 +35,20 @@ import App from './App.vue';
 import VueLogger from 'vuejs-logger';
 import Vuesax from 'vuesax';
 
-import Login from "@/components/Login";
-import BusinessRegister from "@/components/BusinessRegister";
+import Login from "./components/Login";
+import BusinessRegister from "./components/BusinessRegister";
 import Register from "./components/Register";
-import Users from "@/components/Users.vue";
-import Search from "@/components/Search.vue";
-import Business from "@/components/Business.vue";
-import BusinessAdministrators from "@/components/BusinessAdministrators";
+import Users from "./components/Users.vue";
+import Search from "./components/Search.vue";
+import Business from "./components/Business.vue";
+import BusinessAdministrators from "./components/BusinessAdministrators";
 
-Vue.config.productionTip = false
-
-import 'vuesax/dist/vuesax.css'
+import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
+
+
+Vue.config.productionTip = false;
+
 
 const options = {
   isEnabled: true,

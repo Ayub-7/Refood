@@ -116,6 +116,8 @@ export default {
         instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
 
 
+    // ------ BUSINESSES
+
     /**
      * Create a new business by storin their data in the database
      * @param name business name
@@ -124,10 +126,8 @@ export default {
      * @param businessType business type
      */
     createBusiness: async(name, description, address, businessType) =>
-    instance.post('businesses', {name, description, address, businessType}),
+    instance.post('businesses', {name, description, address, businessType}, {withCredentials: true}),
 
-
-    // ------ BUSINESSES
 
     /**
      * Retrieve a single business with their unique id.

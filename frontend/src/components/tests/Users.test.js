@@ -1,6 +1,7 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Users from '../Users';
-import {mutations, store} from '../../store';
+import {store} from '../../store';
+import Vuesax from 'vuesax';
 
 
 let wrapper;
@@ -63,6 +64,7 @@ const $route = {
 
 
 const localVue = createLocalVue();
+localVue.use(Vuesax);
 
 
 beforeEach(() => {
