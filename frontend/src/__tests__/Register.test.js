@@ -1,7 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Register from '../components/Register';
-import Vuesax from 'vuesax';
 import api from '../Api'
 
 let wrapper;
@@ -11,7 +10,6 @@ let mutations;
 let state;
 const localVue = createLocalVue();
 localVue.use(Vuex);
-localVue.use(Vuesax);
 
 // Mocking registered users
 const mockUsers = {
