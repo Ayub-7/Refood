@@ -10,6 +10,7 @@
             <li><router-link class="title" to="/login">Login</router-link></li>
           </div>
           <div v-else>
+            <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
             <li><router-link class="title" to="/businesses">Register a Business</router-link></li>
             <li><router-link class="title" to="/search">Search</router-link></li>
             <li><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
