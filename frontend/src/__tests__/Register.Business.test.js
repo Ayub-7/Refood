@@ -3,8 +3,6 @@ import Vuex from 'vuex';
 import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
 
-import api from '../Api'
-
 let wrapper;
 let store;
 let actions;
