@@ -66,11 +66,11 @@ Vue.use(VueRouter);
 Vue.use(Vuesax);
 
 const routes = [
-  {path: '/', component: Homepage},
+  {path: '/home', component: Homepage},
   {path: '/login', component: Login},
   {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
-  {path: '/register', component: Register},
+  {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {path: '/search', component: Search},
   {

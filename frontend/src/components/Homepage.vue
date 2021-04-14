@@ -61,7 +61,7 @@ const Homepage = {
        * Pushes users profile onto router
        */
       goToProfilePage: function() {
-        this.$router.push({path: `/users/${store.loggedInUserId}`});
+        this.$router.push({path: `/users/${this.getLoggedInUserId()}`});
       }
     },
 

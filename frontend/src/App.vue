@@ -36,7 +36,8 @@
               </div>
           </div>
           <vs-avatar size="large" style="margin-left: 10px">
-            {{getUserName().match(/[A-Z]/g).join('')}}
+            <!--{{getUserName().match(/[A-Z]/g).join('')}}-->
+
           </vs-avatar>
         </div>
     </div>
@@ -141,10 +142,6 @@ export default app;
 
 <style scoped>
 
-#view {
-
-}
-
 .userInfo {
   color: white;
   font-weight: 700;
@@ -174,11 +171,6 @@ export default app;
   border-radius: 20px;
   width: 100px;
   font-family: 'Ubuntu', sans-serif;
-}
-
-.main{
-  top: -110px;
-
 }
 
 .topbar {
