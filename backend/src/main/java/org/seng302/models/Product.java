@@ -8,7 +8,6 @@ import org.seng302.models.requests.NewProductRequest;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 @Data
