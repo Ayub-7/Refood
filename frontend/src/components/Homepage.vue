@@ -1,6 +1,6 @@
 <template>
   <!-- -->
-  <div id="body" v-if="this.$store.state.userId != null">
+  <div id="body" v-if="getLoggedInUserId() != null">
       <!-- Header of page, contains link to user profile and welcome message with user's first name -->
       <div id="welcomeHeader">
        <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
@@ -27,6 +27,7 @@
 
 <script>
 import api from "../Api";
+import {store} from "../store"
 const Homepage = {
     name: "Homepage",
     data: function () {
@@ -48,18 +49,25 @@ const Homepage = {
             throw new Error(`Error trying to get user info from id: ${err}`)
           })
       },
-      
+
+      /**
+       * Gets the logged in users id
+       */
+      getLoggedInUserId: function() {
+        return store.loggedInUserId;
+      },
+
       /**
        * Pushes users profile onto router
        */
       goToProfilePage: function() {
-        this.$router.push({path: `/users/${this.$store.state.userId}`});
+        this.$router.push({path: `/users/${store.loggedInUserId}`});
       }
     },
 
     mounted: function () {
       //Retrieve userId and load user details
-      let userId = this.$store.state.userId
+      let userId = store.loggedInUserId
       this.getUserDetails(userId);
     },
   
