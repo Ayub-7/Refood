@@ -9,8 +9,7 @@
                   class="form-control"
                   type="text"
                   label-placeholder="First name *"
-                  v-model="firstname"
-                  required/>
+                  v-model="firstname"/>
       </div>
       <div id="middlename">
       <vs-input type="text"
@@ -28,8 +27,7 @@
                 type="text"
                 class="form-control"
                 label-placeholder="Last name *"
-                v-model="lastname"
-                required/>
+                v-model="lastname"/>
       </div>
       <div id="nickname">
       <vs-input type="text"
@@ -48,8 +46,7 @@
                   :danger="errors.includes(email)"
                   danger-text="Invalid email."
                   :success="validEmail(email)"
-                  v-model="email"
-                  required/>
+                  v-model="email"/>
       </div>
       <div id="phonenumber">
         <vs-input type="tel"
@@ -69,8 +66,7 @@
                 :danger="errors.includes(dateofbirth)"
                 danger-text="Enter date of birth"
                 :success="(dateofbirth.length!==0)"
-                label="Date of birth *"
-                required/>
+                label="Date of birth *"/>
       <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
       <vs-input type="password"
                 id="password"
@@ -80,8 +76,7 @@
                 danger-text="Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character."
                 :success="validPassword(password)"
                 name="password"
-                v-model="password"
-                required/>
+                v-model="password"/>
       <vs-input type="password"
                 id="confirm-password"
                 class="form-control"
@@ -90,8 +85,7 @@
                 danger-text="Confirmed password invalid."
                 :success="(confirm_password===password && confirm_password.length !== 0)"
                 name="confirm_password"
-                v-model="confirm_password"
-                required/>
+                v-model="confirm_password"/>
       <div id="address-field">
         <label for="address-field" class="label-control">Address *</label>
         <div id="street-number">
@@ -164,8 +158,6 @@
         confirm_password: "",
         dateofbirth: "",
         phonenumber: "",
-        potentialAddresses: [],
-        suggestionsActive: false,
 
         streetNumber: "",
         streetName: "",
@@ -185,14 +177,6 @@
       };
     },
     methods:{
-      /*test: function() {
-        if (this.firstname.length < 5) {
-          this.danger = false;
-        }
-        return true;
-      },
-      */
-
       /**
        * The function checks the inputs of the registration form to ensure they are in the right format.
        * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
@@ -466,6 +450,9 @@
     margin: 0.5em;
   }
 
+  /**
+  Card styling.
+   */
   .card {
     font-family: 'Ubuntu', sans-serif;
 
@@ -483,6 +470,9 @@
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
   }
 
+  /**
+  Card header styling.
+   */
   .card-header {
     grid-row: 1;
     grid-column: 1;
@@ -496,6 +486,9 @@
     padding: 0.5em 0;
   }
 
+  /**
+  Form styling
+   */
   form {
     grid-row: 2;
     grid-column: 1;
@@ -508,6 +501,9 @@
     grid-template-rows: repeat(6, auto);
   }
 
+  /**
+  Styling for form elements.
+   */
   .form-control {
     font-weight: 700;
     font-size: 14px;
@@ -523,6 +519,9 @@
 
   }
 
+  /**
+  Styling for address inputs.
+   */
   .address-form-control {
     font-weight: 700;
     font-size: 14px;
@@ -538,6 +537,9 @@
 
   }
 
+  /**
+  Label styling.
+   */
   .label-control {
     font-family: 'Ubuntu', sans-serif;
     font-weight: 700;
@@ -662,28 +664,5 @@
       grid-column: 1;
     }
 
-  }
-
-  vs-input:invalid,
-  textarea:invalid {
-    border-color: black ;
-  }
-  input:optional,
-  textarea:optional {
-    border-color: gray;
-  }
-  input:focus:invalid,
-  textarea:focus:invalid {
-    background: lightpink;
-    background-size: 25px;
-  }
-  input:required:focus:valid,
-  textarea:required:focus:valid {
-    border-color: green;
-    background: mediumseagreen;
-  }
-  input:required:valid,
-  textarea:required:valid {
-    border-color: green;
   }
 </style>
