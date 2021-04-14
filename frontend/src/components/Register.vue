@@ -281,7 +281,7 @@ const Register = {
      * Sets address field when address in suggestions is clicked
      */
     setAddress: function(address) {
-      this.homeaddressObj = address
+      this.homeaddressObj = address;
     },
 
     setAddressText: function(addressString) {
