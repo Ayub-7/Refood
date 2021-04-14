@@ -97,8 +97,8 @@
         <div id="street-number">
           <vs-input v-model="streetNumber" class="address-form-control" label-placeholder="Street Number" size="small"></vs-input>
         </div>
-        <div id="street-address">
-          <vs-input v-model="streetAddress" class="address-form-control" label-placeholder="Street Address" size="small"></vs-input>
+        <div id="street-name">
+          <vs-input v-model="streetName" class="address-form-control" label-placeholder="Street Name" size="small"></vs-input>
         </div>
         <div id="postcode">
           <vs-input v-model="postcode" class="address-form-control" label-placeholder="Postcode" size="small"></vs-input>
@@ -114,7 +114,7 @@
           <vs-input v-model="region" class="address-form-control" label-placeholder="Region" size="small"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="address-form-control" label-placeholder="Country *" size="small"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="address-form-control" label-placeholder="Country *" size="small"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -168,7 +168,7 @@
         suggestionsActive: false,
 
         streetNumber: "",
-        streetAddress: "",
+        streetName: "",
         postcode: "",
         city: "",
         region: "",
@@ -282,7 +282,6 @@
         //Use createUser function of API to POST user data to backend
         //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
         //https://www.npmjs.com/package/json-server
-        console.log(this.errors);
         if(this.errors.length == 0){
           var hashedPassword = passwordHash.generate(this.password);
           console.log(hashedPassword);
@@ -535,6 +534,7 @@
     font-family: 'Ubuntu', sans-serif;
 
     margin: 0.5em;
+    padding: 0px 0px;
 
   }
 
@@ -542,6 +542,7 @@
     font-family: 'Ubuntu', sans-serif;
     font-weight: 700;
     font-size: 14px;
+    padding-bottom: 5px;
   }
 
   vs-input {
@@ -600,7 +601,7 @@
     grid-column: 1;
   }
 
-  #street-address {
+  #street-name {
     grid-row: 1;
     grid-column: 4;
   }

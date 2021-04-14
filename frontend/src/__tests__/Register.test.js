@@ -56,7 +56,7 @@ describe('Register error checking', () => {
         wrapper.vm.confirm_password = '';
         wrapper.vm.dateofbirth = '';
         wrapper.vm.phonenumber = '';
-        wrapper.vm.homeaddress = '';
+        wrapper.vm.country = '';
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors.length).toBe(7);
@@ -73,7 +73,7 @@ describe('Register error checking', () => {
         wrapper.vm.confirm_password = '';
         wrapper.vm.dateofbirth = '';
         wrapper.vm.phonenumber = '';
-        wrapper.vm.homeaddress = '';
+        wrapper.vm.country = '';
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors.length).toBe(6);
@@ -81,7 +81,7 @@ describe('Register error checking', () => {
     test('Handles only password', () => {
         wrapper.vm.password = 'Potato123!';
         wrapper.vm.confirm_password = 'Potato123!';
-        wrapper.vm.email = 'test@email.com';
+        wrapper.vm.email = '';
         wrapper.vm.firstname = '';
         wrapper.vm.lastname = '';
         wrapper.vm.middlename = '';
@@ -89,7 +89,7 @@ describe('Register error checking', () => {
         wrapper.vm.bio = '';
         wrapper.vm.dateofbirth = '';
         wrapper.vm.phonenumber = '';
-        wrapper.vm.homeaddress = '';
+        wrapper.vm.country = '';
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors.length).toBe(5);
@@ -101,7 +101,7 @@ describe('Register error checking', () => {
         wrapper.vm.firstname = 'bob';
         wrapper.vm.lastname = 'steve';
         wrapper.vm.dateofbirth = '15/09/145';
-        wrapper.vm.homeaddress = '24 fake street';
+        wrapper.vm.country = 'New Zealand';
         wrapper.vm.email = 'thisisnotaemail.com'
         wrapper.vm.middlename = '';
         wrapper.vm.nickname = '';
@@ -109,7 +109,7 @@ describe('Register error checking', () => {
         wrapper.vm.phonenumber = '027254871';
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.errors).toStrictEqual(['thisisnotaemail.com'])
     })
 
 });
