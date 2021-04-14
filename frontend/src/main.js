@@ -33,6 +33,8 @@ import VueRouter from 'vue-router';
 import Vuex from 'vuex';
 import createPersistedState from "vuex-persistedstate";
 import App from './App.vue';
+import VueLogger from 'vuejs-logger';
+import Vuesax from 'vuesax';
 
 import Login from "@/components/Login";
 import BusinessRegister from "@/components/BusinessRegister";
@@ -45,9 +47,8 @@ import Homepage from "@/components/Homepage"
 
 Vue.config.productionTip = false
 
-
-
-import VueLogger from 'vuejs-logger';
+import 'vuesax/dist/vuesax.css'
+import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
 
 const options = {
   isEnabled: true,
@@ -62,6 +63,7 @@ const options = {
 Vue.use(VueLogger, options);
 Vue.use(VueRouter);
 Vue.use(Vuex);
+Vue.use(Vuesax);
 
 //Store data used to maintain state in program
 const store = new Vuex.Store({
@@ -73,40 +75,66 @@ const store = new Vuex.Store({
   state: {
     userId: null,
     viewingUserId: null,
-    userRole: null
+    userRole: null,
+    businessId: null,
+    businessName: null,
+    userPrimaryBusinesses: []
   },
 
   mutations: {
+    resetState (state) {
+      state.userId = null;
+      state.viewingUserId = null;
+      state.userRole = null;
+      state.userPrimaryBusinesses = [];
+    },
+
     setUserId (state, newUserId) {
       state.userId = newUserId;
     },
 
-    setviewUserId (state, newUserId) {
+    setViewUserId (state, newUserId) {
       state.viewingUserId = newUserId;
     },
 
     setUserRole (state, newUserRole) {
       state.userRole = newUserRole;
     },
+
+    setUserPrimaryBusinesses (state, newBusinesses) {
+      state.userPrimaryBusinesses = newBusinesses;
+    },
+
+    setBusinessId (state, newBusinessId) {
+      state.businessId = newBusinessId;
+    },
+
+    setBusinessName (state, newBusinessName) {
+      state.businessName = newBusinessName;
+    },
+
   }
 })
 
 
 const routes = [
-  {path: '/home', component: Homepage},
-  {path: '/businesslike', component: BusinessRegister},
+  {path: '/', component: Homepage},
+  {path: '/login', component: Login},
+  {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
-  {path: '/', component: Register},
+  {path: '/Register', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {path: '/search', component: Search},
   {
-    path: '/business',
+    path: '/businesses/:id',
+    name: 'Business',
     component: Business,
     children: [
-        {
-          path: 'administrators',
-          component: BusinessAdministrators
-        }
+          {
+            path: 'administrators',
+            name: 'BusinessAdministrators',
+            component: BusinessAdministrators,
+          }
         ]
   },
 

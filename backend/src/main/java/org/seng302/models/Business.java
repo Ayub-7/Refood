@@ -1,28 +1,38 @@
 package org.seng302.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
+import org.seng302.utilities.serializers.PrimaryAdministratorSerializer;
 
 import javax.persistence.*;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id") // Forces any nested business objects to only use name to prevent recursion.
+@JsonPropertyOrder({"id", "administrators", "name", "primaryAdministratorId"}) // force json property order to match api.
 public class Business {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
+
     @ManyToMany
     @JoinTable(name = "BUSINESS_ADMINS",
                     joinColumns = @JoinColumn(name="BUSINESS_ID"),
                     inverseJoinColumns = @JoinColumn(name="USER_ID"))
-    private Set<User> administrators = new HashSet<>();
+    private List<User> administrators = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name="USER_ID")
+    @JsonSerialize(using = PrimaryAdministratorSerializer.class)
+    @JsonProperty("primaryAdministratorId") // while the entity itself stores the user object, when we output to a JSON,
+    private User primaryAdministrator; // it will only use the id as the value, and key as primaryAdministratorId.
+
     private String name;
     private String description;
     private String address;
@@ -54,6 +64,7 @@ public class Business {
      */
     public void createBusiness(User owner) {
         this.administrators.add(owner);
+        this.primaryAdministrator = owner;
         this.created = new Date();
     }
 }

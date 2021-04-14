@@ -51,7 +51,6 @@ const Login = {
     },
     /**
      * Checks if the username and password match on what is stored in the backend.
-     * @param e
      * @returns {boolean} True if it matches what is stored in the backend; otherwise, false.
      */
     checkForm: function() {
@@ -84,10 +83,12 @@ const Login = {
         .then((response) => {
           this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
           this.$store.commit('setUserRole', response.data.role);
-          //LOAD USER PAGE, USING ROUTER
-          this.$router.push({name: 'UserPage', params: {id: this.$store.state.userId}})
+          // REDIRECT TO HOME PAGE
+          this.$router.push({path: `/`});
+
         }).catch(err => {
           if(err.response) { //Catch bad request
+            console.log(err.response.message)
             this.email = this.password = null;
             this.errors.push('Incorrect email or password')
           }
@@ -164,7 +165,7 @@ form#login-form {
   margin-bottom: 27px;
   font-family: 'Ubuntu', sans-serif;
 }
-#username:focus, #password:focus {
+#email:focus, #password:focus {
   border: 2px solid rgba(0, 0, 0, 0.18) !important;
 }
 

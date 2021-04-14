@@ -82,9 +82,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest req, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
-
         if (existingUser != null) {
-            if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
+            if (loginRequest.getPassword().equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
                 session.setAttribute("user", existingUser);
 
@@ -95,7 +94,7 @@ public class UserController {
 
             }
         }
-
+        
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -104,13 +103,15 @@ public class UserController {
      * Prints out the current user session/authentication details into console.
      */
     @GetMapping("/checksession")
-    public void checksession(HttpServletRequest req, HttpSession session) {
+    public ResponseEntity<String> checksession(HttpServletRequest req, HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("--------------------------------------------------");
-        System.out.println("PRINCIPAL: " + auth.getPrincipal());
-        System.out.println("CREDS: " + auth.getCredentials());
-        System.out.println("DETAILS: " + auth.getDetails());
-        System.out.println("AUTH: " + auth.getAuthorities());
+        String info = "--------------------------------------------------" +
+                "\nPRINCIPAL: " + auth.getPrincipal() +
+                "\nCREDS: " + auth.getCredentials() +
+                "\nDETAILS: " + auth.getDetails() +
+                "\nAUTH: " + auth.getAuthorities();
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_PLAIN).body(info);
 
     }
 
@@ -126,6 +127,8 @@ public class UserController {
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             if (isValidUser(user)) {
                 User newUser = new User(user);
+                System.out.println(user.getPassword());
+                System.out.println(newUser.getPassword());
                 userRepository.save(newUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
@@ -140,6 +143,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }
+        System.out.println("Bad email");
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 

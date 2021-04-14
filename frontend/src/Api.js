@@ -52,20 +52,20 @@ export default {
     /**
      * Create a new user by storing their data to the database
      * @param firstName Their firstname
-     * @param lastName Their lastname
      * @param middleName Their middlename (OPTIONAL)
+     * @param lastName Their lastname
      * @param nickname Their nickname (OPTIONAL)
      * @param bio Their bio (OPTIONAL)
      * @param email Their email
      * @param dateOfBirth Their date of birth
      * @param phoneNumber Their phone
      * @param homeAddress Their home address
-     * @param hashedPassword Their password hashed using password-hash library
+     * @param password Their password hashed using password-hash library
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: async(firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
-  instance.post('users', {firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate}),
+    createUser: async(firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password) =>
+  instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password}),
 
     /**
      * Get a specific user via their unique ID number
@@ -96,5 +96,41 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     searchQuery: () => instance.get(`users`),
+
+    /**
+     * Create a new business by storin their data in the database
+     * @param name business name
+     * @param description business description
+     * @param address business address
+     * @param businessType business type
+     */
+    createBusiness: async(name, description, address, businessType) =>
+    instance.post('businesses', {name, description, address, businessType}),
+
+
+    // ------ BUSINESSES
+
+    /**
+     * Retrieve a single business with their unique id.
+     * @param businessId the unique id of the business.
+     * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
+     */
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`),
+
+    /**
+     * Put request to make a user a business administrator (not primary).
+     * @param businessId unique identifier of the business.
+     * @param userId unique identifier of the user.
+     * @returns {Promise<AxiosResponse<any>>} a response with a OK if it is successful.
+     */
+    makeUserBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/makeAdministrator`, {userId}, {withCredentials: true}),
+
+    /**
+     * Put request to remove administrator rights to a business.
+     * @param businessId business identifier to remove rights to.
+     * @param userId user identifier to remove the rights from.
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
+    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true})
 
 }
