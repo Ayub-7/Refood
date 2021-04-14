@@ -99,7 +99,22 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: () => instance.get(`users`),
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+    /**
+     * Method (frontend) to let a DGAA user make a user an GAA admin user.
+     * @param id user id to be made admin.
+     */
+    makeUserAdmin: async(id) =>
+        instance.put('/users/'+id+'/makeAdmin',{},{withCredentials: true}),
+
+    /**
+     * Method (frontend) to let a DGAA user revoke GAA admin status from another user. Reverts the user back to USER role.
+     * @param id user id to revoke admin user role.
+     */
+    revokeUserAdmin: async(id) =>
+        instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
+
 
     /**
      * Create a new business by storin their data in the database

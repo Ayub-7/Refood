@@ -1,43 +1,30 @@
 <template>
   <div id="app" class="main" >
 
-    <div class="topbar">
-      <table>
-        <tr>
+    <div class="topbar" id="topBar">
+      <a class="navButton" @click="toggleMobileMenu">Nav</a>
+      <div id="navLinks">
+        <ul class ="bar">
           <div id='loggedIn' v-if="getLoggedInUser() == null">
-          <th>
-            <router-link class="title" to="/">Register</router-link>
-          </th>
-          <th>
-            <router-link class="title" to="/login">Login</router-link>
-          </th>
+            <li><router-link class="title" to="/">Register</router-link></li>
+            <li><router-link class="title" to="/login">Login</router-link></li>
           </div>
           <div v-else>
-          <th>
-            <router-link class="title" to="/businesses">Register a Business</router-link>
-          </th>
-          <th>
-            <router-link class="title" to="/search">Search</router-link>
-          </th>
-          <!-- Display if user is logged in -->
-
-            <th>
-              <router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link>
-            </th>
-            <th>
-              <router-link :to="{path: '/login'}" class="title">
+            <li><router-link class="title" to="/businesses">Register a Business</router-link></li>
+            <li><router-link class="title" to="/search">Search</router-link></li>
+            <li><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
+            <li><router-link :to="{path: '/login'}" class="title">
                 <span class="title" @click="logoutUser()">Logout</span>
-              </router-link>
-
-            </th>
+              </router-link></li>
           </div>
-        </tr>
-      </table>
-      <span class="userName" v-if="getUserName()">
+        </ul>
+      </div>
+
+    <div class="userInfo" v-if="getUserName()">
         <div style="  display: flex;  justify-content: right; text-align: right">
           <div>
             <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
-              <div v-if="getUserName()">
+              <div v-if="getUserName() != null">
                 {{getUserName()}}
               </div>
               <div v-if="getUserBusinesses() > 0">
@@ -48,10 +35,11 @@
                 </div>
               </div>
           </div>
-          <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
-          <p>profile pic</p>
+          <vs-avatar size="large" style="margin-left: 10px">
+            {{getUserName().match(/[A-Z]/g).join('')}}
+          </vs-avatar>
         </div>
-      </span>
+    </div>
     </div>
     <div id="view">
       <router-view></router-view>
@@ -65,8 +53,11 @@
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
-import {store, mutations} from "./store"
-import api from "./Api"
+import {store, mutations} from "./store";
+import api from "./Api";
+import 'vuesax';
+import 'vuesax/dist/vuesax.css';
+
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -114,6 +105,22 @@ const app = {
       .then(() => {
         mutations.userLogout();
       })
+    },
+    toggleMobileMenu: function () {
+      let x = document.getElementById("navLinks");
+      let y = document.getElementById("topBar")
+      if (x.style.display === "block") {
+        x.style.display = "none";
+
+        y.style.height = "55px";
+      } else {
+        x.style.display = "block";
+        if(store.loggedInUserId){
+          y.style.height = "140px";
+        } else {
+          y.style.height = "105px";
+        }
+      }
     }
   },
 
@@ -138,8 +145,7 @@ export default app;
 
 }
 
-.userName {
-  width: 76%;
+.userInfo {
   color: white;
   font-weight: 700;
   font-size: 14px;
@@ -178,14 +184,12 @@ export default app;
 .topbar {
   display: flex;
   justify-content: space-around;
+  position: relative;
   padding-bottom: 20px;
-  top:-30px;
-  /*flex-direction: row;*/
-  padding-top: 20px;
   max-width: 100%;
   max-height: 100%;
-  /*margin: 0 auto 0 auto;*/
   background: #385898;
+  overflow: hidden;
 }
 
 .title {
@@ -210,5 +214,7 @@ export default app;
 [v-cloak] {
   display: none;
 }
+
+
 
 </style>

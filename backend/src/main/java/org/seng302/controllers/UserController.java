@@ -82,7 +82,7 @@ public class UserController {
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest req, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
         if (existingUser != null) {
-            if (loginRequest.getPassword().equals(existingUser.getPassword())) {
+            if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
                 session.setAttribute("user", existingUser);
 
@@ -115,7 +115,6 @@ public class UserController {
    }
 
 
-
     /**
      * This method inserts a new user into the user repository
      * @param user Body of request in API specific format
@@ -123,10 +122,11 @@ public class UserController {
      */
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException {
-
+        
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             if (isValidUser(user)) {
                 User newUser = new User(user);
+                System.out.println(user.getHomeAddress());
                 System.out.println(user.getPassword());
                 System.out.println(newUser.getPassword());
                 userRepository.save(newUser);
@@ -154,7 +154,7 @@ public class UserController {
      */
     @GetMapping("/users/search")
     public  ResponseEntity<String> searchUser(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
-
+        System.out.println("search called");
         List<User> users = userFinder.queryByName(query);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
     }

@@ -50,12 +50,12 @@
               <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-6" >
               <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
               <div v-if="suggestionsActive">
                 <ul class="addressSuggestion" id="myApp">Suggestions:
-                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); toggle = !toggle" class="address">
-                    {{address}}
+                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); setAddressText(toText(address)); deleteItem()" class="address">
+                    {{toText(address)}}
                 </li>
                 </ul>
               </div>
@@ -76,13 +76,11 @@
       </div>
     </div>
 </template>
-<script src="https://unpkg.com/vue@2.5.3/dist/vue.js"></script>
 <script>
 
 import api from "../Api";
 import axios from "axios"
-import main from "../main.js";
-import {store, mutations} from "../store"
+import {mutations} from "../store"
 // const data = require('../testUser.json');
 // const users = data.users;
 // Need to somehow access the users database to check params.
@@ -103,6 +101,7 @@ const Register = {
       dateofbirth: null,
       phonenumber: null,
       homeaddress: null,
+      homeaddressObj: null,
       potentialAddresses: [],
       suggestionsActive: false
     };
@@ -218,13 +217,12 @@ const Register = {
       //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
-        api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, this.homeaddress, this.password)
+        api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, {streetNumber: this.homeaddressObj.housenumber, streetName: this.homeaddressObj.street, city: this.homeaddressObj.city, region: this.homeaddressObj.state, country: this.homeaddressObj.country, postcode: this.homeaddressObj.postcode}, this.password)
       .then((response) => {
         this.$log.debug("New item created:", response.data);
         // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
         mutations.setUserLoggedIn(response.data.userId, response.data.role)
         mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-
         //LOAD USER PAGE, USING ROUTER
         this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
       }).catch((error) => {
@@ -250,7 +248,7 @@ const Register = {
             let addressDetails = address.properties;
             //Filter null values and make sure not too many addresses are pushed
             if(addressDetails.housenumber != null && addressDetails.street != null && addressDetails.city != null && this.potentialAddresses.length <= addressesShown) {
-              this.potentialAddresses.push(`${addressDetails.housenumber} ${addressDetails.street}, ${addressDetails.city}`);
+              this.potentialAddresses.push(addressDetails);
             }
           }
 
@@ -260,7 +258,7 @@ const Register = {
      * Performs a GET request to the photon API using values from address input field,
      * also handles the showing and hiding of the suggestion bar
      */
-    getAddressFromPhoton : function() {
+    getAddressFromPhoton: function() {
       let minNumberOfCharacters = 3
 
       if(this.homeaddress.length >= minNumberOfCharacters) {
@@ -276,6 +274,17 @@ const Register = {
         this.suggestionsActive = false; //Hide address suggestions
       }
     },
+    /**
+     * Sets potential addresses to an empty list once a user has clicked an address
+     */
+    deleteItem: function() {
+      this.potentialAddresses = [];
+    },
+
+    toText : function(address){
+      return `${address.housenumber} ${address.street}, ${address.city}, ${address.country}`;
+    },
+
 
     /**
      * Sets address field when address in suggestions is clicked

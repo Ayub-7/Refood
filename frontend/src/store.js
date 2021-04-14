@@ -47,6 +47,8 @@ export const mutations = {
 
     userLogout() {
         store.loggedInUserId = null;
+        store.userName = null;
+        store.userPrimaryBusinesses = null;
     },
 
     setUserRole(role) {
