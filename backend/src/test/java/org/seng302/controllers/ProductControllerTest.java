@@ -59,8 +59,7 @@ public class ProductControllerTest {
 
         Address businessAddress = new Address(null, null, null, null, "New Zealand", null);
         business = new Business("TestBusiness", "Test Description", businessAddress, BusinessType.RETAIL_TRADE);
-        business.setPrimaryAdministrator(user);
-        business.getAdministrators().add(user);
+        business.createBusiness(user);
         business.setId(1L);
 
         product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", 14.69, new Date());
@@ -107,12 +106,11 @@ public class ProductControllerTest {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
 
-        User newPrimaryAdmin = new User("email@email.com", "password", Role.USER);
-        business.setPrimaryAdministrator(newPrimaryAdmin);
+        User nonAdminUser = new User("email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
 
         mvc.perform(get("/businesses/{id}/products", business.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, nonAdminUser))
                 .andExpect(status().isForbidden());
 
     }

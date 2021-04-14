@@ -43,9 +43,8 @@ public class ProductController {
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        if (user.getId() != business.getPrimaryAdministrator().getId() && !Role.isGlobalApplicationAdmin(user.getRole())) {
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
