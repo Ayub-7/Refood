@@ -35,9 +35,7 @@
                 </div>
               </div>
           </div>
-          <vs-avatar size="large" style="margin-left: 10px">
-            {{getUserName().match(/[A-Z]/g).join('')}}
-          </vs-avatar>
+          <vs-avatar size="medium" color="red" :text="getUserName()" style="margin-left: 10px; margin-top: -5px;"/>
         </div>
     </div>
     </div>
