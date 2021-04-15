@@ -1,6 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import Vuesax from 'vuesax';
 import Register from '../components/Register';
 import Vuesax from 'vuesax';
 import api from '../Api'
