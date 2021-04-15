@@ -2,13 +2,17 @@
   <div class="userInfo">
         <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
         <ul class="actInfo" v-if="getActingAsBusinessName() == null">
-          <li class="user" >
-            Logged in as {{getUserRole()}} {{getUserName()}}
+          <li class="userStuff" >
+            <span class ="user">Logged in as {{getUserRole()}} {{getUserName()}}</span>
+            <span class="avatar"> IMG</span>
+            <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
           </li>
+
           <li>
             <form class="dropdown">
               <label class="label"> Select Business to act as:  </label>
-              <select class="select" name="acting" v-model="buss" @click="setActingAsBusinessId(buss) ; Redirect()">
+              <select class="select" name="acting" placeholder="Business" v-model="buss" @change="setActingAsBusinessId(buss) ; Redirect()">
+                <option value="" disabled selected>Choose business</option>
                 <option  v-for="business in getPrimaryBusinesses()"
                         v-bind:href="business.id"
                         :key="business.id" >{{ business.name}}</option>
@@ -21,12 +25,12 @@
         <li class="business" >
           Logged in as BUSINESS: {{getActingAsBusinessName()}}
         </li>
+        <br>
         <li class="user" @click="setActingAsUser()">
-          <p>Act As User: {{ getUserName() }} </p>
+          <span class="" style="display: inline;">Act As User: {{ getUserName() }} </span>
         </li>
         </ul>
-      <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
-      <p>profile pic</p>
+
   </div>
 </template>
 
@@ -64,7 +68,6 @@ name: "actingAs",
     },
 
     setActingAsBusinessId(businessName){
-      //console.log("hi");
       const businessId = mutations.getIdByName(businessName);
       mutations.setActingAsBusiness(businessId, businessName)
     },
@@ -101,9 +104,29 @@ export default actingAs;
 
 .actInfo {
   display: inline;
+  padding: 0px;
 }
 
 li.business {
   display: inline;
+
+}
+
+.dropdown .select {
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  text-decoration: none;
+  width: 100%;
+  border-radius: 20px;
+  padding: 12px 16px;
+  border: none;
+  background: -webkit-gradient(linear, left top, right top, from(#9C27B0), to(#E040FB));
+  background: linear-gradient(to right, #385898, #385898);
+  -webkit-box-shadow: 0 0 20px 1px rgb(0 0 0 / 4%);
+}
+
+.dropdown .select option {
+  color: black;
 }
 </style>
