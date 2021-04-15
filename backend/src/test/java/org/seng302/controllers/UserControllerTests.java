@@ -126,4 +126,21 @@ public class UserControllerTests {
                 .andReturn();
         assert userFound.getResponse().getStatus() == HttpStatus.OK.value();
     }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testGettingNonExistingUser() throws Exception {
+        MvcResult userNotFound = mockMvc.perform(get("/users/{id}", 0))
+                .andReturn();
+        assert userNotFound.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
+    }
+
+    @Test
+    public void testUnauthorizedGettingUser() throws Exception {
+        MvcResult userNotFound = mockMvc.perform(get("/users/{id}", 0))
+                .andReturn();
+        assert userNotFound.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+    }
+
+
 }
