@@ -1,9 +1,11 @@
 package org.seng302.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.seng302.finders.UserFinder;
 import org.seng302.models.Address;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +25,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
+import java.util.Enumeration;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = TestApplication.class)
@@ -99,5 +111,19 @@ public class UserControllerTests {
                 .content(mapper.writeValueAsString(noEmailUser)))
                 .andExpect(status().isBadRequest());
 
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testGetExistingUser() throws Exception {
+        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
+        User user = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserById(0)).thenReturn(user);
+        MvcResult userFound = mockMvc.perform(get("/users/{id}",0)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andReturn();
+        assert userFound.getResponse().getStatus() == HttpStatus.OK.value();
     }
 }
