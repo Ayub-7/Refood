@@ -114,13 +114,6 @@
           </ul>
         </div>
       </div>
-      <div v-if="suggestionsActive">
-        <ul class="addressSuggestion">Suggestions:
-          <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
-            {{address}}
-          </li>
-        </ul>
-      </div>
 
       <button type="button" class="register-button" @click="checkForm(); createUserInfo()">Register</button>
 
@@ -184,11 +177,11 @@
        */
       checkForm: function() {
         this.errors = [];
-        if (this.firstname.length < 2 || this.firstname.length > 20) {
+        if (this.firstname.length < 2 || this.firstname.length >= 20) {
           this.errors.push(this.firstname);
         }
 
-        if (this.lastname.length < 2 || this.lastname.length > 20) {
+        if (this.lastname.length < 2 || this.lastname.length >= 20) {
           this.errors.push(this.lastname);
         }
 
@@ -216,6 +209,13 @@
           this.errors.push(this.phonenumber);
         }
 
+        if (this.errors.length >= 1) {
+          // let message = "";
+          for (let error in this.errors) {
+            console.log(this.errors[error]);
+          }
+          this.$vs.notify({title:'Failed to register', text:'Required fields are missing.', color:'danger'});
+        }
       },
 
 
@@ -288,52 +288,6 @@
           });
         }},
 
-      /**
-       * Function that filters response from photon API and pushes the address to potentialAddresses, The photon API response contains
-       * undefined values which have to be filtered.
-       * @param response Response from photon API containing address information
-       */
-      filterAddressInfo : function(response) {
-        //Filters response from photon API and pushes information to potentialAddresses
-        let addressesShown = 5;
-        let addressList = response.data.features
-        for (let address of addressList) {
-          let addressDetails = address.properties;
-          //Filter null values and make sure not too many addresses are pushed
-          if(addressDetails.housenumber != null && addressDetails.street != null && addressDetails.city != null && this.potentialAddresses.length <= addressesShown) {
-            this.potentialAddresses.push(`${addressDetails.housenumber} ${addressDetails.street}, ${addressDetails.city}`);
-          }
-        }
-
-      },
-
-      /**
-       * Performs a GET request to the photon API using values from address input field,
-       * also handles the showing and hiding of the suggestion bar
-       */
-      getAddressFromPhoton : function() {
-        let minNumberOfCharacters = 3
-
-        if(this.homeaddress.length >= minNumberOfCharacters) {
-          this.suggestionsActive = true;
-          //Make call to photon API using value from address field, take only values that are houses
-          axios.get(`https://photon.komoot.io/api/?q=${this.homeaddress}&osm_tag=:house`)
-                  .then(response => {
-                    //Pass response into filter function which also pushes info to potential addresses
-                    this.potentialAddresses = []
-                    this.filterAddressInfo(response);
-                  })
-        } else {
-          this.suggestionsActive = false; //Hide address suggestions
-        }
-      },
-
-      /**
-       * Sets address field when address in suggestions is clicked
-       */
-      setAddress: function(address) {
-        this.homeaddress = address
-      },
 
       getCitiesFromPhoton: function() {
         if (this.city.length >= this.minNumberOfCharacters) {
@@ -546,6 +500,28 @@
     font-size: 14px;
     padding-bottom: 5px;
   }
+
+  .suggested-box {
+    position: absolute;
+    list-style: none;
+    width: 225px;
+  }
+
+  .suggested-item {
+    cursor: pointer;
+    position: relative;
+    margin: 0 0 0 1em;
+
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    padding: 0.5em 1em;
+    background: white;
+    z-index: 99;
+  }
+
+  .suggested-item:hover {
+    background: lightgray;
+  }
+
 
   vs-input {
     margin: 0;
