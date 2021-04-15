@@ -31,24 +31,25 @@
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Vuex from 'vuex';
-import createPersistedState from "vuex-persistedstate";
 import App from './App.vue';
 import VueLogger from 'vuejs-logger';
 import Vuesax from 'vuesax';
 
-import Login from "@/components/Login";
-import BusinessRegister from "@/components/BusinessRegister";
+import Login from "./components/Login";
+import BusinessRegister from "./components/BusinessRegister";
 import Register from "./components/Register";
-import Users from "@/components/Users.vue";
-import Search from "@/components/Search.vue";
-import Business from "@/components/Business.vue";
-import BusinessAdministrators from "@/components/BusinessAdministrators";
+import Users from "./components/Users.vue";
+import Search from "./components/Search.vue";
+import Business from "./components/Business.vue";
+import BusinessAdministrators from "./components/BusinessAdministrators";
+import Homepage from "./components/Homepage"
 
-Vue.config.productionTip = false
-
-import 'vuesax/dist/vuesax.css'
+import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
+
+
+Vue.config.productionTip = false;
+
 
 const options = {
   isEnabled: true,
@@ -62,62 +63,10 @@ const options = {
 
 Vue.use(VueLogger, options);
 Vue.use(VueRouter);
-Vue.use(Vuex);
 Vue.use(Vuesax);
 
-//Store data used to maintain state in program
-const store = new Vuex.Store({
-
-  plugins: [createPersistedState({
-    storage: window.sessionStorage,
-  })],
-
-  state: {
-    userId: null,
-    viewingUserId: null,
-    userRole: null,
-    businessId: null,
-    businessName: null,
-    userPrimaryBusinesses: []
-  },
-
-  mutations: {
-    resetState (state) {
-      state.userId = null;
-      state.viewingUserId = null;
-      state.userRole = null;
-      state.userPrimaryBusinesses = [];
-    },
-
-    setUserId (state, newUserId) {
-      state.userId = newUserId;
-    },
-
-    setViewUserId (state, newUserId) {
-      state.viewingUserId = newUserId;
-    },
-
-    setUserRole (state, newUserRole) {
-      state.userRole = newUserRole;
-    },
-
-    setUserPrimaryBusinesses (state, newBusinesses) {
-      state.userPrimaryBusinesses = newBusinesses;
-    },
-
-    setBusinessId (state, newBusinessId) {
-      state.businessId = newBusinessId;
-    },
-
-    setBusinessName (state, newBusinessName) {
-      state.businessName = newBusinessName;
-    },
-
-  }
-})
-
-
 const routes = [
+  {path: '/home', component: Homepage},
   {path: '/login', component: Login},
   {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
@@ -148,6 +97,5 @@ const router = new VueRouter({
 new Vue({
   el: '#app',
   router,
-  store: store,
   render: h => h(App)
 });

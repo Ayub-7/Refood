@@ -53,7 +53,7 @@ public class BusinessController {
     @PostMapping("/businesses")
     public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) {
         Business business = new Business(req.getName(), req.getDescription(), req.getAddress(), req.getBusinessType());
-        System.out.println("hello");
+
         User owner = (User) session.getAttribute("user");
         business.createBusiness(owner);
 

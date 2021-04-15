@@ -2,6 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Vuesax from 'vuesax';
 import Register from '../components/Register';
+import Vuesax from 'vuesax';
 import api from '../Api'
 
 let wrapper;
@@ -13,6 +14,75 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 localVue.use(Vuesax);
 
+// Mocking registered users
+const mockUsers = {
+    "id": 1,
+    "users" : [
+        {
+            "firstName": "Helene",
+            "lastName": "Newton",
+            "middleName": "Angeline",
+            "nickname": "non",
+            "bio": "cillum nisi ullamco labore",
+            "email": "angelinenewton@digitalus.com",
+            "dateOfBirth": "1995-08-21",
+            "phoneNumber": "(868) 442-3726",
+            "homeAddress": "Albemarle Terrace",
+            "password": "proident",
+            "registerDate": "3/14/2021",
+            "id": 1
+        },
+        {
+            "firstName": "Sheri",
+            "lastName": "Christian",
+            "middleName": "Griffith",
+            "nickname": "velit",
+            "bio": "nulla quis elit ullamco",
+            "email": "griffithchristian@digitalus.com",
+            "dateOfBirth": "1995-08-21",
+            "phoneNumber": "(983) 576-3532",
+            "homeAddress": "Village Road",
+            "password": "id",
+            "registerDate": "3/14/2021",
+            "id": 2
+        },
+        {
+            "firstName": "Irwin",
+            "lastName": "Lara",
+            "middleName": "Fuentes",
+            "nickname": "adipisicing",
+            "bio": "irure reprehenderit laboris aute",
+            "email": "fuenteslara@digitalus.com",
+            "dateOfBirth": "1995-08-21",
+            "phoneNumber": "(917) 580-3281",
+            "homeAddress": "Fiske Place",
+            "password": "culpa",
+            "registerDate": "3/14/2021",
+            "id": 3
+        },
+        {
+            "firstName": "Eloise",
+            "lastName": "Hewitt",
+            "middleName": "Stella",
+            "nickname": "exercitation",
+            "bio": "irure ex laborum ipsum",
+            "email": "stellahewitt@digitalus.com",
+            "dateOfBirth": "1995-08-21",
+            "phoneNumber": "(833) 599-2927",
+            "homeAddress": "Java Street",
+            "password": "ea",
+            "registerDate": "3/14/2021",
+            "id": 4
+        }
+    ]
+}
+
+// Mocking $route
+const $route = {
+    params: {
+        id: 1
+    }
+};
 
 beforeEach(() => {
     actions = {
@@ -31,8 +101,8 @@ beforeEach(() => {
     });
     wrapper = shallowMount(Register, {
         propsData: {},
-        mocks: {},
-        stubs: {},
+        mocks: {$route},
+        stubs: ['router-link', 'router-view'],
         methods: {},
         store,
         localVue,
@@ -45,6 +115,8 @@ afterEach(() => {
 
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Register error checking', () => {
+    const getRegisterMethod = jest.spyOn(Register.methods, 'createUserInfo');
+    getRegisterMethod.mockResolvedValue(mockUsers);
     test('Handles empty register', () => {
         wrapper.vm.firstname = '';
         wrapper.vm.lastname = '';
@@ -112,5 +184,6 @@ describe('Register error checking', () => {
         expect(wrapper.vm.errors).toStrictEqual(['thisisnotaemail.com'])
     })
 
-});
 
+
+});

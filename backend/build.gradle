@@ -34,7 +34,7 @@ plugins {
     id 'org.sonarqube' version '3.0'
 }
 
-group = 'Seng302-team-11'
+group = 'Seng302-team-900'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 

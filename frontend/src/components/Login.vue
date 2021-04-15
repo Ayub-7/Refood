@@ -3,9 +3,7 @@
   <div id="body">
   <div class="main">
     <p class="sign" align="center">Sign in</p>
-  <form id="login-form">
-    <div class="container">
-
+  <form id="login-form" >
       <div v-if="errors.length">
         <b>Please correct the following error(s):</b>
       <ul>
@@ -16,9 +14,9 @@
 
       <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
       <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
+
       <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
-      <button type="button" class="forgotPassword">Forgot Password?</button>
-    </div>
+      <div type="button" class="forgotPassword">Forgot Password?</div>
   </form>
   </div>
   </div>
@@ -28,6 +26,7 @@
 
 <script>
 import api from "../Api";
+import {mutations} from "../store"
 //import Vue from "vue"
 //import VueSimpleAlert from "vue-simple-alert";
 //let passwordHash = require('password-hash');
@@ -81,10 +80,11 @@ const Login = {
       if(this.errors.length == 0){
         api.login(this.email, this.password)
         .then((response) => {
-          this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
-          this.$store.commit('setUserRole', response.data.role);
           //LOAD USER PAGE, USING ROUTER
-          this.$router.push({path: `/users/${response.data.userId}`});
+          mutations.setUserLoggedIn(response.data.userId, response.data.role);
+          mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+          this.$router.push({path: `/home`});
+
 
         }).catch(err => {
           if(err.response) { //Catch bad request
@@ -192,6 +192,7 @@ form#login-form {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
   color: #3B5998;
   padding-top: 15px;
+  text-align: center;
 }
 a {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);

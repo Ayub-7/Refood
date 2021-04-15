@@ -82,7 +82,7 @@ public class UserController {
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest req, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
         if (existingUser != null) {
-            if (loginRequest.getPassword().equals(existingUser.getPassword())) {
+            if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
                 session.setAttribute("user", existingUser);
 
@@ -102,17 +102,17 @@ public class UserController {
      * Prints out the current user session/authentication details into console.
      */
     @GetMapping("/checksession")
-    public ResponseEntity<String> checksession(HttpServletRequest req, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String info = "--------------------------------------------------" +
-                "\nPRINCIPAL: " + auth.getPrincipal() +
-                "\nCREDS: " + auth.getCredentials() +
-                "\nDETAILS: " + auth.getDetails() +
-                "\nAUTH: " + auth.getAuthorities();
-
-        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_PLAIN).body(info);
-
+    public ResponseEntity<User> checksession(HttpServletRequest req, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
+
+    @PostMapping("/logoutuser")
+    public ResponseEntity<String> logoutUser(HttpServletRequest req, HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.OK).build();
+   }
 
 
     /**
@@ -122,10 +122,11 @@ public class UserController {
      */
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException {
-
+        
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             if (isValidUser(user)) {
                 User newUser = new User(user);
+                System.out.println(user.getHomeAddress());
                 System.out.println(user.getPassword());
                 System.out.println(newUser.getPassword());
                 userRepository.save(newUser);
@@ -153,7 +154,7 @@ public class UserController {
      */
     @GetMapping("/users/search")
     public  ResponseEntity<String> searchUser(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
-
+        System.out.println("search called");
         List<User> users = userFinder.queryByName(query);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
     }

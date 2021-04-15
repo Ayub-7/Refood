@@ -48,6 +48,10 @@ export default {
      */
     login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
 
+    logout: () => instance.post('logoutuser', [], {withCredentials: true}),
+
+    checkSession: () => instance.get('checksession', {withCredentials: true}),
+
   // user POST create new user account data
     /**
      * Create a new user by storing their data to the database
@@ -95,7 +99,24 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: () => instance.get(`users`),
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+    /**
+     * Method (frontend) to let a DGAA user make a user an GAA admin user.
+     * @param id user id to be made admin.
+     */
+    makeUserAdmin: async(id) =>
+        instance.put('/users/'+id+'/makeAdmin',{},{withCredentials: true}),
+
+    /**
+     * Method (frontend) to let a DGAA user revoke GAA admin status from another user. Reverts the user back to USER role.
+     * @param id user id to revoke admin user role.
+     */
+    revokeUserAdmin: async(id) =>
+        instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
+
+
+    // ------ BUSINESSES
 
     /**
      * Create a new business by storin their data in the database
@@ -105,10 +126,8 @@ export default {
      * @param businessType business type
      */
     createBusiness: async(name, description, address, businessType) =>
-    instance.post('businesses', {name, description, address, businessType}),
+    instance.post('businesses', {name, description, address, businessType}, {withCredentials: true}),
 
-
-    // ------ BUSINESSES
 
     /**
      * Retrieve a single business with their unique id.

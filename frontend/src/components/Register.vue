@@ -126,7 +126,6 @@
     </form>
   </div>
 </template>
-
 <script>
 
   import api from "../Api";
@@ -209,6 +208,14 @@
           this.errors.push(this.phonenumber);
         }
 
+      if (!this.validPhoneNum(this.phonenumber)) {
+        this.errors.push("Invalid phone number!");
+      } else if (this.phonenumber.length > 13) {
+        this.errors.push("The phone number you inputted is too long!");
+      } else if (this.phonenumber.length < 3) {
+        this.errors.push("The phone number you inputted is too short!");
+      }
+    },
         if (this.errors.length >= 1) {
           // let message = "";
           for (let error in this.errors) {

@@ -1,48 +1,65 @@
 <template>
   <div id="app" class="main" >
-    <div class="topbar">
-      <table>
-        <tr>
-          <th>
-            <router-link class="title" to="/">Register</router-link>
-          </th>
-          <th>
-            <router-link class="title" to="/login">Login</router-link>
-          </th>
-          <th>
-            <router-link class="title" to="/businesses">Register a Business</router-link>
-          </th>
-          <th>
-            <router-link class="title" to="/search">Search</router-link>
-          </th>
-          <th>
-            <router-link :to="{path: `/users/${this.$store.state.userId}`}" v-if="this.$store.state.userId != null" class="title">Profile</router-link>
-          </th>
-          <th>
-            <router-link :to="{path: '/login'}" v-if="this.$store.state.userId != null" class="title">
-            <span @click="$store.commit('resetState')" class="title">Logout</span>
-            </router-link>
 
-          </th>
-        </tr>
-      </table>
-      <h2 class = "dgaa" v-if="this.$store.state.userRole == 'DGAA' || this.$store.state.userRole == 'GAA'"><span>{{this.$store.state.userRole}}</span></h2>
+    <div class="topbar" id="topBar">
+      <a class="navButton" @click="toggleMobileMenu">Nav</a>
+      <div id="navLinks">
+        <ul class ="bar">
+          <div id='loggedIn' v-if="getLoggedInUser() == null">
+            <li><router-link class="title" to="/">Register</router-link></li>
+            <li><router-link class="title" to="/login">Login</router-link></li>
+          </div>
+          <div v-else>
+            <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
+            <li><router-link class="title" to="/businesses">Register a Business</router-link></li>
+            <li><router-link class="title" to="/search">Search</router-link></li>
+            <li><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
+            <li><router-link :to="{path: '/login'}" class="title">
+                <span class="title" @click="logoutUser()">Logout</span>
+              </router-link></li>
+          </div>
+        </ul>
+      </div>
+
+    <div class="userInfo" v-if="getUserName()">
+        <div style="  display: flex;  justify-content: right; text-align: right">
+          <div>
+            <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
+              <div v-if="getUserName() != null">
+                {{getUserName()}}
+              </div>
+              <div v-if="getUserBusinesses() > 0">
+                <div v-for="user in getUserBusinesses()"
+                     v-bind:href="user.id"
+                     :key="user.id">
+                  <div>{{ user.name }} </div>
+                </div>
+              </div>
+          </div>
+          <vs-avatar size="large" style="margin-left: 10px">
+            <!--{{getUserName().match(/[A-Z]/g).join('')}}-->
+
+          </vs-avatar>
+        </div>
     </div>
-
+    </div>
     <div id="view">
       <router-view></router-view>
     </div>
-
     <footer class="info">
       <h4>REFOOD 2021</h4>
     </footer>
   </div>
 </template>
-
 <script>
 import Register from "./components/Register";
 import Login from "@/components/Login.vue";
 import BusinessRegister from "@/components/BusinessRegister";
+import {store, mutations} from "./store";
+import api from "./Api";
+import 'vuesax';
+import 'vuesax/dist/vuesax.css';
+
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -59,9 +76,65 @@ const app = {
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
-    return {};
+    return {
+
+    };
+  },
+  methods: {
+    /**
+     * Method used to get the current logged in user to use inside template
+     * @returns {int} userId of current logged in user
+     */
+    getLoggedInUser() {
+      return store.loggedInUserId;
+    },
+
+    getUserRole(){
+      return store.role;
+    },
+    getUserName(){
+      return store.userName;
+    },
+
+    getUserBusinesses(){
+      return store.userPrimaryBusinesses;
+    },
+    /**
+     * Calls the logout function which removes loggedInUserId
+     */
+    logoutUser() {
+      api.logout()
+      .then(() => {
+        mutations.userLogout();
+      })
+    },
+    toggleMobileMenu: function () {
+      let x = document.getElementById("navLinks");
+      let y = document.getElementById("topBar")
+      if (x.style.display === "block") {
+        x.style.display = "none";
+
+        y.style.height = "55px";
+      } else {
+        x.style.display = "block";
+        if(store.loggedInUserId){
+          y.style.height = "140px";
+        } else {
+          y.style.height = "105px";
+        }
+      }
+    }
   },
 
+
+  beforeMount() {
+    api.checkSession()
+    .then((response) => {
+      mutations.setUserLoggedIn(response.data.id, response.data.role);
+      mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+      mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+    })
+  },
 };
 
 // make the 'app' available
@@ -70,10 +143,24 @@ export default app;
 
 <style scoped>
 
-#view {
-
+.userInfo {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  background: #385898;
+  /*padding: 10px 20px;*/
+  border-radius: 20px;
+  outline: none;
+  box-sizing: border-box;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin-left: 5px;
+  margin-right: 20px;
+  margin-bottom: 27px;
+  font-family: 'Ubuntu', sans-serif;
+  padding-top: 20px;
+  text-align: right
 }
-
 .dgaa {
   color: rgb(38, 50, 56);
   background: #dbe0dd;
@@ -87,21 +174,15 @@ export default app;
   font-family: 'Ubuntu', sans-serif;
 }
 
-.main{
-  top: -110px;
-
-}
-
 .topbar {
-  padding-bottom: 20px;
   display: flex;
-  top:-30px;
-  /*flex-direction: row;*/
-  padding-top: 20px;
+  justify-content: space-around;
+  position: relative;
+  padding-bottom: 20px;
   max-width: 100%;
   max-height: 100%;
-  /*margin: 0 auto 0 auto;*/
   background: #385898;
+  overflow: hidden;
 }
 
 .title {
@@ -126,5 +207,7 @@ export default app;
 [v-cloak] {
   display: none;
 }
+
+
 
 </style>

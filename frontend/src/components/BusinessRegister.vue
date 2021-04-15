@@ -1,178 +1,205 @@
 <template>
-  <div class="card" id="body">
-    <h3 class="card-header text-center">Create a ReFood Business Account</h3>
-    <div class="card-body">
-      <div v-if="errors.length > 0">
-          <b>Please correct the following error(s):</b>
-          <ul>
-            <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-          </ul>
-        </div>
-        <form @submit="checkForm" method="post">
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <input type="text" class="form-control" placeholder="Enter Name of Business" name="businessName"  v-model="businessName">
+  <div class="card">
+    <h3 class="card-header">Create a ReFood Business Account</h3>
+      <form autocomplete="off">
+          <vs-input id="business-name"
+                    :danger="this.errors.includes('businessName')"
+                    type="text"
+                    class="form-control"
+                    label-placeholder="Business Name (Required)"
+                    v-model="businessName"/>
+
+          <vs-select
+              width="90%"
+              id="business-type"
+              :danger="this.errors.includes('businessType')"
+              class="form-control"
+              label="Select Business Type (Required)"
+              v-model="businessType"
+              autocomplete >
+            <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
+          </vs-select>
+
+        <div id="address-container">
+          <div id="street-number">
+            <vs-input v-model="streetNumber" class="form-control" label-placeholder="Street Number"></vs-input>
           </div>
-
-          <div class="form-group col-md-6">
-            <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Business Address" name="businessAddress" v-model="businessAddress" required></textarea>
-            <div v-if="suggestionsActive">
-              <ul class="addressSuggestion">Suggestions:
-
-                <li v-for="(address, index) in potentialAddresses" v-bind:key="index" @click = "setAddress(address)" class="address">
-                  {{address}}
-              </li>
-              </ul>
-            </div>
+          <div id="street-address">
+            <vs-input v-model="streetAddress" class="form-control" label-placeholder="Street Address"></vs-input>
           </div>
-
-          <!-- <div class="form-group col-md-6">
-            <input type="text" class="form-control" placeholder="Enter Business Address" name="Address" v-model="businessAddress">
-          </div> -->
-
-          <div class="form-group col-md-6">
-            <textarea type="text" class="form-control" placeholder="Enter Business Description" name="Description" v-model="description"></textarea>
+          <div id="postcode">
+            <vs-input v-model="postcode" class="form-control" label-placeholder="Postcode"></vs-input>
           </div>
-
-          <!-- <div class="form-group col-md-6">
-            <input type="tel" class="form-control" placeholder="Enter Business Phone number" name="phonenumber" v-model="phonenumber">
-          </div> -->
-
-          <form class="dropdown">
-            <label class="label"> Select Business Type :   </label>
-            <select class="select" name="type" v-model="businessType">
-              <option value = "Accommodation and Food Services" >Accommodation and Food Services</option>
-              <option value = "Retail Trade">Retail Trade</option>
-              <option value = " Charitable organisation">Charitable organisation</option>
-              <option value = "Non-profit organisation">Non-profit organisation</option>
-            </select>
-          </form>
-
-
-          <div class="form-group col-md-6">
-            <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
+          <div id="city">
+            <!-- If wanting to test/check suggested item tiles, remove blur. -->
+            <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label-placeholder="City"></vs-input>
+            <ul v-if="this.suggestCities" class="suggested-box">
+              <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+            </ul>
+          </div>
+          <div id="region">
+            <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
+          </div>
+          <div id="country">
+            <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+            <ul v-if="this.suggestCountries" class="suggested-box">
+              <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+            </ul>
           </div>
         </div>
-        </form>
-      </div>
+
+          <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
+
+          <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
+      </form>
   </div>
 </template>
 
 <script>
 import api from "../Api";
 import axios from "axios"
-//import Vue from 'vue';
-//import Dropdown from 'bp-vuejs-dropdown';
-
-// global
-//Vue.use(Dropdown);
+import {store} from "../store"
 
 const BusinessRegister = {
   name: "BusinessRegister",
   data: function () {
     return {
+      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
+
       errors: [],
-      businessName: null,
-      businessAddress: null,
-      description: null,
+      businessName: "",
+
+      streetNumber: "",
+      streetAddress: "",
+      postcode: "",
+      city: "",
+      region: "",
+      country: "",
+
+      description: "",
       businessType: null,
-      potentialAddresses: [],
-      suggestionsActive: false
+
+      suggestCities: false,
+      suggestedCities: [],
+
+      suggestCountries: false,
+      suggestedCountries: [],
+      minNumberOfCharacters: 3
     };
   },
   methods:{
-
     /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
-     * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
-     * is in the wrong format.
+     * Pushes name of error into an array, and display notification have errors exist.
      */
     checkForm: function() {
       this.errors = [];
 
-      if (!this.businessName) {
-        this.errors.push("Please enter your business name!");
+      if (this.businessName.length === 0) {
+        this.errors.push('businessName');
       }
 
-      if (!this.businessAddress) {
-        this.errors.push("Please enter your business address!");
+      if (this.country.length === 0) {
+        this.errors.push('country');
       }
+
       if (!this.businessType) {
-        this.errors.push("Please enter a business type!");
+        this.errors.push('businessType');
       }
+
+      if (this.errors.length >= 1) {
+        this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
+      }
+
     },
 
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
     createBusinessInfo: function() {
+      // Use createUser function of API to POST user data to backend
+      if(this.errors.length === 0) {
+        let businessAddress = {
+          streetNumber: this.streetNumber,
+          streetName: this.streetAddress,
+          city: this.city,
+          region: this.region,
+          country: this.country,
+          postcode: this.postcode,
+        };
 
-      //Use createUser function of API to POST user data to backend
-      //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
-      //https://www.npmjs.com/package/json-server
-      if(this.errors.length == 0){
-        api.createBusiness(this.businessName, this.description, this.businessAddress, this.businessType)
-      .then((response) => {
-        this.$log.debug("New business created:", response.data);
-        this.$store.commit('setBusinessId', response.data.businessId); //Store user info into program state, used for later calls
-        this.$store.commit('setBusinessName', response.data.businessName);
-         this.$router.push({name: 'BusinessPage', params: {id: this.$store.state.businessId}})
-      }).catch((error) => {
-        if(error.response){
-          console.log(error.response.status);
-          console.log(error.response.message);
-          this.errors.push("Business name already in use");
-        }
-        this.$log.debug("Error Status:", error)
-      });
+      api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
+        .then((response) => {
+          this.$log.debug("New business created:", response.data);
+          this.$router.push({path: `/users/${store.loggedInUserId}`});
+        }).catch((error) => {
+          if(error.response) {
+            console.log(error.response.status);
+            console.log(error.response.message);
+            this.errors.push("Access token is missing/invalid");
+          }
+          this.$log.debug("Error Status:", error)
+        });
     }},
 
     /**
-     * Function that filters response from photon API and pushes the address to potentialAddresses, The photon API response contains
-     * undefined values which have to be filtered.
-     * @param response Response from photon API containing address information
+     * Retrieve a list of suggested cities using the photon open api.
      */
-    filterAddressInfo : function(response) {
-      //Filters response from photon API and pushes information to potentialAddresses
-      let addressesShown = 5;
-      let addressList = response.data.features
-          for (let address of addressList) {
-            let addressDetails = address.properties;
-            //Filter null values and make sure not too many addresses are pushed
-            if(addressDetails.housenumber != null && addressDetails.street != null && addressDetails.city != null && this.potentialAddresses.length <= addressesShown) {
-              this.potentialAddresses.push(`${addressDetails.housenumber} ${addressDetails.street}, ${addressDetails.city}`);
-            }
-          }
+    getCitiesFromPhoton: function() {
+      if (this.city.length >= this.minNumberOfCharacters) {
 
-    },
-
-    /**
-     * Performs a GET request to the photon API using values from address input field,
-     * also handles the showing and hiding of the suggestion bar
-     */
-    getAddressFromPhoton : function() {
-      let minNumberOfCharacters = 3
-
-      if(this.businessAddress.length >= minNumberOfCharacters) {
-        this.suggestionsActive = true;
-        //Make call to photon API using value from address field, take only values that are houses
-        axios.get(`https://photon.komoot.io/api/?q=${this.businessAddress}&osm_tag=:house`)
-        .then(response => {
-          //Pass response into filter function which also pushes info to potential addresses
-          this.potentialAddresses = []
-          this.filterAddressInfo(response);
-        })
-      } else {
-        this.suggestionsActive = false; //Hide address suggestions
+        this.suggestCities = true;
+        axios.get(`https://photon.komoot.io/api/?q=${this.city}&osm_tag=place:city&lang=en`)
+            .then( res => {
+              this.suggestedCities = res.data.features.map(location => location.properties.name);
+              this.suggestedCities = this.suggestedCities.filter(city => city != null);
+            })
+            .catch( error => {
+              console.log("Error with getting cities from photon." + error);
+            });
+      }
+      else {
+        this.suggestCities = false;
       }
     },
 
     /**
-     * Sets address field when address in suggestions is clicked
+     * Set the city as the new city.
+     * @param selectedCity string to set as the new city.
      */
-    setAddress: function(address) {
-      this.businessAddress = address
-    }
+    setCity: function(selectedCity) {
+      this.city = selectedCity;
+      this.suggestCities = false;
+    },
+
+    /**
+     * Retrieve a list of suggested countries using the photon open api.
+     */
+    getCountriesFromPhoton: function() {
+      if (this.country.length >= this.minNumberOfCharacters) {
+
+        this.suggestCountries = true;
+        axios.get(`https://photon.komoot.io/api/?q=${this.country}&osm_tag=place:country&lang=en`)
+          .then( res => {
+            this.suggestedCountries = res.data.features.map(location => location.properties.country);
+          })
+          .catch( error => {
+            console.log("Error with getting countries from photon." + error);
+          });
+      }
+      else {
+        this.suggestCountries = false;
+      }
+    },
+
+    /**
+     * Set the country as the new country.
+     * @param selectedCountry the country string to set as.
+     */
+    setCountry: function(selectedCountry) {
+        this.country = selectedCountry;
+        this.suggestCountries = false;
+    },
 
   },
 
@@ -182,126 +209,146 @@ export default BusinessRegister;
 </script>
 
 <style scoped>
-/* Dropdown Button */
 
-.label{
-  color: white;
+.suggested-box {
+  position: absolute;
+  display: inline-block;
+  list-style: none;
+  width: 225px;
 }
 
-.dropdown {
+.suggested-item {
   cursor: pointer;
-  border-radius: 5em;
-  background: #3B5998;
-  border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
+  position: relative;
+  margin: 0 0 0 1em;
 
-  margin-left: 50%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  padding: 0.5em 1em;
+  background: white;
+  z-index: 99;
+}
+
+.suggested-item:hover {
+  background: lightgray;
 }
 
 .register-button {
+  margin: 1em auto;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
   background: #3B5998;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  padding: 10px 40px;
   font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
-  margin-bottom: 100%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
-/* The container <div> - needed to position the dropdown content */
-
-
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  margin-left: 80px;
-  margin-right: 80px;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-/* Links inside the dropdown */
-.dropdown-content a {
-  color: black;
-  padding: 3px 6px;
-  text-decoration: none;
-  display: block;
-}
-
-/* Change color of dropdown links on hover */
-
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {display: block;}
-
-/* Change the background color of the dropdown button when the dropdown content is shown */
-
-.form-group col-md-6{
-  color: rgb(38, 50, 56);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
 
 .card {
-  background-color: #FFFFFF;
-  width: 700px;
-  height: 400px;
+  max-width: 650px;
+  background-color: white;
   margin: 1em auto;
-  border-radius: 2.5em;
-  outline: none;
-  border: none;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  grid-row-gap: 1em;
+
 }
 
 .card-header {
-  font-family: 'Ubuntu', sans-serif;
+  grid-row: 1;
+
+  text-align: center;
   font-weight: bold;
-  font-size: 23px;
+  font-size: 24px;
   color: #3B5998;
+
+  margin: 0;
+  padding: 1em 0;
+
+}
+
+form {
+  grid-row: 2;
+
+  margin: 0 4em;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(5, auto);
+  grid-row-gap: 4px;
+
 }
 
 .form-control {
-  width: 76%;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 5px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
-  margin-left: 46px;
-  text-align: center;
-  margin-bottom: 27px;
   font-family: 'Ubuntu', sans-serif;
+  margin: 0.25em auto;
+  width: 90%;
+
+}
+
+#business-name {
+  padding: 0;
+}
+
+#address-container {
+  display: grid;
+  grid-template-columns: repeat(2, 2fr) repeat(3, 3fr);
+  grid-template-rows: repeat(3, auto);
+
+}
+
+vs-input {
+  margin: 0;
+}
+
+#street-number {
+  grid-row: 1;
+  grid-column: 1 / 3;
+}
+
+#street-address {
+  grid-row: 1;
+  grid-column: 3 / 6;
+}
+
+#city {
+  grid-row: 2;
+  grid-column: 3 / 6;
+}
+
+#region {
+  grid-row: 3;
+  grid-column: 1 / 3;
+}
+
+#country {
+  grid-row: 3;
+  grid-column: 3 / 6;
+}
+
+#postcode {
+  grid-row: 2;
+  grid-column: 1 / 3;
+}
+
+.text-areas {
+  margin-top: 1em;
+  width: 90%;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+}
+
+@media screen and (max-width: 600px) {
+  .card {
+    width: 90%;
+  }
 }
 
 </style>
