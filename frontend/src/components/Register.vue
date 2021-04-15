@@ -297,6 +297,11 @@
                   .then( res => {
                     this.suggestedCities = res.data.features.map(location => location.properties.name);
                     this.suggestedCities = this.suggestedCities.filter(city => city != null);
+                    var found = {};
+                    this.suggestedCities = this.suggestedCities.filter(function(country) {
+                      // eslint-disable-next-line no-prototype-builtins
+                      return found.hasOwnProperty(country) ? false : (found[country] = true);
+                    });
                   })
                   .catch( error => {
                     console.log("Error with getting cities from photon." + error);
