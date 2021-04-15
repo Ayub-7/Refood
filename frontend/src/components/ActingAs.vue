@@ -37,20 +37,29 @@ const actingAs =  {
 name: "actingAs",
   data: function () {
     return {
-      buss:null,
+      buss: null,
+      loggedInUserId: null,
+      userName: null,
+      role: null,
+      userPrimaryBusinesses: [],
+      actingAsBusinessId: null,
+      actingAsBusinessName: null
     }
   },
   methods: {
     getUserName() {
-      return store.userName;
+      this.userName = store.userName;
+      return this.userName;
     },
 
     getUserRole() {
-      return store.role;
+      this.role = store.role;
+      return this.role;
     },
 
     getPrimaryBusinesses(){
-      console.log(store.userPrimaryBusinesses);
+      this.userPrimaryBusinesses = store.userPrimaryBusinesses;
+      //console.log(store.userPrimaryBusinesses);
       return store.userPrimaryBusinesses;
     },
 
@@ -59,6 +68,7 @@ name: "actingAs",
       const businessId = mutations.getIdByName(businessName);
       mutations.setActingAsBusiness(businessId, businessName)
     },
+
     Redirect() {
       this.$router.push({path: `/businesses/${store.actingAsBusinessId}`});
     },
@@ -68,8 +78,9 @@ name: "actingAs",
       this.$router.push({path: `/users/${store.loggedInUserId}`});
     },
 
-    getActingAsBusinessName(){
-      return store.actingAsBusinessName;
+    getActingAsBusinessName() {
+      this.actingAsBusinessName = store.actingAsBusinessName
+      return this.actingAsBusinessName;
     }
   },
   // mounted: function () {

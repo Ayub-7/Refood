@@ -1,36 +1,12 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import ActingAs from '../components/ActingAs';
-import {store} from '../store';
+//import {store} from "@/store";
 //import Users from "@/components/Users";
-//import Users from "../components/Users";
-
-
+//import {store} from "@/store";
 
 const localVue = createLocalVue();
 let wrapper;
-jest.mock('../store', () => ({ store: jest.fn()}));
 
-//jest.mock('../store.js', () => jest.fn);
-
-
-//Mock User
-// const mockUser = {
-//     "id": 5,
-//     "firstName": "Rayna",
-//     "middleName": "YEP",
-//     "lastName": "Dalgety",
-//     "nickname": "Universal",
-//     "bio": "zero tolerance task-force",
-//     "email": "rdalgety3@ocn.ne.jp",
-//     "dateOfBirth": "2006-03-30",
-//     "phoneNumber": "+7 684 622 5902",
-//     "homeAddress": "44 Ramsey Court",
-//     "created": "2021-04-05 00:11:04",
-//     "role": "USER",
-//     "businessesAdministered": [
-//         2
-//     ]
-// }
 
 // Mock Business
 const mockBusinesses = [
@@ -93,6 +69,14 @@ const mockBusinesses = [
     }
 ]
 
+// let store = {loggedInUserId: 22,
+//     role: "USER",
+//     userName: "Wileen Tisley",
+//     userPrimaryBusinesses: [],
+//     actingAsBusinessId: null,
+//     actingAsBusinessName: null
+// }
+
 beforeEach(() => {
     wrapper = shallowMount(ActingAs, {
         localVue,
@@ -100,16 +84,36 @@ beforeEach(() => {
         mocks: {},
         stubs: ['router-link', 'router-view'],
         methods: {},
+        data() {
+            return {
+                loggedInUserId: 22,
+                userName: "Wileen Tisley",
+                role: "USER",
+                userPrimaryBusinesses: mockBusinesses,
+                actingAsBusinessId: null,
+                actingAsBusinessName: null
+            }
+        }
     });
-    const setUserLoggedIn = jest.spyOn(mutations.methods, 'setUserLoggedIn');
-    setUserLoggedIn.mockResolvedValue(22, "USER");
-    store.setUserLoggedIn(22, "USER");
-    const setUserName = jest.spyOn(mutations.methods, 'setUserName');
-    setUserName.mockResolvedValue("Wileen Tilsley");
-    const setUserPrimaryBusinesses = jest.spyOn(mutations.methods, 'setUserPrimaryBusinesses');
-    setUserPrimaryBusinesses.mockResolvedValue(mockBusinesses);
+    const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName')
+    getUserNameMethod.mockImplementation(() => {
+        wrapper.vm.userName = "Wileen Tisley";
+        return wrapper.vm.userName;
+    });
+    const getUserRoleMethod = jest.spyOn(ActingAs.methods, 'getUserRole')
+    getUserRoleMethod.mockImplementation(() => {
+        wrapper.vm.role = "USER";
+        return wrapper.vm.role;
+    });
 
-
+    //wrapper.vm.store.userPrimaryBusinesses = mockBusinesses;
+    //wrapper.vm.userName = "Wileen Tisley";
+    //wrapper.setData({role: "USER"})
+    //wrapper.vm.role =  "USER";
+    //wrapper.setData({userPrimaryBusinesses: mockBusinesses})
+    //wrapper.vm.userPrimaryBusinesses =  mockBusinesses;
+    //wrapper.setData({actingAsBusinessName: null})
+    //wrapper.vm.actingAsBusinessName =  null;
 });
 
 afterEach(() => {
@@ -127,7 +131,9 @@ describe('User acting as tests', () => {
     });
 
     test('Check username is displaying the correct username and role', () =>  {
-        expect(wrapper.find('.user').toEqual('Logged in as ' + wrapper.store.role +  ' ' + wrapper.store.userName));
+        // wrapper.vm.userName = "Wileen Tisley";
+        // wrapper.vm.role =  "USER";
+        expect(wrapper.find('.user').text()).toBe('Logged in as USER Wileen Tisley');
     });
 
     test('Check user primary businesses dropdown is rendered', () =>  {
@@ -136,26 +142,35 @@ describe('User acting as tests', () => {
 
     test('Check selecting business in dropdown updates actingAsBusinessId, actingAsBusinessName ', () => {
         //Select business
-        const businessOne = wrapper.store.userPrimaryBusinesses[0]
+        wrapper.vm.userPrimaryBusinesses =  mockBusinesses;
+        const businessOne = wrapper.vm.userPrimaryBusinesses[0];
         wrapper.vm.buss = businessOne.name;
         wrapper.find('.dropdown').trigger('click');
-        expect(wrapper.store.actingAsBusinessId).toBe(businessOne.id);
-        expect(wrapper.store.actingAsBusinessName).toBe(businessOne.name);
+        expect(wrapper.vm.actingAsBusinessId).toBe(businessOne.id);
+        expect(wrapper.vm.actingAsBusinessName).toBe(businessOne.name);
     });
 
     test('Check selecting business in dropdown displays business info, updates user text', () => {
         //Select business
-        const businessOne = wrapper.store.userPrimaryBusinesses[0]
+        wrapper.vm.userPrimaryBusinesses =  mockBusinesses;
+        wrapper.vm.userName = "Wileen Tisley";
+        const businessOne = wrapper.vm.userPrimaryBusinesses[0];
         wrapper.vm.buss = businessOne.name;
+        // const getActingAsBusinessNameMethod = jest.spyOn(ActingAs.methods, 'getActingAsBusinessName')
+        // getActingAsBusinessNameMethod.mockImplementation(() => {
+        //     wrapper.vm.actingAsBusinessName = "Dabshots";
+        //     return wrapper.vm.actingAsBusinessName;
+        // });
         wrapper.find('.dropdown').trigger('click');
         expect(wrapper.find('.business').exists()).toBe(true);
-        expect(wrapper.find('.business').toEqual('Logged in as BUSINESS: ' + businessOne.name));
-        expect(wrapper.find('.user').toEqual('Act as User: ' + wrapper.store.userName));
+        expect(wrapper.find('.business').text()).toBe('Logged in as BUSINESS: ' + businessOne.name);
+        expect(wrapper.find('.user').text()).toBe('Act as User: ' + wrapper.vm.userName);
     });
 
     test('Check selecting business in dropdown calls setActingAsBusinessId method', () => {
         //Select business
-        const businessOne = wrapper.store.userPrimaryBusinesses[0]
+        wrapper.vm.userPrimaryBusinesses =  mockBusinesses;
+        const businessOne = wrapper.vm.userPrimaryBusinesses[0];
         wrapper.vm.setActingAsBusinessId = jest.fn();
         wrapper.vm.buss = businessOne.name;
         wrapper.find('.dropdown').trigger('click');
@@ -164,18 +179,22 @@ describe('User acting as tests', () => {
 
     test('Check selecting username in userinfo, makes user act as user, hides business info', () => {
         //Select business
-        const businessOne = wrapper.store.userPrimaryBusinesses[0]
+        wrapper.vm.userPrimaryBusinesses =  mockBusinesses;
+        wrapper.vm.userName = "Wileen Tisley";
+        wrapper.vm.role = "USER";
+        const businessOne = wrapper.vm.userPrimaryBusinesses[0];
         wrapper.vm.buss = businessOne.name;
         wrapper.find('.dropdown').trigger('click');
         wrapper.find('.user').trigger('click');
         expect(wrapper.find('.dropdown').exists()).toBe(false);
-        expect(wrapper.find('.user').toEqual('Logged in as ' + wrapper.store.role +  ' ' + wrapper.store.userName));
+        expect(wrapper.find('.user').text()).toBe('Logged in as ' + wrapper.vm.role +  ' ' + wrapper.vm.userName);
         expect(wrapper.find('.business').exists()).toBe(false);
     });
 
     test('Check selecting user calls setActingAsUser method', () => {
         //Select business
-        const businessOne = wrapper.store.userPrimaryBusinesses[0]
+        wrapper.vm.userPrimaryBusinesses =  mockBusinesses;
+        const businessOne = wrapper.vm.userPrimaryBusinesses[0];
         wrapper.vm.buss = businessOne.name;
         wrapper.vm.setActingAsUser = jest.fn();
         wrapper.find('.dropdown').trigger('click');
