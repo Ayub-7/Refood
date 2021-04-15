@@ -38,8 +38,6 @@ name: "actingAs",
   data: function () {
     return {
       buss:null,
-      actingAsBusinessId: null,
-      actingAsBusinessName: null,
     }
   },
   methods: {
@@ -52,6 +50,7 @@ name: "actingAs",
     },
 
     getPrimaryBusinesses(){
+      console.log(store.userPrimaryBusinesses);
       return store.userPrimaryBusinesses;
     },
 

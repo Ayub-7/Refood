@@ -17,7 +17,7 @@
 
       <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
       <div type="button" class="forgotPassword">Forgot Password?</div>
-  </form>2
+  </form>
   </div>
   </div>
 </template>
