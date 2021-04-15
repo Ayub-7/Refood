@@ -7,6 +7,7 @@ import org.seng302.models.Product;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.NewProductRequest;
+import org.seng302.models.requests.UpdateProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+//import jdk.internal.net.http.Response;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -86,6 +89,45 @@ public class ProductController {
                 else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
                 }
+            }
+        }
+    }
+
+
+
+    @PutMapping("/businesses/{businessId}/products/{productId}")
+    public ResponseEntity<String> updateProduct(@PathVariable("businessId") long businessId, @PathVariable("productId") String productId, @RequestBody UpdateProductRequest req, HttpSession session) {
+        Business business = businessRepository.findBusinessById(businessId);
+
+        if (business == null) { // Business does not exist
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        } else {
+            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else { // User is authorized
+                if(req.getId() != null) {
+                    productRepository.updateProductId(req.getId(), productId);
+                    
+                }
+                // if(req.getName() != null) {
+                //     productRepository.updateProductName(req.getName(), productId);
+                    
+                // }
+                // if(req.getDescription() != null) {
+                //     productRepository.updateProductDescription(req.getDescription(), productId);
+                    
+                // }
+                // if(req.getRecommendedRetailPrice() != null) {
+                //     productRepository.updateProductRRP(req.getRecommendedRetailPrice(), productId);
+                    
+                // }
+
+                
+
+                return ResponseEntity.status(HttpStatus.OK).build();
             }
         }
     }
