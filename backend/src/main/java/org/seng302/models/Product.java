@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.seng302.models.requests.NewProductRequest;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
+/**
+ * Entity class that holds the information of a business product.
+ */
 @Data
 @Entity
 @IdClass(ProductId.class)
@@ -27,7 +29,9 @@ public class Product {
     private double recommendedRetailPrice;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
-    // images when we get to it.
+
+    @OneToMany(cascade = CascadeType.ALL) // Creates a table PRODUCT_IMAGES.
+    private List<Image> images;
 
     protected Product() { }
 
@@ -40,6 +44,11 @@ public class Product {
         this.created = created;
     }
 
+    /**
+     * Used for when a new product request is called.
+     * @param newProductRequest The request body information that was mapped into a NewProductRequest.
+     * @param businessId business to assign the product rights to.
+     */
     public Product(NewProductRequest newProductRequest, Long businessId) {
         this.id = newProductRequest.getId();
         this.businessId = businessId;
@@ -48,4 +57,13 @@ public class Product {
         this. recommendedRetailPrice = newProductRequest.getRecommendedRetailPrice();
         this.created = new Date();
     }
+
+    /**
+     * Adds a new image to the product entity.
+     * @param image the image object to add.
+     */
+    public void addProductImage(Image image) {
+        this.images.add(image);
+    }
+
 }

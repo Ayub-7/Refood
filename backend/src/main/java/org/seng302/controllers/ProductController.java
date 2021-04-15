@@ -15,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -131,22 +129,37 @@ public class ProductController {
 
     /**
      * Receives and saves a new image pertaining to a product.
+     * Authorization required - 401 code response if not.
      * @param businessId unique identifier of the business that the image is relating to.
      * @param productId product identifier that the image is relating to.
      * @param image a multipart image of the file
-     * @return
-     * @throws IOException
+     * @return ResponseEntity with the appriate status codes - 201, 400, 403, 406.
+     * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image ) throws Exception {
+    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws Exception {
         String rootImageDir = System.getProperty("user.dir") + "/media/images/";
-        String imageExtension;
 
+        Business business = businessRepository.findBusinessById(businessId);
+        if (business == null)  {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String imageExtension;
         if (image.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
         }
         try { // Throw error if the file is not an image.
-            imageExtension = Image.getImageExtension(image.getContentType());
+            imageExtension = Image.getContentTypeExtension(image.getContentType());
         }
         catch (InvalidImageExtensionException exception) {
             throw new InvalidImageExtensionException(exception.getMessage());
@@ -163,16 +176,22 @@ public class ProductController {
         int count = 0;
         while (!freeImage) {
             imageName = String.valueOf(count);
-            File checkFile = new File(businessDir + imageName + imageExtension);
+            File checkFile = new File(businessDir + "/" + imageName + imageExtension);
 
             if (checkFile.exists()) {
                 count++;
-            } else {
+            }
+            else {
                 freeImage = true;
             }
         }
         File file = new File(businessDir + "/" + imageName + imageExtension);
-        image.transferTo(file);
+        image.transferTo(file); // Saves file locally.
+
+        // Save into DB.
+        Image newImage = new Image(imageName + imageExtension, null);
+        product.addProductImage(newImage);
+        productRepository.save(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
