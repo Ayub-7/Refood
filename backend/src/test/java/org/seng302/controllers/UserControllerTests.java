@@ -269,11 +269,6 @@ public class UserControllerTests {
 
     @Test
     public void testNoTokenUserRevokeAdmin() throws Exception {
-        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
-        User user = new User("John", "Hector", "Smith", "Jonny",
-                "Likes long walks on the beach", "johnsmith99@gmail.com",
-                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        Mockito.when(userRepository.findUserById(0)).thenReturn(user);
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
@@ -282,11 +277,6 @@ public class UserControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testNoAuthorityUserRevokeAdmin() throws Exception {
-        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
-        User user = new User("John", "Hector", "Smith", "Jonny",
-                "Likes long walks on the beach", "johnsmith99@gmail.com",
-                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        Mockito.when(userRepository.findUserById(0)).thenReturn(user);
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.FORBIDDEN.value();
