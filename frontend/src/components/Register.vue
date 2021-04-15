@@ -215,7 +215,6 @@
       } else if (this.phonenumber.length < 3) {
         this.errors.push("The phone number you inputted is too short!");
       }
-    },
         if (this.errors.length >= 1) {
           // let message = "";
           for (let error in this.errors) {
