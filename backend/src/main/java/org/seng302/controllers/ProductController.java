@@ -186,7 +186,7 @@ public class ProductController {
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images")
     public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image ) throws Exception {
-
+        return null;
     }
 
 
