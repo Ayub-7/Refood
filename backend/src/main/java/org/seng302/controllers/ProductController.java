@@ -176,5 +176,18 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    /**
+         * deletes an image
+         * @param businessId unique identifier of the business that the image is relating to.
+         * @param productId product identifier that the image is relating to.
+         * @param image a multipart image of the file
+         * @return
+         * @throws IOException
+         */
+    @DeleteMapping("/businesses/{businessId}/products/{productId}/images")
+    public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image ) throws Exception {
+
+    }
+
 
 }
