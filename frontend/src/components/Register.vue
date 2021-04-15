@@ -1,80 +1,80 @@
 <template>
-    <div class="card" id="body">
-      <h3 class="card-header text-center">Create a ReFood Account</h3>
-      <div class="card-body">
-        <div v-if="errors.length > 0">
-          <b>Please correct the following error(s):</b>
-          <ul>
-            <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-          </ul>
-        </div>
-        <form @submit="checkForm" action="/something" method="post" novalidate="true">
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter First name" name="firstname" v-model="firstname" required>
-            </div>
+  <div class="card" id="body">
+    <h3 class="card-header text-center">Create a ReFood Account</h3>
+    <div class="card-body">
+      <div v-if="errors.length > 0">
+        <b>Please correct the following error(s):</b>
+        <ul>
+          <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+        </ul>
+      </div>
+      <form @submit="checkForm" action="/something" method="post" novalidate="true">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <input type="text" class="form-control" placeholder="Enter First name" name="firstname" v-model="firstname" required>
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter Middle name" name="middlename" v-model="middlename">
-            </div>
+          <div class="form-group col-md-6">
+            <input type="text" class="form-control" placeholder="Enter Middle name" name="middlename" v-model="middlename">
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter Last name" name="lastname" v-model="lastname" required>
-            </div>
+          <div class="form-group col-md-6">
+            <input type="text" class="form-control" placeholder="Enter Last name" name="lastname" v-model="lastname" required>
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="text" class="form-control" placeholder="Enter Nick Name" name="nickname" v-model="nickname">
-            </div>
+          <div class="form-group col-md-6">
+            <input type="text" class="form-control" placeholder="Enter Nick Name" name="nickname" v-model="nickname">
+          </div>
 
-            <div class="form-group col-md-6">
-              <textarea type="text" class="form-control" placeholder="Enter Bio" name="bio" v-model="bio"></textarea>
-            </div>
+          <div class="form-group col-md-6">
+            <textarea type="text" class="form-control" placeholder="Enter Bio" name="bio" v-model="bio"></textarea>
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="email" class="form-control" placeholder="Enter Email" name="email" v-model="email" required>
-            </div>
+          <div class="form-group col-md-6">
+            <input type="email" class="form-control" placeholder="Enter Email" name="email" v-model="email" required>
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="password" class="form-control" placeholder="Enter your password" name="password" v-model="password" required>
-            </div>
+          <div class="form-group col-md-6">
+            <input type="password" class="form-control" placeholder="Enter your password" name="password" v-model="password" required>
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="password" class="form-control" placeholder="Confirm your password" name="confirm_password" v-model="confirm_password" required>
-            </div>
+          <div class="form-group col-md-6">
+            <input type="password" class="form-control" placeholder="Confirm your password" name="confirm_password" v-model="confirm_password" required>
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="date" class="form-control" placeholder="Enter DoB" name="dateofbirth" v-model="dateofbirth" required>
-            </div>
+          <div class="form-group col-md-6">
+            <input type="date" class="form-control" placeholder="Enter DoB" name="dateofbirth" v-model="dateofbirth" required>
+          </div>
 
-            <div class="form-group col-md-6">
-              <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
-            </div>
+          <div class="form-group col-md-6">
+            <input type="tel" class="form-control" placeholder="Enter Phone number" name="phonenumber" v-model="phonenumber">
+          </div>
 
-            <div class="form-group col-md-6" >
-              <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
-              <div v-if="suggestionsActive">
-                <ul class="addressSuggestion" id="myApp">Suggestions:
-                  <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); setAddressText(toText(address)); deleteItem()" class="address">
-                    {{toText(address)}}
+          <div class="form-group col-md-6" >
+            <textarea type="text" class="form-control" @input="getAddressFromPhoton()" autocomplete='nope' placeholder="Enter Home Address" name="homeaddress" v-model="homeaddress" required></textarea>
+            <div v-if="suggestionsActive">
+              <ul class="addressSuggestion" id="myApp">Suggestions:
+                <li v-for="(address, index) in potentialAddresses" v-bind:key="index"  @click = "setAddress(address); setAddressText(toText(address)); deleteItem()" class="address">
+                  {{toText(address)}}
                 </li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="form-group col-md-6">
-              <button type="button" class="register-button" @click="checkForm(); createUserInfo()">Register</button>
-            </div>
-
-            <div class="form-group col-md-6">
-              <label>Already registered? </label>
-              <router-link to="/Login">
-              <button type="button" class="loginButton" to="/login">Login</button>
-              </router-link>
+              </ul>
             </div>
           </div>
-        </form>
-      </div>
+
+          <div class="form-group col-md-6">
+            <button type="button" class="register-button" @click="checkForm(); createUserInfo()">Register</button>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label>Already registered? </label>
+            <router-link to="/Login">
+              <button type="button" class="loginButton" to="/login">Login</button>
+            </router-link>
+          </div>
+        </div>
+      </form>
     </div>
+  </div>
 </template>
 <script>
 
@@ -152,6 +152,8 @@ const Register = {
 
       if (!this.dateofbirth) {
         this.errors.push("Please enter your date of birth");
+      } else if (this.getAge(this.dateofbirth) < 13) {
+        this.errors.push("Sorry, you are not old enough to join ReFood.")
       }
 
       if (!this.homeaddress) {
@@ -216,22 +218,22 @@ const Register = {
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
         api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, {streetNumber: this.homeaddressObj.housenumber, streetName: this.homeaddressObj.street, city: this.homeaddressObj.city, region: this.homeaddressObj.state, country: this.homeaddressObj.country, postcode: this.homeaddressObj.postcode}, this.password)
-      .then((response) => {
-        this.$log.debug("New item created:", response.data);
-        // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
-        mutations.setUserLoggedIn(response.data.userId, response.data.role)
-        mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-        //LOAD USER PAGE, USING ROUTER
-        this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
-      }).catch((error) => {
-        if(error.response){
-          console.log(error.response.status);
-          console.log(error.response.message);
-          this.errors.push("Email already in use");
-        }
-        this.$log.debug("Error Status:", error)
-      });
-    }},
+            .then((response) => {
+              this.$log.debug("New item created:", response.data);
+              // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
+              mutations.setUserLoggedIn(response.data.userId, response.data.role)
+              mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+              //LOAD USER PAGE, USING ROUTER
+              this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
+            }).catch((error) => {
+          if(error.response){
+            console.log(error.response.status);
+            console.log(error.response.message);
+            this.errors.push("Email already in use");
+          }
+          this.$log.debug("Error Status:", error)
+        });
+      }},
 
     /**
      * Function that filters response from photon API and pushes the address to potentialAddresses, The photon API response contains
@@ -242,13 +244,13 @@ const Register = {
       //Filters response from photon API and pushes information to potentialAddresses
       let addressesShown = 5;
       let addressList = response.data.features
-          for (let address of addressList) {
-            let addressDetails = address.properties;
-            //Filter null values and make sure not too many addresses are pushed
-            if(addressDetails.housenumber != null && addressDetails.street != null && addressDetails.city != null && this.potentialAddresses.length <= addressesShown) {
-              this.potentialAddresses.push(addressDetails);
-            }
-          }
+      for (let address of addressList) {
+        let addressDetails = address.properties;
+        //Filter null values and make sure not too many addresses are pushed
+        if(addressDetails.housenumber != null && addressDetails.street != null && addressDetails.city != null && this.potentialAddresses.length <= addressesShown) {
+          this.potentialAddresses.push(addressDetails);
+        }
+      }
 
     },
 
@@ -263,11 +265,11 @@ const Register = {
         this.suggestionsActive = true;
         //Make call to photon API using value from address field, take only values that are houses
         axios.get(`https://photon.komoot.io/api/?q=${this.homeaddress}&osm_tag=:house`)
-        .then(response => {     
-          //Pass response into filter function which also pushes info to potential addresses
-          this.potentialAddresses = []
-          this.filterAddressInfo(response);
-        })
+            .then(response => {
+              //Pass response into filter function which also pushes info to potential addresses
+              this.potentialAddresses = []
+              this.filterAddressInfo(response);
+            })
       } else {
         this.suggestionsActive = false; //Hide address suggestions
       }
@@ -293,8 +295,19 @@ const Register = {
 
     setAddressText: function(addressString) {
       this.homeaddress = addressString;
+    },
+
+    /**
+     * Returns the years since the user was born. No rounding is done in the function.
+     * @param enteredDate The user's birthdate
+     * @returns {number} The user's age in years.
+     */
+    getAge: function(enteredDate) {
+      var years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
+      return years;
     }
   },
+
 
 }
 export default Register;
@@ -311,8 +324,8 @@ Registration form's background styling
 Address suggestion list's styling
  */
 .addressSuggestion {
-  text-align: center; 
-  padding-right: 40px; 
+  text-align: center;
+  padding-right: 40px;
   border-radius: 30px;
   color: white;
 

@@ -70,9 +70,9 @@
       </div>
 
       <div slot="body">
-          <select class="business-dropdown" v-model="selectedBusiness">
-            <option v-for="business in this.userViewingBusinesses" :key="business.id" v-bind:business="business" v-bind:value="business">{{business.name}}</option>
-          </select>
+          <vs-select class="business-dropdown" v-model="selectedBusiness">
+            <vs-select-item v-for="business in userViewingBusinesses" :key="business.id" :text="business.name" :value="business"/>
+          </vs-select>
       </div>
 
       <div id="modal-footer" slot="footer">
@@ -423,21 +423,12 @@ main {
 
 /* Make User Admin Popup Box */
 .business-dropdown {
-  color: #FFFFFF;
   text-align: center;
   font-size: 14px;
   text-decoration: none;
 
   width: 100%;
   padding: 12px 16px;
-  border-radius: 5rem;
-  border: none;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-
-option {
-  color: black;
 }
 
 #modal-footer {
