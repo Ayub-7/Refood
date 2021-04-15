@@ -142,5 +142,43 @@ public class UserControllerTests {
         assert userNotFound.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
     }
 
+    @Test
+    public void testGoodLogin() throws Exception {
+        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
+        User user = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserByEmail("johnsmith99@gmail.com")).thenReturn(user);
+        LoginRequest loginReq = new LoginRequest(user.getEmail(), user.getPassword());
+        MvcResult success = mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginReq)))
+                .andReturn();
+        assert success.getResponse().getStatus() == HttpStatus.OK.value();
+    }
 
+    @Test
+    public void testBadPasswordLogin() throws Exception {
+        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
+        User user = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserByEmail("johnsmith99@gmail.com")).thenReturn(user);
+        LoginRequest loginReq = new LoginRequest(user.getEmail(), "BABABOOEY");
+        MvcResult success = mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginReq)))
+                .andReturn();
+        assert success.getResponse().getStatus() == HttpStatus.BAD_REQUEST.value();
+    }
+
+    @Test
+    public void testNonExistingUserLogin() throws Exception {
+        LoginRequest loginReq = new LoginRequest("Bazinga", "BABABOOEY");
+        MvcResult success = mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginReq)))
+                .andReturn();
+        assert success.getResponse().getStatus() == HttpStatus.BAD_REQUEST.value();
+    }
 }
