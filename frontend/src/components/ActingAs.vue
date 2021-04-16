@@ -4,14 +4,16 @@
         <ul class="actInfo" v-if="getActingAsBusinessName() == null">
           <li class="userStuff" >
             <span class ="user">Logged in as {{getUserRole()}} {{getUserName()}}</span>
-            <span class="avatar"> IMG</span>
-            <!-- <img src="../profile-pic.jpeg" alt="Profile Pic" style="height: 10%; width: 10%; margin-left: 10px">-->
+            <!-- <span class="avatar"> IMG</span> -->
+            <vs-avatar size="large" style="margin-left: 10px">
+              {{getUserName().match(/[A-Z]/g).join('')}}
+            </vs-avatar>
           </li>
 
           <li>
             <form class="dropdown">
               <label class="label"> Select Business to act as:  </label>
-              <select class="select" name="acting" placeholder="Business" v-model="buss" @change="setActingAsBusinessId(buss) ; Redirect()">
+              <select class="select" name="acting" placeholder="Business" v-model="buss" @change="setActingAsBusinessId(buss);">
                 <option value="" disabled selected>Choose business</option>
                 <option  v-for="business in getPrimaryBusinesses()"
                         v-bind:href="business.id"
@@ -70,15 +72,13 @@ name: "actingAs",
     setActingAsBusinessId(businessName){
       const businessId = mutations.getIdByName(businessName);
       mutations.setActingAsBusiness(businessId, businessName)
-    },
-
-    Redirect() {
-      this.$router.push({path: `/businesses/${store.actingAsBusinessId}`});
+      this.buss = null;
+      this.$router.push({path: `/businesses/${businessId}`});
     },
 
     setActingAsUser(){
       mutations.setActingAsUser();
-      this.$router.push({path: `/users/${store.loggedInUserId}`});
+      this.$router.push({path: `/home`});
     },
 
     getActingAsBusinessName() {
@@ -128,5 +128,21 @@ li.business {
 
 .dropdown .select option {
   color: black;
+}
+
+.vs-avatar-content.vs-avatar-content--size.vs-change-color-badge {
+  float: right;
+  margin-right: 20px;
+  margin-top: -9px;
+  position: relative;
+}
+
+span.user {
+  width: 75%;
+  float: left;
+}
+
+.dropdown {
+  margin-top: 30px;
 }
 </style>
