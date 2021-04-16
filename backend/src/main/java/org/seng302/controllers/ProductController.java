@@ -10,15 +10,17 @@ import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,9 @@ public class ProductController {
 
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
+
+    @Value("${media.image.business.directory}")
+    String rootImageDir;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -96,6 +101,42 @@ public class ProductController {
         }
     }
 
+
+    /**
+     * Updates product information using PUT request, SINCE IT IS A PUT REQUEST ALL FIELDS HAVE TO EXIST
+     * Authentication is required, user must be a business admin or a default global admin
+     * @param businessId Business id, used to get business to get product catalogue
+     * @param productId Product id, is a string since product ids can be any value
+     * @param req the request body for the new product object (using NewProduct request of this because it contains the required variables for this request)
+     * @param session http session which holds the authenticated user
+     * @return error codes: 403 (forbidden user), 400 (Bad Request (Incorrect fields or business doesn't exist))), 200 (Object Updated)
+     */
+    @PutMapping("/businesses/{businessId}/products/{productId}")
+    public ResponseEntity<String> updateProduct(@PathVariable("businessId") long businessId, @PathVariable("productId") String productId, @RequestBody NewProductRequest req, HttpSession session) {
+        Business business = businessRepository.findBusinessById(businessId);
+
+        if (business == null) { // Business does not exist
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } else {
+            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else { // User is authorized
+                ArrayList checkProduct = isValidProduct(req, business);
+                boolean isValid = (Boolean) checkProduct.get(0);
+                String errorMessage = (String) checkProduct.get(1);
+                if(isValid) {
+                    productRepository.updateProduct(req.getId(), req.getName(), req.getDescription(), req.getRecommendedRetailPrice(), productId);
+                    return ResponseEntity.status(HttpStatus.OK).build();
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+                }
+            }
+        }
+    }
+
     /**
      * Checks the product request body to ensure all fields are valid
      * @param product The product to be created, includes id, name, description and price
@@ -131,25 +172,41 @@ public class ProductController {
 
     /**
      * Receives and saves a new image pertaining to a product.
+     * Authorization required - 401 code response if not.
      * @param businessId unique identifier of the business that the image is relating to.
      * @param productId product identifier that the image is relating to.
      * @param image a multipart image of the file
-     * @return
-     * @throws IOException
+     * @return ResponseEntity with the appriate status codes - 201, 400, 403, 406.
+     * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image ) throws Exception {
-        String rootImageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/";
+    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpServletRequest request, HttpSession session) throws Exception {
+        Business business = businessRepository.findBusinessById(businessId);
+        if (business == null)  {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         String imageExtension;
+
         if (image.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
         }
         try { // Throw error if the file is not an image.
-            imageExtension = Image.getImageExtension(image.getContentType());
+            imageExtension = Image.getContentTypeExtension(image.getContentType());
         }
         catch (InvalidImageExtensionException exception) {
             throw new InvalidImageExtensionException(exception.getMessage());
         }
+
         // Check if business' own folder directory exists - make directory if false.
         File businessDir = new File(rootImageDir + "business_" + businessId);
         if (businessDir.mkdir()) {
@@ -161,16 +218,28 @@ public class ProductController {
         int count = 0;
         while (!freeImage) {
             imageName = String.valueOf(count);
-            File checkFile = new File(businessDir + imageName + imageExtension);
+            File checkFile = new File(businessDir + "/" + imageName + imageExtension);
 
             if (checkFile.exists()) {
                 count++;
-            } else {
+            }
+            else {
                 freeImage = true;
             }
         }
         File file = new File(businessDir + "/" + imageName + imageExtension);
-        image.transferTo(file);
+        logger.info(System.getProperty("user.dir"));
+        logger.info("File Being written into: " + file);
+        file.createNewFile();
+        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
+        stream.write(image.getBytes());
+        stream.close();
+
+        // Save into DB.
+        Image newImage = new Image("business_" + businessId + imageName + imageExtension, null);
+        product.addProductImage(newImage);
+        productRepository.save(product);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     /**

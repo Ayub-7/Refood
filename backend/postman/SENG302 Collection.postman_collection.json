@@ -482,9 +482,6 @@
 				},
 				{
 					"name": "Upload New Product Image",
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {}
-					},
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -493,8 +490,9 @@
 							"formdata": [
 								{
 									"key": "filename",
+									"description": "Insert image file here.",
 									"type": "file",
-									"src": "/C:/Users/Jackie/Desktop/Fresh-lettuce-isolated-on-white-background-with-clipping-path-1080x675.jpeg"
+									"src": "/C:/Users/Jackie/Desktop/mcchicken.jpg"
 								}
 							]
 						},
@@ -549,12 +547,12 @@
 	],
 	"variable": [
 		{
-			"id": "00f6a768-a556-4535-bed5-e17fd193c917",
+			"id": "1cf6c4b4-84d8-41fa-a19d-a5067d1f9041",
 			"key": "URL",
 			"value": "localhost:9499"
 		},
 		{
-			"id": "380616e2-1573-4a94-bcd4-249377c1855b",
+			"id": "63463b7c-45f2-402e-a1b9-30c81ed1d55d",
 			"key": "userId",
 			"value": ""
 		}
