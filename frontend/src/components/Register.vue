@@ -58,16 +58,6 @@
                   name="phonenumber"
                   v-model="phonenumber"/>
       </div>
-      <vs-input type="date"
-                id="date-of-birth"
-                class="form-control"
-                name="dateofbirth"
-                v-model="dateofbirth"
-                :danger="errors.includes(dateofbirth)"
-                danger-text="Enter date of birth"
-                :success="(dateofbirth.length!==0)"
-                label="Date of birth *"/>
-      <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
       <vs-input type="password"
                 id="password"
                 class="form-control"
@@ -86,6 +76,16 @@
                 :success="(confirm_password===password && confirm_password.length !== 0)"
                 name="confirm_password"
                 v-model="confirm_password"/>
+      <vs-input type="date"
+                id="date-of-birth"
+                class="form-control"
+                name="dateofbirth"
+                v-model="dateofbirth"
+                :danger="errors.includes(dateofbirth)"
+                danger-text="Enter date of birth"
+                :success="(dateofbirth.length!==0)"
+                label="Date of birth *"/>
+      <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
       <div id="address-field">
         <label for="address-field" class="label-control">Address *</label>
         <div id="street-number">
@@ -490,7 +490,7 @@
     font-family: 'Ubuntu', sans-serif;
 
     margin: 0.5em;
-    padding: 0px 0px;
+    padding: 3px 10px;
 
   }
 
@@ -561,7 +561,7 @@
   }
 
   #address-field {
-    grid-column: 1 / 3;
+    grid-column: 1/3;
     display: grid;
     padding: 0px;
     grid-template-columns: repeat(2, auto);
