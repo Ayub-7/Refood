@@ -7,7 +7,6 @@ import org.seng302.models.Product;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.NewProductRequest;
-import org.seng302.models.requests.UpdateProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
