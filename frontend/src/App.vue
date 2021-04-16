@@ -11,37 +11,24 @@
           </div>
           <div v-else>
             <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
-            <li><router-link class="title" to="/businesses">Register a Business</router-link></li>
+            <li v-if="getActingAsUserId() == null"><router-link class="title" to="/businesses">Register a Business</router-link></li>
             <li><router-link class="title" to="/search">Search</router-link></li>
-            <li><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
+            <li v-if="getActingAsUserId() == null"><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
+            <li v-if="getActingAsUserId() != null"><router-link :to="{path: `/businesses/${getActingAsUserId()}`}" class="title">Business Profile</router-link></li>
             <li><router-link :to="{path: '/login'}" class="title">
                 <span class="title" @click="logoutUser()">Logout</span>
               </router-link></li>
+            <div class="userDetail">
+              <ActingAs/>
+            </div>
           </div>
         </ul>
       </div>
-
-    <div class="userInfo" v-if="getUserName()">
-        <div style="  display: flex;  justify-content: right; text-align: right">
-          <div>
-            <h2 class = "dgaa" v-if="getUserRole() == 'DGAA' || getUserRole() == 'GAA'"><span>{{getUserRole()}}</span></h2>
-              <div v-if="getUserName() != null">
-                {{getUserName()}}
-              </div>
-              <div v-if="getUserBusinesses() > 0">
-                <div v-for="user in getUserBusinesses()"
-                     v-bind:href="user.id"
-                     :key="user.id">
-                  <div>{{ user.name }} </div>
-                </div>
-              </div>
-          </div>
           <vs-avatar size="large" style="margin-left: 10px">
             <!--{{getUserName().match(/[A-Z]/g).join('')}}-->
 
           </vs-avatar>
         </div>
-    </div>
     </div>
     <div id="view">
       <router-view></router-view>
@@ -53,13 +40,13 @@
 </template>
 <script>
 import Register from "./components/Register";
-import Login from "@/components/Login.vue";
-import BusinessRegister from "@/components/BusinessRegister";
-import {store, mutations} from "./store";
-import api from "./Api";
+import ActingAs from "./components/ActingAs";
+import Login from "./components/Login";
+import BusinessRegister from "./components/BusinessRegister";
+import {store, mutations} from "./store"
+import api from "./Api"
 import 'vuesax';
 import 'vuesax/dist/vuesax.css';
-
 // @click="goToUserPage()"
 
 // Vue app instance
@@ -71,7 +58,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister
+    Login, Register, BusinessRegister, ActingAs
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
@@ -89,14 +76,14 @@ const app = {
       return store.loggedInUserId;
     },
 
-    getUserRole(){
-      return store.role;
-    },
-    getUserName(){
-      return store.userName;
+    getActingAsUserId(){
+      return store.actingAsBusinessId;
     },
 
-    getUserBusinesses(){
+    // getUserRole() {
+    //   return store.role;
+    // },
+    getPrimaryBusinesses(){
       return store.userPrimaryBusinesses;
     },
     /**
@@ -173,6 +160,10 @@ export default app;
   width: 100px;
   font-family: 'Ubuntu', sans-serif;
 }
+#view {
+
+}
+
 
 .topbar {
   display: flex;

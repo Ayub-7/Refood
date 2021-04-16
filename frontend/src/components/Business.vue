@@ -57,7 +57,7 @@
 
 <script>
 import api from "../Api";
-
+import {store} from "../store";
 const Business = {
   name: "Business",
 
@@ -71,7 +71,7 @@ const Business = {
 
   methods: {
     getBusiness: function() {
-      api.getBusinessFromId(this.$route.params.id)
+      api.getBusinessFromId(store.actingAsBusinessId)
         .then((res) => {
           this.business = res.data;
           this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?

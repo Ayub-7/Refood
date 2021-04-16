@@ -64,9 +64,6 @@ const Login = {
       if (!this.password) {
         this.errors.push('Password required.');
       }
-      // else if(this.password.length < 8){
-      //   this.errors.push('Password must be 8 characters long.');
-      // }
 
       if (this.email && this.password) {
         return true;
@@ -80,7 +77,7 @@ const Login = {
       if(this.errors.length == 0){
         api.login(this.email, this.password)
         .then((response) => {
-          //LOAD USER PAGE, USING ROUTER
+          //LOAD USER HOME PAGE, USING ROUTER
           mutations.setUserLoggedIn(response.data.userId, response.data.role);
           mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
           this.$router.push({path: `/home`});

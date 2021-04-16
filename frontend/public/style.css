@@ -426,6 +426,22 @@ html .clear-checked:active {
   width: 70%;
   position: relative;
   margin-top: 22px;
+  width: 75%;
+}
+.userDetail {
+  float: right;
+  width: auto;
+  color: #4d4d4d;
+  display: block;
+  grid-column: 2 / 4;
+  text-align: center;
+  background-color: #f5f5f5;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin: 8px 0 0 0;
+  -webkit-box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
 }
 
 .topbar #navLinks li {
@@ -434,7 +450,7 @@ html .clear-checked:active {
 
 .topbar #navLinks .bar {
   list-style-type: none;
-
+  width: 75%;
 }
 
 @media only screen and (max-width: 700px) {
@@ -451,6 +467,7 @@ html .clear-checked:active {
 
   .topbar #navLinks li {
     display: block;
+
   }
 
   .navButton {
@@ -467,5 +484,5 @@ html .clear-checked:active {
   border-top: 2px solid black;
 }
 #topBar {
-  height: 55px;
+  height: auto;
 }
