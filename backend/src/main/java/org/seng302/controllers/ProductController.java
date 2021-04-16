@@ -259,7 +259,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image to delete supplied.");
         }
         try { // Throw error if the file is not an image.
-            imageExtension = Image.getImageExtension(image.getContentType());
+            imageExtension = Image.getContentTypeExtension(image.getContentType());
         }
         catch (InvalidImageExtensionException exception) {
             throw new InvalidImageExtensionException(exception.getMessage());
