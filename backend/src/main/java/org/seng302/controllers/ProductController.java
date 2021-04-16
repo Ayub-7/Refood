@@ -15,11 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -173,6 +174,43 @@ public class ProductController {
         }
         File file = new File(businessDir + "/" + imageName + imageExtension);
         image.transferTo(file);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * Sets the primary image for a product from a previously saved image.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @return
+     */
+    @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
+    public ResponseEntity<String> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) {
+        String imageDir = System.getProperty("user.dir") + "/media/images/business_" + businessId + "/" + imageId;
+
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Business business = businessRepository.findBusinessById(businessId);
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        boolean pathExists = false;
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add("jpg");
+        extensions.add("gif");
+        for (String ext: extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                pathExists = true;
+                break;
+            }
+        }
+        if (!pathExists) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
