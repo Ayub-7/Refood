@@ -10,12 +10,28 @@
 			"item": [
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Set user_id after login\", function() {\r",
+									"    const userId = pm.response.json().userId;\r",
+									"    if (typeof userId !== \"undefined\") {\r",
+									"        pm.collectionVariables.set(\"userId\", userId);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"wtilsley0@rakuten.co.jp\",\r\n    \"password\": \"zWkb3AeLn3lc\"\r\n}",
+							"raw": "{\r\n    \"email\": \"jsails0@go.com\",\r\n    \"password\": \"t146MwLm\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -35,11 +51,44 @@
 					"response": []
 				},
 				{
-					"name": "Login (admin)",
+					"name": "Login (DGAA)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Set user_id after login\", function() {\r",
+									"    const userId = pm.response.json().userId;\r",
+									"    if (typeof userId !== \"undefined\") {\r",
+									"        pm.collectionVariables.set(\"userId\", userId);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
-						"url": null
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"defaultdgaa@team11.com\",\r\n    \"password\": \"dgaapassword123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"login"
+							]
+						}
 					},
 					"response": []
 				},
@@ -76,7 +125,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"firstName\": \"John\",\r\n  \"lastName\": \"Smith\",\r\n  \"middleName\": \"Hector\",\r\n  \"nickname\": \"Jonny\",\r\n  \"bio\": \"Likes long walks on the beach\",\r\n  \"email\": \"johnsmith99@gmail.com\",\r\n  \"dateOfBirth\": \"1999-04-27\",\r\n  \"phoneNumber\": \"+64 3 555 0129\",\r\n  \"homeAddress\": \"4 Rountree Street, Upper Riccarton\",\r\n  \"password\": \"1337-H%nt3r2\"\r\n}",
+							"raw": "{\r\n  \"firstName\": \"John\",\r\n  \"lastName\": \"Smith\",\r\n  \"middleName\": \"Hector\",\r\n  \"nickname\": \"Jonny\",\r\n  \"bio\": \"Likes long walks on the beach\",\r\n  \"email\": \"johnsmith99@gmail.com\",\r\n  \"dateOfBirth\": \"1999-04-27\",\r\n  \"phoneNumber\": \"+64 3 555 0129\",\r\n  \"homeAddress\": {\r\n    \"streetNumber\": \"3/24\",\r\n    \"streetName\": \"Ilam Road\",\r\n    \"city\": \"Christchurch\",\r\n    \"region\": \"Canterbury\",\r\n    \"country\": \"New Zealand\",\r\n    \"postcode\": \"90210\"\r\n  },\r\n  \"password\": \"1337-H%nt3r2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -192,63 +241,26 @@
 			]
 		},
 		{
-			"name": "Business",
+			"name": "Users",
 			"item": [
 				{
-					"name": "New Business",
+					"name": "User by ID (Self)",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Lumbridge General Store\",\r\n    \"description\": \"A one-stop shop for all your adventuring needs\",\r\n    \"address\": \"92 River Lum Road, Lumbridge, Misthalin\",\r\n    \"businessType\": \"Accommodation and Food Services\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{URL}}/businesses",
+							"raw": "{{URL}}/users/{{userId}}",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"businesses"
+								"users",
+								"{{userId}}"
 							]
 						}
 					},
 					"response": []
 				},
-				{
-					"name": "Find Business",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{URL}}/businesses/:id",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "3"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Users",
-			"item": [
 				{
 					"name": "User by ID",
 					"request": {
@@ -266,7 +278,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "2"
+									"value": "8"
 								}
 							]
 						}
@@ -316,6 +328,203 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Business",
+			"item": [
+				{
+					"name": "New Business",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"primaryAdministratorId\": 20,\r\n  \"name\": \"Lumbridge General Store\",\r\n  \"description\": \"A one-stop shop for all your adventuring needs\",\r\n  \"address\": {\r\n    \"streetNumber\": \"3/24\",\r\n    \"streetName\": \"Ilam Road\",\r\n    \"city\": \"Christchurch\",\r\n    \"region\": \"Canterbury\",\r\n    \"country\": \"New Zealand\",\r\n    \"postcode\": \"90210\"\r\n  },\r\n  \"businessType\": \"Accommodation and Food Services\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Business",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Make User Admin",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/makeAdministrator",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"makeAdministrator"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove User Admin",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/removeAdministrator",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"removeAdministrator"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Business Product Catalogue",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:id/products",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"products"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload New Product Image",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "filename",
+									"type": "file",
+									"src": "/C:/Users/Jackie/Desktop/Fresh-lettuce-isolated-on-white-background-with-clipping-path-1080x675.jpeg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/products/:productId/images",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"products",
+								":productId",
+								"images"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								},
+								{
+									"key": "productId",
+									"value": "07-4957066"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -340,8 +549,14 @@
 	],
 	"variable": [
 		{
+			"id": "00f6a768-a556-4535-bed5-e17fd193c917",
 			"key": "URL",
 			"value": "localhost:9499"
+		},
+		{
+			"id": "380616e2-1573-4a94-bcd4-249377c1855b",
+			"key": "userId",
+			"value": ""
 		}
 	]
 }
