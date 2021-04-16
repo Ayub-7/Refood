@@ -1,6 +1,6 @@
 <template>
   <!-- -->
-  <div id="body" v-if="this.userLoggedIn == true">
+  <div id="body" v-if="this.userLoggedIn">
       <!-- Header of page, contains link to user profile and welcome message with user's first name -->
       <div id="welcomeHeader">
        <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
@@ -27,13 +27,14 @@
 
 <script>
 import api from "../Api";
-import {store} from "../store"
+import {mutations, store} from "../store"
 const Homepage = {
     name: "Homepage",
     data: function () {
         return {
             userFirstName: null,
-            userLoggedIn: false
+            userLoggedIn: false,
+            businesses: []
         }
     },
 
@@ -45,8 +46,17 @@ const Homepage = {
       getUserDetails: function(userId) {
         api.getUserFromID(userId)
           .then((response) => {
-            this.userFirstName = `${response.data.firstName}`
-            this.userLoggedIn = true;
+            if(store.loggedInUserId != null) {
+              this.user = response.data;
+              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
+              this.userFirstName = `${response.data.firstName}`
+              this.userLoggedIn = true;
+              mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+              mutations.setUserPrimaryBusinesses(this.businesses);
+            } else {
+              this.$router.push({path: "/login"}); //If user not logged in send to login page
+            }
+
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`)
           })
