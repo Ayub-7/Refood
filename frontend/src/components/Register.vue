@@ -131,7 +131,6 @@
   import api from "../Api";
   import axios from "axios";
   import {mutations} from '../store.js';
-  var passwordHash = require('password-hash');
   // const data = require('../testUser.json');
   // const users = data.users;
   // Need to somehow access the users database to check params.
@@ -259,7 +258,6 @@
         //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
         //https://www.npmjs.com/package/json-server
         if(this.errors.length == 0){
-          const hashedPassword = passwordHash.generate(this.password);
 
           const homeAddress = {
             streetNumber: this.streetNumber,
@@ -270,8 +268,7 @@
             postcode: this.postcode
           }
 
-          console.log(hashedPassword);
-          api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, homeAddress, hashedPassword)
+          api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, homeAddress, this.password)
                   .then((response) => {
                     this.$log.debug("New item created:", response.data);
                     // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
