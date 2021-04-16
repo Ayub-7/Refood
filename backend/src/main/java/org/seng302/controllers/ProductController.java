@@ -11,7 +11,6 @@ import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -172,7 +171,7 @@ public class ProductController {
         }
 
         // Check if business' own folder directory exists - make directory if false.
-        File businessDir = new File(System.getProperty("user.dir") + rootImageDir + "business_" + businessId);
+        File businessDir = new File(rootImageDir + "business_" + businessId);
         if (businessDir.mkdir()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
@@ -192,6 +191,7 @@ public class ProductController {
             }
         }
         File file = new File(businessDir + "/" + imageName + imageExtension);
+        logger.info(System.getProperty("user.dir"));
         logger.info("File Being written into: " + file);
         file.createNewFile();
         BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
