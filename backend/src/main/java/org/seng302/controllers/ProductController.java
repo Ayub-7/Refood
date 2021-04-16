@@ -101,6 +101,42 @@ public class ProductController {
         }
     }
 
+
+    /**
+     * Updates product information using PUT request, SINCE IT IS A PUT REQUEST ALL FIELDS HAVE TO EXIST
+     * Authentication is required, user must be a business admin or a default global admin
+     * @param businessId Business id, used to get business to get product catalogue
+     * @param productId Product id, is a string since product ids can be any value
+     * @param req the request body for the new product object (using NewProduct request of this because it contains the required variables for this request)
+     * @param session http session which holds the authenticated user
+     * @return error codes: 403 (forbidden user), 400 (Bad Request (Incorrect fields or business doesn't exist))), 200 (Object Updated)
+     */
+    @PutMapping("/businesses/{businessId}/products/{productId}")
+    public ResponseEntity<String> updateProduct(@PathVariable("businessId") long businessId, @PathVariable("productId") String productId, @RequestBody NewProductRequest req, HttpSession session) {
+        Business business = businessRepository.findBusinessById(businessId);
+
+        if (business == null) { // Business does not exist
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } else {
+            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else { // User is authorized
+                ArrayList checkProduct = isValidProduct(req, business);
+                boolean isValid = (Boolean) checkProduct.get(0);
+                String errorMessage = (String) checkProduct.get(1);
+                if(isValid) {
+                    productRepository.updateProduct(req.getId(), req.getName(), req.getDescription(), req.getRecommendedRetailPrice(), productId);
+                    return ResponseEntity.status(HttpStatus.OK).build();
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+                }
+            }
+        }
+    }
+
     /**
      * Checks the product request body to ensure all fields are valid
      * @param product The product to be created, includes id, name, description and price
