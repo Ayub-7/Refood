@@ -196,6 +196,7 @@ public class ProductController {
         }
 
         String imageExtension;
+
         if (image.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
         }
@@ -250,9 +251,40 @@ public class ProductController {
          * @throws IOException
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image ) throws Exception {
-        return null;
+    public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="Image_To_Delete") MultipartFile image ) throws Exception {
+        String rootImageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/";
+        String imageExtension;
+
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image to delete supplied.");
+        }
+        try { // Throw error if the file is not an image.
+            imageExtension = Image.getContentTypeExtension(image.getContentType());
+        }
+        catch (InvalidImageExtensionException exception) {
+            throw new InvalidImageExtensionException(exception.getMessage());
+        }
+
+        String imageName = "";
+        boolean freeImage = false;
+        int count = 0;
+        File businessDir = new File(rootImageDir + "business_" + businessId);
+        while (!freeImage) {
+            imageName = String.valueOf(count);
+            File checkFile = new File(businessDir + "/" + imageName + imageExtension);
+            if (checkFile.exists()) {
+
+                checkFile.delete();
+                System.out.println("File "
+                + checkFile.toString()
+                + " successfully removed");
+                freeImage = true;
+
+            } else {
+                logger.info(checkFile);
+                count++;
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-
 }
