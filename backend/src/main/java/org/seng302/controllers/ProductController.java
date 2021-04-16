@@ -10,13 +10,18 @@ import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +37,9 @@ public class ProductController {
 
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
+
+    @Value("${media.image.business.directory}")
+    String rootImageDir;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -137,9 +145,7 @@ public class ProductController {
      * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws Exception {
-        String rootImageDir = System.getProperty("user.dir") + "/media/images/";
-
+    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpServletRequest request, HttpSession session) throws Exception {
         Business business = businessRepository.findBusinessById(businessId);
         if (business == null)  {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
@@ -166,7 +172,7 @@ public class ProductController {
         }
 
         // Check if business' own folder directory exists - make directory if false.
-        File businessDir = new File(rootImageDir + "business_" + businessId);
+        File businessDir = new File(System.getProperty("user.dir") + rootImageDir + "business_" + businessId);
         if (businessDir.mkdir()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
@@ -186,10 +192,14 @@ public class ProductController {
             }
         }
         File file = new File(businessDir + "/" + imageName + imageExtension);
-        image.transferTo(file); // Saves file locally.
+        logger.info("File Being written into: " + file);
+        file.createNewFile();
+        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
+        stream.write(image.getBytes());
+        stream.close();
 
         // Save into DB.
-        Image newImage = new Image(imageName + imageExtension, null);
+        Image newImage = new Image("business_" + businessId + imageName + imageExtension, null);
         product.addProductImage(newImage);
         productRepository.save(product);
 

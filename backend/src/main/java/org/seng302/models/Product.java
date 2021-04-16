@@ -6,6 +6,7 @@ import lombok.Data;
 import org.seng302.models.requests.NewProductRequest;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class Product {
         this.description = description;
         this.recommendedRetailPrice = recommendedRetailPrice;
         this.created = created;
+        this.images = new ArrayList<>();
     }
 
     /**
@@ -54,8 +56,9 @@ public class Product {
         this.businessId = businessId;
         this.name = newProductRequest.getName();
         this.description = newProductRequest.getDescription();
-        this. recommendedRetailPrice = newProductRequest.getRecommendedRetailPrice();
+        this.recommendedRetailPrice = newProductRequest.getRecommendedRetailPrice();
         this.created = new Date();
+        this.images = new ArrayList<>();
     }
 
     /**
