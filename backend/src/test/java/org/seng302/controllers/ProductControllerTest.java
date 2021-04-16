@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
@@ -30,6 +31,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -294,6 +296,66 @@ public class ProductControllerTest {
                 .file(image)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isCreated());
+
+        User gaaUser = new User("fake@fakemail.com", "testpass", Role.GAA);
+
+        mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
+                .file(image)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaaUser))
+                .andExpect(status().isCreated());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testBadPathForProductImages() throws Exception {
+        File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
+        assertThat(data).exists();
+        byte[] bytes = FileCopyUtils.copyToByteArray(data);
+        MockMultipartFile image = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
+
+        // Non-existent business.
+        Mockito.when(businessRepository.findBusinessById(5)).thenReturn(null);
+        mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
+                .file(image)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+
+        // Non-existent product.
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId("FAKE-123", business.getId())).thenReturn(null);
+        mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), "FAKE-123")
+                .file(image)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testUnsuccessfulAddProductImage() throws Exception {
+        // No Image Supplied
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        MockMultipartFile noImageFile = new MockMultipartFile("filename", null, null, (byte[]) null);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
+                .file(noImageFile)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+
+        // Incorrect file type supplied.
+        byte[] badTypeBytes = "Hello World".getBytes();
+        MockMultipartFile badTypeFile = new MockMultipartFile("filename", "", MediaType.TEXT_HTML_VALUE, badTypeBytes);
+        mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
+                .file(badTypeFile)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+
+        // Forbidden Account
+        User anotherUser = new User("fake@fakemail.com", "testpass", Role.USER);
+        mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
+                .file(badTypeFile)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isForbidden());
 
     }
 
