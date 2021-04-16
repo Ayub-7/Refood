@@ -23,14 +23,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Product p SET id = :newId where id = :prevId")
-    void updateProductId(@Param(value = "newId") String newId, @Param(value = "prevId") String prevId);
-    // @Query("UPDATE Product p SET name = :name where id = :id")
-    // void updateProductName(@Param(value = "name") String name, @Param(value = "id") String id);
-    // @Query("UPDATE Product p SET description = :description where id = :id")
-    // void updateProductDescription(@Param(value = "description") String description, @Param(value = "id") String id);
-    // @Query("UPDATE Product p SET recommended_retail_price = :rrp where id = :id")
-    // void updateProductRRP(@Param(value = "rrp") double rrp, @Param(value = "id") String id);
+    @Query("UPDATE Product p SET id = :newId, name = :name, description = :description, recommended_retail_price = :rrp where id = :prevId")
+    void updateProduct(@Param(value = "newId") String newId,
+                         @Param(value = "name") String name,
+                         @Param(value = "description") String description,
+                         @Param(value = "rrp") Double rrp,
+                         @Param(value = "prevId") String prevId);
 
 
 
