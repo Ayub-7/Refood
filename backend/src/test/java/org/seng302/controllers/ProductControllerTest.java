@@ -181,6 +181,21 @@ public class ProductControllerTest {
                 .andExpect(status().isCreated());
     }
 
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPostProductDuplicateId() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+
+        mvc.perform(post("/businesses/{id}/products", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(product1)))
+                .andExpect(status().isBadRequest());
+
+    }
+
+
 
     @Test
     @WithMockUser(roles="USER")
