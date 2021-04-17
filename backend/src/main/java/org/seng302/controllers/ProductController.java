@@ -86,7 +86,7 @@ public class ProductController {
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProduct(req, business);
+                ArrayList checkProduct = isValidProduct(req, business, true);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if (isValid) {
@@ -114,8 +114,9 @@ public class ProductController {
     @PutMapping("/businesses/{businessId}/products/{productId}")
     public ResponseEntity<String> updateProduct(@PathVariable("businessId") long businessId, @PathVariable("productId") String productId, @RequestBody NewProductRequest req, HttpSession session) {
         Business business = businessRepository.findBusinessById(businessId);
+        Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
 
-        if (business == null) { // Business does not exist
+        if (business == null || product == null) { // Business or product does not exist
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
@@ -124,7 +125,7 @@ public class ProductController {
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProduct(req, business);
+                ArrayList checkProduct = isValidProduct(req, business, false);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
@@ -141,13 +142,15 @@ public class ProductController {
      * Checks the product request body to ensure all fields are valid
      * @param product The product to be created, includes id, name, description and price
      * @param business The business that is creating the product
+     * @param isPosting Since PUT request checking is being run through this function,
+     *                  it shouldn't check the PUT request for duplicate IDs
      * @return True if all fields are valid, otherwise false
      */
-    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business) {
+    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business, Boolean isPosting) {
         boolean isValid = true;
         String errorMessage = null;
 
-        if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
+        if (isPosting && productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
             errorMessage = "A product already exists with this ID";
             isValid = false;
         } else if (product.getId() == null || product.getId() == "") {

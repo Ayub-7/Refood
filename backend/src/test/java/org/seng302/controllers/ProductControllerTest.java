@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
+import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,8 @@ public class ProductControllerTest {
     private Product product1;
     private Product product2;
 
+    private NewProductRequest productUpdate;
+
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
         user = new User("testemail@email.com", "testpassword", Role.USER);
@@ -69,6 +72,8 @@ public class ProductControllerTest {
         product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", 14.69, new Date());
         product2 = new Product("07-4957066", 1, "Seedlings", "Buckwheat, Organic", 1.26, new Date());
 
+        //Mocking body of PUT request
+        productUpdate = new NewProductRequest("replace id", "replace name", "replace desc", 2.2);
     }
 
     @Test
@@ -176,19 +181,6 @@ public class ProductControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @Test
-    @WithMockUser(roles="USER")
-    public void testPostProductDuplicateId() throws Exception {
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
-
-        mvc.perform(post("/businesses/{id}/products", business.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(product1)))
-                .andExpect(status().isBadRequest());
-
-    }
 
     @Test
     @WithMockUser(roles="USER")
@@ -269,6 +261,152 @@ public class ProductControllerTest {
                 .content(mapper.writeValueAsString(product1)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void testNoAuthPutProduct() throws Exception {
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    //PUT (Modify Catalogue Entries) tests, similar to POST tests since they're both very similar
+    @Test
+    @WithMockUser(roles="USER")
+    public void testForbiddenUserPutProduct() throws Exception {
+        User forbiddenUser = new User("email@email.com", "password", Role.USER);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbiddenUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutProductAsGlobalAdmin() throws Exception {
+        User DGAAUser = new User("email@email.com", "password", Role.DGAA);
+        User GAAUser = new User("email2@email.com", "password", Role.GAA);
+
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, DGAAUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, GAAUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testSuccessfulPutProductAsBusinessAdmin() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isOk());
+
+        User businessSecondaryAdmin = new User("email@email.com", "password", Role.USER);
+        business.getAdministrators().add(businessSecondaryAdmin);
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, businessSecondaryAdmin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutProductEmptyId() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
+        productUpdate.setId(null);
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isBadRequest());
+
+        productUpdate.setId("");
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutProductEmptyName() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
+        productUpdate.setName(null);
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isBadRequest());
+
+        productUpdate.setName("");
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutProductEmptyDescription() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
+        productUpdate.setDescription(null);
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isBadRequest());
+
+        productUpdate.setDescription("");
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutProductNegativePrice() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
+        productUpdate.setRecommendedRetailPrice(-0.01);
+
+        mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(productUpdate)))
+                .andExpect(status().isBadRequest());
+    }
+
 
 
     // Adding Product Image Tests.
@@ -356,5 +494,6 @@ public class ProductControllerTest {
                 .andExpect(status().isForbidden());
 
     }
+
 
 }
