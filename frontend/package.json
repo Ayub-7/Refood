@@ -75,7 +75,7 @@
       "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
     },
     "testURL": "http://localhost/",
-    "testEnvironment": "jsdom",
+    "testEnvironment": "node",
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/components/*.{js,vue}",
