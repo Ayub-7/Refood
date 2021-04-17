@@ -9,6 +9,7 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -16,11 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedOutputStream;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +37,14 @@ public class ProductController {
 
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
+    @Autowired private FileService fileService;
+
+    @Autowired private ObjectMapper mapper;
 
     @Value("${media.image.business.directory}")
     String rootImageDir;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+
 
     /**
      * Retrieves all of the products in the business' product catalogue.
@@ -227,21 +231,21 @@ public class ProductController {
                 freeImage = true;
             }
         }
+
         File file = new File(businessDir + "/" + imageName + imageExtension);
-        logger.info(System.getProperty("user.dir"));
-        logger.info("File Being written into: " + file);
-        file.createNewFile();
-        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
-        stream.write(image.getBytes());
-        stream.close();
+        File thumbnailFile = new File(businessDir + "/" + imageName + "_thumbnail" + imageExtension);
+        fileService.uploadImage(file, image.getBytes());
+        fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
 
         // Save into DB.
-        Image newImage = new Image("business_" + businessId + imageName + imageExtension, null);
+        Image newImage = new Image(file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
         productRepository.save(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+
     /**
          * deletes an image
          * @param businessId unique identifier of the business that the image is relating to.

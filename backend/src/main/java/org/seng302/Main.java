@@ -59,8 +59,6 @@ public class Main {
     logger.info("-- booting up application --");
     SpringApplication.run(Main.class, args);
 
-
-
   }
 
   /**
