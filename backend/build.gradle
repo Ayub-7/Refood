@@ -42,6 +42,9 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
 }
 
 repositories {
@@ -80,10 +83,15 @@ dependencies {
 }
 
 // create a specific task to run cucumber tests
-task cucumber(type: Test) {
-    description = "Runs JUnit 4 tests (cucumber tests)"
-    testLogging.showStandardStreams = true
-    useJUnit()
+task cucumber() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/test/resources']
+        }
+    }
 }
 
 // configure test task to run on JUnit 5
