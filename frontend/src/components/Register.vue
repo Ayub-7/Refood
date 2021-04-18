@@ -2,113 +2,120 @@
   <div class="card">
     <h3 class="card-header">Create a ReFood Account</h3>
     <form @submit="checkForm" novalidate="true">
-      <div id="firstname">
-        <vs-input :danger="(errors.includes(firstname))"
-                  danger-text="Firstname must be between 2 and 20 letters."
-                  :success="(firstname.length >= 2 && firstname.length < 20)"
+      <div id="info-field">
+        <div id="firstname">
+          <vs-input :danger="(errors.includes(firstname))"
+                    danger-text="Firstname must be between 2 and 20 letters."
+                    :success="(firstname.length >= 2 && firstname.length < 20)"
+                    class="form-control"
+                    type="text"
+                    label-placeholder="First name *"
+                    v-model="firstname"/>
+        </div>
+        <div id="middlename">
+        <vs-input type="text"
                   class="form-control"
+                  label-placeholder="Middle name"
+                  :danger="middlename.length>20"
+                  danger-text="Middlename must be less that 20 characters"
+                  :success="middlename.length > 0 && middlename.length < 20"
+                  v-model="middlename"/>
+        </div>
+        <div id="lastname">
+        <vs-input :danger="(errors.includes(lastname))"
+                  danger-text="Lastname must be between 2 and 20 letters."
+                  :success="(lastname.length >= 2 && lastname.length < 20)"
                   type="text"
-                  label-placeholder="First name *"
-                  v-model="firstname"/>
-      </div>
-      <div id="middlename">
-      <vs-input type="text"
-                class="form-control"
-                label-placeholder="Middle name"
-                :danger="middlename.length>20"
-                danger-text="Middlename must be less that 20 characters"
-                :success="middlename.length > 0 && middlename.length < 20"
-                v-model="middlename"/>
-      </div>
-      <div id="lastname">
-      <vs-input :danger="(errors.includes(lastname))"
-                danger-text="Lastname must be between 2 and 20 letters."
-                :success="(lastname.length >= 2 && lastname.length < 20)"
-                type="text"
-                class="form-control"
-                label-placeholder="Last name *"
-                v-model="lastname"/>
-      </div>
-      <div id="nickname">
-      <vs-input type="text"
-                class="form-control"
-                label-placeholder="Nick Name"
-                :danger="nickname.length>20"
-                danger-text="Nickname must be less that 20 characters"
-                :success="nickname.length > 0 && nickname.length < 20"
-                name="nickname"
-                v-model="nickname"/>
-      </div>
-      <div id="email">
-        <vs-input type="email"
                   class="form-control"
-                  label-placeholder="Email *"
-                  :danger="errors.includes(email)"
-                  danger-text="Invalid email."
-                  :success="validEmail(email)"
-                  v-model="email"/>
-      </div>
-      <div id="phonenumber">
-        <vs-input type="tel"
+                  label-placeholder="Last name *"
+                  v-model="lastname"/>
+        </div>
+        <div id="nickname">
+        <vs-input type="text"
                   class="form-control"
-                  label-placeholder="Phone number"
-                  :danger="phonenumber.length>0 && errors.includes(phonenumber)"
-                  danger-text="Invalid phone number."
-                  :success="validPhoneNum(phonenumber)"
-                  name="phonenumber"
-                  v-model="phonenumber"/>
+                  label-placeholder="Nick Name"
+                  :danger="nickname.length>20"
+                  danger-text="Nickname must be less that 20 characters"
+                  :success="nickname.length > 0 && nickname.length < 20"
+                  name="nickname"
+                  v-model="nickname"/>
+        </div>
+        <div id="email">
+          <vs-input type="email"
+                    class="form-control"
+                    label-placeholder="Email *"
+                    :danger="errors.includes(email)"
+                    danger-text="Invalid email."
+                    :success="validEmail(email)"
+                    v-model="email"/>
+        </div>
+        <div id="phonenumber">
+          <vs-input type="tel"
+                    class="form-control"
+                    label-placeholder="Phone number"
+                    :danger="phonenumber.length>0 && errors.includes(phonenumber)"
+                    danger-text="Invalid phone number."
+                    :success="validPhoneNum(phonenumber)"
+                    name="phonenumber"
+                    v-model="phonenumber"/>
+        </div>
+        <div id="password">
+          <vs-input type="password"
+                    class="form-control"
+                    label-placeholder="Password *"
+                    :danger="errors.includes(password)"
+                    danger-text="Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character."
+                    :success="validPassword(password)"
+                    name="password"
+                    v-model="password"/>
+        </div>
+        <div id="confirm-password">
+          <vs-input type="password"
+                    class="form-control"
+                    label-placeholder="Confirm Password *"
+                    :danger="errors.includes(confirm_password)"
+                    danger-text="Confirmed password invalid."
+                    :success="(confirm_password===password && confirm_password.length !== 0)"
+                    name="confirm_password"
+                    v-model="confirm_password"/>
+        </div>
+        <div id="date-of-birth">
+          <vs-input type="date"
+                    class="form-control"
+                    name="dateofbirth"
+                    v-model="dateofbirth"
+                    :danger="errors.includes(dateofbirth)"
+                    danger-text="Enter date of birth"
+                    :success="(dateofbirth.length!==0)"
+                    label="Date of birth *"/>
+        </div>
+        <div id="bio">
+          <vs-textarea type="text" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
+        </div>
       </div>
-      <vs-input type="password"
-                id="password"
-                class="form-control"
-                label-placeholder="Password *"
-                :danger="errors.includes(password)"
-                danger-text="Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character."
-                :success="validPassword(password)"
-                name="password"
-                v-model="password"/>
-      <vs-input type="password"
-                id="confirm-password"
-                class="form-control"
-                label-placeholder="Confirm Password *"
-                :danger="errors.includes(confirm_password)"
-                danger-text="Confirmed password invalid."
-                :success="(confirm_password===password && confirm_password.length !== 0)"
-                name="confirm_password"
-                v-model="confirm_password"/>
-      <vs-input type="date"
-                id="date-of-birth"
-                class="form-control"
-                name="dateofbirth"
-                v-model="dateofbirth"
-                :danger="errors.includes(dateofbirth)"
-                danger-text="Enter date of birth"
-                :success="(dateofbirth.length!==0)"
-                label="Date of birth *"/>
-      <vs-textarea type="text" id="bio" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
+      <label for="address-field" class="label-control">Address *</label>
       <div id="address-field">
-        <label for="address-field" class="label-control">Address *</label>
         <div id="street-number">
-          <vs-input v-model="streetNumber" class="address-form-control" label-placeholder="Street Number" size="small"></vs-input>
+          <vs-input v-model="streetNumber" class="form-control" label-placeholder="Street Number"></vs-input>
         </div>
         <div id="street-name">
-          <vs-input v-model="streetName" class="address-form-control" label-placeholder="Street Name" size="small"></vs-input>
+          <vs-input v-model="streetName" class="form-control" label-placeholder="Street Name"></vs-input>
         </div>
         <div id="postcode">
-          <vs-input v-model="postcode" class="address-form-control" label-placeholder="Postcode" size="small"></vs-input>
+          <vs-input v-model="postcode" class="form-control" label-placeholder="Postcode"></vs-input>
         </div>
         <div id="city">
           <!-- If wanting to test/check suggested item tiles, remove blur. -->
-          <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="address-form-control" label-placeholder="City" size="small"></vs-input>
+          <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label-placeholder="City"></vs-input>
           <ul v-if="this.suggestCities" class="suggested-box">
             <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
         </div>
         <div id="region">
-          <vs-input v-model="region" class="address-form-control" label-placeholder="Region" size="small"></vs-input>
+          <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="address-form-control" label-placeholder="Country *" size="small"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country *"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -451,11 +458,14 @@
     grid-column: 1;
 
     margin: auto;
-    text-align: center;
 
     display: grid;
     grid-template-columns: repeat(2, auto);
-    grid-template-rows: repeat(6, auto);
+    grid-template-rows: repeat(2, auto);
+  }
+
+  label, input {
+    display: block;
   }
 
   /**
@@ -473,25 +483,6 @@
 
     padding: 3px 10px;
     margin: 0.5em;
-
-  }
-
-  /**
-  Styling for address inputs.
-   */
-  .address-form-control {
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 1px;
-    border-radius: 20px;
-    outline: none;
-    box-sizing: border-box;
-    text-align: center;
-    font-family: 'Ubuntu', sans-serif;
-
-    margin: 0.5em;
-    padding: 3px 10px;
-
   }
 
   /**
@@ -501,7 +492,8 @@
     font-family: 'Ubuntu', sans-serif;
     font-weight: 700;
     font-size: 14px;
-    padding-bottom: 5px;
+    padding-bottom: 0px;
+    padding-left: 185px;
   }
 
   .suggested-box {
@@ -530,6 +522,15 @@
     margin: 0;
   }
 
+  #info-field {
+    grid-column: 1/3;
+    display: grid;
+    margin: auto;
+    padding: 0px;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(5, auto);
+  }
+
   #firstname {
     grid-column: 1;
     grid-row: 1;
@@ -555,19 +556,39 @@
     grid-row: 3;
   }
 
+  #phonenumber {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  #password {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  #confirm-password {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  #date-of-birth {
+    grid-column: 1;
+    grid-row: 5;
+  }
+
   #bio {
-    grid-column: 1 / 3;
-    grid-row: 6;
+    grid-column: 2;
+    grid-row: 5;
   }
 
   #address-field {
     grid-column: 1/3;
     display: grid;
+    margin: auto;
     padding: 0px;
     grid-template-columns: repeat(2, auto);
     grid-template-rows: repeat(3, auto);
   }
-
 
   #login-container {
     grid-column: 2;
@@ -584,12 +605,12 @@
 
   #street-name {
     grid-row: 1;
-    grid-column: 4;
+    grid-column: 2;
   }
 
   #city {
     grid-row: 2;
-    grid-column: 4;
+    grid-column: 2;
   }
 
   #region {
@@ -599,7 +620,7 @@
 
   #country {
     grid-row: 3;
-    grid-column: 4;
+    grid-column: 2;
   }
 
   #postcode {
