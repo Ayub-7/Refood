@@ -9,17 +9,25 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.seng302.models.requests.LoginRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -253,41 +261,61 @@ public class ProductController {
          * @return
          * @throws IOException
          */
-    @DeleteMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="Image_To_Delete") MultipartFile image ) throws Exception {
-        String rootImageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/";
-        String imageExtension;
+    @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
+        public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable long imageId, HttpSession session) throws Exception {
+            String rootImageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/";
+            String imageExtension = "";
+            Business business = businessRepository.findBusinessById(businessId);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+            if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
 
-        if (image.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image to delete supplied.");
-        }
-        try { // Throw error if the file is not an image.
-            imageExtension = Image.getContentTypeExtension(image.getContentType());
-        }
-        catch (InvalidImageExtensionException exception) {
-            throw new InvalidImageExtensionException(exception.getMessage());
-        }
+            //User existingUser = UserRepository.findUserByEmail(loginRequest.getEmail());
 
-        String imageName = "";
-        boolean freeImage = false;
-        int count = 0;
-        File businessDir = new File(rootImageDir + "business_" + businessId);
-        while (!freeImage) {
-            imageName = String.valueOf(count);
-            File checkFile = new File(businessDir + "/" + imageName + imageExtension);
-            if (checkFile.exists()) {
+            if (business == null)  {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            }
+
+            Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
+            if (product == null) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            }
+
+
+            boolean freeImage = false;
+            String imageDir = rootImageDir + "business_" + businessId + "/" + imageId;
+            boolean pathExists = false;
+            List<String> extensions = new ArrayList<>();
+            extensions.add(".png");
+            extensions.add(".jpg");
+            extensions.add(".gif");
+            for (String ext: extensions) {
+                Path path = Paths.get(imageDir + ext);
+                if (Files.exists(path)) {
+                    pathExists = true;
+                    imageExtension = ext;
+                    break;
+                }
+            }
+            File businessDir = new File(rootImageDir + "business_" + businessId);
+            File checkFile = new File(businessDir + "/" + imageId + imageExtension);
+            if (pathExists == true) {
 
                 checkFile.delete();
                 System.out.println("File "
                 + checkFile.toString()
                 + " successfully removed");
-                freeImage = true;
+                    freeImage = true;
 
             } else {
-                logger.info(checkFile);
-                count++;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
             }
+
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
 }
