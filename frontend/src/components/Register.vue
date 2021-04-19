@@ -9,7 +9,7 @@
                     :success="(firstname.length >= 2 && firstname.length < 20)"
                     class="form-control"
                     type="text"
-                    label-placeholder="First name *"
+                    label-placeholder="First name (Required)"
                     v-model="firstname"/>
         </div>
         <div id="middlename">
@@ -27,7 +27,7 @@
                   :success="(lastname.length >= 2 && lastname.length < 20)"
                   type="text"
                   class="form-control"
-                  label-placeholder="Last name *"
+                  label-placeholder="Last name (Required)"
                   v-model="lastname"/>
         </div>
         <div id="nickname">
@@ -43,7 +43,7 @@
         <div id="email">
           <vs-input type="email"
                     class="form-control"
-                    label-placeholder="Email *"
+                    label-placeholder="Email (Required)"
                     :danger="errors.includes(email)"
                     danger-text="Invalid email."
                     :success="validEmail(email)"
@@ -66,7 +66,7 @@
                     :danger="errors.includes(password)"
                     danger-text="Your password must have eight characters, at least one uppercase letter, one lowercase letter, one number and one special character."
                     :success="validPassword(password)"
-                    name="password"
+                    name="password (Required)"
                     v-model="password"/>
         </div>
         <div id="confirm-password">
@@ -76,7 +76,7 @@
                     :danger="errors.includes(confirm_password)"
                     danger-text="Confirmed password invalid."
                     :success="(confirm_password===password && confirm_password.length !== 0)"
-                    name="confirm_password"
+                    name="confirm_password (Required)"
                     v-model="confirm_password"/>
         </div>
         <div id="date-of-birth">
@@ -87,13 +87,13 @@
                     :danger="errors.includes(dateofbirth)"
                     danger-text="Enter date of birth"
                     :success="(dateofbirth.length!==0)"
-                    label="Date of birth *"/>
+                    label="Date of birth (Required)"/>
         </div>
         <div id="bio">
-          <vs-textarea type="text" class="form-control" placeholder="Bio" name="bio" v-model="bio"></vs-textarea>
+          <vs-textarea type="text" class="form-control text-areas" label="Bio" name="bio" v-model="bio"></vs-textarea>
         </div>
       </div>
-      <label for="address-field" class="label-control">Address *</label>
+      <label for="address-field" class="label-control">Address</label>
       <div id="address-field">
         <div id="street-number">
           <vs-input v-model="streetNumber" class="form-control" label-placeholder="Street Number"></vs-input>
@@ -115,7 +115,7 @@
           <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country *"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -134,13 +134,10 @@
   </div>
 </template>
 <script>
-
   import api from "../Api";
   import axios from "axios";
   import {mutations} from '../store.js';
-  // const data = require('../testUser.json');
-  // const users = data.users;
-  // Need to somehow access the users database to check params.
+
 
   const Register = {
     name: "Register",
@@ -360,29 +357,6 @@
 </script>
 <style scoped>
 
-  /**
-  Address suggestion list's styling
-   */
-  .addressSuggestion {
-    text-align: center;
-    padding-right: 40px;
-    border-radius: 30px;
-    color: white;
-
-    background: white;
-  }
-
-  .address {
-    list-style-type: none;
-    list-style-position: outside;
-    cursor: pointer;
-    background: #e44aff;
-    border-radius: 10px;
-    padding-bottom: 3px;
-    background-clip: content-box;
-
-  }
-
   /*
   Register button's styling
    */
@@ -472,13 +446,6 @@
   Styling for form elements.
    */
   .form-control {
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 1px;
-    border-radius: 20px;
-    outline: none;
-    box-sizing: border-box;
-    text-align: center;
     font-family: 'Ubuntu', sans-serif;
 
     padding: 3px 10px;
@@ -628,7 +595,12 @@
     grid-column: 1 / 3;
   }
 
-
+  .text-areas {
+    margin-top: 1em;
+    width: 90%;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 14px;
+  }
 
   @media screen and (max-width: 700px) {
     .card {
