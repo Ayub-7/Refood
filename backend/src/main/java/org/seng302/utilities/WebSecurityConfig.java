@@ -32,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/users/*").authenticated()
                 .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "/users/{id}/revokeAdmin").hasRole("DGAA")
                 .antMatchers("/businesses", "/businesses/*", "/businesses/*/*","/businesses/*/*/*" ,"/businesses/*/*/*/*").authenticated() // covers main business endpoints, admin, products.
+                .antMatchers(HttpMethod.PUT, "/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary").authenticated()
                 .anyRequest().permitAll()
 
                 .and()

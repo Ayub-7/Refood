@@ -514,6 +514,7 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(roles="USER")
     public void testSetProductImageWrongImageId() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
 
     }
 
