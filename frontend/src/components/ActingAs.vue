@@ -73,7 +73,7 @@ name: "actingAs",
       const businessId = mutations.getIdByName(businessName);
       mutations.setActingAsBusiness(businessId, businessName)
       this.buss = null;
-      this.$router.push({path: `/businesses/${businessId}`});
+      this.$router.push({path: `/home`});
     },
 
     setActingAsUser(){
