@@ -21,13 +21,14 @@
           <!-- Things like user businesses, business inventory etc. -->
           <h2>Business links</h2>
           <ul id="businfo-content">
-            <li class="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Go to profile</li>
+            <li class="profileLink" @click='goToProfile()' style='cursor: pointer'>Profile</li>
+            <li class="profileLink" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
           </ul>
         </div>
         <div class="userinfo-container" v-else>
           <h2>User links</h2>
           <ul id="userinfo-content">
-            <li class="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Go to profile</li>
+            <li class="profileLink" @click='goToProfile()' style='cursor: pointer'>Go to profile</li>
           </ul>
         </div>
 
@@ -103,21 +104,20 @@ const Homepage = {
       /**
        * Pushes users profile onto router
        */
-      goToProfilePage: function() {
+      goToProfile: function() {
         if(this.getBusinessId() != null){
           this.$router.push({path: `/businesses/${this.getBusinessId() }`});
         } else {
           this.$router.push({path: `/users/${this.getLoggedInUserId()}`});
         }
+      },
+      goToProductCatalogue: function() {
+        this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
       }
     },
 
     mounted: function () {
-      //Retrieve userId and load user details
       let userId = store.loggedInUserId;
-      //let businessId = store.actingAsBusinessId;
-      //console.log(store.actingAsBusinessId);
-      console.log(store.loggedInUserId);
       this.getUserDetails(userId);
     },
   
@@ -152,7 +152,7 @@ export default Homepage;
   background-color: #f3e3f9;
   margin-right: 10px;
   margin-top: 5px;
-  font-size: 30px;
+  font-size: 20px;
   padding: 10px 5px;
   list-style-type: none;
   box-shadow: 0px 3px 8px#cfcfcf;
