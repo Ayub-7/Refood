@@ -3,8 +3,8 @@
   <div id="body" v-if="getLoggedInUserId() != null">
       <!-- Header of page, contains link to user profile and welcome message with user's first name -->
       <div id="welcomeHeader">
-        <div v-if="getBusinessId()">
-          <h1 id="BusPageTitle"> Welcome to your home page, {{business.name}}! </h1>
+        <div v-if="this.actingAsBusinessId != null">
+          <h1 id="busPageTitle"> Welcome to your home page, {{this.business.name}}! </h1>
         </div>
         <div v-else>
           <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
@@ -17,18 +17,18 @@
           <h2>Content Header</h2>
           <p class="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean in facilisis ligula. Maecenas suscipit at magna vel maximus. Nunc in imperdiet erat. Aenean semper leo tellus, vestibulum interdum tortor aliquet a. Interdum et malesuada fames ac ante ipsum primis in faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam feugiat dolor consequat erat bibendum, sit amet condimentum lectus lacinia.</p>
         </div>
-        <div class="userinfo-container" v-if="getBusinessId()">
+        <div class="userinfo-conta iner" v-if="getBusinessId()">
           <!-- Things like user businesses, business inventory etc. -->
           <h2>Business links</h2>
           <ul id="businfo-content">
-            <li class="profileLink" @click='goToProfile()' style='cursor: pointer'>Profile</li>
-            <li class="profileLink" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
+            <li class="profileLink" id="busProfile" @click='goToProfile()' style='cursor: pointer'>Profile</li>
+            <li class="profileLink" id="busCatalogue" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
           </ul>
         </div>
         <div class="userinfo-container" v-else>
           <h2>User links</h2>
           <ul id="userinfo-content">
-            <li class="profileLink" @click='goToProfile()' style='cursor: pointer'>Go to profile</li>
+            <li class="profileLink" id="userProfile" @click='goToProfile()' style='cursor: pointer'>Go to profile</li>
           </ul>
         </div>
 
