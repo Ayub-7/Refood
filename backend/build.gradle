@@ -33,73 +33,57 @@ plugins {
     id 'jacoco'
     id 'org.sonarqube' version '3.0'
 }
-
 group = 'Seng302-team-900'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+
+repositories {
+    // Use JCenter for resolving dependencies.
+    jcenter()
+}
+
+dependencies {
+    // Use JUnit Jupiter API for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
+
+    // Use JUnit Jupiter Engine for testing.
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    // This dependency is used by the application.
+    implementation 'com.google.guava:guava:29.0-jre'
+
+    // use hibernate to persist (java) domain entities for us, aka JPA implementation
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.29.Final'
+
+    // use sqlite
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.34.0'
+    compile group: 'com.zsoltfabok', name: 'sqlite-dialect', version: '1.0'
+
+    // use a in-memory database to store entities (can be substituted with any database)
+    compile group: 'com.h2database', name: 'h2', version: '1.4.200'
+
+    // Cucumber dependencies
+    testImplementation 'io.cucumber:cucumber-java:6.9.1'
+}
+
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
     cucumberRuntime {
         extendsFrom testImplementation
     }
 }
 
-repositories {
-    jcenter()
-    mavenCentral()
-}
-
-dependencies {
-    // ability to use JPA in spring
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // ability to expose JPA as REST services (discouraged, but used for example purpose here)
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-    // ability to expose RESTFul services (with controllers)
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    // security starter package
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.security:spring-security-test'
-    // connector to mariadb (mysql) database2
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    // ability to use in-memory database (for testing only)
-    runtimeOnly 'com.h2database:h2'
-
-
-    // use spring boot mocking test framework
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    // Cucumber dependencies
-    testImplementation 'io.cucumber:cucumber-java:6.9.1'
-    testImplementation 'io.cucumber:cucumber-junit:6.9.1'
-    testImplementation 'io.cucumber:cucumber-spring:6.9.1'
-
-    // use code pre-processor to generate boiler plate code (e.g., getters)
-    compileOnly 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.projectlombok:lombok:1.18.16'
-    testCompileOnly 'org.projectlombok:lombok:1.18.16'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
-
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-// create a specific task to run cucumber tests
+// specify a dedicated task for Cucumber
 task cucumber() {
     dependsOn assemble, testClasses
     doLast {
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'org.seng302.gradle.cucumber', 'src/test/resources']
+            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/test/resources']
         }
     }
 }
-
 // configure test task to run on JUnit 5
 test {
     description = "Runs JUnit 5/Jupiter tests (unit tests)"
