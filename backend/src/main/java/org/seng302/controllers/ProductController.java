@@ -198,8 +198,8 @@ public class ProductController {
         boolean pathExists = false;
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
-        extensions.add("jpg");
-        extensions.add("gif");
+        extensions.add(".jpg");
+        extensions.add(".gif");
         for (String ext: extensions) {
             Path path = Paths.get(imageDir + ext);
             if (Files.exists(path)) {
@@ -212,7 +212,7 @@ public class ProductController {
         }
 
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
     /**
          * deletes an image

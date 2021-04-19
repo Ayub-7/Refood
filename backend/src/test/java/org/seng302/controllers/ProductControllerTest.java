@@ -266,4 +266,36 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser(roles="USER")
+    public void testSetProductImageWrongImageId() throws Exception {
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void tesSetProductImageNotProductOwner() throws Exception {
+
+    }
+
+    @Test
+    @WithMockUser(roles="DGAA")
+    public void testSetProductImageNotProductOwnerSuccess() throws Exception {
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testSetProductImageBadProductId() throws Exception {
+
+    }
+
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testSetProductImageSuccessful() throws Exception {
+
+    }
+
 }
