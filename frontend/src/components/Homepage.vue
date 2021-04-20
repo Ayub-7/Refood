@@ -1,10 +1,14 @@
 <template>
   <!-- -->
-  <div id="body" v-if="this.userLoggedIn">
+  <div id="body" v-if="getLoggedInUserId() != null">
       <!-- Header of page, contains link to user profile and welcome message with user's first name -->
       <div id="welcomeHeader">
-       <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
-       <h1 id="profileLink" @click='goToProfilePage()' style='cursor: pointer'>Go to profile</h1>
+        <div v-if="this.actingAsBusinessId != null">
+          <h1 id="busPageTitle"> Welcome to your home page, {{this.business.name}}! </h1>
+        </div>
+        <div v-else>
+          <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
+        </div>
       </div>
 
       <div id="page-container">
@@ -13,12 +17,19 @@
           <h2>Content Header</h2>
           <p class="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean in facilisis ligula. Maecenas suscipit at magna vel maximus. Nunc in imperdiet erat. Aenean semper leo tellus, vestibulum interdum tortor aliquet a. Interdum et malesuada fames ac ante ipsum primis in faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam feugiat dolor consequat erat bibendum, sit amet condimentum lectus lacinia.</p>
         </div>
-        <div id="userinfo-container">
+        <div class="userinfo-conta iner" v-if="getBusinessId()">
           <!-- Things like user businesses, business inventory etc. -->
-          <h2>User/Business Info</h2>
-          <div id="userinfo-content">
-            <h3>Inventory</h3>
-          </div>
+          <h2>Business links</h2>
+          <ul id="businfo-content">
+            <li class="profileLink" id="busProfile" @click='goToProfile()' style='cursor: pointer'>Profile</li>
+            <li class="profileLink" id="busCatalogue" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
+          </ul>
+        </div>
+        <div class="userinfo-container" v-else>
+          <h2>User links</h2>
+          <ul id="userinfo-content">
+            <li class="profileLink" id="userProfile" @click='goToProfile()' style='cursor: pointer'>Go to profile</li>
+          </ul>
         </div>
 
       </div>
@@ -33,8 +44,11 @@ const Homepage = {
     data: function () {
         return {
             userFirstName: null,
-            userLoggedIn: false,
-            businesses: []
+            userId: null,
+            businesses: [],
+            actingAsBusinessId: null,
+            business: null,
+
         }
     },
 
@@ -63,25 +77,48 @@ const Homepage = {
           })
       },
 
+      getBusiness: function(id) {
+        api.getBusinessFromId(id)
+            .then((res) => {
+              this.business = res.data;
+            })
+            .catch((error) => {
+              throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+            })
+      },
+
+      getBusinessId: function() {
+        let busId = store.actingAsBusinessId;
+        if(busId){
+          this.getBusiness(busId);
+        }
+        return busId;
+      },
+
       /**
        * Gets the logged in users id
        */
       getLoggedInUserId: function() {
-        let user = store.loggedInUserId;
-        this.userLoggedIn = user ? true : false; //check if user null or not
-        return store.loggedInUserId;
+        this.userId = store.loggedInUserId;
+        return this.userId;
       },
 
       /**
        * Pushes users profile onto router
        */
-      goToProfilePage: function() {
-        this.$router.push({path: `/users/${this.getLoggedInUserId()}`});
+      goToProfile: function() {
+        if(this.getBusinessId() != null){
+          this.$router.push({path: `/businesses/${this.getBusinessId() }`});
+        } else {
+          this.$router.push({path: `/users/${this.getLoggedInUserId()}`});
+        }
+      },
+      goToProductCatalogue: function() {
+        this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
       }
     },
 
     mounted: function () {
-      //Retrieve userId and load user details
       let userId = store.loggedInUserId;
       this.getUserDetails(userId);
     },
@@ -112,16 +149,20 @@ export default Homepage;
 
 }
 
-#profileLink {
+.profileLink {
   border-radius: 30px;
   background-color: #f3e3f9;
   margin-right: 10px;
   margin-top: 5px;
-  font-size: 30px;
-  padding-top: 5%;
+  font-size: 20px;
+  padding: 10px 5px;
+  list-style-type: none;
   box-shadow: 0px 3px 8px#cfcfcf;
 }
 
+ul#businfo-content {
+  padding-left: 10px;
+}
 
 #page-container {
   display: grid;
@@ -146,7 +187,7 @@ export default Homepage;
   border-radius: 30px;
 }
 
-#userinfo-container {
+.userinfo-container {
   text-align: center;
   background: #F3EBF6;
   margin-left: 10px;
