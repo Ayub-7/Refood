@@ -262,31 +262,32 @@ public class ProductController {
          * @throws IOException
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
-        public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable long imageId, HttpSession session) throws Exception {
+        public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable long imageId, HttpSession session, HttpServletRequest request) throws Exception {
             String rootImageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/";
             String imageExtension = "";
             Business business = businessRepository.findBusinessById(businessId);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) {
+            //checks if user us logged in and authorized
+            if (auth.getPrincipal() == "anonymousUser") {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
+            //checks if user is forbidden
             User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
             if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
-            //User existingUser = UserRepository.findUserByEmail(loginRequest.getEmail());
-
+            //checks if business exists
             if (business == null)  {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             }
-
+            //checks if product exists
             Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
             if (product == null) {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             }
 
-
+            //finds correct image path
             boolean freeImage = false;
             String imageDir = rootImageDir + "business_" + businessId + "/" + imageId;
             boolean pathExists = false;
