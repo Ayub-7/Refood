@@ -4,6 +4,7 @@ import Vue from 'vue';
 export const store = Vue.observable({
     loggedInUserId: null,
     role: null,
+    userDateOfBirth: null,
     userName: null,
     userPrimaryBusinesses: [],
     actingAsBusinessId: null,
@@ -49,6 +50,7 @@ export const mutations = {
     userLogout() {
         store.loggedInUserId = null;
         store.userName = null;
+        store.userAge = null;
         store.userPrimaryBusinesses = null;
         store.actingAsBusinessId = null;
         store.actingAsBusinessName = null;
@@ -67,6 +69,10 @@ export const mutations = {
 
     setUserName(userName) {
         store.userName = userName;
+    },
+
+    setUserDateOfBirth(userDateOfBirth) {
+        store.userDateOfBirth = userDateOfBirth;
     },
 
     setUserPrimaryBusinesses(newBusinesses) {
