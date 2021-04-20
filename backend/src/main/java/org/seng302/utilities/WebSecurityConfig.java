@@ -30,6 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/checksession").permitAll()
+                .antMatchers(HttpMethod.GET, "/users/{id}").authenticated()
                 .antMatchers(HttpMethod.POST, "/login", "/users", "/businesses", "/logout").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/login", "/users", "/businesses", "/logout").permitAll()
                 .antMatchers(HttpMethod.GET, "/users/search*").authenticated()

@@ -103,12 +103,20 @@ const BusinessRegister = {
         this.errors.push('country');
       }
 
+      if (this.getAge(store.userDateOfBirth) < 16) {
+        this.errors.push('dob');
+      }
+
       if (!this.businessType) {
         this.errors.push('businessType');
       }
 
       if (this.errors.length >= 1) {
-        this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
+        if(this.errors.includes("dob") && this.errors.length == 1){
+          this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
+        } else {
+          this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
+        }
       }
 
     },
@@ -141,6 +149,17 @@ const BusinessRegister = {
           this.$log.debug("Error Status:", error)
         });
     }},
+
+    /**
+     * Returns the years since the user was born. No rounding is done in the function.
+     * @param enteredDate The user's birthdate
+     * @returns {number} The user's age in years.
+     */
+    getAge: function(enteredDate) {
+      let years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
+      return years;
+    },
+
 
     /**
      * Retrieve a list of suggested cities using the photon open api.

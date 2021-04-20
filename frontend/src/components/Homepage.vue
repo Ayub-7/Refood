@@ -64,6 +64,8 @@ const Homepage = {
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
               this.userFirstName = `${response.data.firstName}`
+              this.userLoggedIn = true;
+              mutations.setUserDateOfBirth(response.data.dateOfBirth);
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
               mutations.setUserPrimaryBusinesses(this.businesses);
             } else {
