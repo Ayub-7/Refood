@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="getLoggedInUserId() != null">
+  <div class="card" v-if="this.user != null">
     <h3 class="card-header">Create a ReFood Business Account</h3>
       <form autocomplete="off">
           <vs-input id="business-name"
@@ -56,7 +56,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "../store";
+import {store} from "@/store";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -83,7 +83,7 @@ const BusinessRegister = {
       suggestCountries: false,
       suggestedCountries: [],
       minNumberOfCharacters: 3,
-      userId: null
+      user: null
     };
   },
   methods:{
@@ -220,13 +220,25 @@ const BusinessRegister = {
         this.suggestCountries = false;
     },
 
-    /**
-     * Gets the logged in users id
-     */
-    getLoggedInUserId: function() {
-      this.userId = store.loggedInUserId;
-      return this.userId;
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId)
+          .then((response) => {
+            if(store.loggedInUserId == null) {
+              this.user = response.data;
+            } else {
+              this.$router.push({path: "/login"});
+            }
+          }).catch((err) => {
+            throw new Error(`Error trying to get user info from id: ${err}`);
+      });
     },
+
+    mounted: function () {
+      let userId = this.$route.params.id
+      this.user = this.getUserInfo(userId);
+    }
+
+
 
   },
 

@@ -1,6 +1,6 @@
 <template>
 
-  <div v-if="getLoggedInUserId() != null">
+  <div v-if="this.user != null">
     <div id="container" v-if="this.business != null">
       <!-- Left Side Business Information Panel -->
       <div id="business-name-container">
@@ -65,41 +65,48 @@ const Business = {
   name: "Business",
 
   // App's initial state.
-  data: function() {
+  data: function () {
     return {
       business: null,
       adminList: null,
-      userId: null
+      user: null
     };
   },
 
   methods: {
-    getBusiness: function() {
+    getBusiness: function () {
       api.getBusinessFromId(this.$route.params.id)
-        .then((res) => {
-          this.business = res.data;
-          this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
-          console.log(this.business);
-        })
-        .catch((error) => {
-          throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
-        })
+          .then((res) => {
+            this.business = res.data;
+            this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
+            console.log(this.business);
+          })
+          .catch((error) => {
+            throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+          })
     },
 
-    /**
-     * Gets the logged in users id
-     */
-    getLoggedInUserId: function() {
-      this.userId = store.loggedInUserId;
-      return this.userId;
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId)
+          .then((response) => {
+            if (store.loggedInUserId == null) {
+              this.user = response.data;
+            } else {
+              this.$router.push({path: "/login"});
+            }
+          }).catch((err) => {
+        throw new Error(`Error trying to get user info from id: ${err}`);
+      });
     },
-  },
 
-  mounted() {
-    // Retrieve business info.
-    this.getBusiness();
+    mounted() {
+      let userId = this.$route.params.id
+      this.user = this.getUserInfo(userId);
+      // Retrieve business info.
+      this.getBusiness();
+    }
+
   }
-
 }
 
 export default Business;
