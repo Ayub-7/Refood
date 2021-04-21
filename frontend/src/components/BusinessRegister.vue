@@ -56,7 +56,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "@/store";
+import {store} from "../store";
 
 const BusinessRegister = {
   name: "BusinessRegister",
