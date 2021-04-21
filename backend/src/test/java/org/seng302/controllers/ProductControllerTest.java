@@ -536,6 +536,11 @@ public class ProductControllerTest {
 
     }
 
+    @Test
+    public void noAuthSetImage() throws Exception {
+        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), 1))
+                .andExpect(status().isUnauthorized());
+    }
 
 
     @Test
