@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.78% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/36</span>
+                <span class='fraction'>19/38</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.46% </span>
+                <span class="strong">41.67% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/13</span>
+                <span class='fraction'>5/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.78% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>19/36</span>
+                <span class='fraction'>19/38</span>
             </div>
         
             
@@ -532,7 +532,17 @@
 <a name='L473'></a><a href='#L473'>473</a>
 <a name='L474'></a><a href='#L474'>474</a>
 <a name='L475'></a><a href='#L475'>475</a>
-<a name='L476'></a><a href='#L476'>476</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -702,15 +712,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -729,11 +744,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1047,7 +1058,11 @@
           &lt;/div&gt;
           &lt;div id="address"&gt;
             &lt;div class="sub-header"&gt;Home Address&lt;/div&gt;
-            {{ this.user.homeAddress }}
+              &lt;div id="street-address"&gt;{{ user.homeAddress.streetNumber }} {{ user.homeAddress.streetName }}&lt;/div&gt;
+              &lt;div id="city"&gt;{{ user.homeAddress.city }}&lt;/div&gt;
+              &lt;div id="region"&gt;{{ user.homeAddress.region }}&lt;/div&gt;
+              &lt;div id="country"&gt;{{ user.homeAddress.country }}&lt;/div&gt;
+              &lt;div id="postcode"&gt;{{ user.homeAddress.postcode }}&lt;/div&gt;
           &lt;/div&gt;
           &lt;div id="phonenumber"&gt;
             &lt;div class="sub-header"&gt;Phone Number&lt;/div&gt;
@@ -1099,7 +1114,7 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
-import {store, mutations} from "../store";
+import {mutations, store} from "../store";
 &nbsp;
 &nbsp;
 const Users = {
@@ -1176,17 +1191,22 @@ const Users = {
     getUserInfo: function(userId) {
 <span class="fstat-no" title="function not covered" >      api.getUserFromID(userId) //Get user data</span>
           .then((response) =&gt; {
+<span class="cstat-no" title="statement not covered" >            if(store.userPrimaryBusinesses != null){</span>
+<span class="cstat-no" title="statement not covered" >              this.userViewingBusinesses = store.userPrimaryBusinesses;</span>
+            }
+<span class="cstat-no" title="statement not covered" >            console.log(this.userViewingBusinesses)</span>
 <span class="cstat-no" title="statement not covered" >            if(store.loggedInUserId != null) {</span>
 <span class="cstat-no" title="statement not covered" >              this.user = response.data;</span>
 <span class="cstat-no" title="statement not covered" >              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >              if (response.data.id === store.loggedInUserId) {</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >                mutations.setUserPrimaryBusinesses(this.businesses.filter(b =&gt; b.primaryAdministratorId === this.user.id));</span></span>
-<span class="cstat-no" title="statement not covered" >                this.userViewingBusinesses = store.userPrimaryBusinesses;</span>
-              }
             } else {
 <span class="cstat-no" title="statement not covered" >              this.$router.push({path: "/login"}); //If user not logged in send to login page</span>
             }
+&nbsp;
+            //update thumbnail user name and associated businesses, if any
+            // this.$store.commit('setUserName', response.data.firstName + " " + response.data.middleName + " " + response.data.lastName); //store the user's name in the program state to be displayed on the top right of the page
+            // this.$store.commit('setUserAssociatedBusinesses', this.businesses);
+<span class="cstat-no" title="statement not covered" >            mutations.setUserName(response.data.firstName + " " + response.data.lastName);</span>
+<span class="cstat-no" title="statement not covered" >            mutations.setUserPrimaryBusinesses(this.businesses);</span>
 <span class="fstat-no" title="function not covered" >          }).catch((err) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >            throw new Error(`Error trying to get user info from id: ${err}`);</span>
       });
@@ -1205,7 +1225,6 @@ const Users = {
   mounted: function () {
   //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
-    
     this.user = this.getUserInfo(userId);
   },
 &nbsp;
@@ -1296,7 +1315,6 @@ export default Users;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto) repeat(1, 1fr);
   grid-row-gap: 1em;
-&nbsp;
 }
 &nbsp;
 .sub-header {
@@ -1314,7 +1332,6 @@ export default Users;
 #bio {
   grid-column: 1;
   grid-row: 2;
-&nbsp;
 }
 &nbsp;
 #info-container {
@@ -1490,7 +1507,7 @@ option {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Apr 12 2021 11:00:16 GMT+1200 (New Zealand Standard Time)
+                at Wed Apr 21 2021 22:14:39 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
