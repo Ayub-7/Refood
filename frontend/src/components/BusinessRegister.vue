@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" v-if="getLoggedInUserId() != null">
     <h3 class="card-header">Create a ReFood Business Account</h3>
       <form autocomplete="off">
           <vs-input id="business-name"
@@ -58,7 +58,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "../store"
+import {store} from "@/store"
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -84,7 +84,8 @@ const BusinessRegister = {
 
       suggestCountries: false,
       suggestedCountries: [],
-      minNumberOfCharacters: 3
+      minNumberOfCharacters: 3,
+      userId: null
     };
   },
   methods:{
@@ -219,6 +220,14 @@ const BusinessRegister = {
     setCountry: function(selectedCountry) {
         this.country = selectedCountry;
         this.suggestCountries = false;
+    },
+
+    /**
+     * Gets the logged in users id
+     */
+    getLoggedInUserId: function() {
+      this.userId = store.loggedInUserId;
+      return this.userId;
     },
 
   },

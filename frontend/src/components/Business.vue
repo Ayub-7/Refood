@@ -1,55 +1,57 @@
 <template>
 
-  <div id="container" v-if="this.business != null">
-    <!-- Left Side Business Information Panel -->
-    <div id="business-name-container">
-      <div id="business-name"  >{{ business.name }}</div>
-      <div id="business-type">{{ business.businessType }}</div>
-    </div>
-
-    <div id="business-container">
-      <div id="description" class="sub-container">
-        <div class="sub-header">Description</div>
-        {{ business.description }}
+  <div v-if="getLoggedInUserId() != null">
+    <div id="container" v-if="this.business != null">
+      <!-- Left Side Business Information Panel -->
+      <div id="business-name-container">
+        <div id="business-name"  >{{ business.name }}</div>
+        <div id="business-type">{{ business.businessType }}</div>
       </div>
 
-      <div id="info-container" class="sub-container">
-
-        <div id="created-date">
-          <div class="sub-header">Created</div>
-          {{ business.created.split(' ')[0] }}
+      <div id="business-container">
+        <div id="description" class="sub-container">
+          <div class="sub-header">Description</div>
+          {{ business.description }}
         </div>
 
-        <div id="address">
-          <div class="sub-header">Address</div>
-          <div id="street-address">{{ business.address.streetNumber }} {{ business.address.streetName }}</div>
-          <div id="city">{{ business.address.city }}</div>
-          <div id="region">{{ business.address.region }}</div>
-          <div id="country">{{ business.address.country }}</div>
-          <div id="postcode">{{ business.address.postcode }}</div>
+        <div id="info-container" class="sub-container">
+
+          <div id="created-date">
+            <div class="sub-header">Created</div>
+            {{ business.created.split(' ')[0] }}
+          </div>
+
+          <div id="address">
+            <div class="sub-header">Address</div>
+            <div id="street-address">{{ business.address.streetNumber }} {{ business.address.streetName }}</div>
+            <div id="city">{{ business.address.city }}</div>
+            <div id="region">{{ business.address.region }}</div>
+            <div id="country">{{ business.address.country }}</div>
+            <div id="postcode">{{ business.address.postcode }}</div>
+          </div>
+
         </div>
 
       </div>
 
+      <main>
+        <!-- Sub Navigation Bar -->
+        <nav id="business-navbar">
+          <router-link class="business-nav-item" :to="{name: `Business`, params:{id: business.id}}">Products</router-link>
+          <router-link class="business-nav-item" :to="{name: `BusinessAdministrators`}">Administrators</router-link>
+        </nav>
+
+        <div id="content">
+          <router-view></router-view>
+        </div>
+
+      </main>
     </div>
-
-    <main>
-      <!-- Sub Navigation Bar -->
-      <nav id="business-navbar">
-        <router-link class="business-nav-item" :to="{name: `Business`, params:{id: business.id}}">Products</router-link>
-        <router-link class="business-nav-item" :to="{name: `BusinessAdministrators`}">Administrators</router-link>
-      </nav>
-
-      <div id="content">
-        <router-view></router-view>
-      </div>
-
-    </main>
-  </div>
-  <!-- 406 Error: Business with given Id does not exist. -->
-  <div id="error" v-else>
-    <div id="error-header"> Error 406 </div>
-    <div id="error-description" style="font-size: 16px"> This business could not be found :( </div>
+    <!-- 406 Error: Business with given Id does not exist. -->
+    <div id="error" v-else>
+      <div id="error-header"> Error 406 </div>
+      <div id="error-description" style="font-size: 16px"> This business could not be found :( </div>
+    </div>
   </div>
 
 </template>
@@ -57,6 +59,7 @@
 
 <script>
 import api from "../Api";
+import {store} from "@/store";
 //import {store} from "../store";
 const Business = {
   name: "Business",
@@ -65,7 +68,8 @@ const Business = {
   data: function() {
     return {
       business: null,
-      adminList: null
+      adminList: null,
+      userId: null
     };
   },
 
@@ -80,7 +84,15 @@ const Business = {
         .catch((error) => {
           throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
         })
-    }
+    },
+
+    /**
+     * Gets the logged in users id
+     */
+    getLoggedInUserId: function() {
+      this.userId = store.loggedInUserId;
+      return this.userId;
+    },
   },
 
   mounted() {
