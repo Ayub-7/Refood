@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" v-if="this.user == null">
     <h3 class="card-header">Add a Product to your Catalogue</h3>
     <form>
       <div id="info-field">
@@ -57,6 +57,7 @@
         type="button"
         class="add-button"
         @click="checkForm()">Add Item to Catalogue</button>
+      <div>{{this.$route.params.id}}</div>
     </form>
   </div>
 </template>
@@ -64,26 +65,28 @@
 <script>
 import CurrencyInput from "@/components/CurrencyInput";
 import api from "@/Api";
-import {mutations} from "@/store";
+import {store} from "../store";
 
 const AddToCatalogue = {
   name: "AddToCatalogue",
+  components: {CurrencyInput},
   data: function () {
     return {
+      user: null,
       errors: [],
       productid: "",
       productname: "",
       description: "",
       manufacturer: "",
-      rrp: null,
+      rrp: null
     };
   },
   methods: {
-    /**
+/*    /!**
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
      * is in the wrong format.
-     */
+     *!/
     checkForm: function() {
       this.errors = [];
       if (this.productname.length === 0) {
@@ -98,9 +101,9 @@ const AddToCatalogue = {
         this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
       }
     },
-    /**
+    /!**
      * Creates a POST request when user submits form, using the createUser function from Api.js
-     */
+     *!/
     createItem: function() {
 
       //Use createUser function of API to POST user data to backend
@@ -128,11 +131,31 @@ const AddToCatalogue = {
           }
           this.$log.debug("Error Status:", error)
         });
-      }}
+      }
+    }*/
+
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId)
+          .then((response) => {
+            if(store.loggedInUserId != null) {
+              return response.data;
+            } else {
+              this.$router.push({path: "/login"});
+            }
+          }).catch((err) => {
+            throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    }
+
 
   },
-  components: {CurrencyInput}
+
+  mounted: function () {
+    let userId = this.$route.params.id;
+    this.user = this.getUserInfo(userId);
+  },
 }
+
 export default AddToCatalogue;
 
 </script>
