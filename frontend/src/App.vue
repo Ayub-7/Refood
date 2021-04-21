@@ -8,11 +8,11 @@
           <div id='loggedIn' v-if="getLoggedInUser() == null">
             <li><router-link class="title" to="/">Register</router-link></li>
             <li><router-link class="title" to="/login">Login</router-link></li>
-            <li><router-link class="title" to="/addcatalogue">Add To Catalogue</router-link></li>
           </div>
           <div v-else>
             <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
             <li v-if="getActingAsUserId() == null"><router-link class="title" to="/businesses">Register a Business</router-link></li>
+            <li v-if="getActingAsUserId() != null"><router-link class="title" :to="{path: `/addcatalogue/`}">Add To Catalogue</router-link></li>
             <li><router-link class="title" to="/search">Search</router-link></li>
             <li v-if="getActingAsUserId() == null"><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
             <li v-if="getActingAsUserId() != null"><router-link :to="{path: `/businesses/${getActingAsUserId()}`}" class="title">Business Profile</router-link></li>

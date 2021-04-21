@@ -8,14 +8,14 @@
               class="form-control"
               type="text"
               label-placeholder="Product name (required)"
-              v-model="productname"/>
+              v-model="productName"/>
         </div>
         <div id="product-id">
           <vs-input
               class="form-control"
               type="text"
               label-placeholder="Product ID (required)"
-              v-model="productid"/>
+              v-model="productId"/>
         </div>
         <div id="manufacturer">
           <vs-input
@@ -64,15 +64,14 @@
 <script>
 import CurrencyInput from "@/components/CurrencyInput";
 import api from "@/Api";
-import {mutations} from "@/store";
 
 const AddToCatalogue = {
   name: "AddToCatalogue",
   data: function () {
     return {
       errors: [],
-      productid: "",
-      productname: "",
+      productId: "",
+      productName: "",
       description: "",
       manufacturer: "",
       rrp: null,
@@ -86,12 +85,12 @@ const AddToCatalogue = {
      */
     checkForm: function() {
       this.errors = [];
-      if (this.productname.length === 0) {
-        this.errors.push(this.productname);
+      if (this.productName.length === 0) {
+        this.errors.push(this.productName);
       }
 
-      if (this.productid.length === 0) {
-        this.errors.push(this.productid);
+      if (this.productId.length === 0) {
+        this.errors.push(this.productId);
       }
 
       if (this.errors.length >= 1) {
@@ -102,34 +101,23 @@ const AddToCatalogue = {
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
     createItem: function() {
-
-      //Use createUser function of API to POST user data to backend
-      //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
+      //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
-
-        //const homeAddress = {
-
-
-
-        api.createProduct()
+        api.createProduct(this.productId, this.productName, this.description, this.rrp)
             .then((response) => {
-              this.$log.debug("New item created:", response.data);
-              // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
-              mutations.setUserLoggedIn(response.data.userId, response.data.role); //Store user info into program state, used for later calls
-              //LOAD USER PAGE, USING ROUTER
-              this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
-              //this.$router.push({path: `/users/${response.data.id}`});
+              this.$log.debug("New catalogue item created:", response.data);
+              //LOAD PRODUCT CATALOGUE PAGE, USING ROUTER
+              this.$router.push({name: 'ProductCatalogue'})
             }).catch((error) => {
           if(error.response){
             console.log(error.response.status);
             console.log(error.response.message);
-            this.errors.push("Email already in use");
+            this.errors.push("ProductId already in use");
           }
           this.$log.debug("Error Status:", error)
         });
       }}
-
   },
   components: {CurrencyInput}
 }
