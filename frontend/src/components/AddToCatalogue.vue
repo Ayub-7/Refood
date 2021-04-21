@@ -54,9 +54,9 @@
         </div>
       </div>
       <button
-          type="button"
-          class="add-button"
-          @click="checkForm()">Add Item to Catalogue</button>
+        type="button"
+        class="add-button"
+        @click="checkForm()">Add Item to Catalogue</button>
     </form>
   </div>
 </template>
@@ -74,7 +74,7 @@ const AddToCatalogue = {
       productid: "",
       productname: "",
       description: "",
-      manufacturer: null,
+      manufacturer: "",
       rrp: null,
     };
   },
@@ -128,10 +128,10 @@ const AddToCatalogue = {
           }
           this.$log.debug("Error Status:", error)
         });
-      }},
-    components: {CurrencyInput}
+      }}
 
-  }
+  },
+  components: {CurrencyInput}
 }
 export default AddToCatalogue;
 
@@ -139,4 +139,132 @@ export default AddToCatalogue;
 
 <style scoped>
 
+  /*
+  Add button's styling
+   */
+  .add-button {
+    cursor: pointer;
+    border-radius: 5em;
+    color: #fff;
+    background: #3B5998;
+    border: 0;
+    padding: 10px 40px;
+    margin: 2em;
+    font-size: 13px;
+    box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  }
+
+  /**
+  Card styling.
+  */
+  .card {
+    font-family: 'Ubuntu', sans-serif;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-row-gap: 1em;
+
+    max-width: 650px;
+    background-color: white;
+    margin: 1em auto;
+    padding: 0.5em 0 0.5em 0;
+    border-radius: 20px;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+  }
+
+  /**
+  Card header styling.
+  */
+  .card-header {
+    grid-row: 1;
+    grid-column: 1;
+
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    color: #3B5998;
+
+    margin: 0;
+    padding: 0.5em 0;
+  }
+
+  /**
+  Form styling
+  */
+  form {
+    grid-row: 2;
+    grid-column: 1;
+
+    margin: auto;
+
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(2, auto);
+  }
+
+  label, input {
+    display: block;
+  }
+
+  /**
+  Styling for form elements.
+  */
+  .form-control {
+    font-family: 'Ubuntu', sans-serif;
+    padding: 3px 10px;
+    margin: 0.5em;
+  }
+
+  #info-field {
+    grid-column: 1/3;
+    display: grid;
+    margin: auto;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(5, auto);
+  }
+
+  #product-name {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #product-id {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #manufacturer {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  #description {
+    grid-column: 2;
+    grid-row: 2;
+    width: 180px;
+    position: relative;
+    left: 10px;
+  }
+
+  #rrp {
+    grid-column: 1;
+    grid-row: 2;
+    position: relative;
+    top: 58px;
+    left: 10px;
+  }
+
+  #rrp-title {
+    position: relative;
+    top: 3px;
+    left: 8px;
+  }
+
+  #currency-box {
+    border-radius: 5px;
+    border: solid thin #CCCCCC;
+    width: 180px;
+  }
 </style>
