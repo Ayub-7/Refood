@@ -103,7 +103,7 @@ const BusinessRegister = {
         this.errors.push('country');
       }
 
-      if (this.getAge(store.userDateOfBirth) < 16) {
+      if (this.checkAge()){
         this.errors.push('dob');
       }
 
@@ -153,11 +153,12 @@ const BusinessRegister = {
     /**
      * Returns the years since the user was born. No rounding is done in the function.
      * @param enteredDate The user's birthdate
-     * @returns {number} The user's age in years.
+     * @returns {boolean} Whether the user is old enough, 16, to register a business.
      */
-    getAge: function(enteredDate) {
+    checkAge: function() {
+      let enteredDate = store.userDateOfBirth;
       let years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
-      return years;
+      return (years >= 16);
     },
 
 

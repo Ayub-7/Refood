@@ -66,12 +66,6 @@ beforeEach(() => {
             }
         }
     });
-    //console.log()
-
-    //wrapper.setData({actingAsBusinessId: mockBusiness.id});
-
-    // const getBusinessMethod = jest.spyOn(Homepage.methods, 'getBusiness');
-    // getBusinessMethod.mockResolvedValue(mockBusiness);
 
     const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
     getUserMethod.mockResolvedValue(mockUser);
