@@ -22,8 +22,10 @@
             label-placeholder="Manufacturer"
             v-model="manufacturer"/>
         </div>
+        <p>Recommended Retail Price:</p>
         <div id="rrp">
           <currency-input
+            label="Price"
             v-model="rrp"
             :options="{
               locale: 'en-NZ',
@@ -40,6 +42,10 @@
           />
         </div>
       </div>
+      <button
+        type="button"
+        class="add-button"
+        @click="checkForm">Add Item to Catalogue</button>
     </form>
   </div>
 </template>
