@@ -8,7 +8,6 @@
                     class="form-control"
                     label-placeholder="Business Name (Required)"
                     v-model="businessName"/>
-
           <vs-select
               width="90%"
               id="business-type"
@@ -49,7 +48,6 @@
         </div>
 
           <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
-
           <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
       </form>
   </div>
@@ -58,7 +56,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "@/store"
+import {store} from "../store";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -104,7 +102,7 @@ const BusinessRegister = {
         this.errors.push('country');
       }
 
-      if (this.checkAge()){
+      if (!this.checkAge()){
         this.errors.push('dob');
       }
 
