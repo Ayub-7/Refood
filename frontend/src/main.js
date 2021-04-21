@@ -43,6 +43,7 @@ import Search from "./components/Search.vue";
 import Business from "./components/Business.vue";
 import BusinessAdministrators from "./components/BusinessAdministrators";
 import Homepage from "./components/Homepage"
+import AddToCatalogue from "@/components/AddToCatalogue";
 
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
@@ -72,6 +73,7 @@ const routes = [
   {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
+  {name: 'AddToCatalogue', path: '/addcatalogue', component: AddToCatalogue},
   {path: '/search', component: Search},
   {
     path: '/businesses/:id',

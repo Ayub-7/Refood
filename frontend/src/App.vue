@@ -8,6 +8,7 @@
           <div id='loggedIn' v-if="getLoggedInUser() == null">
             <li><router-link class="title" to="/">Register</router-link></li>
             <li><router-link class="title" to="/login">Login</router-link></li>
+            <li><router-link class="title" to="/addcatalogue">Add To Catalogue</router-link></li>
           </div>
           <div v-else>
             <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
@@ -38,6 +39,8 @@ import Register from "./components/Register";
 import ActingAs from "./components/ActingAs";
 import Login from "./components/Login";
 import BusinessRegister from "./components/BusinessRegister";
+import AddToCatalogue from "@/components/AddToCatalogue";
+import CurrencyInput from "@/components/CurrencyInput";
 import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
@@ -53,7 +56,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, CurrencyInput
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
