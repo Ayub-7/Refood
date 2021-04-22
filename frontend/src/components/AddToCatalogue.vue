@@ -111,9 +111,12 @@ const AddToCatalogue = {
               this.$router.push({name: 'ProductCatalogue'})
             }).catch((error) => {
           if(error.response){
+            if(error.response.status == 400){
+              this.$vs.notify({title:'Failed to create catalogue item', text:'Product ID is already in use', color:'danger'});
+            }
             console.log(error.response.status);
             console.log(error.response.message);
-            this.errors.push("ProductId already in use");
+            //this.errors.push("ProductId already in use");
           }
           this.$log.debug("Error Status:", error)
         });
