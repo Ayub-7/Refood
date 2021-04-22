@@ -176,7 +176,7 @@ const Users = {
               }
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-              
+
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
               mutations.setUserPrimaryBusinesses(this.businesses);
             }).catch((err) => {
