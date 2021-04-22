@@ -202,12 +202,17 @@ public class UserController {
     /**
      * Method to let a DGAA user revoke GAA admin status from another user. Reverts the user back to USER role.
      * @param id user id to revoke admin user role.
-     * @return status code. 200 if it works, 406 if bad id, 401 if missing session token, 403 if no authority (last two handled by spring sec).
+     * @return status code. 200 if it works, 409 if the DGAA is revoking their own role, 406 if bad id, 401 if missing session token, 403 if incorrect role (last two handled by spring sec).
      */
     @PutMapping("/users/{id}/revokeAdmin")
-    public ResponseEntity<String> revokeUserAdmin(@PathVariable Long id) {
+    public ResponseEntity<String> revokeUserAdmin(@PathVariable Long id, HttpSession session) {
         if (userRepository.findUserById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User self = (User) session.getAttribute("user");
+        if (self.getId() == id) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         userRepository.updateUserRole(id, Role.USER);

@@ -1,6 +1,7 @@
 package org.seng302.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,18 +11,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Address;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
+import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -45,7 +50,6 @@ public class UserControllerTests {
     private UserFinder userFinder;
     @Autowired
     private ObjectMapper mapper;
-
 
     User user;
 
@@ -197,7 +201,135 @@ public class UserControllerTests {
 
     }
 
+    @Test
+    public void testUnauthorizedMakeAdmin() throws Exception {
+        mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
+                .andExpect(status().isUnauthorized());
+    }
 
+    @Test
+    @WithMockUser(roles="USER")
+    public void testForbiddenMakeAdmin() throws Exception {
+        mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
+                .andExpect(status().isForbidden());
+    }
 
+    @Test
+    @WithMockUser(roles="GAA")
+    public void testForbiddenMakeAdminAsGAA() throws Exception {
+        mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles="DGAA")
+    public void testNotAcceptableMakeAdmin() throws Exception {
+        Mockito.when(userRepository.findUserById(1000)).thenReturn(null);
+        mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="DGAA")
+    public void testSuccessfulMakeAdmin() throws Exception {
+        User adminUser = new User("dgaaEmail@email.com", "dgaa123", Role.DGAA);
+        adminUser.setId(5);
+
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(put("/users/{id}/makeAdmin", user.getId())
+                .sessionAttr("user", adminUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testUnauthorizedRevokeAdmin() throws Exception {
+        mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testForbiddenRevokeAdmin() throws Exception {
+        mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles="GAA")
+    public void testForbiddenRevokeAdminAsGAA() throws Exception {
+        mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles="DGAA")
+    public void testNotAcceptableRevokeAdmin() throws Exception {
+        Mockito.when(userRepository.findUserById(1000)).thenReturn(null);
+        mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="DGAA")
+    public void testConflictRevokeAdmin() throws Exception {
+        User adminUser = new User("dgaaEmail@email.com", "dgaa123", Role.DGAA);
+        adminUser.setId(5);
+
+        Mockito.when(userRepository.findUserById(adminUser.getId())).thenReturn(adminUser);
+        mockMvc.perform(put("/users/{id}/revokeAdmin", adminUser.getId())
+                .sessionAttr("user", adminUser))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(roles="DGAA")
+    public void testSuccessfulRevokeAdmin() throws Exception {
+        User adminUser = new User("dgaaEmail@email.com", "dgaa123", Role.DGAA);
+        adminUser.setId(5);
+
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId())
+                .sessionAttr("user", adminUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testBadRequestLogin() throws Exception {
+        LoginRequest loginRequest = new LoginRequest(user.getEmail(), user.getPassword());
+        Mockito.when(userRepository.findUserByEmail(loginRequest.getEmail())).thenReturn(null);
+
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest());
+
+        Mockito.when(userRepository.findUserByEmail(loginRequest.getEmail())).thenReturn(user);
+        loginRequest.setPassword("incorrectpassword");
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest());
+
+        Mockito.when(userRepository.findUserByEmail(loginRequest.getEmail())).thenReturn(null);
+        LoginRequest nullRequest = new LoginRequest(null, null);
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(nullRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testSuccessfulLogin() throws Exception {
+        LoginRequest loginRequest = new LoginRequest(user.getEmail(), "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserByEmail(loginRequest.getEmail())).thenReturn(user);
+
+        MvcResult result = mockMvc.perform(post("/login")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(mapper.writeValueAsString(loginRequest))).andReturn();
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        UserIdResponse response = new UserIdResponse(user.getId(), user.getRole());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
+    }
 
 }
