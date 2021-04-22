@@ -1,5 +1,6 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import ActingAs from '../components/ActingAs';
+import Vuesax from 'vuesax';
 //import {mutations} from "@/store";
 //import {store} from "@/store";
 //import Users from "@/components/Users";
@@ -7,6 +8,7 @@ import ActingAs from '../components/ActingAs';
 
 const localVue = createLocalVue();
 let wrapper;
+localVue.use(Vuesax);
 
 
 // Mock Business
@@ -77,8 +79,9 @@ const mockBusinesses = [
 //     actingAsBusinessId: null,
 //     actingAsBusinessName: null
 // }
-
+//console.log(localVue);
 beforeEach(() => {
+    //console.log(mockBusinesses);
     wrapper = shallowMount(ActingAs, {
         localVue,
         propsData: {},

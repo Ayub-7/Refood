@@ -5,7 +5,7 @@
           <li class="userStuff" >
             <span class ="user">Logged in as {{getUserRole()}} {{getUserName()}}</span>
             <!-- <span class="avatar"> IMG</span> -->
-            <vs-avatar size="large" style="margin-left: 10px">
+            <vs-avatar v-if="getUserName() !== null" size="large" style="margin-left: 10px" name="avatar">
               {{getUserName().match(/[A-Z]/g).join('')}}
             </vs-avatar>
           </li>
