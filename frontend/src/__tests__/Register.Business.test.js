@@ -59,32 +59,32 @@ describe('Business Register error checking', () => {
     test('Handles empty Register', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
-        console.log(wrapper.vm.errors);
-        expect(wrapper.vm.errors.length).toBe(3);
+        expect(wrapper.vm.errors.length).toBe(4);
     });
 
     test('Handles only name', () => {
         wrapper.vm.businessName = 'bestBusiness';
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(2);
+        expect(wrapper.vm.errors.length).toBe(3);
     })
     test('Handles only a type', () => {
         wrapper.vm.businessType = 'Charitable Organisation';
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(2);
+        expect(wrapper.vm.errors.length).toBe(3);
     })
 
     test('Handles old enough user', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(3);
+        expect(wrapper.vm.errors.length).toBe(4);
     })
 });
 
 describe('Business Register user age checking', () => {
     beforeEach(() => {
+        wrapper.vm.user = mockUser;
         const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
         checkAgeMethod.mockResolvedValue(false);
     });
@@ -92,7 +92,7 @@ describe('Business Register user age checking', () => {
     test('Handles to young user', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(4);
+        expect(wrapper.vm.errors.length).toBe(3);
     })
 });
 
