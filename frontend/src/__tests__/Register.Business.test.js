@@ -1,6 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
+import {store} from "../store";
 let wrapper;
 
 const localVue = createLocalVue();
@@ -8,10 +9,6 @@ localVue.use(Vuesax);
 
 let $vs = {
     notify: jest.fn()
-}
-
-let store = {
-    userDateOfBirth: '1989-02-28'
 }
 
 const mockUser = {
@@ -22,7 +19,7 @@ const mockUser = {
     "nickname": "Universal",
     "bio": "zero tolerance task-force",
     "email": "rdalgety3@ocn.ne.jp",
-    "dateOfBirth": "2006-03-30",
+    "dateOfBirth": "1999-02-28",
     "phoneNumber": "+7 684 622 5902",
     "homeAddress": "44 Ramsey Court",
     "created": "2021-04-05 00:11:04",
@@ -36,11 +33,10 @@ beforeEach(() => {
     wrapper = shallowMount(Business, {
         propsData: {},
         mocks: {$vs, store},
-        stubs: ['router-link', 'router-view'],
+        stubs: [],
         methods: {},
         localVue,
     });
-
 });
 
 afterEach(() => {
@@ -54,6 +50,7 @@ describe('Business Register error checking', () => {
     beforeEach(() => {
         wrapper.vm.user = mockUser;
         wrapper.vm.checkAge = jest.fn();
+        wrapper.vm.store.userDateOfBirth = '1989-02-28';
     });
 
     test('Handles empty Register', () => {
@@ -85,14 +82,13 @@ describe('Business Register error checking', () => {
 describe('Business Register user age checking', () => {
     beforeEach(() => {
         wrapper.vm.user = mockUser;
-        const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
-        checkAgeMethod.mockResolvedValue(false);
+        wrapper.vm.store.userDateOfBirth = '2008-02-28';
     });
 
     test('Handles to young user', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(3);
+        expect(wrapper.vm.errors.includes('dob')).toBe(true);
     })
 });
 
