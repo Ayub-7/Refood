@@ -11,6 +11,7 @@ let $vs = {
     notify: jest.fn()
 }
 
+//Mock user
 const mockUser = {
     "id": 5,
     "firstName": "Rayna",
@@ -50,7 +51,6 @@ describe('Business Register error checking', () => {
     beforeEach(() => {
         wrapper.vm.user = mockUser;
         wrapper.vm.checkAge = jest.fn();
-        wrapper.vm.store.userDateOfBirth = '1989-02-28';
     });
 
     test('Handles empty Register', () => {
