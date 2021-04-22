@@ -1,6 +1,5 @@
 package org.seng302.models;
 
-import com.sun.istack.NotNull;
 import lombok.Data;
 import org.seng302.exceptions.InvalidImageExtensionException;
 
@@ -46,6 +45,10 @@ public class Image {
                 return ".gif";
         }
         throw new InvalidImageExtensionException("Unsupported extension type.");
+    }
+
+    public long getId() {
+        return this.id;
     }
 
 }

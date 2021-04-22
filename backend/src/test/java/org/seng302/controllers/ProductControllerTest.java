@@ -56,6 +56,7 @@ public class ProductControllerTest {
     private Business business;
     private Product product1;
     private Product product2;
+    private Image image1;
 
     private NewProductRequest productUpdate;
 
@@ -71,6 +72,7 @@ public class ProductControllerTest {
 
         product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", 14.69, new Date());
         product2 = new Product("07-4957066", 1, "Seedlings", "Buckwheat, Organic", 1.26, new Date());
+        image1 = new Image("../../../resources/media.images/testlettuce.jpeg", "");
 
         //Mocking body of PUT request
         productUpdate = new NewProductRequest("replace id", "replace name", "replace desc", 2.2);
@@ -513,9 +515,35 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSetProductImageWrongImageId() throws Exception {
+    public void testBadSetProductImage() throws Exception {
+        // Wrong image id
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/100/makeprimary", business.getId(), product1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
 
+        //wrong product id
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        mvc.perform(put("/businesses/{businessId}/products/1/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+
+        //wrong business id
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+
+        //forbidden user
+        User forbidden = new User("test@gmail.com", "password", Role.USER);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbidden))
+                .andExpect(status().isForbidden());
     }
 
     @Test
