@@ -1,62 +1,64 @@
 <template>
-  <div class="card" v-if="this.user != null">
+  <div class="card">
     <h3 class="card-header">Create a ReFood Business Account</h3>
-      <form autocomplete="off">
-          <vs-input id="business-name"
-                    :danger="this.errors.includes('businessName')"
-                    type="text"
-                    class="form-control"
-                    label-placeholder="Business Name (Required)"
-                    v-model="businessName"/>
-          <vs-select
-              width="90%"
-              id="business-type"
-              :danger="this.errors.includes('businessType')"
-              class="form-control"
-              label="Select Business Type (Required)"
-              v-model="businessType"
-              autocomplete >
-            <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
-          </vs-select>
+    <form autocomplete="off">
+      <vs-input id="business-name"
+                :danger="this.errors.includes('businessName')"
+                type="text"
+                class="form-control"
+                label-placeholder="Business Name (Required)"
+                v-model="businessName"/>
 
-        <div id="address-container">
-          <div id="street-number">
-            <vs-input v-model="streetNumber" class="form-control" label-placeholder="Street Number"></vs-input>
-          </div>
-          <div id="street-address">
-            <vs-input v-model="streetAddress" class="form-control" label-placeholder="Street Address"></vs-input>
-          </div>
-          <div id="postcode">
-            <vs-input v-model="postcode" class="form-control" label-placeholder="Postcode"></vs-input>
-          </div>
-          <div id="city">
-            <!-- If wanting to test/check suggested item tiles, remove blur. -->
-            <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label-placeholder="City"></vs-input>
-            <ul v-if="this.suggestCities" class="suggested-box">
-              <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
-            </ul>
-          </div>
-          <div id="region">
-            <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
-          </div>
-          <div id="country">
-            <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
-            <ul v-if="this.suggestCountries" class="suggested-box">
-              <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
-            </ul>
-          </div>
+      <vs-select
+          width="90%"
+          id="business-type"
+          :danger="this.errors.includes('businessType')"
+          class="form-control"
+          label="Select Business Type (Required)"
+          v-model="businessType"
+          autocomplete >
+        <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
+      </vs-select>
+
+      <div id="address-container">
+        <div id="street-number">
+          <vs-input v-model="streetNumber" class="form-control" label-placeholder="Street Number"></vs-input>
         </div>
+        <div id="street-address">
+          <vs-input v-model="streetAddress" class="form-control" label-placeholder="Street Address"></vs-input>
+        </div>
+        <div id="postcode">
+          <vs-input v-model="postcode" class="form-control" label-placeholder="Postcode"></vs-input>
+        </div>
+        <div id="city">
+          <!-- If wanting to test/check suggested item tiles, remove blur. -->
+          <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label-placeholder="City"></vs-input>
+          <ul v-if="this.suggestCities" class="suggested-box">
+            <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+          </ul>
+        </div>
+        <div id="region">
+          <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
+        </div>
+        <div id="country">
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+          <ul v-if="this.suggestCountries" class="suggested-box">
+            <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+          </ul>
+        </div>
+      </div>
 
-          <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
-          <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
-      </form>
+      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
+
+      <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
+    </form>
   </div>
 </template>
 
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "../store";
+import {store} from "../store"
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -82,8 +84,7 @@ const BusinessRegister = {
 
       suggestCountries: false,
       suggestedCountries: [],
-      minNumberOfCharacters: 3,
-      user: null
+      minNumberOfCharacters: 3
     };
   },
   methods:{
@@ -102,7 +103,7 @@ const BusinessRegister = {
         this.errors.push('country');
       }
 
-      if (!this.checkAge()){
+      if (this.checkAge()){
         this.errors.push('dob');
       }
 
@@ -135,11 +136,11 @@ const BusinessRegister = {
           postcode: this.postcode,
         };
 
-      api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
-        .then((response) => {
-          this.$log.debug("New business created:", response.data);
-          this.$router.push({path: `/users/${store.loggedInUserId}`});
-        }).catch((error) => {
+        api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
+            .then((response) => {
+              this.$log.debug("New business created:", response.data);
+              this.$router.push({path: `/users/${store.loggedInUserId}`});
+            }).catch((error) => {
           if(error.response) {
             console.log(error.response.status);
             console.log(error.response.message);
@@ -147,7 +148,7 @@ const BusinessRegister = {
           }
           this.$log.debug("Error Status:", error)
         });
-    }},
+      }},
 
     /**
      * Returns the years since the user was born. No rounding is done in the function.
@@ -199,12 +200,12 @@ const BusinessRegister = {
 
         this.suggestCountries = true;
         axios.get(`https://photon.komoot.io/api/?q=${this.country}&osm_tag=place:country&lang=en`)
-          .then( res => {
-            this.suggestedCountries = res.data.features.map(location => location.properties.country);
-          })
-          .catch( error => {
-            console.log("Error with getting countries from photon." + error);
-          });
+            .then( res => {
+              this.suggestedCountries = res.data.features.map(location => location.properties.country);
+            })
+            .catch( error => {
+              console.log("Error with getting countries from photon." + error);
+            });
       }
       else {
         this.suggestCountries = false;
@@ -216,29 +217,9 @@ const BusinessRegister = {
      * @param selectedCountry the country string to set as.
      */
     setCountry: function(selectedCountry) {
-        this.country = selectedCountry;
-        this.suggestCountries = false;
+      this.country = selectedCountry;
+      this.suggestCountries = false;
     },
-
-    getUserInfo: function (userId) {
-      api.getUserFromID(userId)
-          .then((response) => {
-            if(store.loggedInUserId == null) {
-              this.user = response.data;
-            } else {
-              this.$router.push({path: "/login"});
-            }
-          }).catch((err) => {
-            throw new Error(`Error trying to get user info from id: ${err}`);
-      });
-    },
-
-    mounted: function () {
-      let userId = this.$route.params.id
-      this.user = this.getUserInfo(userId);
-    }
-
-
 
   },
 
