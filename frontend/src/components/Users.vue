@@ -168,22 +168,23 @@ const Users = {
      * @param userId ID of user that is currently being viewed
      */
     getUserInfo: function(userId) {
-      api.getUserFromID(userId) //Get user data
-          .then((response) => {
-            if(store.userPrimaryBusinesses != null){
-              this.userViewingBusinesses = store.userPrimaryBusinesses;
-            }
-            if(store.loggedInUserId != null) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              if(store.userPrimaryBusinesses != null){
+                this.userViewingBusinesses = store.userPrimaryBusinesses;
+              }
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-            } else {
-              this.$router.push({path: "/login"}); //If user not logged in send to login page
-            }
-            mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-            mutations.setUserPrimaryBusinesses(this.businesses);
-          }).catch((err) => {
-            throw new Error(`Error trying to get user info from id: ${err}`);
-      });
+              
+              mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+              mutations.setUserPrimaryBusinesses(this.businesses);
+            }).catch((err) => {
+              throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
     },
 
     /**
