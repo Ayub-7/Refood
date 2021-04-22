@@ -77,8 +77,9 @@ const mockBusinesses = [
 //     actingAsBusinessId: null,
 //     actingAsBusinessName: null
 // }
-
+//console.log(localVue);
 beforeEach(() => {
+    //console.log(mockBusinesses);
     wrapper = shallowMount(ActingAs, {
         localVue,
         propsData: {},
