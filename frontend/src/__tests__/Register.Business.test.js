@@ -1,7 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
-//import ActingAs from "@/components/ActingAs";
 let wrapper;
 
 const localVue = createLocalVue();
@@ -15,11 +14,29 @@ let store = {
     userDateOfBirth: '1989-02-28'
 }
 
+const mockUser = {
+    "id": 5,
+    "firstName": "Rayna",
+    "middleName": "YEP",
+    "lastName": "Dalgety",
+    "nickname": "Universal",
+    "bio": "zero tolerance task-force",
+    "email": "rdalgety3@ocn.ne.jp",
+    "dateOfBirth": "2006-03-30",
+    "phoneNumber": "+7 684 622 5902",
+    "homeAddress": "44 Ramsey Court",
+    "created": "2021-04-05 00:11:04",
+    "role": "USER",
+    "businessesAdministered": []
+}
+
+
+
 beforeEach(() => {
     wrapper = shallowMount(Business, {
         propsData: {},
         mocks: {$vs, store},
-        stubs: {},
+        stubs: ['router-link', 'router-view'],
         methods: {},
         localVue,
     });
@@ -32,15 +49,17 @@ afterEach(() => {
 
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Business Register error checking', () => {
+
+
     beforeEach(() => {
-        // const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
-        // checkAgeMethod.mockResolvedValue(true);
+        wrapper.vm.user = mockUser;
         wrapper.vm.checkAge = jest.fn();
     });
 
     test('Handles empty Register', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
+        console.log(wrapper.vm.errors);
         expect(wrapper.vm.errors.length).toBe(3);
     });
 
