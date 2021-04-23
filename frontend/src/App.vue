@@ -12,10 +12,9 @@
           <div v-else>
             <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
             <li v-if="getActingAsUserId() == null"><router-link class="title" to="/businesses">Register a Business</router-link></li>
-            <li v-if="getActingAsUserId() != null"><router-link class="title" :to="{path: `/addcatalogue/`}">Add To Catalogue</router-link></li>
+            <li v-if="getActingAsUserId() != null"><router-link class="title" :to="{path: `/addtocatalogue/`}">Add To Catalogue</router-link></li>
             <li v-if="getActingAsUserId() != null"><router-link class="title" :to="{path: `/productcatalogue/`}">Product Catalogue</router-link></li>
             <li><router-link class="title" to="/search">Search</router-link></li>
-            <li><router-link class="title" to="/addtocatalogue">Add To Catalogue</router-link></li>
             <li v-if="getActingAsUserId() == null"><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
             <li v-if="getActingAsUserId() != null"><router-link :to="{path: `/businesses/${getActingAsUserId()}`}" class="title">Business Profile</router-link></li>
             <li><router-link :to="{path: '/login'}" class="title">

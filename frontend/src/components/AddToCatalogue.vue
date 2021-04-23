@@ -146,7 +146,6 @@ const AddToCatalogue = {
     let userId = store.loggedInUserId;
     this.getUserInfo(userId);
   },
-  }
 }
 
 export default AddToCatalogue;
