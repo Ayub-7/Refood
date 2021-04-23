@@ -50,8 +50,8 @@
 </template>
 
 <script>
-import CurrencyInput from "@/components/CurrencyInput";
-import api from "@/Api";
+import CurrencyInput from "../components/CurrencyInput";
+import api from "../Api";
 import axios from "axios";
 import {store} from "../store";
 
@@ -163,6 +163,7 @@ export default AddToCatalogue;
     color: #fff;
     background: #3B5998;
     border: 0;
+    z-index: 1000;
     padding: 10px 40px;
     margin: 2em;
     font-size: 13px;
