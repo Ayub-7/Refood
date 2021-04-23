@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="this.user == null">
+  <div class="card" v-if="this.user != null">
     <h3 class="card-header">Add a Product to your Catalogue</h3>
     <form>
       <div id="info-field">
@@ -40,7 +40,7 @@
               v-model="rrp"
               :options="{
                 locale: 'en-NZ',
-                currency: 'NZD',
+                currency: `NZD`,
                 valueRange: { min: 0 },
                 precision: 2,
                 distractionFree: {
@@ -57,7 +57,7 @@
         type="button"
         class="add-button"
         @click="checkForm()">Add Item to Catalogue</button>
-      <div>{{this.$route.params.id}}</div>
+      <div>{{this.currencySymbol}}, {{this.currencyCode}}</div>
     </form>
   </div>
 </template>
@@ -65,6 +65,7 @@
 <script>
 import CurrencyInput from "@/components/CurrencyInput";
 import api from "@/Api";
+import axios from "axios";
 import {store} from "../store";
 
 const AddToCatalogue = {
@@ -78,6 +79,8 @@ const AddToCatalogue = {
       productname: "",
       description: "",
       manufacturer: "",
+      currencySymbol: "",
+      currencyCode: "",
       rrp: null
     };
   },
@@ -134,25 +137,40 @@ const AddToCatalogue = {
       }
     }*/
 
-    getUserInfo: function (userId) {
-      api.getUserFromID(userId)
-          .then((response) => {
-            if(store.loggedInUserId != null) {
-              return response.data;
-            } else {
-              this.$router.push({path: "/login"});
-            }
-          }).catch((err) => {
-            throw new Error(`Error trying to get user info from id: ${err}`);
+    getUserInfo: function(userId) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              console.log(response.data.id);
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
+          throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
+    },
+
+    setCurrency: function (country) {
+      console.log(country);
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then( response => {
+            console.log(response.data[0].currencies[0].symbol);
+            this.currencySymbol = response.data[0].currencies[0].symbol;
+            this.currencyCode = response.data[0].currencies[0].code;
+          }).catch( err => {
+        console.log("Error with getting cities from REST Countries." + err);
       });
-    }
+    },
+
 
 
   },
 
   mounted: function () {
-    let userId = this.$route.params.id;
-    this.user = this.getUserInfo(userId);
+    let userId = store.loggedInUserId;
+    this.getUserInfo(userId);
   },
 }
 
