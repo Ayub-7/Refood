@@ -37,7 +37,7 @@ public class ProductRepositoryTests {
     }
 
     @Test
-    public void saveUser() {
+    public void saveProduct() {
         Product product = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", 43.66, new Date());
         productRepository.save(product);
 

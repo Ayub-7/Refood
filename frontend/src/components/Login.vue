@@ -85,7 +85,7 @@ const Login = {
 
         }).catch(err => {
           if(err.response) { //Catch bad request
-            console.log(err.response.message)
+            console.log(err.response)
             this.email = this.password = null;
             this.errors.push('Incorrect email or password')
           }

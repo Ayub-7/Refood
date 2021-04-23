@@ -8,14 +8,14 @@
               class="form-control"
               type="text"
               label-placeholder="Product name (required)"
-              v-model="productname"/>
+              v-model="productName"/>
         </div>
         <div id="product-id">
           <vs-input
               class="form-control"
               type="text"
               label-placeholder="Product ID (required)"
-              v-model="productid"/>
+              v-model="productId"/>
         </div>
         <div id="manufacturer">
           <vs-input
@@ -56,7 +56,7 @@
       <button
         type="button"
         class="add-button"
-        @click="checkForm()">Add Item to Catalogue</button>
+        @click="checkForm(); createItem();">Add Item to Catalogue</button>
       <div>{{this.$route.params.id}}</div>
     </form>
   </div>
@@ -65,7 +65,7 @@
 <script>
 import CurrencyInput from "@/components/CurrencyInput";
 import api from "@/Api";
-import {store} from "../store";
+import {store} from "../store"
 
 const AddToCatalogue = {
   name: "AddToCatalogue",
@@ -74,66 +74,55 @@ const AddToCatalogue = {
     return {
       user: null,
       errors: [],
-      productid: "",
-      productname: "",
+      productId: "",
+      productName: "",
       description: "",
       manufacturer: "",
       rrp: null
     };
   },
   methods: {
-/*    /!**
+    /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
      * is in the wrong format.
-     *!/
+     */
     checkForm: function() {
       this.errors = [];
-      if (this.productname.length === 0) {
-        this.errors.push(this.productname);
+      if (this.productName.length === 0) {
+        this.errors.push(this.productName);
       }
 
-      if (this.productid.length === 0) {
-        this.errors.push(this.productid);
+      if (this.productId.length === 0) {
+        this.errors.push(this.productId);
       }
 
       if (this.errors.length >= 1) {
         this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
       }
     },
-    /!**
+    /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
-     *!/
+     */
     createItem: function() {
-
-      //Use createUser function of API to POST user data to backend
-      //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
+      //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
-
-        //const homeAddress = {
-
-
-
-        api.createProduct()
+        api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.rrp)
             .then((response) => {
-              this.$log.debug("New item created:", response.data);
-              // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
-              mutations.setUserLoggedIn(response.data.userId, response.data.role); //Store user info into program state, used for later calls
-              //LOAD USER PAGE, USING ROUTER
-              this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
-              //this.$router.push({path: `/users/${response.data.id}`});
+              this.$log.debug("New catalogue item created:", response.data);
+              this.$router.push({name: 'ProductCatalogue'})
             }).catch((error) => {
           if(error.response){
+            if(error.response.status == 400){
+              this.$vs.notify({title:'Failed to create catalogue item', text:'Product ID is already in use', color:'danger'});
+            }
             console.log(error.response.status);
-            console.log(error.response.message);
-            this.errors.push("Email already in use");
           }
           this.$log.debug("Error Status:", error)
         });
       }
-    }*/
-
+    },
     getUserInfo: function (userId) {
       api.getUserFromID(userId)
           .then((response) => {
@@ -145,15 +134,13 @@ const AddToCatalogue = {
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`);
       });
-    }
-
-
-  },
+    },
 
   mounted: function () {
     let userId = this.$route.params.id;
     this.user = this.getUserInfo(userId);
   },
+  }
 }
 
 export default AddToCatalogue;
