@@ -13,6 +13,7 @@
             <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
             <li v-if="getActingAsUserId() == null"><router-link class="title" to="/businesses">Register a Business</router-link></li>
             <li v-if="getActingAsUserId() != null"><router-link class="title" :to="{path: `/addcatalogue/`}">Add To Catalogue</router-link></li>
+            <li v-if="getActingAsUserId() != null"><router-link class="title" :to="{path: `/productcatalogue/`}">Product Catalogue</router-link></li>
             <li><router-link class="title" to="/search">Search</router-link></li>
             <li v-if="getActingAsUserId() == null"><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
             <li v-if="getActingAsUserId() != null"><router-link :to="{path: `/businesses/${getActingAsUserId()}`}" class="title">Business Profile</router-link></li>
@@ -38,6 +39,7 @@
 import Register from "./components/Register";
 import ActingAs from "./components/ActingAs";
 import Login from "./components/Login";
+import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
 import AddToCatalogue from "@/components/AddToCatalogue";
 import CurrencyInput from "@/components/CurrencyInput";
@@ -56,7 +58,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, CurrencyInput
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue, CurrencyInput
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
