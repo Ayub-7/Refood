@@ -159,8 +159,8 @@ export default {
      * @param description product description
      * @param recommendedRetailPrice product recommended retail price in their local currency
      */
-    createProduct: async(id, name, description, recommendedRetailPrice) =>
-        instance.post(`/businesses/${id}/products`, {id, name, description, recommendedRetailPrice}, {withCredentials: true}),
+    createProduct: async(businessId, id, name, description, recommendedRetailPrice) =>
+        instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
 
     getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true})
 }

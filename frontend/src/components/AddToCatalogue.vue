@@ -64,6 +64,7 @@
 <script>
 import CurrencyInput from "@/components/CurrencyInput";
 import api from "@/Api";
+import {store} from "../store"
 
 const AddToCatalogue = {
   name: "AddToCatalogue",
@@ -104,10 +105,9 @@ const AddToCatalogue = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
-        api.createProduct(this.productId, this.productName, this.description, this.rrp)
+        api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.rrp)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
-              //LOAD PRODUCT CATALOGUE PAGE, USING ROUTER
               this.$router.push({name: 'ProductCatalogue'})
             }).catch((error) => {
           if(error.response){
@@ -115,8 +115,6 @@ const AddToCatalogue = {
               this.$vs.notify({title:'Failed to create catalogue item', text:'Product ID is already in use', color:'danger'});
             }
             console.log(error.response.status);
-            console.log(error.response.message);
-            //this.errors.push("ProductId already in use");
           }
           this.$log.debug("Error Status:", error)
         });
