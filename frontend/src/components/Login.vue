@@ -1,47 +1,42 @@
 <template>
   <!-- <h1> Basic Login Form</h1> -->
-  <div id="body">
-  <div class="main">
-    <p class="sign" align="center">Sign in</p>
-  <form id="login-form" >
-      <div v-if="errors.length">
-        <b>Please correct the following error(s):</b>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-      </div>
+  <div id="main">
 
+    <p id="sign">Sign In</p>
+    <form>
+        <vs-input class="form-control"
+                  id="email" type="text"
+                  v-model="email"
+                  label-placeholder="Enter Email"
+                  :danger="this.errors.email != null"
+                  :danger-text="this.errors.email"
+                  required></vs-input>
+        <vs-input class="form-control"
+                  id="password" type="password"
+                  v-model="password"
+                  label-placeholder="Enter password"
+                  :danger="this.errors.password != null"
+                  :danger-text="this.errors.password"
+                  required></vs-input>
 
-      <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
-      <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
+        <button class="loginButton form-input" type="button"  @click="checkForm(); loginSubmit()">Sign in</button>
+    </form>
 
-      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
-      <div type="button" class="forgotPassword">Forgot Password?</div>
-  </form>
-  </div>
   </div>
 </template>
-
-
 
 <script>
 import api from "../Api";
 import {mutations} from "../store"
-//import Vue from "vue"
-//import VueSimpleAlert from "vue-simple-alert";
-//let passwordHash = require('password-hash');
 
-
-//const data = require('../testUser.json');
-//const users = data.users;
 const Login = {
   name: "Login",
   data: function () {
-  return {
-    errors: [],
-    email: null,
-    password: null,
-  };
+    return {
+      errors: [],
+      email: "",
+      password: "",
+    };
   },
   methods: {
     validEmail: function (email) {
@@ -50,45 +45,48 @@ const Login = {
     },
     /**
      * Checks if the username and password match on what is stored in the backend.
-     * @returns {boolean} True if it matches what is stored in the backend; otherwise, false.
      */
     checkForm: function() {
-      this.errors = [];
+      this.errors = {
+        hasErrors: false,
+        email: null,
+        password: null,
+      };
 
-      if (!this.email) {
-        this.errors.push("Email is required!");
-      } else if (!this.validEmail(this.email)) {
-        this.errors.push("Please enter a valid email!");
+      if (this.email.length === 0) {
+        this.errors.email = "Email required.";
+        this.errors.hasErrors = true;
+      }
+      else if (!this.validEmail(this.email)) {
+        this.errors.email = "Email invalid.";
+        this.errors.hasErrors = true;
+      }
+      if (this.password.length === 0) {
+        this.errors.password = "Password required.";
+        this.errors.hasErrors = true;
       }
 
-      if (!this.password) {
-        this.errors.push('Password required.');
-      }
-
-      if (this.email && this.password) {
-        return true;
-      }
+      console.log(this.errors);
     },
 
     /**
      * Sends the login request to the backend by calling the login function from the API.
      */
     loginSubmit: function() {
-      if(this.errors.length == 0){
+      if(!this.errors.hasErrors){
         api.login(this.email, this.password)
-        .then((response) => {
-          //LOAD USER HOME PAGE, USING ROUTER
-          mutations.setUserLoggedIn(response.data.userId, response.data.role);
-          mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
-          this.$router.push({path: `/home`});
+          .then((response) => {
+            //LOAD USER HOME PAGE, USING ROUTER
+            mutations.setUserLoggedIn(response.data.userId, response.data.role);
+            mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+            this.$router.push({path: `/home`});
 
-
-        }).catch(err => {
-          if(err.response) { //Catch bad request
-            console.log(err.response.message)
-            this.email = this.password = null;
-            this.errors.push('Incorrect email or password')
-          }
+          }).catch(err => {
+            if(err.response) { //Catch bad request
+              console.log(err.response.message)
+              this.email = this.password = null;
+              this.errors.push('Incorrect email or password')
+            }
         })
       }
     }
@@ -98,107 +96,87 @@ const Login = {
 export default Login;
 </script>
 
-
-
-
 <style scoped>
-#body {
+
+#main {
+  font-family: 'Ubuntu', sans-serif;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  grid-row-gap: 1em;
+
+  max-width: 400px;
   background-color: white;
-  font-family: 'Ubuntu', sans-serif;
-
+  margin: 1em auto;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
 
-.main {
-  background-color: #FFFFFF;
-  width: 400px;
-  height: 400px;
-  margin: 7em auto;
-  border-radius: 1.5em;
-  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
-}
+/* First Header Row */
+#sign {
+  grid-row: 1;
+  grid-column: 1;
 
-.sign {
-  padding-top: 40px;
+  margin: 0;
+  padding: 0.5em 0;
+
   color: #385898;
-  font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
-  font-size: 23px;
+  font-size: 24px;
+  text-align: center;
+}
+
+form {
+  grid-row: 2;
+  grid-column: 1;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, auto);
+  grid-row-gap: 1em;
+
+  margin: auto;
+
+}
+
+.form-control {
+  font-family: 'Ubuntu', sans-serif;
 }
 
 #email {
-  width: 76%;
-  color: rgb(38, 50, 56);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
-  margin-left: 46px;
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
-form#login-form {
-  padding-top: 40px;
-}
-#password {
-  width: 76%;
-  color: rgb(38, 50, 56);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
-  margin-left: 46px;
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
-#email:focus, #password:focus {
-  border: 2px solid rgba(0, 0, 0, 0.18) !important;
+  grid-row: 1;
+  grid-column: 1;
+
 }
 
+#password {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+
 .loginButton {
+  grid-row: 3;
+  grid-column: 1;
+
+  margin: 1em auto 2em auto;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
   background: #3B5998;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
+  padding: 10px 40px;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
-.forgotPassword {
-  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #3B5998;
-  padding-top: 15px;
-  text-align: center;
-}
-a {
-  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #E1BEE7;
-  text-decoration: none
-}
+
 @media (max-width: 600px) {
   .main {
     border-radius: 0px;
   }
 }
+
 </style>
