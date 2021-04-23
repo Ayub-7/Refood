@@ -16,6 +16,7 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -49,6 +50,8 @@ public class ProductControllerTest {
     private BusinessRepository businessRepository;
     @MockBean
     private ProductRepository productRepository;
+    @MockBean
+    private FileService fileService;
     @Autowired
     private ObjectMapper mapper;
 
