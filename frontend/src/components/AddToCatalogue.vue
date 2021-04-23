@@ -56,7 +56,7 @@
       <button
         type="button"
         class="add-button"
-        @click="checkForm()">Add Item to Catalogue</button>
+        @click="checkForm(); createItem();">Add Item to Catalogue</button>
     </form>
   </div>
 </template>

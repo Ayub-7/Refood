@@ -103,7 +103,7 @@ const BusinessRegister = {
         this.errors.push('country');
       }
 
-      if (this.checkAge()){
+      if (!this.checkAge()){
         this.errors.push('dob');
       }
 
