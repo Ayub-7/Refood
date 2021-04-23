@@ -32,32 +32,19 @@
               v-model="description"/>
         </div>
         <div id="rrp">
-          <p id="rrp-title">Recommended Retail Price:</p>
-          <currency-input
-              class="form-control"
-              id="currency-box"
-              label="Price"
-              v-model="rrp"
-              :options="{
-                locale: 'en-NZ',
-                currency: `NZD`,
-                valueRange: { min: 0 },
-                precision: 2,
-                distractionFree: {
-                  hideCurrencySymbol: true,
-                  hideGroupingSymbol: true
-                },
-                autoSign: true,
-                useGrouping: true
-              }"
-          />
+          <div id="currencySymbol">{{this.currencySymbol}}</div>
+          <vs-input
+              id="currencyInput"
+              label-placeholder="Recommended Retail Price"
+              type="text"
+              v-model="rrp"/>
+          <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
       </div>
       <button
         type="button"
         class="add-button"
         @click="checkForm()">Add Item to Catalogue</button>
-      <div>{{this.currencySymbol}}, {{this.currencyCode}}</div>
     </form>
   </div>
 </template>
@@ -141,7 +128,6 @@ const AddToCatalogue = {
       if(store.loggedInUserId != null) {
         api.getUserFromID(userId) //Get user data
             .then((response) => {
-              console.log(response.data.id);
               this.user = response.data;
               this.setCurrency(this.user.homeAddress.country);
             }).catch((err) => {
@@ -153,10 +139,8 @@ const AddToCatalogue = {
     },
 
     setCurrency: function (country) {
-      console.log(country);
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
           .then( response => {
-            console.log(response.data[0].currencies[0].symbol);
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
           }).catch( err => {
@@ -295,17 +279,30 @@ export default AddToCatalogue;
     position: relative;
     top: 58px;
     left: 10px;
+    display: inline-grid;
   }
 
-  #rrp-title {
+  #currencySymbol {
+    grid-row: 1;
+    grid-column: 1;
     position: relative;
-    top: 3px;
-    left: 8px;
+    top: 24px;
+    font-size: 15px;
   }
 
-  #currency-box {
-    border-radius: 5px;
-    border: solid thin #CCCCCC;
-    width: 180px;
+  #currencyInput {
+    grid-row: 1;
+    grid-column: 2;
+    width: 50%;
   }
+
+  #currencyCode {
+    grid-row: 1;
+    grid-column: 3;
+    position: relative;
+    top: 24px;
+    font-size: 15px;
+  }
+
+
 </style>
