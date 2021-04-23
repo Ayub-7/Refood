@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="this.user == null">
+  <div class="card" v-if="this.user != null">
     <h3 class="card-header">Add a Product to your Catalogue</h3>
     <form>
       <div id="info-field">
@@ -32,32 +32,19 @@
               v-model="description"/>
         </div>
         <div id="rrp">
-          <p id="rrp-title">Recommended Retail Price:</p>
-          <currency-input
-              class="form-control"
-              id="currency-box"
-              label="Price"
-              v-model="rrp"
-              :options="{
-                locale: 'en-NZ',
-                currency: 'NZD',
-                valueRange: { min: 0 },
-                precision: 2,
-                distractionFree: {
-                  hideCurrencySymbol: true,
-                  hideGroupingSymbol: true
-                },
-                autoSign: true,
-                useGrouping: true
-              }"
-          />
+          <div id="currencySymbol">{{this.currencySymbol}}</div>
+          <vs-input
+              id="currencyInput"
+              label-placeholder="Recommended Retail Price"
+              type="text"
+              v-model="rrp"/>
+          <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
       </div>
       <button
         type="button"
         class="add-button"
         @click="checkForm(); createItem();">Add Item to Catalogue</button>
-      <div>{{this.$route.params.id}}</div>
     </form>
   </div>
 </template>
@@ -65,7 +52,8 @@
 <script>
 import CurrencyInput from "@/components/CurrencyInput";
 import api from "@/Api";
-import {store} from "../store"
+import axios from "axios";
+import {store} from "../store";
 
 const AddToCatalogue = {
   name: "AddToCatalogue",
@@ -78,6 +66,8 @@ const AddToCatalogue = {
       productName: "",
       description: "",
       manufacturer: "",
+      currencySymbol: "",
+      currencyCode: "",
       rrp: null
     };
   },
@@ -123,22 +113,38 @@ const AddToCatalogue = {
         });
       }
     },
-    getUserInfo: function (userId) {
-      api.getUserFromID(userId)
-          .then((response) => {
-            if(store.loggedInUserId != null) {
-              return response.data;
-            } else {
-              this.$router.push({path: "/login"});
-            }
-          }).catch((err) => {
-            throw new Error(`Error trying to get user info from id: ${err}`);
+
+    getUserInfo: function(userId) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
+          throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
+    },
+
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then( response => {
+            this.currencySymbol = response.data[0].currencies[0].symbol;
+            this.currencyCode = response.data[0].currencies[0].code;
+          }).catch( err => {
+        console.log("Error with getting cities from REST Countries." + err);
       });
     },
 
+
+
+  },
+
   mounted: function () {
-    let userId = this.$route.params.id;
-    this.user = this.getUserInfo(userId);
+    let userId = store.loggedInUserId;
+    this.getUserInfo(userId);
   },
   }
 }
@@ -264,17 +270,30 @@ export default AddToCatalogue;
     position: relative;
     top: 58px;
     left: 10px;
+    display: inline-grid;
   }
 
-  #rrp-title {
+  #currencySymbol {
+    grid-row: 1;
+    grid-column: 1;
     position: relative;
-    top: 3px;
-    left: 8px;
+    top: 24px;
+    font-size: 15px;
   }
 
-  #currency-box {
-    border-radius: 5px;
-    border: solid thin #CCCCCC;
-    width: 180px;
+  #currencyInput {
+    grid-row: 1;
+    grid-column: 2;
+    width: 50%;
   }
+
+  #currencyCode {
+    grid-row: 1;
+    grid-column: 3;
+    position: relative;
+    top: 24px;
+    font-size: 15px;
+  }
+
+
 </style>
