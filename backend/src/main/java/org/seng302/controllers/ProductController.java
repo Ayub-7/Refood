@@ -54,7 +54,7 @@ public class ProductController {
     @Value("${media.image.business.directory}")
     String rootImageDir;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+//    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Retrieves all of the products in the business' product catalogue.
