@@ -1,5 +1,6 @@
 package org.seng302.utilities;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired private AuthEntryPoint authenticationEntryPoint;
 
     /**
      * Configuration of web security - sets the rules on what user can go where.
@@ -25,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
         http
                 .csrf().disable()
-                .httpBasic()
+                .httpBasic().authenticationEntryPoint(authenticationEntryPoint)
 
                 .and()
                 .authorizeRequests()
@@ -33,7 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/users/{id}").authenticated()
                 .antMatchers(HttpMethod.POST, "/login", "/users", "/businesses", "/logout").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/login", "/users", "/businesses", "/logout").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/search*").authenticated()
+                .antMatchers(HttpMethod.GET, "/users/search*", "/businesses/*").authenticated()
                 .antMatchers(HttpMethod.PUT, "/users/{id}/*").hasRole("DGAA")
                 .antMatchers(HttpMethod.PUT, "/businesses/{id}/*").authenticated()
                 .anyRequest().permitAll();

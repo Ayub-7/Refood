@@ -1,6 +1,6 @@
 <template>
 
-  <div v-if="this.user != null">
+  <div>
     <div id="container" v-if="this.business != null">
       <!-- Left Side Business Information Panel -->
       <div id="business-name-container">
@@ -59,7 +59,7 @@
 
 <script>
 import api from "../Api";
-import {store} from "../store";
+//import {store} from "../store";
 const Business = {
   name: "Business",
 
@@ -75,36 +75,26 @@ const Business = {
   methods: {
     getBusiness: function () {
       api.getBusinessFromId(this.$route.params.id)
-          .then((res) => {
-            this.business = res.data;
-            this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
-            console.log(this.business);
-          })
-          .catch((error) => {
-            throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
-          })
+        .then((res) => {
+          this.business = res.data;
+          this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
+
+        })
+        .catch((error) => {
+          if (error.response.status === 401) {
+            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+            this.$router.push({name: 'LoginPage'});
+          }
+          throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+        });
     },
 
-    getUserInfo: function (userId) {
-      api.getUserFromID(userId)
-          .then((response) => {
-            if (store.loggedInUserId == null) {
-              this.user = response.data;
-            } else {
-              this.$router.push({path: "/login"});
-            }
-          }).catch((err) => {
-        throw new Error(`Error trying to get user info from id: ${err}`);
-      });
-    },
 
-    mounted() {
-      let userId = this.$route.params.id
-      this.user = this.getUserInfo(userId);
-      // Retrieve business info.
-      this.getBusiness();
-    }
+  },
 
+  mounted() {
+    // Retrieve business info.
+    this.getBusiness();
   }
 }
 

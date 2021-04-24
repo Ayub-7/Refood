@@ -40,7 +40,7 @@ const Login = {
   },
   methods: {
     validEmail: function (email) {
-      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
     },
     /**
@@ -78,16 +78,21 @@ const Login = {
           .then((response) => {
             //LOAD USER HOME PAGE, USING ROUTER
             mutations.setUserLoggedIn(response.data.userId, response.data.role);
-            mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
             this.$router.push({path: `/home`});
+          })
+          .catch(err => {
+            console.log(err.response);
+            if(err.response.status === 400) { // Catch 400 Bad Request
+              this.email = this.password = "";
+              this.errors.email = this.errors.password = "";
+              this.$vs.notify({title:'Login Failed', text:'Email or password is incorrect.', color:'danger'});
 
-          }).catch(err => {
-            if(err.response) { //Catch bad request
-              console.log(err.response.message)
-              this.email = this.password = null;
-              this.errors.push('Incorrect email or password')
             }
-        })
+            else { // Catch anything else.
+              this.$vs.notify({title:'Error Logging In', text:`Status Code ${err.response.status}`, color:'danger'});
+
+            }
+        });
       }
     }
   },
@@ -173,10 +178,5 @@ form {
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
 
-@media (max-width: 600px) {
-  .main {
-    border-radius: 0px;
-  }
-}
 
 </style>

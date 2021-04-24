@@ -134,7 +134,7 @@ export default {
      * @param businessId the unique id of the business.
      * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
      */
-    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`),
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`, {withCredentials: true}),
 
     /**
      * Put request to make a user a business administrator (not primary).
