@@ -82,6 +82,7 @@
 
 <script>
 import api from "../Api";
+import {store} from "@/store";
 //import {store} from "../store"
 
 const Search = {
@@ -144,7 +145,7 @@ const Search = {
   methods: {
     //todo: update getBusinessID get to use new store.js upon merge...
     getBusinessID: function () {
-      return this.$store.state.userId;
+      return store.actingAsBusinessId
     },
 
     /**
