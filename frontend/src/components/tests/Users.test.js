@@ -2,6 +2,7 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Users from '../Users';
 import {store} from '../../store';
 import Vuesax from 'vuesax';
+import VueRouter from 'vue-router';
 
 
 let wrapper;
@@ -65,13 +66,15 @@ const $route = {
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
-
+localVue.use(VueRouter);
+const router = new VueRouter();
 
 beforeEach(() => {
 
 
     wrapper = shallowMount(Users, {
         localVue,
+        router,
         propsData: {},
         mocks: {$route, store},
         stubs: ['router-link', 'router-view'],

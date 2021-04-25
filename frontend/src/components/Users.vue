@@ -168,27 +168,23 @@ const Users = {
      * @param userId ID of user that is currently being viewed
      */
     getUserInfo: function(userId) {
-      api.getUserFromID(userId) //Get user data
-          .then((response) => {
-            if(store.userPrimaryBusinesses != null){
-              this.userViewingBusinesses = store.userPrimaryBusinesses;
-            }
-            console.log(this.userViewingBusinesses)
-            if(store.loggedInUserId != null) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              if(store.userPrimaryBusinesses != null){
+                this.userViewingBusinesses = store.userPrimaryBusinesses;
+              }
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-            } else {
-              this.$router.push({path: "/login"}); //If user not logged in send to login page
-            }
 
-            //update thumbnail user name and associated businesses, if any
-            // this.$store.commit('setUserName', response.data.firstName + " " + response.data.middleName + " " + response.data.lastName); //store the user's name in the program state to be displayed on the top right of the page
-            // this.$store.commit('setUserAssociatedBusinesses', this.businesses);
-            mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-            mutations.setUserPrimaryBusinesses(this.businesses);
-          }).catch((err) => {
-            throw new Error(`Error trying to get user info from id: ${err}`);
-      });
+              mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+              mutations.setUserPrimaryBusinesses(this.businesses);
+            }).catch((err) => {
+              throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
     },
 
     /**

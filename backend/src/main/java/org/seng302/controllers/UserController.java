@@ -28,17 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * REST controller for user related calls.
@@ -67,7 +59,6 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            logger.info(user.getHomeAddress());
             String userJson = mapper.writeValueAsString(user);
             return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(userJson);
         }
@@ -122,13 +113,10 @@ public class UserController {
      */
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException {
-        
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
-            if (isValidUser(user)) {
+            List<String> registrationErrors = registrationUserCheck(user);
+            if (registrationErrors.size() == 0) { // No errors found.
                 User newUser = new User(user);
-                System.out.println(user.getHomeAddress());
-                System.out.println(user.getPassword());
-                System.out.println(newUser.getPassword());
                 userRepository.save(newUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
@@ -140,12 +128,47 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
             }
             else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                logger.error("Invalid registration.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errors with registration details: " + registrationErrors);
             }
         }
-        System.out.println("Bad email");
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        logger.error("Registration email address already in use.");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use.");
     }
+
+    /**
+     * This method checks whether all the mandatory fields of the new user are present.
+     * @param user The user to check the validity of
+     * @return list of errors with the new registration request - if there is any.
+     */
+    public List<String> registrationUserCheck(NewUserRequest user) {
+        List<String> errors = new ArrayList<>();
+
+        if (user.getFirstName() == null) {
+            errors.add("First Name");
+        }
+        if (user.getLastName() == null) {
+            errors.add("Last Name");
+        }
+        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            errors.add("Email");
+        }
+        if (user.getPassword() == null) {
+            errors.add("Password");
+        }
+        if (user.getDateOfBirth() == null) {
+            errors.add("Date of Birth");
+        }
+        if (user.getHomeAddress() == null) {
+            errors.add("Home Address");
+        }
+        else if (user.getHomeAddress().getCountry() == null) {
+            errors.add("Home Address - Country");
+        }
+
+        return errors;
+    }
+
 
     /**
      * This method retrieves user information by name.
@@ -157,15 +180,6 @@ public class UserController {
         System.out.println("search called");
         List<User> users = userFinder.queryByName(query);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
-    }
-
-    /**
-     * This method checks whether all the mandatory fields of the new user are present.
-     * @param user The user to check the validity of
-     * @return boolean If the users mandatory fields are present
-     */
-    public Boolean isValidUser(NewUserRequest user) {
-        return user.getFirstName() != null && user.getLastName() != null && user.getDateOfBirth() != null && user.getHomeAddress() != null && user.getEmail() != null;
     }
 
     // -- ADMIN REQUESTS
@@ -188,12 +202,17 @@ public class UserController {
     /**
      * Method to let a DGAA user revoke GAA admin status from another user. Reverts the user back to USER role.
      * @param id user id to revoke admin user role.
-     * @return status code. 200 if it works, 406 if bad id, 401 if missing session token, 403 if no authority (last two handled by spring sec).
+     * @return status code. 200 if it works, 409 if the DGAA is revoking their own role, 406 if bad id, 401 if missing session token, 403 if incorrect role (last two handled by spring sec).
      */
     @PutMapping("/users/{id}/revokeAdmin")
-    public ResponseEntity<String> revokeUserAdmin(@PathVariable Long id) {
+    public ResponseEntity<String> revokeUserAdmin(@PathVariable Long id, HttpSession session) {
         if (userRepository.findUserById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User self = (User) session.getAttribute("user");
+        if (self.getId() == id) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         userRepository.updateUserRole(id, Role.USER);

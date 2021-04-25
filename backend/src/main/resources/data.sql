@@ -45,15 +45,16 @@ INSERT INTO user (first_name, middle_name, last_name, nickname, email, bio, date
     ('Gris', 'Carlotta', 'Woodwin', 'zero administration', 'cwoodwina@samsung.com', 'Multi-tiered secondary pricing structure', '2005-04-15', '+1 260 493 4589', '5eVUsp6s3g', '2021-03-10T11:55:53Z', 'USER', 11),
     ('Guinevere', 'Kath', 'Grahamslaw', 'Phased', 'kgrahamslawb@wisc.edu', 'Optimized 6th generation capacity', '1990-08-18', '+235 527 784 2956', 'ME0feNfd', '2020-06-26T05:08:51Z', 'USER', 12),
     ('Ros', 'Maribel', 'Drable', 'Front-line', 'mdrablec@hc360.com', 'Reduced mobile ability', '1980-09-09', '+506 894 444 0931', 'VdP0lufryC', '2021-01-03T15:22:29Z', 'USER', 13),
-    ('Mellicent', null, 'Foucar', null, 'gfoucard@huffingtonpost.com', null, '1996-08-09', null, null, '2020-07-27T19:54:26Z', 'USER', 14),
+    ('Mellicent', null, 'Foucar', null, 'gfoucard@huffingtonpost.com', null, '1996-08-09', null, 'VdPaJk0luFryC', '2020-07-27T19:54:26Z', 'USER', 14),
     ('Chiarra', 'Dyanne', 'Phelip', 'context-sensitive', 'dphelipe@godaddy.com', 'Synergized scalable attitude', '2002-01-04', '+93 374 108 2586', 'fZ2KmBsEr0', '2020-04-26T06:23:01Z', 'USER', 15),
-    ('Mark', null, 'Snibson', null, 'bsnibsonf@eepurl.com', null, '1975-10-26', null, null, '2021-03-10T23:48:06Z', 'USER', 16),
+    ('Mark', null, 'Snibson', null, 'bsnibsonf@eepurl.com', null, '1975-10-26', null, 'VdP0aufrqyC', '2021-03-10T23:48:06Z', 'USER', 16),
     ('Lexis', 'Dorri', 'Garbert', 'Enhanced', 'dgarbertg@npr.org', 'Balanced multi-state intranet', '1993-08-18', '+63 192 437 4906', 'aC46V7uAs1ur', '2020-07-11T09:33:36Z', 'USER', 17),
     ('Giselbert', 'Gates', 'Sleney', 'client-server', 'gsleneyh@cbslocal.com', 'Diverse responsive info-mediaries', '1994-11-16', '+7 106 973 4702', 'snqO88', '2020-05-17T16:58:23Z', 'USER', 19),
     ('Adan', 'Rickey', 'McGilvra', 'Inverse', 'rmcgilvrai@opera.com', 'Public-key static archive', '2003-01-21', '+48 366 279 7985', 'qjMGWWf', '2020-12-17T02:16:35Z', 'USER', 19),
     ('Pamella', 'Maighdiln', 'Poupard', 'Persevering', 'mpoupardj@bluehost.com', 'Grass-roots asymmetric success', '1992-09-17', '+963 350 483 0624', 'Uq9LpBxyeQ', '2021-04-02T20:24:58Z', 'USER', 20);
 
-UPDATE user SET password = HASH('SHA256', password);
+/* Uncomment this line when the password encryption is re-added. */
+UPDATE USER SET password = HASH('SHA256', password);
 
 INSERT INTO business (name, description, created, user_id, business_type, address_id) VALUES
     /* 5 businesses */
@@ -65,6 +66,11 @@ INSERT INTO business (name, description, created, user_id, business_type, addres
 
 
 INSERT INTO business_admins (business_id, user_id) VALUES
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
     (3, 7),
     (5, 9),
     (4, 6),

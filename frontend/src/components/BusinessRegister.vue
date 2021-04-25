@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" v-if="this.user != null">
     <h3 class="card-header">Create a ReFood Business Account</h3>
       <form autocomplete="off">
           <vs-input id="business-name"
@@ -8,7 +8,6 @@
                     class="form-control"
                     label-placeholder="Business Name (Required)"
                     v-model="businessName"/>
-
           <vs-select
               width="90%"
               id="business-type"
@@ -49,7 +48,6 @@
         </div>
 
           <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
-
           <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
       </form>
   </div>
@@ -58,7 +56,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "../store"
+import {store} from "../store";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -84,7 +82,8 @@ const BusinessRegister = {
 
       suggestCountries: false,
       suggestedCountries: [],
-      minNumberOfCharacters: 3
+      minNumberOfCharacters: 3,
+      user: null
     };
   },
   methods:{
@@ -103,14 +102,21 @@ const BusinessRegister = {
         this.errors.push('country');
       }
 
+      if (!this.checkAge()){
+        this.errors.push('dob');
+      }
+
       if (!this.businessType) {
         this.errors.push('businessType');
       }
 
       if (this.errors.length >= 1) {
-        this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
+        if(this.errors.includes("dob") && this.errors.length == 1){
+          this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
+        } else {
+          this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
+        }
       }
-
     },
 
     /**
@@ -141,6 +147,18 @@ const BusinessRegister = {
           this.$log.debug("Error Status:", error)
         });
     }},
+
+    /**
+     * Returns the years since the user was born. No rounding is done in the function.
+     * @param enteredDate The user's birthdate
+     * @returns {boolean} Whether the user is old enough, 16, to register a business.
+     */
+    checkAge: function() {
+      let enteredDate = store.userDateOfBirth;
+      let years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
+      return (years >= 16);
+    },
+
 
     /**
      * Retrieve a list of suggested cities using the photon open api.
@@ -201,6 +219,23 @@ const BusinessRegister = {
         this.suggestCountries = false;
     },
 
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId)
+          .then((response) => {
+            if(store.loggedInUserId == null) {
+              this.user = response.data;
+            } else {
+              this.$router.push({path: "/login"});
+            }
+          }).catch((err) => {
+            throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
+
+    mounted: function () {
+      let userId = this.$route.params.id
+      this.user = this.getUserInfo(userId);
+    }
   },
 
 }
