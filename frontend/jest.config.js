@@ -18,6 +18,7 @@ module.exports = {
     coverageReporters: [
         "html",
         "text-summary",
+        "lcov"
     ],
-    testResultsProcessor: "jest-sonar-reporter"
+    testResultsProcessor: "jest-sonar-reporter",
 }
