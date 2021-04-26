@@ -17,6 +17,7 @@ module.exports = {
     ],
     coverageReporters: [
         "html",
-        "text-summary"
+        "text-summary",
     ],
+    testResultsProcessor: "jest-sonar-reporter"
 }
