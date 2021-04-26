@@ -2,6 +2,7 @@
   <div id="app" class="main" >
 
     <vs-navbar
+        class="vs-navbar"
         v-model="indexActive"
         type="fund"
         color="#1F74FF"
@@ -40,9 +41,9 @@
         </router-link>
       </vs-navbar-item>
 
-      <div class="userDetail" v-if="getLoggedInUser() != null">
-        <ActingAs/>
-      </div>
+<!--      <div class="userDetail" v-if="getLoggedInUser() != null">-->
+<!--        <ActingAs/>-->
+<!--      </div>-->
 
     </vs-navbar>
 
@@ -152,6 +153,9 @@ export default app;
   display: none;
 }
 
-
+.vs-navbar {
+  padding: 5px;
+  color: rgb(255,255,255);
+}
 
 </style>
