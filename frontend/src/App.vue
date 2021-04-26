@@ -41,9 +41,9 @@
         </router-link>
       </vs-navbar-item>
 
-<!--      <div class="userDetail" v-if="getLoggedInUser() != null">-->
-<!--        <ActingAs/>-->
-<!--      </div>-->
+      <div class="userDetail" v-if="getLoggedInUser() != null">
+        <ActingAs/>
+      </div>
 
     </vs-navbar>
 
