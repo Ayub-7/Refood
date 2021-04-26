@@ -1,5 +1,5 @@
 <template>
-    <div id="imageUpload">
+    <div>
         <label id='imageSelectBtn' for="fileUpload" class="btn">Upload Image</label>
         <input id="fileUpload" type="file" @change="uploadImage">
     </div>
@@ -48,11 +48,11 @@ export default ImageUpload
 </script>
 
 <style scoped>
-    #imageUpload {
+    /* #imageUpload {
         color: white;
         width: 400px;
         padding: 0.5em;
-    }
+    } */
 
     #fileUpload {
         visibility: hidden;
@@ -60,12 +60,10 @@ export default ImageUpload
 
     #imageSelectBtn {
         background: #3B5998;
+        color: white;
         padding: 0.8em;
         border-radius: 20px;
     }
 
-    #status {
-        color: green;
-    }
 
 </style>
