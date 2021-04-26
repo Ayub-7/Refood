@@ -31,7 +31,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/users/*").authenticated()
                 .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "/users/{id}/revokeAdmin").hasRole("DGAA")
-                .antMatchers("/businesses", "/businesses/*", "/businesses/*/*","/businesses/*/*/*" ,"/businesses/*/*/*/*").authenticated() // covers main business endpoints, admin, products.
+                .antMatchers(HttpMethod.OPTIONS, "/businesses", "/businesses/*", "/businesses/*/*","/businesses/*/*/*" ,"/businesses/*/*/*/*", "/businesses/*/*/*/*/*").permitAll()
+                .antMatchers(HttpMethod.POST, "/businesses", "/businesses/*", "/businesses/*/*","/businesses/*/*/*" ,"/businesses/*/*/*/*", "/businesses/*/*/*/*/*").authenticated()
+                .antMatchers(HttpMethod.GET, "/businesses", "/businesses/*", "/businesses/*/*","/businesses/*/*/*" ,"/businesses/*/*/*/*", "/businesses/*/*/*/*/*").authenticated()
+                .antMatchers(HttpMethod.PUT, "/businesses", "/businesses/*", "/businesses/*/*","/businesses/*/*/*" ,"/businesses/*/*/*/*", "/businesses/*/*/*/*/*").authenticated()
+                .antMatchers(HttpMethod.PUT, "/businesses", "/businesses/*", "/businesses/*/*","/businesses/*/*/*" ,"/businesses/*/*/*/*", "/businesses/*/*/*/*/*").authenticated() // covers main business endpoints, admin, products.
                 .anyRequest().permitAll()
 
                 .and()

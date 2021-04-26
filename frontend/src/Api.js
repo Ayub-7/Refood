@@ -115,7 +115,7 @@ export default {
      * @param businessId the unique id of the business.
      * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
      */
-    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`),
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`, {withCredentials: true}),
 
     /**
      * Put request to make a user a business administrator (not primary).
@@ -133,5 +133,13 @@ export default {
      */
     removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true}),
 
-    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true})
+    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
+
+
+    postProductImage: (businessId, productId, image) => instance.post(`businesses/${businessId}/products/${productId}/images`, image, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      withCredentials: true,
+    })
 }
