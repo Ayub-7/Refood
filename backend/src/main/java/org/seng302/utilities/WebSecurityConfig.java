@@ -15,8 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired private AuthEntryPoint authenticationEntryPoint;
-
     /**
      * Configuration of web security - sets the rules on what user can go where.
      * @param http security configurer.
@@ -27,7 +25,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
         http
                 .csrf().disable()
-                .httpBasic().authenticationEntryPoint(authenticationEntryPoint)
+                .httpBasic().authenticationEntryPoint(new AuthEntryPoint())
 
                 .and()
                 .authorizeRequests()
