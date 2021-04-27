@@ -136,6 +136,13 @@ export default {
     getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
 
 
+      /**
+     * Post request to send a product image
+     * @param businessId business identifier to remove rights to.
+     * @param productId product identifier, product that the image is for
+     * @param image FormData object containing image file to be sent to server
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
     postProductImage: (businessId, productId, image) => instance.post(`businesses/${businessId}/products/${productId}/images`, image, {
       headers: {
         'Content-Type': 'multipart/form-data'

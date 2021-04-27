@@ -1,7 +1,9 @@
 <template>
     <div>
-        <label id='imageSelectBtn' for="fileUpload" class="btn">Upload Image</label>
+        <!-- Using label for button since can't rename button text -->
+        <label ref="loadableButton" id='imageSelectBtn' for="fileUpload" class="btn">Upload Image</label>
         <input id="fileUpload" type="file" @change="uploadImage">
+
     </div>
 </template>
 
@@ -24,21 +26,26 @@ const ImageUpload = {
      * @param e Event object which contains file uploaded
      */
     uploadImage(e) {
+        
         //Get image file from event
         const image = e.target.files[0];
-
         //Setup FormData object to send in request
         const fd = new FormData();
         fd.append('filename', image, image.name);
 
+        this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
         api.postProductImage(this.businessId, this.productId, fd)
             .then(() => { //On success
-                this.$vs.notify({title:`Image was successfully uploaded`, color:'success'});
+                this.$vs.notify({title:`Image for ${this.productId} was uploaded`, color:'success'});
             }).catch((error) => { //On fail
                 if (error.response.status === 400) {
                     this.$vs.notify({title:`Image failed to upload`, color:'danger'});
                 }
-            })     
+            }).finally(() => {
+                this.$vs.loading.close();
+            })   
+        
+
     },
   },
 
@@ -48,11 +55,6 @@ export default ImageUpload
 </script>
 
 <style scoped>
-    /* #imageUpload {
-        color: white;
-        width: 400px;
-        padding: 0.5em;
-    } */
 
     #fileUpload {
         visibility: hidden;
@@ -63,6 +65,11 @@ export default ImageUpload
         color: white;
         padding: 0.8em;
         border-radius: 20px;
+        cursor: pointer; 
+    }
+
+    #imageSelectBtn:hover {
+        background: #30487c
     }
 
 

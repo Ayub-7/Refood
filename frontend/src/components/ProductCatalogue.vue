@@ -4,7 +4,6 @@
     <form class="main1">
       <div class="profile-text-inner">
         <!-- <h1 class="title text-center" style="font-size: 40px">{{this.business}} Products</h1> -->
-        <ImageUpload productId='WAUVT64B54N722288' businessId='1'/>
         <div style="margin: 50px;">
           <h2 class="title" style="margin-bottom: 20px">Sort By: </h2>
           <select v-model="selected">
@@ -62,6 +61,7 @@
           <td>{{ product.description }} </td>
           <td>{{ product.recommendedRetailPrice }} </td>
           <td>{{ product.created }} </td>
+          <td><ImageUpload productId=product.id businessId=this.business.id /></td>
         </tr>
 
         <!-- If search query returns more than 10 products then this should be active -->
