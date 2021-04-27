@@ -147,9 +147,6 @@ public class ProductController {
         } else if (product.getName() == null || product.getName() == "") {
             errorMessage = "Product name can not be empty";
             isValid = false;
-        } else if (product.getDescription() == null || product.getDescription() == "") {
-            errorMessage = "Product description can not be empty";
-            isValid = false;
         } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
             errorMessage = "Product recommended retail price must be at least 0";
             isValid = false;

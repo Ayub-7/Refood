@@ -5,6 +5,8 @@
       <div id="info-field">
         <div id="product-name">
           <vs-input
+              :danger="(errors.includes(productName))"
+              danger-text="Product name is required"
               class="form-control"
               type="text"
               label-placeholder="Product name (required)"
@@ -12,6 +14,8 @@
         </div>
         <div id="product-id">
           <vs-input
+              :danger="(errors.includes(productId))"
+              danger-text="Product id is required"
               class="form-control"
               type="text"
               label-placeholder="Product ID (required)"
@@ -34,6 +38,8 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
+              :danger="(errors.includes('rrp'))"
+              danger-text="RRP must be at least 0"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
               type="text"
@@ -68,7 +74,7 @@ const AddToCatalogue = {
       manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
-      rrp: null
+      rrp: ""
     };
   },
   methods: {
@@ -87,8 +93,18 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
+      if (this.rrp.length === 0 || this.rrp === null) {
+        this.errors.push('no-rrp');
+      } else if(this.rrp < 0){
+        this.errors.push('rrp');
+      }
+
       if (this.errors.length >= 1) {
-        this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
+        if(this.errors.includes(this.productName) || this.errors.includes(this.productId) || this.errors.includes('no-rrp')){
+          this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
+        } else if(this.errors.includes('rrp')){
+          this.$vs.notify({title:'Failed to create catalogue item', text:'RRP must be at least 0.', color:'danger'});
+        }
       }
     },
     /**

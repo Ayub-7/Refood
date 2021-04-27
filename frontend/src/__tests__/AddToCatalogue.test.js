@@ -60,7 +60,6 @@ describe('Component', () => {
 });
 
 
-
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Add To Catalogue form error checking', () => {
 
@@ -75,7 +74,7 @@ describe('Add To Catalogue form error checking', () => {
     test('Handles empty Register', () => {
         const addBtn = wrapper.find('.add-button');
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(2);
+        expect(wrapper.vm.errors.length).toBe(3);
     });
 
     test('Handles no product name', () => {
@@ -83,7 +82,7 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "Good product";
         wrapper.vm.manufacturer = "Bob tyres";
-        wrapper.vm.rrp = 22;
+        wrapper.vm.rrp = "22";
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
@@ -95,19 +94,43 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "";
         wrapper.vm.description = "Good product";
         wrapper.vm.manufacturer = "Bob tyres";
-        wrapper.vm.rrp = 22;
+        wrapper.vm.rrp = "22";
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
         expect(wrapper.vm.errors.length).toBe(1);
     });
 
-    test('Handles no description, manufacturer or rrp', () => {
+    test('Handles no rrp', () => {
+        wrapper.vm. productName = "Big Tyre";
+        wrapper.vm.productId = "BB";
+        wrapper.vm.description = "Good product";
+        wrapper.vm.manufacturer = "Bob tyres";
+        wrapper.vm.rrp = "";
+
+        const addBtn = wrapper.find('.add-button')
+        addBtn.trigger('click');
+        expect(wrapper.vm.errors.length).toBe(1);
+    });
+
+    test('Handles negative rrp', () => {
+        wrapper.vm. productName = "Big Tyre";
+        wrapper.vm.productId = "BB";
+        wrapper.vm.description = "Good product";
+        wrapper.vm.manufacturer = "Bob tyres";
+        wrapper.vm.rrp = "-2";
+
+        const addBtn = wrapper.find('.add-button')
+        addBtn.trigger('click');
+        expect(wrapper.vm.errors.length).toBe(1);
+    });
+
+    test('Handles no description, manufacturer', () => {
         wrapper.vm. productName = "Big Tyre";
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "";
         wrapper.vm.manufacturer = "";
-        wrapper.vm.rrp = null;
+        wrapper.vm.rrp = "2";
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
