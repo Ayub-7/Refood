@@ -1,22 +1,22 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AddToCatalogue from '../components/AddToCatalogue';
 import Vuesax from 'vuesax';
-//import VueRouter from 'vue-router'
-//import axios from "axios";
-import {CurrencyInput} from "../components/CurrencyInput";
 import {store} from "../store";
+
+//import {CurrencyInput} from "../components/CurrencyInput";
 //import api from "../Api";
 
 let wrapper;
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
-//localVue.use(VueRouter);
-// localVue.use(axios);
 
-let $vs = {
-    notify: jest.fn()
-}
+
+// let $vs = {
+//     notify: jest.fn()
+// }
+
+store.loggedInUserId = 5;
 
 //Mock user
 const mockUser = {
@@ -30,9 +30,6 @@ const mockUser = {
     "dateOfBirth": "1999-02-28",
     "phoneNumber": "+7 684 622 5902",
     "homeAddress": "44 Ramsey Court",
-    "created": "2021-04-05 00:11:04",
-    "role": "USER",
-    "businessesAdministered": []
 }
 
 // const mockProduct = {
@@ -44,10 +41,10 @@ const mockUser = {
 beforeEach(() => {
     wrapper = shallowMount(AddToCatalogue, {
         propsData: {},
-        mocks: {$vs, store},
+        mocks: {store},
         stubs: ['router-link', 'router-view'],
         methods: {},
-        components: CurrencyInput,
+        // components: CurrencyInput,
         localVue,
     });
 });
@@ -60,8 +57,9 @@ describe('Component', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
     });
-
 });
+
+
 
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Add To Catalogue form error checking', () => {
@@ -77,7 +75,7 @@ describe('Add To Catalogue form error checking', () => {
     test('Handles empty Register', () => {
         const addBtn = wrapper.find('.add-button');
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.errors.length).toBe(2);
     });
 
     test('Handles no product name', () => {
@@ -116,17 +114,4 @@ describe('Add To Catalogue form error checking', () => {
         expect(wrapper.vm.errors.length).toBe(0);
     });
 });
-
-// describe('Business Register user age checking', () => {
-//     beforeEach(() => {
-//         wrapper.vm.user = mockUser;
-//         wrapper.vm.store.userDateOfBirth = '2008-02-28';
-//     });
-//
-//     test('Handles to young user', () => {
-//         const registerBtn = wrapper.find('.register-button')
-//         registerBtn.trigger('click');
-//         expect(wrapper.vm.errors.includes('dob')).toBe(true);
-//     })
-// });
 
