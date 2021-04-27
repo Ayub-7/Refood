@@ -2,8 +2,9 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
 import {store} from "../store";
-let wrapper;
+import Vue from "vue";
 
+let wrapper;
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
@@ -28,12 +29,14 @@ const mockUser = {
     "businessesAdministered": []
 }
 
-
+const $router = {
+    push: jest.fn()
+}
 
 beforeEach(() => {
     wrapper = shallowMount(Business, {
         propsData: {},
-        mocks: {$vs, store},
+        mocks: {$vs, store, $router},
         stubs: [],
         methods: {},
         localVue,

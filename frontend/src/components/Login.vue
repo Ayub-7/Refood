@@ -58,7 +58,7 @@ const Login = {
         this.errors.hasErrors = true;
       }
       else if (!this.validEmail(this.email)) {
-        this.errors.email = "Email invalid.";
+        this.errors.email = "Invalid email.";
         this.errors.hasErrors = true;
       }
       if (this.password.length === 0) {

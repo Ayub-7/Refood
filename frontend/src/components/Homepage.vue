@@ -73,6 +73,10 @@ const Homepage = {
             }
 
           }).catch((err) => {
+            if (err.response.status === 401) {
+              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+              this.$router.push({name: 'LoginPage'});
+            }
             throw new Error(`Error trying to get user info from id: ${err}`)
           })
       },

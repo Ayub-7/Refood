@@ -89,7 +89,6 @@ const Business = {
         });
     },
 
-
   },
 
   mounted() {

@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Login from '../components/Login';
-import api from '../Api'
+import Vuesax from 'vuesax';
 
 let wrapper;
 let store;
@@ -10,6 +10,11 @@ let mutations;
 let state;
 const localVue = createLocalVue();
 localVue.use(Vuex);
+localVue.use(Vuesax);
+
+const $router = {
+    push: jest.fn()
+}
 
 beforeEach(() => {
     actions = {
@@ -28,7 +33,7 @@ beforeEach(() => {
     });
     wrapper = shallowMount(Login, {
         propsData: {},
-        mocks: {},
+        mocks: {$router},
         stubs: {},
         methods: {},
         store,
@@ -45,20 +50,26 @@ describe('Login error checking', () => {
     test('Handles empty login', () => {
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(2);
+        expect(wrapper.vm.errors.email).toBeTruthy();
+        expect(wrapper.vm.errors.password).toBeTruthy();
+        expect(wrapper.vm.errors.hasErrors).toBe(true);
     });
     
     test('Handles only email', () => {
         wrapper.vm.email = 'test@email.com';
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.errors.email).toBeFalsy();
+        expect(wrapper.vm.errors.password).toBeTruthy();
+        expect(wrapper.vm.errors.hasErrors).toBe(true);
     })
     test('Handles only password', () => {
         wrapper.vm.password = 'test';
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.errors.email).toBeTruthy();
+        expect(wrapper.vm.errors.password).toBeFalsy();
+        expect(wrapper.vm.errors.hasErrors).toBe(true);
     })
 
     test('Handles bad email', () => {
@@ -66,7 +77,9 @@ describe('Login error checking', () => {
         wrapper.vm.email = 'thisisnotaemail.com'
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.errors.email).toBeTruthy();
+        expect(wrapper.vm.errors.password).toBeFalsy();
+        expect(wrapper.vm.errors.hasErrors).toBe(true);
     })
   
 });
