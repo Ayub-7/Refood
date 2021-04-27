@@ -2,7 +2,7 @@
     <div>
         <!-- Using label for button since can't rename button text -->
         <label ref="loadableButton" id='imageSelectBtn' for="fileUpload" class="btn">Upload Image</label>
-        <input id="fileUpload" type="file" @change="uploadImage">
+        <input id="fileUpload" type="file" @change="uploadImage($event)">
 
     </div>
 </template>
@@ -25,7 +25,7 @@ const ImageUpload = {
      * Upload product image when image is uploaded on web page
      * @param e Event object which contains file uploaded
      */
-    uploadImage(e) {
+    uploadImage: function(e) {
         
         //Get image file from event
         const image = e.target.files[0];
