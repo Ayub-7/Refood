@@ -1,4 +1,4 @@
-package org.seng302.gradle.cucumber;
+package org.seng302.steps;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
