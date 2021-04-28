@@ -262,12 +262,11 @@ public class ProductController {
      */
     @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
     public ResponseEntity<String> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) {
-        String imageDir = System.getProperty("user.dir") + "/media/images/business_" + businessId + "/" + imageId;
+        String imageDir = System.getProperty("user.dir") + "/src/test/resources/media/images/business_" + businessId + "/" + imageId;
         String idString = "";
         Business business = businessRepository.findBusinessById(businessId);
-
-        System.out.println(business);
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
         if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -280,6 +279,7 @@ public class ProductController {
         extensions.add(".gif");
         for (String ext: extensions) {
             Path path = Paths.get(imageDir + ext);
+            System.out.println(path.toString());
             if (Files.exists(path)) {
                 idString = imageId + ext;
                 pathExists = true;
