@@ -134,7 +134,7 @@ export default {
      * @param businessId the unique id of the business.
      * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
      */
-    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`),
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`, {withCredentials: true}),
 
     /**
      * Put request to make a user a business administrator (not primary).
@@ -158,9 +158,26 @@ export default {
      * @param name product name
      * @param description product description
      * @param recommendedRetailPrice product recommended retail price in their local currency
-     */
+     */ 
     createProduct: async(businessId, id, name, description, recommendedRetailPrice) =>
         instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
 
-    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true})
+    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
+    
+    /**
+     * Post request to send a product image
+     * @param businessId business identifier to remove rights to.
+     * @param productId product identifier, product that the image is for
+     * @param image FormData object containing image file to be sent to server
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
+    postProductImage: (businessId, productId, image) => instance.post(`businesses/${businessId}/products/${productId}/images`, image, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      withCredentials: true,
+    })
+
+
+    
 }

@@ -3,6 +3,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <form class="main1">
       <div class="profile-text-inner">
+<<<<<<< HEAD
         <div style="display: flex; ">
           <h1 class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
 
@@ -11,12 +12,28 @@
               <p v-if="displaytype">Grid</p>
               <p v-if="!displaytype">List</p>
             </div>
+=======
+        <!-- <h1 class="title text-center" style="font-size: 40px">{{this.business}} Products</h1> -->
+        <div style="margin: 50px;">
+          <h2 class="title" style="margin-bottom: 20px">Sort By: </h2>
+          <select v-model="selected">
+            <option disabled value="">Please select one</option>
+            <option @click="sortByName($event, 'id', 0);">ID</option>
+            <option @click="sortByName($event, 'name', 1);">Product Name</option>
+            <option @click="sortByName($event, 'description', 2);" >Description</option>
+            <option @click="sortByName($event, 'recommendedRetailPrice', 3);" >Recommended Retail Price</option>
+            <option @click="sortByName($event, 'created', 4);" >Date Created</option>
+          </select>
+        </div>
+        </div>
+>>>>>>> U15-42_image_upload
 
             <label class="switch" >
               <input v-model="displaytype" type="checkbox" checked>
               <span class="slider round"></span>
             </label>
 
+<<<<<<< HEAD
           </div>
         </div>
         <div style="display: flex; ">
@@ -34,6 +51,56 @@
 
           <!-- If search query returns more than 10 products then this should be active -->
           <tfoot style="margin-right: 0; margin-left: auto">
+=======
+      <div>
+        <!-- Separate search within results search bar. Rather than calling the database, this filters the table
+        entries within the page by matching the search field to the product's firstname, middlename or lastname -->
+        <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
+
+        <table class="profile-text-inner" style="border-spacing: 0px 20px">
+        <tr>
+
+          <th>
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'id', 0);">
+              ID <i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'name', 1);">
+              Product Name <i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'description', 2);">
+              Description<i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'recommendedRetailPrice', 3)">
+              Recommended Retail Price<i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'created', 4)">
+              Date Created<i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+        </tr>
+
+        <tr v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
+            v-bind:href="product.id"
+            :key="product.id">
+          <td><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></td>
+          <td>{{ product.name }} </td>
+          <td>{{ product.description }} </td>
+          <td>{{ product.recommendedRetailPrice }} </td>
+          <td>{{ product.created }} </td>
+          <td><ImageUpload v-bind:productId=product.id v-bind:businessId=business.id /></td>
+        </tr>
+
+        <!-- If search query returns more than 10 products then this should be active -->
+        <tfoot v-if="filteredproducts.length > 10">
+>>>>>>> U15-42_image_upload
           <tr>
             <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
             <div  v-if="filteredproducts.length > 10">
@@ -143,9 +210,14 @@
 import api from "../Api";
 import {store} from "@/store";
 //import {store} from "../store"
+import ImageUpload from "./ImageUpload";
 
 const Search = {
   name: "Search",
+
+  components: {
+    ImageUpload
+  },
   data: function() {
     return {
       errors: [],
