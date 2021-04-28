@@ -40,7 +40,7 @@ const ImageUpload = {
             }).catch((error) => { //On fail
                 if (error.response.status === 400) {
                     this.$vs.notify({title:`Image failed to upload`, color:'danger'});
-                } else if (error.repsonse.status == 500) {
+                } else if (error.repsonse.status === 500) {
                     this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
                 }
             }).finally(() => {
