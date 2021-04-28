@@ -547,24 +547,6 @@ public class ProductControllerTest {
     }
 
     @Test
-    @WithMockUser(roles="USER")
-    public void tesSetProductImageNotProductOwner() throws Exception {
-
-    }
-
-    @Test
-    @WithMockUser(roles="DGAA")
-    public void testSetProductImageNotProductOwnerSuccess() throws Exception {
-
-    }
-
-    @Test
-    @WithMockUser(roles="USER")
-    public void testSetProductImageBadProductId() throws Exception {
-
-    }
-
-    @Test
     public void noAuthSetImage() throws Exception {
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), 1))
                 .andExpect(status().isUnauthorized());
@@ -574,7 +556,17 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(roles="USER")
     public void testSetProductImageSuccessful() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
 
+        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+
+//        User gaa = new User("test@tester.com", "password", Role.GAA);
+//        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
+//                .andExpect(status().isOk());
     }
 
 }
