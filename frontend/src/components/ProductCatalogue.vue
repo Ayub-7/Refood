@@ -61,7 +61,7 @@
           <td>{{ product.description }} </td>
           <td>{{ product.recommendedRetailPrice }} </td>
           <td>{{ product.created }} </td>
-          <td><ImageUpload productId=product.id businessId=this.business.id /></td>
+          <td><ImageUpload v-bind:productId=product.id v-bind:businessId=business.id /></td>
         </tr>
 
         <!-- If search query returns more than 10 products then this should be active -->
