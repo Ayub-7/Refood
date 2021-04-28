@@ -1,39 +1,29 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vuex from 'vuex';
 import Business from '../components/BusinessRegister';
-import api from '../Api'
-
+import Vuesax from 'vuesax';
+//import ActingAs from "@/components/ActingAs";
 let wrapper;
-let store;
-let actions;
-let mutations;
-let state;
+
 const localVue = createLocalVue();
-localVue.use(Vuex);
+localVue.use(Vuesax);
+
+let $vs = {
+    notify: jest.fn()
+}
+
+let store = {
+    userDateOfBirth: '1989-02-28'
+}
 
 beforeEach(() => {
-    actions = {
-        someAction: jest.fn()
-    };
-    mutations = {
-        someMutation: jest.fn()
-    };
-    state = {
-        key: {}
-    };
-    store = new Vuex.Store({
-        actions,
-        mutations,
-        state,
-    });
     wrapper = shallowMount(Business, {
         propsData: {},
-        mocks: {},
+        mocks: {$vs, store},
         stubs: {},
         methods: {},
-        store,
         localVue,
     });
+
 });
 
 afterEach(() => {
@@ -42,6 +32,12 @@ afterEach(() => {
 
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Business Register error checking', () => {
+    beforeEach(() => {
+        // const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
+        // checkAgeMethod.mockResolvedValue(true);
+        wrapper.vm.checkAge = jest.fn();
+    });
+
     test('Handles empty Register', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
@@ -59,6 +55,25 @@ describe('Business Register error checking', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors.length).toBe(2);
+    })
+
+    test('Handles old enough user', () => {
+        const registerBtn = wrapper.find('.register-button')
+        registerBtn.trigger('click');
+        expect(wrapper.vm.errors.length).toBe(3);
+    })
+});
+
+describe('Business Register user age checking', () => {
+    beforeEach(() => {
+        const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
+        checkAgeMethod.mockResolvedValue(false);
+    });
+
+    test('Handles to young user', () => {
+        const registerBtn = wrapper.find('.register-button')
+        registerBtn.trigger('click');
+        expect(wrapper.vm.errors.length).toBe(4);
     })
 });
 

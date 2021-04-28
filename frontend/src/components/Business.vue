@@ -57,7 +57,7 @@
 
 <script>
 import api from "../Api";
-
+//import {store} from "../store";
 const Business = {
   name: "Business",
 

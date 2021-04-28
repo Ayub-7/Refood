@@ -43,7 +43,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToMany(mappedBy = "administrators")
+    @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
     private List<Business> businessesAdministered;
 
 
@@ -72,7 +72,7 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.phoneNumber = phoneNumber;
         this.homeAddress = homeAddress;
-        this.password = password;
+        this.password = Encrypter.hashString(password);
         this.created = new Date();
         this.role = Role.USER;
     }
@@ -106,7 +106,7 @@ public class User {
         this.email = email;
         this.role = role;
         this.created = new Date();
-        this.password = password;
+        this.password = Encrypter.hashString(password);
     }
 
     /**
@@ -114,6 +114,7 @@ public class User {
      */
     public void newRegistration() throws NoSuchAlgorithmException {
         this.created = new Date();
+        this.password = Encrypter.hashString(this.password);
         this.role = Role.USER;
     }
 

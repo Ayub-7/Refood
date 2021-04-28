@@ -1,6 +1,7 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Users from '../Users';
-import Vuex from 'vuex';
+import {store} from '../../store';
+import Vuesax from 'vuesax';
 
 
 let wrapper;
@@ -61,29 +62,27 @@ const $route = {
     }
 };
 
+
 const localVue = createLocalVue();
-localVue.use(Vuex);
+localVue.use(Vuesax);
+
 
 beforeEach(() => {
-    const store = new Vuex.Store({
-        state: {
-            userId: mockUser.id,
-            userPrimaryBusinesses: mockBusinesses
-        },
-    });
+
 
     wrapper = shallowMount(Users, {
         localVue,
         propsData: {},
-        mocks: {$route},
+        mocks: {$route, store},
         stubs: ['router-link', 'router-view'],
         methods: {},
-        store
+        
     });
     wrapper.setData({user: mockUser})
+    wrapper.setData({userViewingBusinesses: ['test', 'test']})
     const getUserMethod = jest.spyOn(Users.methods, 'getUserInfo');
     getUserMethod.mockResolvedValue(mockUser);
-    //wrapper.setData({businesses: mockBusinesses})
+    wrapper.setData({businesses: mockBusinesses})
 
 
 });
@@ -108,6 +107,7 @@ describe('User profile page tests', () => {
         openModalMethod.mockImplementation(() => {
             wrapper.vm.showModal = true;
         });
+
 
         expect(wrapper.find('#option-add-to-business').exists()).toBe(true);
         wrapper.find('#option-add-to-business').trigger('click');

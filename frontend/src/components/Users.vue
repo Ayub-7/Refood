@@ -5,7 +5,7 @@
       <!-- Far left side options menu-->
       <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <div class="options-card" id="option-add-to-business" v-if="this.$store.state.userPrimaryBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
+        <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
       </div>
 
       <div id="name-container">
@@ -70,9 +70,9 @@
       </div>
 
       <div slot="body">
-          <select class="business-dropdown" v-model="selectedBusiness">
-            <option v-for="business in this.$store.state.userPrimaryBusinesses" :key="business.id" v-bind:business="business" v-bind:value="business">{{business.name}}</option>
-          </select>
+          <vs-select class="business-dropdown" v-model="selectedBusiness">
+            <vs-select-item v-for="business in userViewingBusinesses" :key="business.id" :text="business.name" :value="business"/>
+          </vs-select>
       </div>
 
       <div id="modal-footer" slot="footer">
@@ -93,6 +93,8 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
+import {mutations, store} from "../store";
+
 
 const Users = {
   name: "Profile",
@@ -101,7 +103,7 @@ const Users = {
     return {
       user: null,
       businesses: [],
-
+      userViewingBusinesses: [],
       showOptions: false,
 
       showModal: false,
@@ -168,16 +170,19 @@ const Users = {
     getUserInfo: function(userId) {
       api.getUserFromID(userId) //Get user data
           .then((response) => {
-            this.user = response.data;
-            this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-
-            if (response.data.id === this.$store.state.userId) {
-              this.$store.commit('setUserPrimaryBusinesses', this.businesses.filter(b => b.primaryAdministratorId === this.user.id));
+            if(store.userPrimaryBusinesses != null){
+              this.userViewingBusinesses = store.userPrimaryBusinesses;
             }
-
-            console.log(this.user);
+            if(store.loggedInUserId != null) {
+              this.user = response.data;
+              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
+            } else {
+              this.$router.push({path: "/login"}); //If user not logged in send to login page
+            }
+            mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+            mutations.setUserPrimaryBusinesses(this.businesses);
           }).catch((err) => {
-        throw new Error(`Error trying to get user info from id: ${err}`);
+            throw new Error(`Error trying to get user info from id: ${err}`);
       });
     },
 
@@ -413,21 +418,12 @@ main {
 
 /* Make User Admin Popup Box */
 .business-dropdown {
-  color: #FFFFFF;
   text-align: center;
   font-size: 14px;
   text-decoration: none;
 
   width: 100%;
   padding: 12px 16px;
-  border-radius: 5rem;
-  border: none;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-
-option {
-  color: black;
 }
 
 #modal-footer {

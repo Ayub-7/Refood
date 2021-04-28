@@ -6,7 +6,10 @@ build/
 !**/src/test/**
 dist/
 node_modules/
+.coverage/
 coverage/
+/coverage/
+/coverage.data
 
 ### STS ###
 .apt_generated
