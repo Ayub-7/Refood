@@ -2,7 +2,7 @@
     <div>
         <!-- Using label for button since can't rename button text -->
         <label ref="loadableButton" id='imageSelectBtn' for="fileUpload" class="btn">Upload Image</label>
-        <input id="fileUpload" type="file" onchange="uploadImage($event)">
+        <input id="fileUpload" type="file" @change="uploadImage($event)">
 
     </div>
 </template>
@@ -40,6 +40,8 @@ const ImageUpload = {
             }).catch((error) => { //On fail
                 if (error.response.status === 400) {
                     this.$vs.notify({title:`Image failed to upload`, color:'danger'});
+                } else if (error.repsonse.status == 500) {
+                    this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
                 }
             }).finally(() => {
                 this.$vs.loading.close();
