@@ -152,7 +152,7 @@ export default ModifyCatalog;
 <style scoped>
 
 /*
-Add button's styling
+Add button's stylingg
  */
 .add-button {
   cursor: pointer;
