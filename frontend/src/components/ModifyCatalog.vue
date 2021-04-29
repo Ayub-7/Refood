@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="this.user != null">
+  <div class="card">
     <h3 class="card-header">Modify Catalog Product</h3>
     <form>
       <div id="info-field">
@@ -44,7 +44,11 @@
       <button
           type="button"
           class="add-button"
-          @click="checkForm(); ModifyItem();">Modify Item To Catalog</button>
+          @click="checkForm(); ModifyItem();">Save Changes</button>
+      <button
+          type="button"
+          class="add-button"
+          @click="cancel();">Cancel</button>
     </form>
   </div>
 </template>
@@ -62,6 +66,7 @@ const ModifyCatalog = {
       user: null,
       errors: [],
       productName: "",
+      productId: "",
       description: "",
       currencySymbol: "",
       currencyCode: "",
@@ -103,10 +108,10 @@ const ModifyCatalog = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length === 0){
-        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productName, this.description, this.rrp)
+        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.rrp)
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
-              this.$router.push({name: 'ProductCatalogue'})
+              this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if(error.response){
             if(error.response.status === 400){
@@ -117,6 +122,10 @@ const ModifyCatalog = {
           this.$log.debug("Error Status:", error)
         });
       }
+    },
+
+    cancel: function(){
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
     },
 
     getUserInfo: function(userId) {
