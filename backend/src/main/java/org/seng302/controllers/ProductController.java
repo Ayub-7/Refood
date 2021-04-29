@@ -2,6 +2,7 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.exceptions.InvalidImageExtensionException;
@@ -226,11 +227,13 @@ public class ProductController {
         String imageName = "";
         boolean freeImage = false;
         int count = 0;
+
         while (!freeImage) {
             imageName = String.valueOf(count);
-            File checkFile = new File(businessDir + "/" + imageName + imageExtension);
-
-            if (checkFile.exists()) {
+            File checkFile1 = new File(businessDir + "/" + imageName + ".jpg");
+            File checkFile2 = new File(businessDir + "/" + imageName + ".png");
+            File checkFile3 = new File(businessDir + "/" + imageName + ".gif");
+            if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
                 count++;
             }
             else {
@@ -268,10 +271,12 @@ public class ProductController {
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
         boolean pathExists = false;
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
@@ -289,7 +294,6 @@ public class ProductController {
         if (!pathExists) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         product.setPrimaryImage(idString);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

@@ -526,14 +526,14 @@ public class ProductControllerTest {
         //wrong product id
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
-        mvc.perform(put("/businesses/{businessId}/products/1/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+        mvc.perform(put("/businesses/{businessId}/products/1/images/{imageId}/makeprimary", business.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
 
         //wrong business id
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
-        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+        mvc.perform(put("/businesses/900/products/{productId}/images/{imageId}/makeprimary", product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
 
@@ -563,10 +563,10 @@ public class ProductControllerTest {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
 
-//        User gaa = new User("test@tester.com", "password", Role.GAA);
-//        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
-//                .andExpect(status().isOk());
+        User gaa = new User("test@tester.com", "password", Role.GAA);
+        mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
+                .andExpect(status().isOk());
     }
 
 }
