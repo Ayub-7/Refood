@@ -34,7 +34,7 @@ import VueRouter from 'vue-router';
 import App from './App.vue';
 import VueLogger from 'vuejs-logger';
 import Vuesax from 'vuesax';
-
+import ModifyCatalog from "./components/ModifyCatalog"
 import Login from "./components/Login";
 import BusinessRegister from "./components/BusinessRegister";
 import Register from "./components/Register";
@@ -47,7 +47,8 @@ import ProductCatalogue from "@/components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
 
 import 'vuesax/dist/vuesax.css';
-import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
+import 'material-icons/iconfont/material-icons.css';
+//import ModifyCatalog from "@/components/ModifyCatalog"; // used with vuesax.
 
 
 Vue.config.productionTip = false;
@@ -76,6 +77,7 @@ const routes = [
   {name: 'UserPage', path: '/users/:id', component: Users},
   {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
   {path: '/search', component: Search},
+  {name: ModifyCatalog, path: '/modifyCatalog', component: ModifyCatalog},
   {path: '/ProductCatalogue', component: ProductCatalogue},
   {
     path: '/businesses/:id',

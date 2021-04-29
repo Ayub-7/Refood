@@ -161,6 +161,15 @@ export default {
      */ 
     createProduct: async(businessId, id, name, description, recommendedRetailPrice) =>
         instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
+    /**
+     * modifies catalog product
+     * @param id product id (chosen by user)
+     * @param name product name
+     * @param description product description
+     * @param recommendedRetailPrice product recommended retail price in their local currency
+     */
+    modifyProduct: async (businessId, id, name, description, recommendedRetailPrice) =>
+        instance.put(`/businesses/${businessId}/products/${id}`, {businessId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
 
     getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
     
