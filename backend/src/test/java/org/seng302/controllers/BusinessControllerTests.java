@@ -20,6 +20,7 @@ import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,7 +34,6 @@ import java.security.NoSuchAlgorithmException;
  */
 @WebMvcTest(controllers = BusinessController.class)
 @ContextConfiguration(classes = TestApplication.class)
-@RunWith(SpringRunner.class)
 public class BusinessControllerTests {
 
     @Autowired
