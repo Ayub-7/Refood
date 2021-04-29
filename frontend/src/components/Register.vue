@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h3 class="card-header">Create a ReFood Account</h3>
-    <form @submit="checkForm" novalidate="true">
+    <form>
       <div id="info-field">
         <div id="firstname">
           <vs-input :danger="(errors.includes(firstname))"
@@ -261,7 +261,7 @@
         //Use createUser function of API to POST user data to backend
         //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
         //https://www.npmjs.com/package/json-server
-        if(this.errors.length == 0){
+        if(this.errors.length === 0){
 
           const homeAddress = {
             streetNumber: this.streetNumber,
@@ -275,11 +275,9 @@
           api.createUser(this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, homeAddress, this.password)
                   .then((response) => {
                     this.$log.debug("New item created:", response.data);
-                    // window.location.replace("http://localhost:9500/Users?id=" + response.data.id);
                     mutations.setUserLoggedIn(response.data.userId, response.data.role); //Store user info into program state, used for later calls
                     //LOAD USER PAGE, USING ROUTER
                     this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
-                    //this.$router.push({path: `/users/${response.data.id}`});
                   }).catch((error) => {
             if(error.response){
               console.log(error.response.status);
@@ -429,7 +427,7 @@
    */
   form {
     grid-row: 2;
-    grid-column: 1;
+    grid-column: 1/3;
 
     margin: auto;
 
@@ -456,11 +454,11 @@
   Label styling.
    */
   .label-control {
+    grid-column: 1/3;
     font-family: 'Ubuntu', sans-serif;
     font-weight: 700;
     font-size: 14px;
-    padding-bottom: 0px;
-    padding-left: 185px;
+    margin: auto auto 0 auto;
   }
 
   .suggested-box {
@@ -552,13 +550,14 @@
     grid-column: 1/3;
     display: grid;
     margin: auto;
-    padding: 0px;
+    padding: 0;
     grid-template-columns: repeat(2, auto);
     grid-template-rows: repeat(3, auto);
   }
 
   #login-container {
     grid-column: 2;
+    text-align: center;
   }
 
   #login-container label {
@@ -612,29 +611,113 @@
       display: grid;
       grid-template-columns: 1fr;
       grid-template-rows: repeat(11, auto);
-      margin: 0 5em;
+      grid-row-gap: 0.5em;
+      margin: 0;
+    }
+    
+    #info-field {
+      margin: auto;
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(11, auto);
     }
 
-    .form-control {
+    #firstname {
       grid-column: 1;
-      grid-row: auto;
+      grid-row: 1;
+    }
+
+    #middlename {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    #lastname {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    #nickname {
+      grid-column: 1;
+      grid-row: 4;
     }
 
     #email {
       grid-column: 1;
+      grid-row: 5;
+    }
+
+    #phonenumber {
+      grid-column: 1;
+      grid-row: 6;
+    }
+
+    #password {
+      grid-column: 1;
+      grid-row: 7;
+    }
+
+    #confirm-password {
+      grid-column: 1;
+      grid-row: 8;
+    }
+
+    #date-of-birth {
+      grid-column: 1;
+      grid-row: 9;
     }
 
     #bio {
       grid-column: 1;
+      grid-row: 10;
+    }
+
+    #address-field {
+      margin: auto;
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(11, auto);
+    }
+
+    #street-number {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    #street-name {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    #city {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
+    #region {
+      grid-column: 1;
+      grid-row: 4;
+    }
+
+    #country {
+      grid-column: 1;
+      grid-row: 5;
+    }
+
+    #postcode {
+      grid-column: 1;
+      grid-row: 6;
     }
 
     .register-button {
       grid-column: 1;
+      margin: auto;
     }
 
     #login-container {
       grid-column: 1;
+      text-align: center;
     }
+
+
 
   }
 </style>
