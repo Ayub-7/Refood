@@ -133,5 +133,14 @@ export default {
      */
     removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true}),
 
-    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true})
+    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
+
+    /**
+     * Put request to set the primary image from the existing images for a product.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    setPrimaryImage: (businessId, productId, imageId) => instance.put(`businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, {withCredentials: true})
 }

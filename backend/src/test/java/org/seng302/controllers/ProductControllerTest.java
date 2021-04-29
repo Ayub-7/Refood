@@ -548,6 +548,7 @@ public class ProductControllerTest {
 
     @Test
     public void noAuthSetImage() throws Exception {
+        //no authentication
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), 1))
                 .andExpect(status().isUnauthorized());
     }
@@ -556,17 +557,17 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(roles="USER")
     public void testSetProductImageSuccessful() throws Exception {
+        // Business owner
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
-
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
 
+        // DGAA not owner of business
         User gaa = new User("test@tester.com", "password", Role.GAA);
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
                 .andExpect(status().isOk());
     }
-
 }
