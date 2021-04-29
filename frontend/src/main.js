@@ -77,8 +77,8 @@ const routes = [
   {name: 'UserPage', path: '/users/:id', component: Users},
   {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
   {path: '/search', component: Search},
-  {name: ModifyCatalog, path: '/modifyCatalog', component: ModifyCatalog},
-  {path: '/ProductCatalogue', component: ProductCatalogue},
+  {name: ModifyCatalog, path: '/businesses/:id/products/modify', component: ModifyCatalog},
+  {path: '/businesses/:id/products', component: ProductCatalogue},
   {
     path: '/businesses/:id',
     name: 'Business',

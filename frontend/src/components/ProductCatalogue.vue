@@ -125,7 +125,8 @@
                 <td>{{ product.created }} </td>
                 <td>
                   <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId />
-                  <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify">Modify product</button>
+                  <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" v-on:click="goToModify(product.id)">Modify product</button>
+                  {{product.id}}
                 </td>
               </tr>
 
@@ -234,7 +235,7 @@ const Search = {
 
     //modifies selected catalog item
     goToModify: function () {
-      this.$router.push({path: `/modifyCatalog`})
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/modify`})
     },
 
     /**

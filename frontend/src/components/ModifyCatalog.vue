@@ -100,7 +100,7 @@ const ModifyCatalog = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length === 0){
-        api.modifyProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.rrp)
+        api.modifyProduct(store.actingAsBusinessId, this.productId, this.productId, this.productName, this.description, this.rrp)
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
               this.$router.push({name: 'ProductCatalogue'})

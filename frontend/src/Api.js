@@ -168,8 +168,8 @@ export default {
      * @param description product description
      * @param recommendedRetailPrice product recommended retail price in their local currency
      */
-    modifyProduct: async (businessId, id, name, description, recommendedRetailPrice) =>
-        instance.put(`/businesses/${businessId}/products/${id}`, {businessId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
+    modifyProduct: async (businessId, productId, id, name, description, recommendedRetailPrice) =>
+        instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
 
     getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
     
