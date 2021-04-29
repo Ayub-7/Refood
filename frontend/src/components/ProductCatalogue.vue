@@ -62,7 +62,7 @@
                 </div>
                 <div class="action_btn">
                   <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
-                  <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify()">Modify product</button>
+                  <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
@@ -125,8 +125,7 @@
                 <td>{{ product.created }} </td>
                 <td>
                   <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId />
-                  <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" v-on:click="goToModify(product.id)">Modify product</button>
-                  {{product.id}}
+                  <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </td>
               </tr>
 
@@ -156,7 +155,6 @@ import api from "../Api";
 import {store} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
-
 const Search = {
   name: "Search",
 
@@ -233,6 +231,10 @@ const Search = {
       return store.actingAsBusinessName
     },
 
+    //sets the product to alter id
+    setProductToAlter(productId) {
+      store.setProductToAlter(productId);
+    },
     //modifies selected catalog item
     goToModify: function () {
       this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/modify`})

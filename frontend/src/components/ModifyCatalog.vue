@@ -12,6 +12,15 @@
               label-placeholder="Product name (required)"
               v-model="productName"/>
         </div>
+        <div id="product-id">
+          <vs-input
+              :danger="(errors.includes(productId))"
+              danger-text="Product id is required"
+              class="form-control"
+              type="text"
+              label-placeholder="Product ID (required)"
+              v-model="productId"/>
+        </div>
         <div id="description">
           <vs-textarea
               class="form-control"
@@ -45,7 +54,6 @@ import CurrencyInput from "../components/CurrencyInput";
 import api from "../Api";
 import axios from "axios";
 import {store} from "../store";
-
 const ModifyCatalog = {
   name: "ModifyCatalog",
   components: {CurrencyInput},
@@ -74,7 +82,7 @@ const ModifyCatalog = {
 
 
       if (this.rrp.length === 0 || this.rrp === null) {
-        this.errors.push('rrp');
+        this.errors.push('no-rrp');
       } else if(this.rrp < 0){
         this.errors.push('rrp');
       }
@@ -87,20 +95,15 @@ const ModifyCatalog = {
         }
       }
     },
-    /**
-     * finds the product id of the item getting modified
-     */
-    FindProductId: function () {
 
-    },
     /**
-     * Creates a put request when user submits form, using the modifyproduct function from Api.js
+     * Creates a put request when user submits form, using the modifyProduct function from Api.js
      */
     ModifyItem: function() {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length === 0){
-        api.modifyProduct(store.actingAsBusinessId, this.productId, this.productId, this.productName, this.description, this.rrp)
+        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productName, this.description, this.rrp)
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
               this.$router.push({name: 'ProductCatalogue'})
