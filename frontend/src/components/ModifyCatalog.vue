@@ -74,7 +74,7 @@ const ModifyCatalog = {
 
 
       if (this.rrp.length === 0 || this.rrp === null) {
-        this.errors.push('rrp');
+        this.errors.push('no-rrp');
       } else if(this.rrp < 0){
         this.errors.push('rrp');
       }
@@ -87,14 +87,9 @@ const ModifyCatalog = {
         }
       }
     },
-    /**
-     * finds the product id of the item getting modified
-     */
-    FindProductId: function () {
 
-    },
     /**
-     * Creates a put request when user submits form, using the modifyproduct function from Api.js
+     * Creates a put request when user submits form, using the modifyProduct function from Api.js
      */
     ModifyItem: function() {
       //Use creatItem function of API to POST user data to backend
