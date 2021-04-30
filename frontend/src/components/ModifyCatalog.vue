@@ -1,0 +1,313 @@
+<template>
+  <div class="card">
+    <h3 class="card-header">Modify Catalog Product</h3>
+    <form>
+      <div id="info-field">
+        <div id="product-name">
+          <vs-input
+              :danger="(errors.includes(productName))"
+              danger-text="Product name is required"
+              class="form-control"
+              type="text"
+              label-placeholder="Product name (required)"
+              v-model="productName"/>
+        </div>
+        <div id="product-id">
+          <vs-input
+              :danger="(errors.includes(productId))"
+              danger-text="Product id is required"
+              class="form-control"
+              type="text"
+              label-placeholder="Product ID (required)"
+              v-model="productId"/>
+        </div>
+        <div id="description">
+          <vs-textarea
+              class="form-control"
+              type="text"
+              label="Description"
+              v-model="description"/>
+        </div>
+        <div id="rrp">
+          <div id="currencySymbol">{{this.currencySymbol}}</div>
+          <vs-input
+              :danger="(errors.includes('rrp'))"
+              danger-text="RRP must be at least 0"
+              id="currencyInput"
+              label-placeholder="Recommended Retail Price"
+              type="text"
+              v-model="rrp"/>
+          <div id="currencyCode">{{this.currencyCode}}</div>
+        </div>
+
+      </div>
+      <button
+          type="button"
+          class="add-button"
+          @click="checkForm(); ModifyItem();">Save Changes</button>
+      <button
+          type="button"
+          class="add-button"
+          @click="cancel();">Cancel</button>
+    </form>
+  </div>
+</template>
+
+<script>
+import CurrencyInput from "../components/CurrencyInput";
+import api from "../Api";
+import axios from "axios";
+import {store} from "../store";
+const ModifyCatalog = {
+  name: "ModifyCatalog",
+  components: {CurrencyInput},
+  data: function () {
+    return {
+      user: null,
+      errors: [],
+      productName: "",
+      productId: "",
+      description: "",
+      currencySymbol: "",
+      currencyCode: "",
+      rrp: ""
+    };
+  },
+  methods: {
+    /**
+     * The function checks the inputs of the registration form to ensure they are in the right format.
+     * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
+     * is in the wrong format.
+     */
+    checkForm: function() {
+      this.errors = [];
+      if (this.productName.length === 0) {
+        this.errors.push(this.productName);
+      }
+
+
+      if (this.rrp.length === 0 || this.rrp === null) {
+        this.errors.push('no-rrp');
+      } else if(this.rrp < 0){
+        this.errors.push('rrp');
+      }
+
+      if (this.errors.length >= 1) {
+        if(this.errors.includes(this.productName) || this.errors.includes('no-rrp')){
+          this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
+        } else if(this.errors.includes('rrp')){
+          this.$vs.notify({title:'Failed to create catalogue item', text:'RRP must be at least 0.', color:'danger'});
+        }
+      }
+    },
+
+    /**
+     * Creates a put request when user submits form, using the modifyProduct function from Api.js
+     */
+    ModifyItem: function() {
+      //Use creatItem function of API to POST user data to backend
+      //https://www.npmjs.com/package/json-server
+      if(this.errors.length === 0){
+        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.rrp)
+            .then((response) => {
+              this.$log.debug("catalogue item modified:", response.data);
+              this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
+            }).catch((error) => {
+          if(error.response){
+            if(error.response.status === 400){
+              this.$vs.notify({title:'Failed to modify catalogue item', text:'Product ID is already in use', color:'danger'});
+            }
+            console.log(error.response.status);
+          }
+          this.$log.debug("Error Status:", error)
+        });
+      }
+    },
+
+    cancel: function(){
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
+    },
+
+    getUserInfo: function(userId) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
+          throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
+    },
+
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then( response => {
+            this.currencySymbol = response.data[0].currencies[0].symbol;
+            this.currencyCode = response.data[0].currencies[0].code;
+          }).catch( err => {
+        console.log("Error with getting cities from REST Countries." + err);
+      });
+    },
+
+
+
+  },
+
+  mounted: function () {
+    let userId = store.loggedInUserId;
+    this.getUserInfo(userId);
+  },
+}
+
+export default ModifyCatalog;
+
+</script>
+
+<style scoped>
+
+/*
+Add button's styling
+ */
+.add-button {
+  cursor: pointer;
+  border-radius: 5em;
+  color: #fff;
+  background: #3B5998;
+  border: 0;
+  z-index: 1000;
+  padding: 10px 40px;
+  margin: 2em;
+  font-size: 13px;
+  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+}
+
+/**
+Card styling.
+*/
+.card {
+  font-family: 'Ubuntu', sans-serif;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-row-gap: 1em;
+
+  max-width: 650px;
+  background-color: white;
+  margin: 1em auto;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+/**
+Card header styling.
+*/
+.card-header {
+  grid-row: 1;
+  grid-column: 1;
+
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  color: #3B5998;
+
+  margin: 0;
+  padding: 0.5em 0;
+}
+
+/**
+Form styling
+*/
+form {
+  grid-row: 2;
+  grid-column: 1;
+
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: repeat(2, auto);
+}
+
+label, input {
+  display: block;
+}
+
+/**
+Styling for form elements.
+*/
+.form-control {
+  font-family: 'Ubuntu', sans-serif;
+  padding: 3px 10px;
+  margin: 0.5em;
+}
+
+#info-field {
+  grid-column: 1/3;
+  display: grid;
+  margin: auto;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: repeat(5, auto);
+}
+
+#product-name {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#product-id {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#manufacturer {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#description {
+  grid-column: 1;
+  grid-row: 2;
+  width: 180px;
+  position: relative;
+  left: 10px;
+}
+
+#rrp {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  top: 58px;
+  left: 10px;
+  display: inline-grid;
+}
+
+#currencySymbol {
+  grid-row: 1;
+  grid-column: 1;
+  position: relative;
+  top: 24px;
+  font-size: 15px;
+}
+
+#currencyInput {
+  grid-row: 1;
+  grid-column: 2;
+  width: 50%;
+}
+
+#currencyCode {
+  grid-row: 1;
+  grid-column: 3;
+  position: relative;
+  top: 24px;
+  font-size: 15px;
+}
+
+
+</style>

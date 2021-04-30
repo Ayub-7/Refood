@@ -60,10 +60,13 @@
                   <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
-                <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
+                <div class="action_btn">
+                  <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
+                  <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
+                </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #9C27B0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{ product.recommendedRetailPrice }} </p>
+                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{ product.recommendedRetailPrice }} </p>
               </div>
             </div>
           </div>
@@ -122,6 +125,7 @@
                 <td>{{ product.created }} </td>
                 <td>
                   <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId />
+                  <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </td>
               </tr>
 
@@ -148,10 +152,9 @@
 
 <script>
 import api from "../Api";
-import {store} from "@/store";
+import {store, mutations} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
-
 const Search = {
   name: "Search",
 
@@ -226,6 +229,15 @@ const Search = {
 
     getBusinessName: function () {
       return store.actingAsBusinessName
+    },
+
+    //sets the product to alter id
+    setProductToAlter(productId) {
+      mutations.setProductToAlter(productId);
+    },
+    //modifies selected catalog item
+    goToModify: function () {
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/modify`})
     },
 
     /**
@@ -424,6 +436,17 @@ export default Search;
   margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+}
+#modify {
+  background: #3B5998;
+  color: white;
+  padding: 0.8em;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+#modify:hover {
+  background: #30487c
 }
 
 .prevNextSearchButton {
