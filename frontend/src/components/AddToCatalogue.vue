@@ -38,8 +38,8 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('rrp'))"
-              danger-text="RRP must be at least 0"
+              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
+              danger-text="RRP is required and must be at least 0"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
               type="text"
@@ -100,10 +100,10 @@ const AddToCatalogue = {
       }
 
       if (this.errors.length >= 1) {
-        if(this.errors.includes(this.productName) || this.errors.includes(this.productId) || this.errors.includes('no-rrp')){
+        if(this.errors.includes(this.productName) || this.errors.includes(this.productId)){
           this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
-        } else if(this.errors.includes('rrp')){
-          this.$vs.notify({title:'Failed to create catalogue item', text:'RRP must be at least 0.', color:'danger'});
+        }if(this.errors.includes('rrp') || this.errors.includes('no-rrp')){
+          this.$vs.notify({title:'Failed to create catalogue item', text:'RRP is required and must be at least 0.', color:'danger'});
         }
       }
     },
@@ -117,7 +117,7 @@ const AddToCatalogue = {
         api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.rrp)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
-              this.$router.push({name: 'ProductCatalogue'})
+              this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if(error.response){
             if(error.response.status == 400){

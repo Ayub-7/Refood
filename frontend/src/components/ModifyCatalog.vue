@@ -31,8 +31,8 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('rrp'))"
-              danger-text="RRP must be at least 0"
+              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
+              danger-text="RRP is required and must be at least 0"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
               type="text"
@@ -85,18 +85,21 @@ const ModifyCatalog = {
         this.errors.push(this.productName);
       }
 
+      if (this.productId.length === 0) {
+        this.errors.push(this.productId);
+      }
 
-      if (this.rrp.length === 0 || this.rrp === null) {
+      if (this.rrp.length === 0) {
         this.errors.push('no-rrp');
       } else if(this.rrp < 0){
         this.errors.push('rrp');
       }
 
       if (this.errors.length >= 1) {
-        if(this.errors.includes(this.productName) || this.errors.includes('no-rrp')){
-          this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
-        } else if(this.errors.includes('rrp')){
-          this.$vs.notify({title:'Failed to create catalogue item', text:'RRP must be at least 0.', color:'danger'});
+        if(this.errors.includes(this.productName) || this.errors.includes(this.productId)){
+          this.$vs.notify({title:'Failed to modify catalogue item', text:'Required fields are missing.', color:'danger'});
+        } if(this.errors.includes('rrp') || this.errors.includes('no-rrp')){
+          this.$vs.notify({title:'Failed to modify catalogue item', text:'RRP is required and must be at least 0.', color:'danger'});
         }
       }
     },
