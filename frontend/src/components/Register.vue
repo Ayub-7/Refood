@@ -276,8 +276,14 @@
                   .then((response) => {
                     this.$log.debug("New item created:", response.data);
                     mutations.setUserLoggedIn(response.data.userId, response.data.role); //Store user info into program state, used for later calls
-                    //LOAD USER PAGE, USING ROUTER
-                    this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
+                    api.login(this.email, this.password)
+                        .then((response) => {
+                          mutations.setUserLoggedIn(response.data.userId, response.data.role);
+                          //LOAD USER PAGE, USING ROUTER
+                          this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
+                        }).catch((error) => {
+                        this.$log.debug("Error logging in from registration: " + error);
+                    });
                   }).catch((error) => {
             if(error.response){
               console.log(error.response.status);
