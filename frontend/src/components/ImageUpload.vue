@@ -45,6 +45,7 @@ const ImageUpload = {
                 }
             }).finally(() => {
                 this.$vs.loading.close();
+                document.getElementById("fileUpload").value = null; //reset file path value since images would stay in input (meaning you couldn't upload same image twice)
             })   
         
 
