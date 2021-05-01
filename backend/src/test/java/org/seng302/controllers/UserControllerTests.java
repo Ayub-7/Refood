@@ -66,7 +66,6 @@ public class UserControllerTests {
         NewUserRequest newUserRequest = new NewUserRequest("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
                 "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-
         mockMvc.perform(post("/users")
                         .contentType("application/json")
                         .content(mapper.writeValueAsString(newUserRequest)))

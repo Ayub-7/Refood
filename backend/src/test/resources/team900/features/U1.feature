@@ -1,6 +1,6 @@
 Feature: U1 Registering and logging into an individual account
   Scenario: Successful login
-    Given Registered user attempts to login
+    Given User attempts to login
     When They enter with email "johnsmith@yahoo.com" and password "Potato1!"
     Then They are redirected to their profile
 
