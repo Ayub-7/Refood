@@ -168,23 +168,21 @@ const Users = {
      * @param userId ID of user that is currently being viewed
      */
     getUserInfo: function(userId) {
-      if(store.loggedInUserId != null) {
-        api.getUserFromID(userId) //Get user data
-            .then((response) => {
-              if(store.userPrimaryBusinesses != null){
-                this.userViewingBusinesses = store.userPrimaryBusinesses;
-              }
-              this.user = response.data;
-              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
+      api.getUserFromID(userId) //Get user data
+        .then((response) => {
+          if(store.userPrimaryBusinesses != null){
+            this.userViewingBusinesses = store.userPrimaryBusinesses;
+          }
+          this.user = response.data;
+          this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
 
-              mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-              mutations.setUserPrimaryBusinesses(this.businesses);
-            }).catch((err) => {
-              throw new Error(`Error trying to get user info from id: ${err}`);
-        });
-      } else {
-        this.$router.push({path: "/login"}); //If user not logged in send to login page
-      }
+          mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+          mutations.setUserPrimaryBusinesses(this.businesses);
+        }).catch((err) => {
+          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+          this.$router.push({path: "/login"}); //If user not logged in send to login page
+          throw new Error(`Error trying to get user info from id: ${err}`);
+      });
     },
 
     /**
@@ -200,7 +198,7 @@ const Users = {
   mounted: function () {
   //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
-    this.user = this.getUserInfo(userId);
+    this.getUserInfo(userId);
   },
 
 }

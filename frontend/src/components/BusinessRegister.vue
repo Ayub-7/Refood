@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="this.user != null">
+  <div class="card">
     <h3 class="card-header">Create a ReFood Business Account</h3>
       <form autocomplete="off">
           <vs-input id="business-name"
@@ -228,15 +228,25 @@ const BusinessRegister = {
               this.$router.push({path: "/login"});
             }
           }).catch((err) => {
-            throw new Error(`Error trying to get user info from id: ${err}`);
+            if (err.response.status === 401) {
+              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+              this.$router.push({name: 'LoginPage'});
+            }
+            throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
       });
     },
 
-    mounted: function () {
-      let userId = this.$route.params.id
-      this.user = this.getUserInfo(userId);
-    }
+    checkLoggedIn: function() {
+      if (store.loggedInUserId == null) {
+        this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+        this.$router.push({name: 'LoginPage'});
+      }
+    },
   },
+
+  mounted: function () {
+    this.checkLoggedIn();
+  }
 
 }
 export default BusinessRegister;
