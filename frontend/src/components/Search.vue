@@ -1,21 +1,16 @@
 <template>
   <div class="main" id="body">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-      <div class="profile-text-inner">
-        <h3 class="title text-center">Search for users</h3>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <input type="search" class="form-control" placeholder="Search" name="searchbar" v-model="searchbar">
-          </div>
-          <div class="form-group col-md-6">
-            <button type="button" class="searchButton" @click="searchUsers();">Search!</button>
-          </div>
-        </div>
-      </div>
+  <div id="search">
+    
+    <input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar">
+    <vs-button type="border" @click="searchUsers">Search</vs-button>
+  </div>
+
 
   <div v-if="users.length" id="userTable">
     <vs-table :data="users" pagination max-items="10">
-      <template slot="thead">
+      <template slot="thead" id="tableHeader">
+
         <vs-th sort-key="id">
           ID
         </vs-th>
@@ -36,40 +31,40 @@
         </vs-th>
         <vs-th>
         </vs-th>
+
+        <vs-th v-if="isDGAA">Is Admin</vs-th>
+        <vs-th class="dgaaCheckbox" v-if="isDGAA">Toggle Admin</vs-th>
+
+
+
       </template>
 
       <template slot-scope="{data}">
         <vs-tr :key="indextr" v-for="(tr, indextr) in data" @click="test()">
 
-          <vs-td :data="data[indextr].id">
-            {{data[indextr].id}}
+          <vs-td :data="data[indextr].id"> {{data[indextr].id}} </vs-td>
 
-          </vs-td>
+          <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
 
-          <vs-td :data="data[indextr].firstName">
-            {{data[indextr].firstName}}
-          </vs-td>
+          <vs-td :data="data[indextr].firstName">{{data[indextr].lastName}}</vs-td>
 
+          <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
 
-          <vs-td :data="data[indextr].firstName">
-            {{data[indextr].lastName}}
-          </vs-td>
+          <vs-td :data="data[indextr].country">{{`${data[indextr].country}`}}</vs-td>
 
-          <vs-td :data="data[indextr].city">
-            {{`${data[indextr].city}`}}
-          </vs-td>
-
-          <vs-td :data="data[indextr].country">
-            {{`${data[indextr].country}`}}
-          </vs-td>
-
-          <vs-td :data="data[indextr].email">
-            {{data[indextr].email}}
-          </vs-td>
+          <vs-td :data="data[indextr].email">{{data[indextr].email}}</vs-td>
 
           <vs-td>
             <div id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</div>
           </vs-td>
+
+          <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
+
+          <vs-td v-if="isDGAA" class="dgaaCheckbox">
+            <input type="checkbox" @click="toggleAdmin(data[indextr])">
+          </vs-td>
+
+
         </vs-tr>
       </template>
     </vs-table>
@@ -121,10 +116,6 @@ const Search = {
   methods: {
     getUserRole: function () {
       return store.role;
-    },
-
-    test: function() {
-      console.log("hello")
     },
 
     goToProfile(userId) {
@@ -190,6 +181,20 @@ export default Search;
 
 <style scoped>
 
+#search {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  height: 10em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+#search input {
+  font-size: 30px;
+}
+
 #goToProfileButton {
   background:#3B5998;
   text-align: center;
@@ -204,7 +209,11 @@ export default Search;
   font-weight: bold;
   margin: auto;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  border-radius: 20px;
+  border-radius: 1.5em;
+  border-style: solid;
+  border-color: white;
+  padding: 1em;
+  
 }
 
 tr {
@@ -233,21 +242,6 @@ th {
   top: 1px;
 }
 
-.searchButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #3B5998;
-  border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
 
 .prevNextSearchButton {
   cursor: pointer;
