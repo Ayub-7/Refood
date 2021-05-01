@@ -1,7 +1,6 @@
 <template>
   <div class="main" id="body">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="main1">
       <div class="profile-text-inner">
         <h3 class="title text-center">Search for users</h3>
         <div class="form-row">
@@ -9,92 +8,72 @@
             <input type="search" class="form-control" placeholder="Search" name="searchbar" v-model="searchbar">
           </div>
           <div class="form-group col-md-6">
-            <button type="button" class="searchButton" @click="searchUsers(); filterUsers()">Search!</button>
+            <button type="button" class="searchButton" @click="searchUsers();">Search!</button>
           </div>
         </div>
       </div>
 
+  <div v-if="users.length" id="userTable">
+    <vs-table :data="users" pagination max-items="10">
+      <template slot="thead">
+        <vs-th sort-key="id">
+          ID
+        </vs-th>
+        <vs-th sort-key="firstName">
+          First name
+        </vs-th>
+        <vs-th sort-key="lastName">
+          Last name
+        </vs-th>
+        <vs-th sort-key="city">
+          City
+        </vs-th>
+        <vs-th sort-key="country">
+          Country
+        </vs-th>
+        <vs-th sort-key="email">
+          Email
+        </vs-th>
+        <vs-th>
+        </vs-th>
+      </template>
 
-      <div v-if="(this.searchbar.length > 0) && (this.enableTable)">
-        <!-- Separate search within results search bar. Rather than calling the database, this filters the table
-        entries within the page by matching the search field to the user's firstname, middlename or lastname -->
-        <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
+      <template slot-scope="{data}">
+        <vs-tr :key="indextr" v-for="(tr, indextr) in data" @click="test()">
 
-        <table class="profile-text-inner" style="border-spacing: 0px 50px">
-        <tr>
+          <vs-td :data="data[indextr].id">
+            {{data[indextr].id}}
 
-          <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'id', 0);">
-              ID <i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
-          <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'firstName', 0);">
-              Firstname<i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
-          <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'middleName', 1);">
-              Middlename<i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
-          <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'lastName', 2)">
-              Lastname<i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
-          <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'homeAddress', 3)">
-              Address<i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
-          <th>
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'email', 4)">
-              Email<i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
+          </vs-td>
 
-          <th  v-if="isDGAA">
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 5)">
-              Is Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
+          <vs-td :data="data[indextr].firstName">
+            {{data[indextr].firstName}}
+          </vs-td>
 
-          <th  v-if="isDGAA">
-            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 6)">
-              Toggle Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
-            </button>
-          </th>
 
-        </tr>
+          <vs-td :data="data[indextr].firstName">
+            {{data[indextr].lastName}}
+          </vs-td>
 
-        <tr v-for="user in filteredUsers.slice(userSearchIndexMin, userSearchIndexMax)"
-            v-bind:href="user.id"
-            :key="user.id">
-          <td><a v-bind:href="'/Users?id='+ user.id">{{ user.id }}</a></td>
-          <td>{{ user.firstName }} </td>
-          <td> {{ user.middleName }} </td>
-          <td> {{ user.lastName }} </td>
-          <td> {{ user.homeAddress}}</td>
-          <td>{{ user.email }}</td>
-          <td v-if="isDGAA" >{{ user.role }}</td>
-          <td v-if="isDGAA">
-            <input type="checkbox" @click="toggleAdmin(user)">
-          </td>
-        </tr>
+          <vs-td :data="data[indextr].city">
+            {{`${data[indextr].city}`}}
+          </vs-td>
 
-        <!-- If search query returns more than 10 users then this should be active -->
-        <tfoot v-if="filteredUsers.length > 10">
-          <tr>
-            <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredUsers.length}}</td>
-            <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
-            <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
-          </tr>
-        </tfoot>
-      </table>
-      </div>
+          <vs-td :data="data[indextr].country">
+            {{`${data[indextr].country}`}}
+          </vs-td>
 
-    </form>
+          <vs-td :data="data[indextr].email">
+            {{data[indextr].email}}
+          </vs-td>
+
+          <vs-td>
+            <div id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</div>
+          </vs-td>
+        </vs-tr>
+      </template>
+    </vs-table>
+  </div>
 
   </div>
 </template>
@@ -107,6 +86,7 @@ const Search = {
   name: "Search",
   data: function() {
     return {
+      selected: [],
       errors: [],
       toggle: [1,1,1,1,1,1,1,1],
       searchbar: "",
@@ -143,13 +123,18 @@ const Search = {
       return store.role;
     },
 
+    test: function() {
+      console.log("hello")
+    },
+
+    goToProfile(userId) {
+      this.$router.push({path: `/users/${userId}`})
+    },
     /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
      */
     searchUsers: function () {
-      this.userSearchIndexMin = 0;
-      this.userSearchIndexMax = 10;
       if (this.searchbar.length > 0) {
         this.enableTable = true;
         this.resultTrack = this.searchbar;
@@ -157,10 +142,19 @@ const Search = {
         api
             .searchQuery(this.searchbar)
             .then((response) => {
-              console.log(response.data);
+              console.log(response)
               this.$log.debug("Data loaded: ", response.data);
               this.users = response.data;
-              this.filteredUsers = response.data;
+              this.users = this.users.filter(x => typeof(x) == "object")
+
+              //Need to set properties of user object so they can be sorted by
+              for(let user of this.users) {
+                user.country = user.homeAddress.country;
+                user.city = user.homeAddress.city; 
+              }
+
+              console.log(this.users)
+              //this.filteredUsers = response.data;
             })
             .catch((error) => {
               this.$log.debug(error);
@@ -188,126 +182,39 @@ const Search = {
         currentUser.role = 'USER'
       }
     },
-
-    /**
-     * Filters the displayed users alphabetically by
-     * @param JSONField is the name of the field to sort by (as string)
-     * @param index references the toggle state list in the data object (int)
-     */
-    sortByName: function (event, JSONField, index) {
-      //toggles the classlist (arrow up or down) in the child DOM element: <i/>
-      if(event.target.firstElementChild) {
-        event.target.firstElementChild.classList.toggle('fa-angle-double-down');
-        event.target.firstElementChild.classList.toggle('fa-angle-double-up');
-      }
-
-      if (this.filteredUsers) {
-        this.filteredUsers.sort(function(a, b) {
-          var aField = a[JSONField];
-          var bField = b[JSONField];
-
-          //first check if null
-          if(aField == null) {
-            return 1;
-          }
-          if(bField == null) {
-            return -1;
-          }
-
-          //check if a or b contains any numbers or whitespace
-          //before capitalzation to avoid errors
-          //also check if boolean
-          if (!(typeof aField === "boolean" || typeof bField === "boolean")) {
-            if ( !(/[^a-zA-Z]/.test(aField) && (/[^a-zA-Z]/.test(bField))) ) {
-              aField = aField.toUpperCase();
-              bField = bField.toUpperCase();
-            }
-          }
-
-
-          //first < second
-          if (aField > bField ) {
-            return 1;
-          }
-          //second < first
-          if (aField< bField) {
-            return -1;
-          }
-          // a must be equal to b
-          return 0;
-        });
-        if (this.toggle[index]) {
-          this.filteredUsers.reverse();
-          this.toggle[index]=0;
-        } else {
-          this.toggle[index]=1;
-        }
-      }
-    },
-
-    /**
-     * Filters the SQL query results to be displayed on this webpage.
-     */
-    filterUsers: function () {
-      if (this.searchbar && this.resultTrack == this.searchbar) {
-        this.filteredUsers = this.users.filter((item) => {
-          return (item.firstName + " " + item.middleName + " " + item.lastName).includes(this.searchbar) || (item.firstName + " " + item.lastName).includes(this.searchbar);
-        });
-
-      }
-    },
-
-
-
-    /**
-     * Helper function to control the number of search range values.
-     * It increments Minimum and Maximum search index by 10 as long as the maximum search index does not exceed
-     * the number of filtered users.
-     */
-    increaseSearchRange: function () {
-      //Stop value from going over range
-      if(this.userSearchIndexMax < this.filteredUsers.length) {
-        //console.log(this.userSearchIndexMax, this.filteredUsers.length, this.userSearchIndexMin)
-        this.userSearchIndexMin += 10;
-        this.userSearchIndexMax += 10;
-      }
-    },
-
-    /**
-     * Helper function to control the number of search range values.
-     * It decrements Minimum and Maximum search index by 10 as long as the minimum is at least 10.
-     */
-    decreaseSearchRange: function () {
-      //Stop value from reaching negative
-      if(this.userSearchIndexMin >= 10) {
-        this.userSearchIndexMin -= 10;
-        this.userSearchIndexMax -= 10;
-      }
-    }
-
   },
-  computed: {
-    /**
-     * Computes ranges to be displayed below table, max of range is switched
-     * to length of user query if the length is less than the current range
-     * @returns {Array} Array with start index and end index for searchRange
-     */
-    searchRange: function () {
-      let max = this.userSearchIndexMax;
-
-      if (max > this.filteredUsers.length) {
-        max = this.filteredUsers.length
-      }
-
-      return [this.userSearchIndexMin + 1, max]
-    }
-  }
 }
 
 export default Search;
 </script>
 
 <style scoped>
+
+#goToProfileButton {
+  background:#3B5998;
+  text-align: center;
+  color: white;
+  border-radius: 1.5em;
+  cursor: pointer;
+}
+
+#userTable {
+  width: 65%;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  margin: auto;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  border-radius: 20px;
+}
+
+tr {
+  font-size: 15px
+}
+
+th {
+  background: #3B5998;
+  color: white;
+}
 
 .main1{
   top:-100px;
