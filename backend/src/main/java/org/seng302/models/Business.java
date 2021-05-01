@@ -22,7 +22,7 @@ public class Business {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "BUSINESS_ADMINS",
                     joinColumns = @JoinColumn(name="BUSINESS_ID"),
                     inverseJoinColumns = @JoinColumn(name="USER_ID"))

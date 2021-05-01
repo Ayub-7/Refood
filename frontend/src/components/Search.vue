@@ -1,7 +1,7 @@
 <template>
-  <div class="card" id="body">
+  <div class="main" id="body">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="profile">
+    <form class="main1">
       <div class="profile-text-inner">
         <h3 class="title text-center">Search for users</h3>
         <div class="form-row">
@@ -53,6 +53,19 @@
               Email<i class="fa fa-angle-double-down" style="font-size:20px"/>
             </button>
           </th>
+
+          <th  v-if="isDGAA">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 5)">
+              Is Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+
+          <th  v-if="isDGAA">
+            <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'isAdmin', 6)">
+              Toggle Admin<i class="fa fa-angle-double-down" style="font-size:20px"/>
+            </button>
+          </th>
+
         </tr>
 
         <tr v-for="user in filteredUsers.slice(userSearchIndexMin, userSearchIndexMax)"
@@ -62,8 +75,12 @@
           <td>{{ user.firstName }} </td>
           <td> {{ user.middleName }} </td>
           <td> {{ user.lastName }} </td>
-          <td> {{ user.homeAddress }} </td>
+          <td> {{ user.homeAddress}}</td>
           <td>{{ user.email }}</td>
+          <td v-if="isDGAA" >{{ user.role }}</td>
+          <td v-if="isDGAA">
+            <input type="checkbox" @click="toggleAdmin(user)">
+          </td>
         </tr>
 
         <!-- If search query returns more than 10 users then this should be active -->
@@ -84,13 +101,14 @@
 
 <script>
 import api from "../Api";
+import {store} from "../store"
 
 const Search = {
   name: "Search",
   data: function() {
     return {
       errors: [],
-      toggle: [1,1,1,1,1,1],
+      toggle: [1,1,1,1,1,1,1,1],
       searchbar: "",
       searchbarResults: "",
       users: [],
@@ -99,7 +117,8 @@ const Search = {
       enableTable: false,
       resultTrack: "",
       userSearchIndexMin: 0,
-      userSearchIndexMax: 10
+      userSearchIndexMax: 10,
+      isDGAA: false
     };
   },
 
@@ -113,21 +132,17 @@ const Search = {
    * remove when test back end works well...
  */
   mounted() {
-    api
-        .searchQuery()
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.users = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load users";
-        })
-        .finally(() => (this.loading = false));
+    if ( this.getUserRole() === 'DGAA') {
+      this.isDGAA = true;
+    }
   },
 
 
   methods: {
+    getUserRole: function () {
+      return store.role;
+    },
+
     /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
@@ -138,8 +153,39 @@ const Search = {
       if (this.searchbar.length > 0) {
         this.enableTable = true;
         this.resultTrack = this.searchbar;
+        console.log(this.searchbar);
+        api
+            .searchQuery(this.searchbar)
+            .then((response) => {
+              console.log(response.data);
+              this.$log.debug("Data loaded: ", response.data);
+              this.users = response.data;
+              this.filteredUsers = response.data;
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+              this.error = "Failed to load users";
+            })
+            .finally(() => (this.loading = false));
       } else {
         this.errors.push("Please enter input the user you want to search for");
+      }
+    },
+
+    /**
+     * makes the checkuser an administrator
+     * if they are already, revoke privledges...
+     */
+
+    toggleAdmin: function (currentUser) {
+      if (currentUser.role == 'USER') {
+        //currentUser.id = true;
+        api.makeUserAdmin(currentUser.id);
+        currentUser.role = 'GAA'
+        //console.log("admin true"+currentUser.id+currentUser.firstName)
+      } else if (currentUser.role == 'GAA') {
+        api.revokeUserAdmin(currentUser.id);
+        currentUser.role = 'USER'
       }
     },
 
@@ -157,15 +203,25 @@ const Search = {
 
       if (this.filteredUsers) {
         this.filteredUsers.sort(function(a, b) {
-
           var aField = a[JSONField];
           var bField = b[JSONField];
 
-          //first check if a or b contains any numbers or whitespace
+          //first check if null
+          if(aField == null) {
+            return 1;
+          }
+          if(bField == null) {
+            return -1;
+          }
+
+          //check if a or b contains any numbers or whitespace
           //before capitalzation to avoid errors
-          if ( !(/[^a-zA-Z]/.test(aField) && (/[^a-zA-Z]/.test(bField))) ) {
-            aField = aField.toUpperCase();
-            bField = bField.toUpperCase();
+          //also check if boolean
+          if (!(typeof aField === "boolean" || typeof bField === "boolean")) {
+            if ( !(/[^a-zA-Z]/.test(aField) && (/[^a-zA-Z]/.test(bField))) ) {
+              aField = aField.toUpperCase();
+              bField = bField.toUpperCase();
+            }
           }
 
 
@@ -252,23 +308,29 @@ export default Search;
 </script>
 
 <style scoped>
+
+.main1{
+  top:-100px;
+}
+
 .title {
   padding-top: 40px;
-  color: #8C55AA;
+  color: #3B5998;
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
 }
 
-.card {
+.main {
   background-color: white;
+  top: 1px;
 }
 
 .searchButton {
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -284,17 +346,19 @@ export default Search;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 5px;
-  padding-top: 5px;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-bottom: 10px;
+  padding-top: 10px;
   font-family: 'Ubuntu', sans-serif;
-  margin-top: 10px;
+  margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
+
+
 
 .displaying {
   padding-top: 15px;
@@ -305,13 +369,14 @@ export default Search;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
   padding-bottom: 10px;
   padding-top: 10px;
   font-family: 'Ubuntu', sans-serif;
+  margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }

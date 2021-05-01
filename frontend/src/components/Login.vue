@@ -3,9 +3,7 @@
   <div id="body">
   <div class="main">
     <p class="sign" align="center">Sign in</p>
-  <form id="login-form">
-    <div class="container">
-
+  <form id="login-form" >
       <div v-if="errors.length">
         <b>Please correct the following error(s):</b>
       <ul>
@@ -16,9 +14,9 @@
 
       <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
       <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
+
       <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" to="/users">Sign in</button>
-      <button type="button" class="forgotPassword">Forgot Password?</button>
-    </div>
+      <div type="button" class="forgotPassword">Forgot Password?</div>
   </form>
   </div>
   </div>
@@ -28,6 +26,7 @@
 
 <script>
 import api from "../Api";
+import {mutations} from "../store"
 //import Vue from "vue"
 //import VueSimpleAlert from "vue-simple-alert";
 //let passwordHash = require('password-hash');
@@ -65,9 +64,6 @@ const Login = {
       if (!this.password) {
         this.errors.push('Password required.');
       }
-      // else if(this.password.length < 8){
-      //   this.errors.push('Password must be 8 characters long.');
-      // }
 
       if (this.email && this.password) {
         return true;
@@ -81,14 +77,15 @@ const Login = {
       if(this.errors.length == 0){
         api.login(this.email, this.password)
         .then((response) => {
-          this.$store.commit('setUserId', response.data.userId); //Store user info into program state, used for later calls
-          this.$store.commit('setUserRole', response.data.role);
-          //LOAD USER PAGE, USING ROUTER
-          this.$router.push({path: `/users/${response.data.userId}`});
+          //LOAD USER HOME PAGE, USING ROUTER
+          mutations.setUserLoggedIn(response.data.userId, response.data.role);
+          mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+          this.$router.push({path: `/home`});
+
 
         }).catch(err => {
           if(err.response) { //Catch bad request
-            console.log(err.response.message)
+            console.log(err.response)
             this.email = this.password = null;
             this.errors.push('Incorrect email or password')
           }
@@ -101,10 +98,14 @@ const Login = {
 export default Login;
 </script>
 
+
+
+
 <style scoped>
 #body {
-  background-color: #F3EBF6;
+  background-color: white;
   font-family: 'Ubuntu', sans-serif;
+
 }
 
 .main {
@@ -118,7 +119,7 @@ export default Login;
 
 .sign {
   padding-top: 40px;
-  color: #8C55AA;
+  color: #385898;
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
@@ -173,7 +174,7 @@ form#login-form {
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #3B5998;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -186,8 +187,9 @@ form#login-form {
 }
 .forgotPassword {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #E1BEE7;
+  color: #3B5998;
   padding-top: 15px;
+  text-align: center;
 }
 a {
   text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);

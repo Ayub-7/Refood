@@ -147,7 +147,7 @@ h1.loading {
 .main {
   position: relative;
   z-index: 2;
-  border-top: 1px solid #e6e6e6;
+  width: auto;
 }
 
 label[for="toggle-all"] {
@@ -401,10 +401,6 @@ html .clear-checked:active {
   }
 }
 
-body {
-  padding-top: 100px;
-}
-
 .error {
   font-size: 24px;
   font-weight: 400;
@@ -419,4 +415,74 @@ body {
 .logout-link {
   font-size: 18px;
   text-decoration: underline;
+}
+
+.navButton {
+  display: none;
+}
+
+.topbar #navLinks {
+  display: block;
+  width: 70%;
+  position: relative;
+  margin-top: 22px;
+  width: 75%;
+}
+.userDetail {
+  float: right;
+  width: auto;
+  color: #4d4d4d;
+  display: block;
+  grid-column: 2 / 4;
+  text-align: center;
+  background-color: #f5f5f5;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin: 8px 0 0 0;
+  -webkit-box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
+  box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
+}
+
+.topbar #navLinks li {
+  display: inline;
+}
+
+.topbar #navLinks .bar {
+  list-style-type: none;
+  width: 75%;
+}
+
+@media only screen and (max-width: 700px) {
+  .topbar #navLinks {
+    display: none;
+    top: 34px;
+    position: absolute;
+    text-align: center;
+  }
+
+  #topBar {
+    height: 55px;
+  }
+
+  .topbar #navLinks li {
+    display: block;
+
+  }
+
+  .navButton {
+    display: block;
+    color: white;
+    position: relative;
+    margin-top: 23px;
+    font-size: 12px;
+  }
+
+}
+.hl {
+  width: 100%;
+  border-top: 2px solid black;
+}
+#topBar {
+  height: auto;
 }

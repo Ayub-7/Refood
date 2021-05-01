@@ -10,6 +10,8 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
+import org.seng302.repositories.UserRepository;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,9 +20,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.seng302.models.requests.LoginRequest;
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedOutputStream;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,11 +48,14 @@ public class ProductController {
 
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
+    @Autowired private FileService fileService;
+
+    @Autowired private ObjectMapper mapper;
 
     @Value("${media.image.business.directory}")
     String rootImageDir;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+//    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Retrieves all of the products in the business' product catalogue.
@@ -158,7 +165,7 @@ public class ProductController {
         boolean isValid = true;
         String errorMessage = null;
 
-        if (isPosting && productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
+        if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
             errorMessage = "A product already exists with this ID";
             isValid = false;
         } else if (product.getId() == null || product.getId() == "") {
@@ -166,9 +173,6 @@ public class ProductController {
             isValid = false;
         } else if (product.getName() == null || product.getName() == "") {
             errorMessage = "Product name can not be empty";
-            isValid = false;
-        } else if (product.getDescription() == null || product.getDescription() == "") {
-            errorMessage = "Product description can not be empty";
             isValid = false;
         } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
             errorMessage = "Product recommended retail price must be at least 0";
@@ -240,16 +244,14 @@ public class ProductController {
                 freeImage = true;
             }
         }
+
         File file = new File(businessDir + "/" + imageName + imageExtension);
-        logger.info(System.getProperty("user.dir"));
-        logger.info("File Being written into: " + file);
-        file.createNewFile();
-        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
-        stream.write(image.getBytes());
-        stream.close();
+        File thumbnailFile = new File(businessDir + "/" + imageName + "_thumbnail" + imageExtension);
+        fileService.uploadImage(file, image.getBytes());
+        fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
 
         // Save into DB.
-        Image newImage = new Image("business_" + businessId + imageName + imageExtension, null);
+        Image newImage = new Image(file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
         productRepository.save(product);
 

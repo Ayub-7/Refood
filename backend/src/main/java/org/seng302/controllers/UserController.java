@@ -30,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 
 /**
  * REST controller for user related calls.
@@ -58,7 +59,6 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            logger.info(user.getHomeAddress());
             String userJson = mapper.writeValueAsString(user);
             return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(userJson);
         }
@@ -73,9 +73,12 @@ public class UserController {
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest req, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
         if (existingUser != null) {
-            if (loginRequest.getPassword().equals(existingUser.getPassword())) {
+            if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser);
                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
+//             if (loginRequest.getPassword().equals(existingUser.getPassword())) {
+//                 UserIdResponse userIdResponse = new UserIdResponse(existingUser);
+//                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -93,17 +96,17 @@ public class UserController {
      * Prints out the current user session/authentication details into console.
      */
     @GetMapping("/checksession")
-    public ResponseEntity<String> checksession(HttpServletRequest req, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String info = "--------------------------------------------------" +
-                "\nPRINCIPAL: " + auth.getPrincipal() +
-                "\nCREDS: " + auth.getCredentials() +
-                "\nDETAILS: " + auth.getDetails() +
-                "\nAUTH: " + auth.getAuthorities();
-
-        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_PLAIN).body(info);
-
+    public ResponseEntity<User> checksession(HttpServletRequest req, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
+
+    @PostMapping("/logoutuser")
+    public ResponseEntity<String> logoutUser(HttpServletRequest req, HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.status(HttpStatus.OK).build();
+   }
 
 
     /**
@@ -113,9 +116,9 @@ public class UserController {
      */
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException {
-
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
-            if (isValidUser(user)) {
+            List<String> registrationErrors = registrationUserCheck(user);
+            if (registrationErrors.size() == 0) { // No errors found.
                 User newUser = new User(user);
                 userRepository.save(newUser);
 
@@ -128,12 +131,47 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
             }
             else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                logger.error("Invalid registration.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errors with registration details: " + registrationErrors);
             }
         }
-        System.out.println("Bad email");
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        logger.error("Registration email address already in use.");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use.");
     }
+
+    /**
+     * This method checks whether all the mandatory fields of the new user are present.
+     * @param user The user to check the validity of
+     * @return list of errors with the new registration request - if there is any.
+     */
+    public List<String> registrationUserCheck(NewUserRequest user) {
+        List<String> errors = new ArrayList<>();
+
+        if (user.getFirstName() == null) {
+            errors.add("First Name");
+        }
+        if (user.getLastName() == null) {
+            errors.add("Last Name");
+        }
+        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            errors.add("Email");
+        }
+        if (user.getPassword() == null) {
+            errors.add("Password");
+        }
+        if (user.getDateOfBirth() == null) {
+            errors.add("Date of Birth");
+        }
+        if (user.getHomeAddress() == null) {
+            errors.add("Home Address");
+        }
+        else if (user.getHomeAddress().getCountry() == null) {
+            errors.add("Home Address - Country");
+        }
+
+        return errors;
+    }
+
 
     /**
      * This method retrieves user information by name.
@@ -142,18 +180,9 @@ public class UserController {
      */
     @GetMapping("/users/search")
     public  ResponseEntity<String> searchUser(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
-
+        System.out.println("search called");
         List<User> users = userFinder.queryByName(query);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
-    }
-
-    /**
-     * This method checks whether all the mandatory fields of the new user are present.
-     * @param user The user to check the validity of
-     * @return boolean If the users mandatory fields are present
-     */
-    public Boolean isValidUser(NewUserRequest user) {
-        return user.getFirstName() != null && user.getLastName() != null && user.getDateOfBirth() != null && user.getHomeAddress() != null && user.getEmail() != null;
     }
 
     // -- ADMIN REQUESTS
