@@ -140,7 +140,7 @@ export default {
      * @param businessId
      * @param productId
      * @param imageId
-     * @returns {Promise<AxiosResponse<any>>}
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
      */
     setPrimaryImage: (businessId, productId, imageId) => instance.put(`businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, {withCredentials: true})
 }

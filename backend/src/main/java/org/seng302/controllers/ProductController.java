@@ -271,7 +271,7 @@ public class ProductController {
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
-        if (product == null) {
+        if (product == null || business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
