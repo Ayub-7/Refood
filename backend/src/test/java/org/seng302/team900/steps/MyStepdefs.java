@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,6 +37,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,9 +49,9 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @WebMvcTest(controllers = UserController.class)
 public class MyStepdefs {
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-    private MockMvc mockMvc;
+//    @Autowired
+//    private WebApplicationContext webApplicationContext;
+//    private MockMvc mockMvc;
 
     @InjectMocks
     private UserController userController;
@@ -57,19 +59,21 @@ public class MyStepdefs {
     @MockBean
     private UserRepository userRepository;
 
+    private UserFinder userFinder;
+
     @Autowired
     ObjectMapper mapper;
 
     private static final String DATEFORMAT = "dd/MM/yyyy";
     LoginRequest loginRequest;
     User user;
-    MvcResult result;
+    ResponseEntity<String> result;
 
     @Before
     public void setup() throws Exception {
         this.user = new User("johnsmith@yahoo.com", "Potato1!", Role.USER);
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         this.userRepository = Mockito.mock(UserRepository.class);
+        this.userController = new UserController(this.userRepository, this.userFinder);
     }
 
     @Given("User attempts to login")
@@ -80,14 +84,13 @@ public class MyStepdefs {
     public void theyEnterWithEmailAndPassword(String email, String password) throws Exception {
         loginRequest = new LoginRequest(email, password);
         Mockito.when(userRepository.findUserByEmail((loginRequest.getEmail()))).thenReturn(user);
-        result = mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(loginRequest))).andReturn();
+        HttpSession temp = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, temp);
     }
 
     @Then("They are redirected to their profile")
     public void theyAreRedirectedToTheirProfile() throws UnsupportedEncodingException {
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.OK.value());
     }
 
 

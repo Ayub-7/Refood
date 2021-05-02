@@ -41,11 +41,17 @@ public class UserController {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
-    @Autowired
+//    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
+//    @Autowired
     private UserFinder userFinder;
+
+    @Autowired
+    public UserController(UserRepository userRepository, UserFinder userFinder) {
+        this.userRepository = userRepository;
+        this.userFinder = userFinder;
+    }
 
     /**
      * Get request mapping for get user information by Id
@@ -67,6 +73,7 @@ public class UserController {
     /**
      * Login POST method. Checks if user exists and provided details are correct and authenticates if true.
      * @param loginRequest a login request containing the email and password.
+     * @param session
      * @return 200 if login is successful, 400 if email/password is invalid.
      */
     @PostMapping("/login")
