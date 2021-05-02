@@ -27,6 +27,7 @@ public class Product {
 
     private String name;
     private String description;
+    private String manufacturer;
     private double recommendedRetailPrice;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
@@ -38,11 +39,12 @@ public class Product {
 
     protected Product() { }
 
-    public Product(String id, long businessId, String name, String description, double recommendedRetailPrice, Date created) {
+    public Product(String id, long businessId, String name, String description, String manufacturer, double recommendedRetailPrice, Date created) {
         this.id = id;
         this.businessId = businessId;
         this.name = name;
         this.description = description;
+        this.manufacturer = manufacturer;
         this.recommendedRetailPrice = recommendedRetailPrice;
         this.created = created;
         this.images = new ArrayList<>();
@@ -61,6 +63,7 @@ public class Product {
         this.businessId = businessId;
         this.name = newProductRequest.getName();
         this.description = newProductRequest.getDescription();
+        this.manufacturer = newProductRequest.getManufacturer();
         this.recommendedRetailPrice = newProductRequest.getRecommendedRetailPrice();
         this.created = new Date();
         this.images = new ArrayList<>();

@@ -118,10 +118,10 @@ public class MainApplicationRunner implements ApplicationRunner {
     businessRepository.save(b2);
 
     // Test Data for Products
-    Product p1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", 14.69, new Date());
-    Product p2 = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", 43.66, new Date());
-    Product p3 = new Product("55-9986231", 2, "Seedlings", "Buckwheat, Organic", 1.26, new Date());
-    Product p4 = new Product("12-5088639", 2, "Foam Cup", "6 Oz", 55.2, new Date());
+    Product p1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Watties", 14.69, new Date());
+    Product p2 = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", "Play-doh", 43.66, new Date());
+    Product p3 = new Product("55-9986231", 2, "Seedlings", "Buckwheat, Organic", "Nestle", 1.26, new Date());
+    Product p4 = new Product("12-5088639", 2, "Foam Cup", "6 Oz", "Edible Objects Ltd.",55.2, new Date());
 
     productRepository.save(p1);
     productRepository.save(p2);

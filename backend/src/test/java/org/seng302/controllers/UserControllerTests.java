@@ -222,7 +222,7 @@ public class UserControllerTests {
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
                 "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
         Mockito.when(userRepository.findUserByEmail("johnsmith99@gmail.com")).thenReturn(user);
-        LoginRequest loginReq = new LoginRequest(user.getEmail(), user.getPassword());
+        LoginRequest loginReq = new LoginRequest(user.getEmail(), "1337-H%nt3r2");
         MvcResult success = mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(loginReq)))
