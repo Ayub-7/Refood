@@ -8,12 +8,9 @@
 
 
   <div v-if="users.length" id="userTable">
-    <vs-table :data="users" pagination max-items="10">
+    <vs-table :data="this.users" pagination max-items="10" @selected="handleSelected">
       <template slot="thead" id="tableHeader">
 
-        <vs-th sort-key="id">
-          ID
-        </vs-th>
         <vs-th sort-key="firstName">
           First name
         </vs-th>
@@ -23,12 +20,14 @@
         <vs-th sort-key="city">
           City
         </vs-th>
-        <vs-th sort-key="country">
+        <vs-th sort-key="country" v-if="mobileMode==false">
           Country
         </vs-th>
-        <vs-th sort-key="email">
+        <vs-th sort-key="email" v-if="mobileMode==false">
           Email
         </vs-th>
+        
+        <!-- Extra header for go to profile button -->
         <vs-th>
         </vs-th>
 
@@ -42,7 +41,6 @@
       <template slot-scope="{data}">
         <vs-tr :key="indextr" v-for="(tr, indextr) in data" @click="test()">
 
-          <vs-td :data="data[indextr].id"> {{data[indextr].id}} </vs-td>
 
           <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
 
@@ -50,9 +48,9 @@
 
           <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
 
-          <vs-td :data="data[indextr].country">{{`${data[indextr].country}`}}</vs-td>
+          <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].country}`}}</vs-td>
 
-          <vs-td :data="data[indextr].email">{{data[indextr].email}}</vs-td>
+          <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
 
           <vs-td>
             <div id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</div>
@@ -81,6 +79,7 @@ const Search = {
   name: "Search",
   data: function() {
     return {
+      mobileMode: false,
       selected: [],
       errors: [],
       toggle: [1,1,1,1,1,1,1,1],
@@ -110,10 +109,33 @@ const Search = {
     if ( this.getUserRole() === 'DGAA') {
       this.isDGAA = true;
     }
+
+    this.setMobileMode()
+  },
+  
+  created() {
+    window.addEventListener(
+      'resize',
+      this.setMobileMode
+    )
   },
 
 
   methods: {
+
+    setMobileMode: function() {
+
+      if(window.innerWidth < 1300) {
+        this.mobileMode = true
+      } else {
+        this.mobileMode = false;
+      }
+    },
+
+    handleSelected: function(t) {
+      console.log(t);
+    },
+
     getUserRole: function () {
       return store.role;
     },
@@ -287,5 +309,27 @@ th {
   width: 90%;
   height: 80%;
 }
+
+
+/* For when the screen gets too narrow - mainly for mobile view */
+@media screen and (max-width: 1300px) {
+  #userTable {
+    width: 100%;
+  }
+
+  tr {
+    font-size: 10px;
+
+  }
+
+  th {
+  background: #3B5998;
+  color: white;
+  font-size: 10px
+  }
+
+
+}
+
 
 </style>
