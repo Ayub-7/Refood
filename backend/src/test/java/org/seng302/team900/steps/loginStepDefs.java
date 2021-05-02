@@ -49,11 +49,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 @ContextConfiguration(classes = CucumberRunnerTest.class)
 @WebMvcTest(controllers = UserController.class)
-public class MyStepdefs {
+public class loginStepDefs {
 
-//    @Autowired
-//    private WebApplicationContext webApplicationContext;
-//    private MockMvc mockMvc;
 
     @InjectMocks
     private UserController userController;
@@ -66,7 +63,6 @@ public class MyStepdefs {
     @Autowired
     ObjectMapper mapper;
 
-    private static final String DATEFORMAT = "dd/MM/yyyy";
     LoginRequest loginRequest;
     User user;
     ResponseEntity<String> result;
@@ -159,61 +155,4 @@ public class MyStepdefs {
     public void theyAreGivenAWarningThatBothEmailAndPasswordFieldsAreEmpty() {
         assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
-
-    @Given("User attempts to register")
-    public void userAttemptsToRegister() {
-    }
-
-    @When("They input the firstname {string}, lastname {string}, email {string}, DoB {string}, address {string}")
-    public void theyInputTheFirstnameLastnameEmailDoBAddress(String arg0, String arg1, String arg2, String arg3, String arg4) {
-    }
-
-    @Then("They successfully register and are redirected to their homepage")
-    public void theySuccessfullyRegisterAndAreRedirectedToTheirHomepage() {
-    }
-
-    @Given("User attempts to register with an email that is already registered")
-    public void userAttemptsToRegisterWithAnEmailThatIsAlreadyRegistered() {
-    }
-
-    @Then("They are notified that the email they tried to register with is already registered")
-    public void theyAreNotifiedThatTheEmailTheyTriedToRegisterWithIsAlreadyRegistered() {
-    }
-
-    @Then("They are notified that they need to enter firstname and lastname as they are mandatory fields")
-    public void theyAreNotifiedThatTheyNeedToEnterFirstnameAndLastnameAsTheyAreMandatoryFields() {
-    }
-
-    @Then("They are notified that they need to enter a valid email")
-    public void theyAreNotifiedThatTheyNeedToEnterAValidEmail() {
-    }
-
-    @When("They input the firstname {string}, lastname {string}, email {string}, DoB {string}, and address {string}")
-    public void theyInputTheFirstnameLastnameEmailDoBAndAddress(String arg0, String arg1, String arg2, String arg3, String arg4) {
-    }
-
-    @Then("They are notified that the email they need to be at least {int} years old to register")
-    public void theyAreNotifiedThatTheEmailTheyNeedToBeAtLeastYearsOldToRegister(int arg0) {
-    }
-
-    @When("They successfully register")
-    public void theySuccessfullyRegister() {
-    }
-
-    @Then("Password is hashed and not stored in plain text")
-    public void passwordIsHashedAndNotStoredInPlainText() {
-    }
-
-    @Given("User is logged in")
-    public void userIsLoggedIn() {
-    }
-
-    @When("They press log out")
-    public void theyPressLogOut() {
-    }
-
-    @Then("They successfully logout and their token session disappears")
-    public void theySuccessfullyLogoutAndTheirTokenSessionDisappears() {
-    }
-
 }
