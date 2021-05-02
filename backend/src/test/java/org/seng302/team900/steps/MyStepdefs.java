@@ -1,5 +1,6 @@
 package org.seng302.team900.steps;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -39,6 +40,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -95,43 +97,67 @@ public class MyStepdefs {
 
 
     @When("They enter an email with an invalid format, such that {string}")
-    public void theyEnterAnEmailWithAnInvalidFormatSuchThat(String arg0) {
+    public void theyEnterAnEmailWithAnInvalidFormatSuchThat(String email) throws NoSuchAlgorithmException, JsonProcessingException {
+        loginRequest = new LoginRequest(email, "Potato1!");
+        HttpSession temp = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, temp);
     }
 
     @Then("They are given a warning that their email format is invalid")
     public void theyAreGivenAWarningThatTheirEmailFormatIsInvalid() {
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @When("They enter an email with the valid format {string} and password {string}")
-    public void theyEnterAnEmailWithTheValidFormatAndPassword(String arg0, String arg1) {
+    public void theyEnterAnEmailWithTheValidFormatAndPassword(String email, String password) throws NoSuchAlgorithmException, JsonProcessingException {
+        loginRequest = new LoginRequest(email, password);
+        Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
+        HttpSession temp = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, temp);
     }
 
     @Then("They are given a warning that either their password or email is incorrect")
     public void theyAreGivenAWarningThatEitherTheirPasswordOrEmailIsIncorrect() {
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @When("They enter only the password {string}")
-    public void theyEnterOnlyThePassword(String arg0) {
+    public void theyEnterOnlyThePassword(String password) throws NoSuchAlgorithmException, JsonProcessingException {
+        loginRequest = new LoginRequest(null, password);
+        Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
+        HttpSession temp = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, temp);
     }
 
     @Then("They are given a warning that the email field is empty")
     public void theyAreGivenAWarningThatTheEmailFieldIsEmpty() {
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @When("They enter only the email {string}")
-    public void theyEnterOnlyTheEmail(String arg0) {
+    public void theyEnterOnlyTheEmail(String email) throws NoSuchAlgorithmException, JsonProcessingException {
+        loginRequest = new LoginRequest(email, "");
+        Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
+        HttpSession temp = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, temp);
     }
 
     @Then("They are given a warning that the password field is empty")
     public void theyAreGivenAWarningThatThePasswordFieldIsEmpty() {
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @When("They enter nothing, but attempt to logging anyway")
-    public void theyEnterNothingButAttemptToLoggingAnyway() {
+    public void theyEnterNothingButAttemptToLoggingAnyway() throws NoSuchAlgorithmException, JsonProcessingException {
+        loginRequest = new LoginRequest(null, "");
+        Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
+        HttpSession temp = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, temp);
     }
 
     @Then("They are given a warning that both email and password fields are empty")
     public void theyAreGivenAWarningThatBothEmailAndPasswordFieldsAreEmpty() {
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Given("User attempts to register")

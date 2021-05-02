@@ -26,7 +26,7 @@ Feature: U1 Registering and logging into an individual account
 
   Scenario: Password is blank
     Given User attempts to login
-    When They enter only the email "slimshady@hotmail.com"
+    When They enter only the email "johnsmith@yahoo.com"
     Then They are given a warning that the password field is empty
 
   Scenario: Both email and password are blank
