@@ -20,7 +20,7 @@
               </router-link></li>
           </div>
         </ul>
-        <div class="userDetail">
+        <div class="userDetail" v-if="getLoggedInUser() != null">
           <ActingAs/>
         </div>
       </div>

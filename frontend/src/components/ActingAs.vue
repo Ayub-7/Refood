@@ -6,14 +6,13 @@
           <li class="userStuff">
             <span class ="user">{{getUserName()}}</span>
             <vs-avatar v-if="getUserName() !== null" size="30" style="margin-left: 10px" name="avatar">
-              {{getUserName().match(/[A-Z]/g).join('')}}
             </vs-avatar>
           </li>
 
           <li id="userBusinessPanel">
               <h3>Businesses:</h3>
               <ul id="businessList">
-                <li v-for="business in getPrimaryBusinesses()" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id)">
+                <li v-for="business in getPrimaryBusinesses()" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
                   {{ business.name}}
                 </li>
               </ul>
@@ -22,11 +21,15 @@
         </ul>
       <ul class="actInfo" v-else>
         <li class="business" >
-          Logged in as BUSINESS: {{getActingAsBusinessName()}}
+          <span class ="user">{{getActingAsBusinessName()}}</span>
+          <vs-avatar v-if="getUserName() !== null" icon="store" size="30" style="margin-left: 10px" name="avatar">
+          </vs-avatar>
         </li>
-        <br>
-        <li class="user" @click="setActingAsUser()">
-          <span class="" style="display: inline;">Act As User: {{ getUserName() }} </span>
+
+        <li id="userBusinessPanel" class="user" @click="setActingAsUser()">
+          <span class="user" style="display: inline; font-size: 12px;">{{ getUserName() }} </span>
+          <vs-avatar v-if="getUserName() !== null" icon="person" size="10" style="margin-left: 10px">
+          </vs-avatar>
         </li>
         </ul>
 
@@ -40,7 +43,6 @@ const actingAs =  {
 name: "actingAs",
   data: function () {
     return {
-      buss: null,
       loggedInUserId: null,
       userName: null,
       role: null,
@@ -66,10 +68,8 @@ name: "actingAs",
       return store.userPrimaryBusinesses;
     },
 
-    setActingAsBusinessId(businessName){
-      const businessId = mutations.getIdByName(businessName);
+    setActingAsBusinessId(businessId, businessName){
       mutations.setActingAsBusiness(businessId, businessName)
-      this.buss = null;
       this.$router.push({path: `/home`});
     },
 
