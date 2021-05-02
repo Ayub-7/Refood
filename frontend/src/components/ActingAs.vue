@@ -1,24 +1,31 @@
 <template>
-  <div class="userInfo">
+  <div class="userInfo" @focus="showUserBusinesses" @focusout="hideUserBusinesses" tabindex="0">
         <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
         <ul class="actInfo" v-if="getActingAsBusinessName() == null">
-          <li class="userStuff" >
-            <span class ="user">Logged in as {{getUserRole()}} {{getUserName()}}</span>
-            <!-- <span class="avatar"> IMG</span> -->
+          <!--v-on:click="showUserBusinesses" -->
+          <li class="userStuff">
+            <span class ="user">{{getUserName()}}</span>
             <vs-avatar v-if="getUserName() !== null" size="large" style="margin-left: 10px" name="avatar">
               {{getUserName().match(/[A-Z]/g).join('')}}
             </vs-avatar>
           </li>
 
-          <li>
+          <li id="userBusinessPanel">
             <form class="dropdown">
-              <label class="label"> Select Business to act as:  </label>
-              <select class="select" name="acting" placeholder="Business" v-model="buss" @change="setActingAsBusinessId(buss);">
-                <option value="" disabled selected>Choose business</option>
-                <option  v-for="business in getPrimaryBusinesses()"
-                        v-bind:href="business.id"
-                        :key="business.id" >{{ business.name}}</option>
-              </select>
+              <h2>Businesses:</h2>
+              <ul id="businessList">
+                <li v-for="business in getPrimaryBusinesses()" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id)">
+                  {{ business.name}}
+                </li>
+              </ul>
+<!--              <label class="label"> Select Business to act as:  </label>-->
+
+<!--              <select class="select" name="acting" placeholder="Business" v-model="buss" @change="setActingAsBusinessId(buss);">-->
+<!--                <option value="" disabled selected>Choose business</option>-->
+<!--                <option  v-for="business in getPrimaryBusinesses()"-->
+<!--                        v-bind:href="business.id"-->
+<!--                        :key="business.id" >{{ business.name}}</option>-->
+<!--              </select>-->
             </form>
           </li>
 
@@ -84,15 +91,31 @@ name: "actingAs",
     getActingAsBusinessName() {
       this.actingAsBusinessName = store.actingAsBusinessName
       return this.actingAsBusinessName;
+    },
+
+
+
+    showUserBusinesses: function() {
+      let x = document.getElementById('userBusinessPanel');
+      x.style.display = "block";
+      // if (x.style.display === "block") {
+      //   console.log("Hello");
+      //   window.onload = function(){
+      //     document.onclick = function(e){
+      //       if(e.target.id !== 'userBusinessPanel'){
+      //         //element clicked wasn't the div; hide the div
+      //         x.style.display = 'none';
+      //       }
+      //     };
+      //   };
+      // }
+    },
+
+    hideUserBusinesses: function() {
+      let x = document.getElementById('userBusinessPanel');
+      x.style.display = "none";
     }
   },
-  // mounted: function () {
-  //   this.userName = store.userName;
-  //   this.userRole = store.role;
-  //   this.userPrimaryBusinesses = store.userPrimaryBusinesses;
-  //   this.actingAsBusinessId = store.actingAsBusinessId;
-  //   this.actingAsBusinessName = store.actingAsBusinessName;
-  // }
 }
 export default actingAs;
 </script>
@@ -109,7 +132,10 @@ export default actingAs;
 
 li.business {
   display: inline;
+}
 
+#userBusinessPanel {
+  display: none;
 }
 
 .dropdown .select {

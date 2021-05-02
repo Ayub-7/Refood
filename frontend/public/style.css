@@ -174,10 +174,6 @@ html .clear-checked:active {
   box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
 }
 
-.topbar #navLinks li {
-  display: inline;
-}
-
 .topbar #navLinks .bar {
   list-style-type: none;
   width: 75%;
@@ -195,11 +191,6 @@ html .clear-checked:active {
     height: 55px;
   }
 
-  .topbar #navLinks li {
-    display: block;
-
-  }
-
   .navButton {
     display: block;
     color: white;
@@ -213,3 +204,4 @@ html .clear-checked:active {
 #topBar {
   height: auto;
 }
+
