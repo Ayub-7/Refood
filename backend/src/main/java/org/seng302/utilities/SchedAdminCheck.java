@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 public class SchedAdminCheck {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AdminUtils adminUtils;
 
     private static final Logger logger = LogManager.getLogger(SchedAdminCheck.class.getName());
 
@@ -26,6 +28,6 @@ public class SchedAdminCheck {
     @Scheduled(fixedDelay = 30000, initialDelay = 60000)
     public void fixedRateSched() throws NoSuchAlgorithmException {
         logger.info("Checking for DGAA");
-        AdminUtils.checkForDefaultGlobalAdmin(userRepository);
+        adminUtils.checkForDefaultGlobalAdmin(userRepository);
     }
 }
