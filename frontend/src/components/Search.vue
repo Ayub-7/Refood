@@ -3,12 +3,12 @@
   <div id="search">
     
     <input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar">
-    <vs-button type="border" @click="searchUsers">Search</vs-button>
+    <vs-button id="submitSearch" type="border" @click="searchUsers">Search</vs-button>
   </div>
 
 
-  <div v-if="users.length" id="userTable">
-    <vs-table :data="this.users" pagination max-items="10" @selected="handleSelected">
+  <div v-if="users.length > 0" id="userTable">
+    <vs-table :data="this.users" pagination max-items="10">
       <template slot="thead" id="tableHeader">
 
         <vs-th sort-key="firstName">
@@ -39,7 +39,7 @@
       </template>
 
       <template slot-scope="{data}">
-        <vs-tr :key="indextr" v-for="(tr, indextr) in data" @click="test()">
+        <vs-tr :key="indextr" v-for="(tr, indextr) in data">
 
 
           <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
@@ -124,16 +124,11 @@ const Search = {
   methods: {
 
     setMobileMode: function() {
-
       if(window.innerWidth < 1300) {
         this.mobileMode = true
       } else {
         this.mobileMode = false;
       }
-    },
-
-    handleSelected: function(t) {
-      console.log(t);
     },
 
     getUserRole: function () {
@@ -251,64 +246,11 @@ th {
   top:-100px;
 }
 
-.title {
-  padding-top: 40px;
-  color: #3B5998;
-  font-family: 'Ubuntu', sans-serif;
-  font-weight: bold;
-  font-size: 23px;
-}
-
 .main {
   background-color: white;
   top: 1px;
 }
 
-
-.prevNextSearchButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
-  border: 0;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 5px;
-  padding-top: 5px;
-  font-family: 'Ubuntu', sans-serif;
-  margin-top: 10px;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-
-
-
-.displaying {
-  padding-top: 15px;
-}
-
-
-.headingButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #3B5998;
-  border: 0;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-
-.profile-text-inner {
-  margin: 7em auto;
-  width: 90%;
-  height: 80%;
-}
 
 
 /* For when the screen gets too narrow - mainly for mobile view */
