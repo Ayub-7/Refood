@@ -6,7 +6,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.seng302.CucumberRunnerTest;
+import org.seng302.Main;
+import org.seng302.TestApplication;
 import org.seng302.controllers.UserController;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Address;
@@ -15,15 +19,21 @@ import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.repositories.UserRepository;
+import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.UnsupportedEncodingException;
@@ -33,14 +43,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+@ContextConfiguration(classes = CucumberRunnerTest.class)
+@WebMvcTest(controllers = UserController.class)
 public class MyStepdefs {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
+
+    @InjectMocks
+    private UserController userController;
 
     @MockBean
     private UserRepository userRepository;
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
-    private MockMvc mockMvc;
+    @Autowired
+    ObjectMapper mapper;
+
     private static final String DATEFORMAT = "dd/MM/yyyy";
     LoginRequest loginRequest;
     User user;
@@ -48,12 +67,9 @@ public class MyStepdefs {
 
     @Before
     public void setup() throws Exception {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
-        String sampleUser = "{\"firstName\":\"John\",\"middleName\":\"Hector\",\"lastName\":\"Smith\",\"nickname\":\"Jonny\",\"bio\":\"Likes long walks on the beach\",\"email\":\"johnsmith99@gmail.com\",\"dateOfBirth\":\"1999-04-27\",\"phoneNumber\":\"+64 3 555 0129\",\"homeAddress\":{\"streetNumber\":\"1\",\"streetName\":\"Kropf Court\",\"city\":\"Jequitinhonha\",\"region\":null,\"country\":\"Brazil\",\"postcode\":\"39960-000\"},\"password\":\"1337-H%nt3r2\"}";
-        mockMvc.perform(post("/users")
-                .contentType("application/json")
-                .content(sampleUser))
-                .andReturn();
+        this.user = new User("johnsmith@yahoo.com", "Potato1!", Role.USER);
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.userRepository = Mockito.mock(UserRepository.class);
     }
 
     @Given("User attempts to login")
@@ -61,19 +77,17 @@ public class MyStepdefs {
     }
 
     @When("They enter with email {string} and password {string}")
-    public void theyEnterWithEmailAndPassword(String arg0, String arg1) throws Exception {
-        loginRequest = new LoginRequest(arg0, arg1);
-//        Mockito.when(userRepository.findUserByEmail((loginRequest.getEmail()))).thenReturn(user);
+    public void theyEnterWithEmailAndPassword(String email, String password) throws Exception {
+        loginRequest = new LoginRequest(email, password);
+        Mockito.when(userRepository.findUserByEmail((loginRequest.getEmail()))).thenReturn(user);
         result = mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\":\"johnsmith99@gmail.com\",\"password\":\"1337-H%nt3r2\"}")).andReturn();
+                .content(mapper.writeValueAsString(loginRequest))).andReturn();
     }
 
     @Then("They are redirected to their profile")
     public void theyAreRedirectedToTheirProfile() throws UnsupportedEncodingException {
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-//        UserIdResponse response = new UserIdResponse(user.getId(), user.getRole());
-//        assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
     }
 
 
