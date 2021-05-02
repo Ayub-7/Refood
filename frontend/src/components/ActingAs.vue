@@ -5,28 +5,18 @@
           <!--v-on:click="showUserBusinesses" -->
           <li class="userStuff">
             <span class ="user">{{getUserName()}}</span>
-            <vs-avatar v-if="getUserName() !== null" size="large" style="margin-left: 10px" name="avatar">
+            <vs-avatar v-if="getUserName() !== null" size="30" style="margin-left: 10px" name="avatar">
               {{getUserName().match(/[A-Z]/g).join('')}}
             </vs-avatar>
           </li>
 
           <li id="userBusinessPanel">
-            <form class="dropdown">
-              <h2>Businesses:</h2>
+              <h3>Businesses:</h3>
               <ul id="businessList">
                 <li v-for="business in getPrimaryBusinesses()" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id)">
                   {{ business.name}}
                 </li>
               </ul>
-<!--              <label class="label"> Select Business to act as:  </label>-->
-
-<!--              <select class="select" name="acting" placeholder="Business" v-model="buss" @change="setActingAsBusinessId(buss);">-->
-<!--                <option value="" disabled selected>Choose business</option>-->
-<!--                <option  v-for="business in getPrimaryBusinesses()"-->
-<!--                        v-bind:href="business.id"-->
-<!--                        :key="business.id" >{{ business.name}}</option>-->
-<!--              </select>-->
-            </form>
           </li>
 
         </ul>
@@ -164,8 +154,14 @@ li.business {
 }
 
 span.user {
-  width: 75%;
+  width: auto;
   float: left;
+  padding: 10px 5px 0px 15px;
+}
+
+.con-vs-avatar {
+  height: 30px;
+  width: 30px;
 }
 
 .dropdown {

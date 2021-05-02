@@ -18,11 +18,11 @@
             <li><router-link :to="{path: '/login'}" class="title">
                 <span class="title" @click="logoutUser()">Logout</span>
               </router-link></li>
-            <div class="userDetail">
-              <ActingAs/>
-            </div>
           </div>
         </ul>
+        <div class="userDetail">
+          <ActingAs/>
+        </div>
       </div>
         </div>
     <div id="view">
