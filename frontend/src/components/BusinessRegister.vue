@@ -232,7 +232,7 @@ const BusinessRegister = {
               this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
               this.$router.push({name: 'LoginPage'});
             }
-            throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+            throw new Error(`ERROR trying to obtain business info from Id: ${err}`);
       });
     },
 
