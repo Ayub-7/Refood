@@ -66,7 +66,7 @@
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{ product.recommendedRetailPrice }} </p>
+                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
             </div>
           </div>
@@ -121,7 +121,7 @@
                 </td>
                 <td>{{ product.name }} </td>
                 <td>{{ product.description }} </td>
-                <td style="text-align: center">{{ product.recommendedRetailPrice }} </td>
+                <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </td>
                 <td>{{ product.created }} </td>
                 <td>
                   <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId />
@@ -155,6 +155,7 @@ import api from "../Api";
 import {store} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
+import axios from "axios";
 const Search = {
   name: "Search",
 
@@ -177,6 +178,8 @@ const Search = {
       business: null,
       businessId: null,
       displaytype: true,
+      currencySymbol: "",
+      currencyCode: "",
     };
   },
 
@@ -187,23 +190,9 @@ const Search = {
    * be filtered by the webpage.
  */
   mounted() {
-    console.log("this.getBusinessID()");
-    console.log(this.getBusinessID());
+    let userId = store.loggedInUserId;
+    this.getUserInfo(userId);
 
-    /*
-    api.getBusinessFromId(this.getBusinessID())
-        .then((response) => {
-          console.log(response.data);
-          this.$log.debug("getBusinessFromId: ", response.data);
-          this.business = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to get Business";
-        })
-        .finally(() => (this.loading = false));
-
-     */
     this.business = this.getBusinessName();
     this.businessId = this.getBusinessID();
     api.getBusinessProducts(this.businessId)
@@ -222,7 +211,30 @@ const Search = {
 
 
   methods: {
-    //todo: update getBusinessID get to use new store.js upon merge...
+    getUserInfo: function(userId) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
+          throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
+    },
+
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then( response => {
+            this.currencySymbol = response.data[0].currencies[0].symbol;
+            this.currencyCode = response.data[0].currencies[0].code;
+          }).catch( err => {
+        console.log("Error with getting cities from REST Countries." + err);
+      });
+    },
+
     getBusinessID: function () {
       return store.actingAsBusinessId
     },
