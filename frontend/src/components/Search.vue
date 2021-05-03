@@ -7,7 +7,7 @@
   </div>
 
 
-  <div v-if="users.length > 0" id="userTable">
+  <div v-if="users.length" id="userTable">
     <vs-table :data="this.users" pagination max-items="10">
       <template slot="thead" id="tableHeader">
 
@@ -66,6 +66,7 @@
         </vs-tr>
       </template>
     </vs-table>
+    <div id="displaying">Showing {{userSearchIndexMin}} - {{userSearchIndexMax}} of {{users.length}} results</div>
   </div>
 
   </div>
@@ -79,18 +80,12 @@ const Search = {
   name: "Search",
   data: function() {
     return {
-      mobileMode: false,
-      selected: [],
-      errors: [],
-      toggle: [1,1,1,1,1,1,1,1],
+      tableLoaded: false,
       searchbar: "",
-      searchbarResults: "",
+      mobileMode: false,
+      errors: [],
       users: [],
-      filteredUsers: [],
-      reducedUsers: [],
-      enableTable: false,
-      resultTrack: "",
-      userSearchIndexMin: 0,
+      userSearchIndexMin: 1,
       userSearchIndexMax: 10,
       isDGAA: false
     };
@@ -109,7 +104,6 @@ const Search = {
     if ( this.getUserRole() === 'DGAA') {
       this.isDGAA = true;
     }
-
     this.setMobileMode()
   },
   
@@ -118,11 +112,15 @@ const Search = {
       'resize',
       this.setMobileMode
     )
+
   },
 
 
   methods: {
 
+    /**
+     * If page reaches certain width set mobile mode on, this removes columns from the table to ensure it fits on the page
+     */
     setMobileMode: function() {
       if(window.innerWidth < 1300) {
         this.mobileMode = true
@@ -131,10 +129,39 @@ const Search = {
       }
     },
 
+    /**
+     * Increases search range to be shown on page
+     */
+
+    increaseSearchRange: function() {
+      this.userSearchIndexMin += 10;
+      if(this.userSearchIndexMax + 10 > this.users.length) {
+        this.userSearchIndexMax += this.users.length - this.userSearchIndexMax
+      } else {
+        this.userSearchIndexMax += 10;
+      }
+    },
+
+    /**
+     * Increases search range to be shown on page
+     */
+    decreaseSearchRange: function() {
+      this.userSearchIndexMin -= 10;
+      if(this.userSearchIndexMax % 10 != 0){
+        this.userSearchIndexMax -= this.userSearchIndexMax % 10;
+      } else {
+        this.userSearchIndexMax -= 10;
+      }
+    },
+
     getUserRole: function () {
       return store.role;
     },
 
+    /**
+     * Go to users profile
+     * @param userId id of user that has been clicked
+     */
     goToProfile(userId) {
       this.$router.push({path: `/users/${userId}`})
     },
@@ -143,15 +170,9 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-      if (this.searchbar.length > 0) {
-        this.enableTable = true;
-        this.resultTrack = this.searchbar;
-        console.log(this.searchbar);
         api
             .searchQuery(this.searchbar)
-            .then((response) => {
-              console.log(response)
-              this.$log.debug("Data loaded: ", response.data);
+            .then((response) => { 
               this.users = response.data;
               this.users = this.users.filter(x => typeof(x) == "object")
 
@@ -160,18 +181,33 @@ const Search = {
                 user.country = user.homeAddress.country;
                 user.city = user.homeAddress.city; 
               }
+            
+              if(this.users.length < 10) {
+                this.userSearchIndexMin = 1;
+                this.userSearchIndexMax = this.users.length;
+                if(this.users.length == 0){
+                  this.userSearchIndexMin = 0;
+                }
+              } else {
+                this.userSearchIndexMin = 1;
+                this.userSearchIndexMax = 10;
+              }
 
-              console.log(this.users)
-              //this.filteredUsers = response.data;
             })
             .catch((error) => {
               this.$log.debug(error);
               this.error = "Failed to load users";
+            }).finally(() => {
+              if(!this.tableLoaded){
+                document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+                
+                //Event listeners for vuesax buttons on table since they're generated afterwards
+                document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
+                document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
+
+                this.tableLoaded = true;
+              }
             })
-            .finally(() => (this.loading = false));
-      } else {
-        this.errors.push("Please enter input the user you want to search for");
-      }
     },
 
     /**
@@ -181,10 +217,8 @@ const Search = {
 
     toggleAdmin: function (currentUser) {
       if (currentUser.role == 'USER') {
-        //currentUser.id = true;
         api.makeUserAdmin(currentUser.id);
         currentUser.role = 'GAA'
-        //console.log("admin true"+currentUser.id+currentUser.firstName)
       } else if (currentUser.role == 'GAA') {
         api.revokeUserAdmin(currentUser.id);
         currentUser.role = 'USER'
@@ -197,6 +231,11 @@ export default Search;
 </script>
 
 <style scoped>
+
+
+#displaying {
+  text-align: right;
+}
 
 #search {
   font-family: 'Ubuntu', sans-serif;
