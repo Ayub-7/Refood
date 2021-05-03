@@ -51,7 +51,9 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <img style="width: 100%; height: 100%;   border-radius: 1em;" :src="'getImgUrl(product)'"/>
+                <p>{{getImgUrl(product)}}</p>
+                <img style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('' + getImgUrl(product))"/>
+
               </div>
              
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
