@@ -2,39 +2,39 @@
   <!-- -->
   <div id="container" v-if="getLoggedInUserId() != null">
       <!-- Header of page, contains link to user profile and welcome message with user's first name -->
-      <div id="business-name-container">
-        <div v-if="getBusinessName() != null" id="business-name">
+      <div id="name-container">
+        <div v-if="this.actingAsBusinessId != null" id="name">
           Welcome to your home page, {{getBusinessName()}}!
         </div>
-        <div v-else id="business-name">
-          Welcome to your home page, {{getUserName()}}! </h1>
+        <div v-else id="name">
+          Welcome to your home page, {{getUserName()}}!
         </div>
       </div>
 
-      <div id="business-container">
+      <div id="sidebar-container">
         <!-- Activity feed THINGS WILL LATER BE PLACE IN THESE FIELDS, JUST SAMPLE AT THE MOMENT -->
-        <div id="description" class="sub-container">
+        <div id="left-nav" class="sub-container">
           <div class="userinfo-container" v-if="getBusinessId()">
           <ul id="businfo-content">
-            <li class="business-nav-item" @click='goToProfile()' style='cursor: pointer; text-decoration: none;'>Business Profile</li>
-            <li class="business-nav-item"  @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
+            <li class="left-nav-item" id="bus-profile-btn" @click='goToProfile()' style='cursor: pointer; text-decoration: none;'>Business Profile</li>
+            <li class="left-nav-item" id="bus-catalogue-btn" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
           </ul>
           </div>
           <div class="userinfo-container" v-else>
             <ul id="userinfo-content">
-              <li class="business-nav-item" @click='goToProfile()' style='cursor: pointer'>Profile</li>
+              <li class="left-nav-item" id="user-profile-btn" @click='goToProfile()' style='cursor: pointer'>Profile</li>
             </ul>
           </div>
         </div>
 
-        <div id="info-container" class="sub-container">
-          <p>Favourites</p>
+        <div id="watchlist-container" class="sub-container">
+          <h3>Watchlist:</h3>
         </div>
 
       </div>
         <main>
-          <nav id="business-navbar">
-            <div id="business-name" style="text-align: center;">
+          <nav id="newsfeed-navbar">
+            <div id="name" style="text-align: center;">
               News Feed
             </div>
           </nav>
@@ -138,7 +138,7 @@ const Homepage = {
       let userId = store.loggedInUserId;
       this.getUserDetails(userId);
     },
-  
+
 }
 export default Homepage;
 </script>
@@ -153,10 +153,9 @@ export default Homepage;
 }
 
 /* Top Business Name Container */
-#business-name-container {
+#name-container {
   grid-column: 2 / 4;
   grid-row: 1;
-
   text-align: center;
   background-color: transparent;
   padding: 15px 0 15px 0;
@@ -166,7 +165,7 @@ export default Homepage;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
-#business-name {
+#name {
   font-size: 32px;
   padding: 0.5em 0 0.5em 0;
 }
@@ -177,7 +176,7 @@ export default Homepage;
 }
 
 /* Business Info Panel on left side */
-#business-container {
+#sidebar-container {
   grid-column: 2;
   grid-row: 2;
 
@@ -199,29 +198,17 @@ export default Homepage;
   color: gray;
 }
 
-#description {
+#left-nav {
   grid-row: 2;
 }
 
-#info-container {
+#watchlist-container {
   grid-column: 1;
   grid-row: 3;
-
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(1, auto) repeat(1, 1fr);
   grid-row-gap: 2em;
-
-}
-
-#created-date {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-#address {
-  grid-row: 2;
-  height: fit-content;
 }
 
 /* Right Hand Content Side. */
@@ -235,22 +222,19 @@ main {
   background-color: #F5F5F5;
 }
 
-#business-navbar {
+#newsfeed-navbar {
   grid-column: 2;
   grid-row: 1;
-
   font-size: 18px;
-
   padding-top: 1em;
   padding-bottom: 1em;
-
   box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
   border-radius: 1em;
   border: 2px solid rgba(0, 0, 0, 0.02);
 
 }
 
-.business-nav-item {
+.left-nav-item {
   text-align: center;
   color: black;
   font-weight: 700;
@@ -260,7 +244,6 @@ main {
   list-style: none;
   padding: 10px 0px;
   margin: 10px;
-
   background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
   background-size: 500%;
   border: none;
@@ -268,7 +251,7 @@ main {
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
-.business-nav-item:hover {
+.left-nav-item:hover {
   box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
 }
 
@@ -283,12 +266,12 @@ main {
     padding: 0 2em;
   }
 
-  #business-name-container {
+  #name-container {
     grid-column: 1;
     grid-row: 1;
   }
 
-  #business-container {
+  #sidebar-container {
     grid-column: 1;
     grid-row: 2;
   }
@@ -298,7 +281,7 @@ main {
     grid-row: 3;
   }
 
-  #business-navbar {
+  #newsfeed-navbar {
     align-content: center;
   }
 
