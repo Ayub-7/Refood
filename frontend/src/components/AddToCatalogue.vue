@@ -21,6 +21,17 @@
               label-placeholder="Product ID (required)"
               v-model="productId"/>
         </div>
+        <div id="rrp">
+          <div id="currencySymbol">{{this.currencySymbol}}</div>
+          <vs-input
+              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
+              danger-text="RRP is required and must be at least 0"
+              id="currencyInput"
+              label-placeholder="Recommended Retail Price"
+              type="text"
+              v-model="rrp"/>
+          <div id="currencyCode">{{this.currencyCode}}</div>
+        </div>
         <div id="manufacturer">
           <vs-input
               class="form-control"
@@ -32,19 +43,9 @@
           <vs-textarea
               class="form-control"
               type="text"
+              width="400px"
               label="Description"
               v-model="description"/>
-        </div>
-        <div id="rrp">
-          <div id="currencySymbol">{{this.currencySymbol}}</div>
-          <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
-              danger-text="RRP is required and must be at least 0"
-              id="currencyInput"
-              label-placeholder="Recommended Retail Price"
-              type="text"
-              v-model="rrp"/>
-          <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
       </div>
       <button
@@ -114,13 +115,13 @@ const AddToCatalogue = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length == 0){
-        api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.rrp)
+        api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.manufacturer, this.rrp)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if(error.response){
-            if(error.response.status == 400){
+            if(error.response.status === 400){
               this.$vs.notify({title:'Failed to create catalogue item', text:'Product ID is already in use', color:'danger'});
             }
             console.log(error.response.status);
@@ -174,6 +175,8 @@ export default AddToCatalogue;
   Add button's styling
    */
   .add-button {
+    grid-column: 1 / 3;
+
     cursor: pointer;
     border-radius: 5em;
     color: #fff;
@@ -181,9 +184,10 @@ export default AddToCatalogue;
     border: 0;
     z-index: 1000;
     padding: 10px 40px;
-    margin: 2em;
+    margin: 2em auto;
     font-size: 13px;
     box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+    text-align: center;
   }
 
   /**
@@ -268,46 +272,41 @@ export default AddToCatalogue;
   }
 
   #manufacturer {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 2;
   }
 
   #description {
-    grid-column: 2;
-    grid-row: 2;
-    width: 180px;
-    position: relative;
-    left: 10px;
+    grid-column: 1 / 3;
+    grid-row: 3;
   }
 
   #rrp {
     grid-column: 1;
     grid-row: 2;
-    position: relative;
-    top: 58px;
-    left: 10px;
-    display: inline-grid;
+
+    margin: 0;
+    display: flex;
   }
 
   #currencySymbol {
     grid-row: 1;
     grid-column: 1;
-    position: relative;
-    top: 24px;
+    margin: auto;
     font-size: 15px;
+    line-height: 20px;
   }
 
   #currencyInput {
     grid-row: 1;
     grid-column: 2;
-    width: 50%;
   }
 
   #currencyCode {
     grid-row: 1;
     grid-column: 3;
-    position: relative;
-    top: 24px;
+
+    margin: auto;
     font-size: 15px;
   }
 
