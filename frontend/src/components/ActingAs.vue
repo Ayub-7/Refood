@@ -1,35 +1,36 @@
 <template>
-  <div class="userInfo">
+  <div class="userInfo" @focus="showUserBusinesses" @focusout="hideUserBusinesses" tabindex="0">
         <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
         <ul class="actInfo" v-if="getActingAsBusinessName() == null">
-          <li class="userStuff" >
-            <span class ="user">Logged in as {{getUserRole()}} {{getUserName()}}</span>
-            <!-- <span class="avatar"> IMG</span> -->
-            <vs-avatar v-if="getUserName() !== null" size="large" style="margin-left: 10px" name="avatar">
-              {{getUserName().match(/[A-Z]/g).join('')}}
+          <!--v-on:click="showUserBusinesses" -->
+          <li class="userStuff">
+            <span class ="user">{{getUserName()}}</span>
+            <vs-avatar v-if="getUserName() !== null" size="30" style="margin-left: 10px" name="avatar">
             </vs-avatar>
           </li>
 
-          <li>
-            <form class="dropdown">
-              <label class="label"> Select Business to act as:  </label>
-              <select class="select" name="acting" placeholder="Business" v-model="buss" @change="setActingAsBusinessId(buss);">
-                <option value="" disabled selected>Choose business</option>
-                <option  v-for="business in getPrimaryBusinesses()"
-                        v-bind:href="business.id"
-                        :key="business.id" >{{ business.name}}</option>
-              </select>
-            </form>
+          <li id="userBusinessPanel">
+              <ul id="businessList">
+                <li v-for="business in getPrimaryBusinesses()" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
+                  <span class="user small" style="display: inline; font-size: 12px; padding-top: 5px"> {{ business.name}} </span>
+                  <vs-avatar class="v-small" v-if="getUserName() !== null" icon="store" style="transform: translate(0%, -20%) scale(0.7) !important; right: 0px;">
+                  </vs-avatar>
+                </li>
+              </ul>
           </li>
 
         </ul>
       <ul class="actInfo" v-else>
         <li class="business" >
-          Logged in as BUSINESS: {{getActingAsBusinessName()}}
+          <span class ="user">{{getActingAsBusinessName()}}</span>
+          <vs-avatar v-if="getUserName() !== null" icon="store" size="30" style="margin-left: 10px" name="avatar">
+          </vs-avatar>
         </li>
-        <br>
-        <li class="user" @click="setActingAsUser()">
-          <span class="" style="display: inline;">Act As User: {{ getUserName() }} </span>
+
+        <li id="userBusinessPanel" class="user" @click="setActingAsUser()">
+          <span class="user small" style="display: inline; font-size: 12px; padding-top: 5px">{{ getUserName() }} </span>
+          <vs-avatar class="v-small" v-if="getUserName() !== null" icon="person" style="transform: translate(0%, -20%) scale(0.7) !important;">
+          </vs-avatar>
         </li>
         </ul>
 
@@ -43,7 +44,6 @@ const actingAs =  {
 name: "actingAs",
   data: function () {
     return {
-      buss: null,
       loggedInUserId: null,
       userName: null,
       role: null,
@@ -69,10 +69,8 @@ name: "actingAs",
       return store.userPrimaryBusinesses;
     },
 
-    setActingAsBusinessId(businessName){
-      const businessId = mutations.getIdByName(businessName);
+    setActingAsBusinessId(businessId, businessName){
       mutations.setActingAsBusiness(businessId, businessName)
-      this.buss = null;
       this.$router.push({path: `/home`});
     },
 
@@ -84,15 +82,20 @@ name: "actingAs",
     getActingAsBusinessName() {
       this.actingAsBusinessName = store.actingAsBusinessName
       return this.actingAsBusinessName;
+    },
+
+
+
+    showUserBusinesses: function() {
+      let x = document.getElementById('userBusinessPanel');
+      x.style.display = "block";
+    },
+
+    hideUserBusinesses: function() {
+      let x = document.getElementById('userBusinessPanel');
+      x.style.display = "none";
     }
   },
-  // mounted: function () {
-  //   this.userName = store.userName;
-  //   this.userRole = store.role;
-  //   this.userPrimaryBusinesses = store.userPrimaryBusinesses;
-  //   this.actingAsBusinessId = store.actingAsBusinessId;
-  //   this.actingAsBusinessName = store.actingAsBusinessName;
-  // }
 }
 export default actingAs;
 </script>
@@ -109,40 +112,33 @@ export default actingAs;
 
 li.business {
   display: inline;
-
 }
 
-.dropdown .select {
-  color: #FFFFFF;
-  text-align: center;
-  font-size: 14px;
-  text-decoration: none;
-  width: 100%;
-  border-radius: 20px;
-  padding: 12px 16px;
-  border: none;
-  background: -webkit-gradient(linear, left top, right top, from(#9C27B0), to(#E040FB));
-  background: linear-gradient(to right, #385898, #385898);
-  -webkit-box-shadow: 0 0 20px 1px rgb(0 0 0 / 4%);
+#userBusinessPanel {
+  display: none;
+  margin-bottom: -15px;
+  border-top: 1px solid black;
+}
+
+li.userStuff, #userBusinessPanel li {
+  list-style: none;
 }
 
 .dropdown .select option {
   color: black;
 }
 
-.vs-avatar-content.vs-avatar-content--size.vs-change-color-badge {
-  float: right;
-  margin-right: 20px;
-  margin-top: -9px;
-  position: relative;
-}
+
 
 span.user {
-  width: 75%;
+  width: auto;
   float: left;
+  font-size: 16px;
+  padding: 10px 5px 0px 15px;
 }
 
-.dropdown {
-  margin-top: 30px;
-}
+
+
+
+
 </style>
