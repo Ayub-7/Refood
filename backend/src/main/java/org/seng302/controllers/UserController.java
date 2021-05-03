@@ -27,10 +27,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * REST controller for user related calls.
@@ -41,11 +48,17 @@ public class UserController {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
-    @Autowired
+//    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
+//    @Autowired
     private UserFinder userFinder;
+
+    @Autowired
+    public UserController(UserRepository userRepository, UserFinder userFinder) {
+        this.userRepository = userRepository;
+        this.userFinder = userFinder;
+    }
 
     /**
      * Get request mapping for get user information by Id
@@ -67,6 +80,7 @@ public class UserController {
     /**
      * Login POST method. Checks if user exists and provided details are correct and authenticates if true.
      * @param loginRequest a login request containing the email and password.
+     * @param session
      * @return 200 if login is successful, 400 if email/password is invalid.
      */
     @PostMapping("/login")
@@ -112,7 +126,7 @@ public class UserController {
      * @return Status code depending on result of registration.
      */
     @PostMapping("/users")
-    public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException {
+    public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             List<String> registrationErrors = registrationUserCheck(user);
             if (registrationErrors.size() == 0) { // No errors found.
@@ -141,34 +155,58 @@ public class UserController {
      * @param user The user to check the validity of
      * @return list of errors with the new registration request - if there is any.
      */
-    public List<String> registrationUserCheck(NewUserRequest user) {
+    public List<String> registrationUserCheck(NewUserRequest user) throws ParseException {
         List<String> errors = new ArrayList<>();
 
-        if (user.getFirstName() == null) {
+        if (user.getFirstName() == null || (user.getFirstName() != null && user.getFirstName().length() == 0)) {
             errors.add("First Name");
         }
-        if (user.getLastName() == null) {
+        if (user.getLastName() == null || (user.getLastName() != null && user.getLastName().length() == 0)) {
             errors.add("Last Name");
         }
-        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+        if (user.getEmail() == null || !this.isValidEmail(user.getEmail()) || (user.getEmail() != null && user.getEmail().length() == 0)) {
             errors.add("Email");
         }
-        if (user.getPassword() == null) {
+        if (user.getPassword() == null || (user.getPassword() != null && user.getPassword().length() == 0)) {
             errors.add("Password");
         }
-        if (user.getDateOfBirth() == null) {
+        if (user.getDateOfBirth() == null || !this.isNotUnderage(user.getDateOfBirth()) || (user.getDateOfBirth() != null && user.getDateOfBirth().length() == 0)) {
             errors.add("Date of Birth");
         }
         if (user.getHomeAddress() == null) {
             errors.add("Home Address");
         }
-        else if (user.getHomeAddress().getCountry() == null) {
+        else if (user.getHomeAddress().getCountry() == null || (user.getHomeAddress().getCountry() != null && user.getHomeAddress().getCountry().length() == 0)) {
             errors.add("Home Address - Country");
         }
 
         return errors;
     }
 
+    /**
+     * Takes an email as a parameter to check if it is in the right format.
+     * @param email The email to be checked
+     * @return True if it is in a valid format; otherwise, false
+     */
+    public boolean isValidEmail(String email) {
+        Pattern re = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+        Matcher m = re.matcher(email);
+        return m.matches();
+    }
+
+    /**
+     * Checks that the user is not underage.
+     * @param date The date of birth of the user.
+     * @return True if not underage; otherwise, false.
+     * @throws ParseException
+     */
+    public boolean isNotUnderage(String date) throws ParseException {
+        Date dob = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        Date present = new SimpleDateFormat("dd/MM/yyyy").parse(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDateTime.now()));
+        long diffInMillies = present.getTime() - dob.getTime();
+        long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 365;
+        return diff >= 13;
+    }
 
     /**
      * This method retrieves user information by name.
