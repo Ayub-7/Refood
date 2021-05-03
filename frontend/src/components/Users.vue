@@ -175,9 +175,6 @@ const Users = {
           }
           this.user = response.data;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-
-          mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-          mutations.setUserPrimaryBusinesses(this.businesses);
         }).catch((err) => {
           this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
           this.$router.push({path: "/login"}); //If user not logged in send to login page
