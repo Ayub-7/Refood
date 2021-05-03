@@ -51,11 +51,9 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <p>{{getImgUrl(product)}}</p>
-                <img style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('' + getImgUrl(product))"/>
-
-              </div>
-             
+                <img v-if="!product.images[0]" style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
+                <img v-if="product.images[0]" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/' + product.images[0].filename.replace('./',''))"/>
+               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
               
                 <div style="display: flex;">
@@ -68,7 +66,7 @@
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{ product.recommendedRetailPrice }} </p>
+                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
             </div>
           </div>
@@ -122,7 +120,7 @@
                 </td>
                 <td>{{ product.name }} </td>
                 <td>{{ product.description }} </td>
-                <td style="text-align: center">{{ product.recommendedRetailPrice }} </td>
+                <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </td>
                 <td>{{ product.created }} </td>
                 <td>
                   <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId />
@@ -156,6 +154,7 @@ import api from "../Api";
 import {store, mutations} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
+import axios from "axios";
 const Search = {
   name: "Search",
 
@@ -178,6 +177,9 @@ const Search = {
       business: null,
       businessId: null,
       displaytype: true,
+      currencySymbol: "",
+      currencyCode: "",
+      selected: "",
     };
   },
 
@@ -188,23 +190,9 @@ const Search = {
    * be filtered by the webpage.
  */
   mounted() {
-    console.log("this.getBusinessID()");
-    console.log(this.getBusinessID());
+    let userId = store.loggedInUserId;
+    this.getUserInfo(userId);
 
-    /*
-    api.getBusinessFromId(this.getBusinessID())
-        .then((response) => {
-          console.log(response.data);
-          this.$log.debug("getBusinessFromId: ", response.data);
-          this.business = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to get Business";
-        })
-        .finally(() => (this.loading = false));
-
-     */
     this.business = this.getBusinessName();
     this.businessId = this.getBusinessID();
     api.getBusinessProducts(this.businessId)
@@ -213,6 +201,10 @@ const Search = {
           this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
           this.filteredproducts = response.data;
+
+          console.log("this.products[0].images[0].filename");
+          console.log(this.products[0].images[0].filename);
+
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -223,7 +215,6 @@ const Search = {
 
 
   methods: {
-
     getImgUrl(product) {
       console.log(product.primaryImagePath)
       if (product.primaryImagePath != null) {
@@ -232,8 +223,30 @@ const Search = {
         return "../../public/ProductShoot.jpg"
       }
     },
+    getUserInfo: function(userId) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
+          throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
+    },
 
-    //todo: update getBusinessID get to use new store.js upon merge...
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then( response => {
+            this.currencySymbol = response.data[0].currencies[0].symbol;
+            this.currencyCode = response.data[0].currencies[0].code;
+          }).catch( err => {
+        console.log("Error with getting cities from REST Countries." + err);
+      });
+    },
+
     getBusinessID: function () {
       return store.actingAsBusinessId
     },
