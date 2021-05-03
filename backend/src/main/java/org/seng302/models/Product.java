@@ -76,5 +76,5 @@ public class Product {
 
     public void setPrimaryImage(String id) {
         this.primaryImage = id;
-    };
+    }
 }

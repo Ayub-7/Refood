@@ -116,8 +116,7 @@
                 <td style="width: 20px; padding-right: 10px">
                   <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
                   <div>
-                    <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
-                  </div>
+                    <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../../backend/src/main/resources/media/images/businesses/business_1/0.jpg" />                  </div>
                 </td>
                 <td>{{ product.name }} </td>
                 <td>{{ product.description }} </td>

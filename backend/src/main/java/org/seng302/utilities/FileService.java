@@ -6,10 +6,9 @@ import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.awt.image.DataBufferByte;
+import java.awt.image.WritableRaster;
+import java.io.*;
 
 /**
  * Service class that deals with file writing and saving.
@@ -52,6 +51,17 @@ public class FileService {
         BufferedImage bufferedImage = new BufferedImage(img.getWidth() / THUMBNAIL_SCALE_WIDTH, img.getHeight() / THUMBNAIL_SCALE_HEIGHT, BufferedImage.TYPE_INT_RGB);
         bufferedImage.createGraphics().drawImage(img, 0, 0, img.getWidth() / THUMBNAIL_SCALE_WIDTH, img.getHeight() / THUMBNAIL_SCALE_HEIGHT, null);
         ImageIO.write(bufferedImage, imageExtension, thumbnailLocation);
+    }
+
+
+    public byte[] getImage(File file) throws IOException {
+        logger.info("Retrieving Image from " + file);
+        BufferedImage bufferedImage = ImageIO.read(file);
+        // get DataBufferBytes from Raster
+        WritableRaster raster = bufferedImage .getRaster();
+        DataBufferByte data   = (DataBufferByte) raster.getDataBuffer();
+        return ( data.getData() );
+
     }
 
 }
