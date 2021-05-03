@@ -51,7 +51,7 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
+                <img style="width: 100%; height: 100%;   border-radius: 1em;" :src="'getImgUrl(product)'"/>
               </div>
              
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
@@ -114,9 +114,9 @@
                   :key="product.id">
 
                 <td style="width: 20px; padding-right: 10px">
-                  <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
+                  <a v-bind:href="'/products?id='+ product.id">{{ product.primaryImagePath }}</a>
                   <div>
-                    <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../../backend/src/main/resources/media/images/businesses/business_1/0.jpg" />                  </div>
+                    <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../../backend/src/main/resources/media/images/businesses/business_1/0_thumbnail.jpg" />                  </div>
                 </td>
                 <td>{{ product.name }} </td>
                 <td>{{ product.description }} </td>
@@ -221,6 +221,16 @@ const Search = {
 
 
   methods: {
+
+    getImgUrl(product) {
+      console.log(product.primaryImagePath)
+      if (product.primaryImagePath != null) {
+        return product.primaryImagePath.toString()
+      } else {
+        return "../../public/ProductShoot.jpg"
+      }
+    },
+
     //todo: update getBusinessID get to use new store.js upon merge...
     getBusinessID: function () {
       return store.actingAsBusinessId
