@@ -364,7 +364,7 @@ public class ProductController {
             File businessDir = new File(rootImageDir + "business_" + businessId);
             File checkFile = new File(businessDir + "/" + imageId + imageExtension);
             if (pathExists == true) {
-
+                product.deleteProductImage(rootImageDir + "business_" + businessId + "/" + imageId + imageExtension, "business_" + businessId + "/" + imageId + imageExtension);
                 checkFile.delete();
                 System.out.println("File "
                 + checkFile.toString()

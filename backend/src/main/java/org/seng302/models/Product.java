@@ -77,4 +77,22 @@ public class Product {
     public void setPrimaryImage(String path) {
         this.primaryImagePath = path;
     }
+
+    public void deleteProductImage(String filePath, String primaryPath) {
+        for (Image image: this.images) {
+            if (image.getFileName() == filePath) {
+                this.images.remove(image);
+            }
+        }
+        if (primaryPath == this.primaryImagePath) {
+            if (this.images.size() > 0) {
+                Image primary = this.images.get(0);
+                String primaryFilename = primary.getFileName();
+                primaryFilename.replace("./src/main/resources/media/images/businesses/", "");
+                this.setPrimaryImage(primaryFilename);
+            } else {
+                this.primaryImagePath = null;
+            }
+        }
+    }
 }

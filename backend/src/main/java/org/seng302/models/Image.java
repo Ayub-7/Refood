@@ -51,4 +51,6 @@ public class Image {
         return this.id;
     }
 
+    public String getFileName() { return this.filename; }
+
 }
