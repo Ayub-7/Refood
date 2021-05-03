@@ -114,11 +114,6 @@ li.business {
   display: inline;
 }
 
-li#userBusinessPanel ul#businessList li {
-  display: block;
-  height: 25px;
-}
-
 #userBusinessPanel {
   display: none;
   margin-bottom: -15px;
