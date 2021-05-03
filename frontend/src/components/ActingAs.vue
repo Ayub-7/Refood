@@ -10,10 +10,11 @@
           </li>
 
           <li id="userBusinessPanel">
-              <h3>Businesses:</h3>
               <ul id="businessList">
                 <li v-for="business in getPrimaryBusinesses()" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
-                  {{ business.name}}
+                  <span class="user small" style="display: inline; font-size: 12px; padding-top: 5px"> {{ business.name}} </span>
+                  <vs-avatar class="v-small" v-if="getUserName() !== null" icon="store" style="transform: translate(0%, -20%) scale(0.7) !important; right: 0px;">
+                  </vs-avatar>
                 </li>
               </ul>
           </li>
@@ -27,8 +28,8 @@
         </li>
 
         <li id="userBusinessPanel" class="user" @click="setActingAsUser()">
-          <span class="user" style="display: inline; font-size: 12px;">{{ getUserName() }} </span>
-          <vs-avatar v-if="getUserName() !== null" icon="person" size="10" style="margin-left: 10px">
+          <span class="user small" style="display: inline; font-size: 12px; padding-top: 5px">{{ getUserName() }} </span>
+          <vs-avatar class="v-small" v-if="getUserName() !== null" icon="person" style="transform: translate(0%, -20%) scale(0.7) !important;">
           </vs-avatar>
         </li>
         </ul>
@@ -88,17 +89,6 @@ name: "actingAs",
     showUserBusinesses: function() {
       let x = document.getElementById('userBusinessPanel');
       x.style.display = "block";
-      // if (x.style.display === "block") {
-      //   console.log("Hello");
-      //   window.onload = function(){
-      //     document.onclick = function(e){
-      //       if(e.target.id !== 'userBusinessPanel'){
-      //         //element clicked wasn't the div; hide the div
-      //         x.style.display = 'none';
-      //       }
-      //     };
-      //   };
-      // }
     },
 
     hideUserBusinesses: function() {
@@ -124,47 +114,40 @@ li.business {
   display: inline;
 }
 
-#userBusinessPanel {
-  display: none;
+li#userBusinessPanel ul#businessList li {
+  display: block;
+  height: 25px;
 }
 
-.dropdown .select {
-  color: #FFFFFF;
-  text-align: center;
-  font-size: 14px;
-  text-decoration: none;
-  width: 100%;
-  border-radius: 20px;
-  padding: 12px 16px;
-  border: none;
-  background: -webkit-gradient(linear, left top, right top, from(#9C27B0), to(#E040FB));
-  background: linear-gradient(to right, #385898, #385898);
-  -webkit-box-shadow: 0 0 20px 1px rgb(0 0 0 / 4%);
+#userBusinessPanel {
+  display: none;
+  margin-bottom: -15px;
+  border-top: 1px solid black;
 }
+
+/*.dropdown .select {*/
+/*  color: #FFFFFF;*/
+/*  text-align: center;*/
+/*  font-size: 14px;*/
+/*  text-decoration: none;*/
+/*  width: 100%;*/
+/*  border-radius: 20px;*/
+/*  padding: 12px 16px;*/
+/*  border: none;*/
+/*  background: -webkit-gradient(linear, left top, right top, from(#9C27B0), to(#E040FB));*/
+/*  background: linear-gradient(to right, #385898, #385898);*/
+/*  -webkit-box-shadow: 0 0 20px 1px rgb(0 0 0 / 4%);*/
+/*}*/
 
 .dropdown .select option {
   color: black;
 }
 
-.vs-avatar-content.vs-avatar-content--size.vs-change-color-badge {
-  float: right;
-  margin-right: 20px;
-  margin-top: -9px;
-  position: relative;
-}
-
 span.user {
   width: auto;
   float: left;
+  font-size: 16px;
   padding: 10px 5px 0px 15px;
 }
 
-.con-vs-avatar {
-  height: 30px;
-  width: 30px;
-}
-
-.dropdown {
-  margin-top: 30px;
-}
 </style>
