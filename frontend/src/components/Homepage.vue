@@ -117,6 +117,7 @@ const Homepage = {
        */
       getBusinessId: function() {
         let busId = store.actingAsBusinessId;
+        this.actingAsBusinessId = busId;
         if(busId){
           this.getBusiness(busId);
         }
@@ -203,6 +204,7 @@ export default Homepage;
 #name {
   font-size: 32px;
   padding: 0.5em 0 0.5em 0;
+  line-height: 1.2em;
 }
 
 /* Side-bar panel on left side */
@@ -232,6 +234,11 @@ export default Homepage;
   grid-row-gap: 2em;
 }
 
+#watchlist-container h3 {
+  font-weight: 400;
+  margin: 0px auto;
+  widows: 100%;
+}
 /* News feed styles. */
 main {
   grid-column: 3;
