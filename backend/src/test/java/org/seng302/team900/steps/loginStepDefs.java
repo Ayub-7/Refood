@@ -66,7 +66,8 @@ public class loginStepDefs {
     LoginRequest loginRequest;
     User user;
     ResponseEntity<String> result;
-
+    HttpSession sesh;
+    
     @Before
     public void setup() throws Exception {
         this.user = new User("johnsmith@yahoo.com", "Potato1!", Role.USER);
@@ -82,8 +83,8 @@ public class loginStepDefs {
     public void theyEnterWithEmailAndPassword(String email, String password) throws Exception {
         loginRequest = new LoginRequest(email, password);
         Mockito.when(userRepository.findUserByEmail((loginRequest.getEmail()))).thenReturn(user);
-        HttpSession temp = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, temp);
+        sesh = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, sesh);
     }
 
     @Then("They are redirected to their profile")
@@ -95,8 +96,8 @@ public class loginStepDefs {
     @When("They enter an email with an invalid format, such that {string}")
     public void theyEnterAnEmailWithAnInvalidFormatSuchThat(String email) throws NoSuchAlgorithmException, JsonProcessingException {
         loginRequest = new LoginRequest(email, "Potato1!");
-        HttpSession temp = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, temp);
+        sesh = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, sesh);
     }
 
     @Then("They are given a warning that their email format is invalid")
@@ -108,8 +109,8 @@ public class loginStepDefs {
     public void theyEnterAnEmailWithTheValidFormatAndPassword(String email, String password) throws NoSuchAlgorithmException, JsonProcessingException {
         loginRequest = new LoginRequest(email, password);
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
-        HttpSession temp = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, temp);
+        sesh = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, sesh);
     }
 
     @Then("They are given a warning that either their password or email is incorrect")
@@ -121,8 +122,8 @@ public class loginStepDefs {
     public void theyEnterOnlyThePassword(String password) throws NoSuchAlgorithmException, JsonProcessingException {
         loginRequest = new LoginRequest(null, password);
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
-        HttpSession temp = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, temp);
+        sesh = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, sesh);
     }
 
     @Then("They are given a warning that the email field is empty")
@@ -134,8 +135,8 @@ public class loginStepDefs {
     public void theyEnterOnlyTheEmail(String email) throws NoSuchAlgorithmException, JsonProcessingException {
         loginRequest = new LoginRequest(email, "");
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
-        HttpSession temp = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, temp);
+        sesh = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, sesh);
     }
 
     @Then("They are given a warning that the password field is empty")
@@ -147,12 +148,31 @@ public class loginStepDefs {
     public void theyEnterNothingButAttemptToLoggingAnyway() throws NoSuchAlgorithmException, JsonProcessingException {
         loginRequest = new LoginRequest(null, "");
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
-        HttpSession temp = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, temp);
+        sesh = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, sesh);
     }
 
     @Then("They are given a warning that both email and password fields are empty")
     public void theyAreGivenAWarningThatBothEmailAndPasswordFieldsAreEmpty() {
         assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Given("User is logged in")
+    public void userIsLoggedIn() throws NoSuchAlgorithmException, JsonProcessingException {
+        loginRequest = new LoginRequest("johnsmith@yahoo.com", "Potato1!");
+        Mockito.when(userRepository.findUserByEmail((loginRequest.getEmail()))).thenReturn(user);
+        sesh = Mockito.mock(HttpSession.class);
+        result = userController.loginUser(loginRequest, null, sesh);
+    }
+
+    @When("They press log out")
+    public void theyPressLogOut() {
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Then("They successfully logout and their token session disappears")
+    public void theySuccessfullyLogoutAndTheirTokenSessionDisappears() {
+        result = userController.logoutUser(null, sesh);
+        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.OK.value());
     }
 }

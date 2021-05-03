@@ -33,3 +33,8 @@ Feature: U1 Registering and logging into an individual account
     Given User attempts to login
     When They enter nothing, but attempt to logging anyway
     Then They are given a warning that both email and password fields are empty
+
+  Scenario: Logging out
+    Given User is logged in
+    When They press log out
+    Then They successfully logout and their token session disappears

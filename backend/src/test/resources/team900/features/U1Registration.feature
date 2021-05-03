@@ -32,10 +32,5 @@ Feature: U1 Registering and logging into an individual account
 
   Scenario: Password storage
   Given User attempts to register
-  When They successfully register
+  When They successfully register with the password "Potato1!"
   Then Password is hashed and not stored in plain text
-
-  Scenario: Logging out
-  Given User is logged in
-  When They press log out
-  Then They successfully logout and their token session disappears

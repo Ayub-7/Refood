@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,7 +50,7 @@ public class registerStepDefs {
     }
 
     @When("They input the firstname {string}, lastname {string}, email {string}, DoB {string}, and password {string}")
-    public void theyInputTheFirstnameLastnameEmailDoBAndAddress(String fname, String lname, String email, String DoB, String password) throws JsonProcessingException, NoSuchAlgorithmException {
+    public void theyInputTheFirstnameLastnameEmailDoBAndAddress(String fname, String lname, String email, String DoB, String password) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         NewUserRequest newUserRequest = new NewUserRequest(fname, null, lname, null,
                 null, email,
@@ -95,25 +96,15 @@ public class registerStepDefs {
         assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @When("They successfully register")
-    public void theySuccessfullyRegister() {
-        assertThat(result.getStatusCodeValue()).isEqualTo(HttpStatus.CREATED.value());
+    @When("They successfully register with the password {string}")
+    public void theySuccessfullyRegister(String password) throws NoSuchAlgorithmException, ParseException, JsonProcessingException {
+        Mockito.when(userRepository.findUserByEmail("jeffgold@hotmail.com")).thenReturn(new User("jeffgold@hotmail.com", password, Role.USER));
+        em = "jeffgold@hotmail.com";
+        pass = password;
     }
 
     @Then("Password is hashed and not stored in plain text")
     public void passwordIsHashedAndNotStoredInPlainText() throws JsonProcessingException {
         assertThat(this.userRepository.findUserByEmail(em).getPassword() != pass);
-    }
-
-    @Given("User is logged in")
-    public void userIsLoggedIn() {
-    }
-
-    @When("They press log out")
-    public void theyPressLogOut() {
-    }
-
-    @Then("They successfully logout and their token session disappears")
-    public void theySuccessfullyLogoutAndTheirTokenSessionDisappears() {
     }
 }
