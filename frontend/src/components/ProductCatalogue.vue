@@ -61,7 +61,7 @@
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
                 <div class="action_btn">
-                  <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
+                  <ImageUpload :productId="product.id" :businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
                   <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
@@ -123,7 +123,7 @@
                 <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </td>
                 <td>{{ product.created }} </td>
                 <td>
-                  <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId />
+                  <ImageUpload :productId=product.id :businessId=businessId />
                   <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </td>
               </tr>
@@ -192,6 +192,7 @@ const Search = {
   mounted() {
     let userId = store.loggedInUserId;
     this.getUserInfo(userId);
+    
 
     this.business = this.getBusinessName();
     this.businessId = this.getBusinessID();
@@ -215,6 +216,9 @@ const Search = {
 
 
   methods: {
+
+
+
     getImgUrl(product) {
       console.log(product.primaryImagePath)
       if (product.primaryImagePath != null) {
