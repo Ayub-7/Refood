@@ -180,6 +180,7 @@ const Search = {
       displaytype: true,
       currencySymbol: "",
       currencyCode: "",
+      selected: "",
     };
   },
 
