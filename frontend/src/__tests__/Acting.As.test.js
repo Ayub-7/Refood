@@ -1,11 +1,13 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import ActingAs from '../components/ActingAs';
+import Vuesax from 'vuesax';
 //import {mutations} from "@/store";
 //import {store} from "@/store";
 //import Users from "@/components/Users";
 //import {store} from "@/store";
 
 const localVue = createLocalVue();
+localVue.use(Vuesax);
 let wrapper;
 
 
@@ -70,37 +72,28 @@ const mockBusinesses = [
     }
 ]
 
-// let store = {loggedInUserId: 22,
-//     role: "USER",
-//     userName: "Wileen Tisley",
-//     userPrimaryBusinesses: [],
-//     actingAsBusinessId: null,
-//     actingAsBusinessName: null
-// }
+let store = {
+    loggedInUserId: 22,
+    role: "USER",
+    userName: "Wileen Tisley",
+    userPrimaryBusinesses: [],
+    actingAsBusinessId: null,
+    actingAsBusinessName: null
+}
+const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
+getUserNameMethod.mockImplementation(() => {
+    return store.userName;
+});
 
 beforeEach(() => {
     wrapper = shallowMount(ActingAs, {
-        localVue,
         propsData: {},
-        mocks: {},
+        mocks: {store},
         stubs: ['router-link', 'router-view'],
         methods: {},
-        data() {
-            return {
-                loggedInUserId: 22,
-                userName: "Wileen Tisley",
-                role: "USER",
-                userPrimaryBusinesses: mockBusinesses,
-                actingAsBusinessId: null,
-                actingAsBusinessName: null
-            }
-        }
+        localVue,
     });
-    const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName')
-    getUserNameMethod.mockImplementation(() => {
-        wrapper.vm.userName = "Wileen Tisley";
-        return wrapper.vm.userName;
-    });
+
     const getUserRoleMethod = jest.spyOn(ActingAs.methods, 'getUserRole')
     getUserRoleMethod.mockImplementation(() => {
         wrapper.vm.role = "USER";

@@ -14,7 +14,7 @@ let $vs = {
 let store = {
     userDateOfBirth: '1989-02-28'
 }
-
+const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
 beforeEach(() => {
     wrapper = shallowMount(Business, {
         propsData: {},
@@ -33,9 +33,9 @@ afterEach(() => {
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Business Register error checking', () => {
     beforeEach(() => {
-        // const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
-        // checkAgeMethod.mockResolvedValue(true);
-        wrapper.vm.checkAge = jest.fn();
+        checkAgeMethod.mockImplementation(() => {
+            return true;
+        });
     });
 
     test('Handles empty Register', () => {
@@ -66,8 +66,9 @@ describe('Business Register error checking', () => {
 
 describe('Business Register user age checking', () => {
     beforeEach(() => {
-        const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
-        checkAgeMethod.mockResolvedValue(false);
+        checkAgeMethod.mockImplementation(() => {
+            return false;
+        });
     });
 
     test('Handles to young user', () => {
