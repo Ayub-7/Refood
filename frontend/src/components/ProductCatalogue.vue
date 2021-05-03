@@ -51,9 +51,9 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
-              </div>
-             
+                <img v-if="!product.images[0]" style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
+                <img v-if="product.images[0]" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/' + product.images[0].filename.replace('./',''))"/>
+               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
               
                 <div style="display: flex;">
@@ -202,6 +202,10 @@ const Search = {
           this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
           this.filteredproducts = response.data;
+
+          console.log("this.products[0].images[0].filename");
+          console.log(this.products[0].images[0].filename);
+
         })
         .catch((error) => {
           this.$log.debug(error);
