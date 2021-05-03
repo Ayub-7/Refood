@@ -194,8 +194,14 @@ public class UserController {
         return m.matches();
     }
 
+    /**
+     * Checks that the user is not underage.
+     * @param date The date of birth of the user.
+     * @return True if not underage; otherwise, false.
+     * @throws ParseException
+     */
     public boolean isNotUnderage(String date) throws ParseException {
-        Date dob = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+        Date dob = new SimpleDateFormat("yyyy-MM-dd").parse(date);
         Date present = new SimpleDateFormat("dd/MM/yyyy").parse(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(LocalDateTime.now()));
         long diffInMillies = present.getTime() - dob.getTime();
         long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 365;
