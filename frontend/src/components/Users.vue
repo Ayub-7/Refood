@@ -3,7 +3,7 @@
     <div id="container" v-if="this.user != null">
 
       <!-- Far left side options menu-->
-      <div id="options-bar">
+      <div id="options-bar" v-if="showOptionsMenu()">
         <div class="sub-header" style="text-align: center"> Options </div>
         <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
       </div>
@@ -104,7 +104,6 @@ const Users = {
       user: null,
       businesses: [],
       userViewingBusinesses: [],
-      showOptions: false,
 
       showModal: false,
       selectedBusiness: null
@@ -194,6 +193,13 @@ const Users = {
       this.$router.push({path: `/businesses/${business.id}`})
     },
 
+    showOptionsMenu: function() {
+      if (this.userViewingBusinesses < 1) {
+        return false
+      }
+      return true
+    },
+
   },
 
   mounted: function () {
@@ -201,7 +207,6 @@ const Users = {
     let userId = this.$route.params.id
     this.user = this.getUserInfo(userId);
   },
-
 }
 
 export default Users;
