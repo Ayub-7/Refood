@@ -2,6 +2,7 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.exceptions.InvalidImageExtensionException;
@@ -15,14 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.seng302.models.requests.LoginRequest;
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -33,6 +31,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -176,6 +177,9 @@ public class ProductController {
         } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
             errorMessage = "Product recommended retail price must be at least 0";
             isValid = false;
+        } else if (product.getDescription() == null || product.getDescription() == "") {
+            errorMessage = "Product must have description";
+            isValid = false;
         }
 
         ArrayList returnObjects = new ArrayList();
@@ -230,11 +234,13 @@ public class ProductController {
         String imageName = "";
         boolean freeImage = false;
         int count = 0;
+
         while (!freeImage) {
             imageName = String.valueOf(count);
-            File checkFile = new File(businessDir + "/" + imageName + imageExtension);
-
-            if (checkFile.exists()) {
+            File checkFile1 = new File(businessDir + "/" + imageName + ".jpg");
+            File checkFile2 = new File(businessDir + "/" + imageName + ".png");
+            File checkFile3 = new File(businessDir + "/" + imageName + ".gif");
+            if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
                 count++;
             }
             else {
@@ -255,7 +261,47 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /**
+     * Sets the primary image for a product from a previously saved image.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @return
+     */
+    @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
+    public ResponseEntity<String> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) {
+        String imageDir = System.getProperty("user.dir") + "/src/test/resources/media/images/business_" + businessId + "/" + imageId;
+        String idString = "";
+        Business business = businessRepository.findBusinessById(businessId);
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
+        Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
+        if (product == null || business == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        boolean pathExists = false;
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext: extensions) {
+            Path path = Paths.get(imageDir + ext);
+            System.out.println(path.toString());
+            if (Files.exists(path)) {
+                idString = imageId + ext;
+                pathExists = true;
+                break;
+            }
+        }
+        if (!pathExists) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        product.setPrimaryImage(idString);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
     /**
          * deletes an image
          * @param businessId unique identifier of the business that the image is relating to.

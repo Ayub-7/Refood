@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="this.user != null">
+  <div class="card">
     <h3 class="card-header">Modify Catalog Product</h3>
     <form>
       <div id="info-field">
@@ -12,6 +12,15 @@
               label-placeholder="Product name (required)"
               v-model="productName"/>
         </div>
+        <div id="product-id">
+          <vs-input
+              :danger="(errors.includes(productId))"
+              danger-text="Product id is required"
+              class="form-control"
+              type="text"
+              label-placeholder="Product ID (required)"
+              v-model="productId"/>
+        </div>
         <div id="description">
           <vs-textarea
               class="form-control"
@@ -22,8 +31,8 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('rrp'))"
-              danger-text="RRP must be at least 0"
+              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
+              danger-text="RRP is required and must be at least 0"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
               type="text"
@@ -35,7 +44,11 @@
       <button
           type="button"
           class="add-button"
-          @click="checkForm(); ModifyItem();">Modify Item To Catalog</button>
+          @click="checkForm(); ModifyItem();">Save Changes</button>
+      <button
+          type="button"
+          class="add-button"
+          @click="cancel();">Cancel</button>
     </form>
   </div>
 </template>
@@ -45,7 +58,6 @@ import CurrencyInput from "../components/CurrencyInput";
 import api from "../Api";
 import axios from "axios";
 import {store} from "../store";
-
 const ModifyCatalog = {
   name: "ModifyCatalog",
   components: {CurrencyInput},
@@ -54,6 +66,7 @@ const ModifyCatalog = {
       user: null,
       errors: [],
       productName: "",
+      productId: "",
       description: "",
       currencySymbol: "",
       currencyCode: "",
@@ -72,18 +85,21 @@ const ModifyCatalog = {
         this.errors.push(this.productName);
       }
 
+      if (this.productId.length === 0) {
+        this.errors.push(this.productId);
+      }
 
-      if (this.rrp.length === 0 || this.rrp === null) {
+      if (this.rrp.length === 0) {
         this.errors.push('no-rrp');
       } else if(this.rrp < 0){
         this.errors.push('rrp');
       }
 
       if (this.errors.length >= 1) {
-        if(this.errors.includes(this.productName) || this.errors.includes('no-rrp')){
-          this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
-        } else if(this.errors.includes('rrp')){
-          this.$vs.notify({title:'Failed to create catalogue item', text:'RRP must be at least 0.', color:'danger'});
+        if(this.errors.includes(this.productName) || this.errors.includes(this.productId)){
+          this.$vs.notify({title:'Failed to modify catalogue item', text:'Required fields are missing.', color:'danger'});
+        } if(this.errors.includes('rrp') || this.errors.includes('no-rrp')){
+          this.$vs.notify({title:'Failed to modify catalogue item', text:'RRP is required and must be at least 0.', color:'danger'});
         }
       }
     },
@@ -95,10 +111,10 @@ const ModifyCatalog = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length === 0){
-        api.modifyProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.rrp)
+        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.rrp)
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
-              this.$router.push({name: 'ProductCatalogue'})
+              this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if(error.response){
             if(error.response.status === 400){
@@ -109,6 +125,10 @@ const ModifyCatalog = {
           this.$log.debug("Error Status:", error)
         });
       }
+    },
+
+    cancel: function(){
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
     },
 
     getUserInfo: function(userId) {
@@ -152,7 +172,7 @@ export default ModifyCatalog;
 <style scoped>
 
 /*
-Add button's stylingg
+Add button's styling
  */
 .add-button {
   cursor: pointer;

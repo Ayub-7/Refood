@@ -34,6 +34,8 @@ public class Product {
     @OneToMany(cascade = CascadeType.ALL) // Creates a table PRODUCT_IMAGES.
     private List<Image> images;
 
+    private String primaryImage;
+
     protected Product() { }
 
     public Product(String id, long businessId, String name, String description, double recommendedRetailPrice, Date created) {
@@ -44,6 +46,9 @@ public class Product {
         this.recommendedRetailPrice = recommendedRetailPrice;
         this.created = created;
         this.images = new ArrayList<>();
+
+        //TODO default image
+        this.primaryImage = "";
     }
 
     /**
@@ -69,4 +74,7 @@ public class Product {
         this.images.add(image);
     }
 
+    public void setPrimaryImage(String id) {
+        this.primaryImage = id;
+    };
 }

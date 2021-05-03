@@ -152,7 +152,7 @@
 
 <script>
 import api from "../Api";
-import {store} from "@/store";
+import {store, mutations} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
 import axios from "axios";
@@ -250,11 +250,11 @@ const Search = {
 
     //sets the product to alter id
     setProductToAlter(productId) {
-      store.setProductToAlter(productId);
+      mutations.setProductToAlter(productId);
     },
     //modifies selected catalog item
     goToModify: function () {
-      this.$router.push({path: `/modifyCatalog`})
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/modify`})
     },
 
     /**

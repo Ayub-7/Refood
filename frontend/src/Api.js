@@ -158,21 +158,21 @@ export default {
      * @param name product name
      * @param description product description
      * @param recommendedRetailPrice product recommended retail price in their local currency
-     */ 
+     */
     createProduct: async(businessId, id, name, description, recommendedRetailPrice) =>
         instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
     /**
      * modifies catalog product
-     * @param productId product id (chosen by user)
+     * @param id product id (chosen by user)
      * @param name product name
      * @param description product description
      * @param recommendedRetailPrice product recommended retail price in their local currency
      */
-    modifyProduct: async (businessId, productId, name, description, recommendedRetailPrice) =>
-        instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, name, description, recommendedRetailPrice}, {withCredentials: true}),
+    modifyProduct: async (businessId, productId, id, name, description, recommendedRetailPrice) =>
+        instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
 
     getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
-    
+
     /**
      * Post request to send a product image
      * @param businessId business identifier to remove rights to.
@@ -185,8 +185,13 @@ export default {
         'Content-Type': 'multipart/form-data'
       },
       withCredentials: true,
-    })
-
-
-    
+    }),
+    /**
+     * Put request to set the primary image from the existing images for a product.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
+     */
+    setPrimaryImage: (businessId, productId, imageId) => instance.put(`businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, {withCredentials: true})
 }
