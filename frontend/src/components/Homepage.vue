@@ -1,8 +1,9 @@
 <template>
   <!-- -->
   <div id="container" v-if="getLoggedInUserId() != null">
-      <!-- Header of page, contains link to user profile and welcome message with user's first name -->
+      <!-- Welcome message that greets user with their name, or a business administrator with the business name -->
       <div id="name-container">
+        <!-- Shows a different greeting message depending on who the user is acting as -->
         <div v-if="this.actingAsBusinessId != null" id="name">
           Welcome to your home page, {{getBusinessName()}}!
         </div>
@@ -12,10 +13,12 @@
       </div>
 
       <div id="sidebar-container">
-        <!-- Activity feed THINGS WILL LATER BE PLACE IN THESE FIELDS, JUST SAMPLE AT THE MOMENT -->
+        <!-- Left navigation with links to profile pages, or the product catalogue -->
         <div id="left-nav" class="sub-container">
+          <!-- Shows a different nav depending on who the user is acting as -->
           <div class="userinfo-container" v-if="getBusinessId()">
           <ul id="businfo-content">
+            <!-- When each list item is clicked, redirects to the relevant page in the application -->
             <li class="left-nav-item" id="bus-profile-btn" @click='goToProfile()' style='cursor: pointer; text-decoration: none;'>Business Profile</li>
             <li class="left-nav-item" id="bus-catalogue-btn" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
           </ul>
@@ -26,12 +29,13 @@
             </ul>
           </div>
         </div>
-
+        <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container">
           <h3>Watchlist:</h3>
         </div>
 
       </div>
+        <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
         <main>
           <nav id="newsfeed-navbar">
             <div id="name" style="text-align: center;">
@@ -39,13 +43,13 @@
             </div>
           </nav>
         </main>
-          <!-- Things like user businesses, business inventory etc. -->
   </div>
 </template>
 
 <script>
 import api from "../Api";
 import {mutations, store} from "../store"
+
 const Homepage = {
     name: "Homepage",
     data: function () {
@@ -61,6 +65,9 @@ const Homepage = {
     methods: {
       /**
        * Gets user info from backend and sets userFirstname property (for welcome message)
+       * Also sets the users details in store.js, so the users session can be maintained
+       * as they navigate throughout the applications and 'act' as a business
+       *
        * @param userId ID of user who is currently viewing page.
        */
       getUserDetails: function(userId) {
@@ -70,6 +77,7 @@ const Homepage = {
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
               this.userLoggedIn = true;
+              /* Sets user details in store.js */
               mutations.setUserDateOfBirth(response.data.dateOfBirth);
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
               mutations.setUserPrimaryBusinesses(this.businesses);
@@ -86,6 +94,12 @@ const Homepage = {
           })
       },
 
+      /**
+       * Sends an api request to get a business object from a business Id
+       * Sets this components business variable to this object
+       *
+       * @param id business id
+       */
       getBusiness: function(id) {
         api.getBusinessFromId(id)
             .then((res) => {
@@ -96,6 +110,11 @@ const Homepage = {
             })
       },
 
+      /**
+       * Gets the business id from the store, for the business the user is acting as
+       *
+       * @return busId the business id
+       */
       getBusinessId: function() {
         let busId = store.actingAsBusinessId;
         if(busId){
@@ -104,15 +123,23 @@ const Homepage = {
         return busId;
       },
 
+      /**
+       * Gets the name of the business the user is acting as from the store
+       */
       getBusinessName: function() {
         return store.actingAsBusinessName;
       },
 
+      /**
+       * Gets the username of the logged in user from the store
+       */
       getUserName: function() {
         return store.userName;
       },
+
       /**
-       * Gets the logged in users id
+       * Gets the logged in users id from the store, and assigns this components
+       * userId variable equal to it.
        */
       getLoggedInUserId: function() {
         this.userId = store.loggedInUserId;
@@ -120,7 +147,8 @@ const Homepage = {
       },
 
       /**
-       * Pushes users profile onto router
+       * Redirects the user to either the business profile page, if acting as a business,
+       * or the user profile page, if acting as an individual
        */
       goToProfile: function() {
         if(this.getBusinessId() != null){
@@ -129,12 +157,20 @@ const Homepage = {
           this.$router.push({path: `/users/${this.getLoggedInUserId()}`});
         }
       },
+
+      /**
+       * Redirects the user to the product catalogue page, if acting as a business
+       */
       goToProductCatalogue: function() {
         this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
       }
     },
 
-    mounted: function () {
+  /**
+   * Sets the userId variable equal to the userId from the store when the component
+   * is first rendered, then gets the users details from the backend using the API
+   */
+  mounted: function () {
       let userId = store.loggedInUserId;
       this.getUserDetails(userId);
     },
@@ -144,7 +180,6 @@ export default Homepage;
 </script>
 
 <style scoped>
-
 #container {
   display: grid;
   grid-template-columns: 1fr 1fr 3fr 1fr;
@@ -152,7 +187,7 @@ export default Homepage;
   grid-column-gap: 1em;
 }
 
-/* Top Business Name Container */
+/* Top Name Container */
 #name-container {
   grid-column: 2 / 4;
   grid-row: 1;
@@ -170,12 +205,7 @@ export default Homepage;
   padding: 0.5em 0 0.5em 0;
 }
 
-#business-type {
-  font-size: 16px;
-  padding: 0 0 0.5em 0;
-}
-
-/* Business Info Panel on left side */
+/* Side-bar panel on left side */
 #sidebar-container {
   grid-column: 2;
   grid-row: 2;
@@ -193,15 +223,6 @@ export default Homepage;
   background-color: #F5F5F5;
 }
 
-.sub-header {
-  font-size: 12px;
-  color: gray;
-}
-
-#left-nav {
-  grid-row: 2;
-}
-
 #watchlist-container {
   grid-column: 1;
   grid-row: 3;
@@ -211,7 +232,7 @@ export default Homepage;
   grid-row-gap: 2em;
 }
 
-/* Right Hand Content Side. */
+/* News feed styles. */
 main {
   grid-column: 3;
   grid-row: 2;
@@ -231,7 +252,12 @@ main {
   box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
   border-radius: 1em;
   border: 2px solid rgba(0, 0, 0, 0.02);
+}
 
+/* left navigation panel styling */
+
+#left-nav {
+  grid-row: 2;
 }
 
 .left-nav-item {
@@ -261,7 +287,6 @@ main {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
-
     margin: auto;
     padding: 0 2em;
   }
