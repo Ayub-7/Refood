@@ -1,38 +1,45 @@
 <template>
   <!-- -->
-  <div id="body" v-if="getLoggedInUserId() != null">
+  <div id="container" v-if="getLoggedInUserId() != null">
       <!-- Header of page, contains link to user profile and welcome message with user's first name -->
-      <div id="welcomeHeader">
-        <div v-if="this.actingAsBusinessId != null">
-          <h1 id="busPageTitle"> Welcome to your home page, {{this.business.name}}! </h1>
+      <div id="business-name-container">
+        <div v-if="getBusinessName() != null" id="business-name">
+          Welcome to your home page, {{getBusinessName()}}!
         </div>
-        <div v-else>
-          <h1 id="pageTitle"> Welcome to your home page, {{this.userFirstName}}! </h1>
+        <div v-else id="business-name">
+          Welcome to your home page, {{getUserName()}}! </h1>
         </div>
       </div>
 
-      <div id="page-container">
+      <div id="business-container">
         <!-- Activity feed THINGS WILL LATER BE PLACE IN THESE FIELDS, JUST SAMPLE AT THE MOMENT -->
-        <div class="content-container">
-          <h2>Content Header</h2>
-          <p class="content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean in facilisis ligula. Maecenas suscipit at magna vel maximus. Nunc in imperdiet erat. Aenean semper leo tellus, vestibulum interdum tortor aliquet a. Interdum et malesuada fames ac ante ipsum primis in faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam feugiat dolor consequat erat bibendum, sit amet condimentum lectus lacinia.</p>
-        </div>
-        <div class="userinfo-conta iner" v-if="getBusinessId()">
-          <!-- Things like user businesses, business inventory etc. -->
-          <h2>Business links</h2>
+        <div id="description" class="sub-container">
+          <div class="userinfo-container" v-if="getBusinessId()">
           <ul id="businfo-content">
-            <li class="profileLink" id="busProfile" @click='goToProfile()' style='cursor: pointer'>Profile</li>
-            <li class="profileLink" id="busCatalogue" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
+            <li class="business-nav-item" @click='goToProfile()' style='cursor: pointer; text-decoration: none;'>Business Profile</li>
+            <li class="business-nav-item"  @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
           </ul>
+          </div>
+          <div class="userinfo-container" v-else>
+            <ul id="userinfo-content">
+              <li class="business-nav-item" @click='goToProfile()' style='cursor: pointer'>Profile</li>
+            </ul>
+          </div>
         </div>
-        <div class="userinfo-container" v-else>
-          <h2>User links</h2>
-          <ul id="userinfo-content">
-            <li class="profileLink" id="userProfile" @click='goToProfile()' style='cursor: pointer'>Go to profile</li>
-          </ul>
+
+        <div id="info-container" class="sub-container">
+          <p>Favourites</p>
         </div>
 
       </div>
+        <main>
+          <nav id="business-navbar">
+            <div id="business-name" style="text-align: center;">
+              News Feed
+            </div>
+          </nav>
+        </main>
+          <!-- Things like user businesses, business inventory etc. -->
   </div>
 </template>
 
@@ -43,7 +50,6 @@ const Homepage = {
     name: "Homepage",
     data: function () {
         return {
-            userFirstName: null,
             userId: null,
             businesses: [],
             actingAsBusinessId: null,
@@ -63,7 +69,6 @@ const Homepage = {
             if(store.loggedInUserId != null) {
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-              this.userFirstName = `${response.data.firstName}`
               this.userLoggedIn = true;
               mutations.setUserDateOfBirth(response.data.dateOfBirth);
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
@@ -99,6 +104,13 @@ const Homepage = {
         return busId;
       },
 
+      getBusinessName: function() {
+        return store.actingAsBusinessName;
+      },
+
+      getUserName: function() {
+        return store.userName;
+      },
       /**
        * Gets the logged in users id
        */
@@ -132,132 +144,163 @@ export default Homepage;
 </script>
 
 <style scoped>
-#body {
-  /* background-color: #F3EBF6; */
-  font-family: 'Ubuntu', sans-serif;
-  padding: 3em;
-}
 
-#welcomeHeader {
+#container {
   display: grid;
-  grid-template-columns: 85% 1fr;
-  text-align: center;
-  background-color: #F3EBF6;
-  border-radius: 20px;
+  grid-template-columns: 1fr 1fr 3fr 1fr;
+  grid-template-rows: auto auto;
+  grid-column-gap: 1em;
 }
 
-#pageTitle {
-  border-radius: 10px;
-  background-color: #F3EBF6;
-  font-size: 50px
-
-}
-
-.profileLink {
-  border-radius: 30px;
-  background-color: #f3e3f9;
-  margin-right: 10px;
-  margin-top: 5px;
-  font-size: 20px;
-  padding: 10px 5px;
-  list-style-type: none;
-  box-shadow: 0px 3px 8px#cfcfcf;
-}
-
-ul#businfo-content {
-  padding-left: 10px;
-}
-
-#page-container {
-  display: grid;
-  grid-template-columns: 60% 1fr;
-  margin-top: 20px;
-
-}
-
-.content-container {
-  grid-column: 1;
-  text-align: center;
-  background: #F3EBF6;
-  border-radius: 30px;
-  margin-bottom: 30px;
-}
-
-.content {
-  background: #f3e3f9;
-  padding: 1em;
-  margin: 1em;
-  font-size: 20px;
-  border-radius: 30px;
-}
-
-.userinfo-container {
-  text-align: center;
-  background: #F3EBF6;
-  margin-left: 10px;
-  border-radius: 30px;
+/* Top Business Name Container */
+#business-name-container {
+  grid-column: 2 / 4;
   grid-row: 1;
+
+  text-align: center;
+  background-color: transparent;
+  padding: 15px 0 15px 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  margin: 8px 0 0 0;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+
+#business-name {
+  font-size: 32px;
+  padding: 0.5em 0 0.5em 0;
+}
+
+#business-type {
+  font-size: 16px;
+  padding: 0 0 0.5em 0;
+}
+
+/* Business Info Panel on left side */
+#business-container {
   grid-column: 2;
+  grid-row: 2;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, auto) repeat(1, 1fr);
+  grid-row-gap: 1em;
 }
 
-#userinfo-content {
-  font-size: 20px
+.sub-container {
+  padding: 2em;
+  border-radius: 1.5em;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  background-color: #F5F5F5;
 }
 
+.sub-header {
+  font-size: 12px;
+  color: gray;
+}
+
+#description {
+  grid-row: 2;
+}
+
+#info-container {
+  grid-column: 1;
+  grid-row: 3;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(1, auto) repeat(1, 1fr);
+  grid-row-gap: 2em;
+
+}
+
+#created-date {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#address {
+  grid-row: 2;
+  height: fit-content;
+}
+
+/* Right Hand Content Side. */
+main {
+  grid-column: 3;
+  grid-row: 2;
+
+  margin: 1em 0 1em 0;
+  border-radius: 1.5em;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  background-color: #F5F5F5;
+}
+
+#business-navbar {
+  grid-column: 2;
+  grid-row: 1;
+
+  font-size: 18px;
+
+  padding-top: 1em;
+  padding-bottom: 1em;
+
+  box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
+  border-radius: 1em;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+
+}
+
+.business-nav-item {
+  text-align: center;
+  color: black;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  list-style: none;
+  padding: 10px 0px;
+  margin: 10px;
+
+  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
+  background-size: 500%;
+  border: none;
+  border-radius: 5rem;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+
+.business-nav-item:hover {
+  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
+}
+
+/* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {
-  #welcomeHeader {
-    grid-template-columns: 1fr;
-  }
-  
-  #page-container {
-    grid-template-columns: 1fr;
-  }
-
   #container {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
 
     margin: auto;
     padding: 0 2em;
   }
 
-  #pageTitle {
-    font-size: 30px;
+  #business-name-container {
     grid-column: 1;
     grid-row: 1;
   }
 
-  #profileLink {
-    margin-right: 0px;
+  #business-container {
     grid-column: 1;
     grid-row: 2;
   }
 
-  #userinfo-container {
+  main {
     grid-column: 1;
     grid-row: 3;
-    margin-bottom: 20px;
   }
 
-  .content-container {
-    grid-column: 1;
-    grid-row: 4
+  #business-navbar {
+    align-content: center;
   }
 
-}
-
-
-
-
-a {
-  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #E1BEE7;
-  text-decoration: none
-}
-@media (max-width: 600px) {
-  .main {
-    border-radius: 0px;
-  }
 }
 </style>
