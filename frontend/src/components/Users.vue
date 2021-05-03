@@ -93,7 +93,7 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
-import {mutations, store} from "../store";
+import {store} from "../store";
 
 
 const Users = {

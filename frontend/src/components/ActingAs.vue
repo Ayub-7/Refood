@@ -120,23 +120,15 @@ li.business {
   border-top: 1px solid black;
 }
 
-/*.dropdown .select {*/
-/*  color: #FFFFFF;*/
-/*  text-align: center;*/
-/*  font-size: 14px;*/
-/*  text-decoration: none;*/
-/*  width: 100%;*/
-/*  border-radius: 20px;*/
-/*  padding: 12px 16px;*/
-/*  border: none;*/
-/*  background: -webkit-gradient(linear, left top, right top, from(#9C27B0), to(#E040FB));*/
-/*  background: linear-gradient(to right, #385898, #385898);*/
-/*  -webkit-box-shadow: 0 0 20px 1px rgb(0 0 0 / 4%);*/
-/*}*/
+li.userStuff, #userBusinessPanel li {
+  list-style: none;
+}
 
 .dropdown .select option {
   color: black;
 }
+
+
 
 span.user {
   width: auto;
@@ -144,5 +136,9 @@ span.user {
   font-size: 16px;
   padding: 10px 5px 0px 15px;
 }
+
+
+
+
 
 </style>
