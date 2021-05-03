@@ -36,16 +36,25 @@ const mockUser = {
 //
 // }
 
-
+let $log = {
+    debug: jest.fn(),
+}
 
 beforeEach(() => {
     wrapper = shallowMount(AddToCatalogue, {
         propsData: {},
-        mocks: {store},
+        mocks: {store, $log},
         stubs: ['router-link', 'router-view'],
         methods: {},
         // components: CurrencyInput,
         localVue,
+    });
+
+    const getUserMethod = jest.spyOn(AddToCatalogue.methods, 'getUserInfo');
+    getUserMethod.mockImplementation(() =>{
+        wrapper.vm.user = mockUser;
+        wrapper.vm.currencyCode = "NZD";
+        wrapper.vm.currencySymbol = "$"
     });
 });
 
