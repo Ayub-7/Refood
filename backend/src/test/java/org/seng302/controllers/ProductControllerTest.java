@@ -432,7 +432,16 @@ public class ProductControllerTest {
     // Adding Product Image Tests.
     @Test
     public void testNoAuthAddProductImage() throws Exception {
-        mvc.perform(post("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId()))
+        File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
+        assertThat(data).exists();
+
+        byte[] bytes = FileCopyUtils.copyToByteArray(data);
+        MockMultipartFile image = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+
+        mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
+                .file(image))
                 .andExpect(status().isUnauthorized());
     }
 
