@@ -47,7 +47,7 @@ public class Product {
         this.created = created;
         this.images = new ArrayList<>();
 
-        this.primaryImagePath = "../../public/ProductShoot.jpg";
+        this.primaryImagePath = null;
     }
 
     /**
@@ -63,7 +63,7 @@ public class Product {
         this.recommendedRetailPrice = newProductRequest.getRecommendedRetailPrice();
         this.created = new Date();
         this.images = new ArrayList<>();
-        this.primaryImagePath = "../../public/ProductShoot.jpg";
+        this.primaryImagePath = null;
     }
 
     /**

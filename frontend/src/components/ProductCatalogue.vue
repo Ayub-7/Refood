@@ -51,8 +51,8 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <img v-if="!product.images[0]" style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
-                <img v-if="product.images[0]" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/' + product.images[0].filename.replace('./',''))"/>
+                <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
                </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
               
@@ -220,7 +220,8 @@ const Search = {
       if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString()
       } else {
-        return "../../public/ProductShoot.jpg"
+        return '../../public/ProductShoot.jpg'
+        //return product.primaryImagePath.toString()
       }
     },
     getUserInfo: function(userId) {

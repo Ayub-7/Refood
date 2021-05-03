@@ -3,7 +3,6 @@
         <!-- Using label for button since can't rename button text -->
         <label ref="loadableButton" id='imageSelectBtn' for="fileUpload" class="btn">Upload Image</label>
         <input id="fileUpload" type="file" @change="uploadImage($event)">
-
     </div>
 </template>
 

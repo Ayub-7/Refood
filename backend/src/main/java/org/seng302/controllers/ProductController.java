@@ -258,6 +258,10 @@ public class ProductController {
         // Save into DB.
         Image newImage = new Image(file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
+        if (product.getPrimaryImagePath() == null) {
+            System.out.println(imageName);
+            product.setPrimaryImage("business_" + businessId + "/" + imageName + imageExtension);
+        }
         productRepository.save(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -303,16 +307,8 @@ public class ProductController {
         if (!pathExists) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        product.setPrimaryImage(idString);
-        File file = new File(rootImageDir + "business_" + businessId + "/" + idString);
-        File thumbnailFile = new File(rootImageDir + "business_" + businessId + "/" + imageId + "_thumbnail" + extension);
-        byte[] image =fileService.getImage(file);
-        byte[] thumbnail = fileService.getImage(thumbnailFile);
-        List<byte[]> response = new ArrayList<>();
-        response.add(image);
-        response.add(thumbnail);
-        System.out.println(response);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        product.setPrimaryImage("business_" + businessId + "/" + idString);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
