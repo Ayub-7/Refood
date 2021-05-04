@@ -252,8 +252,10 @@ public class UserController {
         }
 
         User self = (User) session.getAttribute("user");
-        if (self.getId() == id) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        if (self != null) {
+            if (self.getId() == id) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
         }
 
         userRepository.updateUserRole(id, Role.USER);

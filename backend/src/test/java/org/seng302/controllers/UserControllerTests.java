@@ -333,6 +333,7 @@ public class UserControllerTests {
         assert success.getResponse().getStatus() == HttpStatus.OK.value();
     }
 
+
     @Test
     @WithMockUser(roles="DGAA")
     public void testBadIdUserRevokeAdmin() throws Exception {
@@ -511,7 +512,7 @@ public class UserControllerTests {
                                     .content(mapper.writeValueAsString(loginRequest))).andReturn();
 
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        UserIdResponse response = new UserIdResponse(user.getId(), user.getRole());
+        UserIdResponse response = new UserIdResponse(user);
         assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
     }
 

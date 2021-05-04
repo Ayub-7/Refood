@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.53% </span>
+                <span class="strong">36.36% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>4/17</span>
+                <span class='fraction'>4/11</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">12.5% </span>
+                <span class="strong">40% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/8</span>
+                <span class='fraction'>2/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.53% </span>
+                <span class="strong">36.36% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>4/17</span>
+                <span class='fraction'>4/11</span>
             </div>
         
             
@@ -338,18 +338,7 @@
 <a name='L279'></a><a href='#L279'>279</a>
 <a name='L280'></a><a href='#L280'>280</a>
 <a name='L281'></a><a href='#L281'>281</a>
-<a name='L282'></a><a href='#L282'>282</a>
-<a name='L283'></a><a href='#L283'>283</a>
-<a name='L284'></a><a href='#L284'>284</a>
-<a name='L285'></a><a href='#L285'>285</a>
-<a name='L286'></a><a href='#L286'>286</a>
-<a name='L287'></a><a href='#L287'>287</a>
-<a name='L288'></a><a href='#L288'>288</a>
-<a name='L289'></a><a href='#L289'>289</a>
-<a name='L290'></a><a href='#L290'>290</a>
-<a name='L291'></a><a href='#L291'>291</a>
-<a name='L292'></a><a href='#L292'>292</a>
-<a name='L293'></a><a href='#L293'>293</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L282'></a><a href='#L282'>282</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -410,7 +399,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -429,33 +418,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -643,7 +621,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;template&gt;
 &nbsp;
-  &lt;div v-if="this.user != null"&gt;
+  &lt;div&gt;
     &lt;div id="container" v-if="this.business != null"&gt;
       &lt;!-- Left Side Business Information Panel --&gt;
       &lt;div id="business-name-container"&gt;
@@ -702,7 +680,7 @@
 &nbsp;
 &lt;script&gt;
 import api from "../Api";
-import {store} from "../store";
+//import {store} from "../store";
 const Business = {
   name: "Business",
 &nbsp;
@@ -718,36 +696,25 @@ const Business = {
   methods: {
 <span class="fstat-no" title="function not covered" >    getBusiness: function () {</span>
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      api.getBusinessFromId(this.$route.params.id)</span></span>
-          .then((res) =&gt; {
-<span class="cstat-no" title="statement not covered" >            this.business = res.data;</span>
-<span class="cstat-no" title="statement not covered" >            this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?</span>
-<span class="cstat-no" title="statement not covered" >            console.log(this.business);</span>
-<span class="fstat-no" title="function not covered" >          })</span>
-          .catch((error) =&gt; {
-<span class="cstat-no" title="statement not covered" >            throw new Error(`ERROR trying to obtain business info from Id: ${error}`);</span>
-          })
+        .then((res) =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.business = res.data;</span>
+<span class="cstat-no" title="statement not covered" >          this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >        })</span>
+        .catch((error) =&gt; {
+<span class="cstat-no" title="statement not covered" >          if (error.response.status === 401) {</span>
+<span class="cstat-no" title="statement not covered" >            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});</span>
+<span class="cstat-no" title="statement not covered" >            this.$router.push({name: 'LoginPage'});</span>
+          }
+<span class="cstat-no" title="statement not covered" >          throw new Error(`ERROR trying to obtain business info from Id: ${error}`);</span>
+        });
     },
 &nbsp;
-<span class="fstat-no" title="function not covered" >    getUserInfo: function (userId) {</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      api.getUserFromID(userId)</span></span>
-          .then((response) =&gt; {
-<span class="cstat-no" title="statement not covered" >            if (store.loggedInUserId == null) {</span>
-<span class="cstat-no" title="statement not covered" >              this.user = response.data;</span>
-            } else {
-<span class="cstat-no" title="statement not covered" >              this.$router.push({path: "/login"});</span>
-            }
-<span class="fstat-no" title="function not covered" >          }).catch((err) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        throw new Error(`Error trying to get user info from id: ${err}`);</span>
-      });
-    },
+  },
 &nbsp;
-<span class="fstat-no" title="function not covered" >    mounted() {</span>
-<span class="cstat-no" title="statement not covered" >      let userId = this.$route.params.id</span>
-<span class="cstat-no" title="statement not covered" >      this.user = this.getUserInfo(userId);</span>
-      // Retrieve business info.
-<span class="cstat-no" title="statement not covered" >      this.getBusiness();</span>
-    }
-&nbsp;
+  mounted() {
+    // Retrieve business info.
+    this.getBusiness();
   }
 }
 &nbsp;
@@ -940,7 +907,7 @@ main {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Apr 26 2021 21:48:58 GMT+1200 (New Zealand Standard Time)
+                at Tue May 04 2021 13:20:31 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

@@ -84,7 +84,7 @@ public class loginStepDefs {
         loginRequest = new LoginRequest(email, password);
         Mockito.when(userRepository.findUserByEmail((loginRequest.getEmail()))).thenReturn(user);
         sesh = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, sesh);
+        result = userController.loginUser(loginRequest, sesh);
     }
 
     @Then("They are redirected to their profile")
@@ -97,7 +97,7 @@ public class loginStepDefs {
     public void theyEnterAnEmailWithAnInvalidFormatSuchThat(String email) throws NoSuchAlgorithmException, JsonProcessingException {
         loginRequest = new LoginRequest(email, "Potato1!");
         sesh = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, sesh);
+        result = userController.loginUser(loginRequest, sesh);
     }
 
     @Then("They are given a warning that their email format is invalid")
@@ -110,7 +110,7 @@ public class loginStepDefs {
         loginRequest = new LoginRequest(email, password);
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
         sesh = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, sesh);
+        result = userController.loginUser(loginRequest, sesh);
     }
 
     @Then("They are given a warning that either their password or email is incorrect")
@@ -123,7 +123,7 @@ public class loginStepDefs {
         loginRequest = new LoginRequest(null, password);
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
         sesh = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, sesh);
+        result = userController.loginUser(loginRequest, sesh);
     }
 
     @Then("They are given a warning that the email field is empty")
@@ -136,7 +136,7 @@ public class loginStepDefs {
         loginRequest = new LoginRequest(email, "");
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
         sesh = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, sesh);
+        result = userController.loginUser(loginRequest, sesh);
     }
 
     @Then("They are given a warning that the password field is empty")
@@ -149,7 +149,7 @@ public class loginStepDefs {
         loginRequest = new LoginRequest(null, "");
         Mockito.when(userRepository.findUserByEmail("johnsmith@yahoo.com")).thenReturn(user);
         sesh = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, sesh);
+        result = userController.loginUser(loginRequest, sesh);
     }
 
     @Then("They are given a warning that both email and password fields are empty")
@@ -162,7 +162,7 @@ public class loginStepDefs {
         loginRequest = new LoginRequest("johnsmith@yahoo.com", "Potato1!");
         Mockito.when(userRepository.findUserByEmail((loginRequest.getEmail()))).thenReturn(user);
         sesh = Mockito.mock(HttpSession.class);
-        result = userController.loginUser(loginRequest, null, sesh);
+        result = userController.loginUser(loginRequest, sesh);
     }
 
     @When("They press log out")
