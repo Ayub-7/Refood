@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="main" >
 
-    <vs-navbar v-if="getLoggedInUser() == null"
+    <vs-navbar
         class="vs-navbar"
         v-model="indexActive"
         type="fund"
@@ -9,48 +9,40 @@
         text-color="rgba(255,255,255,.6)"
         active-text-color="rgba(255,255,255,1)">
       <div slot="title">
-        <vs-navbar-title>ReFood</vs-navbar-title>
+        <vs-navbar-title>
+          ReFood
+        </vs-navbar-title>
       </div>
-      <vs-navbar-item index="0">
+      <vs-navbar-item index="0" v-if="getLoggedInUser() == null">
         <router-link to="/">Register</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="1">
+      <vs-navbar-item index="1" v-if="getLoggedInUser() == null">
         <router-link to="/login">Login</router-link>
       </vs-navbar-item>
-    </vs-navbar>
-    <vs-navbar v-if="getLoggedInUser() != null"
-               class="vs-navbar"
-               v-model="indexActive"
-               type="fund"
-               color="#1F74FF"
-               text-color="rgba(255,255,255,.6)"
-               active-text-color="rgba(255,255,255,1)">
-      <div slot="title">
-        <vs-navbar-title>ReFood</vs-navbar-title>
-      </div>
-      <vs-navbar-item index="0">
+
+      <vs-navbar-item index="0" v-if="getLoggedInUser() != null">
         <router-link :to="{path: '/home'}">Home</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="1" v-if="getActingAsUserId() == null">
+      <vs-navbar-item index="1" v-if="getLoggedInUser() != null && getActingAsUserId() == null">
         <router-link to="/businesses">Register a Business</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="2">
+      <vs-navbar-item index="2" v-if="getLoggedInUser() != null">
         <router-link to="/search">Search</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="3" v-if="getActingAsUserId() == null">
+      <vs-navbar-item index="3" v-if="getLoggedInUser() != null && getActingAsUserId() == null">
         <router-link :to="{path: `/users/${getLoggedInUser()}`}">Profile</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="4" v-if="getActingAsUserId() != null">
+      <vs-navbar-item index="4" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
         <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="5" v-if="getActingAsUserId() != null">
+      <vs-navbar-item index="5" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
         <router-link :to="{path: `/addtocatalogue`}">Add To Catalogue</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="6" v-if="getActingAsUserId() != null">
+      <vs-navbar-item index="6" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
         <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
       </vs-navbar-item>
       <div @click="logoutUser()">
-        <vs-navbar-item index="7">
+        <vs-navbar-item index="7" v-if="getLoggedInUser() != null">
           <router-link :to="{path: '/login'}">
           <span>Logout</span>
           </router-link>
@@ -121,7 +113,7 @@ const app = {
       return store.actingAsBusinessId;
     },
 
-    getBusinesses(){
+    getPrimaryBusinesses(){
       return store.userBusinesses;
     },
     /**

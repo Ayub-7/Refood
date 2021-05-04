@@ -17,7 +17,7 @@
                   class="form-control"
                   label-placeholder="Middle name"
                   :danger="middlename.length>20"
-                  danger-text="Middlename must be less than 20 characters"
+                  danger-text="Middlename must be less that 20 characters"
                   :success="middlename.length > 0 && middlename.length < 20"
                   v-model="middlename"/>
         </div>
@@ -35,7 +35,7 @@
                   class="form-control"
                   label-placeholder="Nick Name"
                   :danger="nickname.length>20"
-                  danger-text="Nickname must be less than 20 characters"
+                  danger-text="Nickname must be less that 20 characters"
                   :success="nickname.length > 0 && nickname.length < 20"
                   name="nickname"
                   v-model="nickname"/>
@@ -44,9 +44,9 @@
           <vs-input type="email"
                     class="form-control"
                     label-placeholder="Email (Required)"
-                    :danger="errors.includes(email) && emailInUse"
-                    danger-text="Invalid email. (This email may already be in use)"
-                    :success="validEmail(email) && !emailInUse"
+                    :danger="errors.includes(email)"
+                    danger-text="Invalid email."
+                    :success="validEmail(email)"
                     v-model="email"/>
         </div>
         <div id="phonenumber">
@@ -85,12 +85,12 @@
                     name="dateofbirth"
                     v-model="dateofbirth"
                     :danger="errors.includes(dateofbirth)"
-                    danger-text="You must be atleast 13 years old to register"
-                    :success="(dateofbirth.length!==0 && this.validAge(this.dateofbirth))"
-                    label="Date of birth (Required)" />
+                    danger-text="Enter date of birth"
+                    :success="(dateofbirth.length!==0)"
+                    label="Date of birth (Required)"/>
         </div>
         <div id="bio">
-          <vs-textarea width="200px" type="text" class="form-control text-areas" label="Bio" name="bio" v-model="bio"></vs-textarea>
+          <vs-textarea type="text" class="form-control text-areas" label="Bio" name="bio" v-model="bio"></vs-textarea>
         </div>
       </div>
       <label for="address-field" class="label-control">Address</label>
@@ -115,7 +115,7 @@
           <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input autocomplete="off" @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -143,7 +143,6 @@
     name: "Register",
     data: function () {
       return {
-        emailInUse: false,
         errors: [],
         firstname: "",
         middlename: "",
@@ -192,20 +191,16 @@
         if (!this.validEmail(this.email)) {
           this.errors.push(this.email);
         }
-        if (this.bio != null) {
-          if (this.bio.length > 40) {
-            this.errors.push(this.bio);
-          }
-        }
 
         if (!this.validPassword(this.password)) {
           this.errors.push(this.password);
         }
 
-        if (this.confirm_password.length === 0 || this.password !== this.confirm_password) {
+        if (this.confirm_password.length == 0 || this.password !== this.confirm_password) {
           this.errors.push(this.confirm_password);
         }
-        if (this.dateofbirth.length === 0 || !this.validAge(this.dateofbirth)) {
+
+        if (this.dateofbirth.length === 0) {
           this.errors.push(this.dateofbirth);
         }
 
@@ -218,35 +213,10 @@
         }
 
         if (this.errors.length >= 1) {
-          this.$vs.notify({title: 'Failed to register', text: 'Required fields are missing.', color: 'danger'});
-          if (this.errors.includes(this.bio)) {
-            this.$vs.notify({
-              title: 'Failed to register',
-              text: 'Bio must be less that 40 characters.',
-              color: 'danger'
-            });
-          }
+          console.log(this.errors);
+          this.$vs.notify({title:'Failed to register', text:'Required fields are missing.', color:'danger'});
         }
       },
-
-
-      /**
-       * from https://stackoverflow.com/questions/14231381/to-check-if-age-is-not-less-than-13-years-in-javascript
-       * @param birthDateString string of date inputted by user
-       * @returns {Boolean} True if user is 13 and above false if below
-       */
-
-      validAge: function(birthDateString) {
-          var today = new Date();
-          var birthDate = new Date(birthDateString);
-          var age = today.getFullYear() - birthDate.getFullYear();
-          var m = today.getMonth() - birthDate.getMonth();
-          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
-          }
-          return age >= 13;
-      },
-
 
 
       /**
@@ -288,12 +258,8 @@
         //Use createUser function of API to POST user data to backend
         //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
         //https://www.npmjs.com/package/json-server
-        // if(!this.emailInUse.includes(this.email) && this.emailInUse) {
-        //   this.emailInUse = false;
-        //   this.errors.pop(this.errors.indexOf(this.email));
-        // }
         if(this.errors.length === 0){
-          this.emailInUse = false;
+
           const homeAddress = {
             streetNumber: this.streetNumber,
             streetName: this.streetName,
@@ -316,10 +282,12 @@
                         this.$log.debug("Error logging in from registration: " + error);
                     });
                   }).catch((error) => {
-            if(error.response.status === 409){
-              this.emailInUse = true;
-              this.errors.push(this.email);
+            if(error.response){
+              console.log(error.response.status);
+              console.log(error.response.message);
+              this.errors.push("Email already in use");
             }
+            this.$log.debug("Error Status:", error)
           });
         }},
 

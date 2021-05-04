@@ -9,8 +9,7 @@ export const store = Vue.observable({
     userBusinesses: [],
     actingAsBusinessId: null,
     actingAsBusinessName: null,
-    productToAlterId: null,
-    homeAddress: null
+    productToAlterId: null
 });
 
 
@@ -56,10 +55,7 @@ export const mutations = {
         store.userBusinesses = null;
         store.actingAsBusinessId = null;
         store.actingAsBusinessName = null;
-        store.homeAddress = null;
     },
-
-
 
     getIdByName(name) {
         for (const names of store.userBusinesses){
@@ -70,10 +66,6 @@ export const mutations = {
     },
     setUserRole(role) {
         store.role = role;
-    },
-
-    setHomeAddress(homeAddress) {
-        store.homeAddress = homeAddress;
     },
 
     setUserName(userName) {

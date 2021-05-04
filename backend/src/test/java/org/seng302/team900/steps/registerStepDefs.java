@@ -1,6 +1,7 @@
 package org.seng302.team900.steps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -12,12 +13,15 @@ import org.seng302.finders.UserFinder;
 import org.seng302.models.Address;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 
@@ -34,6 +38,8 @@ public class registerStepDefs {
 
     private UserFinder userFinder;
 
+    @Autowired
+    ObjectMapper mapper;
     ResponseEntity<String> result;
     String em;
     String pass;
