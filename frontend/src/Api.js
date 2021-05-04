@@ -99,7 +99,7 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: (query) => instance.get(`/users/search?searchQuery=${query}`,{withCredentials: true}),
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.

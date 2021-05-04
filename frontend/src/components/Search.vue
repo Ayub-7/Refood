@@ -170,8 +170,6 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-        if (this.searchbar === "") return;
-
         api
             .searchQuery(this.searchbar)
             .then((response) => {
@@ -290,7 +288,6 @@ th {
 .main {
   background-color: white;
   top: 1px;
-  padding-bottom: 4em;
 }
 
 
