@@ -55,7 +55,7 @@
               <div>
                 <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                 <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
-               </div>
+              </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
               
                 <div style="display: flex;">
@@ -117,7 +117,9 @@
                 <td style="width: 20px; padding-right: 10px">
                   <a v-bind:href="'/products?id='+ product.id">{{ product.primaryImagePath }}</a>
                   <div>
-                    <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../../backend/src/main/resources/media/images/businesses/business_1/0_thumbnail.jpg" />                  </div>
+                    <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                    <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                  </div>
                 </td>
                 <td>{{ product.name }} </td>
                 <td>{{ product.description }} </td>
