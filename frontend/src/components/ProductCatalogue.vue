@@ -65,6 +65,17 @@
                 <div class="action_btn">
                   <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </div>
+                <div>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
+                          {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+
+                  </vs-dropdown>
+                </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
                 <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
@@ -202,6 +213,7 @@ const Search = {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
+          console.log(this.products)
           this.filteredproducts = response.data;
         })
         .catch((error) => {
@@ -214,7 +226,17 @@ const Search = {
 
   methods: {
 
-
+    setDefaultImage(product, image) {
+      this.imageId = image.id;
+      this.productId = product.id;
+      console.log(this.businessId, this.productId, this.imageId);
+      api.setPrimaryImage(this.businessId, this.productId, this.imageId)
+          .then((response) => {
+            console.log(response.data);
+          }).catch((err) => {
+            throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
 
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
@@ -407,6 +429,7 @@ const Search = {
     }
 
   },
+
   computed: {
     /**
      * Computes ranges to be displayed below table, max of range is switched
