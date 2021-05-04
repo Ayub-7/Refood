@@ -1,7 +1,7 @@
 <template>
   <div class="main" id="body">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="main1">
+    <form class="main1" :key="componentKey">
       <div class="profile-text-inner">
         <div style="display: flex; ">
           <h1 class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
@@ -64,6 +64,24 @@
                 </div>
                 <div class="action_btn">
                   <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
+                </div>
+                <div>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
+                          {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
@@ -128,6 +146,26 @@
                 <td>
                   <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </td>
+                <td>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Change Primary Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
+                </td>
+                <td>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
+                </td>
               </tr>
 
               <!-- If search query returns more than 10 products then this should be active -->
@@ -167,7 +205,6 @@ const Search = {
     return {
       errors: [],
       toggle: [1,1,1,1,1],
-      userId: null,
       searchbar: "",
       searchbarResults: "",
       products: [],
@@ -183,6 +220,7 @@ const Search = {
       currencySymbol: "",
       currencyCode: "",
       selected: "",
+      componentKey: 0,
     };
   },
 
@@ -194,34 +232,59 @@ const Search = {
  */
   mounted() {
     api.checkSession()
-    .then((response) => {
-      this.businessId = this.$route.params.id;
-      this.userId = response.data.id;
-      this.getUserInfo(this.userId);
-      this.getBusinessName();
+        .then((response) => {
+          this.businessId = this.$route.params.id;
+          this.userId = response.data.id;
+          this.getUserInfo(this.userId);
+          this.getBusinessName();
 
-      api.getBusinessProducts(this.businessId)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.products = response.data;
-            this.filteredproducts = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load products";
-          })
-          .finally(() => (this.loading = false));
-    }).catch(() => {
-
+          api.getBusinessProducts(this.businessId)
+              .then((response) => {
+                this.$log.debug("Data loaded: ", response.data);
+                this.products = response.data;
+                this.filteredproducts = response.data;
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+                this.error = "Failed to load products";
+              })
+              .finally(() => (this.loading = false));
+        }).catch(() => {
     });
-
-
-
-
   },
 
 
+
   methods: {
+    forceRerender() {
+      console.log("gogogogogogo")
+      this.$forceUpdate()
+    },
+
+    setPrimaryImage(product, image) {
+      this.imageId = image.id;
+      this.productId = product.id;
+      console.log(this.businessId, this.productId, this.imageId);
+      api.setPrimaryImage(this.businessId, this.productId, this.imageId)
+          .then((response) => {
+            console.log(response.data);
+          }).catch((err) => {
+            throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
+
+    deleteImage(product, image) {
+      this.imageId = image.id;
+      this.productId = product.id;
+      console.log(this.businessId, this.productId, this.imageId);
+      api.deletePrimaryImage(this.businessId, this.productId, this.imageId)
+          .then((response) => {
+            console.log(response.data);
+          }).catch((err) => {
+        throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
+
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString()
@@ -230,18 +293,17 @@ const Search = {
       }
     },
     getUserInfo: function(userId) {
-      api.getUserFromID(userId) //Get user data
-          .then((response) => {
-            this.user = response.data;
-            this.setCurrency(this.user.homeAddress.country);
-          }).catch((err) => {
-        if (err.response.status === 401) {
-          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-          this.$router.push({name: 'LoginPage'});
-        } else {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
           throw new Error(`Error trying to get user info from id: ${err}`);
-        }
-      });
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
     },
 
     setCurrency: function (country) {
@@ -254,13 +316,12 @@ const Search = {
       });
     },
 
+    getBusinessID: function () {
+      return store.actingAsBusinessId
+    },
+
     getBusinessName: function () {
-      api.getBusinessFromId(this.businessId)
-          .then((res) => {
-            this.business = res.data.name;
-          }).catch((error) => {
-        throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
-      })
+      return store.actingAsBusinessName
     },
 
     //sets the product to alter id
@@ -415,6 +476,7 @@ const Search = {
     }
 
   },
+
   computed: {
     /**
      * Computes ranges to be displayed below table, max of range is switched

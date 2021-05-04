@@ -72,8 +72,7 @@ const Homepage = {
        */
       getUserDetails: function(userId) {
         api.getUserFromID(userId)
-          .then((response) => {
-            if(store.loggedInUserId != null) {
+            .then((response) => {
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
               this.userLoggedIn = true;
@@ -81,20 +80,17 @@ const Homepage = {
               mutations.setUserDateOfBirth(response.data.dateOfBirth);
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
               mutations.setUserBusinesses(this.businesses);
-            } else {
-              this.$router.push({path: "/login"}); //If user not logged in send to login page
-            }
-
-          }).catch((err) => {
-            if (err.response.status === 401) {
-              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-              this.$router.push({name: 'LoginPage'});
-            }
-            throw new Error(`Error trying to get user info from id: ${err}`)
-          })
+            }).catch((err) => {
+          if (err.response.status === 401) {
+            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+            this.$router.push({name: 'LoginPage'});
+          }
+          this.$log.error(err);
+        })
       },
 
-      /**
+
+        /**
        * Sends an api request to get a business object from a business Id
        * Sets this components business variable to this object
        *
@@ -106,7 +102,7 @@ const Homepage = {
               this.business = res.data;
             })
             .catch((error) => {
-              throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+              this.$log.error(error);
             })
       },
 
@@ -175,8 +171,12 @@ const Homepage = {
     api.checkSession()
         .then((response) => {
           this.getUserDetails(response.data.id);
-        });
-  },
+        }).catch(() => {
+      this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+    });
+  }
+
+
 }
 
 export default Homepage;

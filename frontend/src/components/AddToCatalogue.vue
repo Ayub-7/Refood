@@ -24,11 +24,11 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
-              danger-text="RRP is required and must be at least 0"
+              :danger="errors.includes('rrp')"
+              danger-text="RRP is required and must be not be a negative number"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
-              type="text"
+              type="number"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
@@ -49,9 +49,9 @@
         </div>
       </div>
       <button
-        type="button"
-        class="add-button"
-        @click="checkForm(); createItem();">Add Item to Catalogue</button>
+          type="button"
+          class="add-button"
+          @click="checkForm(); createItem();">Add Item to Catalogue</button>
     </form>
   </div>
 </template>
@@ -75,7 +75,7 @@ const AddToCatalogue = {
       manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
-      rrp: ""
+      rrp: null
     };
   },
   methods: {
@@ -94,24 +94,17 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
-      if (this.rrp.length === 0 || this.rrp === null) {
-        this.errors.push('no-rrp');
-      } else if (this.rrp < 0) {
+      if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
+
       if (this.errors.length >= 1) {
-        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)) {
+        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)
+            || this.errors.includes('rrp')) {
           this.$vs.notify({
             title: 'Failed to create catalogue item',
             text: 'Required fields are missing.',
-            color: 'danger'
-          });
-        }
-        if (this.errors.includes('rrp') || this.errors.includes('no-rrp')) {
-          this.$vs.notify({
-            title: 'Failed to create catalogue item',
-            text: 'RRP is required and must be at least 0.',
             color: 'danger'
           });
         }
@@ -123,13 +116,14 @@ const AddToCatalogue = {
     createItem: function () {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
-      if (this.errors.length == 0) {
+      if (this.errors.length === 0) {
         api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.manufacturer, this.rrp)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if (error.response) {
+            this.$log.error(error);
             if (error.response.status === 400) {
               this.$vs.notify({
                 title: 'Failed to create catalogue item',
@@ -137,7 +131,7 @@ const AddToCatalogue = {
                 color: 'danger'
               });
             }
-            console.log(error.response.status);
+            this.$log.error(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         });
@@ -165,17 +159,23 @@ const AddToCatalogue = {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
           }).catch(err => {
-        console.log("Error with getting cities from REST Countries." + err);
+        this.$log.error("Error with getting cities from REST Countries." + err);
       });
     },
+
+
+
   },
-    mounted: function () {
-      api.checkSession()
-          .then((response) => {
-            this.getUserInfo(response.data.id);
-          });
-    }
+  mounted: function () {
+    api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+        })
+        .catch(() => {
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});;
+        });
   }
+}
 
 export default AddToCatalogue;
 
@@ -183,144 +183,145 @@ export default AddToCatalogue;
 
 <style scoped>
 
-  /*
-  Add button's styling
-   */
-  .add-button {
-    grid-column: 1 / 3;
+/*
+Add button's styling
+ */
+.add-button {
+  grid-column: 1 / 3;
 
-    cursor: pointer;
-    border-radius: 5em;
-    color: #fff;
-    background: #3B5998;
-    border: 0;
-    z-index: 1000;
-    padding: 10px 40px;
-    margin: 2em auto;
-    font-size: 13px;
-    box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-    text-align: center;
-  }
+  cursor: pointer;
+  border-radius: 5em;
+  color: #fff;
+  background: #3B5998;
+  border: 0;
+  z-index: 1000;
+  padding: 10px 40px;
+  margin: 2em auto;
+  font-size: 13px;
+  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
 
-  /**
-  Card styling.
-  */
-  .card {
-    font-family: 'Ubuntu', sans-serif;
+/**
+Card styling.
+*/
+.card {
+  font-family: 'Ubuntu', sans-serif;
 
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    grid-row-gap: 1em;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-row-gap: 1em;
 
-    max-width: 650px;
-    background-color: white;
-    margin: 1em auto;
-    padding: 0.5em 0 0.5em 0;
-    border-radius: 20px;
-    border: 2px solid rgba(0, 0, 0, 0.02);
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
-  }
+  max-width: 650px;
+  background-color: white;
+  margin: 1em auto;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
 
-  /**
-  Card header styling.
-  */
-  .card-header {
-    grid-row: 1;
-    grid-column: 1;
+/**
+Card header styling.
+*/
+.card-header {
+  grid-row: 1;
+  grid-column: 1;
 
-    text-align: center;
-    font-weight: bold;
-    font-size: 24px;
-    color: #3B5998;
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  color: #3B5998;
 
-    margin: 0;
-    padding: 0.5em 0;
-  }
+  margin: 0;
+  padding: 0.5em 0;
+}
 
-  /**
-  Form styling
-  */
-  form {
-    grid-row: 2;
-    grid-column: 1;
+/**
+Form styling
+*/
+form {
+  grid-row: 2;
+  grid-column: 1;
 
-    margin: auto;
+  margin: auto;
 
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    grid-template-rows: repeat(2, auto);
-  }
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: repeat(2, auto);
+}
 
-  label, input {
-    display: block;
-  }
+label, input {
+  display: block;
+}
 
-  /**
-  Styling for form elements.
-  */
-  .form-control {
-    font-family: 'Ubuntu', sans-serif;
-    padding: 3px 10px;
-    margin: 0.5em;
-  }
+/**
+Styling for form elements.
+*/
+.form-control {
+  font-family: 'Ubuntu', sans-serif;
+  padding: 3px 10px;
+  margin: 0.5em;
+}
 
-  #info-field {
-    grid-column: 1/3;
-    display: grid;
-    margin: auto;
-    grid-template-columns: repeat(2, auto);
-    grid-template-rows: repeat(5, auto);
-  }
+#info-field {
+  grid-column: 1/3;
+  display: grid;
+  margin: auto;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: repeat(5, auto);
+}
 
-  #product-name {
-    grid-column: 1;
-    grid-row: 1;
-  }
+#product-name {
+  grid-column: 1;
+  grid-row: 1;
+}
 
-  #product-id {
-    grid-column: 2;
-    grid-row: 1;
-  }
+#product-id {
+  grid-column: 2;
+  grid-row: 1;
+}
 
-  #manufacturer {
-    grid-column: 2;
-    grid-row: 2;
-  }
+#manufacturer {
+  grid-column: 2;
+  grid-row: 2;
+}
 
-  #description {
-    grid-column: 1 / 3;
-    grid-row: 3;
-  }
+#description {
+  grid-column: 1 / 3;
+  grid-row: 3;
+}
 
-  #rrp {
-    grid-column: 1;
-    grid-row: 2;
+#rrp {
+  grid-column: 1;
+  grid-row: 2;
 
-    margin: 0;
-    display: flex;
-  }
+  margin: 0;
+  display: flex;
+}
 
-  #currencySymbol {
-    grid-row: 1;
-    grid-column: 1;
-    margin: auto;
-    font-size: 15px;
-    line-height: 20px;
-  }
+#currencySymbol {
+  grid-row: 1;
+  grid-column: 1;
+  margin: auto;
+  font-size: 15px;
+  line-height: 20px;
+}
 
-  #currencyInput {
-    grid-row: 1;
-    grid-column: 2;
-  }
+#currencyInput {
+  grid-row: 1;
+  grid-column: 2;
 
-  #currencyCode {
-    grid-row: 1;
-    grid-column: 3;
+}
 
-    margin: auto;
-    font-size: 15px;
-  }
+#currencyCode {
+  grid-row: 1;
+  grid-column: 3;
+
+  margin: auto;
+  font-size: 15px;
+}
 
 
 </style>

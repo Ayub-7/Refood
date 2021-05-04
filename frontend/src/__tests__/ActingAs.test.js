@@ -72,7 +72,7 @@ let store = {
     loggedInUserId: 22,
     role: "USER",
     userName: "Wileen Tisley",
-    userBusinesses: mockBusinesses,
+    userPrimaryBusinesses: [],
     actingAsBusinessId: null,
     actingAsBusinessName: null
 }
@@ -81,16 +81,11 @@ getUserNameMethod.mockImplementation(() => {
     return store.userName;
 });
 
-const getBusinessesMethod = jest.spyOn(ActingAs.methods, 'getBusinesses');
-getBusinessesMethod.mockImplementation(() => {
-    return store.userBusinesses;
-});
-
 beforeEach(() => {
     wrapper = shallowMount(ActingAs, {
         propsData: {},
         mocks: {store},
-        stubs: ['router-link', 'router-view', 'vs-dropdown-item'],
+        stubs: ['router-link', 'router-view'],
         methods: {},
         localVue,
     });
@@ -100,7 +95,6 @@ beforeEach(() => {
         wrapper.vm.role = "USER";
         return wrapper.vm.role;
     });
-
 });
 
 afterEach(() => {
@@ -156,10 +150,9 @@ describe('User acting as tests', () => {
 
     test('Check selecting business in dropdown calls setActingAsBusinessId method', () => {
         wrapper.vm.setActingAsBusinessId = jest.fn();
-        const busLi = wrapper.find('.dropdown-item');
+        const busLi = wrapper.find('#businessList');
         busLi.trigger('click');
-        console.log(wrapper.html());
-        expect(wrapper.vm.setActingAsBusinessId).toBeCalled();
+        expect(wrapper.vm.setActingAsBusinessId).toBeCalled;
     });
 
     // TODO: get jest test working for changing from user to business and back to business
@@ -182,7 +175,7 @@ describe('User acting as tests', () => {
         wrapper.vm.setActingAsBusinessId = jest.fn();
         const busLi = wrapper.find('#businessList');
         busLi.trigger('click');
-        const userName = wrapper.find('#userBusinessPanel');
+        const userName = wrapper.find('.user-menu');
         wrapper.vm.setActingAsUser = jest.fn();
         userName.trigger('click');
         expect(wrapper.vm.setActingAsUser).toBeCalled;
