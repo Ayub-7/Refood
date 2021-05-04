@@ -11,7 +11,7 @@
 
           <li id="userBusinessPanel">
               <ul id="businessList">
-                <li v-for="business in getPrimaryBusinesses()" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
+                <li v-for="business in getPrimaryBusinesses()" id="user-business" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
                   <span class="user small" style="display: inline; font-size: 12px; padding-top: 5px"> {{ business.name}} </span>
                   <vs-avatar class="v-small" v-if="getUserName() !== null" icon="store" style="transform: translate(0%, -20%) scale(0.7) !important; right: 0px;">
                   </vs-avatar>
@@ -28,7 +28,7 @@
         </li>
 
         <li id="userBusinessPanel" class="user" @click="setActingAsUser()">
-          <span class="user small" style="display: inline; font-size: 12px; padding-top: 5px">{{ getUserName() }} </span>
+          <span class="user small"  style="display: inline; font-size: 12px; padding-top: 5px">{{ getUserName() }} </span>
           <vs-avatar class="v-small" v-if="getUserName() !== null" icon="person" style="transform: translate(0%, -20%) scale(0.7) !important;">
           </vs-avatar>
         </li>
