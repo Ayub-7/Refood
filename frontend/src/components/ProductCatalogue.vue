@@ -53,15 +53,15 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div style="position: relative">
-                <button  type="button" id="editButton" style="z-index: 1; position: absolute; right: 0px" @click="goToModify(); setProductToAlter(product.id)">
+                <button  type="button" id="editButton" style="z-index: 2; position: absolute; right: 0px" @click="goToModify(); setProductToAlter(product.id)">
                   <img src="../../public/edit.png" height="50" width="50" >
                 </button>
                 <div id="editTriangle" class="triangle-topright" style="position: absolute; right: 0px"/>
 
                 <img v-if="product.primaryImagePath" style="position: relative; width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                 <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
-                <span>
-                  <ImageUpload :businessId=businessId :products=products style=" font-size: 15px"/>
+                <span style="display: flex;">
+                  <ImageUpload :businessId=businessId :products=products style="z-index: 2;  font-size: 15px; margin-top: -31px"/>
                 </span>
 
               </div>
@@ -74,7 +74,7 @@
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
                 <div style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >
-                  <p> {{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
+                  <p> {{currencySymbol + " " +  Math.round(product.recommendedRetailPrice*currencyMultiplier*100)/100 }} </p>
                 </div>
               </div>
             </div>
@@ -132,7 +132,7 @@
                 </td>
                 <td>{{ product.name }} </td>
                 <td>{{ product.description }} </td>
-                <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </td>
+                <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice*currencyMultiplier }} </td>
                 <td>{{ product.created }} </td>
                 <td>
                   <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
@@ -167,6 +167,7 @@ import {store, mutations} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
 import axios from "axios";
+
 const Search = {
   name: "Search",
 
@@ -193,14 +194,18 @@ const Search = {
       currencySymbol: "",
       currencyCode: "",
       selected: "",
+      currencyMultiplier: 1,
     };
   },
 
   /**
    *
-   * api.getBusinessProducts() queries the test back-end (json-server)
+   * api.getBusinessProducts() queries the back-end
    * at /businesses/${businessId}/products which returns a JSON object list of test products which can
    * be filtered by the webpage.
+   *
+   * call to currency converter API (free.currencyconverterapi.com)
+   *
  */
   mounted() {
     api.checkSession()
@@ -224,10 +229,6 @@ const Search = {
     }).catch(() => {
 
     });
-
-
-
-
   },
 
 
@@ -259,10 +260,22 @@ const Search = {
           .then( response => {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
+
+            var query = 'USD_' + this.currencyCode;
+            const url = "https://free.currconv.com/api/v7/convert?q="+query+"&compact=ultra&apiKey=a67b4ad2aba59aca187c"
+            axios
+                .get(url)
+                .then(response => {
+                  this.currencyMultiplier = response.data[query];
+                  console.log(this.currencyMultiplier)
+                }).catch( err => {
+              console.log("Error getting multiplier from REST Currencies." + err);
+            });
           }).catch( err => {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
+
 
     getBusinessName: function () {
       api.getBusinessFromId(this.businessId)
@@ -435,9 +448,8 @@ const Search = {
         this.productSearchIndexMin -= 10;
         this.productSearchIndexMax -= 10;
       }
-    }
-
-  },
+    },
+},
   computed: {
     /**
      * Computes ranges to be displayed below table, max of range is switched
@@ -633,6 +645,7 @@ input:checked + .slider:before {
 }
 
 .triangle-topright {
+  z-index: 1;
   width: 0;
   height: 0;
   border-top: 100px solid white;
@@ -640,6 +653,7 @@ input:checked + .slider:before {
 }
 
 #editButton:hover + #editTriangle {
+
   border-top: 100px solid #2196F3;
 }
 
