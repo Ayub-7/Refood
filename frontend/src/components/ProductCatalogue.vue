@@ -73,7 +73,14 @@
                           {{pImage.fileName}}
                       </vs-dropdown-item>
                     </vs-dropdown-menu>
-
+                  </vs-dropdown>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
                   </vs-dropdown>
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
@@ -235,6 +242,18 @@ const Search = {
             console.log(response.data);
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
+
+    deleteImage(product, image) {
+      this.imageId = image.id;
+      this.productId = product.id;
+      console.log(this.businessId, this.productId, this.imageId);
+      api.deletePrimaryImage(this.businessId, this.productId, this.imageId)
+          .then((response) => {
+            console.log(response.data);
+          }).catch((err) => {
+        throw new Error(`Error trying to get user info from id: ${err}`);
       });
     },
 
