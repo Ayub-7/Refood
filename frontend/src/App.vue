@@ -114,7 +114,7 @@ const app = {
     },
 
     getPrimaryBusinesses(){
-      return store.userPrimaryBusinesses;
+      return store.userBusinesses;
     },
     /**
      * Calls the logout function which removes loggedInUserId
@@ -148,9 +148,11 @@ const app = {
     api.checkSession()
     .then((response) => {
       mutations.setUserLoggedIn(response.data.id, response.data.role);
-      mutations.setUserPrimaryBusinesses(response.data.businessesAdministered);
+      mutations.setUserBusinesses(response.data.businessesAdministered);
       mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-    })
+    }).catch(() => {
+      this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+    });
   },
 };
 

@@ -1,7 +1,7 @@
 <template>
   <div class="main" id="body">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="main1">
+    <form class="main1" :key="componentKey">
       <div class="profile-text-inner">
         <div style="display: flex; ">
           <h1 class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
@@ -148,9 +148,9 @@
                 </td>
                 <td>
                   <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-button>Change Primary Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
                     <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
                         {{pImage.fileName}}
                       </vs-dropdown-item>
                     </vs-dropdown-menu>
@@ -220,6 +220,7 @@ const Search = {
       currencySymbol: "",
       currencyCode: "",
       selected: "",
+      componentKey: 0,
     };
   },
 
@@ -230,30 +231,37 @@ const Search = {
    * be filtered by the webpage.
  */
   mounted() {
-    let userId = store.loggedInUserId;
-    this.getUserInfo(userId);
-    
-
-    this.business = this.getBusinessName();
-    this.businessId = this.getBusinessID();
-    api.getBusinessProducts(this.businessId)
+    api.checkSession()
         .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.products = response.data;
-          console.log(this.products)
-          this.filteredproducts = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load products";
-        })
-        .finally(() => (this.loading = false));
+          this.businessId = this.$route.params.id;
+          this.userId = response.data.id;
+          this.getUserInfo(this.userId);
+          this.getBusinessName();
+
+          api.getBusinessProducts(this.businessId)
+              .then((response) => {
+                this.$log.debug("Data loaded: ", response.data);
+                this.products = response.data;
+                this.filteredproducts = response.data;
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+                this.error = "Failed to load products";
+              })
+              .finally(() => (this.loading = false));
+        }).catch(() => {
+    });
   },
 
 
-  methods: {
 
-    setDefaultImage(product, image) {
+  methods: {
+    forceRerender() {
+      console.log("gogogogogogo")
+      this.$forceUpdate()
+    },
+
+    setPrimaryImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
       console.log(this.businessId, this.productId, this.imageId);

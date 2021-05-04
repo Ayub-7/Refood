@@ -175,7 +175,7 @@ describe('User acting as tests', () => {
         wrapper.vm.setActingAsBusinessId = jest.fn();
         const busLi = wrapper.find('#businessList');
         busLi.trigger('click');
-        const userName = wrapper.find('#userBusinessPanel');
+        const userName = wrapper.find('.user-menu');
         wrapper.vm.setActingAsUser = jest.fn();
         userName.trigger('click');
         expect(wrapper.vm.setActingAsUser).toBeCalled;

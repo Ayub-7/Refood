@@ -1,124 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testExecutions version="1">
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\Homepage.test.js">
-        <testCase name="Homepage user tests User&apos;s first name is shown" duration="95"/>
-        <testCase name="Homepage user tests Go to profile gets called when clicked" duration="10"/>
-        <testCase name="Homepage business tests is a Vue instance" duration="6"/>
-        <testCase name="Homepage business tests Business&apos;s name is shown" duration="7"/>
-        <testCase name="Homepage business tests Go to business profile gets called when clicked" duration="7"/>
-        <testCase name="Homepage business tests Go to business catalogue gets called when clicked" duration="7"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\ActingAs.test.js">
+        <testCase name="User acting as tests is a Vue instance" duration="50"/>
+        <testCase name="User acting as tests Check username is shown" duration="51"/>
+        <testCase name="User acting as tests Check username is displaying the correct username and role" duration="18"/>
+        <testCase name="User acting as tests Check user primary businesses list is rendered" duration="12"/>
+        <testCase name="User acting as tests Check selecting business in dropdown calls setActingAsBusinessId method" duration="14"/>
+        <testCase name="User acting as tests Check selecting user calls setActingAsUser method" duration="23"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\Search.test.js">
-        <testCase name="Search page tests Table exists when valid data is in response" duration="49"/>
-        <testCase name="Search page tests Mobile mode not on when window is normal size" duration="22"/>
-        <testCase name="Search page tests Mobile mode active when window size is reduced" duration="17"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\Search.test.js">
+        <testCase name="Search page tests Table exists when valid data is in response" duration="163"/>
+        <testCase name="Search page tests Mobile mode not on when window is normal size" duration="42"/>
+        <testCase name="Search page tests Mobile mode active when window size is reduced" duration="25"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\Login.test.js">
-        <testCase name="Login error checking Handles empty login" duration="72"/>
-        <testCase name="Login error checking Handles only email" duration="13"/>
-        <testCase name="Login error checking Handles only password" duration="10"/>
-        <testCase name="Login error checking Handles bad email" duration="13"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\components\tests\ImageUpload.test.js">
+        <testCase name="Test image upload button uploadImage is called when new file uploaded" duration="85"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\RegisterBusiness.test.js">
-        <testCase name="Business Register error checking Handles empty Register" duration="66">
-            <failure message="Error: expect(received).toBe(expected) // Object.is equality"><![CDATA[Error: expect(received).toBe(expected) // Object.is equality
-
-Expected: 4
-Received: 3
-    at Object.<anonymous> (C:\Users\rta11\git2\team-900\frontend\src\__tests__\RegisterBusiness.test.js:63:42)
-    at Object.asyncJestTest (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\jasmineAsyncInstall.js:106:37)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:45:12
-    at new Promise (<anonymous>)
-    at mapper (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:28:19)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:75:41
-    at processTicksAndRejections (internal/process/task_queues.js:93:5)]]></failure>
-        </testCase>
-        <testCase name="Business Register error checking Handles only name" duration="42">
-            <failure message="Error: expect(received).toBe(expected) // Object.is equality"><![CDATA[Error: expect(received).toBe(expected) // Object.is equality
-
-Expected: 3
-Received: 2
-    at Object.<anonymous> (C:\Users\rta11\git2\team-900\frontend\src\__tests__\RegisterBusiness.test.js:70:42)
-    at Object.asyncJestTest (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\jasmineAsyncInstall.js:106:37)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:45:12
-    at new Promise (<anonymous>)
-    at mapper (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:28:19)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:75:41
-    at processTicksAndRejections (internal/process/task_queues.js:93:5)]]></failure>
-        </testCase>
-        <testCase name="Business Register error checking Handles only a type" duration="41">
-            <failure message="Error: expect(received).toBe(expected) // Object.is equality"><![CDATA[Error: expect(received).toBe(expected) // Object.is equality
-
-Expected: 3
-Received: 2
-    at Object.<anonymous> (C:\Users\rta11\git2\team-900\frontend\src\__tests__\RegisterBusiness.test.js:76:42)
-    at Object.asyncJestTest (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\jasmineAsyncInstall.js:106:37)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:45:12
-    at new Promise (<anonymous>)
-    at mapper (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:28:19)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:75:41
-    at processTicksAndRejections (internal/process/task_queues.js:93:5)]]></failure>
-        </testCase>
-        <testCase name="Business Register error checking Handles old enough user" duration="31">
-            <failure message="Error: expect(received).toBe(expected) // Object.is equality"><![CDATA[Error: expect(received).toBe(expected) // Object.is equality
-
-Expected: 4
-Received: 3
-    at Object.<anonymous> (C:\Users\rta11\git2\team-900\frontend\src\__tests__\RegisterBusiness.test.js:82:42)
-    at Object.asyncJestTest (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\jasmineAsyncInstall.js:106:37)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:45:12
-    at new Promise (<anonymous>)
-    at mapper (C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:28:19)
-    at C:\Users\rta11\git2\team-900\frontend\node_modules\jest-jasmine2\build\queueRunner.js:75:41
-    at processTicksAndRejections (internal/process/task_queues.js:93:5)]]></failure>
-        </testCase>
-        <testCase name="Business Register user age checking Handles to young user" duration="33"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\components\tests\Business.test.js">
+        <testCase name="Business tests is a Vue instance" duration="177"/>
+        <testCase name="Business tests has business" duration="48"/>
+        <testCase name="Successful login business page loads successfully" duration="23"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\components\tests\Users.test.js">
-        <testCase name="User profile page tests Check calculateDuration is called" duration="144"/>
-        <testCase name="User profile page tests User info loads successfully" duration="27"/>
-        <testCase name="User profile page tests addUserToBusiness function is called" duration="44"/>
-        <testCase name="Business link tests with businesses Business names load successfully" duration="37"/>
-        <testCase name="Business link tests with businesses goToBusinessPage function gets called" duration="18"/>
-        <testCase name="Business link tests without businesses Business names don&apos;t appear" duration="20"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\ModifyCatalog.test.js">
+        <testCase name="Component is a Vue instance" duration="145"/>
+        <testCase name="Modify Catalogue form error checking Handles empty modification" duration="91"/>
+        <testCase name="Modify Catalogue form error checking Handles no product name modification" duration="46"/>
+        <testCase name="Modify Catalogue form error checking Handles no product id modification" duration="44"/>
+        <testCase name="Modify Catalogue form error checking Handles no rrp modification" duration="46"/>
+        <testCase name="Modify Catalogue form error checking Handles negative rrp modification" duration="47"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\Register.test.js">
-        <testCase name="Register error checking Handles empty register" duration="187"/>
-        <testCase name="Register error checking Handles only email" duration="59"/>
-        <testCase name="Register error checking Handles only password" duration="51"/>
-        <testCase name="Register error checking Handles bad email" duration="51"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\components\tests\Users.test.js">
+        <testCase name="User profile page tests Check calculateDuration is called" duration="195"/>
+        <testCase name="User profile page tests User info loads successfully" duration="38"/>
+        <testCase name="User profile page tests addUserToBusiness function is called" duration="53"/>
+        <testCase name="Business link tests with businesses Business names load successfully" duration="22"/>
+        <testCase name="Business link tests with businesses goToBusinessPage function gets called" duration="20"/>
+        <testCase name="Business link tests without businesses Business names don&apos;t appear" duration="25"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\components\tests\Business.test.js">
-        <testCase name="Business tests is a Vue instance" duration="25"/>
-        <testCase name="Business tests has business" duration="14"/>
-        <testCase name="Successful login business page loads successfully" duration="20"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\Login.test.js">
+        <testCase name="Login error checking Handles empty login" duration="138"/>
+        <testCase name="Login error checking Handles only email" duration="18"/>
+        <testCase name="Login error checking Handles only password" duration="12"/>
+        <testCase name="Login error checking Handles bad email" duration="10"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\components\tests\ImageUpload.test.js">
-        <testCase name="Test image upload button uploadImage is called when new file uploaded" duration="22"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\Register.test.js">
+        <testCase name="Register error checking Handles empty register" duration="200"/>
+        <testCase name="Register error checking Handles only email" duration="61"/>
+        <testCase name="Register error checking Handles only password" duration="58"/>
+        <testCase name="Register error checking Handles bad email" duration="38"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\AddToCatalogue.test.js">
-        <testCase name="Component is a Vue instance" duration="13"/>
-        <testCase name="Add To Catalogue form error checking Handles empty Register" duration="54"/>
-        <testCase name="Add To Catalogue form error checking Handles no product name" duration="27"/>
-        <testCase name="Add To Catalogue form error checking Handles no product id" duration="19"/>
-        <testCase name="Add To Catalogue form error checking Handles no rrp" duration="20"/>
-        <testCase name="Add To Catalogue form error checking Handles negative rrp" duration="16"/>
-        <testCase name="Add To Catalogue form error checking Handles no description, manufacturer" duration="21"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\RegisterBusiness.test.js">
+        <testCase name="Business Register error checking Handles empty Register" duration="199"/>
+        <testCase name="Business Register error checking Handles only name" duration="46"/>
+        <testCase name="Business Register error checking Handles only a type" duration="33"/>
+        <testCase name="Business Register error checking Handles old enough user" duration="32"/>
+        <testCase name="Business Register user age checking Handles to young user" duration="25"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\ModifyCatalog.test.js">
-        <testCase name="Component is a Vue instance" duration="85"/>
-        <testCase name="Modify Catalogue form error checking Handles empty modification" duration="40"/>
-        <testCase name="Modify Catalogue form error checking Handles no product name modification" duration="20"/>
-        <testCase name="Modify Catalogue form error checking Handles no product id modification" duration="25"/>
-        <testCase name="Modify Catalogue form error checking Handles no rrp modification" duration="20"/>
-        <testCase name="Modify Catalogue form error checking Handles negative rrp modification" duration="16"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\AddToCatalogue.test.js">
+        <testCase name="Component is a Vue instance" duration="110"/>
+        <testCase name="Add To Catalogue form error checking Handles empty Register" duration="50"/>
+        <testCase name="Add To Catalogue form error checking Handles no product name" duration="28"/>
+        <testCase name="Add To Catalogue form error checking Handles no product id" duration="24"/>
+        <testCase name="Add To Catalogue form error checking Handles no rrp" duration="23"/>
+        <testCase name="Add To Catalogue form error checking Handles negative rrp" duration="17"/>
+        <testCase name="Add To Catalogue form error checking Handles no description, manufacturer" duration="16"/>
     </file>
-    <file path="C:\Users\rta11\git2\team-900\frontend\src\__tests__\ActingAs.test.js">
-        <testCase name="User acting as tests is a Vue instance" duration="17"/>
-        <testCase name="User acting as tests Check username is shown" duration="10"/>
-        <testCase name="User acting as tests Check username is displaying the correct username and role" duration="4"/>
-        <testCase name="User acting as tests Check user primary businesses list is rendered" duration="4"/>
-        <testCase name="User acting as tests Check selecting business in dropdown calls setActingAsBusinessId method" duration="4"/>
-        <testCase name="User acting as tests Check selecting user calls setActingAsUser method" duration="4"/>
+    <file path="C:\Users\Jackie\Documents\University\SENG302\team-900\frontend\src\__tests__\Homepage.test.js">
+        <testCase name="Homepage user tests User&apos;s first name is shown" duration="72"/>
+        <testCase name="Homepage user tests Go to profile gets called when clicked" duration="8"/>
+        <testCase name="Homepage business tests is a Vue instance" duration="5"/>
+        <testCase name="Homepage business tests Business&apos;s name is shown" duration="5"/>
+        <testCase name="Homepage business tests Go to business profile gets called when clicked" duration="6"/>
+        <testCase name="Homepage business tests Go to business catalogue gets called when clicked" duration="6"/>
     </file>
 </testExecutions>

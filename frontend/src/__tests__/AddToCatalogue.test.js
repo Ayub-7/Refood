@@ -38,6 +38,7 @@ const mockUser = {
 
 let $log = {
     debug: jest.fn(),
+    error: jest.fn(),
 }
 
 beforeEach(() => {
@@ -48,6 +49,13 @@ beforeEach(() => {
         methods: {},
         // components: CurrencyInput,
         localVue,
+    });
+
+    const checkSessionMethod = jest.spyOn(AddToCatalogue.methods, 'checkUserSession');
+    checkSessionMethod.mockImplementation(() => {
+        wrapper.vm.user = mockUser;
+        wrapper.vm.currencyCode = "NZD";
+        wrapper.vm.currencySymbol = "$"
     });
 
     const getUserMethod = jest.spyOn(AddToCatalogue.methods, 'getUserInfo');
@@ -83,7 +91,7 @@ describe('Add To Catalogue form error checking', () => {
     test('Handles empty Register', () => {
         const addBtn = wrapper.find('.add-button');
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(3);
+        expect(wrapper.vm.errors.length).toBe(2);
     });
 
     test('Handles no product name', () => {
@@ -91,7 +99,7 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "Good product";
         wrapper.vm.manufacturer = "Bob tyres";
-        wrapper.vm.rrp = "22";
+        wrapper.vm.rrp = 22;
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
@@ -103,7 +111,7 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "";
         wrapper.vm.description = "Good product";
         wrapper.vm.manufacturer = "Bob tyres";
-        wrapper.vm.rrp = "22";
+        wrapper.vm.rrp = 22;
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
@@ -115,11 +123,11 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "Good product";
         wrapper.vm.manufacturer = "Bob tyres";
-        wrapper.vm.rrp = "";
+        wrapper.vm.rrp = null;
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.errors.length).toBe(0);
     });
 
     test('Handles negative rrp', () => {
@@ -127,7 +135,7 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "Good product";
         wrapper.vm.manufacturer = "Bob tyres";
-        wrapper.vm.rrp = "-2";
+        wrapper.vm.rrp = -2;
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
@@ -139,7 +147,7 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "";
         wrapper.vm.manufacturer = "";
-        wrapper.vm.rrp = "2";
+        wrapper.vm.rrp = 2;
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
