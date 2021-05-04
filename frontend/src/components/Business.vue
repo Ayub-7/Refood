@@ -47,11 +47,6 @@
 
       </main>
     </div>
-    <!-- 406 Error: Business with given Id does not exist. -->
-    <div id="error" v-else>
-      <div id="error-header"> Error 406 </div>
-      <div id="error-description" style="font-size: 16px"> This business could not be found :( </div>
-    </div>
   </div>
 
 </template>
@@ -80,8 +75,11 @@ const Business = {
           this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
         })
         .catch((error) => {
+          if (error.response.status === 406) {
+            this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})
+          }
           throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
-        });
+        })
     },
 
     getUserInfo: function (userId) {
