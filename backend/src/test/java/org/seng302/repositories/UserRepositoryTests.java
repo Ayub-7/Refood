@@ -10,6 +10,7 @@ import org.seng302.models.Address;
 import org.seng302.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -18,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Integration tests of the user repository.
  */
-@RunWith(SpringRunner.class)
+
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
 public class UserRepositoryTests {

@@ -2,10 +2,12 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.coyote.Response;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.NewBusinessRequest;
+import org.seng302.models.requests.NewProductRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @RestController
 public class BusinessController {
@@ -54,7 +58,7 @@ public class BusinessController {
     public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) {
         Business business = new Business(req.getName(), req.getDescription(), req.getAddress(), req.getBusinessType());
 
-        User owner = (User) session.getAttribute("user");
+        User owner = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         business.createBusiness(owner);
 
         if (isValidBusiness(business)) {
@@ -86,7 +90,7 @@ public class BusinessController {
     @PutMapping("/businesses/{id}/makeAdministrator")
     public ResponseEntity<String> makeUserBusinessAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
         long userId = userIdRequest.getUserId();
-        User owner = (User) session.getAttribute("user");
+        User owner = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
         Business business = businessRepository.findBusinessById(id);
 
@@ -112,7 +116,7 @@ public class BusinessController {
     @PutMapping("/businesses/{id}/removeAdministrator")
     public ResponseEntity<String> removeUserBusinessAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
         long userId = userIdRequest.getUserId();
-        User currentUser = (User) session.getAttribute("user");
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         Business business = businessRepository.findBusinessById(id);
 
         if (business == null) { // 406 business non-existent.
@@ -134,5 +138,4 @@ public class BusinessController {
         businessRepository.save(business);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 }

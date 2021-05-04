@@ -1,5 +1,6 @@
 package org.seng302.utilities;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     /**
      * Configuration of web security - sets the rules on what user can go where.
      * @param http security configurer.
@@ -25,19 +25,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
         http
                 .csrf().disable()
-                .httpBasic()
+                .httpBasic().authenticationEntryPoint(new AuthEntryPoint())
 
                 .and()
-                .authorizeRequests()
-                .antMatchers("/checksession").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/{id}").authenticated()
-                .antMatchers(HttpMethod.POST, "/login", "/users", "/businesses", "/logout").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/login", "/users", "/businesses", "/logout").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/search*").authenticated()
-                .antMatchers(HttpMethod.PUT, "/users/{id}/*").hasRole("DGAA")
-                .antMatchers(HttpMethod.PUT, "/businesses/{id}/*").authenticated()
-                .anyRequest().permitAll();
-
+                 .authorizeRequests()
+                 .antMatchers("/checksession").permitAll()
+                 .antMatchers(HttpMethod.POST, "/login", "/users", "/logout").permitAll()
+                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                 .antMatchers(HttpMethod.GET, "/users/**").authenticated()
+                 .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "/users/{id}/revokeAdmin").hasRole("DGAA")
+                 .antMatchers("/businesses", "/businesses/**").authenticated()
+                 .anyRequest().permitAll()
+                 .and()
+                .logout()
+                ;
 
     }
 

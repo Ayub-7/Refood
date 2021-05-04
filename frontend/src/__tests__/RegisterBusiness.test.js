@@ -2,8 +2,9 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
 import {store} from "../store";
-let wrapper;
+import Vue from "vue";
 
+let wrapper;
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
@@ -28,12 +29,14 @@ const mockUser = {
     "businessesAdministered": []
 }
 
-
-
+const $router = {
+    push: jest.fn()
+}
+const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
 beforeEach(() => {
     wrapper = shallowMount(Business, {
         propsData: {},
-        mocks: {$vs, store},
+        mocks: {$vs, store, $router},
         stubs: [],
         methods: {},
         localVue,
@@ -49,8 +52,9 @@ describe('Business Register error checking', () => {
 
 
     beforeEach(() => {
-        wrapper.vm.user = mockUser;
-        wrapper.vm.checkAge = jest.fn();
+        checkAgeMethod.mockImplementation(() => {
+            return true;
+        });
     });
 
     test('Handles empty Register', () => {
@@ -81,8 +85,9 @@ describe('Business Register error checking', () => {
 
 describe('Business Register user age checking', () => {
     beforeEach(() => {
-        wrapper.vm.user = mockUser;
-        wrapper.vm.store.userDateOfBirth = '2008-02-28';
+        checkAgeMethod.mockImplementation(() => {
+            return false;
+        });
     });
 
     test('Handles to young user', () => {

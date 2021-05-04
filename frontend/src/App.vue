@@ -1,30 +1,59 @@
 <template>
   <div id="app" class="main" >
 
-    <div class="topbar" id="topBar">
-      <a class="navButton" @click="toggleMobileMenu">Nav</a>
-      <div id="navLinks">
-        <ul class ="bar">
-          <div id='loggedIn' v-if="getLoggedInUser() == null">
-            <li><router-link class="title" to="/">Register</router-link></li>
-            <li><router-link class="title" to="/login">Login</router-link></li>
-          </div>
-          <div v-else>
-            <li><router-link :to="{path: '/home'}" class="title">Home</router-link></li>
-            <li v-if="getActingAsUserId() == null"><router-link class="title" to="/businesses">Register a Business</router-link></li>
-            <li><router-link class="title" to="/search">Search</router-link></li>
-            <li v-if="getActingAsUserId() == null"><router-link :to="{path: `/users/${getLoggedInUser()}`}" class="title">Profile</router-link></li>
-            <li v-if="getActingAsUserId() != null"><router-link :to="{path: `/businesses/${getActingAsUserId()}`}" class="title">Business Profile</router-link></li>
-            <li><router-link :to="{path: '/login'}" class="title">
-                <span class="title" @click="logoutUser()">Logout</span>
-              </router-link></li>
-            <div class="userDetail">
-              <ActingAs/>
-            </div>
-          </div>
-        </ul>
+    <vs-navbar
+        class="vs-navbar"
+        v-model="indexActive"
+        type="fund"
+        color="#1F74FF"
+        text-color="rgba(255,255,255,.6)"
+        active-text-color="rgba(255,255,255,1)">
+      <div slot="title">
+        <vs-navbar-title>
+          ReFood
+        </vs-navbar-title>
       </div>
-        </div>
+      <vs-navbar-item index="0" v-if="getLoggedInUser() == null">
+        <router-link to="/">Register</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="1" v-if="getLoggedInUser() == null">
+        <router-link to="/login">Login</router-link>
+      </vs-navbar-item>
+
+      <vs-navbar-item index="0" v-if="getLoggedInUser() != null">
+        <router-link :to="{path: '/home'}">Home</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="1" v-if="getLoggedInUser() != null && getActingAsUserId() == null">
+        <router-link to="/businesses">Register a Business</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="2" v-if="getLoggedInUser() != null">
+        <router-link to="/search">Search</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="3" v-if="getLoggedInUser() != null && getActingAsUserId() == null">
+        <router-link :to="{path: `/users/${getLoggedInUser()}`}">Profile</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="4" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
+        <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="5" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
+        <router-link :to="{path: `/addtocatalogue`}">Add To Catalogue</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="6" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
+        <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
+      </vs-navbar-item>
+      <vs-navbar-item index="7" v-if="getLoggedInUser() != null">
+        <router-link :to="{path: '/login'}">
+        <span @click="logoutUser()">Logout</span>
+        </router-link>
+      </vs-navbar-item>
+
+      <div class="userDetail" v-if="getLoggedInUser() != null">
+        <ActingAs/>
+      </div>
+
+    </vs-navbar>
+
+
     <div id="view">
       <router-view></router-view>
     </div>
@@ -37,7 +66,10 @@
 import Register from "./components/Register";
 import ActingAs from "./components/ActingAs";
 import Login from "./components/Login";
+import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
+import AddToCatalogue from "@/components/AddToCatalogue";
+import CurrencyInput from "@/components/CurrencyInput";
 import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
@@ -53,13 +85,13 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue, CurrencyInput
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
     return {
-
+      indexActive: 0
     };
   },
   methods: {
@@ -126,41 +158,18 @@ export default app;
 
 <style scoped>
 
-
-.topbar {
-  display: flex;
-  justify-content: space-around;
-  position: relative;
-  padding-bottom: 20px;
-  max-width: 100%;
-  max-height: 100%;
-  background: #385898;
-  overflow: hidden;
-}
-
-.title {
-  width: 76%;
-  color: white;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: #385898;
-  /*padding: 10px 20px;*/
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-left: 5px;
-  margin-right: 20px;
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
-
 [v-cloak] {
   display: none;
 }
 
+.vs-navbar {
+  padding: 5px;
+  color: rgb(255,255,255);
+}
 
+.userDetail:hover {
+  background: #E0E0E0;
+  /*color: #f5f5f5;*/
+}
 
 </style>

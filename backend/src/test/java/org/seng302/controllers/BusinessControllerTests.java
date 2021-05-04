@@ -20,6 +20,7 @@ import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,15 +34,12 @@ import java.security.NoSuchAlgorithmException;
  */
 @WebMvcTest(controllers = BusinessController.class)
 @ContextConfiguration(classes = TestApplication.class)
-@RunWith(SpringRunner.class)
 public class BusinessControllerTests {
 
     @Autowired
     private MockMvc mvc;
     @InjectMocks
     private BusinessController businessController;
-    @MockBean
-    private UserController userController;
     @MockBean
     private BusinessRepository businessRepository;
     @MockBean
@@ -76,7 +74,7 @@ public class BusinessControllerTests {
     public void testNoAuthMakeUserAdmin() throws Exception {
         UserIdRequest userIdReq = new UserIdRequest(user.getId());
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
-                .contentType("application/json").sessionAttr("user", ownerUser)
+                .contentType("application/json").sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(userIdReq)))
                 .andExpect(status().isUnauthorized());
     }
@@ -90,7 +88,7 @@ public class BusinessControllerTests {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
 
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
-                .contentType("application/json").sessionAttr("user", ownerUser)
+                .contentType("application/json").sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(userIdReq)))
                 .andExpect(status().isOk());
 
@@ -99,21 +97,21 @@ public class BusinessControllerTests {
         UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
                 .contentType("application/json")
-                .sessionAttr("user", ownerUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isBadRequest());
 
         // Test for non-existent business.
         mvc.perform(put("/businesses/{id}/makeAdministrator", 100)
                 .contentType("application/json")
-                .sessionAttr("user", ownerUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isNotAcceptable());
 
         // Non-primary admin user test.
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
                 .contentType("application/json")
-                .sessionAttr("user", adminUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .content(mapper.writeValueAsString(user)))
                 .andExpect(status().isForbidden());
     }
@@ -123,7 +121,7 @@ public class BusinessControllerTests {
         UserIdRequest userIdReq = new UserIdRequest(user.getId());
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
-                .sessionAttr("user", ownerUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(userIdReq)))
                 .andExpect(status().isUnauthorized());
     }
@@ -138,7 +136,7 @@ public class BusinessControllerTests {
 
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
-                .sessionAttr("user", ownerUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(adminUserIdReq)))
                 .andExpect(status().isOk());
 
@@ -147,21 +145,21 @@ public class BusinessControllerTests {
         UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
-                .sessionAttr("user", ownerUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isBadRequest());
 
         // Test for non-existent business.
         mvc.perform(put("/businesses/{id}/removeAdministrator", 100)
                 .contentType("application/json")
-                .sessionAttr("user", ownerUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isNotAcceptable());
 
         // Non-primary admin user test.
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
-                .sessionAttr("user", adminUser)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isForbidden());
     }

@@ -43,9 +43,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * This is the main entry point for Spring Boot application. This class's main
  * method will boot up the web application and can contain other sort of
  * configuration.
- *
- * Should look in to removing the org.seng302.example section when we no longer want to use anything in the example folder.
- * - Jackie
  */
 @SpringBootApplication
 @EnableScheduling
@@ -61,9 +58,6 @@ public class Main {
   public static void main(String[] args) {
     logger.info("-- booting up application --");
     SpringApplication.run(Main.class, args);
-
-
-
   }
 
   /**
@@ -81,7 +75,8 @@ public class Main {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-            .allowedOrigins("http://localhost:9500", "https://csse-s302g12.canterbury.ac.nz");
+            .allowedOrigins("http://localhost:9500", "https://csse-s302g12.canterbury.ac.nz")
+            .allowCredentials(true);
       }
     };
   }

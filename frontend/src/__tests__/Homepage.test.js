@@ -42,11 +42,12 @@ const mockBusiness =
         "created": "2020-05-18 21:06:11"
     };
 
-// Mocking $store
-// const store = {
-//     loggedInUserId: 5,
-//     actingAsBusinessId: 1,
-// };
+const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
+getUserName.mockImplementation(() =>  {
+    return 'Rayna';
+});
+
+const getBussinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
 
 const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getLoggedInUserId');
 getLoggedInUserIdMethod.mockResolvedValue(mockUser.id);
@@ -59,7 +60,6 @@ beforeEach(() => {
         methods: {},
         data () {
             return {
-                userFirstName: mockUser.firstName,
                 userId: mockUser.id,
                 business: mockBusiness,
                 actingAsBusinessId: null
@@ -69,9 +69,6 @@ beforeEach(() => {
 
     const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
     getUserMethod.mockResolvedValue(mockUser);
-
-
-
     expect(wrapper).toBeTruthy();
 });
 
@@ -80,23 +77,17 @@ afterEach(() => {
 });
 
 describe('Homepage user tests', () => {
-    beforeEach(() => {
-
-    });
 
     test('User\'s first name is shown', () => {
-        const nameTitle = wrapper.find("#pageTitle")
-
-        expect(nameTitle.text().includes(wrapper.vm.userFirstName)).toBe(true);
+        const nameTitle = wrapper.find("#name")
+        expect(nameTitle.text().includes('Rayna')).toBe(true);
     });
 
 
     test('Go to profile gets called when clicked', () => {
-        const profileButton = wrapper.find("#userProfile");
+        const profileButton = wrapper.find("#user-profile-btn");
         wrapper.vm.goToProfile = jest.fn();
-
         profileButton.trigger('click')
-
         expect(wrapper.vm.goToProfile).toBeCalled();
     })
 });
@@ -104,32 +95,33 @@ describe('Homepage user tests', () => {
 describe('Homepage business tests', () => {
     beforeEach(() => {
         wrapper.vm.actingAsBusinessId = 1;
-
+        getBussinessName.mockImplementation(() =>  {
+            return 'Dabshots';
+        });
         const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getBusinessId');
         getLoggedInUserIdMethod.mockResolvedValue(wrapper.vm.actingAsBusinessId);
     });
 
-    test('Business\'s name is shown', () => {
-        const busPageTitle = wrapper.find("#busPageTitle")
-        expect(busPageTitle.text().includes(wrapper.vm.business.name)).toBe(true);
+    test('is a Vue instance', () => {
+        expect(wrapper.isVueInstance).toBeTruthy();
     });
 
+    test('Business\'s name is shown', () => {
+        const busPageTitle = wrapper.find("#name")
+        expect(busPageTitle.text().includes('Dabshots')).toBe(true);
+    });
 
     test('Go to business profile gets called when clicked', () => {
-        const profileButton = wrapper.find("#busProfile");
+        const profileButton = wrapper.find("#bus-profile-btn");
         wrapper.vm.goToProfile = jest.fn();
-
         profileButton.trigger('click')
-
         expect(wrapper.vm.goToProfile).toBeCalled();
     });
 
     test('Go to business catalogue gets called when clicked', () => {
-        const profileButton = wrapper.find("#busCatalogue");
+        const profileButton = wrapper.find("#bus-catalogue-btn");
         wrapper.vm.goToProductCatalogue = jest.fn();
-
         profileButton.trigger('click')
-
         expect(wrapper.vm.goToProductCatalogue).toBeCalled();
     });
 
