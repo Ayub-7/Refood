@@ -4,7 +4,7 @@
       <!-- Welcome message that greets user with their name, or a business administrator with the business name -->
       <div id="name-container">
         <!-- Shows a different greeting message depending on who the user is acting as -->
-        <div v-if="this.actingAsBusinessId != null" id="name">
+        <div v-if="getBusinessId() != null" id="name">
           Welcome to your home page, {{getBusinessName()}}!
         </div>
         <div v-else id="name">
