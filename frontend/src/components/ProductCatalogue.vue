@@ -177,6 +177,7 @@ const Search = {
     return {
       errors: [],
       toggle: [1,1,1,1,1],
+      userId: null,
       searchbar: "",
       searchbarResults: "",
       products: [],
@@ -202,30 +203,35 @@ const Search = {
    * be filtered by the webpage.
  */
   mounted() {
-    let userId = store.loggedInUserId;
-    this.getUserInfo(userId);
-    
+    api.checkSession()
+    .then((response) => {
+      this.businessId = this.$route.params.id;
+      this.userId = response.data.id;
+      this.getUserInfo(this.userId);
+      this.getBusinessName();
 
-    this.business = this.getBusinessName();
-    this.businessId = this.getBusinessID();
-    api.getBusinessProducts(this.businessId)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.products = response.data;
-          this.filteredproducts = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load products";
-        })
-        .finally(() => (this.loading = false));
+      api.getBusinessProducts(this.businessId)
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            this.products = response.data;
+            this.filteredproducts = response.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to load products";
+          })
+          .finally(() => (this.loading = false));
+    }).catch(() => {
+
+    });
+
+
+
+
   },
 
 
   methods: {
-
-
-
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString()
@@ -234,17 +240,18 @@ const Search = {
       }
     },
     getUserInfo: function(userId) {
-      if(store.loggedInUserId != null) {
-        api.getUserFromID(userId) //Get user data
-            .then((response) => {
-              this.user = response.data;
-              this.setCurrency(this.user.homeAddress.country);
-            }).catch((err) => {
+      api.getUserFromID(userId) //Get user data
+          .then((response) => {
+            this.user = response.data;
+            this.setCurrency(this.user.homeAddress.country);
+          }).catch((err) => {
+        if (err.response.status === 401) {
+          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+          this.$router.push({name: 'LoginPage'});
+        } else {
           throw new Error(`Error trying to get user info from id: ${err}`);
-        });
-      } else {
-        this.$router.push({path: "/login"}); //If user not logged in send to login page
-      }
+        }
+      });
     },
 
     setCurrency: function (country) {
@@ -257,12 +264,13 @@ const Search = {
       });
     },
 
-    getBusinessID: function () {
-      return store.actingAsBusinessId
-    },
-
     getBusinessName: function () {
-      return store.actingAsBusinessName
+      api.getBusinessFromId(this.businessId)
+          .then((res) => {
+            this.business = res.data.name;
+          }).catch((error) => {
+        throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+      })
     },
 
     //sets the product to alter id

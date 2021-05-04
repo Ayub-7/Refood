@@ -4,6 +4,7 @@
       <form autocomplete="off">
           <vs-input id="business-name"
                     :danger="this.errors.includes('businessName')"
+                    danger-text="Business name must be filled and be less than 30 characters"
                     type="text"
                     class="form-control"
                     label-placeholder="Business Name (Required)"
@@ -15,7 +16,7 @@
               class="form-control"
               label="Select Business Type (Required)"
               v-model="businessType"
-              autocomplete >
+               >
             <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
           </vs-select>
 
@@ -40,14 +41,14 @@
             <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
           </div>
           <div id="country">
-            <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+            <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country field must be filled" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
             <ul v-if="this.suggestCountries" class="suggested-box">
               <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
             </ul>
           </div>
         </div>
 
-          <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
+          <vs-textarea width='500px' type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
           <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
       </form>
   </div>
@@ -56,7 +57,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "../store";
+import {store, mutations} from "../store";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -94,7 +95,7 @@ const BusinessRegister = {
     checkForm: function() {
       this.errors = [];
 
-      if (this.businessName.length === 0) {
+      if (this.businessName.length === 0 || this.businessName.length > 30) {
         this.errors.push('businessName');
       }
 
@@ -113,7 +114,7 @@ const BusinessRegister = {
 
       if (this.errors.length >= 1) {
         if(this.errors.includes("dob") && this.errors.length === 1){
-          this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
+          this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood business account.', color:'danger'});
         } else {
           this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
         }
@@ -138,7 +139,8 @@ const BusinessRegister = {
       api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
         .then((response) => {
           this.$log.debug("New business created:", response.data);
-          this.$router.push({path: `/users/${store.loggedInUserId}`});
+          mutations.setActingAsBusiness(response.data.businessId, this.businessName);
+          this.$router.push({path: `/home`});
         }).catch((error) => {
           if(error.response) {
             console.log(error.response.status);
@@ -223,30 +225,24 @@ const BusinessRegister = {
     getUserInfo: function (userId) {
       api.getUserFromID(userId)
           .then((response) => {
-            if(store.loggedInUserId == null) {
               this.user = response.data;
-            } else {
-              this.$router.push({path: "/login"});
-            }
           }).catch((err) => {
             if (err.response.status === 401) {
               this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
               this.$router.push({name: 'LoginPage'});
+            } else {
+              throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
             }
-            throw new Error(`ERROR trying to obtain business info from Id: ${err}`);
-      });
-    },
 
-    checkLoggedIn: function() {
-      if (store.loggedInUserId == null) {
-        this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-        this.$router.push({name: 'LoginPage'});
-      }
+      });
     },
   },
 
   mounted: function () {
-    this.checkLoggedIn();
+    api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+        });
   }
 
 }
