@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.responses.BusinessIdResponse;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -51,7 +52,7 @@ public class BusinessController {
      * @return ResponseEntity
      */
     @PostMapping("/businesses")
-    public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) {
+    public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) throws JsonProcessingException {
         Business business = new Business(req.getName(), req.getDescription(), req.getAddress(), req.getBusinessType());
 
         User owner = (User) session.getAttribute("user");
@@ -59,8 +60,10 @@ public class BusinessController {
 
         if (isValidBusiness(business)) {
             businessRepository.save(business);
-            System.out.println("Valid business");
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            BusinessIdResponse businessIdResponse = new BusinessIdResponse(business.getId(), business.getBusinessType());
+            System.out.println(businessIdResponse);
+            String jsonString = mapper.writeValueAsString(businessIdResponse);
+            return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
         } else {
             System.out.println(owner.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
