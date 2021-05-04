@@ -5,7 +5,7 @@
             <!-- Add user to business as admin modal -->
         <Modal v-if="showModal">
             <div slot="header">
-                Upload image for product:
+                Upload images for product:
             </div>
 
             <div slot="body">
@@ -19,7 +19,9 @@
                 Cancel
                 </button>
                 <label ref="loadableButton" id='imageUploadBtn' for="fileUpload" class="button">Upload image</label>
-                <input ref="fileUpload" id="fileUpload" type="file" @change='uploadImage($event)'>
+                <input ref="fileUpload" id="fileUpload" type="file" multiple @change="uploadImage($event)">
+                <!-- <div v-for> -->
+                <!-- @change='uploadImage($event)' -->
             </div>
         </Modal>
 
@@ -42,6 +44,7 @@ const ImageUpload = {
     return {
         selectedProduct: null,
         showModal: false,
+        selectedImages: [],
     }
   },
 
@@ -51,34 +54,35 @@ const ImageUpload = {
      * Upload product image when image is uploaded on web page
      * @param e Event object which contains file uploaded
      */
-    uploadImage: function(e) {
 
+    uploadImage: function(e) {
+            console.log('yo')
             //Get image file from event
-            const image = e.target.files[0];
+            //const image = e.target.files[0];
             
             //reset file path value since images would stay in input (meaning you couldn't upload same image twice)
-            document.getElementById("fileUpload").value = null; 
+            // document.getElementById("fileUpload").value = null; 
             this.showModal = false;
             //Setup FormData object to send in request
-            const fd = new FormData();
-            fd.append('filename', image, image.name);
-
             this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
-            api.postProductImage(this.businessId, this.selectedProduct, fd)
-                .then(() => { //On success
-                    this.$vs.notify({title:`Image for ${this.selectedProduct} was uploaded`, color:'success'});
-                }).catch((error) => { //On fail
-                    if (error.response.status === 400) {
-                        this.$vs.notify({title:`Image failed to upload`, color:'danger'});
-                    } else if (error.repsonse.status === 500) {
-                        this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
-                    }
-                }).finally(() => {
-                this.$vs.loading.close();
-                this.$parent.forceRerender();
-            })
-        
-    
+            for (let image of e.target.files) {
+                const fd = new FormData();
+                fd.append('filename', image, image.name);
+
+
+                api.postProductImage(this.businessId, this.selectedProduct, fd)
+                    .then(() => { //On success
+                        this.$vs.notify({title:`Image for ${this.selectedProduct} was uploaded`, color:'success'});
+                    }).catch((error) => { //On fail
+                        if (error.response.status === 400) {
+                            this.$vs.notify({title:`Image failed to upload`, color:'danger'});
+                        } else if (error.repsonse.status === 500) {
+                            this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
+                        }
+                    }).finally(() => {
+                        this.$vs.loading.close();
+                    })   
+            }
     }
   },
 
