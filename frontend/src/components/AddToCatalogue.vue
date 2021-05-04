@@ -24,18 +24,16 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp') || errors.includes('invalid-rrp'))"
-              danger-text="RRP is required and must be at least 0 and a Number."
+              :danger="errors.includes('rrp')"
+              danger-text="RRP is required and must be not be a negative number"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
-              type="text"
+              type="number"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
         <div id="manufacturer">
           <vs-input
-              :danger="(errors.includes('no-manu'))"
-              danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
               label-placeholder="Manufacturer"
@@ -43,12 +41,10 @@
         </div>
         <div id="description">
           <vs-textarea
-              :danger="(errors.includes('no-desc'))"
-              danger-text="Description is Required."
               class="form-control"
               type="text"
               width="400px"
-              label="Description (required)"
+              label="Description"
               v-model="description"/>
         </div>
       </div>
@@ -79,7 +75,7 @@ const AddToCatalogue = {
       manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
-      rrp: ""
+      rrp: null
     };
   },
   methods: {
@@ -98,41 +94,20 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
-      if (this.description.length === 0) {
-        this.errors.push('no-desc');
-      }
-
-      if (this.manufacturer.length === 0) {
-        this.errors.push('no-manu');
-      }
-
-      if (this.rrp.length === 0 || this.rrp === null) {
-        this.errors.push('no-rrp');
-      } else if (this.rrp < 0) {
+      if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
-      if (isNaN(this.rrp)) {
-        this.errors.push('invalid-rrp');
-      }
 
       if (this.errors.length >= 1) {
         if (this.errors.includes(this.productName) || this.errors.includes(this.productId)
-            || this.errors.includes('rrp') || this.errors.includes('no-rrp')
-            || this.errors.includes('invalid-rrp') || this.errors.includes('no-manu')) {
+            || this.errors.includes('rrp')) {
           this.$vs.notify({
             title: 'Failed to create catalogue item',
             text: 'Required fields are missing.',
             color: 'danger'
           });
         }
-      }
-      if (this.errors.includes('no-desc')) {
-        this.$vs.notify({
-          title: 'Failed to create catalogue item',
-          text: 'Description is Required.',
-          color: 'danger'
-        });
       }
     },
     /**
@@ -148,7 +123,7 @@ const AddToCatalogue = {
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if (error.response) {
-            console.log(error);
+            this.$log.error(error);
             if (error.response.status === 400) {
               this.$vs.notify({
                 title: 'Failed to create catalogue item',
@@ -156,7 +131,7 @@ const AddToCatalogue = {
                 color: 'danger'
               });
             }
-            console.log(error.response.status);
+            this.$log.error(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         });
@@ -184,14 +159,20 @@ const AddToCatalogue = {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
           }).catch(err => {
-        console.log("Error with getting cities from REST Countries." + err);
+        this.$log.error("Error with getting cities from REST Countries." + err);
       });
     },
+
+
+
   },
   mounted: function () {
     api.checkSession()
         .then((response) => {
           this.getUserInfo(response.data.id);
+        })
+        .catch((error) => {
+          this.$log.debug("Error checking user session: " + error);
         });
   }
 }
@@ -331,6 +312,7 @@ Styling for form elements.
 #currencyInput {
   grid-row: 1;
   grid-column: 2;
+
 }
 
 #currencyCode {

@@ -85,10 +85,11 @@
                     name="dateofbirth"
                     v-model="dateofbirth"
                     :danger="errors.includes(dateofbirth)"
-                    danger-text="You must be atleast 13 years old to register"
-                    :success="(dateofbirth.length!==0 && this.validAge(this.dateofbirth))"
-                    label="Date of birth (Required)" />
+                    danger-text="Enter date of birth"
+                    :success="(dateofbirth.length!==0)"
+                    label="Date of birth (Required)"/>
         </div>
+
         <div id="bio">
           <vs-textarea width="200px" type="text" class="form-control text-areas" label="Bio" name="bio" v-model="bio"></vs-textarea>
         </div>
