@@ -41,11 +41,13 @@
       <vs-navbar-item index="6" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
         <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
       </vs-navbar-item>
-      <vs-navbar-item index="7" v-if="getLoggedInUser() != null">
-        <router-link :to="{path: '/login'}">
-        <span @click="logoutUser()">Logout</span>
-        </router-link>
-      </vs-navbar-item>
+      <div @click="logoutUser()">
+        <vs-navbar-item index="7" v-if="getLoggedInUser() != null">
+          <router-link :to="{path: '/login'}">
+          <span>Logout</span>
+          </router-link>
+        </vs-navbar-item>
+      </div>
 
       <div class="userDetail" v-if="getLoggedInUser() != null">
         <ActingAs/>
