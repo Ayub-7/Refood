@@ -10,6 +10,7 @@ import org.seng302.models.responses.BusinessIdResponse;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.models.requests.UserIdRequest;
+import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,9 +137,24 @@ public class BusinessController {
         if (userToRevoke == null || !business.getAdministrators().contains(userToRevoke) || business.getPrimaryAdministrator().getId() == userToRevoke.getId()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
         business.getAdministrators().remove(userToRevoke);
         businessRepository.save(business);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/actasbusiness")
+    public ResponseEntity<String> actAsBusiness(@RequestBody BusinessIdRequest businessIdRequest, HttpSession session) {
+        long businessId = businessIdRequest.getBusinessId();
+        System.out.println("session");
+        Business existingBusiness = businessRepository.findBusinessById(businessId);
+        if (existingBusiness != null) {
+            session.setAttribute(Business.BUSINESS_SESSION_ATTRIBUTE, existingBusiness);
+
+            //Get business from session
+            Business bbusiness = (Business) session.getAttribute("business");
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

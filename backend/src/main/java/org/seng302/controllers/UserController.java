@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.Business;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
@@ -112,8 +113,15 @@ public class UserController {
     @GetMapping("/checksession")
     public ResponseEntity<User> checksession(HttpServletRequest req, HttpSession session) {
         User user = (User) session.getAttribute("user");
+        Business bbusiness = (Business) session.getAttribute("business");
+        System.out.println(user.getId());
+        System.out.println(bbusiness.getName());
+        //System.out.println(business.getId());
+//        System.out.println(business.Name);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
+
 
 
     @PostMapping("/logoutuser")
@@ -262,5 +270,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
+
+
 
 }

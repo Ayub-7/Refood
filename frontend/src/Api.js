@@ -128,6 +128,12 @@ export default {
     createBusiness: async(name, description, address, businessType) =>
     instance.post('businesses', {name, description, address, businessType}, {withCredentials: true}),
 
+    /**
+     * Retrieve a single business with their unique id.
+     * @param businessId the unique id of the business.
+     */
+    actAsBusiness: async(businessId) =>
+        instance.post('actasbusiness',{businessId}, {withCredentials: true}),
 
     /**
      * Retrieve a single business with their unique id.

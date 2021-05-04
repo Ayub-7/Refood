@@ -172,11 +172,14 @@ const Homepage = {
    * is first rendered, then gets the users details from the backend using the API
    */
   mounted: function () {
-      let userId = store.loggedInUserId;
-      this.getUserDetails(userId);
-    },
-
+    api.checkSession()
+        .then((response) => {
+          console.log(response.data);
+          this.getUserDetails(response.data.id);
+        });
+  },
 }
+
 export default Homepage;
 </script>
 
