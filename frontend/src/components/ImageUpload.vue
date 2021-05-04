@@ -74,8 +74,9 @@ const ImageUpload = {
                         this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
                     }
                 }).finally(() => {
-                    this.$vs.loading.close();
-                })   
+                this.$vs.loading.close();
+                this.$parent.forceRerender();
+            })
         
     
     }

@@ -1,7 +1,7 @@
 <template>
   <div class="main" id="body">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="main1">
+    <form class="main1" :key="componentKey">
       <div class="profile-text-inner">
         <div style="display: flex; ">
           <h1 class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
@@ -193,6 +193,7 @@ const Search = {
       currencySymbol: "",
       currencyCode: "",
       selected: "",
+      componentKey: 0,
     };
   },
 
@@ -224,14 +225,14 @@ const Search = {
     }).catch(() => {
 
     });
-
-
-
-
   },
 
 
   methods: {
+    forceRerender() {
+      console.log("gogogogogogo")
+      this.$forceUpdate()
+    },
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString()
