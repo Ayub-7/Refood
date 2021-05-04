@@ -78,22 +78,37 @@ const Business = {
         .then((res) => {
           this.business = res.data;
           this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
-
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-            this.$router.push({name: 'LoginPage'});
-          }
           throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
         });
+    },
+
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId)
+          .then((response) => {
+            this.user = response.data;
+          }).catch((err) => {
+        if (err.response.status === 401) {
+          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+          this.$router.push({name: 'LoginPage'});
+        } else {
+          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
+        }
+
+      });
     },
 
   },
 
   mounted() {
+    api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+          this.getBusiness();
+        });
     // Retrieve business info.
-    this.getBusiness();
+
   }
 }
 
