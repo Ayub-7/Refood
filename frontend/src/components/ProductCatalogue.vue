@@ -192,12 +192,10 @@ const Search = {
    * be filtered by the webpage.
  */
   mounted() {
-    let userId = store.loggedInUserId;
-    this.getUserInfo(userId);
-    
-
     this.business = this.getBusinessName();
-    this.businessId = this.getBusinessID();
+    this.businessId = this.$route.params.id;
+    //this.setCurrency(store.homeAddress.country);
+
     api.getBusinessProducts(this.businessId)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
@@ -213,9 +211,6 @@ const Search = {
 
 
   methods: {
-
-
-
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString()
@@ -223,19 +218,18 @@ const Search = {
         return '../../public/ProductShoot.jpg'
       }
     },
-    getUserInfo: function(userId) {
-      if(store.loggedInUserId != null) {
-        api.getUserFromID(userId) //Get user data
-            .then((response) => {
-              this.user = response.data;
-              this.setCurrency(this.user.homeAddress.country);
-            }).catch((err) => {
-          throw new Error(`Error trying to get user info from id: ${err}`);
-        });
-      } else {
-        this.$router.push({path: "/login"}); //If user not logged in send to login page
-      }
-    },
+    // getUserInfo: function(userId) {
+    //   api.getUserFromID(userId) //Get user data
+    //       .then((response) => {
+    //         this.user = response.data;
+    //         this.setCurrency(this.user.homeAddress.country);
+    //       }).catch((err) => {
+    //     throw new Error(`Error trying to get user info from id: ${err}`);
+    //   });
+    // }
+      // } else {
+      //   this.$router.push({path: "/login"}); //If user not logged in send to login page
+      // }
 
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
