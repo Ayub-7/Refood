@@ -231,32 +231,28 @@ const Search = {
    * be filtered by the webpage.
  */
   mounted() {
-    let userId = store.loggedInUserId;
-    this.getUserInfo(userId);
-    this.business = this.getBusinessName();
-    this.businessId = this.getBusinessID();
-
     api.checkSession()
-            .then((response) => {
-              this.businessId = this.$route.params.id;
-              this.userId = response.data.id;
-              this.getUserInfo(this.userId);
-              this.getBusinessName();
-            }),
-
-    api.getBusinessProducts(this.businessId)
         .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.products = response.data;
-          console.log(this.products)
-          this.filteredproducts = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load products";
-        })
-        .finally(() => (this.loading = false))
+          this.businessId = this.$route.params.id;
+          this.userId = response.data.id;
+          this.getUserInfo(this.userId);
+          this.getBusinessName();
+
+          api.getBusinessProducts(this.businessId)
+              .then((response) => {
+                this.$log.debug("Data loaded: ", response.data);
+                this.products = response.data;
+                this.filteredproducts = response.data;
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+                this.error = "Failed to load products";
+              })
+              .finally(() => (this.loading = false));
+        }).catch(() => {
+    });
   },
+
 
 
   methods: {
