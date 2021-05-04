@@ -85,7 +85,8 @@
                   </vs-dropdown-menu>
                 </vs-dropdown>
 
-                <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
+                <p style="font-size: 20pt; font-weight: bold;  text-align: justify;">{{ product.name }} </p>
+                <p style="font-size: 14pt; text-align: justify; margin-bottom: 20px;">{{ product.manufacturer }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
                 <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
@@ -110,6 +111,9 @@
                   <vs-th sort-key="description">
                     <div>Description</div>
                   </vs-th>
+                  <vs-th sort-key="manufacturer">
+                    <div>Manufacturer</div>
+                  </vs-th>
                   <vs-th sort-key="recommendedRetailPrice">
                     <div>Recommended Retail Price</div>
                   </vs-th>
@@ -130,6 +134,7 @@
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
                     <vs-td>{{ product.description }} </vs-td>
+                    <vs-td>{{ product.manufacturer }} </vs-td>
                     <vs-td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </vs-td>
                     <td>{{ product.created }} </td>
                     <td>
