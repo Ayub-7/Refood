@@ -148,9 +148,9 @@
                 </td>
                 <td>
                   <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-button>Change Primary Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
                     <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
                         {{pImage.fileName}}
                       </vs-dropdown-item>
                     </vs-dropdown-menu>
@@ -242,6 +242,7 @@ const Search = {
               this.userId = response.data.id;
               this.getUserInfo(this.userId);
               this.getBusinessName();
+            }),
 
     api.getBusinessProducts(this.businessId)
         .then((response) => {
@@ -254,7 +255,7 @@ const Search = {
           this.$log.debug(error);
           this.error = "Failed to load products";
         })
-        .finally(() => (this.loading = false));
+        .finally(() => (this.loading = false))
   },
 
 
@@ -264,7 +265,7 @@ const Search = {
       this.$forceUpdate()
     },
 
-    setDefaultImage(product, image) {
+    setPrimaryImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
       console.log(this.businessId, this.productId, this.imageId);
