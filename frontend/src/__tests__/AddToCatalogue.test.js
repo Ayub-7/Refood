@@ -38,6 +38,7 @@ const mockUser = {
 
 let $log = {
     debug: jest.fn(),
+    error: jest.fn(),
 }
 
 beforeEach(() => {

@@ -123,7 +123,7 @@ const AddToCatalogue = {
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if (error.response) {
-            console.log(error);
+            this.$log.error(error);
             if (error.response.status === 400) {
               this.$vs.notify({
                 title: 'Failed to create catalogue item',
@@ -131,7 +131,7 @@ const AddToCatalogue = {
                 color: 'danger'
               });
             }
-            console.log(error.response.status);
+            this.$log.error(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         });
@@ -159,7 +159,7 @@ const AddToCatalogue = {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
           }).catch(err => {
-        console.log("Error with getting cities from REST Countries." + err);
+        this.$log.error("Error with getting cities from REST Countries." + err);
       });
     },
 
@@ -170,6 +170,9 @@ const AddToCatalogue = {
       api.checkSession()
           .then((response) => {
             this.getUserInfo(response.data.id);
+          })
+          .catch((error) => {
+            this.$log.debug("Error checking user session: " + error);
           });
     }
   }
