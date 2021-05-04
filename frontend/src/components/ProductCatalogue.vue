@@ -19,25 +19,25 @@
 
           </div>
         </div>
-        <div style="display: flex; ">
-          <div style="display: flex;">
-            <h2 class="title" style="margin-top: 5px; margin-right: 5px">Sort By: </h2>
-            <select v-model="selected">
-              <option disabled value="">Please select one</option>
-              <option @click="sortByName($event, 'id', 0);">ID</option>
-              <option @click="sortByName($event, 'name', 1);">Product Name</option>
-              <option @click="sortByName($event, 'description', 2);" >Description</option>
-              <option @click="sortByName($event, 'recommendedRetailPrice', 3);" >Recommended Retail Price</option>
-              <option @click="sortByName($event, 'created', 4);" >Date Created</option>
-            </select>
-
-            <ImageUpload :businessId=businessId :products=products style="margin-left: 10px; margin-top: 10px; font-size: 15px"/>
-          </div>
+          <div style="display: flex; ">
+            <div style="display: flex;">
+              <h2 class="title" style="margin-top: 5px; margin-right: 5px">Sort By: </h2>
+              <select v-model="selected">
+                <option disabled value="">Please select one</option>
+                <option value="id">ID</option>
+                <option value="name">Product Name</option>
+                <option value="description">Description</option>
+                <option value="recommendedRetailPrice">Recommended Retail Price</option>
+                <option value="created">Date Created</option>
+              </select>
+              <button class='prevNextSearchButton' type='button' @click="sortByName(null, selected, 0);">Sort</button>
+            </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
           <tfoot style="margin-right: 0; margin-left: auto">
           <tr>
             <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
+
             <div  v-if="filteredproducts.length > 10">
               <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
               <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
@@ -52,9 +52,18 @@
             <div style="position:relative" class="grid-item sub-container" v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
                 v-bind:href="product.id"
                 :key="product.id">
-              <div>
-                <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+              <div style="position: relative">
+                <button  type="button" id="editButton" style="z-index: 1; position: absolute; right: 0px" @click="goToModify(); setProductToAlter(product.id)">
+                  <img src="../../public/edit.png" height="50" width="50" >
+                </button>
+                <div id="editTriangle" class="triangle-topright" style="position: absolute; right: 0px"/>
+
+                <img v-if="product.primaryImagePath" style="position: relative; width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                 <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                <span>
+                  <ImageUpload :businessId=businessId :products=products style=" font-size: 15px"/>
+                </span>
+
               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
               
@@ -62,12 +71,11 @@
                   <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
-                <div class="action_btn">
-                  <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
-                </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
+                <div style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >
+                  <p> {{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
+                </div>
               </div>
             </div>
           </div>
@@ -117,6 +125,7 @@
                 <td style="width: 20px; padding-right: 10px">
                   <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
                   <div>
+                    <img src="../../public/edit.png" height="700" width="700"/>
                     <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                     <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
                   </div>
@@ -147,6 +156,7 @@
 
     <footer>
       "Product shoot" by Aameerule is licensed under CC BY 2.0
+      edit by Anconer Design from the Noun Project
     </footer>
   </div>
 </template>
@@ -315,11 +325,17 @@ const Search = {
      * @param JSONField is the name of the field to sort by (as string)
      * @param index references the toggle state list in the data object (int)
      */
-    sortByName: function (event, JSONField, index) {
+    sortByName: function (event, JSONField ) {
+      console.log(event+JSONField)
+
+      const indexarray = ["id", "name", "description", "recommendedRetailPrice", "created"];
+
       //toggles the classlist (arrow up or down) in the child DOM element: <i/>
-      if(event.target.firstElementChild) {
-        event.target.firstElementChild.classList.toggle('fa-angle-double-down');
-        event.target.firstElementChild.classList.toggle('fa-angle-double-up');
+      if(event) {
+        if(event.target.firstElementChild) {
+          event.target.firstElementChild.classList.toggle('fa-angle-double-down');
+          event.target.firstElementChild.classList.toggle('fa-angle-double-up');
+        }
       }
 
       if (this.filteredproducts) {
@@ -357,11 +373,18 @@ const Search = {
           // a must be equal to b
           return 0;
         });
-        if (this.toggle[index]) {
-          this.filteredproducts.reverse();
-          this.toggle[index]=0;
-        } else {
-          this.toggle[index]=1;
+
+        let index = indexarray.indexOf(JSONField);
+
+        console.log(index)
+
+        if (index > 0) {
+          if (this.toggle[index]) {
+            this.filteredproducts.reverse();
+            this.toggle[index]=0;
+          } else {
+            this.toggle[index]=1;
+          }
         }
       }
     },
@@ -484,7 +507,7 @@ export default Search;
   padding-bottom: 10px;
   padding-top: 10px;
   font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
+  margin-left: 10%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
@@ -599,6 +622,17 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.triangle-topright {
+  width: 0;
+  height: 0;
+  border-top: 100px solid white;
+  border-left: 100px solid transparent;
+}
+
+#editButton:hover + #editTriangle {
+  border-top: 100px solid #2196F3;
 }
 
 </style>
