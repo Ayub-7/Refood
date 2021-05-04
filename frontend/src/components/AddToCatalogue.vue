@@ -34,8 +34,6 @@
         </div>
         <div id="manufacturer">
           <vs-input
-              :danger="(errors.includes('no-manu'))"
-              danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
               label-placeholder="Manufacturer"
@@ -43,12 +41,10 @@
         </div>
         <div id="description">
           <vs-textarea
-              :danger="(errors.includes('no-desc'))"
-              danger-text="Description is Required."
               class="form-control"
               type="text"
               width="400px"
-              label="Description (required)"
+              label="Description"
               v-model="description"/>
         </div>
       </div>
@@ -113,13 +109,6 @@ const AddToCatalogue = {
           });
         }
       }
-      if (this.errors.includes('no-desc')) {
-        this.$vs.notify({
-          title: 'Failed to create catalogue item',
-          text: 'Description is Required.',
-          color: 'danger'
-        });
-      }
     },
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
@@ -173,6 +162,9 @@ const AddToCatalogue = {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
+
+
+
   },
     mounted: function () {
       api.checkSession()

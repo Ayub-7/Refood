@@ -167,7 +167,6 @@ describe('Register error checking', () => {
     })
 
     test('Handles bad email', () => {
-        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
         wrapper.vm.password = 'Potato123!';
         wrapper.vm.confirm_password = 'Potato123!';
         wrapper.vm.firstname = 'bob';

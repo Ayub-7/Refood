@@ -1,35 +1,38 @@
 <template>
-  <div class="userInfo">
+  <div class="userInfo" @focus="showUserBusinesses" @focusout="hideUserBusinesses" tabindex="0">
         <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
+        <ul class="actInfo" v-if="getActingAsBusinessName() == null">
+          <!--v-on:click="showUserBusinesses" -->
+          <li class="userStuff">
+            <span class ="user">{{getUserName()}}</span>
+            <vs-avatar v-if="getUserName() !== null" size="30" style="margin-left: 10px" name="avatar">
+            </vs-avatar>
+          </li>
 
-        <div>
-            <vs-dropdown vs-trigger-click>
-                <div v-if="getActingAsBusinessName() == null" class="acting-display">
-                  <span class="user">{{getUserName()}}</span>
-                  <vs-avatar v-if="getUserName() !== null" size="30" name="avatar"></vs-avatar>
-                </div>
-                <div v-else class="acting-display">
-                  <span class="user">{{getActingAsBusinessName()}}</span>
-                  <vs-avatar v-if="getUserName() !== null" icon="store" size="30" name="avatar">
+          <li id="userBusinessPanel">
+              <ul id="businessList">
+                <li v-for="business in getPrimaryBusinesses()" id="user-business" v-bind:href="business.id" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
+                  <span class="user small" style="display: inline; font-size: 12px; padding-top: 5px"> {{ business.name}} </span>
+                  <vs-avatar class="v-small" v-if="getUserName() !== null" icon="store" style="transform: translate(0%, -20%) scale(0.7) !important; right: 0px;">
                   </vs-avatar>
-                </div>
+                </li>
+              </ul>
+          </li>
 
-              <vs-dropdown-menu>
-                <vs-dropdown-item class="dropdown-item" @click="setActingAsUser()" v-if="getActingAsBusinessName()">
-                  <div class="dropdown-item-name" >{{ getUserName() }} </div>
-                  <vs-avatar class="dropdown-item-avatar" v-if="getUserName() !== null" size="small">
-                  </vs-avatar>
-                </vs-dropdown-item>
+        </ul>
+      <ul class="actInfo" v-else>
+        <li class="business" >
+          <span class ="user">{{getActingAsBusinessName()}}</span>
+          <vs-avatar v-if="getUserName() !== null" icon="store" size="30" style="margin-left: 10px" name="avatar">
+          </vs-avatar>
+        </li>
 
-                <vs-dropdown-group vs-label="Businesses" id="businessList">
-                  <vs-dropdown-item class="dropdown-item" v-for="business in getBusinesses()" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
-                    <div class="dropdown-item-name">{{business.name}} <span v-if="business.primaryAdministratorId === loggedInUserId">(P)</span></div>
-                    <vs-avatar class="dropdown-item-avatar" icon="store" size="small"></vs-avatar>
-                  </vs-dropdown-item>
-                </vs-dropdown-group>
-              </vs-dropdown-menu>
-            </vs-dropdown>
-        </div>
+        <li id="userBusinessPanel" class="user" @click="setActingAsUser()">
+          <span class="user small"  style="display: inline; font-size: 12px; padding-top: 5px">{{ getUserName() }} </span>
+          <vs-avatar class="v-small" v-if="getUserName() !== null" icon="person" style="transform: translate(0%, -20%) scale(0.7) !important;">
+          </vs-avatar>
+        </li>
+        </ul>
 
   </div>
 </template>
@@ -44,7 +47,7 @@ name: "actingAs",
       loggedInUserId: null,
       userName: null,
       role: null,
-      userBusinesses: [],
+      userPrimaryBusinesses: [],
       actingAsBusinessId: null,
       actingAsBusinessName: null
     }
@@ -52,7 +55,6 @@ name: "actingAs",
   methods: {
     getUserName() {
       this.userName = store.userName;
-      this.loggedInUserId = store.loggedInUserId;
       return this.userName;
     },
 
@@ -61,27 +63,28 @@ name: "actingAs",
       return this.role;
     },
 
-    getBusinesses(){
-      this.userBusinesses = store.userBusinesses;
-      return store.userBusinesses;
+    getPrimaryBusinesses(){
+      this.userPrimaryBusinesses = store.userPrimaryBusinesses;
+      //console.log(store.userPrimaryBusinesses);
+      return store.userPrimaryBusinesses;
     },
 
     setActingAsBusinessId(businessId, businessName){
       mutations.setActingAsBusiness(businessId, businessName)
-      this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
-      // Prominent vue-router contributor suggests to catch error and do nothing with it.
-      // @see https://github.com/vuejs/vue-router/issues/2872
+      this.$router.push({path: `/home`});
     },
 
     setActingAsUser(){
       mutations.setActingAsUser();
-      this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+      this.$router.push({path: `/home`});
     },
 
     getActingAsBusinessName() {
       this.actingAsBusinessName = store.actingAsBusinessName
       return this.actingAsBusinessName;
     },
+
+
 
     showUserBusinesses: function() {
       let x = document.getElementById('userBusinessPanel');
@@ -98,26 +101,44 @@ export default actingAs;
 </script>
 
 <style scoped>
-
-.acting-display {
-  display: flex;
-  min-width: 150px;
+.userInfo {
+  display: inline;
 }
+
+.actInfo {
+  display: inline;
+  padding: 0px;
+}
+
+li.business {
+  display: inline;
+}
+
+#userBusinessPanel {
+  display: none;
+  margin-bottom: -15px;
+  border-top: 1px solid black;
+}
+
+li.userStuff, #userBusinessPanel li {
+  list-style: none;
+}
+
+.dropdown .select option {
+  color: black;
+}
+
+
 
 span.user {
+  width: auto;
+  float: left;
   font-size: 16px;
-  margin: auto 0 auto auto;
-  text-align: right;
+  padding: 10px 5px 0px 15px;
 }
 
-.dropdown-item >>> a {
-  display: flex;
-  text-align: center;
-}
 
-.dropdown-item-name {
-  margin: auto;
-  min-width: 100px;
-}
+
+
 
 </style>
