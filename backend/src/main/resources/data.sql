@@ -78,25 +78,25 @@ INSERT INTO business_admins (business_id, user_id) VALUES
     (2, 9);
 
 
-INSERT INTO product (id, name, description, recommended_retail_price, created, business_id) VALUES
+INSERT INTO product (id, name, description, manufacturer, recommended_retail_price, created, business_id) VALUES
     /* 20 products */
-    ('WAUEH98E37A680027', 'Wine - White, Pinot Grigio', 'integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero non mattis pulvinar', 51.63, '2021-01-27T16:07:14Z', 2),
-    ('WAUVT64B54N722288', 'Pastry - Cheese Baked Scones', 'amet erat nulla tempus vivamus', 19.88, '2021-03-05T14:36:54Z', 1),
-    ('KNDJT2A29D7324794', 'Beef - Ground Lean Fresh', 'vestibulum ante ipsum primis in faucibus', 59.43, '2021-02-06T20:17:16Z', 3),
-    ('W04GP5EC0B1798680', 'Compound - Mocha', 'vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc', 88.93, '2021-01-11T20:54:46Z', 1),
-    ('SCFEBBCF6CG218162', 'Yogurt - Blueberry, 175 Gr', 'nec nisi volutpat eleifend donec ut dolor morbi vel lectus in quam fringilla rhoncus mauris enim leo', 72.83, '2021-01-15T16:56:26Z', 5),
-    ('WBAPM7C51AE969438', 'Longos - Lasagna Veg', 'a pede posuere nonummy integer non velit donec diam neque vestibulum eget vulputate ut ultrices vel augue vestibulum ante ipsum', 36.81, '2021-03-04T03:38:04Z', 2),
-    ('5UXWX7C53EL958298', 'Ice Cream Bar - Drumstick', 'eu mi nulla ac enim', 50.2, '2021-01-01T07:57:56Z', 5),
-    ('WBAVD33586K975326', 'Peas Snow', 'porttitor pede justo eu massa donec dapibus duis at velit eu est congue elementum', 73.9, '2021-04-06T19:28:28Z', 2),
-    ('5NPDH4AE0EH887279', 'Cheese - Pied De Vents', 'eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui', 36.65, '2021-01-24T21:22:47Z', 5),
-    ('2C3CDZFJ2FH936197', 'Sherbet - Raspberry', 'justo sollicitudin ut suscipit a feugiat et eros vestibulum ac est', 86.18, '2021-01-28T19:33:16Z', 2),
-    ('WBAUP9C53DV435366', 'Energy Drink', 'ipsum dolor sit amet consectetuer adipiscing elit proin', 91.48, '2021-03-04T02:58:24Z', 4),
-    ('YV1612FS9E2422348', 'Bread Base - Gold Formel', 'condimentum neque sapien placerat ante nulla justo', 29.81, '2021-01-08T21:31:51Z', 3),
-    ('WAUMF98KX9A331487', 'Chicken - White Meat With Tender', 'in eleifend quam a odio in hac habitasse platea dictumst maecenas ut massa quis augue luctus', 30.91, '2021-01-03T04:39:36Z', 3),
-    ('5UXFG8C5XAL953759', 'Yogurt - Strawberry, 175 Gr', 'justo lacinia eget tincidunt eget tempus vel pede morbi porttitor lorem id ligula suspendisse ornare consequat', 95.84, '2021-02-10T16:35:49Z', 3),
-    ('WAUJC58E75A227743', 'Fish - Scallops, Cold Smoked', 'rutrum at lorem integer tincidunt ante vel ipsum praesent blandit lacinia erat vestibulum sed', 65.12, '2021-02-03T19:00:32Z', 2),
-    ('1N6AA0CA2AN447971', 'Wine - Bouchard La Vignee Pinot', 'bibendum morbi non quam nec dui luctus rutrum nulla tellus in sagittis dui', 41.35, '2021-03-16T16:26:06Z', 5),
-    ('SCBDR3ZA2BC827880', 'Nestea - Iced Tea', 'a suscipit nulla elit ac nulla sed vel enim sit amet nunc viverra dapibus nulla suscipit ligula in lacus curabitur', 24.27, '2021-01-27T18:14:57Z', 5),
-    ('WAUUL98E96A125348', 'Calvados - Boulard', 'quis lectus suspendisse potenti in eleifend quam a', 9.03, '2021-01-25T22:18:45Z', 3),
-    ('JN8AF5MR1ET433412', 'Juice - Pineapple, 341 Ml', 'ridiculus mus etiam vel augue vestibulum', 2.66, '2021-03-09T22:56:37Z', 3),
-    ('WAUEH78E77A454447', 'Bread - Focaccia Quarter', 'orci vehicula condimentum curabitur in libero', 22.34, '2021-04-05T18:35:12Z', 5);
+    ('WAUEH98E37A680027', 'Wine - White, Pinot Grigio', 'integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero non mattis pulvinar', 'Bubbletube', 51.63, '2021-01-27T16:07:14Z', 2),
+    ('WAUVT64B54N722288', 'Pastry - Cheese Baked Scones', 'amet erat nulla tempus vivamus', 'Watties', 19.88, '2021-03-05T14:36:54Z', 1),
+    ('KNDJT2A29D7324794', 'Beef - Ground Lean Fresh', 'vestibulum ante ipsum primis in faucibus', 'Watties', 59.43, '2021-02-06T20:17:16Z', 3),
+    ('W04GP5EC0B1798680', 'Compound - Mocha', 'vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc', 'Nestle', 88.93, '2021-01-11T20:54:46Z', 1),
+    ('SCFEBBCF6CG218162', 'Yogurt - Blueberry, 175 Gr', 'nec nisi volutpat eleifend donec ut dolor morbi vel lectus in quam fringilla rhoncus mauris enim leo', 'Gabcube', 72.83, '2021-01-15T16:56:26Z', 5),
+    ('WBAPM7C51AE969438', 'Longos - Lasagna Veg', 'a pede posuere nonummy integer non velit donec diam neque vestibulum eget vulputate ut ultrices vel augue vestibulum ante ipsum', 'Skimia', 36.81, '2021-03-04T03:38:04Z', 2),
+    ('5UXWX7C53EL958298', 'Ice Cream Bar - Drumstick', 'eu mi nulla ac enim', 'Formula Foods', 50.2, '2021-01-01T07:57:56Z', 5),
+    ('WBAVD33586K975326', 'Peas Snow', 'porttitor pede justo eu massa donec dapibus duis at velit eu est congue elementum', 'Peapea Foods', 73.9, '2021-04-06T19:28:28Z', 2),
+    ('5NPDH4AE0EH887279', 'Cheese - Pied De Vents', 'eget congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui', 'Food Food Food', 36.65, '2021-01-24T21:22:47Z', 5),
+    ('2C3CDZFJ2FH936197', 'Sherbet - Raspberry', 'justo sollicitudin ut suscipit a feugiat et eros vestibulum ac est', 'Sherbet Co', 86.18, '2021-01-28T19:33:16Z', 2),
+    ('WBAUP9C53DV435366', 'Energy Drink', 'ipsum dolor sit amet consectetuer adipiscing elit proin', 'Coca-Cola', 91.48, '2021-03-04T02:58:24Z', 4),
+    ('YV1612FS9E2422348', 'Bread Base - Gold Formel', 'condimentum neque sapien placerat ante nulla justo', 'Coopolandes', 29.81, '2021-01-08T21:31:51Z', 3),
+    ('WAUMF98KX9A331487', 'Chicken - White Meat With Tender', 'in eleifend quam a odio in hac habitasse platea dictumst maecenas ut massa quis augue luctus', 'Chicken Little Ltd', 30.91, '2021-01-03T04:39:36Z', 3),
+    ('5UXFG8C5XAL953759', 'Yogurt - Strawberry, 175 Gr', 'justo lacinia eget tincidunt eget tempus vel pede morbi porttitor lorem id ligula suspendisse ornare consequat', 'Formula Foods', 95.84, '2021-02-10T16:35:49Z', 3),
+    ('WAUJC58E75A227743', 'Fish - Scallops, Cold Smoked', 'rutrum at lorem integer tincidunt ante vel ipsum praesent blandit lacinia erat vestibulum sed', 'United Fisheries', 65.12, '2021-02-03T19:00:32Z', 2),
+    ('1N6AA0CA2AN447971', 'Wine - Bouchard La Vignee Pinot', 'bibendum morbi non quam nec dui luctus rutrum nulla tellus in sagittis dui', 'Lorem Ipsum', 41.35, '2021-03-16T16:26:06Z', 5),
+    ('SCBDR3ZA2BC827880', 'Nestea - Iced Tea', 'a suscipit nulla elit ac nulla sed vel enim sit amet nunc viverra dapibus nulla suscipit ligula in lacus curabitur', 'Pepsico', 24.27, '2021-01-27T18:14:57Z', 5),
+    ('WAUUL98E96A125348', 'Calvados - Boulard', 'quis lectus suspendisse potenti in eleifend quam a', 'Vegesdirect', 9.03, '2021-01-25T22:18:45Z', 3),
+    ('JN8AF5MR1ET433412', 'Juice - Pineapple, 341 Ml', 'ridiculus mus etiam vel augue vestibulum', 'Juicelord', 2.66, '2021-03-09T22:56:37Z', 3),
+    ('WAUEH78E77A454447', 'Bread - Focaccia Quarter', 'orci vehicula condimentum curabitur in libero', 'Bread Company', 22.34, '2021-04-05T18:35:12Z', 5);

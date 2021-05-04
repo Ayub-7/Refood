@@ -21,13 +21,6 @@
               label-placeholder="Product ID (required)"
               v-model="productId"/>
         </div>
-        <div id="description">
-          <vs-textarea
-              class="form-control"
-              type="text"
-              label="Description"
-              v-model="description"/>
-        </div>
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
@@ -38,6 +31,21 @@
               type="text"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
+        </div>
+        <div id="manufacturer">
+          <vs-input
+              class="form-control"
+              type="text"
+              label-placeholder="Manufacturer"
+              v-model="manufacturer"/>
+        </div>
+        <div id="description">
+          <vs-textarea
+              class="form-control"
+              type="text"
+              label="Description"
+              width="400px"
+              v-model="description"/>
         </div>
 
       </div>
@@ -58,6 +66,7 @@ import CurrencyInput from "../components/CurrencyInput";
 import api from "../Api";
 import axios from "axios";
 import {store} from "../store";
+
 const ModifyCatalog = {
   name: "ModifyCatalog",
   components: {CurrencyInput},
@@ -68,6 +77,7 @@ const ModifyCatalog = {
       productName: "",
       productId: "",
       description: "",
+      manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
       rrp: ""
@@ -111,7 +121,7 @@ const ModifyCatalog = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length === 0){
-        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.rrp)
+        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.manufacturer, this.rrp)
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
@@ -234,7 +244,7 @@ form {
 
   display: grid;
   grid-template-columns: repeat(2, auto);
-  grid-template-rows: repeat(2, auto);
+  grid-template-rows: repeat(3, auto);
 }
 
 label, input {
@@ -269,46 +279,42 @@ Styling for form elements.
 }
 
 #manufacturer {
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 2;
 }
 
 #description {
-  grid-column: 1;
-  grid-row: 2;
-  width: 180px;
-  position: relative;
-  left: 10px;
+  grid-column: 1 / 3;
+  grid-row: 3;
+  width: 100%;
 }
 
 #rrp {
-  grid-column: 2;
-  grid-row: 1;
-  position: relative;
-  top: 58px;
-  left: 10px;
-  display: inline-grid;
+  grid-column: 1;
+  grid-row: 2;
+
+  margin: 0;
+  display: flex;
 }
 
 #currencySymbol {
   grid-row: 1;
   grid-column: 1;
-  position: relative;
-  top: 24px;
+  margin: auto;
   font-size: 15px;
+  line-height: 20px;
 }
 
 #currencyInput {
   grid-row: 1;
   grid-column: 2;
-  width: 50%;
 }
 
 #currencyCode {
   grid-row: 1;
   grid-column: 3;
-  position: relative;
-  top: 24px;
+
+  margin: auto;
   font-size: 15px;
 }
 

@@ -36,7 +36,7 @@
     <main>
       <!-- Sub Navigation Bar -->
       <nav id="business-navbar">
-        <router-link class="business-nav-item" :to="{name: `Business`, params:{id: business.id}}">Products</router-link>
+<!--        <router-link class="business-nav-item" :to="{name: `Business`, params:{id: business.id}}">Products</router-link>-->
         <router-link class="business-nav-item" :to="{name: `BusinessAdministrators`}">Administrators</router-link>
       </nav>
 

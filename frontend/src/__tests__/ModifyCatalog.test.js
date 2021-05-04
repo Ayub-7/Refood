@@ -36,8 +36,6 @@ const mockUser = {
 //
 // }
 
-
-
 beforeEach(() => {
     wrapper = shallowMount(ModifyCatalogue, {
         propsData: {},
@@ -46,6 +44,13 @@ beforeEach(() => {
         methods: {},
         // components: CurrencyInput,
         localVue,
+    });
+
+    const getUserMethod = jest.spyOn(ModifyCatalogue.methods, 'getUserInfo');
+    getUserMethod.mockImplementation(() =>{
+        wrapper.vm.user = mockUser;
+        wrapper.vm.currencyCode = "NZD";
+        wrapper.vm.currencySymbol = "$"
     });
 });
 
@@ -59,13 +64,11 @@ describe('Component', () => {
     });
 });
 
-
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Modify Catalogue form error checking', () => {
 
 
     beforeEach(() => {
-        wrapper.vm.user = mockUser;
         // const createItemMethod = jest.spyOn(AddToCatalogue.methods, 'createItem');
         // createItemMethod.mockResolvedValue(mockUsers);
         //wrapper.vm.checkForm = jest.fn();

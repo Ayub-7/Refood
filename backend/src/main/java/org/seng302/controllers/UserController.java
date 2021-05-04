@@ -70,7 +70,7 @@ public class UserController {
      * @return 200 if login is successful, 400 if email/password is invalid.
      */
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest req, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
         if (existingUser != null) {
             if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
@@ -212,11 +212,9 @@ public class UserController {
         if (userRepository.findUserById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         userRepository.updateUserRole(id, Role.USER);
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
-
 
 }

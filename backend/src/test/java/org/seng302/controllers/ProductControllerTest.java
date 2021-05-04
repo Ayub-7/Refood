@@ -73,12 +73,12 @@ public class ProductControllerTest {
         business.createBusiness(user);
         business.setId(1L);
 
-        product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", 14.69, new Date());
-        product2 = new Product("07-4957066", 1, "Seedlings", "Buckwheat, Organic", 1.26, new Date());
+        product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
+        product2 = new Product("07-4957066", 1, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
         image1 = new Image("../../../resources/media.images/testlettuce.jpeg", "");
 
         //Mocking body of PUT request
-        productUpdate = new NewProductRequest("replace id", "replace name", "replace desc", 2.2);
+        productUpdate = new NewProductRequest("replace id", "replace name", "replace desc", "replace manufacturer", 2.2);
     }
 
     @Test
@@ -434,11 +434,8 @@ public class ProductControllerTest {
     public void testNoAuthAddProductImage() throws Exception {
         File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
         assertThat(data).exists();
-
         byte[] bytes = FileCopyUtils.copyToByteArray(data);
         MockMultipartFile image = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
 
         mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
                 .file(image))
