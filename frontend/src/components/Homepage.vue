@@ -73,7 +73,6 @@ const Homepage = {
       getUserDetails: function(userId) {
         api.getUserFromID(userId)
           .then((response) => {
-            if(store.loggedInUserId != null) {
               this.user = response.data;
               this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
               this.userLoggedIn = true;
@@ -81,10 +80,6 @@ const Homepage = {
               mutations.setUserDateOfBirth(response.data.dateOfBirth);
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
               mutations.setUserBusinesses(this.businesses);
-            } else {
-              this.$router.push({path: "/login"}); //If user not logged in send to login page
-            }
-
           }).catch((err) => {
             if (err.response.status === 401) {
               this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
@@ -172,10 +167,11 @@ const Homepage = {
    * is first rendered, then gets the users details from the backend using the API
    */
   mounted: function () {
-      let userId = store.loggedInUserId;
-      this.getUserDetails(userId);
-    },
-
+    api.checkSession()
+        .then((response) => {
+          this.getUserDetails(response.data.id);
+        });
+  }
 }
 export default Homepage;
 </script>

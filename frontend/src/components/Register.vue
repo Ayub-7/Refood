@@ -299,7 +299,7 @@
                         .then((response) => {
                           mutations.setUserLoggedIn(response.data.userId, response.data.role);
                           //LOAD USER PAGE, USING ROUTER
-                          this.$router.push({name: 'UserPage', params: {id: response.data.userId}})
+                          this.$router.push({path: '/home'})
                         }).catch((error) => {
                         this.$log.debug("Error logging in from registration: " + error);
                     });
