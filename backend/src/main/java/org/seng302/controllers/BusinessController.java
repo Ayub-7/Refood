@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -142,19 +143,43 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     *
+     * @param businessIdRequest DTO containing the buinessId to make the user act as.
+     * @param session current authenticated login session of the user.
+     * @return a response entity with the appropriate status code.
+     */
     @PostMapping("/actasbusiness")
     public ResponseEntity<String> actAsBusiness(@RequestBody BusinessIdRequest businessIdRequest, HttpSession session) {
         long businessId = businessIdRequest.getBusinessId();
-        System.out.println("session");
-        Business existingBusiness = businessRepository.findBusinessById(businessId);
-        if (existingBusiness != null) {
-            session.setAttribute(Business.BUSINESS_SESSION_ATTRIBUTE, existingBusiness);
-
-            //Get business from session
-            Business bbusiness = (Business) session.getAttribute("business");
-
+        if(businessId == 0){
+            session.setAttribute(Business.BUSINESS_SESSION_ATTRIBUTE, null);
             return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            Business existingBusiness = businessRepository.findBusinessById(businessId);
+            if (existingBusiness != null) {
+                session.setAttribute(Business.BUSINESS_SESSION_ATTRIBUTE, existingBusiness);
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+    }
+
+    /**
+     *
+     * @param req http request
+     * @param session users current session
+     * @return ResponseEntity containing the business object for the current session
+     */
+    @GetMapping("/checkbusinesssession")
+    public ResponseEntity<Business> checkbusinesssession(HttpServletRequest req, HttpSession session) {
+        Business business = (Business) session.getAttribute("business");
+        if(business != null){
+            return ResponseEntity.status(HttpStatus.OK).body(business);
+        } else {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(business);
+        }
+
     }
 }

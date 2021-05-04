@@ -93,10 +93,6 @@ public class UserController {
             if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser);
                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
-//             if (loginRequest.getPassword().equals(existingUser.getPassword())) {
-//                 UserIdResponse userIdResponse = new UserIdResponse(existingUser);
-//                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
-
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -113,20 +109,10 @@ public class UserController {
      * Prints out the current user session/authentication details into console.
      */
     @GetMapping("/checksession")
-    public ResponseEntity<?> checksession(HttpServletRequest req, HttpSession session) {
+    public ResponseEntity<User> checksession(HttpServletRequest req, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        Business bbusiness = (Business) session.getAttribute("business");
-        //Address emptyAddy = new Address("", "", "", "", "", "");
-        if(bbusiness != null){
-            // bbusiness = new Business("", "", emptyAddy, "");
-            return new ResponseEntity<Pair<User, Business>>(Pair.of(user, bbusiness), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<Pair<User, String>>(Pair.of(user, ""), HttpStatus.OK);
-        }
-    
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
-
-
 
 
     @PostMapping("/logoutuser")

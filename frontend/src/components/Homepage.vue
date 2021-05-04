@@ -174,7 +174,6 @@ const Homepage = {
   mounted: function () {
     api.checkSession()
         .then((response) => {
-          console.log(response.data);
           this.getUserDetails(response.data.id);
         });
   },

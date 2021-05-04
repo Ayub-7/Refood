@@ -85,9 +85,17 @@ name: "actingAs",
     },
 
     setActingAsUser(){
-      this.setActingAsBusinessId(null, null);
-      mutations.setActingAsUser();
-      this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+      api.actAsBusiness(0)
+          .then(() => {
+            mutations.setActingAsUser();
+            this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+          }).catch((error) => {
+        if(error.response) {
+          console.log(error.response.status);
+          console.log(error.response.message);
+        }
+        this.$log.debug("Error Status:", error)
+      });
     },
 
     getActingAsBusinessName() {

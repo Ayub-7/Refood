@@ -52,6 +52,8 @@ export default {
 
     checkSession: () => instance.get('checksession', {withCredentials: true}),
 
+    checkBusinessSession: () => instance.get('checkbusinesssession', {withCredentials: true}),
+
   // user POST create new user account data
     /**
      * Create a new user by storing their data to the database
