@@ -56,7 +56,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "../store";
+import {store, mutations} from "../store";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -138,7 +138,8 @@ const BusinessRegister = {
       api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
         .then((response) => {
           this.$log.debug("New business created:", response.data);
-          this.$router.push({path: `/users/${store.loggedInUserId}`});
+          mutations.setActingAsBusiness(response.data.businessId, this.businessName);
+          this.$router.push({path: `/home`});
         }).catch((error) => {
           if(error.response) {
             console.log(error.response.status);
