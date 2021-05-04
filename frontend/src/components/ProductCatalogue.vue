@@ -62,27 +62,29 @@
                   <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
-                <div class="action_btn">
-                  <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
-                </div>
-                <div>
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
-                          {{pImage.fileName}}
+                <!-- Actions Dropdown -->
+                <vs-dropdown vs-trigger-click class="actionButton">
+                  <vs-button>Actions</vs-button>
+                  <vs-dropdown-menu>
+                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                      Modify product
+                    </vs-dropdown-item>
+
+                    <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
+                        {{pImage.fileName}}
                       </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
+                    </vs-dropdown-group>
+
+                    <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
                       <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
                         {{pImage.fileName}}
                       </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                </div>
+                    </vs-dropdown-group>
+
+                  </vs-dropdown-menu>
+                </vs-dropdown>
+
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
                 <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
@@ -673,6 +675,10 @@ input:checked + .slider:before {
 th {
   background: #3B5998;
   color: white;
+}
+
+.actionButton {
+  text-align: left;
 }
 
 </style>
