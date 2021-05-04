@@ -186,6 +186,7 @@ export default {
       },
       withCredentials: true,
     }),
+
     /**
      * Put request to set the primary image from the existing images for a product.
      * @param businessId
@@ -193,5 +194,14 @@ export default {
      * @param imageId
      * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
      */
-    setPrimaryImage: (businessId, productId, imageId) => instance.put(`businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, {withCredentials: true})
+    setPrimaryImage: (businessId, productId, imageId) => instance.put(`businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, {withCredentials: true}),
+
+    /**
+     * Delete request to remove product image.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
+     */
+    deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true})
 }

@@ -30,6 +30,8 @@
               <option @click="sortByName($event, 'recommendedRetailPrice', 3);" >Recommended Retail Price</option>
               <option @click="sortByName($event, 'created', 4);" >Date Created</option>
             </select>
+
+            <ImageUpload :businessId=businessId :products=products style="margin-left: 10px; margin-top: 10px; font-size: 15px"/>
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
@@ -61,7 +63,6 @@
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
                 <div class="action_btn">
-                  <ImageUpload :productId="product.id" :businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
                   <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
@@ -123,7 +124,6 @@
                 <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </td>
                 <td>{{ product.created }} </td>
                 <td>
-                  <ImageUpload :productId=product.id :businessId=businessId />
                   <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </td>
               </tr>
