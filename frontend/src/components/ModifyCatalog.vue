@@ -24,8 +24,8 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
-              danger-text="RRP is required and must be at least 0"
+              :danger="(errors.includes('no-rrp') || errors.includes('rrp') || errors.includes('invalid-rrp'))"
+              danger-text="RRP is required and must be at least 0 and a Number."
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
               type="text"
@@ -34,6 +34,8 @@
         </div>
         <div id="manufacturer">
           <vs-input
+              :danger="(errors.includes('no-manu'))"
+              danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
               label-placeholder="Manufacturer"
@@ -41,6 +43,8 @@
         </div>
         <div id="description">
           <vs-textarea
+              :danger="(errors.includes('no-desc'))"
+              danger-text="Description is Required."
               class="form-control"
               type="text"
               label="Description"
@@ -99,18 +103,41 @@ const ModifyCatalog = {
         this.errors.push(this.productId);
       }
 
-      if (this.rrp.length === 0) {
+      if (this.description.length === 0) {
+        this.errors.push('no-desc');
+      }
+
+      if (this.manufacturer.length === 0) {
+        this.errors.push('no-manu');
+      }
+
+      if (this.rrp.length === 0 || this.rrp === null) {
         this.errors.push('no-rrp');
-      } else if(this.rrp < 0){
+      } else if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
+      if (isNaN(this.rrp)) {
+        this.errors.push('invalid-rrp');
+      }
+
       if (this.errors.length >= 1) {
-        if(this.errors.includes(this.productName) || this.errors.includes(this.productId)){
-          this.$vs.notify({title:'Failed to modify catalogue item', text:'Required fields are missing.', color:'danger'});
-        } if(this.errors.includes('rrp') || this.errors.includes('no-rrp')){
-          this.$vs.notify({title:'Failed to modify catalogue item', text:'RRP is required and must be at least 0.', color:'danger'});
+        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)
+            || this.errors.includes('rrp') || this.errors.includes('no-rrp')
+            || this.errors.includes('invalid-rrp') || this.errors.includes('no-manu')) {
+          this.$vs.notify({
+            title: 'Failed to create catalogue item',
+            text: 'Required fields are missing.',
+            color: 'danger'
+          });
         }
+      }
+      if (this.errors.includes('no-desc')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Description is Required.',
+          color: 'danger'
+        });
       }
     },
 
