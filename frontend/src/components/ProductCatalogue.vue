@@ -93,91 +93,81 @@
 
 
         <div v-if="!displaytype">
-          <div>
             <!-- Separate search within results search bar. Rather than calling the database, this filters the table
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <table class="profile-text-inner" style="border-spacing: 0px 20px">
-              <tr>
+            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" search>
+                <template slot="thead" style="background:blue">
+                  <vs-th sort-key="id">
+                      <div>ID</div>
+                  </vs-th >
+                  <vs-th sort-key="name">
+                     <div>Product Name</div>
+                  </vs-th>
+                  <vs-th sort-key="description">
+                    <div>Description</div>
+                  </vs-th>
+                  <vs-th sort-key="recommendedRetailPrice">
+                    <div>Recommended Retail Price</div>
+                  </vs-th>
+                  <vs-th sort-key="created">
+                    <div>Date Created</div>
+                  </vs-th>
+                  <vs-th><!-- Actions Column --></vs-th>
+                </template>
 
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'id', 0);">
-                    ID <i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'name', 1);">
-                    Product Name <i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'description', 2);">
-                    Description<i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'recommendedRetailPrice', 3)">
-                    Recommended Retail Price<i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'created', 4)">
-                    Date Created<i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-              </tr>
+                <template slot-scope="{data}">
+                  <vs-tr :key="product.id" v-for="product in data">
+                    <vs-td style="width: 20px; padding-right: 10px">
+                      <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
+                      <div>
+                        <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                      </div>
+                    </vs-td>
+                    <vs-td>{{ product.name }} </vs-td>
+                    <vs-td>{{ product.description }} </vs-td>
+                    <vs-td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </vs-td>
+                    <td>{{ product.created }} </td>
+                    <td>
+                      <vs-dropdown vs-trigger-click>
+                        <vs-button>Actions</vs-button>
+                        <vs-dropdown-menu>
+                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                            Modify product
+                          </vs-dropdown-item>
 
-              <tr v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
-                  v-bind:href="product.id"
-                  :key="product.id">
+                          <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
+                              <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
+                                {{pImage.fileName}}
+                              </vs-dropdown-item>
+                          </vs-dropdown-group>
 
-                <td style="width: 20px; padding-right: 10px">
-                  <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
-                  <div>
-                    <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                    <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
-                  </div>
-                </td>
-                <td>{{ product.name }} </td>
-                <td>{{ product.description }} </td>
-                <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </td>
-                <td>{{ product.created }} </td>
-                <td>
-                  <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
-                </td>
-                <td>
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Change Primary Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
-                        {{pImage.fileName}}
-                      </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                </td>
-                <td>
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
-                        {{pImage.fileName}}
-                      </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                </td>
-              </tr>
+                          <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
+                              <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                                {{pImage.fileName}}
+                              </vs-dropdown-item>
+                          </vs-dropdown-group>
 
-              <!-- If search query returns more than 10 products then this should be active -->
-              <tfoot v-if="filteredproducts.length > 10">
-              <tr>
-                <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
-                <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
-                <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
-              </tr>
-              </tfoot>
-            </table>
-          </div>
+                        </vs-dropdown-menu>
+                      </vs-dropdown>
+                    </td>
+                  </vs-tr>
+
+                  <!-- If search query returns more than 10 products then this should be active -->
+                  <tfoot v-if="filteredproducts.length > 1">
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
+                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
+                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
+                  </tr>
+                  </tfoot>
+                </template>
+            </vs-table>
         </div>
       </div>
 
@@ -213,7 +203,7 @@ const Search = {
       enableTable: false,
       resultTrack: "",
       productSearchIndexMin: 0,
-      productSearchIndexMax: 10,
+      productSearchIndexMax: 3,
       business: null,
       businessId: null,
       displaytype: true,
@@ -242,7 +232,9 @@ const Search = {
               this.userId = response.data.id;
               this.getUserInfo(this.userId);
               this.getBusinessName();
-            }),
+            }).catch((error) => {
+              this.$log.debug(error);
+            });
 
     api.getBusinessProducts(this.businessId)
         .then((response) => {
@@ -462,8 +454,9 @@ const Search = {
       //Stop value from going over range
       if(this.productSearchIndexMax < this.filteredproducts.length) {
         //console.log(this.productSearchIndexMax, this.filteredproducts.length, this.productSearchIndexMin)
-        this.productSearchIndexMin += 10;
-        this.productSearchIndexMax += 10;
+        let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
+        this.productSearchIndexMin += minMaxDiff;
+        this.productSearchIndexMax += minMaxDiff;
       }
     },
 
@@ -473,9 +466,10 @@ const Search = {
      */
     decreaseSearchRange: function () {
       //Stop value from reaching negative
-      if(this.productSearchIndexMin >= 10) {
-        this.productSearchIndexMin -= 10;
-        this.productSearchIndexMax -= 10;
+      if(this.productSearchIndexMin >= 1) {
+        let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
+        this.productSearchIndexMin -= minMaxDiff;
+        this.productSearchIndexMax -= minMaxDiff;
       }
     }
 
@@ -568,6 +562,7 @@ export default Search;
 
 .displaying {
   padding-top: 15px;
+  text-align: right;
 }
 
 
@@ -673,6 +668,11 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+th {
+  background: #3B5998;
+  color: white;
 }
 
 </style>
