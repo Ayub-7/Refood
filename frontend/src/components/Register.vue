@@ -17,7 +17,7 @@
                   class="form-control"
                   label-placeholder="Middle name"
                   :danger="middlename.length>20"
-                  danger-text="Middlename must be less that 20 characters"
+                  danger-text="Middlename must be less than 20 characters"
                   :success="middlename.length > 0 && middlename.length < 20"
                   v-model="middlename"/>
         </div>
@@ -35,7 +35,7 @@
                   class="form-control"
                   label-placeholder="Nick Name"
                   :danger="nickname.length>20"
-                  danger-text="Nickname must be less that 20 characters"
+                  danger-text="Nickname must be less than 20 characters"
                   :success="nickname.length > 0 && nickname.length < 20"
                   name="nickname"
                   v-model="nickname"/>
@@ -115,7 +115,7 @@
           <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+          <vs-input autocomplete="off" @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
