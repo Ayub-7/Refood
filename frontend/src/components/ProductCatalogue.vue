@@ -57,29 +57,19 @@
                   <img src="../../public/edit.png" height="50" width="50" >
                 </button>
                 <div id="editTriangle" class="triangle-topright" style="position: absolute; right: 0px"/>
-
                 <img v-if="product.primaryImagePath" style="position: relative; width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                 <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
                 <span style="display: flex;">
                   <ImageUpload :businessId=businessId :products=products style="z-index: 2;  font-size: 15px; margin-top: -31px"/>
                 </span>
-
               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
-              
-                <div style="display: flex;">
-                  <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
-                  <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
-                </div>
-                <div class="action_btn">
-                  <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
-                </div>
-                <div>
+                <div style="margin-top: -10px; display: flex">
                   <vs-dropdown vs-custom-content vs-trigger-click>
                     <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
                     <vs-dropdown-menu>
                       <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
-                          {{pImage.fileName}}
+                        {{pImage.fileName}}
                       </vs-dropdown-item>
                     </vs-dropdown-menu>
                   </vs-dropdown>
@@ -91,6 +81,10 @@
                       </vs-dropdown-item>
                     </vs-dropdown-menu>
                   </vs-dropdown>
+                </div>
+                <div style="display: flex;">
+                  <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
+                  <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
@@ -143,12 +137,18 @@
                   v-bind:href="product.id"
                   :key="product.id">
 
-                <td style="width: 20px; padding-right: 10px">
+                <td style="width: 300px; padding-right: 10px">
                   <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
-                  <div>
-                    <img src="../../public/edit.png" height="700" width="700"/>
-                    <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                  <div style="position: relative">
+                    <button  type="button" id="editButton" style="z-index: 2; position: absolute; right: 0px" @click="goToModify(); setProductToAlter(product.id)">
+                      <img src="../../public/edit.png" height="50" width="50" >
+                    </button>
+                    <div id="editTriangle" class="triangle-topright" style="position: absolute; right: 0px"/>
+                    <img v-if="product.primaryImagePath" style="position: relative; width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                     <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                    <span style="display: flex;">
+                  <ImageUpload :businessId=businessId :products=products style="z-index: 2;  font-size: 15px; margin-top: -31px"/>
+                </span>
                   </div>
                 </td>
                 <td>{{ product.name }} </td>
