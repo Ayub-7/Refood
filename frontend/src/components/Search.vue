@@ -1,7 +1,7 @@
 <template>
   <div class="main" id="body">
   <div id="search">
-    
+
     <input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar">
     <vs-button id="submitSearch" type="border" @click="searchUsers">Search</vs-button>
   </div>
@@ -26,7 +26,7 @@
         <vs-th sort-key="email" v-if="mobileMode==false">
           Email
         </vs-th>
-        
+
         <!-- Extra header for go to profile button -->
         <vs-th>
         </vs-th>
@@ -106,7 +106,7 @@ const Search = {
     }
     this.setMobileMode()
   },
-  
+
   created() {
     window.addEventListener(
       'resize',
@@ -172,16 +172,16 @@ const Search = {
     searchUsers: function () {
         api
             .searchQuery(this.searchbar)
-            .then((response) => { 
+            .then((response) => {
               this.users = response.data;
               this.users = this.users.filter(x => typeof(x) == "object")
 
               //Need to set properties of user object so they can be sorted by
               for(let user of this.users) {
                 user.country = user.homeAddress.country;
-                user.city = user.homeAddress.city; 
+                user.city = user.homeAddress.city;
               }
-            
+
               if(this.users.length < 10) {
                 this.userSearchIndexMin = 1;
                 this.userSearchIndexMax = this.users.length;
@@ -200,7 +200,7 @@ const Search = {
             }).finally(() => {
               if(!this.tableLoaded){
                 document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
-                
+
                 //Event listeners for vuesax buttons on table since they're generated afterwards
                 document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
                 document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
@@ -269,7 +269,7 @@ export default Search;
   border-style: solid;
   border-color: white;
   padding: 1em;
-  
+
 }
 
 tr {

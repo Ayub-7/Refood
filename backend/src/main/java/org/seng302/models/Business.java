@@ -10,11 +10,12 @@ import org.seng302.utilities.serializers.PrimaryAdministratorSerializer;
 import javax.persistence.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id") // Forces any nested business objects to only use name to prevent recursion.
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name") // Forces any nested business objects to only use name to prevent recursion.
 @JsonPropertyOrder({"id", "administrators", "name", "primaryAdministratorId"}) // force json property order to match api.
 public class Business {
     @Id
@@ -71,4 +72,13 @@ public class Business {
         this.primaryAdministrator = owner;
         this.created = new Date();
     }
+
+    /**
+     * Collects and returns a list of Ids of administrators.
+     * @return the list of administrators.
+     */
+    public List<Long> collectAdministratorIds() {
+        return this.getAdministrators().stream().map(User::getId).collect(Collectors.toList());
+    }
+
 }

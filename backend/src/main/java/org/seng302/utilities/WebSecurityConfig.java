@@ -28,16 +28,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().authenticationEntryPoint(new AuthEntryPoint())
 
                 .and()
-                .authorizeRequests()
-                .antMatchers("/checksession").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/{id}").authenticated()
-                .antMatchers(HttpMethod.POST, "/login", "/users", "/businesses", "/logout").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/login", "/users", "/businesses", "/logout").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/search*", "/businesses/*").authenticated()
-                .antMatchers(HttpMethod.PUT, "/users/{id}/*").hasRole("DGAA")
-                .antMatchers(HttpMethod.PUT, "/businesses/{id}/*").authenticated()
-                .anyRequest().permitAll();
-
+                 .authorizeRequests()
+                 .antMatchers("/checksession").permitAll()
+                 .antMatchers(HttpMethod.POST, "/login", "/users", "/logout").permitAll()
+                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                 .antMatchers(HttpMethod.GET, "/users/**").authenticated()
+                 .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "/users/{id}/revokeAdmin").hasRole("DGAA")
+                 .antMatchers("/businesses", "/businesses/**").authenticated()
+                 .anyRequest().permitAll()
+                 .and()
+                .logout()
+                ;
 
     }
 

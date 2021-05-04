@@ -16,6 +16,8 @@ import java.util.List;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id") // Forces any nested user objects to only use id to prevent recursion.
 public class User {
 
+    public static final String USER_SESSION_ATTRIBUTE = "user";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

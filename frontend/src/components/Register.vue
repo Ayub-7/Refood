@@ -213,10 +213,7 @@
         }
 
         if (this.errors.length >= 1) {
-          // let message = "";
-          for (let error in this.errors) {
-            console.log(this.errors[error]);
-          }
+          console.log(this.errors);
           this.$vs.notify({title:'Failed to register', text:'Required fields are missing.', color:'danger'});
         }
       },
