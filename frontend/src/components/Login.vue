@@ -77,7 +77,7 @@ const Login = {
         api.login(this.email, this.password)
           .then((response) => {
             //LOAD USER HOME PAGE, USING ROUTER
-            mutations.setUserLoggedIn(response.data.userId, response.data.role)
+            mutations.setUserLoggedIn(response.data.userId, response.data.role);
             this.$router.push({path: `/home`});
           })
           .catch(err => {

@@ -71,6 +71,27 @@
                   <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
+                <div class="action_btn">
+                  <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
+                </div>
+                <div>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
+                          {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
+                </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
                 <div style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >
@@ -136,6 +157,26 @@
                 <td>{{ product.created }} </td>
                 <td>
                   <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
+                </td>
+                <td>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
+                </td>
+                <td>
+                  <vs-dropdown vs-custom-content vs-trigger-click>
+                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
+                    <vs-dropdown-menu>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-menu>
+                  </vs-dropdown>
                 </td>
               </tr>
 
@@ -208,31 +249,53 @@ const Search = {
    *
  */
   mounted() {
-    api.checkSession()
-    .then((response) => {
-      this.businessId = this.$route.params.id;
-      this.userId = response.data.id;
-      this.getUserInfo(this.userId);
-      this.getBusinessName();
+    let userId = store.loggedInUserId;
+    this.getUserInfo(userId);
 
-      api.getBusinessProducts(this.businessId)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.products = response.data;
-            this.filteredproducts = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load products";
-          })
-          .finally(() => (this.loading = false));
-    }).catch(() => {
 
-    });
+    this.business = this.getBusinessName();
+    this.businessId = this.getBusinessID();
+    api.getBusinessProducts(this.businessId)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.products = response.data;
+          console.log(this.products)
+          this.filteredproducts = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load products";
+        })
+        .finally(() => (this.loading = false));
   },
 
 
   methods: {
+
+    setDefaultImage(product, image) {
+      this.imageId = image.id;
+      this.productId = product.id;
+      console.log(this.businessId, this.productId, this.imageId);
+      api.setPrimaryImage(this.businessId, this.productId, this.imageId)
+          .then((response) => {
+            console.log(response.data);
+          }).catch((err) => {
+            throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
+
+    deleteImage(product, image) {
+      this.imageId = image.id;
+      this.productId = product.id;
+      console.log(this.businessId, this.productId, this.imageId);
+      api.deletePrimaryImage(this.businessId, this.productId, this.imageId)
+          .then((response) => {
+            console.log(response.data);
+          }).catch((err) => {
+        throw new Error(`Error trying to get user info from id: ${err}`);
+      });
+    },
+
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString()
@@ -241,18 +304,20 @@ const Search = {
       }
     },
     getUserInfo: function(userId) {
-      api.getUserFromID(userId) //Get user data
-          .then((response) => {
-            this.user = response.data;
-            this.setCurrency(this.user.homeAddress.country);
-          }).catch((err) => {
-        if (err.response.status === 401) {
-          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-          this.$router.push({name: 'LoginPage'});
-        } else {
-          throw new Error(`Error trying to get user info from id: ${err}`);
-        }
-      });
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
+          if (err.response.status === 401) {
+            this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
+            this.$router.push({name: 'LoginPage'});
+          } else {
+            this.$router.push({path: "/login"}); //If user not logged in send to login page
+          }
+        });
+      }
     },
 
     setCurrency: function (country) {
@@ -276,14 +341,12 @@ const Search = {
       });
     },
 
+    getBusinessID: function () {
+      return store.actingAsBusinessId
+    },
 
     getBusinessName: function () {
-      api.getBusinessFromId(this.businessId)
-          .then((res) => {
-            this.business = res.data.name;
-          }).catch((error) => {
-        throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
-      })
+      return store.actingAsBusinessName
     },
 
     //sets the product to alter id
@@ -448,8 +511,9 @@ const Search = {
         this.productSearchIndexMin -= 10;
         this.productSearchIndexMax -= 10;
       }
-    },
-},
+    }
+
+  },
   computed: {
     /**
      * Computes ranges to be displayed below table, max of range is switched

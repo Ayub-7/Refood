@@ -24,16 +24,18 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
-              danger-text="RRP is required and must be at least 0"
+              :danger="errors.includes('rrp')"
+              danger-text="RRP is required and must not be a negative number."
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
-              type="text"
+              type="number"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
         <div id="manufacturer">
           <vs-input
+              :danger="(errors.includes('no-manu'))"
+              danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
               label-placeholder="Manufacturer"
@@ -41,6 +43,8 @@
         </div>
         <div id="description">
           <vs-textarea
+              :danger="(errors.includes('no-desc'))"
+              danger-text="Description is Required."
               class="form-control"
               type="text"
               label="Description"
@@ -80,7 +84,7 @@ const ModifyCatalog = {
       manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
-      rrp: "",
+      rrp: null,
       currencyMultiplier: 1,
     };
   },
@@ -100,17 +104,17 @@ const ModifyCatalog = {
         this.errors.push(this.productId);
       }
 
-      if (this.rrp.length === 0) {
-        this.errors.push('no-rrp');
-      } else if(this.rrp < 0){
+      if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
       if (this.errors.length >= 1) {
-        if(this.errors.includes(this.productName) || this.errors.includes(this.productId)){
-          this.$vs.notify({title:'Failed to modify catalogue item', text:'Required fields are missing.', color:'danger'});
-        } if(this.errors.includes('rrp') || this.errors.includes('no-rrp')){
-          this.$vs.notify({title:'Failed to modify catalogue item', text:'RRP is required and must be at least 0.', color:'danger'});
+        if (this.errors.includes(this.productName) || this.errors.includes(this.productId) || this.errors.includes('rrp')) {
+          this.$vs.notify({
+            title: 'Failed to create catalogue item',
+            text: 'Required fields are missing.',
+            color: 'danger'
+          });
         }
       }
     },
@@ -128,15 +132,16 @@ const ModifyCatalog = {
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
-            }).catch((error) => {
-          if(error.response){
-            if(error.response.status === 400){
-              this.$vs.notify({title:'Failed to modify catalogue item', text:'Product ID is already in use', color:'danger'});
-            }
-            console.log(error.response.status);
-          }
-          this.$log.debug("Error Status:", error)
-        });
+            })
+            .catch((error) => {
+              if(error.response) {
+                if(error.response.status === 400){
+                  this.$vs.notify({title:'Failed to modify catalogue item', text:'Product ID is already in use', color:'danger'});
+                }
+                this.$log.error(error.response.status);
+              }
+              this.$log.error(error);
+            });
       }
     },
 
@@ -153,9 +158,9 @@ const ModifyCatalog = {
         if (err.response.status === 401) {
           this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
           this.$router.push({name: 'LoginPage'});
-        } else {
-          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
         }
+        this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);
+
       });
     },
 
@@ -172,10 +177,11 @@ const ModifyCatalog = {
                 .then(response => {
                   this.currencyMultiplier = response.data[query];
                 }).catch( err => {
-              console.log("Error getting multiplier from REST Currencies." + err);
+              this.$log.error("Error with getting multiplier from REST Currencies." + err);
+
             });
           }).catch( err => {
-        console.log("Error with getting cities from REST Countries." + err);
+        this.$log.error("Error with getting cities from REST Countries." + err);
       });
     },
     convertRRPtoUSD: function (rrp) {
@@ -191,7 +197,9 @@ const ModifyCatalog = {
     api.checkSession()
         .then((response) => {
           this.getUserInfo(response.data.id);
-        });
+        }).catch((error) => {
+         this.$log.error("Error checking session: " + error);
+       });
   }
 }
 export default ModifyCatalog;

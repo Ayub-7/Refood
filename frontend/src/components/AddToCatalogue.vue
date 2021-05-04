@@ -24,11 +24,11 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
-              danger-text="RRP is required and must be at least 0"
+              :danger="errors.includes('rrp')"
+              danger-text="RRP is required and must be not be a negative number"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
-              type="text"
+              type="number"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
@@ -75,7 +75,7 @@ const AddToCatalogue = {
       manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
-      rrp: ""
+      rrp: null
     };
   },
   methods: {
@@ -94,24 +94,17 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
-      if (this.rrp.length === 0 || this.rrp === null) {
-        this.errors.push('no-rrp');
-      } else if (this.rrp < 0) {
+      if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
+
       if (this.errors.length >= 1) {
-        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)) {
+        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)
+            || this.errors.includes('rrp')) {
           this.$vs.notify({
             title: 'Failed to create catalogue item',
             text: 'Required fields are missing.',
-            color: 'danger'
-          });
-        }
-        if (this.errors.includes('rrp') || this.errors.includes('no-rrp')) {
-          this.$vs.notify({
-            title: 'Failed to create catalogue item',
-            text: 'RRP is required and must be at least 0.',
             color: 'danger'
           });
         }
@@ -123,7 +116,7 @@ const AddToCatalogue = {
     createItem: function () {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
-      if (this.errors.length == 0) {
+      if (this.errors.length === 0) {
         var RRPUSD = this.convertRRPtoUSD(this.rrp);
 
         api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.manufacturer, RRPUSD)
@@ -132,6 +125,7 @@ const AddToCatalogue = {
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if (error.response) {
+            this.$log.error(error);
             if (error.response.status === 400) {
               this.$vs.notify({
                 title: 'Failed to create catalogue item',
@@ -139,7 +133,7 @@ const AddToCatalogue = {
                 color: 'danger'
               });
             }
-            console.log(error.response.status);
+            this.$log.error(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         });
@@ -163,7 +157,7 @@ const AddToCatalogue = {
 
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
-          .then( response => {
+          .then(response => {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
 
@@ -174,20 +168,26 @@ const AddToCatalogue = {
                 .then(response => {
                   this.currencyMultiplier = response.data[query];
                 }).catch( err => {
-              console.log("Error getting multiplier from REST Currencies." + err);
+              this.$log.error("Error with getting Multiplier from REST Currency." + err);
             });
-          }).catch( err => {
-        console.log("Error with getting cities from REST Countries." + err);
+          }).catch(err => {
+        this.$log.error("Error with getting cities from REST Countries." + err);
       });
     },
     convertRRPtoUSD: function (rrp) {
       return this.currencyMultiplier*rrp;
     }
+
+
+
   },
     mounted: function () {
       api.checkSession()
           .then((response) => {
             this.getUserInfo(response.data.id);
+          })
+          .catch((error) => {
+            this.$log.debug("Error checking user session: " + error);
           });
     }
   }
