@@ -6,11 +6,10 @@ export const store = Vue.observable({
     role: null,
     userDateOfBirth: null,
     userName: null,
-    userBusinesses: [],
+    userPrimaryBusinesses: [],
     actingAsBusinessId: null,
     actingAsBusinessName: null,
-    productToAlterId: null,
-    homeAddress: null
+    productToAlterId: null
 });
 
 
@@ -53,16 +52,15 @@ export const mutations = {
         store.loggedInUserId = null;
         store.userName = null;
         store.userAge = null;
-        store.userBusinesses = null;
+        store.userPrimaryBusinesses = null;
         store.actingAsBusinessId = null;
         store.actingAsBusinessName = null;
-        store.homeAddress = null;
     },
 
 
 
     getIdByName(name) {
-        for (const names of store.userBusinesses){
+        for (const names of store.userPrimaryBusinesses){
             if (names.name === name){
                 return names.id;
             }
@@ -70,10 +68,6 @@ export const mutations = {
     },
     setUserRole(role) {
         store.role = role;
-    },
-
-    setHomeAddress(homeAddress) {
-        store.homeAddress = homeAddress;
     },
 
     setUserName(userName) {
@@ -84,8 +78,8 @@ export const mutations = {
         store.userDateOfBirth = userDateOfBirth;
     },
 
-    setUserBusinesses(newBusinesses) {
-        store.userBusinesses = newBusinesses;
+    setUserPrimaryBusinesses(newBusinesses) {
+        store.userPrimaryBusinesses = newBusinesses;
     },
 
     setActingAsBusiness(businessId, businessName){

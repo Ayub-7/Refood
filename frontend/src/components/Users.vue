@@ -169,8 +169,8 @@ const Users = {
     getUserInfo: function(userId) {
       api.getUserFromID(userId) //Get user data
         .then((response) => {
-          if(store.userBusinesses != null){
-            this.userViewingBusinesses = store.userBusinesses;
+          if(store.userPrimaryBusinesses != null){
+            this.userViewingBusinesses = store.userPrimaryBusinesses;
           }
           this.user = response.data;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
