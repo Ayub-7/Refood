@@ -217,7 +217,7 @@ const BusinessRegister = {
               this.suggestedCountries = res.data.features.map(location => location.properties.country);
             })
             .catch( error => {
-              console.log("Error with getting countries from photon." + error);
+              this.$log.error(error)
             });
       }
       else {
@@ -243,7 +243,7 @@ const BusinessRegister = {
           this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
           this.$router.push({name: 'LoginPage'});
         } else {
-          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
+          this.$log.error(err);
         }
 
       });

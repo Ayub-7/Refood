@@ -171,8 +171,8 @@ const AddToCatalogue = {
         .then((response) => {
           this.getUserInfo(response.data.id);
         })
-        .catch((error) => {
-          this.$log.debug("Error checking user session: " + error);
+        .catch(() => {
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});;
         });
   }
 }
