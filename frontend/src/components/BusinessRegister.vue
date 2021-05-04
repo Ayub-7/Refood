@@ -223,30 +223,24 @@ const BusinessRegister = {
     getUserInfo: function (userId) {
       api.getUserFromID(userId)
           .then((response) => {
-            if(store.loggedInUserId == null) {
               this.user = response.data;
-            } else {
-              this.$router.push({path: "/login"});
-            }
           }).catch((err) => {
             if (err.response.status === 401) {
               this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
               this.$router.push({name: 'LoginPage'});
+            } else {
+              throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
             }
-            throw new Error(`ERROR trying to obtain business info from Id: ${err}`);
-      });
-    },
 
-    checkLoggedIn: function() {
-      if (store.loggedInUserId == null) {
-        this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-        this.$router.push({name: 'LoginPage'});
-      }
+      });
     },
   },
 
   mounted: function () {
-    this.checkLoggedIn();
+    api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+        });
   }
 
 }
