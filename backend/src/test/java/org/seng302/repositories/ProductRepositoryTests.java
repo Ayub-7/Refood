@@ -30,16 +30,16 @@ public class ProductRepositoryTests {
     @BeforeEach
     void setUp() {
         assertThat(productRepository).isNotNull();
-        testProd1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", 14.69, new Date());
-        testProd2 = new Product("07-4957066", 2, "Seedlings", "Buckwheat, Organic", 1.26, new Date());
+        testProd1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
+        testProd2 = new Product("07-4957066", 2, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
 
         productRepository.save(testProd1);
         productRepository.save(testProd2);
     }
 
     @Test
-    public void saveUser() {
-        Product product = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", 43.66, new Date());
+    public void saveProduct() {
+        Product product = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", "Some Manufacturer", 43.66, new Date());
         productRepository.save(product);
 
         // Test if insertion is properly inserting values.
@@ -50,7 +50,7 @@ public class ProductRepositoryTests {
 
         List<Product> products = productRepository.findProductsByBusinessId(1);
         assertThat(products.size()).isEqualTo(2);
-        Product anotherProduct = new Product("12-5088639", 1, "Foam Cup", "6 Oz", 55.2, new Date());
+        Product anotherProduct = new Product("12-5088639", 1, "Foam Cup", "6 Oz", "Legit Manufacturer", 55.2, new Date());
         productRepository.save(anotherProduct);
 
         products = productRepository.findProductsByBusinessId(1);

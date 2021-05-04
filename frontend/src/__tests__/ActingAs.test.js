@@ -68,36 +68,32 @@ const mockBusinesses = [
     }
 ]
 
+let store = {
+    loggedInUserId: 22,
+    role: "USER",
+    userName: "Wileen Tisley",
+    userPrimaryBusinesses: [],
+    actingAsBusinessId: null,
+    actingAsBusinessName: null
+}
+const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
+getUserNameMethod.mockImplementation(() => {
+    return store.userName;
+});
 
 beforeEach(() => {
-    //console.log(mockBusinesses);
     wrapper = shallowMount(ActingAs, {
-        localVue,
         propsData: {},
-        mocks: {},
+        mocks: {store},
         stubs: ['router-link', 'router-view'],
         methods: {},
-        data() {
-            return {
-                loggedInUserId: 22,
-                userName: "Wileen Tisley",
-                role: "USER",
-                userPrimaryBusinesses: null,
-                actingAsBusinessId: null,
-                actingAsBusinessName: null
-            }
-        }
-    });
-    const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName')
-    getUserNameMethod.mockImplementation(() => {
-        wrapper.vm.userName = "Wileen Tisley";
-        return wrapper.vm.userName;
+        localVue,
     });
 
-    const getPrimaryBusinessesMethod = jest.spyOn(ActingAs.methods, 'getPrimaryBusinesses');
-    getPrimaryBusinessesMethod.mockImplementation(() => {
-        wrapper.vm.userPrimaryBusinesses = mockBusinesses;
-        return wrapper.vm.userPrimaryBusinesses;
+    const getUserRoleMethod = jest.spyOn(ActingAs.methods, 'getUserRole')
+    getUserRoleMethod.mockImplementation(() => {
+        wrapper.vm.role = "USER";
+        return wrapper.vm.role;
     });
 });
 

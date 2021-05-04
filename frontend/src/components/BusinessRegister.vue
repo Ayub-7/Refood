@@ -110,8 +110,9 @@ const BusinessRegister = {
         this.errors.push('businessType');
       }
 
+
       if (this.errors.length >= 1) {
-        if(this.errors.includes("dob") && this.errors.length == 1){
+        if(this.errors.includes("dob") && this.errors.length === 1){
           this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
         } else {
           this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});

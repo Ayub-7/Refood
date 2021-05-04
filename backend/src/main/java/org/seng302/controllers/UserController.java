@@ -84,12 +84,15 @@ public class UserController {
      * @return 200 if login is successful, 400 if email/password is invalid.
      */
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest req, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
         if (existingUser != null) {
             if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
-                UserIdResponse userIdResponse = new UserIdResponse(existingUser.getId(), existingUser.getRole());
-                session.setAttribute("user", existingUser);
+                UserIdResponse userIdResponse = new UserIdResponse(existingUser);
+                session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
+//             if (loginRequest.getPassword().equals(existingUser.getPassword())) {
+//                 UserIdResponse userIdResponse = new UserIdResponse(existingUser);
+//                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -136,7 +139,7 @@ public class UserController {
                 Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
-                UserIdResponse res = new UserIdResponse(newUser.getId());
+                UserIdResponse res = new UserIdResponse(newUser);
                 String jsonString = mapper.writeValueAsString(res);
 
                 return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
@@ -249,14 +252,15 @@ public class UserController {
         }
 
         User self = (User) session.getAttribute("user");
-        if (self.getId() == id) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        if (self != null) {
+            if (self.getId() == id) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
         }
 
         userRepository.updateUserRole(id, Role.USER);
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
-
 
 }

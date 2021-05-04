@@ -150,6 +150,61 @@ export default {
      * @param userId user identifier to remove the rights from.
      * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
      */
-    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true})
+    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true}),
 
+    /**
+     * Create a new product.
+     * @param businessId id of the business to
+     * @param id product id (chosen by user)
+     * @param name product name
+     * @param description product description
+     * @param manufacturer manufacturer of this product.
+     * @param recommendedRetailPrice product recommended retail price in their local currency
+     */
+    createProduct: async(businessId, id, name, description, manufacturer, recommendedRetailPrice) =>
+        instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, manufacturer, recommendedRetailPrice}, {withCredentials: true}),
+    /**
+     * modifies catalog product
+     * @param id product id (chosen by user)
+     * @param name product name
+     * @param description product description
+     * @param manufacturer manufacturer of this product.
+     * @param recommendedRetailPrice product recommended retail price in their local currency
+     */
+    modifyProduct: async (businessId, productId, id, name, description, manufacturer, recommendedRetailPrice) =>
+        instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, id, name, description, manufacturer, recommendedRetailPrice}, {withCredentials: true}),
+
+    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
+
+    /**
+     * Post request to send a product image
+     * @param businessId business identifier to remove rights to.
+     * @param productId product identifier, product that the image is for
+     * @param image FormData object containing image file to be sent to server
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
+    postProductImage: (businessId, productId, image) => instance.post(`businesses/${businessId}/products/${productId}/images`, image, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      withCredentials: true,
+    }),
+
+    /**
+     * Put request to set the primary image from the existing images for a product.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
+     */
+    setPrimaryImage: (businessId, productId, imageId) => instance.put(`businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, {withCredentials: true}),
+
+    /**
+     * Delete request to remove product image.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
+     */
+    deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true})
 }

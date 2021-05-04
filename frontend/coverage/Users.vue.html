@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">54.05% </span>
+                <span class="strong">55.26% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/37</span>
+                <span class='fraction'>21/38</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.67% </span>
+                <span class="strong">46.15% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/12</span>
+                <span class='fraction'>6/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">54.05% </span>
+                <span class="strong">55.26% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>20/37</span>
+                <span class='fraction'>21/38</span>
             </div>
         
             
@@ -643,7 +643,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -696,7 +695,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -706,11 +704,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -720,6 +714,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -728,7 +729,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -998,7 +998,7 @@
     &lt;div id="container" v-if="this.user != null"&gt;
 &nbsp;
       &lt;!-- Far left side options menu--&gt;
-      &lt;div id="options-bar"&gt;
+      &lt;div id="options-bar" v-if="showOptionsMenu()"&gt;
         &lt;div class="sub-header" style="text-align: center"&gt; Options &lt;/div&gt;
         &lt;div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length &gt;= 1" @click="openModal()"&gt; Add to Business &lt;/div&gt;
       &lt;/div&gt;
@@ -1088,7 +1088,7 @@
 import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
-import {mutations, store} from "../store";
+import {store} from "../store";
 &nbsp;
 &nbsp;
 const Users = {
@@ -1099,7 +1099,6 @@ const Users = {
       user: null,
       businesses: [],
       userViewingBusinesses: [],
-      showOptions: false,
 &nbsp;
       showModal: false,
       selectedBusiness: null
@@ -1163,23 +1162,18 @@ const Users = {
      * @param userId ID of user that is currently being viewed
      */
     getUserInfo: function(userId) {
-<span class="missing-if-branch" title="if path not taken" >I</span>      if(store.loggedInUserId != null) {
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >        api.getUserFromID(userId) //Get user data</span></span>
-            .then((response) =&gt; {
-<span class="cstat-no" title="statement not covered" >              if(store.userPrimaryBusinesses != null){</span>
-<span class="cstat-no" title="statement not covered" >                this.userViewingBusinesses = store.userPrimaryBusinesses;</span>
-              }
-<span class="cstat-no" title="statement not covered" >              this.user = response.data;</span>
-<span class="cstat-no" title="statement not covered" >              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >              mutations.setUserName(response.data.firstName + " " + response.data.lastName);</span>
-<span class="cstat-no" title="statement not covered" >              mutations.setUserPrimaryBusinesses(this.businesses);</span>
-<span class="fstat-no" title="function not covered" >            }).catch((err) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >              throw new Error(`Error trying to get user info from id: ${err}`);</span>
-        });
-      } else {
-        this.$router.push({path: "/login"}); //If user not logged in send to login page
-      }
+<span class="fstat-no" title="function not covered" >      api.getUserFromID(userId) //Get user data</span>
+        .then((response) =&gt; {
+<span class="cstat-no" title="statement not covered" >          if(store.userPrimaryBusinesses != null){</span>
+<span class="cstat-no" title="statement not covered" >            this.userViewingBusinesses = store.userPrimaryBusinesses;</span>
+          }
+<span class="cstat-no" title="statement not covered" >          this.user = response.data;</span>
+<span class="cstat-no" title="statement not covered" >          this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));</span>
+<span class="fstat-no" title="function not covered" >        }).catch((err) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});</span>
+<span class="cstat-no" title="statement not covered" >          this.$router.push({path: "/login"}); //If user not logged in send to login page</span>
+<span class="cstat-no" title="statement not covered" >          throw new Error(`Error trying to get user info from id: ${err}`);</span>
+      });
     },
 &nbsp;
     /**
@@ -1190,14 +1184,20 @@ const Users = {
 <span class="cstat-no" title="statement not covered" >      this.$router.push({path: `/businesses/${business.id}`})</span>
     },
 &nbsp;
+    showOptionsMenu: function() {
+<span class="missing-if-branch" title="if path not taken" >I</span>      if (this.userViewingBusinesses &lt; 1) {
+<span class="cstat-no" title="statement not covered" >        return false</span>
+      }
+      return true
+    },
+&nbsp;
   },
 &nbsp;
   mounted: function () {
   //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
-    this.user = this.getUserInfo(userId);
+    this.getUserInfo(userId);
   },
-&nbsp;
 }
 &nbsp;
 export default Users;
@@ -1468,7 +1468,7 @@ main {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Mon Apr 26 2021 21:48:58 GMT+1200 (New Zealand Standard Time)
+                at Tue May 04 2021 14:36:41 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
