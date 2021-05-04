@@ -153,23 +153,26 @@ export default {
     removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true}),
 
     /**
-     * Create a new business by storin their data in the database
+     * Create a new product.
+     * @param businessId id of the business to
      * @param id product id (chosen by user)
      * @param name product name
      * @param description product description
+     * @param manufacturer manufacturer of this product.
      * @param recommendedRetailPrice product recommended retail price in their local currency
      */
-    createProduct: async(businessId, id, name, description, recommendedRetailPrice) =>
-        instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
+    createProduct: async(businessId, id, name, description, manufacturer, recommendedRetailPrice) =>
+        instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, manufacturer, recommendedRetailPrice}, {withCredentials: true}),
     /**
      * modifies catalog product
      * @param id product id (chosen by user)
      * @param name product name
      * @param description product description
+     * @param manufacturer manufacturer of this product.
      * @param recommendedRetailPrice product recommended retail price in their local currency
      */
-    modifyProduct: async (businessId, productId, id, name, description, recommendedRetailPrice) =>
-        instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, id, name, description, recommendedRetailPrice}, {withCredentials: true}),
+    modifyProduct: async (businessId, productId, id, name, description, manufacturer, recommendedRetailPrice) =>
+        instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, id, name, description, manufacturer, recommendedRetailPrice}, {withCredentials: true}),
 
     getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
 
