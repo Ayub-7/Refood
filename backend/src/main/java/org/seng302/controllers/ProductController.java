@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -247,6 +249,10 @@ public class ProductController {
         // Save into DB.
         Image newImage = new Image(file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
+        if (product.getPrimaryImagePath() == null) {
+            System.out.println(imageName);
+            product.setPrimaryImage("business_" + businessId + "/" + imageName + imageExtension);
+        }
         productRepository.save(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -260,7 +266,7 @@ public class ProductController {
      * @return
      */
     @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
-    public ResponseEntity<String> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) {
+    public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) throws IOException {
         String imageDir = System.getProperty("user.dir") + "/src/test/resources/media/images/business_" + businessId + "/" + imageId;
         String idString = "";
         Business business = businessRepository.findBusinessById(businessId);
@@ -274,6 +280,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         boolean pathExists = false;
+        String extension = "";
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
         extensions.add(".jpg");
@@ -283,6 +290,7 @@ public class ProductController {
             System.out.println(path.toString());
             if (Files.exists(path)) {
                 idString = imageId + ext;
+                extension = ext;
                 pathExists = true;
                 break;
             }
@@ -290,9 +298,10 @@ public class ProductController {
         if (!pathExists) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        product.setPrimaryImage(idString);
+        product.setPrimaryImage("business_" + businessId + "/" + idString);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
     /**
          * deletes an image
          * @param businessId unique identifier of the business that the image is relating to.

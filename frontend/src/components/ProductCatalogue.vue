@@ -51,9 +51,9 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
-              </div>
-             
+                <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
               
                 <div style="display: flex;">
@@ -61,12 +61,12 @@
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
                 <div class="action_btn">
-                  <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
+                  <ImageUpload :productId="product.id" :businessId=businessId style="margin-bottom: 10px; margin-top: 15px;"/>
                   <button type="button" id="modify" style="margin-bottom: 7px; margin-top: -9px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </div>
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{ product.recommendedRetailPrice }} </p>
+                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
             </div>
           </div>
@@ -114,17 +114,16 @@
                   :key="product.id">
 
                 <td style="width: 20px; padding-right: 10px">
-                  <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
+                  <a v-bind:href="'/products?id='+ product.id">{{ product.primaryImagePath }}</a>
                   <div>
-                    <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../public/ProductShoot.jpg"/>
-                  </div>
+                    <img style="width: 100%; height: 100%;   border-radius: 1em;" src="../../../backend/src/main/resources/media/images/businesses/business_1/0_thumbnail.jpg" />                  </div>
                 </td>
                 <td>{{ product.name }} </td>
                 <td>{{ product.description }} </td>
-                <td style="text-align: center">{{ product.recommendedRetailPrice }} </td>
+                <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </td>
                 <td>{{ product.created }} </td>
                 <td>
-                  <ImageUpload v-bind:productId=product.id v-bind:businessId=businessId />
+                  <ImageUpload :productId=product.id :businessId=businessId />
                   <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
                 </td>
               </tr>
@@ -155,6 +154,7 @@ import api from "../Api";
 import {store, mutations} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
+import axios from "axios";
 const Search = {
   name: "Search",
 
@@ -177,6 +177,9 @@ const Search = {
       business: null,
       businessId: null,
       displaytype: true,
+      currencySymbol: "",
+      currencyCode: "",
+      selected: "",
     };
   },
 
@@ -187,23 +190,10 @@ const Search = {
    * be filtered by the webpage.
  */
   mounted() {
-    console.log("this.getBusinessID()");
-    console.log(this.getBusinessID());
+    let userId = store.loggedInUserId;
+    this.getUserInfo(userId);
+    
 
-    /*
-    api.getBusinessFromId(this.getBusinessID())
-        .then((response) => {
-          console.log(response.data);
-          this.$log.debug("getBusinessFromId: ", response.data);
-          this.business = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to get Business";
-        })
-        .finally(() => (this.loading = false));
-
-     */
     this.business = this.getBusinessName();
     this.businessId = this.getBusinessID();
     api.getBusinessProducts(this.businessId)
@@ -212,6 +202,10 @@ const Search = {
           this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
           this.filteredproducts = response.data;
+
+          console.log("this.products[0].images[0].filename");
+          console.log(this.products[0].images[0].filename);
+
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -222,7 +216,42 @@ const Search = {
 
 
   methods: {
-    //todo: update getBusinessID get to use new store.js upon merge...
+
+
+
+    getImgUrl(product) {
+      console.log(product.primaryImagePath)
+      if (product.primaryImagePath != null) {
+        return product.primaryImagePath.toString()
+      } else {
+        return '../../public/ProductShoot.jpg'
+        //return product.primaryImagePath.toString()
+      }
+    },
+    getUserInfo: function(userId) {
+      if(store.loggedInUserId != null) {
+        api.getUserFromID(userId) //Get user data
+            .then((response) => {
+              this.user = response.data;
+              this.setCurrency(this.user.homeAddress.country);
+            }).catch((err) => {
+          throw new Error(`Error trying to get user info from id: ${err}`);
+        });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
+      }
+    },
+
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then( response => {
+            this.currencySymbol = response.data[0].currencies[0].symbol;
+            this.currencyCode = response.data[0].currencies[0].code;
+          }).catch( err => {
+        console.log("Error with getting cities from REST Countries." + err);
+      });
+    },
+
     getBusinessID: function () {
       return store.actingAsBusinessId
     },
