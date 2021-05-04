@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+@RunWith(SpringRunner.class)
 @ContextConfiguration(classes = TestApplication.class)
 public class AdminUtilsTests {
 
