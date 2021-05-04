@@ -90,7 +90,7 @@
                     label="Date of birth (Required)" />
         </div>
         <div id="bio">
-          <vs-textarea type="text" class="form-control text-areas" label="Bio" name="bio" v-model="bio"></vs-textarea>
+          <vs-textarea width="200px" type="text" class="form-control text-areas" label="Bio" name="bio" v-model="bio"></vs-textarea>
         </div>
       </div>
       <label for="address-field" class="label-control">Address</label>

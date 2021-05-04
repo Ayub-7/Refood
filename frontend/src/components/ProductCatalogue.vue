@@ -211,7 +211,7 @@ const Search = {
             this.error = "Failed to load products";
           })
           .finally(() => (this.loading = false));
-    }).catch((err) => {
+    }).catch(() => {
 
     });
 
