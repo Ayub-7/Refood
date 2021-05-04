@@ -80,7 +80,7 @@ const Homepage = {
               /* Sets user details in store.js */
               mutations.setUserDateOfBirth(response.data.dateOfBirth);
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-              mutations.setUserPrimaryBusinesses(this.businesses);
+              mutations.setUserBusinesses(this.businesses);
             } else {
               this.$router.push({path: "/login"}); //If user not logged in send to login page
             }
