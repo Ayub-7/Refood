@@ -24,11 +24,11 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp') || errors.includes('invalid-rrp'))"
-              danger-text="RRP is required and must be at least 0 and a Number."
+              :danger="errors.includes('rrp')"
+              danger-text="RRP is required and must be not be a negative number"
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
-              type="text"
+              type="number"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
         </div>
@@ -79,7 +79,7 @@ const AddToCatalogue = {
       manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
-      rrp: ""
+      rrp: null
     };
   },
   methods: {
@@ -98,28 +98,14 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
-      if (this.description.length === 0) {
-        this.errors.push('no-desc');
-      }
-
-      if (this.manufacturer.length === 0) {
-        this.errors.push('no-manu');
-      }
-
-      if (this.rrp.length === 0 || this.rrp === null) {
-        this.errors.push('no-rrp');
-      } else if (this.rrp < 0) {
+      if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
-      if (isNaN(this.rrp)) {
-        this.errors.push('invalid-rrp');
-      }
 
       if (this.errors.length >= 1) {
         if (this.errors.includes(this.productName) || this.errors.includes(this.productId)
-            || this.errors.includes('rrp') || this.errors.includes('no-rrp')
-            || this.errors.includes('invalid-rrp') || this.errors.includes('no-manu')) {
+            || this.errors.includes('rrp')) {
           this.$vs.notify({
             title: 'Failed to create catalogue item',
             text: 'Required fields are missing.',
@@ -331,6 +317,7 @@ export default AddToCatalogue;
   #currencyInput {
     grid-row: 1;
     grid-column: 2;
+
   }
 
   #currencyCode {
