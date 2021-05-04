@@ -192,12 +192,17 @@
         if (!this.validEmail(this.email)) {
           this.errors.push(this.email);
         }
+        if (this.bio != null) {
+          if (this.bio.length > 40) {
+            this.errors.push(this.bio);
+          }
+        }
 
         if (!this.validPassword(this.password)) {
           this.errors.push(this.password);
         }
 
-        if (this.confirm_password.length == 0 || this.password !== this.confirm_password) {
+        if (this.confirm_password.length === 0 || this.password !== this.confirm_password) {
           this.errors.push(this.confirm_password);
         }
         if (this.dateofbirth.length === 0 || !this.validAge(this.dateofbirth)) {
@@ -213,7 +218,14 @@
         }
 
         if (this.errors.length >= 1) {
-          this.$vs.notify({title:'Failed to register', text:'Required fields are missing.', color:'danger'});
+          this.$vs.notify({title: 'Failed to register', text: 'Required fields are missing.', color: 'danger'});
+          if (this.errors.includes(this.bio)) {
+            this.$vs.notify({
+              title: 'Failed to register',
+              text: 'Bio must be less that 40 characters.',
+              color: 'danger'
+            });
+          }
         }
       },
 

@@ -103,6 +103,12 @@ const BusinessRegister = {
         this.errors.push('country');
       }
 
+      if (this.description != null) {
+        if (this.description.length > 40) {
+          this.errors.push(this.description);
+        }
+      }
+
       if (!this.checkAge()){
         this.errors.push('dob');
       }
@@ -115,6 +121,12 @@ const BusinessRegister = {
       if (this.errors.length >= 1) {
         if(this.errors.includes("dob") && this.errors.length === 1){
           this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood business account.', color:'danger'});
+        } else if (this.errors.includes(this.description)) {
+          this.$vs.notify({
+            title: 'Failed to create business',
+            text: 'description must be less that 40 characters.',
+            color: 'danger'
+          });
         } else {
           this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
         }
