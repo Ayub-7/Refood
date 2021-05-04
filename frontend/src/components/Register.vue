@@ -44,9 +44,9 @@
           <vs-input type="email"
                     class="form-control"
                     label-placeholder="Email (Required)"
-                    :danger="errors.includes(email)"
-                    danger-text="Invalid email."
-                    :success="validEmail(email)"
+                    :danger="errors.includes(email) && emailInUse"
+                    danger-text="Invalid email. (This email may already be in use)"
+                    :success="validEmail(email) && !emailInUse"
                     v-model="email"/>
         </div>
         <div id="phonenumber">
@@ -85,9 +85,9 @@
                     name="dateofbirth"
                     v-model="dateofbirth"
                     :danger="errors.includes(dateofbirth)"
-                    danger-text="Enter date of birth"
-                    :success="(dateofbirth.length!==0)"
-                    label="Date of birth (Required)"/>
+                    danger-text="You must be atleast 13 years old to register"
+                    :success="(dateofbirth.length!==0 && this.validAge(this.dateofbirth))"
+                    label="Date of birth (Required)" />
         </div>
         <div id="bio">
           <vs-textarea type="text" class="form-control text-areas" label="Bio" name="bio" v-model="bio"></vs-textarea>
@@ -143,6 +143,7 @@
     name: "Register",
     data: function () {
       return {
+        emailInUse: false,
         errors: [],
         firstname: "",
         middlename: "",
@@ -199,8 +200,7 @@
         if (this.confirm_password.length == 0 || this.password !== this.confirm_password) {
           this.errors.push(this.confirm_password);
         }
-
-        if (this.dateofbirth.length === 0) {
+        if (this.dateofbirth.length === 0 || !this.validAge(this.dateofbirth)) {
           this.errors.push(this.dateofbirth);
         }
 
@@ -213,10 +213,28 @@
         }
 
         if (this.errors.length >= 1) {
-          console.log(this.errors);
           this.$vs.notify({title:'Failed to register', text:'Required fields are missing.', color:'danger'});
         }
       },
+
+
+      /**
+       * from https://stackoverflow.com/questions/14231381/to-check-if-age-is-not-less-than-13-years-in-javascript
+       * @param birthDateString string of date inputted by user
+       * @returns {Boolean} True if user is 13 and above false if below
+       */
+
+      validAge: function(birthDateString) {
+          var today = new Date();
+          var birthDate = new Date(birthDateString);
+          var age = today.getFullYear() - birthDate.getFullYear();
+          var m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+          }
+          return age >= 13;
+      },
+
 
 
       /**
@@ -258,8 +276,12 @@
         //Use createUser function of API to POST user data to backend
         //AT THE MOMENT BACKEND IS JUST A JSON-SERVER, THE SERVER IS RUN USING testUser.json AS A JSON-SERVER ON PORT 9499
         //https://www.npmjs.com/package/json-server
+        // if(!this.emailInUse.includes(this.email) && this.emailInUse) {
+        //   this.emailInUse = false;
+        //   this.errors.pop(this.errors.indexOf(this.email));
+        // }
         if(this.errors.length === 0){
-
+          this.emailInUse = false;
           const homeAddress = {
             streetNumber: this.streetNumber,
             streetName: this.streetName,
@@ -282,12 +304,10 @@
                         this.$log.debug("Error logging in from registration: " + error);
                     });
                   }).catch((error) => {
-            if(error.response){
-              console.log(error.response.status);
-              console.log(error.response.message);
-              this.errors.push("Email already in use");
+            if(error.response.status === 409){
+              this.emailInUse = true;
+              this.errors.push(this.email);
             }
-            this.$log.debug("Error Status:", error)
           });
         }},
 
