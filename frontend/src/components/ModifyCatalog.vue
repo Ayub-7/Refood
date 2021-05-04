@@ -141,18 +141,19 @@ const ModifyCatalog = {
       this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
     },
 
-    getUserInfo: function(userId) {
-      if(store.loggedInUserId != null) {
-        api.getUserFromID(userId) //Get user data
-            .then((response) => {
-              this.user = response.data;
-              this.setCurrency(this.user.homeAddress.country);
-            }).catch((err) => {
-          throw new Error(`Error trying to get user info from id: ${err}`);
-        });
-      } else {
-        this.$router.push({path: "/login"}); //If user not logged in send to login page
-      }
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId) //Get user data
+          .then((response) => {
+            this.user = response.data;
+            this.setCurrency(this.user.homeAddress.country);
+          }).catch((err) => {
+        if (err.response.status === 401) {
+          this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
+          this.$router.push({name: 'LoginPage'});
+        } else {
+          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
+        }
+      });
     },
 
     setCurrency: function (country) {
@@ -164,17 +165,15 @@ const ModifyCatalog = {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
-
-
-
   },
 
   mounted: function () {
-    let userId = store.loggedInUserId;
-    this.getUserInfo(userId);
-  },
+    api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+        });
+  }
 }
-
 export default ModifyCatalog;
 
 </script>

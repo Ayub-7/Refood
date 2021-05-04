@@ -84,7 +84,7 @@ const AddToCatalogue = {
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
      * is in the wrong format.
      */
-    checkForm: function() {
+    checkForm: function () {
       this.errors = [];
       if (this.productName.length === 0) {
         this.errors.push(this.productName);
@@ -96,33 +96,46 @@ const AddToCatalogue = {
 
       if (this.rrp.length === 0 || this.rrp === null) {
         this.errors.push('no-rrp');
-      } else if(this.rrp < 0){
+      } else if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
       if (this.errors.length >= 1) {
-        if(this.errors.includes(this.productName) || this.errors.includes(this.productId)){
-          this.$vs.notify({title:'Failed to create catalogue item', text:'Required fields are missing.', color:'danger'});
-        }if(this.errors.includes('rrp') || this.errors.includes('no-rrp')){
-          this.$vs.notify({title:'Failed to create catalogue item', text:'RRP is required and must be at least 0.', color:'danger'});
+        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)) {
+          this.$vs.notify({
+            title: 'Failed to create catalogue item',
+            text: 'Required fields are missing.',
+            color: 'danger'
+          });
+        }
+        if (this.errors.includes('rrp') || this.errors.includes('no-rrp')) {
+          this.$vs.notify({
+            title: 'Failed to create catalogue item',
+            text: 'RRP is required and must be at least 0.',
+            color: 'danger'
+          });
         }
       }
     },
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
-    createItem: function() {
+    createItem: function () {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
-      if(this.errors.length == 0){
+      if (this.errors.length == 0) {
         api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.manufacturer, this.rrp)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
-          if(error.response){
-            if(error.response.status === 400){
-              this.$vs.notify({title:'Failed to create catalogue item', text:'Product ID is already in use', color:'danger'});
+          if (error.response) {
+            if (error.response.status === 400) {
+              this.$vs.notify({
+                title: 'Failed to create catalogue item',
+                text: 'Product ID is already in use',
+                color: 'danger'
+              });
             }
             console.log(error.response.status);
           }
@@ -131,39 +144,38 @@ const AddToCatalogue = {
       }
     },
 
-    getUserInfo: function(userId) {
-      if(store.loggedInUserId != null) {
-        api.getUserFromID(userId) //Get user data
-            .then((response) => {
-              this.user = response.data;
-              this.setCurrency(this.user.homeAddress.country);
-            }).catch((err) => {
-          throw new Error(`Error trying to get user info from id: ${err}`);
-        });
-      } else {
-        this.$router.push({path: "/login"}); //If user not logged in send to login page
-      }
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId) //Get user data
+          .then((response) => {
+            this.user = response.data;
+            this.setCurrency(this.user.homeAddress.country);
+          }).catch((err) => {
+        if (err.response.status === 401) {
+          this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
+          this.$router.push({name: 'LoginPage'});
+        } else {
+          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
+        }
+      });
     },
 
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
-          .then( response => {
+          .then(response => {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
-          }).catch( err => {
+          }).catch(err => {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
-
-
-
   },
-
-  mounted: function () {
-    let userId = store.loggedInUserId;
-    this.getUserInfo(userId);
-  },
-}
+    mounted: function () {
+      api.checkSession()
+          .then((response) => {
+            this.getUserInfo(response.data.id);
+          });
+    }
+  }
 
 export default AddToCatalogue;
 
