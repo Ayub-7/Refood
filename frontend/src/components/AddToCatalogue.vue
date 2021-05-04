@@ -24,8 +24,8 @@
         <div id="rrp">
           <div id="currencySymbol">{{this.currencySymbol}}</div>
           <vs-input
-              :danger="(errors.includes('no-rrp') || errors.includes('rrp'))"
-              danger-text="RRP is required and must be at least 0"
+              :danger="(errors.includes('no-rrp') || errors.includes('rrp') || errors.includes('invalid-rrp'))"
+              danger-text="RRP is required and must be at least 0 and a Number."
               id="currencyInput"
               label-placeholder="Recommended Retail Price"
               type="text"
@@ -34,6 +34,8 @@
         </div>
         <div id="manufacturer">
           <vs-input
+              :danger="(errors.includes('no-manu'))"
+              danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
               label-placeholder="Manufacturer"
@@ -41,10 +43,12 @@
         </div>
         <div id="description">
           <vs-textarea
+              :danger="(errors.includes('no-desc'))"
+              danger-text="Description is Required."
               class="form-control"
               type="text"
               width="400px"
-              label="Description"
+              label="Description (required)"
               v-model="description"/>
         </div>
       </div>
@@ -94,27 +98,41 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
+      if (this.description.length === 0) {
+        this.errors.push('no-desc');
+      }
+
+      if (this.manufacturer.length === 0) {
+        this.errors.push('no-manu');
+      }
+
       if (this.rrp.length === 0 || this.rrp === null) {
         this.errors.push('no-rrp');
       } else if (this.rrp < 0) {
         this.errors.push('rrp');
       }
 
+      if (isNaN(this.rrp)) {
+        this.errors.push('invalid-rrp');
+      }
+
       if (this.errors.length >= 1) {
-        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)) {
+        if (this.errors.includes(this.productName) || this.errors.includes(this.productId)
+            || this.errors.includes('rrp') || this.errors.includes('no-rrp')
+            || this.errors.includes('invalid-rrp') || this.errors.includes('no-manu')) {
           this.$vs.notify({
             title: 'Failed to create catalogue item',
             text: 'Required fields are missing.',
             color: 'danger'
           });
         }
-        if (this.errors.includes('rrp') || this.errors.includes('no-rrp')) {
-          this.$vs.notify({
-            title: 'Failed to create catalogue item',
-            text: 'RRP is required and must be at least 0.',
-            color: 'danger'
-          });
-        }
+      }
+      if (this.errors.includes('no-desc')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Description is Required.',
+          color: 'danger'
+        });
       }
     },
     /**
@@ -123,13 +141,14 @@ const AddToCatalogue = {
     createItem: function () {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
-      if (this.errors.length == 0) {
+      if (this.errors.length === 0) {
         api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.manufacturer, this.rrp)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if (error.response) {
+            console.log(error);
             if (error.response.status === 400) {
               this.$vs.notify({
                 title: 'Failed to create catalogue item',
