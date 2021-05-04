@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
@@ -14,6 +15,7 @@ import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -111,14 +113,17 @@ public class UserController {
      * Prints out the current user session/authentication details into console.
      */
     @GetMapping("/checksession")
-    public ResponseEntity<User> checksession(HttpServletRequest req, HttpSession session) {
+    public ResponseEntity<?> checksession(HttpServletRequest req, HttpSession session) {
         User user = (User) session.getAttribute("user");
         Business bbusiness = (Business) session.getAttribute("business");
-        System.out.println(user.getId());
-        System.out.println(bbusiness.getName());
-        //System.out.println(business.getId());
-//        System.out.println(business.Name);
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        //Address emptyAddy = new Address("", "", "", "", "", "");
+        if(bbusiness != null){
+            // bbusiness = new Business("", "", emptyAddy, "");
+            return new ResponseEntity<Pair<User, Business>>(Pair.of(user, bbusiness), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Pair<User, String>>(Pair.of(user, ""), HttpStatus.OK);
+        }
+    
     }
 
 
