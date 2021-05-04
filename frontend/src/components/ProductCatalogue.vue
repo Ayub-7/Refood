@@ -200,14 +200,9 @@ const Search = {
     this.businessId = this.getBusinessID();
     api.getBusinessProducts(this.businessId)
         .then((response) => {
-          console.log(response.data);
           this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
           this.filteredproducts = response.data;
-
-          console.log("this.products[0].images[0].filename");
-          console.log(this.products[0].images[0].filename);
-
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -222,12 +217,10 @@ const Search = {
 
 
     getImgUrl(product) {
-      console.log(product.primaryImagePath)
       if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString()
       } else {
         return '../../public/ProductShoot.jpg'
-        //return product.primaryImagePath.toString()
       }
     },
     getUserInfo: function(userId) {
