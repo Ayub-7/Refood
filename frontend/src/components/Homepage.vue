@@ -160,6 +160,17 @@ const Homepage = {
        */
       goToProductCatalogue: function() {
         this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
+      },
+
+      checkUserSession: function() {
+        api.checkSession()
+            .then((response) => {
+              this.getUserDetails(response.data.id);
+            })
+            .catch((error) => {
+              this.$log.error("Error checking sessions: " + error);
+              this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+            });
       }
     },
 
@@ -168,12 +179,7 @@ const Homepage = {
    * is first rendered, then gets the users details from the backend using the API
    */
   mounted: function () {
-    api.checkSession()
-        .then((response) => {
-          this.getUserDetails(response.data.id);
-        }).catch(() => {
-      this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-    });
+    this.checkUserSession();
   }
 
 

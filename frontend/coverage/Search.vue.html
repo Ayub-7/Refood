@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.4% </span>
+                <span class="strong">22.92% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/47</span>
+                <span class='fraction'>11/48</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.67% </span>
+                <span class="strong">15% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/18</span>
+                <span class='fraction'>3/20</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.4% </span>
+                <span class="strong">22.92% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/47</span>
+                <span class='fraction'>11/48</span>
             </div>
         
             
@@ -372,7 +372,11 @@
 <a name='L313'></a><a href='#L313'>313</a>
 <a name='L314'></a><a href='#L314'>314</a>
 <a name='L315'></a><a href='#L315'>315</a>
-<a name='L316'></a><a href='#L316'>316</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -546,20 +550,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -567,6 +557,22 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -596,6 +602,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -689,74 +697,74 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;template&gt;
   &lt;div class="main" id="body"&gt;
-  &lt;div id="search"&gt;
+    &lt;div id="search"&gt;
 &nbsp;
-    &lt;input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar"&gt;
-    &lt;vs-button id="submitSearch" type="border" @click="searchUsers"&gt;Search&lt;/vs-button&gt;
-  &lt;/div&gt;
-&nbsp;
-&nbsp;
-  &lt;div v-if="users.length" id="userTable"&gt;
-    &lt;vs-table :data="this.users" pagination max-items="10"&gt;
-      &lt;template slot="thead" id="tableHeader"&gt;
-&nbsp;
-        &lt;vs-th sort-key="firstName"&gt;
-          First name
-        &lt;/vs-th&gt;
-        &lt;vs-th sort-key="lastName"&gt;
-          Last name
-        &lt;/vs-th&gt;
-        &lt;vs-th sort-key="city"&gt;
-          City
-        &lt;/vs-th&gt;
-        &lt;vs-th sort-key="country" v-if="mobileMode==false"&gt;
-          Country
-        &lt;/vs-th&gt;
-        &lt;vs-th sort-key="email" v-if="mobileMode==false"&gt;
-          Email
-        &lt;/vs-th&gt;
-&nbsp;
-        &lt;!-- Extra header for go to profile button --&gt;
-        &lt;vs-th&gt;
-        &lt;/vs-th&gt;
-&nbsp;
-        &lt;vs-th v-if="isDGAA"&gt;Is Admin&lt;/vs-th&gt;
-        &lt;vs-th class="dgaaCheckbox" v-if="isDGAA"&gt;Toggle Admin&lt;/vs-th&gt;
+      &lt;input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar"&gt;
+      &lt;vs-button id="submitSearch" type="border" @click="searchUsers"&gt;Search&lt;/vs-button&gt;
+    &lt;/div&gt;
 &nbsp;
 &nbsp;
+    &lt;div v-if="users.length" id="userTable"&gt;
+      &lt;vs-table :data="this.users" pagination max-items="10"&gt;
+        &lt;template slot="thead" id="tableHeader"&gt;
 &nbsp;
-      &lt;/template&gt;
+          &lt;vs-th sort-key="firstName"&gt;
+            First name
+          &lt;/vs-th&gt;
+          &lt;vs-th sort-key="lastName"&gt;
+            Last name
+          &lt;/vs-th&gt;
+          &lt;vs-th sort-key="city"&gt;
+            City
+          &lt;/vs-th&gt;
+          &lt;vs-th sort-key="country" v-if="mobileMode==false"&gt;
+            Country
+          &lt;/vs-th&gt;
+          &lt;vs-th sort-key="email" v-if="mobileMode==false"&gt;
+            Email
+          &lt;/vs-th&gt;
 &nbsp;
-      &lt;template slot-scope="{data}"&gt;
-        &lt;vs-tr :key="indextr" v-for="(tr, indextr) in data"&gt;
+          &lt;!-- Extra header for go to profile button --&gt;
+          &lt;vs-th&gt;
+          &lt;/vs-th&gt;
 &nbsp;
-&nbsp;
-          &lt;vs-td :data="data[indextr].firstName"&gt;{{data[indextr].firstName}}&lt;/vs-td&gt;
-&nbsp;
-          &lt;vs-td :data="data[indextr].firstName"&gt;{{data[indextr].lastName}}&lt;/vs-td&gt;
-&nbsp;
-          &lt;vs-td :data="data[indextr].city"&gt;{{`${data[indextr].city}`}}&lt;/vs-td&gt;
-&nbsp;
-          &lt;vs-td :data="data[indextr].country" v-if="mobileMode==false"&gt;{{`${data[indextr].country}`}}&lt;/vs-td&gt;
-&nbsp;
-          &lt;vs-td :data="data[indextr].email" v-if="mobileMode==false"&gt;{{data[indextr].email}}&lt;/vs-td&gt;
-&nbsp;
-          &lt;vs-td&gt;
-            &lt;div id="goToProfileButton" @click="goToProfile(data[indextr].id)"&gt;Go to profile&lt;/div&gt;
-          &lt;/vs-td&gt;
-&nbsp;
-          &lt;vs-td :data="data[indextr].role" v-if="isDGAA"&gt; {{data[indextr].role}} &lt;/vs-td&gt;
-&nbsp;
-          &lt;vs-td v-if="isDGAA" class="dgaaCheckbox"&gt;
-            &lt;input type="checkbox" @click="toggleAdmin(data[indextr])"&gt;
-          &lt;/vs-td&gt;
+          &lt;vs-th v-if="isDGAA"&gt;Is Admin&lt;/vs-th&gt;
+          &lt;vs-th class="dgaaCheckbox" v-if="isDGAA"&gt;Toggle Admin&lt;/vs-th&gt;
 &nbsp;
 &nbsp;
-        &lt;/vs-tr&gt;
-      &lt;/template&gt;
-    &lt;/vs-table&gt;
-    &lt;div id="displaying"&gt;Showing {{userSearchIndexMin}} - {{userSearchIndexMax}} of {{users.length}} results&lt;/div&gt;
-  &lt;/div&gt;
+&nbsp;
+        &lt;/template&gt;
+&nbsp;
+        &lt;template slot-scope="{data}"&gt;
+          &lt;vs-tr :key="indextr" v-for="(tr, indextr) in data"&gt;
+&nbsp;
+&nbsp;
+            &lt;vs-td :data="data[indextr].firstName"&gt;{{data[indextr].firstName}}&lt;/vs-td&gt;
+&nbsp;
+            &lt;vs-td :data="data[indextr].firstName"&gt;{{data[indextr].lastName}}&lt;/vs-td&gt;
+&nbsp;
+            &lt;vs-td :data="data[indextr].city"&gt;{{`${data[indextr].city}`}}&lt;/vs-td&gt;
+&nbsp;
+            &lt;vs-td :data="data[indextr].country" v-if="mobileMode==false"&gt;{{`${data[indextr].country}`}}&lt;/vs-td&gt;
+&nbsp;
+            &lt;vs-td :data="data[indextr].email" v-if="mobileMode==false"&gt;{{data[indextr].email}}&lt;/vs-td&gt;
+&nbsp;
+            &lt;vs-td&gt;
+              &lt;div id="goToProfileButton" @click="goToProfile(data[indextr].id)"&gt;Go to profile&lt;/div&gt;
+            &lt;/vs-td&gt;
+&nbsp;
+            &lt;vs-td :data="data[indextr].role" v-if="isDGAA"&gt; {{data[indextr].role}} &lt;/vs-td&gt;
+&nbsp;
+            &lt;vs-td v-if="isDGAA" class="dgaaCheckbox"&gt;
+              &lt;input type="checkbox" @click="toggleAdmin(data[indextr])"&gt;
+            &lt;/vs-td&gt;
+&nbsp;
+&nbsp;
+          &lt;/vs-tr&gt;
+        &lt;/template&gt;
+      &lt;/vs-table&gt;
+      &lt;div id="displaying"&gt;Showing {{userSearchIndexMin}} - {{userSearchIndexMax}} of {{users.length}} results&lt;/div&gt;
+    &lt;/div&gt;
 &nbsp;
   &lt;/div&gt;
 &lt;/template&gt;
@@ -788,7 +796,7 @@ const Search = {
    * be filtered by the webpage.
    *
    * remove when test back end works well...
- */
+   */
   mounted() {
 <span class="missing-if-branch" title="if path not taken" >I</span>    if ( this.getUserRole() === 'DGAA') {
 <span class="cstat-no" title="statement not covered" >      this.isDGAA = true;</span>
@@ -798,8 +806,8 @@ const Search = {
 &nbsp;
   created() {
     window.addEventListener(
-      'resize',
-      this.setMobileMode
+        'resize',
+        this.setMobileMode
     )
 &nbsp;
   },
@@ -859,44 +867,46 @@ const Search = {
      * users based on the input in the search box.
      */
 <span class="fstat-no" title="function not covered" >    searchUsers: function () {</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >        api</span></span>
-            .searchQuery(this.searchbar)
-            .then((response) =&gt; {
-<span class="cstat-no" title="statement not covered" >              this.users = response.data;</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >              this.users = this.users.filter(x =&gt; typeof(x) == "object")</span></span>
+<span class="cstat-no" title="statement not covered" >      if (this.searchbar === "") return;</span>
 &nbsp;
-              //Need to set properties of user object so they can be sorted by
-<span class="cstat-no" title="statement not covered" >              for(let user of this.users) {</span>
-<span class="cstat-no" title="statement not covered" >                user.country = user.homeAddress.country;</span>
-<span class="cstat-no" title="statement not covered" >                user.city = user.homeAddress.city;</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      api</span></span>
+          .searchQuery(this.searchbar)
+          .then((response) =&gt; {
+<span class="cstat-no" title="statement not covered" >            this.users = response.data;</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >            this.users = this.users.filter(x =&gt; typeof(x) == "object")</span></span>
+&nbsp;
+            //Need to set properties of user object so they can be sorted by
+<span class="cstat-no" title="statement not covered" >            for(let user of this.users) {</span>
+<span class="cstat-no" title="statement not covered" >              user.country = user.homeAddress.country;</span>
+<span class="cstat-no" title="statement not covered" >              user.city = user.homeAddress.city;</span>
+            }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            if(this.users.length &lt; 10) {</span>
+<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMin = 1;</span>
+<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMax = this.users.length;</span>
+<span class="cstat-no" title="statement not covered" >              if(this.users.length == 0){</span>
+<span class="cstat-no" title="statement not covered" >                this.userSearchIndexMin = 0;</span>
               }
+            } else {
+<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMin = 1;</span>
+<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMax = 10;</span>
+            }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >              if(this.users.length &lt; 10) {</span>
-<span class="cstat-no" title="statement not covered" >                this.userSearchIndexMin = 1;</span>
-<span class="cstat-no" title="statement not covered" >                this.userSearchIndexMax = this.users.length;</span>
-<span class="cstat-no" title="statement not covered" >                if(this.users.length == 0){</span>
-<span class="cstat-no" title="statement not covered" >                  this.userSearchIndexMin = 0;</span>
-                }
-              } else {
-<span class="cstat-no" title="statement not covered" >                this.userSearchIndexMin = 1;</span>
-<span class="cstat-no" title="statement not covered" >                this.userSearchIndexMax = 10;</span>
-              }
+<span class="fstat-no" title="function not covered" >          })</span>
+          .catch((error) =&gt; {
+<span class="cstat-no" title="statement not covered" >            this.$log.debug(error);</span>
+<span class="cstat-no" title="statement not covered" >            this.error = "Failed to load users";</span>
+<span class="fstat-no" title="function not covered" >          }).finally(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        if(!this.tableLoaded){</span>
+<span class="cstat-no" title="statement not covered" >          document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing</span>
 &nbsp;
-<span class="fstat-no" title="function not covered" >            })</span>
-            .catch((error) =&gt; {
-<span class="cstat-no" title="statement not covered" >              this.$log.debug(error);</span>
-<span class="cstat-no" title="statement not covered" >              this.error = "Failed to load users";</span>
-<span class="fstat-no" title="function not covered" >            }).finally(() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >              if(!this.tableLoaded){</span>
-<span class="cstat-no" title="statement not covered" >                document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing</span>
+          //Event listeners for vuesax buttons on table since they're generated afterwards
+<span class="cstat-no" title="statement not covered" >          document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);</span>
+<span class="cstat-no" title="statement not covered" >          document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);</span>
 &nbsp;
-                //Event listeners for vuesax buttons on table since they're generated afterwards
-<span class="cstat-no" title="statement not covered" >                document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);</span>
-<span class="cstat-no" title="statement not covered" >                document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >                this.tableLoaded = true;</span>
-              }
-            })
+<span class="cstat-no" title="statement not covered" >          this.tableLoaded = true;</span>
+        }
+      })
     },
 &nbsp;
     /**
@@ -977,6 +987,7 @@ th {
 .main {
   background-color: white;
   top: 1px;
+  padding-bottom: 4em;
 }
 &nbsp;
 &nbsp;
@@ -993,23 +1004,24 @@ th {
   }
 &nbsp;
   th {
-  background: #3B5998;
-  color: white;
-  font-size: 10px
+    background: #3B5998;
+    color: white;
+    font-size: 10px
   }
 &nbsp;
 &nbsp;
 }
 &nbsp;
 &nbsp;
-&lt;/style&gt;</pre></td></tr></table></pre>
+&lt;/style&gt;
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed May 05 2021 00:35:27 GMT+1200 (New Zealand Standard Time)
+                at Wed May 05 2021 11:48:24 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

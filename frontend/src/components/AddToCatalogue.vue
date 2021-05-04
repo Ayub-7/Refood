@@ -122,18 +122,18 @@ const AddToCatalogue = {
               this.$log.debug("New catalogue item created:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
-          if (error.response) {
-            this.$log.error(error);
-            if (error.response.status === 400) {
-              this.$vs.notify({
-                title: 'Failed to create catalogue item',
-                text: 'Product ID is already in use',
-                color: 'danger'
-              });
-            }
-            this.$log.error(error.response.status);
-          }
-          this.$log.debug("Error Status:", error)
+              if (error.response) {
+                this.$log.error(error);
+                if (error.response.status === 400) {
+                  this.$vs.notify({
+                    title: 'Failed to create catalogue item',
+                    text: 'Product ID is already in use',
+                    color: 'danger'
+                  });
+                }
+                this.$log.error(error.response.status);
+              }
+              this.$log.error("Error Status: ", error)
         });
       }
     },
@@ -143,13 +143,13 @@ const AddToCatalogue = {
           .then((response) => {
             this.user = response.data;
             this.setCurrency(this.user.homeAddress.country);
-          }).catch((err) => {
-        if (err.response.status === 401) {
-          this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
-          this.$router.push({name: 'LoginPage'});
-        } else {
-          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
-        }
+          })
+          .catch((err) => {
+            if (err.response.status === 401) {
+              this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
+              this.$router.push({name: 'LoginPage'});
+            }
+            this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);
       });
     },
 
@@ -163,17 +163,20 @@ const AddToCatalogue = {
       });
     },
 
-
-
+    checkUserSession: function() {
+      api.checkSession()
+          .then((response) => {
+            this.getUserInfo(response.data.id);
+          })
+          .catch((error) => {
+            this.$log.error("Error checking sessions: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+          });
+    }
   },
+
   mounted: function () {
-    api.checkSession()
-        .then((response) => {
-          this.getUserInfo(response.data.id);
-        })
-        .catch(() => {
-          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});;
-        });
+    this.checkUserSession();
   }
 }
 

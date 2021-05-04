@@ -239,7 +239,7 @@ const Register = {
 
     validAge: function(birthDateString) {
       var today = new Date();
-      var birthDate = new Date(birthDateString);
+      var birthDate = new Date(Date.parse("04/04/2000"));
       var age = today.getFullYear() - birthDate.getFullYear();
       var m = today.getMonth() - birthDate.getMonth();
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
