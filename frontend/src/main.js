@@ -95,7 +95,7 @@ const routes = [
   {
     path: '*',
     name: 'catchAll',
-    component: Home
+    component: Register
  }
 
 ];
