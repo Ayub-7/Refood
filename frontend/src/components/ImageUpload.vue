@@ -81,6 +81,7 @@ const ImageUpload = {
                         }
                     }).finally(() => {
                         this.$vs.loading.close();
+                        location.reload();
                     })
             }
     }
