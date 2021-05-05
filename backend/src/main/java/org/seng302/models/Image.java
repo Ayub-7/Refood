@@ -18,11 +18,13 @@ public class Image {
 
     private String filename;
     private String thumbnailFilename;
+    private String name;
 
-    public Image(String id, String filename, String thumbnailFilename) {
+    public Image(String name, String id, String filename, String thumbnailFilename) {
         this.filename = filename;
         this.thumbnailFilename = thumbnailFilename;
         this.id = id;
+        this.name =name;
     }
 
     protected Image() {}

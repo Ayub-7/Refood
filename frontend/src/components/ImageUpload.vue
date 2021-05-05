@@ -56,7 +56,6 @@ const ImageUpload = {
      */
 
     uploadImage: function(e) {
-            console.log('yo')
             //Get image file from event
             //const image = e.target.files[0];
             
