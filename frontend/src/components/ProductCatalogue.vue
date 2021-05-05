@@ -138,12 +138,14 @@
                     <vs-td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </vs-td>
                     <td>{{ product.created }} </td>
                     <td>
+                      <!-- Effectively repeated above, should refactor at some point. -->
                       <vs-dropdown vs-trigger-click>
                         <vs-button>Actions</vs-button>
                         <vs-dropdown-menu>
-                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
-                            Modify product
-                          </vs-dropdown-item>
+<!--                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">-->
+<!--                            Modify product-->
+<!--                          </vs-dropdown-item>-->
+                          <vs-dropdown-item>Add Image</vs-dropdown-item>
 
                           <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
@@ -210,7 +212,7 @@ const Search = {
       enableTable: false,
       resultTrack: "",
       productSearchIndexMin: 0,
-      productSearchIndexMax: 3,
+      productSearchIndexMax: 10,
       business: null,
       businessId: null,
       displaytype: true,
@@ -229,35 +231,28 @@ const Search = {
  */
   mounted() {
     api.checkSession()
+      .then((response) => {
+        this.businessId = this.$route.params.id;
+        this.userId = response.data.id;
+        this.getUserInfo(this.userId);
+        this.getBusinessName();
+
+        api.getBusinessProducts(this.businessId)
             .then((response) => {
-              this.businessId = this.$route.params.id;
-              this.userId = response.data.id;
-              this.getUserInfo(this.userId);
-              this.getBusinessName();
-            }).catch((error) => {
+              this.$log.debug("Data loaded: ", response.data);
+              this.products = response.data;
+              this.filteredproducts = response.data;
+            })
+            .catch((error) => {
               this.$log.debug(error);
-            });
-
-    api.getBusinessProducts(this.businessId)
-        .then((response) => {
-          this.businessId = this.$route.params.id;
-          this.userId = response.data.id;
-          this.getUserInfo(this.userId);
-          this.getBusinessName();
-
-          api.getBusinessProducts(this.businessId)
-              .then((response) => {
-                this.$log.debug("Data loaded: ", response.data);
-                this.products = response.data;
-                this.filteredproducts = response.data;
-              })
-              .catch((error) => {
-                this.$log.debug(error);
-                this.error = "Failed to load products";
-              })
-              .finally(() => (this.loading = false));
-        }).catch(() => {
+              this.error = "Failed to load products";
+            })
+            .finally(() => (this.loading = false));
+      }).catch((error) => {
+        this.$log.error(error);
     });
+
+
   },
 
 

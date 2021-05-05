@@ -76,8 +76,8 @@ INSERT INTO business_admins (business_id, user_id) VALUES
     (4, 6),
     (5, 8),
     (2, 9),
-    (1, 8),
-    (1, 9);
+    (2, 1),
+    (3, 1);
 
 
 
