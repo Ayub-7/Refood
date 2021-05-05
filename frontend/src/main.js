@@ -92,11 +92,18 @@ const routes = [
         ]
   },
 
+  {
+    path: '*',
+    name: 'catchAll',
+    component: Register
+ }
+
 ];
 
 const router = new VueRouter({
   routes,
-  mode: 'history'
+
+  
 });
 
 /* eslint-disable no-new */
