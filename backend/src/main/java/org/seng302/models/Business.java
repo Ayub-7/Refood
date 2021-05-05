@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name") // Forces any nested business objects to only use name to prevent recursion.
 @JsonPropertyOrder({"id", "administrators", "name", "primaryAdministratorId"}) // force json property order to match api.
 public class Business {
+
+    public static final String BUSINESS_SESSION_ATTRIBUTE = "business";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

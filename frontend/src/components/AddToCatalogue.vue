@@ -143,13 +143,13 @@ const AddToCatalogue = {
           .then((response) => {
             this.user = response.data;
             this.setCurrency(this.user.homeAddress.country);
-          })
-          .catch((err) => {
-            if (err.response.status === 401) {
-              this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
-              this.$router.push({name: 'LoginPage'});
-            }
-            this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);
+          }).catch((err) => {
+        if (err.response.status === 401) {
+          this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
+          this.$router.push({name: 'LoginPage'});
+        } else {
+          this.$log.debug("Error Status:", error)
+        }
       });
     },
 
@@ -159,7 +159,7 @@ const AddToCatalogue = {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
           }).catch(err => {
-        this.$log.error("Error with getting cities from REST Countries." + err);
+        this.$log.debug("Error with getting cities from REST Countries." + err);
       });
     },
 
