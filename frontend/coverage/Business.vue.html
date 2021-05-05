@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">22.22% </span>
+                <span class="strong">21.74% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>4/18</span>
+                <span class='fraction'>5/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">22.22% </span>
+                <span class="strong">27.27% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/9</span>
+                <span class='fraction'>3/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">22.22% </span>
+                <span class="strong">21.74% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>4/18</span>
+                <span class='fraction'>5/23</span>
             </div>
         
             
@@ -352,7 +352,16 @@
 <a name='L293'></a><a href='#L293'>293</a>
 <a name='L294'></a><a href='#L294'>294</a>
 <a name='L295'></a><a href='#L295'>295</a>
-<a name='L296'></a><a href='#L296'>296</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -431,6 +440,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -441,13 +452,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -455,12 +479,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -724,38 +742,47 @@ const Business = {
 <span class="cstat-no" title="statement not covered" >            this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?</span>
 <span class="fstat-no" title="function not covered" >          })</span>
           .catch((error) =&gt; {
-<span class="cstat-no" title="statement not covered" >            if (error.response.status === 406) {</span>
-<span class="cstat-no" title="statement not covered" >              this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})</span>
+<span class="cstat-no" title="statement not covered" >            if (error) {</span>
+<span class="cstat-no" title="statement not covered" >              if (error.response.status === 406) {</span>
+<span class="cstat-no" title="statement not covered" >                this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})</span>
+              }
             }
-<span class="cstat-no" title="statement not covered" >            throw new Error(`ERROR trying to obtain business info from Id: ${error}`);</span>
-          })
+<span class="cstat-no" title="statement not covered" >            this.$log.error(`ERROR trying to obtain business info from Id: ${error}`);</span>
+          });
     },
 &nbsp;
 <span class="fstat-no" title="function not covered" >    getUserInfo: function (userId) {</span>
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      api.getUserFromID(userId)</span></span>
-          .then((response) =&gt; {
-<span class="cstat-no" title="statement not covered" >            this.user = response.data;</span>
-<span class="fstat-no" title="function not covered" >          }).catch((err) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (err.response.status === 401) {</span>
-<span class="cstat-no" title="statement not covered" >          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});</span>
-<span class="cstat-no" title="statement not covered" >          this.$router.push({name: 'LoginPage'});</span>
-        } else {
-<span class="cstat-no" title="statement not covered" >          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);</span>
-        }
-&nbsp;
+        .then((response) =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.user = response.data;</span>
+<span class="fstat-no" title="function not covered" >        })</span>
+        .catch((err) =&gt; {
+<span class="cstat-no" title="statement not covered" >          if (err) {</span>
+<span class="cstat-no" title="statement not covered" >            if (err.response.status === 401) {</span>
+<span class="cstat-no" title="statement not covered" >              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});</span>
+<span class="cstat-no" title="statement not covered" >              this.$router.push({name: 'LoginPage'});</span>
+            }
+          }
+<span class="cstat-no" title="statement not covered" >          this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);</span>
       });
     },
+&nbsp;
+    checkUserSession: function() {
+<span class="fstat-no" title="function not covered" >      api.checkSession()</span>
+        .then((response) =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.getUserInfo(response.data.id);</span>
+<span class="cstat-no" title="statement not covered" >          this.getBusiness();</span>
+<span class="fstat-no" title="function not covered" >        })</span>
+        .catch((error) =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});</span>
+<span class="cstat-no" title="statement not covered" >          this.$log.error("Error checking sessions: " + error);</span>
+        });
+    }
 &nbsp;
   },
 &nbsp;
   mounted() {
-<span class="fstat-no" title="function not covered" >    api.checkSession()</span>
-        .then((response) =&gt; {
-<span class="cstat-no" title="statement not covered" >          this.getUserInfo(response.data.id);</span>
-<span class="cstat-no" title="statement not covered" >          this.getBusiness();</span>
-        });
-    // Retrieve business info.
-&nbsp;
+    this.checkUserSession();
   }
 }
 &nbsp;
@@ -949,7 +976,7 @@ main {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed May 05 2021 12:02:44 GMT+1200 (New Zealand Standard Time)
+                at Wed May 05 2021 12:15:58 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
