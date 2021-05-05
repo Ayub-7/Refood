@@ -173,7 +173,7 @@ const AddToCatalogue = {
           this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
           this.$router.push({name: 'LoginPage'});
         } else {
-          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
+          this.$log.debug(err);
         }
       });
     },
@@ -184,7 +184,7 @@ const AddToCatalogue = {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
           }).catch(err => {
-        console.log("Error with getting cities from REST Countries." + err);
+        this.$log.debug(err);
       });
     },
     checkUserSession: function() {
@@ -193,16 +193,13 @@ const AddToCatalogue = {
             this.getUserInfo(response.data.id);
           })
           .catch((error) => {
-            this.$log.error("Error checking sessions: " + error);
+            this.$log.debug("Error checking sessions: " + error);
             this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
           });
     }
   },
   mounted: function () {
-    api.checkSession()
-        .then((response) => {
-          this.getUserInfo(response.data.id);
-        });
+    this.checkUserSession();
   }
 }
 
