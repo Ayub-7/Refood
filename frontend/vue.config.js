@@ -31,7 +31,7 @@ module.exports = {
   // see https://vuejs.org/v2/guide/installation.html#Runtime-Compiler-vs-Runtime-only
   runtimeCompiler: true,
   // because of nginx inner routing and http-server, must set public path to empty
-  publicPath: function() {
+  publicPath: (function() {
     if(process.env.NODE_ENV === 'production') {
       return "/prod/";
     } else if (process.env.NODE_ENV === 'staging') {
@@ -39,5 +39,5 @@ module.exports = {
     } else {
       return "";
     }
-  }
+  })()
 };
