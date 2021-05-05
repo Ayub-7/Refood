@@ -1,7 +1,7 @@
 <template>
   <div class="main" id="body">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="main1">
+    <form class="main1" :key="componentKey">
       <div class="profile-text-inner">
         <div style="display: flex; ">
           <h1 class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
@@ -19,25 +19,25 @@
 
           </div>
         </div>
-          <div style="display: flex; ">
-            <div style="display: flex;">
-              <h2 class="title" style="margin-top: 5px; margin-right: 5px">Sort By: </h2>
-              <select v-model="selected">
-                <option disabled value="">Please select one</option>
-                <option value="id">ID</option>
-                <option value="name">Product Name</option>
-                <option value="description">Description</option>
-                <option value="recommendedRetailPrice">Recommended Retail Price</option>
-                <option value="created">Date Created</option>
-              </select>
-              <button class='prevNextSearchButton' type='button' @click="sortByName(null, selected, 0);">Sort</button>
-            </div>
+        <div style="display: flex; ">
+          <div style="display: flex;">
+            <h2 class="title" style="margin-top: 5px; margin-right: 5px">Sort By: </h2>
+            <select v-model="selected">
+              <option disabled value="">Please select one</option>
+              <option @click="sortByName($event, 'id', 0);">ID</option>
+              <option @click="sortByName($event, 'name', 1);">Product Name</option>
+              <option @click="sortByName($event, 'description', 2);" >Description</option>
+              <option @click="sortByName($event, 'recommendedRetailPrice', 3);" >Recommended Retail Price</option>
+              <option @click="sortByName($event, 'created', 4);" >Date Created</option>
+            </select>
+
+            <ImageUpload :businessId=businessId :products=products style="margin-left: 10px; margin-top: 10px; font-size: 15px"/>
+          </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
           <tfoot style="margin-right: 0; margin-left: auto">
           <tr>
             <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
-
             <div  v-if="filteredproducts.length > 10">
               <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
               <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
@@ -52,45 +52,43 @@
             <div style="position:relative" class="grid-item sub-container" v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
                 v-bind:href="product.id"
                 :key="product.id">
-              <div style="position: relative">
-                <button  type="button" id="editButton" style="z-index: 2; position: absolute; right: 0px" @click="goToModify(); setProductToAlter(product.id)">
-                  <img src="../../public/edit.png" height="50" width="50" >
-                </button>
-                <div id="editTriangle" class="triangle-topright" style="position: absolute; right: 0px"/>
-                <img v-if="product.primaryImagePath" style="position: relative; width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
-                <span style="display: flex;">
-                  <ImageUpload :businessId=businessId :products=products style="z-index: 2;  font-size: 15px; margin-top: -31px"/>
-                </span>
+              <div>
+                <img v-if="product.primaryImagePath != null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="product.primaryImagePath == null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
-                <div style="margin-top: -10px; display: flex">
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
-                        {{pImage.fileName}}
-                      </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
-                        {{pImage.fileName}}
-                      </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                </div>
+              
                 <div style="display: flex;">
                   <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
                   <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
                 </div>
-                <p style="font-size: 20pt; font-weight: bold;  text-align: justify; margin-bottom: 20px;">{{ product.name }} </p>
+                <!-- Actions Dropdown -->
+                <vs-dropdown vs-trigger-click class="actionButton">
+                  <vs-button>Actions</vs-button>
+                  <vs-dropdown-menu>
+                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                      Modify product
+                    </vs-dropdown-item>
+
+                    <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-group>
+
+                    <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
+                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                        {{pImage.fileName}}
+                      </vs-dropdown-item>
+                    </vs-dropdown-group>
+
+                  </vs-dropdown-menu>
+                </vs-dropdown>
+
+                <p style="font-size: 20pt; font-weight: bold;  text-align: justify;">{{ product.name }} </p>
+                <p style="font-size: 14pt; text-align: justify; margin-bottom: 20px;">{{ product.manufacturer }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <div style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >
-                  <p> {{currencySymbol + " " +  Math.round(product.recommendedRetailPrice*currencyMultiplier*100)/100 }} </p>
-                </div>
+                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
             </div>
           </div>
@@ -98,98 +96,87 @@
 
 
         <div v-if="!displaytype">
-          <div>
             <!-- Separate search within results search bar. Rather than calling the database, this filters the table
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <table class="profile-text-inner" style="border-spacing: 0px 20px">
-              <tr>
+            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" search>
+                <template slot="thead" style="background:blue">
+                  <vs-th sort-key="id">
+                      <div>ID</div>
+                  </vs-th >
+                  <vs-th sort-key="name">
+                     <div>Product Name</div>
+                  </vs-th>
+                  <vs-th sort-key="description">
+                    <div>Description</div>
+                  </vs-th>
+                  <vs-th sort-key="manufacturer">
+                    <div>Manufacturer</div>
+                  </vs-th>
+                  <vs-th sort-key="recommendedRetailPrice">
+                    <div>Recommended Retail Price</div>
+                  </vs-th>
+                  <vs-th sort-key="created">
+                    <div>Date Created</div>
+                  </vs-th>
+                  <vs-th><!-- Actions Column --></vs-th>
+                </template>
 
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'id', 0);">
-                    ID <i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'name', 1);">
-                    Product Name <i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'description', 2);">
-                    Description<i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'recommendedRetailPrice', 3)">
-                    Recommended Retail Price<i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-                <th>
-                  <button type="button" class="row-md-2 headingButton" @click="sortByName($event, 'created', 4)">
-                    Date Created<i class="fa fa-angle-double-down" style="font-size:20px"/>
-                  </button>
-                </th>
-              </tr>
+                <template slot-scope="{data}">
+                  <vs-tr :key="product.id" v-for="product in data">
+                    <vs-td style="width: 20px; padding-right: 10px">
+                      <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
+                      <div>
+                        <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                      </div>
+                    </vs-td>
+                    <vs-td>{{ product.name }} </vs-td>
+                    <vs-td>{{ product.description }} </vs-td>
+                    <vs-td>{{ product.manufacturer }} </vs-td>
+                    <vs-td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice }} </vs-td>
+                    <td>{{ product.created }} </td>
+                    <td>
+                      <!-- Effectively repeated above, should refactor at some point. -->
+                      <vs-dropdown vs-trigger-click>
+                        <vs-button>Actions</vs-button>
+                        <vs-dropdown-menu>
+<!--                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">-->
+<!--                            Modify product-->
+<!--                          </vs-dropdown-item>-->
+                          <vs-dropdown-item>Add Image</vs-dropdown-item>
 
-              <tr v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
-                  v-bind:href="product.id"
-                  :key="product.id">
+                          <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
+                              <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
+                                {{pImage.fileName}}
+                              </vs-dropdown-item>
+                          </vs-dropdown-group>
 
-                <td style="width: 300px; padding-right: 10px">
-                  <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
-                  <div style="position: relative">
-                    <button  type="button" id="editButton" style="z-index: 2; position: absolute; right: 0px" @click="goToModify(); setProductToAlter(product.id)">
-                      <img src="../../public/edit.png" height="50" width="50" >
-                    </button>
-                    <div id="editTriangle" class="triangle-topright" style="position: absolute; right: 0px"/>
-                    <img v-if="product.primaryImagePath" style="position: relative; width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                    <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
-                    <span style="display: flex;">
-                  <ImageUpload :businessId=businessId :products=products style="z-index: 2;  font-size: 15px; margin-top: -31px"/>
-                </span>
-                  </div>
-                </td>
-                <td>{{ product.name }} </td>
-                <td>{{ product.description }} </td>
-                <td style="text-align: center">{{currencySymbol + " " + product.recommendedRetailPrice*currencyMultiplier }} </td>
-                <td>{{ product.created }} </td>
-                <td>
-                  <button type="button" id="modify" style="margin-bottom: 10px; margin-top: 10px;" @click="goToModify(); setProductToAlter(product.id)">Modify product</button>
-                </td>
-                <td>
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Change Default Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setDefaultImage(product, pImage);">
-                        {{pImage.fileName}}
-                      </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                </td>
-                <td>
-                  <vs-dropdown vs-custom-content vs-trigger-click>
-                    <vs-button>Delete Image<vs-icon class="" icon="expand_more"></vs-icon></vs-button>
-                    <vs-dropdown-menu>
-                      <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
-                        {{pImage.fileName}}
-                      </vs-dropdown-item>
-                    </vs-dropdown-menu>
-                  </vs-dropdown>
-                </td>
-              </tr>
+                          <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
+                              <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
+                                {{pImage.fileName}}
+                              </vs-dropdown-item>
+                          </vs-dropdown-group>
 
-              <!-- If search query returns more than 10 products then this should be active -->
-              <tfoot v-if="filteredproducts.length > 10">
-              <tr>
-                <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
-                <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
-                <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
-              </tr>
-              </tfoot>
-            </table>
-          </div>
+                        </vs-dropdown-menu>
+                      </vs-dropdown>
+                    </td>
+                  </vs-tr>
+
+                  <!-- If search query returns more than 10 products then this should be active -->
+                  <tfoot v-if="filteredproducts.length > 1">
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
+                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
+                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
+                  </tr>
+                  </tfoot>
+                </template>
+            </vs-table>
         </div>
       </div>
 
@@ -197,7 +184,6 @@
 
     <footer>
       "Product shoot" by Aameerule is licensed under CC BY 2.0
-      edit by Anconer Design from the Noun Project
     </footer>
   </div>
 </template>
@@ -208,7 +194,6 @@ import {store, mutations} from "@/store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
 import axios from "axios";
-
 const Search = {
   name: "Search",
 
@@ -219,7 +204,6 @@ const Search = {
     return {
       errors: [],
       toggle: [1,1,1,1,1],
-      userId: null,
       searchbar: "",
       searchbarResults: "",
       products: [],
@@ -235,44 +219,46 @@ const Search = {
       currencySymbol: "",
       currencyCode: "",
       selected: "",
-      currencyMultiplier: 1,
+      componentKey: 0,
     };
   },
 
   /**
    *
-   * api.getBusinessProducts() queries the back-end
+   * api.getBusinessProducts() queries the test back-end (json-server)
    * at /businesses/${businessId}/products which returns a JSON object list of test products which can
    * be filtered by the webpage.
-   *
-   * call to currency converter API (free.currencyconverterapi.com)
-   *
  */
   mounted() {
-    let userId = store.loggedInUserId;
-    this.getUserInfo(userId);
+    api.checkSession()
+      .then((response) => {
+        this.businessId = this.$route.params.id;
+        this.userId = response.data.id;
+        this.getUserInfo(this.userId);
+        this.getBusinessName();
+
+        api.getBusinessProducts(this.businessId)
+            .then((response) => {
+              this.$log.debug("Data loaded: ", response.data);
+              this.products = response.data;
+              this.filteredproducts = response.data;
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+              this.error = "Failed to load products";
+            })
+            .finally(() => (this.loading = false));
+      }).catch((error) => {
+        this.$log.error(error);
+    });
 
 
-    this.business = this.getBusinessName();
-    this.businessId = this.getBusinessID();
-    api.getBusinessProducts(this.businessId)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.products = response.data;
-          console.log(this.products)
-          this.filteredproducts = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load products";
-        })
-        .finally(() => (this.loading = false));
   },
 
 
-  methods: {
 
-    setDefaultImage(product, image) {
+  methods: {
+    setPrimaryImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
       console.log(this.businessId, this.productId, this.imageId);
@@ -292,13 +278,15 @@ const Search = {
           .then((response) => {
             console.log(response.data);
           }).catch((err) => {
-        throw new Error(`Error trying to get user info from id: ${err}`);
+            console.log(err);
       });
+      api.getBusinessProducts(this.businessId)
+      console.log(this.filteredproducts)
     },
 
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString()
+        return product.primaryImagePath.toString().replace("\\", "/")
       } else {
         return '../../public/ProductShoot.jpg'
       }
@@ -310,13 +298,10 @@ const Search = {
               this.user = response.data;
               this.setCurrency(this.user.homeAddress.country);
             }).catch((err) => {
-          if (err.response.status === 401) {
-            this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
-            this.$router.push({name: 'LoginPage'});
-          } else {
-            this.$router.push({path: "/login"}); //If user not logged in send to login page
-          }
+          throw new Error(`Error trying to get user info from id: ${err}`);
         });
+      } else {
+        this.$router.push({path: "/login"}); //If user not logged in send to login page
       }
     },
 
@@ -325,17 +310,6 @@ const Search = {
           .then( response => {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
-
-            var query = 'USD_' + this.currencyCode;
-            const url = "https://free.currconv.com/api/v7/convert?q="+query+"&compact=ultra&apiKey=a67b4ad2aba59aca187c"
-            axios
-                .get(url)
-                .then(response => {
-                  this.currencyMultiplier = response.data[query];
-                  console.log(this.currencyMultiplier)
-                }).catch( err => {
-              console.log("Error getting multiplier from REST Currencies." + err);
-            });
           }).catch( err => {
         console.log("Error with getting cities from REST Countries." + err);
       });
@@ -409,17 +383,11 @@ const Search = {
      * @param JSONField is the name of the field to sort by (as string)
      * @param index references the toggle state list in the data object (int)
      */
-    sortByName: function (event, JSONField ) {
-      console.log(event+JSONField)
-
-      const indexarray = ["id", "name", "description", "recommendedRetailPrice", "created"];
-
+    sortByName: function (event, JSONField, index) {
       //toggles the classlist (arrow up or down) in the child DOM element: <i/>
-      if(event) {
-        if(event.target.firstElementChild) {
-          event.target.firstElementChild.classList.toggle('fa-angle-double-down');
-          event.target.firstElementChild.classList.toggle('fa-angle-double-up');
-        }
+      if(event.target.firstElementChild) {
+        event.target.firstElementChild.classList.toggle('fa-angle-double-down');
+        event.target.firstElementChild.classList.toggle('fa-angle-double-up');
       }
 
       if (this.filteredproducts) {
@@ -457,18 +425,11 @@ const Search = {
           // a must be equal to b
           return 0;
         });
-
-        let index = indexarray.indexOf(JSONField);
-
-        console.log(index)
-
-        if (index > 0) {
-          if (this.toggle[index]) {
-            this.filteredproducts.reverse();
-            this.toggle[index]=0;
-          } else {
-            this.toggle[index]=1;
-          }
+        if (this.toggle[index]) {
+          this.filteredproducts.reverse();
+          this.toggle[index]=0;
+        } else {
+          this.toggle[index]=1;
         }
       }
     },
@@ -496,8 +457,9 @@ const Search = {
       //Stop value from going over range
       if(this.productSearchIndexMax < this.filteredproducts.length) {
         //console.log(this.productSearchIndexMax, this.filteredproducts.length, this.productSearchIndexMin)
-        this.productSearchIndexMin += 10;
-        this.productSearchIndexMax += 10;
+        let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
+        this.productSearchIndexMin += minMaxDiff;
+        this.productSearchIndexMax += minMaxDiff;
       }
     },
 
@@ -507,13 +469,15 @@ const Search = {
      */
     decreaseSearchRange: function () {
       //Stop value from reaching negative
-      if(this.productSearchIndexMin >= 10) {
-        this.productSearchIndexMin -= 10;
-        this.productSearchIndexMax -= 10;
+      if(this.productSearchIndexMin >= 1) {
+        let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
+        this.productSearchIndexMin -= minMaxDiff;
+        this.productSearchIndexMax -= minMaxDiff;
       }
     }
 
   },
+
   computed: {
     /**
      * Computes ranges to be displayed below table, max of range is switched
@@ -591,7 +555,7 @@ export default Search;
   padding-bottom: 10px;
   padding-top: 10px;
   font-family: 'Ubuntu', sans-serif;
-  margin-left: 10%;
+  margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
@@ -601,6 +565,7 @@ export default Search;
 
 .displaying {
   padding-top: 15px;
+  text-align: right;
 }
 
 
@@ -708,17 +673,13 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.triangle-topright {
-  z-index: 1;
-  width: 0;
-  height: 0;
-  border-top: 100px solid white;
-  border-left: 100px solid transparent;
+th {
+  background: #3B5998;
+  color: white;
 }
 
-#editButton:hover + #editTriangle {
-
-  border-top: 100px solid #2196F3;
+.actionButton {
+  text-align: left;
 }
 
 </style>

@@ -171,13 +171,14 @@ describe('Register error checking', () => {
         wrapper.vm.confirm_password = 'Potato123!';
         wrapper.vm.firstname = 'bob';
         wrapper.vm.lastname = 'steve';
-        wrapper.vm.dateofbirth = '15/09/145';
+        wrapper.vm.dateofbirth = '15/09/0145';
         wrapper.vm.country = 'New Zealand';
         wrapper.vm.email = 'thisisnotaemail.com'
         wrapper.vm.middlename = '';
         wrapper.vm.nickname = '';
         wrapper.vm.bio = '';
         wrapper.vm.phonenumber = '027254871';
+        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors).toStrictEqual(['thisisnotaemail.com'])
