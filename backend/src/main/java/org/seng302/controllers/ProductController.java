@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
@@ -22,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -191,7 +189,7 @@ public class ProductController {
      * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpServletRequest request, HttpSession session) throws Exception {
+    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws Exception {
         Business business = businessRepository.findBusinessById(businessId);
         if (business == null)  {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();

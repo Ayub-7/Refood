@@ -47,8 +47,8 @@ import ProductCatalogue from "@/components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
 
 import 'vuesax/dist/vuesax.css';
-import 'material-icons/iconfont/material-icons.css';
-//import ModifyCatalog from "@/components/ModifyCatalog"; // used with vuesax.
+import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
+//import ModifyCatalog from "@/components/ModifyCatalog";
 
 
 Vue.config.productionTip = false;

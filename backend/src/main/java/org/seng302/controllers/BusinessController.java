@@ -2,13 +2,11 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.coyote.Response;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.responses.BusinessIdResponse;
 import org.seng302.models.requests.NewBusinessRequest;
-import org.seng302.models.requests.NewProductRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -21,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 @RestController
 public class BusinessController {

@@ -14,7 +14,6 @@
   "dependencies": {
     "@vue/composition-api": "^1.0.0-rc.7",
     "axios": "^0.21.1",
-    "bp-vuejs-dropdown": "^2.1.1",
     "core-js": "^3.10.2",
     "lodash.sortby": "^4.7.0",
     "material-icons": "^0.6.1",
@@ -24,7 +23,6 @@
     "vue": "^2.6.12",
     "vue-currency-input": "^2.0.0-rc.4",
     "vue-router": "^3.5.1",
-    "vue-simple-alert": "^1.1.1",
     "vuejs-logger": "^1.5.5",
     "vuesax": "^3.12.2",
     "vuex": "^3.6.2",
