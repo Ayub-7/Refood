@@ -113,11 +113,13 @@ deploy-staging-frontend:
   script:
     - cd frontend
     - npm run build
+    - export NODE_ENV=staging
     - rm -rf /home/gitlab-runner/staging-frontend/ || true
     - mkdir /home/gitlab-runner/staging-frontend/
     - cp -r ./dist/ /home/gitlab-runner/staging-frontend
     - cp ../runner/staging-frontend.sh /home/gitlab-runner/staging-frontend.sh
     - chmod u+x /home/gitlab-runner/staging-frontend.sh
+    - unset NODE_ENV
     - sudo systemctl restart seng302-staging-frontend
   artifacts:
     paths:
