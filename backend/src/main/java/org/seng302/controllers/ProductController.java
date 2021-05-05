@@ -248,7 +248,11 @@ public class ProductController {
         Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
         if (product.getPrimaryImagePath() == null) {
-            product.setPrimaryImage("business_" + businessId + "\\" + id + imageExtension);
+            if (System.getProperty("os.name").startsWith("windows")) {
+                product.setPrimaryImage("business_" + businessId + "\\" + id + imageExtension);
+            } else {
+                product.setPrimaryImage("business_" + businessId + "/" + id + imageExtension);
+            }
         }
         productRepository.save(product);
 
@@ -300,7 +304,11 @@ public class ProductController {
                 break;
             }
         }
-        product.setPrimaryImage("business_" + businessId + "\\" + imageId + extension);
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            product.setPrimaryImage("business_" + businessId + "\\" + imageId + extension);
+        } else {
+            product.setPrimaryImage("business_" + businessId + "/" + imageId + extension);
+        }
         productRepository.save(product);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
