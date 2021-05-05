@@ -75,38 +75,47 @@ const Business = {
             this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
           })
           .catch((error) => {
-            if (error.response.status === 406) {
-              this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})
+            if (error) {
+              if (error.response.status === 406) {
+                this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})
+              }
             }
-            throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
-          })
+            this.$log.error(`ERROR trying to obtain business info from Id: ${error}`);
+          });
     },
 
     getUserInfo: function (userId) {
       api.getUserFromID(userId)
-          .then((response) => {
-            this.user = response.data;
-          }).catch((err) => {
-        if (err.response.status === 401) {
-          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-          this.$router.push({name: 'LoginPage'});
-        } else {
-          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
-        }
-
+        .then((response) => {
+          this.user = response.data;
+        })
+        .catch((err) => {
+          if (err) {
+            if (err.response.status === 401) {
+              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+              this.$router.push({name: 'LoginPage'});
+            }
+          }
+          this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);
       });
     },
+
+    checkUserSession: function() {
+      api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+          this.getBusiness();
+        })
+        .catch((error) => {
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+          this.$log.error("Error checking sessions: " + error);
+        });
+    }
 
   },
 
   mounted() {
-    api.checkSession()
-        .then((response) => {
-          this.getUserInfo(response.data.id);
-          this.getBusiness();
-        });
-    // Retrieve business info.
-
+    this.checkUserSession();
   }
 }
 
