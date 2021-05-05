@@ -75,7 +75,7 @@ public class ProductControllerTest {
 
         product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
         product2 = new Product("07-4957066", 1, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
-        image1 = new Image("0", "../../../resources/media.images/testlettuce.jpeg", "");
+        image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
 
         //Mocking body of PUT request
         productUpdate = new NewProductRequest("replace id", "replace name", "replace desc", "replace manufacturer", 2.2);
@@ -542,7 +542,7 @@ public class ProductControllerTest {
         //wrong business id
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
-        mvc.perform(put("/businesses/900/products/{productId}/images/{imageId}/makeprimary", product1.getId(), image1.getId())
+        mvc.perform(put("/businesses/1/products/{productId}/images/{imageId}/makeprimary", product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
 
@@ -569,6 +569,7 @@ public class ProductControllerTest {
         // Business owner
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        product1.addProductImage(image1);
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
