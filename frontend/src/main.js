@@ -73,7 +73,7 @@ const routes = [
   {path: '/login', component: Login},
   {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/login', component: Login},
-  {path: '/test', component: Register},
+  {path: 'test/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
   {path: '/search', component: Search},
@@ -102,6 +102,7 @@ const routes = [
 
 const router = new VueRouter({
   routes,
+  base: '/test/',
   mode: 'history'
 
   
