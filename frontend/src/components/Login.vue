@@ -171,7 +171,7 @@ form {
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: #3B5998;
+  background: #1F74FF;
   border: 0;
   padding: 10px 40px;
   font-size: 13px;

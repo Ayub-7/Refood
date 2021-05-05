@@ -254,7 +254,7 @@ export default Search;
 }
 
 #goToProfileButton {
-  background:#3B5998;
+  background:#1F74FF;
   text-align: center;
   color: white;
   border-radius: 1.5em;
@@ -279,7 +279,7 @@ tr {
 }
 
 th {
-  background: #3B5998;
+  background: #1F74FF;
   color: white;
 }
 
@@ -307,7 +307,7 @@ th {
   }
 
   th {
-    background: #3B5998;
+    background: #1F74FF;
     color: white;
     font-size: 10px
   }

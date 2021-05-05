@@ -88,7 +88,7 @@
                 <p style="font-size: 20pt; font-weight: bold;  text-align: justify;">{{ product.name }} </p>
                 <p style="font-size: 14pt; text-align: justify; margin-bottom: 20px;">{{ product.manufacturer }} </p>
                 <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #9c27b0; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
+                <p style="color: #1F74FF; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
             </div>
           </div>
@@ -507,7 +507,7 @@ export default Search;
 }
 
 .title {
-  color: #3B5998;
+  color: #1F74FF;
   font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
@@ -522,7 +522,7 @@ export default Search;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: #3B5998;
+  background: #1F74FF;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -534,7 +534,7 @@ export default Search;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
 #modify {
-  background: #3B5998;
+  background: #1F74FF;
   color: white;
   padding: 0.8em;
   border-radius: 20px;
@@ -549,7 +549,7 @@ export default Search;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: #3B5998;
+  background: #1F74FF;
   border: 0;
   padding-left: 40px;
   padding-right: 40px;
@@ -574,7 +574,7 @@ export default Search;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: #3B5998;
+  background: #1F74FF;
   border: 0;
   padding-left: 20px;
   padding-right: 20px;
@@ -675,7 +675,7 @@ input:checked + .slider:before {
 }
 
 th {
-  background: #3B5998;
+  background: #1F74FF;
   color: white;
 }
 

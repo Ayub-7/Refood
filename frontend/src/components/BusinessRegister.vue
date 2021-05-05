@@ -309,7 +309,7 @@ export default BusinessRegister;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: #3B5998;
+  background: #1F74FF;
   border: 0;
   padding: 10px 40px;
   font-family: 'Ubuntu', sans-serif;
@@ -339,7 +339,7 @@ export default BusinessRegister;
   text-align: center;
   font-weight: bold;
   font-size: 24px;
-  color: #3B5998;
+  color: #1F74FF;
 
   margin: 0;
   padding: 1em 0;
