@@ -99,7 +99,7 @@ export default ImageUpload
     }
 
     .button{
-        background: #3B5998;
+        background: #1F74FF;
         color: white;
         padding: 0.8em;
         border-radius: 20px;

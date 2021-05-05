@@ -384,7 +384,7 @@ Register button's styling
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: #3B5998;
+  background: #1F74FF;
   border: 0;
   padding: 10px 40px;
   margin: 2em;
@@ -399,7 +399,7 @@ Login button's styling
   cursor: pointer;
   border-radius: 2em;
   color: #fff;
-  background: #3B5998;
+  background: #1F74FF;
   border: 0;
   padding: 10px 40px;
   font-size: 13px;
@@ -438,7 +438,7 @@ Card header styling.
   text-align: center;
   font-weight: bold;
   font-size: 24px;
-  color: #3B5998;
+  color: #1F74FF;
 
   margin: 0;
   padding: 0.5em 0;
