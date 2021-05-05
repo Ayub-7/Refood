@@ -112,7 +112,9 @@ deploy-staging-frontend:
     policy: pull
   script:
     - cd frontend
+    - export NODE_ENV=staging
     - npm run build
+    - unset NODE_ENV
     - rm -rf /home/gitlab-runner/staging-frontend/ || true
     - mkdir /home/gitlab-runner/staging-frontend/
     - cp -r ./dist/ /home/gitlab-runner/staging-frontend
