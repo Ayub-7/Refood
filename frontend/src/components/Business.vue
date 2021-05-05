@@ -47,11 +47,6 @@
 
       </main>
     </div>
-    <!-- 406 Error: Business with given Id does not exist. -->
-    <div id="error" v-else>
-      <div id="error-header"> Error 406 </div>
-      <div id="error-description" style="font-size: 16px"> This business could not be found :( </div>
-    </div>
   </div>
 
 </template>
@@ -75,25 +70,52 @@ const Business = {
   methods: {
     getBusiness: function () {
       api.getBusinessFromId(this.$route.params.id)
-        .then((res) => {
-          this.business = res.data;
-          this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
+          .then((res) => {
+            this.business = res.data;
+            this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
+          })
+          .catch((error) => {
+            if (error) {
+              if (error.response.status === 406) {
+                this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})
+              }
+            }
+            this.$log.error(`ERROR trying to obtain business info from Id: ${error}`);
+          });
+    },
 
+    getUserInfo: function (userId) {
+      api.getUserFromID(userId)
+        .then((response) => {
+          this.user = response.data;
+        })
+        .catch((err) => {
+          if (err) {
+            if (err.response.status === 401) {
+              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+              this.$router.push({name: 'LoginPage'});
+            }
+          }
+          this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);
+      });
+    },
+
+    checkUserSession: function() {
+      api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+          this.getBusiness();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-            this.$router.push({name: 'LoginPage'});
-          }
-          throw new Error(`ERROR trying to obtain business info from Id: ${error}`);
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+          this.$log.error("Error checking sessions: " + error);
         });
-    },
+    }
 
   },
 
   mounted() {
-    // Retrieve business info.
-    this.getBusiness();
+    this.checkUserSession();
   }
 }
 

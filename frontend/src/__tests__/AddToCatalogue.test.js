@@ -51,6 +51,13 @@ beforeEach(() => {
         localVue,
     });
 
+    const checkSessionMethod = jest.spyOn(AddToCatalogue.methods, 'checkUserSession');
+    checkSessionMethod.mockImplementation(() => {
+        wrapper.vm.user = mockUser;
+        wrapper.vm.currencyCode = "NZD";
+        wrapper.vm.currencySymbol = "$"
+    });
+
     const getUserMethod = jest.spyOn(AddToCatalogue.methods, 'getUserInfo');
     getUserMethod.mockImplementation(() =>{
         wrapper.vm.user = mockUser;

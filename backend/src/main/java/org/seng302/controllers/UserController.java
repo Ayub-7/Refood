@@ -7,12 +7,15 @@ import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.Address;
+import org.seng302.models.Business;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -90,10 +93,6 @@ public class UserController {
             if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
                 UserIdResponse userIdResponse = new UserIdResponse(existingUser);
                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
-//             if (loginRequest.getPassword().equals(existingUser.getPassword())) {
-//                 UserIdResponse userIdResponse = new UserIdResponse(existingUser);
-//                 session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
-
                 Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -262,5 +261,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
+
+
 
 }

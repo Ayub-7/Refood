@@ -1,73 +1,73 @@
 <template>
   <div class="main" id="body">
-  <div id="search">
+    <div id="search">
 
-    <input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar">
-    <vs-button id="submitSearch" type="border" @click="searchUsers">Search</vs-button>
-  </div>
-
-
-  <div v-if="users.length" id="userTable">
-    <vs-table :data="this.users" pagination max-items="10">
-      <template slot="thead" id="tableHeader">
-
-        <vs-th sort-key="firstName">
-          First name
-        </vs-th>
-        <vs-th sort-key="lastName">
-          Last name
-        </vs-th>
-        <vs-th sort-key="city">
-          City
-        </vs-th>
-        <vs-th sort-key="country" v-if="mobileMode==false">
-          Country
-        </vs-th>
-        <vs-th sort-key="email" v-if="mobileMode==false">
-          Email
-        </vs-th>
-
-        <!-- Extra header for go to profile button -->
-        <vs-th>
-        </vs-th>
-
-        <vs-th v-if="isDGAA">Is Admin</vs-th>
-        <vs-th class="dgaaCheckbox" v-if="isDGAA">Toggle Admin</vs-th>
+      <input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar">
+      <vs-button id="submitSearch" type="border" @click="searchUsers">Search</vs-button>
+    </div>
 
 
+    <div v-if="users.length" id="userTable">
+      <vs-table :data="this.users" pagination max-items="10">
+        <template slot="thead" id="tableHeader">
 
-      </template>
+          <vs-th sort-key="firstName">
+            First name
+          </vs-th>
+          <vs-th sort-key="lastName">
+            Last name
+          </vs-th>
+          <vs-th sort-key="city">
+            City
+          </vs-th>
+          <vs-th sort-key="country" v-if="mobileMode==false">
+            Country
+          </vs-th>
+          <vs-th sort-key="email" v-if="mobileMode==false">
+            Email
+          </vs-th>
 
-      <template slot-scope="{data}">
-        <vs-tr :key="indextr" v-for="(tr, indextr) in data">
+          <!-- Extra header for go to profile button -->
+          <vs-th>
+          </vs-th>
 
-
-          <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
-
-          <vs-td :data="data[indextr].firstName">{{data[indextr].lastName}}</vs-td>
-
-          <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
-
-          <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].country}`}}</vs-td>
-
-          <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
-
-          <vs-td>
-            <div id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</div>
-          </vs-td>
-
-          <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
-
-          <vs-td v-if="isDGAA" class="dgaaCheckbox">
-            <input type="checkbox" @click="toggleAdmin(data[indextr])">
-          </vs-td>
+          <vs-th v-if="isDGAA">Is Admin</vs-th>
+          <vs-th class="dgaaCheckbox" v-if="isDGAA">Toggle Admin</vs-th>
 
 
-        </vs-tr>
-      </template>
-    </vs-table>
-    <div id="displaying">Showing {{userSearchIndexMin}} - {{userSearchIndexMax}} of {{users.length}} results</div>
-  </div>
+
+        </template>
+
+        <template slot-scope="{data}">
+          <vs-tr :key="indextr" v-for="(tr, indextr) in data">
+
+
+            <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
+
+            <vs-td :data="data[indextr].firstName">{{data[indextr].lastName}}</vs-td>
+
+            <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
+
+            <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].country}`}}</vs-td>
+
+            <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
+
+            <vs-td>
+              <div id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</div>
+            </vs-td>
+
+            <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
+
+            <vs-td v-if="isDGAA" class="dgaaCheckbox">
+              <input type="checkbox" @click="toggleAdmin(data[indextr])">
+            </vs-td>
+
+
+          </vs-tr>
+        </template>
+      </vs-table>
+      <div id="displaying">Showing {{userSearchIndexMin}} - {{userSearchIndexMax}} of {{users.length}} results</div>
+    </div>
 
   </div>
 </template>
@@ -99,7 +99,7 @@ const Search = {
    * be filtered by the webpage.
    *
    * remove when test back end works well...
- */
+   */
   mounted() {
     if ( this.getUserRole() === 'DGAA') {
       this.isDGAA = true;
@@ -109,8 +109,8 @@ const Search = {
 
   created() {
     window.addEventListener(
-      'resize',
-      this.setMobileMode
+        'resize',
+        this.setMobileMode
     )
 
   },
@@ -170,44 +170,46 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-        api
-            .searchQuery(this.searchbar)
-            .then((response) => {
-              this.users = response.data;
-              this.users = this.users.filter(x => typeof(x) == "object")
+      if (this.searchbar === "") return;
 
-              //Need to set properties of user object so they can be sorted by
-              for(let user of this.users) {
-                user.country = user.homeAddress.country;
-                user.city = user.homeAddress.city;
+      api
+          .searchQuery(this.searchbar)
+          .then((response) => {
+            this.users = response.data;
+            this.users = this.users.filter(x => typeof(x) == "object")
+
+            //Need to set properties of user object so they can be sorted by
+            for(let user of this.users) {
+              user.country = user.homeAddress.country;
+              user.city = user.homeAddress.city;
+            }
+
+            if(this.users.length < 10) {
+              this.userSearchIndexMin = 1;
+              this.userSearchIndexMax = this.users.length;
+              if(this.users.length == 0){
+                this.userSearchIndexMin = 0;
               }
+            } else {
+              this.userSearchIndexMin = 1;
+              this.userSearchIndexMax = 10;
+            }
 
-              if(this.users.length < 10) {
-                this.userSearchIndexMin = 1;
-                this.userSearchIndexMax = this.users.length;
-                if(this.users.length == 0){
-                  this.userSearchIndexMin = 0;
-                }
-              } else {
-                this.userSearchIndexMin = 1;
-                this.userSearchIndexMax = 10;
-              }
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to load users";
+          }).finally(() => {
+        if(!this.tableLoaded){
+          document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-              this.error = "Failed to load users";
-            }).finally(() => {
-              if(!this.tableLoaded){
-                document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+          //Event listeners for vuesax buttons on table since they're generated afterwards
+          document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
+          document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
 
-                //Event listeners for vuesax buttons on table since they're generated afterwards
-                document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
-                document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
-
-                this.tableLoaded = true;
-              }
-            })
+          this.tableLoaded = true;
+        }
+      })
     },
 
     /**
@@ -288,6 +290,7 @@ th {
 .main {
   background-color: white;
   top: 1px;
+  padding-bottom: 4em;
 }
 
 
@@ -304,9 +307,9 @@ th {
   }
 
   th {
-  background: #3B5998;
-  color: white;
-  font-size: 10px
+    background: #3B5998;
+    color: white;
+    font-size: 10px
   }
 
 

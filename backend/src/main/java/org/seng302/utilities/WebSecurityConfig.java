@@ -30,7 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                  .authorizeRequests()
                  .antMatchers("/checksession").permitAll()
-                 .antMatchers(HttpMethod.POST, "/login", "/users", "/logout").permitAll()
+                 .antMatchers(HttpMethod.POST, "/login", "/users", "/logout", "/actasbusiness").permitAll()
                  .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                  .antMatchers(HttpMethod.GET, "/users/**").authenticated()
                  .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "/users/{id}/revokeAdmin").hasRole("DGAA")

@@ -59,14 +59,29 @@ const $route = {
     }
 };
 
+const $vs = {
+    notify: jest.fn(),
+};
+
 beforeEach(() => {
     wrapper = shallowMount(Business, {
         propsData: {},
-        mocks: {$route},
+        mocks: {$route, $vs},
         stubs: ['router-link', 'router-view'],
         methods: {},
     });
-    wrapper.setData({business: mockBusiness})
+    wrapper.setData({business: mockBusiness});
+
+    const checkSessionMethod = jest.spyOn(Business.methods, 'checkUserSession');
+    checkSessionMethod.mockImplementation(() => {
+        wrapper.vm.user = mockAdmin;
+        wrapper.vm.business = mockBusiness;
+        wrapper.vm.adminList = mockBusiness.administrators;
+
+    });
+
+    const getUserMethod = jest.spyOn(Business.methods, 'getUserInfo');
+    getUserMethod.mockResolvedValue(mockAdmin);
 });
 
 afterEach(() => {

@@ -1,4 +1,4 @@
-import { mount, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Homepage from '../components/Homepage.vue';
 
 let wrapper;
@@ -66,6 +66,14 @@ beforeEach(() => {
             }
         }
     });
+
+    const checkSessionMethod = jest.spyOn(Homepage.methods, 'checkUserSession');
+    checkSessionMethod.mockImplementation(() => {
+        wrapper.vm.user = mockUser;
+        wrapper.vm.currencyCode = "NZD";
+        wrapper.vm.currencySymbol = "$"
+    });
+
 
     const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
     getUserMethod.mockResolvedValue(mockUser);

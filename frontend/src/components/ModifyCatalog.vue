@@ -177,8 +177,8 @@ const ModifyCatalog = {
         .then((response) => {
           this.getUserInfo(response.data.id);
         }).catch((error) => {
-         this.$log.error("Error checking session: " + error);
-       });
+      this.$log.error("Error checking session: " + error);
+    });
   }
 }
 export default ModifyCatalog;
