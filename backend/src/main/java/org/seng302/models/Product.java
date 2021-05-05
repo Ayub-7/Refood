@@ -81,21 +81,30 @@ public class Product {
         this.primaryImagePath = path;
     }
 
-    public void deleteProductImage(String filePath, String primaryPath) {
+    public void deleteProductImage(String imageId) {
+        Image removeImage = null;
+        System.out.println(this.images);
         for (Image image: this.images) {
-            if (image.getFileName() == filePath) {
+            if (image.getId().equals(imageId)) {
                 this.images.remove(image);
+                removeImage = image;
+                break;
             }
         }
-        if (primaryPath == this.primaryImagePath) {
+        String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("business_"));
+        if (primaryPath.equals(this.primaryImagePath)) {
             if (this.images.size() > 0) {
                 Image primary = this.images.get(0);
                 String primaryFilename = primary.getFileName();
-                primaryFilename.replace("./src/main/resources/media/images/businesses/", "");
-                this.setPrimaryImage(primaryFilename);
+                int sliceIndex = primaryFilename.indexOf("business_");
+                String primaryFile = primaryFilename.substring(sliceIndex);
+                this.setPrimaryImage(primaryFile);
+                System.out.println(primaryFile);
             } else {
                 this.primaryImagePath = null;
             }
         }
+        System.out.println(primaryPath);
+        System.out.println(this.primaryImagePath);
     }
 }

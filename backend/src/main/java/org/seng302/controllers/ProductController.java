@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
@@ -22,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -191,7 +189,7 @@ public class ProductController {
      * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpServletRequest request, HttpSession session) throws Exception {
+    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws Exception {
         Business business = businessRepository.findBusinessById(businessId);
         if (business == null)  {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
@@ -247,11 +245,10 @@ public class ProductController {
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
 
         // Save into DB.
-        Image newImage = new Image(file.toString(), thumbnailFile.toString());
+        Image newImage = new Image(imageName, file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
         if (product.getPrimaryImagePath() == null) {
-            System.out.println(imageName);
-            product.setPrimaryImage("business_" + businessId + "/" + imageName + imageExtension);
+            product.setPrimaryImage("business_" + businessId + "\\" + imageName + imageExtension);
         }
         productRepository.save(product);
 
@@ -267,7 +264,7 @@ public class ProductController {
      */
     @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
     public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) throws IOException {
-        String imageDir = System.getProperty("user.dir") + "/src/test/resources/media/images/business_" + businessId + "/" + imageId;
+        String imageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/business_" + businessId + "/" + imageId;
         String idString = "";
         Business business = businessRepository.findBusinessById(businessId);
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
@@ -311,61 +308,64 @@ public class ProductController {
          * @throws IOException
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
-        public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable long imageId, HttpSession session, HttpServletRequest request) throws Exception {
-            String rootImageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/";
-            String imageExtension = "";
-            Business business = businessRepository.findBusinessById(businessId);
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            //checks if user us logged in and authorized
-            if (auth.getPrincipal() == "anonymousUser") {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            //checks if user is forbidden
-            User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-            if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-
-            //checks if business exists
-            if (business == null)  {
-                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-            }
-            //checks if product exists
-            Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
-            if (product == null) {
-                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-            }
-
-            //finds correct image path
-            boolean freeImage = false;
-            String imageDir = rootImageDir + "business_" + businessId + "/" + imageId;
-            boolean pathExists = false;
-            List<String> extensions = new ArrayList<>();
-            extensions.add(".png");
-            extensions.add(".jpg");
-            extensions.add(".gif");
-            for (String ext: extensions) {
-                Path path = Paths.get(imageDir + ext);
-                if (Files.exists(path)) {
-                    pathExists = true;
-                    imageExtension = ext;
-                    break;
-                }
-            }
-            File businessDir = new File(rootImageDir + "business_" + businessId);
-            File checkFile = new File(businessDir + "/" + imageId + imageExtension);
-            if (pathExists == true) {
-                product.deleteProductImage(rootImageDir + "business_" + businessId + "/" + imageId + imageExtension, "business_" + businessId + "/" + imageId + imageExtension);
-                checkFile.delete();
-                System.out.println("File "
-                + checkFile.toString()
-                + " successfully removed");
-                    freeImage = true;
-
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
-            }
-
-            return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session, HttpServletRequest request) throws Exception {
+        String rootImageDir2 = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/";
+        String imageExtension = "";
+        Business business = businessRepository.findBusinessById(businessId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //checks if user us logged in and authorized
+        if (auth.getPrincipal() == "anonymousUser") {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        //checks if user is forbidden
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        //checks if business exists
+        if (business == null)  {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        //checks if product exists
+        Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        //finds correct image path
+        boolean freeImage = false;
+        String imageDir = rootImageDir2 + "business_" + businessId + "/" + imageId;
+        boolean pathExists = false;
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext: extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                pathExists = true;
+                imageExtension = ext;
+                break;
+            }
+        }
+        File businessDir = new File(rootImageDir2 + "business_" + businessId);
+        File checkFile = new File(businessDir + "/" + imageId + imageExtension);
+        File thumbnailFile = new File(businessDir + "/" + imageId + "_thumbnail" + imageExtension);
+        if (pathExists == true) {
+            product.deleteProductImage(imageId);
+            productRepository.save(product);
+            checkFile.delete();
+            thumbnailFile.delete();
+            System.out.println("File "
+            + checkFile.toString()
+            + " successfully removed");
+                freeImage = true;
+
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

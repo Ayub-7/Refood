@@ -84,7 +84,8 @@ const ModifyCatalog = {
       manufacturer: "",
       currencySymbol: "",
       currencyCode: "",
-      rrp: ""
+      rrp: "",
+      currencyMultiplier: 1,
     };
   },
   methods: {
@@ -148,7 +149,9 @@ const ModifyCatalog = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length === 0){
-        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.manufacturer, this.rrp)
+        var RRPUSD = this.convertRRPtoUSD(this.rrp);
+
+        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.manufacturer, RRPUSD)
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
@@ -188,6 +191,17 @@ const ModifyCatalog = {
           .then( response => {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
+
+            var query = this.currencyCode + '_USD';
+            const url = "https://free.currconv.com/api/v7/convert?q="+query+"&compact=ultra&apiKey=a67b4ad2aba59aca187c"
+            axios
+                .get(url)
+                .then(response => {
+                  this.currencyMultiplier = response.data[query];
+                }).catch( err => {
+              this.$log.error("Error with getting multiplier from REST Currencies." + err);
+
+            });
           }).catch( err => {
         console.log("Error with getting cities from REST Countries." + err);
       });
@@ -203,6 +217,14 @@ const ModifyCatalog = {
           });
     }
   },
+    convertRRPtoUSD: function (rrp) {
+      console.log(this.currencyMultiplier*rrp + " " + this.currencyMultiplier);
+
+      return this.currencyMultiplier*rrp;
+    }
+  },
+
+
   mounted: function () {
     this.checkUserSession();
   }

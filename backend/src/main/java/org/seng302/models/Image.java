@@ -4,8 +4,6 @@ import lombok.Data;
 import org.seng302.exceptions.InvalidImageExtensionException;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -16,15 +14,15 @@ import javax.persistence.Id;
 public class Image {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
     private String filename;
     private String thumbnailFilename;
 
-    public Image(String filename, String thumbnailFilename) {
+    public Image(String id, String filename, String thumbnailFilename) {
         this.filename = filename;
         this.thumbnailFilename = thumbnailFilename;
+        this.id = id;
     }
 
     protected Image() {}
@@ -47,7 +45,7 @@ public class Image {
         throw new InvalidImageExtensionException("Unsupported extension type.");
     }
 
-    public long getId() {
+    public String getId() {
         return this.id;
     }
 

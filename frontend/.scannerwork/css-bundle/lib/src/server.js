@@ -5,6 +5,7 @@ const express = require("express");
 const stylelint = require("stylelint");
 const fs = require("fs");
 const bodyParser = require("body-parser");
+
 // for testing purposes
 let log = console.log;
 let logError = console.error;
