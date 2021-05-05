@@ -102,6 +102,7 @@ const routes = [
 
 const router = new VueRouter({
   routes,
+  base: '/test/',
   mode: 'history'
 
   
