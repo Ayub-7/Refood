@@ -75,7 +75,10 @@ INSERT INTO business_admins (business_id, user_id) VALUES
     (5, 9),
     (4, 6),
     (5, 8),
-    (2, 9);
+    (2, 9),
+    (1, 8),
+    (1, 9);
+
 
 
 INSERT INTO product (id, name, description, manufacturer, recommended_retail_price, created, business_id) VALUES
