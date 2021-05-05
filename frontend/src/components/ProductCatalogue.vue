@@ -148,13 +148,13 @@
 
                           <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
-                                {{pImage.id}}
+                                {{pImage.name}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
 
                           <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
-                                {{pImage.id}}
+                                {{pImage.name}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
 
@@ -252,35 +252,30 @@ const Search = {
     });
   },
 
-
-
   methods: {
 
     setPrimaryImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
-      console.log(this.businessId, this.productId, this.imageId);
       api.setPrimaryImage(this.businessId, this.productId, this.imageId)
-          .then((response) => {
-            console.log(response.data);
-            this.$vs.notify({title:"Product image updated.", text:"New primary image successfully set.", color:"success"});
+          .then(() => {
+            location.reload();
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`);
       });
-      location.reload();
+      this.$vs.notify({title:"Product image updated.", text:"New primary image successfully set.", color:"success"});
     },
 
     deleteImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
-      console.log(this.businessId, this.productId, this.imageId);
       api.deletePrimaryImage(this.businessId, this.productId, this.imageId)
-          .then((response) => {
-            console.log(response.data);
+          .then(() => {
+            location.reload();
+            this.$vs.notify({title:"Product image deleted.", text:"Image successfully deleted.", color:"success"});
           }).catch((err) => {
             console.log(err);
       });
-      location.reload();
     },
 
     getImgUrl(product) {
@@ -341,11 +336,9 @@ const Search = {
       if (this.searchbar.length > 0) {
         this.enableTable = true;
         this.resultTrack = this.searchbar;
-        console.log(this.searchbar);
         api
             .searchQuery(this.searchbar)
             .then((response) => {
-              console.log(response.data);
               this.$log.debug("Data loaded: ", response.data);
               this.products = response.data;
               this.filteredproducts = response.data;
@@ -370,7 +363,6 @@ const Search = {
         //currentproduct.id = true;
         api.makeproductAdmin(currentproduct.id);
         currentproduct.role = 'GAA'
-        //console.log("admin true"+currentproduct.id+currentproduct.firstName)
       } else if (currentproduct.role == 'GAA') {
         api.revokeproductAdmin(currentproduct.id);
         currentproduct.role = 'product'
