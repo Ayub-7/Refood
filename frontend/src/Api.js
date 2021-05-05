@@ -52,6 +52,8 @@ export default {
 
     checkSession: () => instance.get('checksession', {withCredentials: true}),
 
+    checkBusinessSession: () => instance.get('checkbusinesssession', {withCredentials: true}),
+
   // user POST create new user account data
     /**
      * Create a new user by storing their data to the database
@@ -128,6 +130,12 @@ export default {
     createBusiness: async(name, description, address, businessType) =>
     instance.post('businesses', {name, description, address, businessType}, {withCredentials: true}),
 
+    /**
+     * Retrieve a single business with their unique id.
+     * @param businessId the unique id of the business.
+     */
+    actAsBusiness: async(businessId) =>
+        instance.post('actasbusiness',{businessId}, {withCredentials: true}),
 
     /**
      * Retrieve a single business with their unique id.

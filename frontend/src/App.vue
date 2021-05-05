@@ -147,6 +147,16 @@ const app = {
   beforeMount() {
     api.checkSession()
     .then((response) => {
+      if(response.data.id != null){
+        api.checkBusinessSession()
+        .then((busResponse) => {
+            if(busResponse.status == 200){
+              mutations.setActingAsBusiness(busResponse.data.id, busResponse.data.name);
+            } else {
+              mutations.setActingAsUser();
+            }
+        });
+      }
       mutations.setUserLoggedIn(response.data.id, response.data.role);
       mutations.setUserBusinesses(response.data.businessesAdministered);
       mutations.setUserName(response.data.firstName + " " + response.data.lastName);

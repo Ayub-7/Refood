@@ -36,6 +36,7 @@
 
 <script>
 import {store, mutations} from "../store";
+import api from "../Api";
 
 const actingAs =  {
   name: "actingAs",
@@ -67,15 +68,34 @@ const actingAs =  {
     },
 
     setActingAsBusinessId(businessId, businessName){
-      mutations.setActingAsBusiness(businessId, businessName)
-      this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+      api.actAsBusiness(businessId)
+          .then(() => {
+            mutations.setActingAsBusiness(businessId, businessName)
+            this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+          }).catch((error) => {
+        if(error.response) {
+          console.log(error.response.status);
+          console.log(error.response.message);
+        }
+        this.$log.debug("Error Status:", error)
+      });
+
       // Prominent vue-router contributor suggests to catch error and do nothing with it.
       // @see https://github.com/vuejs/vue-router/issues/2872
     },
 
     setActingAsUser(){
-      mutations.setActingAsUser();
-      this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+      api.actAsBusiness(0)
+          .then(() => {
+            mutations.setActingAsUser();
+            this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+          }).catch((error) => {
+        if(error.response) {
+          console.log(error.response.status);
+          console.log(error.response.message);
+        }
+        this.$log.debug("Error Status:", error)
+      });
     },
 
     getActingAsBusinessName() {
