@@ -215,16 +215,13 @@ const ModifyCatalog = {
             this.$log.error("Error checking sessions: " + error);
             this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
           });
-    }
-  },
+    },
     convertRRPtoUSD: function (rrp) {
       console.log(this.currencyMultiplier*rrp + " " + this.currencyMultiplier);
 
       return this.currencyMultiplier*rrp;
     }
   },
-
-
   mounted: function () {
     this.checkUserSession();
   }
