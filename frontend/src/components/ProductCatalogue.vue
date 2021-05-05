@@ -72,13 +72,13 @@
 
                     <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                       <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
-                        {{pImage.fileName}}
+                        {{pImage.name}}
                       </vs-dropdown-item>
                     </vs-dropdown-group>
 
                     <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
                       <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
-                        {{pImage.fileName}}
+                        {{pImage.name}}
                       </vs-dropdown-item>
                     </vs-dropdown-group>
 
@@ -149,13 +149,13 @@
 
                           <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
-                                {{pImage.fileName}}
+                                {{pImage.id}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
 
                           <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
-                                {{pImage.fileName}}
+                                {{pImage.id}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
 

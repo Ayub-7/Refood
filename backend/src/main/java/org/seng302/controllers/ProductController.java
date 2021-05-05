@@ -224,15 +224,15 @@ public class ProductController {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
 
-        String imageName = "";
+        String id = "";
         boolean freeImage = false;
         int count = 0;
 
         while (!freeImage) {
-            imageName = String.valueOf(count);
-            File checkFile1 = new File(businessDir + "/" + imageName + ".jpg");
-            File checkFile2 = new File(businessDir + "/" + imageName + ".png");
-            File checkFile3 = new File(businessDir + "/" + imageName + ".gif");
+            id = String.valueOf(count);
+            File checkFile1 = new File(businessDir + "/" + id + ".jpg");
+            File checkFile2 = new File(businessDir + "/" + id + ".png");
+            File checkFile3 = new File(businessDir + "/" + id + ".gif");
             if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
                 count++;
             }
@@ -241,16 +241,16 @@ public class ProductController {
             }
         }
 
-        File file = new File(businessDir + "/" + imageName + imageExtension);
-        File thumbnailFile = new File(businessDir + "/" + imageName + "_thumbnail" + imageExtension);
+        File file = new File(businessDir + "/" + id + imageExtension);
+        File thumbnailFile = new File(businessDir + "/" + id + "_thumbnail" + imageExtension);
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
-
+        String imageName = image.getOriginalFilename();
         // Save into DB.
-        Image newImage = new Image(imageName, file.toString(), thumbnailFile.toString());
+        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
         if (product.getPrimaryImagePath() == null) {
-            product.setPrimaryImage("business_" + businessId + "\\" + imageName + imageExtension);
+            product.setPrimaryImage("business_" + businessId + "\\" + id + imageExtension);
         }
         productRepository.save(product);
 
@@ -266,19 +266,23 @@ public class ProductController {
      */
     @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
     public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) throws IOException {
-        String imageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/business_" + businessId + "/" + imageId;
-        String idString = "";
         Business business = businessRepository.findBusinessById(businessId);
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
-        if (product == null || business == null) {
+        Boolean validImage = false;
+
+        for (Image image: product.getImages()) {
+            if (imageId.equals(image.getId())) {
+                validImage = true;
+            }
+        }
+        if (product == null || business == null || validImage == false) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        boolean pathExists = false;
+        String imageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/" + "/business_" + businessId + "/" + imageId;
         String extension = "";
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
@@ -288,16 +292,12 @@ public class ProductController {
             Path path = Paths.get(imageDir + ext);
             System.out.println(path.toString());
             if (Files.exists(path)) {
-                idString = imageId + ext;
                 extension = ext;
-                pathExists = true;
                 break;
             }
         }
-        if (!pathExists) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        product.setPrimaryImage("business_" + businessId + "/" + idString);
+        product.setPrimaryImage("business_" + businessId + "\\" + imageId + extension);
+        productRepository.save(product);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

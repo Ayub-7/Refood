@@ -93,19 +93,16 @@ public class Product {
             }
         }
         String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("business_"));
-        if (primaryPath.equals(this.primaryImagePath)) {
+        if (primaryPath.equals(this.primaryImagePath.replace("/", "\\"))) {
             if (this.images.size() > 0) {
                 Image primary = this.images.get(0);
                 String primaryFilename = primary.getFileName();
                 int sliceIndex = primaryFilename.indexOf("business_");
                 String primaryFile = primaryFilename.substring(sliceIndex);
                 this.setPrimaryImage(primaryFile);
-                System.out.println(primaryFile);
             } else {
                 this.primaryImagePath = null;
             }
         }
-        System.out.println(primaryPath);
-        System.out.println(this.primaryImagePath);
     }
 }
