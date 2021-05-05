@@ -79,12 +79,13 @@ describe('Modify Catalogue form error checking', () => {
     test('Handles empty modification', () => {
         const addBtn = wrapper.find('.add-button');
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(2);
+        expect(wrapper.vm.errors.length).toBe(5);
     });
 
     test('Handles no product name modification', () => {
         wrapper.vm.productName = "";
         wrapper.vm.productId = "BB";
+        wrapper.vm.manufacturer = "Bob tyres";
         wrapper.vm.description = "Good product";
         wrapper.vm.rrp = 22;
 
@@ -96,7 +97,20 @@ describe('Modify Catalogue form error checking', () => {
     test('Handles no product id modification', () => {
         wrapper.vm. productName = "Big Tyre";
         wrapper.vm.productId = "";
+        wrapper.vm.manufacturer = "Bob tyres";
         wrapper.vm.description = "Good product";
+        wrapper.vm.rrp = 22;
+
+        const addBtn = wrapper.find('.add-button')
+        addBtn.trigger('click');
+        expect(wrapper.vm.errors.length).toBe(1);
+    });
+
+    test('Handles no manufacturer modification', () => {
+        wrapper.vm. productName = "Big Tyre";
+        wrapper.vm.productId = "BB";
+        wrapper.vm.description = "Good product";
+        wrapper.vm.manufacturer = "";
         wrapper.vm.rrp = 22;
 
         const addBtn = wrapper.find('.add-button')
@@ -108,17 +122,19 @@ describe('Modify Catalogue form error checking', () => {
         wrapper.vm. productName = "Big Tyre";
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "Good product";
-        wrapper.vm.rrp = null;
+        wrapper.vm.manufacturer = "Bob tyres";
+        wrapper.vm.rrp = "";
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(0);
+        expect(wrapper.vm.errors.length).toBe(1);
     });
 
     test('Handles negative rrp modification', () => {
         wrapper.vm. productName = "Big Tyre";
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "Good product";
+        wrapper.vm.manufacturer = "Bob tyres";
         wrapper.vm.rrp = -2;
 
         const addBtn = wrapper.find('.add-button')

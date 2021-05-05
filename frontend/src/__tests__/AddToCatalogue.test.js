@@ -91,7 +91,7 @@ describe('Add To Catalogue form error checking', () => {
     test('Handles empty Register', () => {
         const addBtn = wrapper.find('.add-button');
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(2);
+        expect(wrapper.vm.errors.length).toBe(5);
     });
 
     test('Handles no product name', () => {
@@ -123,11 +123,11 @@ describe('Add To Catalogue form error checking', () => {
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "Good product";
         wrapper.vm.manufacturer = "Bob tyres";
-        wrapper.vm.rrp = null;
+        wrapper.vm.rrp = "";
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(0);
+        expect(wrapper.vm.errors.length).toBe(1);
     });
 
     test('Handles negative rrp', () => {
@@ -151,7 +151,7 @@ describe('Add To Catalogue form error checking', () => {
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(0);
+        expect(wrapper.vm.errors.length).toBe(2);
     });
 });
 
