@@ -137,7 +137,7 @@
 <script>
 import api from "../Api";
 import axios from "axios";
-import {mutations, store} from '../store.js';
+import {mutations} from '../store.js';
 
 
 const Register = {
