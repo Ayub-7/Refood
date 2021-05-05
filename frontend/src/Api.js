@@ -182,6 +182,11 @@ export default {
     modifyProduct: async (businessId, productId, id, name, description, manufacturer, recommendedRetailPrice) =>
         instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, id, name, description, manufacturer, recommendedRetailPrice}, {withCredentials: true}),
 
+    /**
+     * Get request to return products owned by a business.
+     * @param businessId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
 
     /**
