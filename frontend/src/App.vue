@@ -44,7 +44,7 @@
       <div @click="logoutUser()">
         <vs-navbar-item index="7" v-if="getLoggedInUser() != null">
           <router-link :to="{path: '/login'}">
-          <span>Logout</span>
+            <span>Logout</span>
           </router-link>
         </vs-navbar-item>
       </div>
@@ -121,9 +121,9 @@ const app = {
      */
     logoutUser() {
       api.logout()
-      .then(() => {
-        mutations.userLogout();
-      })
+          .then(() => {
+            mutations.userLogout();
+          })
     },
     toggleMobileMenu: function () {
       let x = document.getElementById("navLinks");
@@ -145,21 +145,21 @@ const app = {
 
   beforeMount() {
     api.checkSession()
-    .then((response) => {
-      if(response.data.id != null){
-        api.checkBusinessSession()
-        .then((busResponse) => {
-            if(busResponse.status == 200){
-              mutations.setActingAsBusiness(busResponse.data.id, busResponse.data.name);
-            } else {
-              mutations.setActingAsUser();
-            }
-        });
-      }
-      mutations.setUserLoggedIn(response.data.id, response.data.role);
-      mutations.setUserBusinesses(response.data.businessesAdministered);
-      mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-    }).catch((err) => {
+        .then((response) => {
+          if(response.data.id != null){
+            api.checkBusinessSession()
+                .then((busResponse) => {
+                  if(busResponse.status == 200){
+                    mutations.setActingAsBusiness(busResponse.data.id, busResponse.data.name);
+                  } else {
+                    mutations.setActingAsUser();
+                  }
+                });
+          }
+          mutations.setUserLoggedIn(response.data.id, response.data.role);
+          mutations.setUserBusinesses(response.data.businessesAdministered);
+          mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+        }).catch((err) => {
       this.$log.debug(err);
     });
   },

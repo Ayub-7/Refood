@@ -265,14 +265,14 @@ const BusinessRegister = {
 
 
 
-    mounted: function () {
-      api.checkSession()
-      .then((response) => {
-        this.getUserInfo(response.data.id);
-      }).catch(() => {
-        this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-      });
-}
+  mounted: function () {
+    api.checkSession()
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+        }).catch(() => {
+      this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+    });
+  }
 
 
 }
