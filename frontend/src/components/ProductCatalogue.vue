@@ -53,8 +53,8 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                <img v-if="product.primaryImagePath != null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="product.primaryImagePath == null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
               
@@ -258,11 +258,6 @@ const Search = {
 
 
   methods: {
-    forceRerender() {
-      console.log("gogogogogogo")
-      this.$forceUpdate()
-    },
-
     setPrimaryImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
@@ -283,13 +278,15 @@ const Search = {
           .then((response) => {
             console.log(response.data);
           }).catch((err) => {
-        throw new Error(`Error trying to get user info from id: ${err}`);
+            console.log(err);
       });
+      api.getBusinessProducts(this.businessId)
+      console.log(this.filteredproducts)
     },
 
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString()
+        return product.primaryImagePath.toString().replace("\\", "/")
       } else {
         return '../../public/ProductShoot.jpg'
       }

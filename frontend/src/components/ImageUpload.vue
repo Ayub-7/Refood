@@ -61,7 +61,7 @@ const ImageUpload = {
             //const image = e.target.files[0];
             
             //reset file path value since images would stay in input (meaning you couldn't upload same image twice)
-            // document.getElementById("fileUpload").value = null; 
+            // document.getElementById("fileUpload").value = null;
             this.showModal = false;
             //Setup FormData object to send in request
             this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
@@ -81,7 +81,7 @@ const ImageUpload = {
                         }
                     }).finally(() => {
                         this.$vs.loading.close();
-                    })   
+                    })
             }
     }
   },
