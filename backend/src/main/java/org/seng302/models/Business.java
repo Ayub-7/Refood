@@ -1,31 +1,49 @@
 package org.seng302.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
+import org.seng302.utilities.serializers.PrimaryAdministratorSerializer;
 
 import javax.persistence.*;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name") // Forces any nested business objects to only use name to prevent recursion.
+@JsonPropertyOrder({"id", "administrators", "name", "primaryAdministratorId"}) // force json property order to match api.
 public class Business {
+
+    public static final String BUSINESS_SESSION_ATTRIBUTE = "business";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToMany
+    private long id;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "BUSINESS_ADMINS",
                     joinColumns = @JoinColumn(name="BUSINESS_ID"),
                     inverseJoinColumns = @JoinColumn(name="USER_ID"))
-    private Set<User> administrators = new HashSet<>();
+    private List<User> administrators = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name="USER_ID")
+    @JsonSerialize(using = PrimaryAdministratorSerializer.class)
+    @JsonProperty("primaryAdministratorId") // while the entity itself stores the user object, when we output to a JSON,
+    private User primaryAdministrator; // it will only use the id as the value, and key as primaryAdministratorId.
+
     private String name;
     private String description;
-    private String address;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    private Address address;
+
     @Enumerated(EnumType.STRING)
     private BusinessType businessType;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -40,7 +58,7 @@ public class Business {
      * @param address   Business address
      * @param businessType  The type of business
      */
-    public Business(String name, String description, String address, BusinessType businessType) {
+    public Business(String name, String description, Address address, BusinessType businessType) {
         this.name = name;
         this.description = description;
         this.address = address;
@@ -54,6 +72,16 @@ public class Business {
      */
     public void createBusiness(User owner) {
         this.administrators.add(owner);
+        this.primaryAdministrator = owner;
         this.created = new Date();
     }
+
+    /**
+     * Collects and returns a list of Ids of administrators.
+     * @return the list of administrators.
+     */
+    public List<Long> collectAdministratorIds() {
+        return this.getAdministrators().stream().map(User::getId).collect(Collectors.toList());
+    }
+
 }

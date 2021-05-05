@@ -1,26 +1,26 @@
 package org.seng302.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.seng302.models.requests.NewUserRequest;
-import org.seng302.utilities.BusinessesAdministeredListSerializer;
 import org.seng302.utilities.Encrypter;
 
 import javax.persistence.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id") // Forces any nested user objects to only use id to prevent recursion.
 public class User {
+
+    public static final String USER_SESSION_ATTRIBUTE = "user";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     
     private String firstName;
     private String middleName;
@@ -30,7 +30,11 @@ public class User {
     private String email;
     private String dateOfBirth;
     private String phoneNumber;
-    private String homeAddress;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    private Address homeAddress;
+
     @JsonIgnore
     private String password;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -39,9 +43,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToMany(mappedBy = "administrators")
-    @JsonSerialize(using = BusinessesAdministeredListSerializer.class)
-    private Set<Business> businessesAdministered;
+    @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
+    private List<Business> businessesAdministered;
 
 
     protected User() {}
@@ -59,7 +62,7 @@ public class User {
      * @param homeAddress current address of the user.
      * @param password (encrypted) password of user.
      */
-    public User(String firstName, String middleName, String lastName, String nickname, String bio, String email, String dateOfBirth, String phoneNumber, String homeAddress, String password) throws NoSuchAlgorithmException {
+    public User(String firstName, String middleName, String lastName, String nickname, String bio, String email, String dateOfBirth, String phoneNumber, Address homeAddress, String password) throws NoSuchAlgorithmException {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -95,8 +98,8 @@ public class User {
 
     /**
      * Alternative constructor with just the barebones fields required. Used to create a DGAA.
-     * @param email
-     * @param password
+     * @param email unique identifier to login with.
+     * @param password to login with - to be hashed.
      * @param role designated website role of user.
      */
     public User(String email, String password, Role role) throws NoSuchAlgorithmException {

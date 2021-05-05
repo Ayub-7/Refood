@@ -14,28 +14,29 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     /**
      * Configuration of web security - sets the rules on what user can go where.
      * @param http security configurer.
-     * @throws Exception
+     * @throws Exception when configuration fails.
      */
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http.headers().frameOptions().disable();
         http
                 .csrf().disable()
-                .httpBasic()
+                .httpBasic().authenticationEntryPoint(new AuthEntryPoint())
 
                 .and()
-                .authorizeRequests()
-                .antMatchers("/checksession").authenticated()
-                .antMatchers(HttpMethod.POST, "/login", "/users").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/search*").authenticated()
-                .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin").hasRole("DGAA")
-                .anyRequest().authenticated()
-
-                .and()
+                 .authorizeRequests()
+                 .antMatchers("/checksession").permitAll()
+                 .antMatchers(HttpMethod.POST, "/login", "/users", "/logout", "/actasbusiness").permitAll()
+                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                 .antMatchers(HttpMethod.GET, "/users/**").authenticated()
+                 .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "/users/{id}/revokeAdmin").hasRole("DGAA")
+                 .antMatchers(HttpMethod.PUT, "/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary").authenticated()
+                 .antMatchers("/businesses", "/businesses/**").authenticated()
+                 .anyRequest().permitAll()
+                 .and()
                 .logout()
                 ;
 

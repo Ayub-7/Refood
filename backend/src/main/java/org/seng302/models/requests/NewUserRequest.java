@@ -1,7 +1,11 @@
 package org.seng302.models.requests;
 
 import lombok.Data;
+import org.seng302.models.Address;
 
+/**
+ * DTO class that holds a new user registration info.
+ */
 @Data
 public class NewUserRequest {
 
@@ -13,7 +17,20 @@ public class NewUserRequest {
     private String email;
     private String dateOfBirth;
     private String phoneNumber;
-    private String homeAddress;
+
+    private Address homeAddress;
     private String password;
 
+    public NewUserRequest(String firstName, String middleName, String lastName, String nickname, String bio, String email, String dateOfBirth, String phoneNumber, Address homeAddress, String password) {
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.nickname = nickname;
+        this.bio = bio;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.phoneNumber = phoneNumber;
+        this.homeAddress = homeAddress;
+        this.password = password;
+    }
 }

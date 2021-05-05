@@ -1,4 +1,4 @@
-package org.seng302.utilities;
+package org.seng302.utilities.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -8,34 +8,34 @@ import org.seng302.models.Business;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Custom serializer to turn the set of Business objects found in User.businessesAdministered
  * into a list of business Id's
  */
-public class BusinessesAdministeredListSerializer extends StdSerializer<Set<Business>> {
+public class BusinessesAdministeredListSerializer extends StdSerializer<List<Business>> {
 
     public BusinessesAdministeredListSerializer() {
         this(null);
     }
 
-    public BusinessesAdministeredListSerializer(Class<Set<Business>> t) {
+    public BusinessesAdministeredListSerializer(Class<List<Business>> t) {
         super(t);
     }
 
+
     @Override
     public void serialize(
-        Set<Business> businesses,
+        List<Business> businesses,
         JsonGenerator generator,
         SerializerProvider provider)
         throws IOException {
 
-        List<Long> ids = new ArrayList<>();
+        List<String> businessNames = new ArrayList<>();
         for (Business business : businesses) {
-            ids.add(business.getId());
+            businessNames.add(business.getName());
         }
-        generator.writeObject(ids);
+        generator.writeObject(businessNames);
     }
 
 }

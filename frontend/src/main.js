@@ -28,20 +28,31 @@
 /**
  * Main entry point for your Vue app
  */
-import "bootstrap/dist/css/bootstrap.min.css"
+
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './App.vue';
-import Login from "@/components/Login";
-import Register from "./components/Register";
-import Users from "@/components/Users.vue";
-import Search from "@/components/Search.vue";
-
-Vue.config.productionTip = false
-
-
-
 import VueLogger from 'vuejs-logger';
+import Vuesax from 'vuesax';
+import ModifyCatalog from "./components/ModifyCatalog"
+import Login from "./components/Login";
+import BusinessRegister from "./components/BusinessRegister";
+import Register from "./components/Register";
+import Users from "./components/Users.vue";
+import Search from "./components/Search.vue";
+import Business from "./components/Business.vue";
+import BusinessAdministrators from "./components/BusinessAdministrators";
+import Homepage from "./components/Homepage"
+import ProductCatalogue from "@/components/ProductCatalogue";
+import AddToCatalogue from "./components/AddToCatalogue";
+
+import 'vuesax/dist/vuesax.css';
+import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
+//import ModifyCatalog from "@/components/ModifyCatalog";
+
+
+Vue.config.productionTip = false;
+
 
 const options = {
   isEnabled: true,
@@ -55,12 +66,31 @@ const options = {
 
 Vue.use(VueLogger, options);
 Vue.use(VueRouter);
+Vue.use(Vuesax);
 
 const routes = [
-  {path: '/Login', component: Login},
+  {path: '/home', component: Homepage},
+  {path: '/login', component: Login},
+  {path: '/businesses', component: BusinessRegister},
+  {name: 'LoginPage', path: '/login', component: Login},
   {path: '/', component: Register},
-  {path: '/Users', component: Users},
-  {path: '/Search', component: Search},
+  {name: 'UserPage', path: '/users/:id', component: Users},
+  {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
+  {path: '/search', component: Search},
+  {name: ModifyCatalog, path: '/businesses/:id/products/modify', component: ModifyCatalog},
+  {path: '/businesses/:id/products', component: ProductCatalogue},
+  {
+    path: '/businesses/:id',
+    name: 'Business',
+    component: Business,
+    children: [
+          {
+            path: 'administrators',
+            name: 'BusinessAdministrators',
+            component: BusinessAdministrators,
+          }
+        ]
+  },
 
 ];
 

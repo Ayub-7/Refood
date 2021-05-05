@@ -1,114 +1,99 @@
 <template>
   <!-- <h1> Basic Login Form</h1> -->
-  <div id="body">
-  <div class="main">
-    <p class="sign" align="center">Sign in</p>
-  <form id="login-form">
-    <div class="container">
+  <div id="main">
 
-      <div v-if="errors.length">
-        <b>Please correct the following error(s):</b>
-      <ul>
-        <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-      </ul>
-      </div>
+    <p id="sign">Sign In</p>
+    <form>
+        <vs-input class="form-control"
+                  id="email" type="text"
+                  v-model="email"
+                  label-placeholder="Enter Email"
+                  :danger="this.errors.email != null"
+                  :danger-text="this.errors.email"
+                  required></vs-input>
+        <vs-input class="form-control"
+                  id="password" type="password"
+                  v-model="password"
+                  label-placeholder="Enter password"
+                  :danger="this.errors.password != null"
+                  :danger-text="this.errors.password"
+                  required></vs-input>
 
+        <button class="loginButton form-input" type="button"  @click="checkForm(); loginSubmit()">Sign in</button>
+    </form>
 
-      <input id="email" type="text" v-model="email" placeholder="Enter Email" name="Email" required>
-      <input id="password" v-model="password" type="password" placeholder="Enter password" name="password" required>
-      <button type="button" class="loginButton" @click="checkForm(); loginSubmit()" href="/login">Sign in</button>
-      <button type="button" class="forgotPassword">Forgot Password?</button>
-    </div>
-  </form>
-  </div>
   </div>
 </template>
 
-
-
 <script>
 import api from "../Api";
-import Vue from "vue"
-import VueSimpleAlert from "vue-simple-alert";
-let passwordHash = require('password-hash');
+import {mutations} from "../store"
 
-Vue.use(VueSimpleAlert);
-const data = require('../testUser.json');
-const users = data.users;
 const Login = {
   name: "Login",
   data: function () {
-  return {
-    errors: [],
-    email: null,
-    password: null,
-  };
+    return {
+      errors: [],
+      email: "",
+      password: "",
+    };
   },
   methods: {
     validEmail: function (email) {
-      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
     },
     /**
      * Checks if the username and password match on what is stored in the backend.
-     * @param e
-     * @returns {boolean} True if it matches what is stored in the backend; otherwise, false.
      */
-    checkForm: function(e) {
-      if (this.email && this.password) {
-        return true;
-      }
-      this.errors = [];
+    checkForm: function() {
+      this.errors = {
+        hasErrors: false,
+        email: null,
+        password: null,
+      };
 
-      if (!this.email) {
-        this.errors.push("Email is required!");
-      } else if (!this.validEmail(this.email)) {
-        this.errors.push("Please enter a valid email!");
+      if (this.email.length === 0) {
+        this.errors.email = "Email required.";
+        this.errors.hasErrors = true;
+      }
+      else if (!this.validEmail(this.email)) {
+        this.errors.email = "Invalid email.";
+        this.errors.hasErrors = true;
+      }
+      if (this.password.length === 0) {
+        this.errors.password = "Password required.";
+        this.errors.hasErrors = true;
       }
 
-      if (!this.password) {
-        this.errors.push('Password required.');
-      }
-      else if(this.password.length < 8){
-        this.errors.push('Password must be 8 characters long.');
-      }
-      e.preventDefault();
+      console.log(this.errors);
     },
 
     /**
      * Sends the login request to the backend by calling the login function from the API.
      */
     loginSubmit: function() {
-      var user_id = 0;
-      var isRegistered = false;
-      var isVerified = false;
-      var token = null;
-      for (var user of users) {
-        if (this.email == user.email){
-          if (passwordHash.verify(this.password, user.hashedPassword)) {
-            isVerified = true;
-            user_id = user.id;
-          }
-          isRegistered = true;
-        }
+      if(!this.errors.hasErrors){
+        api.login(this.email, this.password)
+          .then((response) => {
+            //LOAD USER HOME PAGE, USING ROUTER
+            mutations.setUserLoggedIn(response.data.userId, response.data.role);
+            this.$router.push({path: `/home`});
+          })
+          .catch(err => {
+            console.log(err.response);
+            if(err.response.status === 400) { // Catch 400 Bad Request
+              this.email = this.password = "";
+              this.errors.email = this.errors.password = "";
+              this.$vs.notify({title:'Login Failed', text:'Email or password is incorrect.', color:'danger'});
+
+            }
+            else { // Catch anything else.
+              this.$vs.notify({title:'Error Logging In', text:`Status Code ${err.response.status}`, color:'danger'});
+
+            }
+        });
       }
-      if(isVerified == true){
-        token = Buffer.from(`${this.username}:${this.password}`, 'utf8').toString('base64')
-      }
-      api.login(this.Email, this.password, token)
-      .then((response) => {
-        if (isVerified == true) {
-          this.$log.debug("Login successful!", response.data)
-          window.location.replace("http://localhost:9500/Users?id=" + user_id);
-        } else if (isRegistered == true) {
-          this.$alert("Incorrect username or password!");
-          this.$log.debug("Login unsuccessful!", response.data);
-        } else {
-            this.$alert("You aren't registered You must register.");
-          }
-        }).catch((error) => {
-        this.$log.debug("Login unsuccessful!", error)
-      });
     }
   },
 
@@ -117,101 +102,81 @@ export default Login;
 </script>
 
 <style scoped>
-#body {
-  background-color: #F3EBF6;
+
+#main {
   font-family: 'Ubuntu', sans-serif;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  grid-row-gap: 1em;
+
+  max-width: 400px;
+  background-color: white;
+  margin: 1em auto;
+  padding: 0.5em 0 0.5em 0;
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
 
-.main {
-  background-color: #FFFFFF;
-  width: 400px;
-  height: 400px;
-  margin: 7em auto;
-  border-radius: 1.5em;
-  box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
-}
+/* First Header Row */
+#sign {
+  grid-row: 1;
+  grid-column: 1;
 
-.sign {
-  padding-top: 40px;
-  color: #8C55AA;
-  font-family: 'Ubuntu', sans-serif;
+  margin: 0;
+  padding: 0.5em 0;
+
+  color: #385898;
   font-weight: bold;
-  font-size: 23px;
+  font-size: 24px;
+  text-align: center;
+}
+
+form {
+  grid-row: 2;
+  grid-column: 1;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, auto);
+  grid-row-gap: 1em;
+
+  margin: auto;
+
+}
+
+.form-control {
+  font-family: 'Ubuntu', sans-serif;
 }
 
 #email {
-  width: 76%;
-  color: rgb(38, 50, 56);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
-  margin-left: 46px;
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
-form#login-form {
-  padding-top: 40px;
-}
-#password {
-  width: 76%;
-  color: rgb(38, 50, 56);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  background: rgba(136, 126, 126, 0.04);
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  margin-bottom: 50px;
-  margin-left: 46px;
-  text-align: center;
-  margin-bottom: 27px;
-  font-family: 'Ubuntu', sans-serif;
-}
-#username:focus, #password:focus {
-  border: 2px solid rgba(0, 0, 0, 0.18) !important;
+  grid-row: 1;
+  grid-column: 1;
+
 }
 
+#password {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+
 .loginButton {
+  grid-row: 3;
+  grid-column: 1;
+
+  margin: 1em auto 2em auto;
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
-  background: linear-gradient(to right, #9C27B0, #E040FB);
+  background: #1F74FF;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
-  margin-left: 35%;
+  padding: 10px 40px;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
-.forgotPassword {
-  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #E1BEE7;
-  padding-top: 15px;
-}
-a {
-  text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
-  color: #E1BEE7;
-  text-decoration: none
-}
-@media (max-width: 600px) {
-  .main {
-    border-radius: 0px;
-  }
-}
+
+
 </style>

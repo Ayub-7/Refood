@@ -46,37 +46,39 @@ export default {
      * @param token Authentication token added to API request header
      * @returns {Promise<AxiosResponse<any>>}
      */
-    login: (Email, password, token) => instance.post('login', {Email, password}, {
-      headers: {
-          'Authorization': `Basic ${token}`
-      },
-    }),
+    login: (email, password) => instance.post('login', {email, password}, {withCredentials: true}),
+
+    logout: () => instance.post('logoutuser', [], {withCredentials: true}),
+
+    checkSession: () => instance.get('checksession', {withCredentials: true}),
+
+    checkBusinessSession: () => instance.get('checkbusinesssession', {withCredentials: true}),
 
   // user POST create new user account data
     /**
      * Create a new user by storing their data to the database
      * @param firstName Their firstname
-     * @param lastName Their lastname
      * @param middleName Their middlename (OPTIONAL)
+     * @param lastName Their lastname
      * @param nickname Their nickname (OPTIONAL)
      * @param bio Their bio (OPTIONAL)
      * @param email Their email
      * @param dateOfBirth Their date of birth
      * @param phoneNumber Their phone
      * @param homeAddress Their home address
-     * @param hashedPassword Their password hashed using password-hash library
+     * @param password Their password hashed using password-hash library
      * @param registerDate Their registration date
      * @returns {Promise<AxiosResponse<any>>}
      */
-    createUser: async(firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate) =>
-  instance.post('users', {firstName, lastName, middleName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, hashedPassword, registerDate}),
+    createUser: async(firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password) =>
+  instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password}),
 
     /**
      * Get a specific user via their unique ID number
      * @param userId The user's unique ID number
      * @returns {Promise<AxiosResponse<any>>}
      */
-    getUserFromID: (userId) => instance.get(`users/${userId}`),
+    getUserFromID: (userId) => instance.get(`users/${userId}`, {withCredentials: true}),
 
     /**
      * Get all users from the database.
@@ -99,6 +101,123 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: () => instance.get(`users`),
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
+    /**
+     * Method (frontend) to let a DGAA user make a user an GAA admin user.
+     * @param id user id to be made admin.
+     */
+    makeUserAdmin: async(id) =>
+        instance.put('/users/'+id+'/makeAdmin',{},{withCredentials: true}),
+
+    /**
+     * Method (frontend) to let a DGAA user revoke GAA admin status from another user. Reverts the user back to USER role.
+     * @param id user id to revoke admin user role.
+     */
+    revokeUserAdmin: async(id) =>
+        instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
+
+
+    // ------ BUSINESSES
+
+    /**
+     * Create a new business by storin their data in the database
+     * @param name business name
+     * @param description business description
+     * @param address business address
+     * @param businessType business type
+     */
+    createBusiness: async(name, description, address, businessType) =>
+    instance.post('businesses', {name, description, address, businessType}, {withCredentials: true}),
+
+    /**
+     * Retrieve a single business with their unique id.
+     * @param businessId the unique id of the business.
+     */
+    actAsBusiness: async(businessId) =>
+        instance.post('actasbusiness',{businessId}, {withCredentials: true}),
+
+    /**
+     * Retrieve a single business with their unique id.
+     * @param businessId the unique id of the business.
+     * @returns {Promise<AxiosResponse<any>>} a business json containing relevant information.
+     */
+    getBusinessFromId: (businessId) => instance.get(`businesses/${businessId}`, {withCredentials: true}),
+
+    /**
+     * Put request to make a user a business administrator (not primary).
+     * @param businessId unique identifier of the business.
+     * @param userId unique identifier of the user.
+     * @returns {Promise<AxiosResponse<any>>} a response with a OK if it is successful.
+     */
+    makeUserBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/makeAdministrator`, {userId}, {withCredentials: true}),
+
+    /**
+     * Put request to remove administrator rights to a business.
+     * @param businessId business identifier to remove rights to.
+     * @param userId user identifier to remove the rights from.
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
+    removeUserAsBusinessAdmin: (businessId, userId) => instance.put(`businesses/${businessId}/removeAdministrator`, {userId}, {withCredentials: true}),
+
+    /**
+     * Create a new product.
+     * @param businessId id of the business to
+     * @param id product id (chosen by user)
+     * @param name product name
+     * @param description product description
+     * @param manufacturer manufacturer of this product.
+     * @param recommendedRetailPrice product recommended retail price in their local currency
+     */
+    createProduct: async(businessId, id, name, description, manufacturer, recommendedRetailPrice) =>
+        instance.post(`/businesses/${businessId}/products`, {businessId, id, name, description, manufacturer, recommendedRetailPrice}, {withCredentials: true}),
+    /**
+     * modifies catalog product
+     * @param id product id (chosen by user)
+     * @param name product name
+     * @param description product description
+     * @param manufacturer manufacturer of this product.
+     * @param recommendedRetailPrice product recommended retail price in their local currency
+     */
+    modifyProduct: async (businessId, productId, id, name, description, manufacturer, recommendedRetailPrice) =>
+        instance.put(`/businesses/${businessId}/products/${productId}`, {businessId, productId, id, name, description, manufacturer, recommendedRetailPrice}, {withCredentials: true}),
+
+    /**
+     * Get request to return products owned by a business.
+     * @param businessId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    getBusinessProducts: (businessId) => instance.get(`businesses/${businessId}/products`,  {withCredentials: true}),
+
+    /**
+     * Post request to send a product image
+     * @param businessId business identifier to remove rights to.
+     * @param productId product identifier, product that the image is for
+     * @param image FormData object containing image file to be sent to server
+     * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
+     */
+    postProductImage: (businessId, productId, image) => instance.post(`businesses/${businessId}/products/${productId}/images`, image, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      withCredentials: true,
+    }),
+
+    /**
+     * Put request to set the primary image from the existing images for a product.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
+     */
+    setPrimaryImage: (businessId, productId, imageId) => instance.put(`businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, "", {withCredentials: true}),
+
+    /**
+     * Delete request to remove product image.
+     * @param businessId
+     * @param productId
+     * @param imageId
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
+     */
+    deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true})
 }
