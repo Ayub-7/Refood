@@ -75,7 +75,6 @@ const ImageUpload = {
                     }
                 }).finally(() => {
                 this.$vs.loading.close();
-                this.$parent.forceRerender();
             })
         
     
