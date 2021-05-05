@@ -250,8 +250,6 @@ const Search = {
       }).catch((error) => {
         this.$log.error(error);
     });
-
-
   },
 
 
@@ -269,6 +267,7 @@ const Search = {
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`);
       });
+      location.reload();
     },
 
     deleteImage(product, image) {
@@ -281,8 +280,7 @@ const Search = {
           }).catch((err) => {
             console.log(err);
       });
-      api.getBusinessProducts(this.businessId)
-      console.log(this.filteredproducts)
+      location.reload();
     },
 
     getImgUrl(product) {
