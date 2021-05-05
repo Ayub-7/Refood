@@ -269,18 +269,24 @@ public class ProductController {
         Business business = businessRepository.findBusinessById(businessId);
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
-        Boolean validImage = false;
 
-        for (Image image: product.getImages()) {
-            if (imageId.equals(image.getId())) {
-                validImage = true;
-            }
-        }
-        if (product == null || business == null || validImage == false) {
+        if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Boolean validImage = false;
+        if (product != null) {
+            for (Image image: product.getImages()) {
+                if (imageId.equals(image.getId())) {
+                    validImage = true;
+                }
+            }
+        }
+        if (product == null || validImage == false) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         String imageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/" + "/business_" + businessId + "/" + imageId;
         String extension = "";

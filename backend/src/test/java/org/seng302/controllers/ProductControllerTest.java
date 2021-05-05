@@ -542,7 +542,7 @@ public class ProductControllerTest {
         //wrong business id
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
-        mvc.perform(put("/businesses/900/products/{productId}/images/{imageId}/makeprimary", product1.getId(), image1.getId())
+        mvc.perform(put("/businesses/1/products/{productId}/images/{imageId}/makeprimary", product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
 
@@ -569,6 +569,7 @@ public class ProductControllerTest {
         // Business owner
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
+        product1.addProductImage(image1);
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
