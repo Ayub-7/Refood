@@ -4,7 +4,7 @@
     <form class="main1" :key="componentKey">
       <div class="profile-text-inner">
         <div style="display: flex; ">
-          <h1 class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
+          <h1 id="pagetitle" class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
 
           <div style="margin-right: 0; margin-left: auto; display: flex">
             <div class="title" style="margin-top: 5px; margin-right: 10px">
@@ -190,7 +190,7 @@
 
 <script>
 import api from "../Api";
-import {store, mutations} from "@/store";
+import {store, mutations} from "../store";
 //import {store} from "../store"
 import ImageUpload from "./ImageUpload";
 import axios from "axios";
@@ -235,7 +235,7 @@ const Search = {
         this.businessId = this.$route.params.id;
         this.userId = response.data.id;
         this.getUserInfo(this.userId);
-        this.getBusinessName();
+        this.business = this.getBusinessName();
 
         api.getBusinessProducts(this.businessId)
             .then((response) => {
@@ -258,6 +258,7 @@ const Search = {
 
 
   methods: {
+
     setPrimaryImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
