@@ -192,13 +192,19 @@ const ModifyCatalog = {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
+    checkUserSession: function() {
+      api.checkSession()
+          .then((response) => {
+            this.getUserInfo(response.data.id);
+          })
+          .catch((error) => {
+            this.$log.error("Error checking sessions: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+          });
+    }
   },
-
   mounted: function () {
-    api.checkSession()
-        .then((response) => {
-          this.getUserInfo(response.data.id);
-        });
+    this.checkUserSession();
   }
 }
 export default ModifyCatalog;

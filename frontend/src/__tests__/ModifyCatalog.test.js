@@ -2,6 +2,7 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ModifyCatalogue from '../components/ModifyCatalog';
 import Vuesax from 'vuesax';
 import {store} from "../store";
+//import AddToCatalogue from "@/components/AddToCatalogue";
 
 //import {CurrencyInput} from "../components/CurrencyInput";
 //import api from "../Api";
@@ -37,7 +38,6 @@ let $log = {
     error: jest.fn()
 }
 
-const getUserMethod = jest.spyOn(ModifyCatalogue.methods, 'getUserInfo');
 beforeEach(() => {
     wrapper = shallowMount(ModifyCatalogue, {
         propsData: {},
@@ -48,6 +48,14 @@ beforeEach(() => {
         localVue,
     });
 
+    const checkSessionMethod = jest.spyOn(ModifyCatalogue.methods, 'checkUserSession');
+    checkSessionMethod.mockImplementation(() => {
+        wrapper.vm.user = mockUser;
+        wrapper.vm.currencyCode = "NZD";
+        wrapper.vm.currencySymbol = "$"
+    });
+
+    const getUserMethod = jest.spyOn(ModifyCatalogue.methods, 'getUserInfo');
     getUserMethod.mockImplementation(() =>{
         wrapper.vm.user = mockUser;
         wrapper.vm.currencyCode = "NZD";

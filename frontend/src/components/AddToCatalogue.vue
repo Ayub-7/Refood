@@ -199,10 +199,7 @@ const AddToCatalogue = {
     }
   },
   mounted: function () {
-    api.checkSession()
-        .then((response) => {
-          this.getUserInfo(response.data.id);
-        });
+    this.checkUserSession();
   }
 }
 
