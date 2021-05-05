@@ -137,7 +137,7 @@
 <script>
 import api from "../Api";
 import axios from "axios";
-import {mutations} from '../store.js';
+import {mutations, store} from '../store.js';
 
 
 const Register = {
@@ -238,14 +238,8 @@ const Register = {
      */
 
     validAge: function(birthDateString) {
-      var today = new Date();
-      var birthDate = new Date(Date.parse("04/04/2000"));
-      var age = today.getFullYear() - birthDate.getFullYear();
-      var m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age >= 13;
+      let years = new Date(new Date() - new Date(birthDateString)).getFullYear() - 1970;
+      return (years >= 13);
     },
 
 

@@ -178,6 +178,7 @@ describe('Register error checking', () => {
         wrapper.vm.nickname = '';
         wrapper.vm.bio = '';
         wrapper.vm.phonenumber = '027254871';
+        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors).toStrictEqual(['thisisnotaemail.com'])
