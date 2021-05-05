@@ -21,17 +21,16 @@
         </div>
         <div style="display: flex; ">
           <div style="display: flex;">
-            <h2 class="title" style="margin-top: 5px; margin-right: 5px">Sort By: </h2>
+            <h2 class="title" style="margin-top: 5px; margin-right: 10px">Sort By: </h2>
             <select v-model="selected">
               <option disabled value="">Please select one</option>
-              <option @click="sortByName($event, 'id', 0);">ID</option>
-              <option @click="sortByName($event, 'name', 1);">Product Name</option>
-              <option @click="sortByName($event, 'description', 2);" >Description</option>
-              <option @click="sortByName($event, 'recommendedRetailPrice', 3);" >Recommended Retail Price</option>
-              <option @click="sortByName($event, 'created', 4);" >Date Created</option>
+              <option value="id">ID</option>
+              <option value="name">Product Name</option>
+              <option value="description">Description</option>
+              <option value="recommendedRetailPrice">Recommended Retail Price</option>
+              <option value="created">Date Created</option>
             </select>
-
-            <ImageUpload :businessId=businessId :products=products style="margin-left: 10px; margin-top: 10px; font-size: 15px"/>
+            <button class='prevNextSearchButton' type='button' @click="sortByName(null, selected, 0);">Sort</button>
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
@@ -45,6 +44,8 @@
           </tr>
           </tfoot>
         </div>
+        <ImageUpload :businessId=businessId :products=products style="margin: 50px; font-size: 15px"/>
+
 
         <div v-if="displaytype">
           <div class="grid-container">
@@ -384,11 +385,15 @@ const Search = {
      * @param JSONField is the name of the field to sort by (as string)
      * @param index references the toggle state list in the data object (int)
      */
-    sortByName: function (event, JSONField, index) {
+    sortByName: function (event, JSONField) {
+      const indexarray = ["id", "name", "description", "recommendedRetailPrice", "created"];
+
       //toggles the classlist (arrow up or down) in the child DOM element: <i/>
-      if(event.target.firstElementChild) {
-        event.target.firstElementChild.classList.toggle('fa-angle-double-down');
-        event.target.firstElementChild.classList.toggle('fa-angle-double-up');
+      if(event) {
+        if(event.target.firstElementChild) {
+          event.target.firstElementChild.classList.toggle('fa-angle-double-down');
+          event.target.firstElementChild.classList.toggle('fa-angle-double-up');
+        }
       }
 
       if (this.filteredproducts) {
@@ -426,11 +431,16 @@ const Search = {
           // a must be equal to b
           return 0;
         });
-        if (this.toggle[index]) {
-          this.filteredproducts.reverse();
-          this.toggle[index]=0;
-        } else {
-          this.toggle[index]=1;
+
+        let index = indexarray.indexOf(JSONField);
+
+        if (index > 0) {
+          if (this.toggle[index]) {
+            this.filteredproducts.reverse();
+            this.toggle[index]=0;
+          } else {
+            this.toggle[index]=1;
+          }
         }
       }
     },
