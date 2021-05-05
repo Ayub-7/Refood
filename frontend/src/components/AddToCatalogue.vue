@@ -123,7 +123,7 @@ const AddToCatalogue = {
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
             }).catch((error) => {
           if (error.response) {
-            this.$log.error(error);
+            this.$log.debug(error);
             if (error.response.status === 400) {
               this.$vs.notify({
                 title: 'Failed to create catalogue item',
@@ -131,7 +131,7 @@ const AddToCatalogue = {
                 color: 'danger'
               });
             }
-            this.$log.error(error.response.status);
+            this.$log.debug(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         });
@@ -148,7 +148,7 @@ const AddToCatalogue = {
           this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
           this.$router.push({name: 'LoginPage'});
         } else {
-          throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
+          this.$log.debug("Error Status:", error)
         }
       });
     },
@@ -159,7 +159,7 @@ const AddToCatalogue = {
             this.currencySymbol = response.data[0].currencies[0].symbol;
             this.currencyCode = response.data[0].currencies[0].code;
           }).catch(err => {
-        this.$log.error("Error with getting cities from REST Countries." + err);
+        this.$log.debug("Error with getting cities from REST Countries." + err);
       });
     },
 
