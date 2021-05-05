@@ -4,8 +4,6 @@ import lombok.Data;
 import org.seng302.exceptions.InvalidImageExtensionException;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**

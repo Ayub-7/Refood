@@ -64,7 +64,7 @@
                 </div>
                 <!-- Actions Dropdown -->
                 <vs-dropdown vs-trigger-click class="actionButton">
-                  <vs-button>Actions</vs-button>
+                  <vs-button style="width: fit-content;">Actions</vs-button>
                   <vs-dropdown-menu>
                     <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
                       Modify product
@@ -142,10 +142,9 @@
                       <vs-dropdown vs-trigger-click>
                         <vs-button>Actions</vs-button>
                         <vs-dropdown-menu>
-<!--                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">-->
-<!--                            Modify product-->
-<!--                          </vs-dropdown-item>-->
-                          <vs-dropdown-item>Add Image</vs-dropdown-item>
+                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                            Modify product
+                          </vs-dropdown-item>
 
                           <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
@@ -266,6 +265,7 @@ const Search = {
       api.setPrimaryImage(this.businessId, this.productId, this.imageId)
           .then((response) => {
             console.log(response.data);
+            this.$vs.notify({title:"Product image updated.", text:"New primary image successfully set.", color:"success"});
           }).catch((err) => {
             throw new Error(`Error trying to get user info from id: ${err}`);
       });

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.seng302.models.requests.NewProductRequest;
-import org.seng302.repositories.ProductRepository;
 
 import javax.persistence.*;
 import java.util.ArrayList;
