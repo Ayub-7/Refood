@@ -148,7 +148,7 @@ const AddToCatalogue = {
           this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
           this.$router.push({name: 'LoginPage'});
         } else {
-          this.$log.debug("Error Status:", error)
+          this.$log.debug("Error Status:", err);
         }
       });
     },
