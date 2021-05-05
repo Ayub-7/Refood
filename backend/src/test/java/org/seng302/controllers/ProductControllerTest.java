@@ -75,7 +75,7 @@ public class ProductControllerTest {
 
         product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
         product2 = new Product("07-4957066", 1, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
-        image1 = new Image("0", "../../../resources/media.images/testlettuce.jpeg", "");
+        image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
 
         //Mocking body of PUT request
         productUpdate = new NewProductRequest("replace id", "replace name", "replace desc", "replace manufacturer", 2.2);
