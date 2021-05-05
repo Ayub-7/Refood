@@ -154,7 +154,9 @@ deploy-production-frontend:
     policy: pull
   script:
     - cd frontend
+    - export NODE_ENV=production
     - npm run build-prod
+    - unset NODE_ENV
     - rm -rf /home/gitlab-runner/production-frontend/ || true
     - mkdir /home/gitlab-runner/production-frontend/
     - cp -r ./dist/ /home/gitlab-runner/production-frontend
