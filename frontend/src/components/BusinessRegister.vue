@@ -56,7 +56,7 @@
 <script>
 import api from "../Api";
 import axios from "axios"
-import {store} from "../store";
+import {mutations, store} from "../store";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -151,12 +151,18 @@ const BusinessRegister = {
 
         api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
             .then((response) => {
-              this.$log.debug("New business created:", response.data);
-              this.$router.push({path: `/users/${store.loggedInUserId}`});
+              api.actAsBusiness(response.data.businessId)
+                  .then((busResponse) => {
+                    this.$log.debug("New business created:", busResponse.data);
+                    mutations.setActingAsBusiness(response.data.businessId, this.businessName);
+                    this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+                  }).catch((error) => {
+                this.$log.debug(error.response.message);
+              });
             }).catch((error) => {
           if(error.response) {
-            console.log(error.response.status);
-            console.log(error.response.message);
+            this.$log.debug(error.response.status);
+            this.$log.debug(error.response.message);
             this.errors.push("Access token is missing/invalid");
           }
           this.$log.debug("Error Status:", error)

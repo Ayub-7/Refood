@@ -130,7 +130,6 @@ const app = {
       let y = document.getElementById("topBar")
       if (x.style.display === "block") {
         x.style.display = "none";
-
         y.style.height = "55px";
       } else {
         x.style.display = "block";
@@ -160,8 +159,8 @@ const app = {
       mutations.setUserLoggedIn(response.data.id, response.data.role);
       mutations.setUserBusinesses(response.data.businessesAdministered);
       mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-    }).catch(() => {
-      this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+    }).catch((err) => {
+      this.$log.debug(err);
     });
   },
 };
