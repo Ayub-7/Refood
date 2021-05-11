@@ -63,6 +63,7 @@ public class Inventory {
      * Used for when a new product request is called.
      * @param newInventoryRequest The request body information that was mapped into a NewInventoryRequest.
      * @param businessId business to assign the product inventory rights to.
+     * @param product the product being added to the businesses inventory
      */
     public Inventory(NewInventoryRequest newInventoryRequest, Long businessId, Product product) {
         this.product = product;

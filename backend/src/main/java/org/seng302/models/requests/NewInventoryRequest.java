@@ -3,6 +3,9 @@ package org.seng302.models.requests;
 import lombok.Data;
 import java.util.Date;
 
+/**
+ * DTO class that holds inventory info when added a product to it.
+ */
 @Data
 public class NewInventoryRequest {
 
@@ -24,6 +27,5 @@ public class NewInventoryRequest {
         this.bestBeforeDate = bestBeforeDate;
         this.manufacturedDate = manufacturedDate;
         this.expiryDate = expiryDate;
-        //this.created = new Date();
     }
 }
