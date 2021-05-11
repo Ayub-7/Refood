@@ -45,6 +45,7 @@ import BusinessAdministrators from "./components/BusinessAdministrators";
 import Homepage from "./components/Homepage"
 import ProductCatalogue from "@/components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
+import BusinessInventory from "@/components/BusinessInventory";
 
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
@@ -76,6 +77,7 @@ const routes = [
   {path: '/', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
+  {name: 'BusinessInventory', path: '/businesses/:id/inventory', component: BusinessInventory},
   {path: '/search', component: Search},
   {name: ModifyCatalog, path: '/businesses/:id/products/modify', component: ModifyCatalog},
   {path: '/businesses/:id/products', component: ProductCatalogue},
