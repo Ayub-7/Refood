@@ -4,12 +4,12 @@
     <div id="header-container">
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
-        <vs-button class="header-button">Product Catalogue</vs-button>
+        <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
         <vs-button class="header-button">New Inventory Listing</vs-button>
       </div>
     </div>
 
-
+    <vs-divider></vs-divider>
     <!-- Table View -->
     <vs-table id="table"
               data="inventory"
