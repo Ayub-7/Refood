@@ -239,8 +239,8 @@ public class ProductController {
             }
         }
 
-        File file = new File(businessDir + "/" + id + imageExtension);
-        File thumbnailFile = new File(System.getProperty("user.dir") + businessDir + "/" + id + "_thumbnail" + imageExtension);
+        File file = new File("/home/gitlab-runner" + businessDir + "/" + id + imageExtension);
+        File thumbnailFile = new File( "/home/gitlab-runner" + businessDir + "/" + id + "_thumbnail" + imageExtension);
         System.out.println(thumbnailFile.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
