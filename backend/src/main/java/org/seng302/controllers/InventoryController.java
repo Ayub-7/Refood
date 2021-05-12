@@ -2,11 +2,9 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.seng302.models.Business;
-import org.seng302.models.Product;
-import org.seng302.models.Role;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.repositories.BusinessRepository;
+import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +28,7 @@ public class InventoryController {
     private BusinessRepository businessRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    private InventoryRepository inventoryRepository;
 
     /**
      * Get request mapping for getting business inventory by business id
@@ -38,22 +36,26 @@ public class InventoryController {
      * @return ResponseEntity
      * @throws JsonProcessingException when json mapping object to a json string fails unexpectedly.
      */
-    @GetMapping("/businesses/{id}/inventory/")
-    public ResponseEntity<List<Product>> getInventory(@PathVariable String id, HttpSession session) throws JsonProcessingException {
+    @GetMapping("/businesses/{id}/inventory")
+    public ResponseEntity<List<Inventory>> getInventory(@PathVariable String id, HttpSession session) throws JsonProcessingException {
         Business business = businessRepository.findBusinessById(Long.parseLong(id));
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
-            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-
-            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else {
-                // Todo: Get product list from inventory repository when implemented
-                List<Product> products = null;
-                return ResponseEntity.status(HttpStatus.OK).body(products);
-            }
         }
+
+        ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+
+        if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<Inventory> inventoryItems = inventoryRepository.findInventoryByBusinessId(business.getId());
+        return ResponseEntity.status(HttpStatus.OK).body(inventoryItems);
     }
 }
