@@ -103,3 +103,7 @@ INSERT INTO product (id, name, description, manufacturer, recommended_retail_pri
     ('WAUUL98E96A125348', 'Calvados - Boulard', 'quis lectus suspendisse potenti in eleifend quam a', 'Vegesdirect', 9.03, '2021-01-25T22:18:45Z', 3),
     ('JN8AF5MR1ET433412', 'Juice - Pineapple, 341 Ml', 'ridiculus mus etiam vel augue vestibulum', 'Juicelord', 2.66, '2021-03-09T22:56:37Z', 3),
     ('WAUEH78E77A454447', 'Bread - Focaccia Quarter', 'orci vehicula condimentum curabitur in libero', 'Bread Company', 22.34, '2021-04-05T18:35:12Z', 5);
+
+INSERT INTO inventory (best_before, business_id, price_per_item, product_id, quantity, total_price) VALUES
+    ('2021-05-27T12:00:00Z', 1, 5.00, 'WAUVT64B54N722288', 10, 50.00),
+    ('2021-06-12T12:00:00Z', 1, 5.00, 'W04GP5EC0B1798680', 10, 50.00);
