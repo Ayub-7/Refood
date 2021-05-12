@@ -30,7 +30,7 @@
               <option value="recommendedRetailPrice">Recommended Retail Price</option>
               <option value="created">Date Created</option>
             </select>
-            <button class='prevNextSearchButton' type='button' @click="sortByName(null, selected, 0);">Sort</button>
+            <vs-button @click="sortByName(null, selected, 0);">Sort</vs-button>
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
@@ -45,6 +45,7 @@
           </tfoot>
         </div>
         <ImageUpload :businessId=businessId :products=products style="margin: 50px; font-size: 15px"/>
+        <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)">Inventory</vs-button>
 
 
         <div v-if="displaytype">
@@ -571,23 +572,6 @@ export default Search;
   text-align: right;
 }
 
-
-.headingButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-  margin-left: 0;
-  margin-right: auto;
-}
 
 .profile-text-inner {
   margin: 7em auto;
