@@ -22,12 +22,12 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumns({
-//        @JoinColumn(name="product_id", updatable = false, insertable = false),
-//        @JoinColumn(name="business_id", updatable = false, insertable = false)
-//    })
-//    private Product product;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumns({
+            @JoinColumn(name="product_id", referencedColumnName="id", updatable = false, insertable = false),
+            @JoinColumn(name="business_id", referencedColumnName="businessId", updatable = false, insertable = false)
+    })
+    private Product product;
 
     @Column(name = "product_id")
     private String productId;
@@ -53,8 +53,7 @@ public class Inventory {
 
     protected Inventory() { }
 
-    public Inventory(long id, String productId, long businessId, int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
-        this.id = id;
+    public Inventory(String productId, long businessId, int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
         this.productId = productId;
         this.businessId = businessId;
         this.quantity = quantity;
@@ -82,7 +81,6 @@ public class Inventory {
         this.bestBefore = newInventoryRequest.getBestBefore();
         this.manufactured = newInventoryRequest.getManufactured();
         this.expires = newInventoryRequest.getExpires();
-        //this.created = new Date();
     }
 
 }
