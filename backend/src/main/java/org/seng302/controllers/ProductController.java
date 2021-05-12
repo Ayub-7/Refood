@@ -131,7 +131,7 @@ public class ProductController {
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProduct(req, business, false);
+                ArrayList checkProduct = isValidProductPut(req, business, false);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
@@ -155,7 +155,11 @@ public class ProductController {
     private ArrayList<Object> isValidProduct(NewProductRequest product, Business business, Boolean isPosting) {
         boolean isValid = true;
         String errorMessage = null;
-         if (product.getId() == null || product.getId() == "") {
+
+        if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
+            errorMessage = "A product already exists with this ID";
+            isValid = false;
+        } else if (product.getId() == null || product.getId() == "") {
             errorMessage = "Product id can not be empty";
             isValid = false;
         } else if (product.getName() == null || product.getName() == "") {
@@ -174,6 +178,31 @@ public class ProductController {
         returnObjects.add(errorMessage);
         return returnObjects;
     }
+
+    private ArrayList<Object> isValidProductPut(NewProductRequest product, Business business, Boolean isPosting) {
+            boolean isValid = true;
+            String errorMessage = null;
+
+            if (product.getId() == null || product.getId() == "") {
+                errorMessage = "Product id can not be empty";
+                isValid = false;
+            } else if (product.getName() == null || product.getName() == "") {
+                errorMessage = "Product name can not be empty";
+                isValid = false;
+            } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
+                errorMessage = "Product recommended retail price must be at least 0";
+                isValid = false;
+            } else if (product.getDescription() == null || product.getDescription() == "") {
+                errorMessage = "Product must have description";
+                isValid = false;
+            }
+
+            ArrayList returnObjects = new ArrayList();
+            returnObjects.add(isValid);
+            returnObjects.add(errorMessage);
+            return returnObjects;
+        }
+
 
     /**
      * Receives and saves a new image pertaining to a product.
