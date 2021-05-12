@@ -53,8 +53,7 @@ public class Inventory {
 
     protected Inventory() { }
 
-    public Inventory(long id, String productId, long businessId, int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
-        this.id = id;
+    public Inventory(String productId, long businessId, int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
         this.productId = this.productId;
         this.businessId = this.businessId;
         this.quantity = this.quantity;
