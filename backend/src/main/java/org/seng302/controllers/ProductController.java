@@ -242,7 +242,7 @@ public class ProductController {
         File file = new File("~/home/gitlab-runner" + businessDir + "/" + id + imageExtension);
         File thumbnailFile = new File( "~/home/gitlab-runner" + businessDir + "/" + id + "_thumbnail" + imageExtension);
         System.out.println(file.getAbsolutePath());
-        System.out.println(System.);
+        System.out.println(System.getenv("PATH"));
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
