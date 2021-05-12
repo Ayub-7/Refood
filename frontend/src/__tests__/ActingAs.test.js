@@ -76,10 +76,10 @@ let store = {
     actingAsBusinessId: null,
     actingAsBusinessName: null
 }
-const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
-getUserNameMethod.mockImplementation(() => {
-    return store.userName;
-});
+// const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
+// getUserNameMethod.mockImplementation(() => {
+//     return store.userName;
+// });
 
 beforeEach(() => {
     wrapper = shallowMount(ActingAs, {
@@ -179,5 +179,9 @@ describe('User acting as tests', () => {
         wrapper.vm.setActingAsUser = jest.fn();
         userName.trigger('click');
         expect(wrapper.vm.setActingAsUser).toBeCalled;
+    });
+
+    test("Testing the get username", async () => {
+        expect(await wrapper.vm.getUserName()).toEqual("Wileen Tisley"); //Try async method
     });
 });
