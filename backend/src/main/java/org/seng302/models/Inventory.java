@@ -24,8 +24,8 @@ public class Inventory {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumns({
-        @JoinColumn(name="product_id", updatable = false, insertable = false),
-        @JoinColumn(name="business_id", updatable = false, insertable = false)
+            @JoinColumn(name="product_id", referencedColumnName="id", updatable = false, insertable = false),
+            @JoinColumn(name="business_id", referencedColumnName="businessId", updatable = false, insertable = false)
     })
     private Product product;
 
@@ -53,28 +53,26 @@ public class Inventory {
 
     protected Inventory() { }
 
-    public Inventory(long id, String productId, long businessId, int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
-        this.id = id;
-        this.productId = this.productId;
-        this.businessId = this.businessId;
-        this.quantity = this.quantity;
-        this.pricePerItem = this.pricePerItem;
-        this.totalPrice = this.totalPrice;
-        this.manufactured = this.manufactured;
-        this.sellBy = this.sellBy;
-        this.bestBefore = this.bestBefore;
-        this.expires = this.expires;
+    public Inventory(String productId, long businessId, int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
+        this.productId = productId;
+        this.businessId = businessId;
+        this.quantity = quantity;
+        this.pricePerItem = pricePerItem;
+        this.totalPrice = totalPrice;
+        this.manufactured = manufacturedDate;
+        this.sellBy = sellByDate;
+        this.bestBefore = bestBeforeDate;
+        this.expires = expiryDate;
     }
 
     /**
      * Used for when a new product request is called.
      * @param newInventoryRequest The request body information that was mapped into a NewInventoryRequest.
      * @param businessId business to assign the product inventory rights to.
-     * @param product the product being added to the businesses inventory
      */
     public Inventory(NewInventoryRequest newInventoryRequest, Long businessId) {
         this.productId = newInventoryRequest.getProductId();
-        this.businessId = this.businessId;
+        this.businessId = businessId;
         this.quantity = newInventoryRequest.getQuantity();
         this.pricePerItem = newInventoryRequest.getPricePerItem();
         this.totalPrice = newInventoryRequest.getTotalPrice();
@@ -83,7 +81,6 @@ public class Inventory {
         this.bestBefore = newInventoryRequest.getBestBefore();
         this.manufactured = newInventoryRequest.getManufactured();
         this.expires = newInventoryRequest.getExpires();
-        //this.created = new Date();
     }
 
 }
