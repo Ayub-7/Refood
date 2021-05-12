@@ -155,11 +155,7 @@ public class ProductController {
     private ArrayList<Object> isValidProduct(NewProductRequest product, Business business, Boolean isPosting) {
         boolean isValid = true;
         String errorMessage = null;
-
-        if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
-            errorMessage = "A product already exists with this ID";
-            isValid = false;
-        } else if (product.getId() == null || product.getId() == "") {
+         if (product.getId() == null || product.getId() == "") {
             errorMessage = "Product id can not be empty";
             isValid = false;
         } else if (product.getName() == null || product.getName() == "") {

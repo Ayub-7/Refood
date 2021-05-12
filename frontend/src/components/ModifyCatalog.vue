@@ -38,6 +38,7 @@
               danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
+              value="fdwsd"
               label-placeholder="Manufacturer (required)"
               v-model="manufacturer"/>
         </div>
@@ -90,15 +91,28 @@ const ModifyCatalog = {
   },
   methods: {
     /**
+     * function adds prefilled values for modifying product
+     */
+
+    presetValues: function() {
+      this.productId = store.productToAlterId;
+      this.productName = store.productToAlterName;
+      this.manufacturer = store.productToAlterManufacturer;
+      this.description = store.productToAlterDescription;
+      this.rrp = store.productToAlterRRP;
+    },
+    /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
      * is in the wrong format.
      */
+
     checkForm: function() {
       this.errors = [];
       if (this.productName.length === 0) {
         this.errors.push(this.productName);
       }
+
 
       if (this.productId.length === 0) {
         this.errors.push(this.productId);
@@ -224,6 +238,7 @@ const ModifyCatalog = {
   },
   mounted: function () {
     this.checkUserSession();
+    this.presetValues();
   }
 }
 export default ModifyCatalog;

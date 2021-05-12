@@ -67,7 +67,8 @@
                 <vs-dropdown vs-trigger-click class="actionButton">
                   <vs-button style="width: fit-content;">Actions</vs-button>
                   <vs-dropdown-menu>
-                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
+                          product.manufacturer, product.description)">
                       Modify product
                     </vs-dropdown-item>
 
@@ -143,7 +144,8 @@
                       <vs-dropdown vs-trigger-click>
                         <vs-button>Actions</vs-button>
                         <vs-dropdown-menu>
-                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
+                          product.manufacturer, product.description)">
                             Modify product
                           </vs-dropdown-item>
 
@@ -319,8 +321,8 @@ const Search = {
     },
 
     //sets the product to alter id
-    setProductToAlter(productId) {
-      mutations.setProductToAlter(productId);
+    setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
+      mutations.setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription);
     },
     //modifies selected catalog item
     goToModify: function () {
