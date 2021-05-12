@@ -76,10 +76,10 @@ let store = {
     actingAsBusinessId: null,
     actingAsBusinessName: null
 }
-// const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
-// getUserNameMethod.mockImplementation(() => {
-//     return store.userName;
-// });
+const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
+getUserNameMethod.mockImplementation(() => {
+    return store.userName;
+});
 
 beforeEach(() => {
     wrapper = shallowMount(ActingAs, {
