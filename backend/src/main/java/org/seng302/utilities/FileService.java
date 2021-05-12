@@ -30,13 +30,10 @@ public class FileService {
     public void uploadImage(File file, byte[] bytes) throws IOException {
         logger.info("Uploading Image at " + file);
 
-        boolean created = file.createNewFile();
-        System.out.println("Created: " + created);
-        if (created) {
-            BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
-            stream.write(bytes);
-            stream.close();
-        }
+        file.createNewFile();
+        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
+        stream.write(bytes);
+        stream.close();
     }
 
     /**
