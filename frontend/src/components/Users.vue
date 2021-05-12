@@ -225,7 +225,7 @@ export default Users;
   grid-row: 2;
 
   padding: 2em;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
   margin: 1em 0 1em 0;
@@ -248,7 +248,7 @@ export default Users;
   background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
   background-size: 500%;
   border: none;
-  border-radius: 5rem;
+  border-radius: 4px;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
@@ -264,7 +264,7 @@ export default Users;
 
   background-color: transparent;
   padding: 0.5em 0 0.5em 0;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
@@ -299,7 +299,7 @@ export default Users;
 
 .sub-container {
   padding: 2em;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }
@@ -327,7 +327,7 @@ main {
   grid-column: 3;
   grid-row: 2;
 
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   margin: 1em 0 1em 0;
   padding: 0;
@@ -342,7 +342,7 @@ main {
 .card {
   background-color: transparent;
   padding: 1em;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 1em;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
@@ -445,7 +445,7 @@ main {
   background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
   background-size: 500%;
   border: none;
-  border-radius: 5rem;
+  border-radius: 4px;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 
 }
@@ -460,7 +460,7 @@ main {
   background: #dbe0dd linear-gradient(to left, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
   background-size: 500%;
   border: none;
-  border-radius: 5rem;
+  border-radius: 4px;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 

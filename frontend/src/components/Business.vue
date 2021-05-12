@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <div id="container" v-if="this.business != null">
       <!-- Left Side Business Information Panel -->
@@ -15,12 +14,10 @@
         </div>
 
         <div id="info-container" class="sub-container">
-
           <div id="created-date">
             <div class="sub-header">Created</div>
             {{ business.created.split(' ')[0] }}
           </div>
-
           <div id="address">
             <div class="sub-header">Address</div>
             <div id="street-address">{{ business.address.streetNumber }} {{ business.address.streetName }}</div>
@@ -29,34 +26,35 @@
             <div id="country">{{ business.address.country }}</div>
             <div id="postcode">{{ business.address.postcode }}</div>
           </div>
-
         </div>
-
       </div>
 
       <main>
         <!-- Sub Navigation Bar -->
-        <nav id="business-navbar">
-          <router-link class="business-nav-item" :to="{name: `Business`, params:{id: business.id}}">Products</router-link>
-          <router-link class="business-nav-item" :to="{name: `BusinessAdministrators`}">Administrators</router-link>
-        </nav>
-
-        <div id="content">
-          <router-view></router-view>
-        </div>
-
+        <vs-tabs id="business-navbar"> <!-- id="business-navbar" -->
+          <vs-tab class="business-nav-item" label="Listings">
+            <BusinessListings/>
+          </vs-tab>
+          <vs-tab class="business-nav-item" label="Administrators">
+            <BusinessAdministrators :admins="adminList"/>
+          </vs-tab>
+        </vs-tabs>
       </main>
+
     </div>
   </div>
-
 </template>
 
 
 <script>
 import api from "../Api";
+import BusinessAdministrators from "@/components/BusinessAdministrators";
+import BusinessListings from "@/components/BusinessListings";
 //import {store} from "../store";
+
 const Business = {
   name: "Business",
+  components: {BusinessListings, BusinessAdministrators},
 
   // App's initial state.
   data: function () {
@@ -132,7 +130,7 @@ export default Business;
   grid-column-gap: 1em;
 }
 
-/* Top Business Name Container */
+/* === TOP BANNER BUSINESS NAME === */
 #business-name-container {
   grid-column: 2 / 4;
   grid-row: 1;
@@ -140,7 +138,7 @@ export default Business;
   text-align: center;
   background-color: transparent;
   padding: 0.5em 0 0.5em 0;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
@@ -156,7 +154,7 @@ export default Business;
   padding: 0 0 0.5em 0;
 }
 
-/* Business Info Panel on left side */
+/* === LEFT SIDE INFO PANEL === */
 #business-container {
   grid-column: 2;
   grid-row: 2;
@@ -169,7 +167,7 @@ export default Business;
 
 .sub-container {
   padding: 2em;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }
@@ -191,7 +189,6 @@ export default Business;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(1, auto) repeat(1, 1fr);
   grid-row-gap: 2em;
-
 }
 
 #created-date {
@@ -204,13 +201,13 @@ export default Business;
   height: fit-content;
 }
 
-/* Right Hand Content Side. */
+/* === MAIN CONTENT SECTION === */
 main {
   grid-column: 3;
   grid-row: 2;
 
   margin: 1em 0 1em 0;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }
@@ -218,38 +215,15 @@ main {
 #business-navbar {
   grid-column: 2;
   grid-row: 1;
-
-  font-size: 18px;
-
-  padding-top: 1em;
-  padding-bottom: 1em;
-
-  box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
-  border-radius: 1em;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-
 }
 
 .business-nav-item {
-  text-align: center;
-  color: black;
-  font-weight: 700;
+  padding: 0 1em;
   font-size: 14px;
-  letter-spacing: 1px;
-  text-decoration: none;
-
-  padding: 10px 20px;
-  margin: 10px;
-
-  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
-  background-size: 500%;
-  border: none;
-  border-radius: 5rem;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
-.business-nav-item:hover {
-  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
+#business-navbar >>> .vs-tabs--li { /* Targets individual tab */
+  padding: 0 1em;
 }
 
 /* For when the screen gets too narrow - mainly for mobile view */
@@ -283,22 +257,5 @@ main {
   }
 
 }
-
-
-/* Error 406 Styling */
-#error {
-  text-align: center;
-  padding: 0 1em 1em 1em;
-
-  margin: 1em 0 1em 0;
-  border-radius: 1.5em;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F3EBF6;
-}
-#error-header {
-  font-size: 48px;
-  padding: 0.75em 1em 1em 1em;
-}
-
 
 </style>

@@ -15,10 +15,12 @@ import {store} from "../store"
 const BusinessAdministrators = {
   name: "BusinessAdministrators",
 
+  props: {
+    admins: Array,
+  },
 
   data: function() {
     return {
-      admins: null,
       primaryAdminId: null
     }
   },
@@ -28,24 +30,32 @@ const BusinessAdministrators = {
      * Remove selected admin user from business.
      * @param user
      */
-    removeUserAsAdmin: function(user) {
+    removeUserAsAdmin: function (user) {
       api.removeUserAsBusinessAdmin(this.$route.params.id, user.id)
-      .then(() => {
-        this.admins = this.admins.filter((admin) => admin.id !== user.id);
-        this.$vs.notify({title:`Successfully removed user`, text:`${user.firstName} was removed as an administrator.`, color:'success'});
-      })
-      .catch((error) => {
-        if (error.response.status === 400) {
-          this.$vs.notify({title:`Failed to remove user`, text:`${user.firstName} is the primary administrator.`, color:'danger'});
-        }
-        throw new Error(`ERROR trying to remove user as admin: ${error}`);
-      });
+          .then(() => {
+            this.admins = this.admins.filter((admin) => admin.id !== user.id);
+            this.$vs.notify({
+              title: `Successfully removed user`,
+              text: `${user.firstName} was removed as an administrator.`,
+              color: 'success'
+            });
+          })
+          .catch((error) => {
+            if (error.response.status === 400) {
+              this.$vs.notify({
+                title: `Failed to remove user`,
+                text: `${user.firstName} is the primary administrator.`,
+                color: 'danger'
+              });
+            }
+            throw new Error(`ERROR trying to remove user as admin: ${error}`);
+          });
     },
 
     /**
      * Navigate page to the user that was clicked on.
      */
-    navigateToUser: function(id) {
+    navigateToUser: function (id) {
       this.$router.push({path: `/users/${id}`})
     },
 
@@ -53,24 +63,10 @@ const BusinessAdministrators = {
      * Checks if the current user is also the primary administrator of this business.
      * @returns {boolean} true if the user is the primary admin, else false.
      */
-    isPrimaryAdmin: function() {
+    isPrimaryAdmin: function () {
       return store.loggedInUserId === this.primaryAdminId;
     },
-
-    /**
-     * Retrieve administrator details.
-     */
-    retrieveAdmins: function() {
-      this.admins = this.$parent.adminList;
-      this.primaryAdminId = this.$parent.business.primaryAdministratorId;
-    }
-
   },
-
-  mounted() {
-    this.retrieveAdmins();
-  },
-
 }
 
 export default BusinessAdministrators;
