@@ -9,23 +9,25 @@ import java.util.Date;
 @Data
 public class NewInventoryRequest {
 
+    private String productId;
     private int quantity;
     private double pricePerItem;
     private double totalPrice;
-    private Date manufacturedDate;
-    private Date sellByDate;
-    private Date bestBeforeDate;
-    private Date expiryDate;
+    private Date manufactured;
+    private Date sellBy;
+    private Date bestBefore;
+    private Date expires;
 
 
-    public NewInventoryRequest(int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
+    public NewInventoryRequest(String productId, int quantity, double pricePerItem, double totalPrice, Date manufactured, Date sellBy, Date bestBefore, Date expires) {
+        this.productId = productId;
         this.quantity = quantity;
         this.pricePerItem = pricePerItem;
         this.totalPrice = totalPrice;
-        this.manufacturedDate = manufacturedDate;
-        this.sellByDate = sellByDate;
-        this.bestBeforeDate = bestBeforeDate;
-        this.manufacturedDate = manufacturedDate;
-        this.expiryDate = expiryDate;
+        this.manufactured = manufactured;
+        this.sellBy = sellBy;
+        this.bestBefore = bestBefore;
+        this.manufactured = manufactured;
+        this.expires = expires;
     }
 }
