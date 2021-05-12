@@ -65,8 +65,7 @@ public class Inventory {
      * @param businessId business to assign the product inventory rights to.
      * @param product the product being added to the businesses inventory
      */
-    public Inventory(NewInventoryRequest newInventoryRequest, Long businessId, Product product) {
-        this.product = product;
+    public Inventory(NewInventoryRequest newInventoryRequest, Long businessId) {
         this.quantity = newInventoryRequest.getQuantity();
         this.pricePerItem = newInventoryRequest.getPricePerItem();
         this.totalPrice = newInventoryRequest.getTotalPrice();
