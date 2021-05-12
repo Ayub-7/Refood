@@ -43,7 +43,7 @@ public class ProductController {
 
     @Autowired private ObjectMapper mapper;
 
-    @Value("${media.image.business.directory}")
+    @Value("/src/main/resources/media/images/businesses/")
     String rootImageDir;
 
 //    private final ObjectMapper mapper = new ObjectMapper();
@@ -241,6 +241,7 @@ public class ProductController {
 
         File file = new File(businessDir + "/" + id + imageExtension);
         File thumbnailFile = new File(System.getProperty("user.dir") + businessDir + "/" + id + "_thumbnail" + imageExtension);
+        System.out.println(thumbnailFile.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
