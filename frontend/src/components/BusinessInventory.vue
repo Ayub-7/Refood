@@ -95,11 +95,6 @@ export default {
     border-radius: 1em;
   }
 
-  th {
-    background: #1F74FF;
-    color: white;
-  }
-
   #table {
     margin: 1em;
   }

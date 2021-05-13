@@ -36,7 +36,7 @@
             <BusinessListings/>
           </vs-tab>
           <vs-tab class="business-nav-item" label="Administrators">
-            <BusinessAdministrators :admins="adminList"/>
+            <BusinessAdministrators :admins="adminList" :pAdminId="business.primaryAdministratorId"/>
           </vs-tab>
         </vs-tabs>
       </main>
@@ -48,8 +48,8 @@
 
 <script>
 import api from "../Api";
-import BusinessAdministrators from "@/components/BusinessAdministrators";
-import BusinessListings from "@/components/BusinessListings";
+import BusinessAdministrators from "./BusinessAdministrators";
+import BusinessListings from "./BusinessListings";
 //import {store} from "../store";
 
 const Business = {

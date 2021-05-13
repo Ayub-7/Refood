@@ -2,7 +2,10 @@
   <ul id="administrators-list">
     <!-- Admin Card -->
     <li class="card" v-for="user in admins" :key="user.id" v-bind:user="user">
-      <button class="admin-name" @click="navigateToUser(user.id)">{{user.firstName}} {{user.middleName}} {{user.lastName}}</button>
+      <button class="admin-name" @click="navigateToUser(user.id)">
+        <b v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </b>
+        <div v-else> {{user.firstName}} {{user.middleName}} {{user.lastName}} </div>
+      </button>
       <button class="removeAdminButton" v-if="isPrimaryAdmin()" @click="removeUserAsAdmin(user)">x</button>
     </li>
   </ul>
@@ -17,11 +20,12 @@ const BusinessAdministrators = {
 
   props: {
     admins: Array,
+    pAdminId: Number,
   },
 
   data: function() {
     return {
-      primaryAdminId: null
+      primaryAdminId: this.pAdminId,
     }
   },
 
@@ -84,14 +88,14 @@ export default BusinessAdministrators;
 
   display: inline-flex;
   flex-direction: row;
+  cursor: pointer;
 
   background-color: transparent;
   padding: 10px 20px;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 0.5em 1em;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-
 }
 
 .card:hover {
