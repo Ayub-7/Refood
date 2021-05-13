@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,9 +58,23 @@ public class InventoryController {
     }
 
 
+    /**
+     * POST request for inventory
+     * @param id the business's id
+     * @param request incoming JSON request containing inventory information
+     * @return ResponseEntity
+     * @throws JsonProcessingException when json mapping object to a json string fails unexpectedly.
+     */
     @PostMapping("/businesses/{id}/inventory")
     public ResponseEntity<List<Product>> postInventory(@PathVariable Long id, @RequestBody NewInventoryRequest request, HttpSession session) {
         Business business = businessRepository.findBusinessById(id);
+
+        Product product = productRepository.findProductByIdAndBusinessId(request.getProductId(), business.getId());
+
+        if(product == null) { //Product doesn't exist in business
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
         if(business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
@@ -69,10 +84,14 @@ public class InventoryController {
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else {
-                Inventory newInventoryItem = new Inventory(request, business.getId());
-                inventoryRepository.save(newInventoryItem);
+                try { //Validation done in Inventory model
+                    Inventory newInventoryItem = new Inventory(request, business.getId());
+                    inventoryRepository.save(newInventoryItem);
 
-                return ResponseEntity.status(HttpStatus.CREATED).build();
+                    return ResponseEntity.status(HttpStatus.CREATED).build();
+                } catch(ValidationException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
             }
         }
 
