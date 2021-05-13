@@ -108,18 +108,42 @@ const ModifyCatalog = {
      */
 
     checkForm: function() {
+      var invalidChars = /[^a-z\d]/i;
+      var isValidName = !(invalidChars.test(this.productName));
+      var isValidID = !(invalidChars.test(this.productId));
+      var isValidManu = !(invalidChars.test(this.manufacturer));
       this.errors = [];
+      if (isValidName === false) {
+        this.errors.push("invalid-chars");
+      }
+      if (isValidID === false) {
+        this.errors.push("invalid-chars");
+      }
+      if (isValidManu === false) {
+        this.errors.push("invalid-chars");
+      }
       if (this.productName.length === 0) {
         this.errors.push(this.productName);
       }
 
+      if (this.productName.length > 15) {
+        this.errors.push("long-name");
+      }
 
       if (this.productId.length === 0) {
         this.errors.push(this.productId);
       }
 
+      if (this.productId.length > 17) {
+        this.errors.push("long-id");
+      }
+
       if (this.description.length === 0) {
         this.errors.push('no-desc');
+      }
+
+      if (this.description.length > 70) {
+        this.errors.push('long-desc');
       }
 
       if (this.manufacturer.length === 0) {
@@ -151,6 +175,35 @@ const ModifyCatalog = {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
           text: 'Description is Required.',
+          color: 'danger'
+        });
+      }
+
+      if (this.errors.includes('long-desc')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Description is too long (70 characters MAX).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('long-name')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Name is too long (15 characters MAX).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('long-id')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'ID is too long (17 characters MAX).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('invalid-chars')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Invalid Characters',
           color: 'danger'
         });
       }
