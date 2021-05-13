@@ -96,11 +96,9 @@ public class Inventory {
         Date today = Calendar.getInstance().getTime();
         if(req.getQuantity() < 1 || req.getTotalPrice() < 0 || req.getPricePerItem() < 0) {
             return false;
-        } else if (req.getManufactured() == null && req.getBestBefore() == null && req.getExpires() == null && req.getSellBy() == null) {
+        } else if (req.getExpires() == null || req.getExpires().before(today)) {
             return false;
         } else if (req.getManufactured() != null && req.getManufactured().after(today)) {
-            return false;
-        } else if(req.getExpires() != null && req.getExpires().before(today)) {
             return false;
         } else if(req.getSellBy() != null && req.getSellBy().before(today)) {
             return false;

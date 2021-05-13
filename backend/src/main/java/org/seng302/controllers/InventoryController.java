@@ -3,10 +3,8 @@ package org.seng302.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
-<<<<<<< HEAD
 import org.seng302.models.requests.NewInventoryRequest;
-=======
->>>>>>> S302T900-187_inventory_GET_request
+
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ProductRepository;
@@ -33,7 +31,7 @@ public class InventoryController {
     private InventoryRepository inventoryRepository;
 
     @Autowired
-    private InventoryRepository inventoryRepository;
+    private ProductRepository productRepository;
 
     /**
      * Get request mapping for getting business inventory by business id
