@@ -34,7 +34,7 @@ public class BusinessController {
     /**
      * Get request mapping for getting business by id
      * @param id the business's id
-     * @return ResponseEntity
+     * @return ResponseEntity - 401 when unauthorized (handled by spring sec). 406 when business doesn't exist. 200 otherwise.
      * @throws JsonProcessingException when json mapping object to a json string fails unexpectedly.
      */
     @GetMapping("/businesses/{id}")
@@ -42,10 +42,9 @@ public class BusinessController {
         Business business = businessRepository.findBusinessById(Long.parseLong(id));
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        } else {
-            String businessJson = mapper.writeValueAsString(business);
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(businessJson);
         }
+        String businessJson = mapper.writeValueAsString(business);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(businessJson);
     }
 
     /**

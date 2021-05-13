@@ -187,6 +187,13 @@ html .clear-checked:active {
   float: left;
 }
 
+/** VUESAX TABLE STYLING **/
+th {
+  background: #1F74FF;
+  color: white;
+}
+
+
 @media only screen and (max-width: 700px) {
   .topbar #navLinks {
     display: none;
@@ -216,4 +223,3 @@ html .clear-checked:active {
 #topBar {
   height: auto;
 }
-
