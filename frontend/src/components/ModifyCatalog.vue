@@ -108,25 +108,25 @@ const ModifyCatalog = {
      */
 
     checkForm: function() {
-      var invalidChars = /[^a-z\d]/i;
-      var isValidName = !(invalidChars.test(this.productName));
-      var isValidID = !(invalidChars.test(this.productId));
-      var isValidManu = !(invalidChars.test(this.manufacturer));
+      var invalidChars = /[^a-zA-Z/ -\d]/i;
+      //var isValidName = !(invalidChars.test(this.productName));
+      //var isValidID = !(invalidChars.test(this.productId));
+      //var isValidManu = !(invalidChars.test(this.manufacturer));
       this.errors = [];
-      if (isValidName === false) {
+      if (this.productName.match(invalidChars)) {
         this.errors.push("invalid-chars");
       }
-      if (isValidID === false) {
+      if (this.productId.match(invalidChars)) {
         this.errors.push("invalid-chars");
       }
-      if (isValidManu === false) {
+      if (this.manufacturer.match(invalidChars)) {
         this.errors.push("invalid-chars");
       }
       if (this.productName.length === 0) {
         this.errors.push(this.productName);
       }
 
-      if (this.productName.length > 15) {
+      if (this.productName.length > 28) {
         this.errors.push("long-name");
       }
 
