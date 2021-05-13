@@ -1,13 +1,17 @@
 package org.seng302.controllers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.Listing;
-import org.seng302.models.Role;
-import org.seng302.models.User;
-import org.seng302.models.requests.UserIdRequest;
-import org.seng302.repositories.UserRepository;
+import org.seng302.models.Inventory;
+import org.seng302.models.Business;
+import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ListingRepository;
+import org.seng302.repositories.BusinessRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,21 +21,22 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.List;
+import java.util.ArrayList;
+
 @RestController
 public class ListingController {
-    private static final Logger logger = LogManager.getLogger(ProductController.class.getName());
+    private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
-    @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
-    @Autowired private FileService fileService;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    private ListingRepository ListingRepository;
+    private ListingRepository listingRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private InventoryRepository inventoryRepository;
 
     /**
      * Get request mapping for getting Listing by id
@@ -40,17 +45,21 @@ public class ListingController {
      * @throws JsonProcessingException when json mapping object to a json string fails unexpectedly.
      */
     @GetMapping("/businesses/{id}/listings")
-    public ResponseEntity<String> getListing(@PathVariable String id) throws JsonProcessingException {
+    public ResponseEntity<List<Listing>> getListings(@PathVariable long id) throws JsonProcessingException {
         Business business = businessRepository.findBusinessById(id);
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        List<Inventory> inventoryList = inventoryRepository.findInventoryByBusinessId(id);
+
+        List<Listing> listings = new ArrayList<Listing>();
+
+        //Iterate over reach inventory item to get the corresponding listing (if any)
+        for (Inventory inventoryItem : inventoryList) {
+            List<Listing> listing = listingRepository.findListingsByInventoryItem(inventoryItem);
+            listings.addAll(listing);
         }
 
-        List<Listing> listings = findListingsByBusinessId(id) ;
         return ResponseEntity.status(HttpStatus.OK).body(listings);
     }
 

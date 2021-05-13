@@ -103,15 +103,3 @@ INSERT INTO product (id, name, description, manufacturer, recommended_retail_pri
     ('WAUUL98E96A125348', 'Calvados - Boulard', 'quis lectus suspendisse potenti in eleifend quam a', 'Vegesdirect', 9.03, '2021-01-25T22:18:45Z', 3),
     ('JN8AF5MR1ET433412', 'Juice - Pineapple, 341 Ml', 'ridiculus mus etiam vel augue vestibulum', 'Juicelord', 2.66, '2021-03-09T22:56:37Z', 3),
     ('WAUEH78E77A454447', 'Bread - Focaccia Quarter', 'orci vehicula condimentum curabitur in libero', 'Bread Company', 22.34, '2021-04-05T18:35:12Z', 5);
-
-
-/*
-public Listing(Inventory inventoryItem, int quantity, double price, String moreInfo, Date created, Date closes) {
-
-      public Inventory(long id, String productId, long businessId, int , double pricePerItem, double , Date , Date , Date , Date expiryDate) {
-
-
- */
-
-INSERT INTO inventory (id, productId, businessId, quantity, pricePerItem, totalPrice, manufacturedDate, sellByDate, bestBeforeDate, expiryDate) VALUES
-

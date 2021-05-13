@@ -1,6 +1,8 @@
 package org.seng302.repositories;
 
 import org.seng302.models.Listing;
+import org.seng302.models.Inventory;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,7 +19,5 @@ import java.util.List;
 @RepositoryRestResource
 public interface ListingRepository extends JpaRepository<Listing, Long> {
 
-    Listing findListingByIdAndBusinessId(String id, long businessId);
-
-    List<Listing> findListingsByBusinessId(long businessId);
+    List<Listing> findListingsByInventoryItem(Inventory inventoryItem);
 }

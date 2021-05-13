@@ -33,18 +33,16 @@ public class ListingRepositoryTests {
     void setUp() {
         assertThat(listingRepository).isNotNull();
 
-        public Listing(Inventory inventoryItem, int quantity, double price, String moreInfo, Date created, Date closes) {
-
+        //public Listing(Inventory inventoryItem, int quantity, double price, String moreInfo, Date created, Date closes) {
+        //Inventory inventoryItem, int quantity, double price, String moreInfo, Date created, Date closes
         Inventory inventoryItem = new Inventory();
         Date dateCreated = new Date();
         Date dateCloses = new Date();
         dateCloses.setYear(dateCreated.getYear()+1);
 
-        Listing b1 = new Listing(inventoryItem, 12, 12.00, "test more info", );
+        Listing b1 = new Listing(inventoryItem, 12, 12.00, "test more info", dateCreated, dateCloses);
 
-        Listing b2 = new Listing("Listing2", "Test Listing 2", a2, ListingType.RETAIL_TRADE);
         ListingRepository.save(b1);
-        ListingRepository.save(b2);
     }
 
     @Test
