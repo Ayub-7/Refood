@@ -56,7 +56,7 @@ public class InventoryRepositoryTests {
         //Need to setup business and product for referential integrity
         assertThat(businessRepository2).isNotNull();
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
-        Business b1 = new Business("Business1", "Test Business 1", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+        Business b1 = new Business("AnotherBusiness", "A business", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
         businessRepository2.save(b1);
 
 

@@ -43,6 +43,8 @@ public class BusinessRepositoryTests {
     @Test
     public void findBusiness() {
         Business found = businessRepository.findBusinessById(1);
+        System.out.println("blalgfsadas");
+        System.out.println(found);
         assertThat(found.getName()).isEqualTo("Business1");
         assertThat(found.getBusinessType()).isEqualTo(BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
 
