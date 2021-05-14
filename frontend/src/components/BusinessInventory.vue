@@ -18,7 +18,7 @@
             </div>
             <div class="row">
               <label for="quantity">Quantity</label>
-              <vs-input-number id="quantity" v-model="quantity"/>
+              <vs-input-number min="0" id="quantity" v-model="quantity"/>
             </div>
             <div class="row">
               <label for="description">Description</label>
@@ -99,7 +99,14 @@ export default {
       inventory: [],
       prodId:'',
       addNewInv:false,
-      bestBefore: ''
+      pricePerItem: 0.0,
+      quantity: 0,
+      invDescription: '',
+      bestBefore: '',
+      listExpiry: '',
+      manufactureDate: '',
+      sellBy: ''
+
     }
   }
 }
