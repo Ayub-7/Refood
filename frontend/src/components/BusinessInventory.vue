@@ -10,15 +10,32 @@
       </div>
     </div>
 
-    <vs-prompt :active.sync="newListingPopup" title="Add a new listing">
-      <div>
-        <label>Qty</label><vs-input-number v-model="qty"></vs-input-number> <!-- todo: max based on current inventory amount -->
-        <vs-input class="new-listing-input" v-model="qty" label-placeholder="Qty"></vs-input>
-        <vs-input class="new-listing-input" v-model="price" label-placeholder="Price"></vs-input>
-        <vs-input class="new-listing-input" v-model="moreInfo" label-placeholder="More Info"></vs-input>
-        <vs-input class="new-listing-input" v-model="closes" label-placeholder="Close Date"></vs-input>
+    <vs-popup :active.sync="newListingPopup"
+              title="List a Product">
+      <div class="new-listing-modal">
+        <h3 id="listing-product-id">
+          ABC-123
+        </h3>
+        <h3 id="listing-product-name">
+          Bean of cans
+        </h3>
+        <vs-divider id="listing-divider"></vs-divider>
+
+        <div id="listing-qty">
+          <label>Quantity</label>
+          <vs-input-number v-model="qty"></vs-input-number> <!-- todo: max based on current inventory amount -->
+        </div>
+        <div id="listing-price">
+          <vs-input type="number" v-model="price" label="Price"></vs-input>
+        </div>
+        <div id="listing-closes">
+          <vs-input type="date" v-model="closes" label="Close Date"></vs-input>
+        </div>
+        <div id="listing-moreInfo">
+          <vs-textarea class="textarea" v-model="moreInfo" label="More Info"></vs-textarea>
+        </div>
       </div>
-    </vs-prompt>
+    </vs-popup>
 
     <vs-divider></vs-divider>
     <!-- Table View -->
@@ -109,8 +126,66 @@ export default {
   }
 
   /* ===== NEW LISTING DIALOG/PROMPT ====== */
-  .new-listing-input {
-    padding: 1em 0;
+
+  .new-listing-modal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(auto-fit, 1fr);
+    grid-row-gap: 0.5em;
+  }
+
+  .vs-popup-primary >>> header {
+    background-color: #1F74FF;
+    color: #FFFFFF;
+  }
+
+  .textarea >>> textarea {
+    min-height: 100px;
+    max-height: 100px;
+  }
+
+  .vs-popup-primary >>> #listing-product-id {
+    grid-row: 1;
+    grid-column: 1;
+
+    text-align: center;
+  }
+
+  .vs-popup-primary >>> #listing-product-name {
+    grid-row: 1;
+    grid-column: 2;
+
+    text-align: center;
+  }
+
+  .vs-popup-primary >>> #listing-divider {
+    grid-row: 2;
+    grid-column: 1 / 3;
+  }
+
+  .vs-popup-primary >>> #listing-qty {
+    margin: auto;
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .vs-popup-primary >>> #listing-price {
+    margin: auto;
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .vs-popup-primary >>> #listing-closes {
+    margin: auto;
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .vs-popup-primary >>> #listing-moreInfo {
+    margin: 0.75em auto auto auto;
+    width: 90%;
+    grid-row: 5;
+    grid-column: 1 / 3;
   }
 
 
