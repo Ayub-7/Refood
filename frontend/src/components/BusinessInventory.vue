@@ -6,33 +6,41 @@
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
         <vs-button class="header-button">New Inventory Product</vs-button>
-        <vs-button @click="newListingPopup = true" class="header-button">New Item Listing</vs-button> <!-- todo: remove this when testing done -->
+        <vs-button @click="newListingPopup = true" class="header-button">New Item Listing</vs-button>
+        <!-- todo: remove this new item listing button when testing done
+              - want to make it so there's an action button for each inventory item, with the ability to add a new listing attached.-->
       </div>
     </div>
 
+    <!-- NEW LISTING MODAL -->
     <vs-popup :active.sync="newListingPopup"
-              title="List a Product">
+              title="Create a new listing">
       <div class="new-listing-modal">
         <h3 id="listing-product-id">
           ABC-123
         </h3>
         <h3 id="listing-product-name">
-          Bean of cans
+          Bean of cans - Placeholder Name
         </h3>
         <vs-divider id="listing-divider"></vs-divider>
 
         <div id="listing-qty">
-          <label>Quantity</label>
+          <label style="font-size: 13.6px">Quantity</label>
           <vs-input-number v-model="qty"></vs-input-number> <!-- todo: max based on current inventory amount -->
         </div>
         <div id="listing-price">
-          <vs-input type="number" v-model="price" label="Price"></vs-input>
+          <span style="margin: auto 0 4px 0; font-size: 14px">$</span>
+          <vs-input type="number" v-model="price" label="Price" ></vs-input>
         </div>
         <div id="listing-closes">
           <vs-input type="date" v-model="closes" label="Close Date"></vs-input>
         </div>
         <div id="listing-moreInfo">
           <vs-textarea class="textarea" v-model="moreInfo" label="More Info"></vs-textarea>
+        </div>
+        <div id="listing-button-group">
+          <vs-button color="success" style="width: 100px;">Create</vs-button>
+          <vs-button color="danger" style="width: 100px;" @click="newListingPopup = false">Cancel</vs-button>
         </div>
       </div>
     </vs-popup>
@@ -140,52 +148,66 @@ export default {
   }
 
   .textarea >>> textarea {
+    resize: none;
     min-height: 100px;
     max-height: 100px;
   }
 
-  .vs-popup-primary >>> #listing-product-id {
+  #listing-product-id {
     grid-row: 1;
     grid-column: 1;
 
     text-align: center;
   }
 
-  .vs-popup-primary >>> #listing-product-name {
+  #listing-product-name {
     grid-row: 1;
     grid-column: 2;
 
     text-align: center;
   }
 
-  .vs-popup-primary >>> #listing-divider {
+  #listing-divider {
     grid-row: 2;
     grid-column: 1 / 3;
   }
 
-  .vs-popup-primary >>> #listing-qty {
+  #listing-qty {
     margin: auto;
     grid-column: 2;
     grid-row: 3;
   }
 
-  .vs-popup-primary >>> #listing-price {
+  #listing-price {
     margin: auto;
     grid-column: 1;
     grid-row: 3;
+
+    display: flex;
   }
 
-  .vs-popup-primary >>> #listing-closes {
+  #listing-closes {
     margin: auto;
+    padding-left: 8px;
     grid-column: 1;
     grid-row: 4;
   }
 
-  .vs-popup-primary >>> #listing-moreInfo {
+  #listing-moreInfo {
     margin: 0.75em auto auto auto;
     width: 90%;
     grid-row: 5;
     grid-column: 1 / 3;
+  }
+
+  #listing-button-group {
+    margin: 0.75em auto auto auto;
+    width: 90%;
+    grid-row: 6;
+    grid-column: 2;
+
+    display: flex;
+    justify-content: space-around;
   }
 
 
