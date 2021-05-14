@@ -5,33 +5,48 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-        <vs-button @click="popupActivo2=true" class="header-button">New Inventory Listing</vs-button>
-        <!-- TEST -->
-        <vs-popup classContent="popup-example"  title="Lorem ipsum dolor sit amet" :active.sync="popupActivo2">
-          <vs-input class="inputx" placeholder="Placeholder" v-model="value1"/>
-          <vs-input disabled class="inputx" placeholder="Disabled" v-model="value2"/>
-
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-          </p>
-          <vs-select
-              label="Figuras"
-              v-model="select1"
-          >
-            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="item,index in options1" />
-          </vs-select>
-          <vs-button @click="popupActivo3=true" color="primary" type="filled">Open Inner Popup</vs-button>
-          <vs-popup title="Inner popup" :active.sync="popupActivo3">
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              <br><br>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              <br><br>
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-          </vs-popup>
+        <vs-button @click="addNewInv=true" class="header-button">New Inventory Listing</vs-button>
+        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">
+          <div class="form-group required vs-col" vs-order="1" id="firstColModal">
+            <div class="row">
+              <label for="prodId">Product ID</label>
+              <vs-input type="text" class="inputx" id="prodId" placeholder="Product ID" v-model="prodId"/>
+            </div>
+            <div class="row">
+              <label for="pricePerItem">Price per item</label>
+              <vs-input class="inputx" id="pricePerItem" placeholder="Price per item" v-model="pricePerItem"/>
+            </div>
+            <div class="row">
+              <label for="quantity">Quantity</label>
+              <vs-input-number id="quantity" v-model="quantity"/>
+            </div>
+            <div class="row">
+              <label for="description">Description</label>
+              <vs-textarea id="description" v-model="invDescription"></vs-textarea>
+            </div>
+          </div>
+          <div class="form-group required vs-col" vs-order="2" id="secondColModal">
+            <div class="row">
+              <label for="bestBefore">Best before</label>
+              <vs-input type="date" id="bestBefore" class="inputx" v-model="bestBefore"/>
+            </div>
+            <div class="row">
+              <label for="listingExpiry">Listing expiry</label>
+              <vs-input type="date" id="listingExpiry" class="inputx" v-model="listExpiry"/>
+            </div>
+            <div class="row">
+              <label for="manufactureDate">Manufacture date</label>
+              <vs-input type="date" id="manufactureDate" class="inputx" v-model="manufactureDate"/>
+            </div>
+            <div class="row">
+              <label for="sellBy">Sell by</label>
+              <vs-input type="date" id="sellBy" class="inputx" v-model="sellBy"/>
+            </div>
+          </div>
+          <div class="form-group required vs-col" align="center" id="addButton">
+            <vs-button>Add product</vs-button>
+          </div>
         </vs-popup>
-        <!-- TEST -->
       </div>
     </div>
 
@@ -82,16 +97,9 @@ export default {
   data(){
     return {
       inventory: [],
-      select1:3,
-      options1:[
-        {text:'IT',value:0},
-        {text:'Blade Runner',value:2},
-        {text:'Thor Ragnarok',value:3},
-      ],
-      value1:'',
-      value2:'',
-      popupActivo2:false,
-      popupActivo3:false
+      prodId:'',
+      addNewInv:false,
+      bestBefore: ''
     }
   }
 }
@@ -139,4 +147,15 @@ export default {
     margin: 1em;
   }
 
+  /* ===== INVENTORY ADDING MODAL ===== */
+  #firstColModal {
+    margin-right: 160px;
+    margin-left: 5px;
+  }
+  .row {
+    margin-bottom: 15px;
+  }
+  .addButton {
+    align-self: center;
+  }
 </style>
