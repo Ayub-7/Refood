@@ -44,7 +44,7 @@
 
             <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
 
-            <vs-td :data="data[indextr].firstName">{{data[indextr].lastName}}</vs-td>
+            <vs-td :data="data[indextr].lastName">{{data[indextr].lastName}}</vs-td>
 
             <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
 
