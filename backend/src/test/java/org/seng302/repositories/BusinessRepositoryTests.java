@@ -14,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +43,10 @@ public class BusinessRepositoryTests {
 
     @Test
     public void findBusiness() {
+        List<Business> businesses = businessRepository.findAll();
+        System.out.println(businesses);
         Business found = businessRepository.findBusinessById(1);
+
         System.out.println("blalgfsadas");
         System.out.println(found);
         assertThat(found.getName()).isEqualTo("Business1");
