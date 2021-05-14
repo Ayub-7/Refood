@@ -4,7 +4,6 @@ import org.seng302.models.Business;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.List;
 
 @RepositoryRestResource
 public interface BusinessRepository extends JpaRepository<Business, Long> {
@@ -16,5 +15,4 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
      */
     Business findBusinessById(long id);
 
-    List<Business> findAll();
 }

@@ -1,5 +1,6 @@
 package org.seng302.repositories;
 
+import org.junit.After;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -27,17 +29,19 @@ public class InventoryRepositoryTests {
     private InventoryRepository inventoryRepository;
 
     @Autowired
-    private ProductRepository productRepository2;
+    private ProductRepository productRepository;
 
     @Autowired
-    private BusinessRepository businessRepository2;
+    private BusinessRepository businessRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private Business business1;
 
     private Product testProd1;
 
     private Inventory testInven1;
-    private Inventory testInven2;
 
     private Date dateBefore;
     private Date dateAfter;
@@ -54,15 +58,15 @@ public class InventoryRepositoryTests {
         dateBefore = beforeCalendar.getTime();
 
         //Need to setup business and product for referential integrity
-        assertThat(businessRepository2).isNotNull();
+        assertThat(businessRepository).isNotNull();
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         Business b1 = new Business("AnotherBusiness", "A business", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-        businessRepository2.save(b1);
+        businessRepository.save(b1);
 
 
-        assertThat(productRepository2).isNotNull();
+        assertThat(productRepository).isNotNull();
         testProd1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
-        productRepository2.save(testProd1);
+        productRepository.save(testProd1);
 
 
         assertThat(inventoryRepository).isNotNull();
@@ -70,6 +74,7 @@ public class InventoryRepositoryTests {
 
         inventoryRepository.save(testInven1);
     }
+
 
     @Test
     public void saveInventory() {
