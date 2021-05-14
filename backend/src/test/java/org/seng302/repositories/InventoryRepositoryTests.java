@@ -38,7 +38,7 @@ public class InventoryRepositoryTests {
         inventoryRepository.save(testInven2);
     }
 
-    @Test
+    //@Test
     public void saveInventory() {
         Inventory inventory = new Inventory("12-5088639", 1, 4, 4.0, 16.0, new Date("2021-01-28"), new Date("2021-04-28"), new Date("2021-05-28"), new Date("2021-06-28"));
         inventoryRepository.save(inventory);

@@ -1,5 +1,3 @@
-package org.seng302.repositories;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -12,10 +10,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.uti;
 import java.security.NoSuchAlgorithmException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.seng302.repositories.InventoryRepository;
+import org.seng302.repositories.ListingRepository;
+import org.seng302.repositories.ProductRepository;
+import org.seng302.models.*;
+
+import java.util.Date;
+import java.util.Calendar;
+import java.util.List;
+
 
 /**
  * Integration tests of the user repository.
@@ -28,32 +35,62 @@ public class ListingRepositoryTests {
     @Autowired
     private ListingRepository listingRepository;
 
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+
+    private Inventory testInven1;
+    private Inventory testInven2;
+
+    private Listing testListing1;
+
+    /**
+     * A new listing item requires a new inventory item which in turn requires a new product item...
+     * The the new inventory item should be from the same business otherwise we get a data integrity violation
+     *
+     */
 
     @BeforeEach
     void setUp() {
-        assertThat(listingRepository).isNotNull();
+        Calendar calendar = Calendar.getInstance();
+        Date dateCreated = calendar.getTime();
+        calendar.add(Calendar.YEAR, 2);
+        Date dateCloses = calendar.getTime();
 
-        //public Listing(Inventory inventoryItem, int quantity, double price, String moreInfo, Date created, Date closes) {
-        //Inventory inventoryItem, int quantity, double price, String moreInfo, Date created, Date closes
-        Inventory inventoryItem = new Inventory();
-        Date dateCreated = new Date();
-        Date dateCloses = new Date();
-        dateCloses.setYear(dateCreated.getYear()+1);
+        assertThat(inventoryRepository).isNotNull();
+        assertThat(inventoryRepository).isNotNull();
 
-        Listing b1 = new Listing(inventoryItem, 12, 12.00, "test more info", dateCreated, dateCloses);
+        Product testProd1 = new Product("77-9986231", 2, "Seedlings", "Buckwheat, Organic", "Nestle", 1.26, new Date());
+        Product testProd2 = new Product("77-5088639", 2, "Foam Cup", "6 Oz", "Edible Objects Ltd.",55.2, new Date());
 
-        ListingRepository.save(b1);
+        productRepository.save(testProd1);
+        productRepository.save(testProd2);
+
+        testInven1 = new Inventory("77-9986231", 2, 5, 2.0, 10.0, dateCreated,dateCloses, dateCloses, dateCloses);
+        testInven2 = new Inventory("77-5088639", 2, 7, 4.0, 28.0, dateCreated,dateCloses, dateCloses, dateCloses);
+
+        inventoryRepository.save(testInven1);
+        inventoryRepository.save(testInven2);
+
+        //test Data for Listings
+        testListing1 = new Listing(testInven1, 12, 12.00, "test more info", dateCreated, dateCloses);
+
+        listingRepository.save(testListing1);
+
     }
 
     @Test
-    public void findListing() {
-        Listing found = ListingRepository.findListingById(1);
-        assertThat(found.getName()).isEqualTo("Listing1");
-        assertThat(found.getListingType()).isEqualTo(ListingType.ACCOMMODATION_AND_FOOD_SERVICES);
+    public void findListingByInventoryItem() {
+        // Test if insertion is properly inserting values.
+        List<Listing> testCheckListings = listingRepository.findListingsByInventoryItem(testInven1);
+        //get the first element of the returned list
+        Listing testCheckListing = testCheckListings.get(0);
 
-        Listing notFound = ListingRepository.findListingById(100);
-        assertThat(notFound).isNull();
-
+        //check we are getting the correct listing
+        assertThat(testCheckListing).isEqualTo(testListing1);
     }
 
 
