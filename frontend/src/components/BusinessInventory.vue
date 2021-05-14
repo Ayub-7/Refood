@@ -92,6 +92,10 @@
 </template>
 
 <script>
+import api from "../Api";
+// import axios from "axios";
+import {store} from "../store";
+
 export default {
   name: "BusinessInventory",
   data(){
@@ -100,6 +104,7 @@ export default {
       prodId:'',
       addNewInv:false,
       pricePerItem: 0.0,
+      totalPrice: 0.0,
       quantity: 0,
       invDescription: '',
       bestBefore: '',
@@ -107,6 +112,42 @@ export default {
       manufactureDate: '',
       sellBy: ''
 
+    }
+  },
+  methods: {
+    /**
+     * TODO: FOR AYUB
+     */
+    checkForm: function() {
+
+    },
+    addInventory: function() {
+      if (this.errors.length === 0) {
+        api.createeInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
+          .then((response) => {
+            this.$log.debug("New catalogue item created:", response.data);
+            this.inventory.push(response.data);
+          }).catch((error) => {
+            if (error.response) {
+              console.log(error);
+              if (error.response.status === 400) {
+                this.$vs.notify( {
+                  title: 'Failed to add an inventory item',
+                  text: 'Incomplete form, or the product does not exist.',
+                  color: 'danger'
+                });
+              } else if (error.response.status === 403) {
+                this.$vs.notify( {
+                  title: 'Failed to add an inventory item',
+                  text: 'You do not have the rights to access this business',
+                  color: 'danger'
+                });
+              }
+              console.log(error.response.status);
+            }
+          this.$log.debug("Error Status:", error)
+        })
+      }
     }
   }
 }
