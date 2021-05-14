@@ -43,7 +43,7 @@
               <vs-input type="date" id="sellBy" class="inputx" v-model="sellBy"/>
             </div>
           </div>
-          <div class="form-group required vs-col" align="center" id="addButton">
+          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory">
             <vs-button>Add product</vs-button>
           </div>
         </vs-popup>
@@ -100,6 +100,7 @@ export default {
   name: "BusinessInventory",
   data(){
     return {
+      errors: [],
       inventory: [],
       prodId:'',
       addNewInv:false,
@@ -123,7 +124,7 @@ export default {
     },
     addInventory: function() {
       if (this.errors.length === 0) {
-        api.createeInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
+        api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
           .then((response) => {
             this.$log.debug("New catalogue item created:", response.data);
             this.inventory.push(response.data);
