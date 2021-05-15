@@ -5,7 +5,48 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-        <vs-button class="header-button">New Inventory Listing</vs-button>
+        <vs-button @click="addNewInv=true" class="header-button">New Inventory Listing</vs-button>
+        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">
+          <div class="form-group required vs-col" vs-order="1" id="firstColModal">
+            <div class="row">
+              <label for="prodId">Product ID</label>
+              <vs-input type="text" class="inputx" id="prodId" placeholder="Product ID" v-model="prodId"/>
+            </div>
+            <div class="row">
+              <label for="pricePerItem">Price per item</label>
+              <vs-input class="inputx" id="pricePerItem" placeholder="Price per item" v-model="pricePerItem"/>
+            </div>
+            <div class="row">
+              <label for="quantity">Quantity</label>
+              <vs-input-number min="0" id="quantity" v-model="quantity"/>
+            </div>
+            <div class="row">
+              <label for="description">Description</label>
+              <vs-textarea id="description" v-model="invDescription"></vs-textarea>
+            </div>
+          </div>
+          <div class="form-group required vs-col" vs-order="2" id="secondColModal">
+            <div class="row">
+              <label for="bestBefore">Best before</label>
+              <vs-input type="date" id="bestBefore" class="inputx" v-model="bestBefore"/>
+            </div>
+            <div class="row">
+              <label for="listingExpiry">Listing expiry</label>
+              <vs-input type="date" id="listingExpiry" class="inputx" v-model="listExpiry"/>
+            </div>
+            <div class="row">
+              <label for="manufactureDate">Manufacture date</label>
+              <vs-input type="date" id="manufactureDate" class="inputx" v-model="manufactureDate"/>
+            </div>
+            <div class="row">
+              <label for="sellBy">Sell by</label>
+              <vs-input type="date" id="sellBy" class="inputx" v-model="sellBy"/>
+            </div>
+          </div>
+          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory">
+            <vs-button>Add product</vs-button>
+          </div>
+        </vs-popup>
       </div>
     </div>
 
@@ -51,17 +92,68 @@
 </template>
 
 <script>
+import api from "../Api";
+// import axios from "axios";
+import {store} from "../store";
+
 export default {
   name: "BusinessInventory",
-
-  data: function() {
+  data(){
     return {
+      errors: [],
       inventory: [],
+      prodId:'',
+      addNewInv:false,
+      pricePerItem: 0.0,
+      totalPrice: 0.0,
+      quantity: 0,
+      invDescription: '',
+      bestBefore: '',
+      listExpiry: '',
+      manufactureDate: '',
+      sellBy: ''
 
     }
   },
+  methods: {
+    /**
+     * TODO: FOR AYUB
+     */
+    checkForm: function() {
+
+    },
+    addInventory: function() {
+      if (this.errors.length === 0) {
+        api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
+          .then((response) => {
+            this.$log.debug("New catalogue item created:", response.data);
+            this.inventory.push(response.data);
+          }).catch((error) => {
+            if (error.response) {
+              console.log(error);
+              if (error.response.status === 400) {
+                this.$vs.notify( {
+                  title: 'Failed to add an inventory item',
+                  text: 'Incomplete form, or the product does not exist.',
+                  color: 'danger'
+                });
+              } else if (error.response.status === 403) {
+                this.$vs.notify( {
+                  title: 'Failed to add an inventory item',
+                  text: 'You do not have the rights to access this business',
+                  color: 'danger'
+                });
+              }
+              console.log(error.response.status);
+            }
+          this.$log.debug("Error Status:", error)
+        })
+      }
+    }
+  }
 }
 </script>
+
 
 <style scoped>
   #container {
@@ -104,4 +196,15 @@ export default {
     margin: 1em;
   }
 
+  /* ===== INVENTORY ADDING MODAL ===== */
+  #firstColModal {
+    margin-right: 160px;
+    margin-left: 5px;
+  }
+  .row {
+    margin-bottom: 15px;
+  }
+  .addButton {
+    align-self: center;
+  }
 </style>
