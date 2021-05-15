@@ -16,29 +16,30 @@
               noDataText="You don't have any inventory."
               :pagination="true"
               :maxItems="10"
+              :notSpacer="true"
               stripe>
       <template class="table-head" slot="thead" >
         <vs-th style="border-radius: 8px 0 0 0"> <!-- Image Column --> </vs-th>
-        <vs-th sort-key="id"> ID </vs-th>
-        <vs-th sort-key="name"> Product </vs-th>
-        <vs-th sort-key="manufacturer"> Manufacturer </vs-th>
-        <vs-th sort-key="sellBy"> Sell By </vs-th>
-        <vs-th sort-key="bestBefore"> Best Before </vs-th>
-        <vs-th sort-key="expires"> Expires </vs-th>
+        <vs-th sort-key="productId"> ID </vs-th>
+        <vs-th sort-key="productName"> Product </vs-th>
+        <vs-th class="dateInTable" sort-key="manufactured"> Manufactured </vs-th>
+        <vs-th class="dateInTable" sort-key="sellBy"> Sell By </vs-th>
+        <vs-th class="dateInTable" sort-key="bestBefore"> Best Before </vs-th>
+        <vs-th class="dateInTable" sort-key="expires"> Expires </vs-th>
         <vs-th sort-key="quantity"> Qty </vs-th>
-        <vs-th> Price Per Item </vs-th>
-        <vs-th> Total Price </vs-th>
+        <vs-th id="pricePerItemCol"  sort-key="pricePerItem"> Price Per Item </vs-th>
+        <vs-th sort-key="totalPrice"> Total Price </vs-th>
         <vs-th style="border-radius: 0 8px 0 0"> <!-- Action Button Column --> </vs-th>
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="inventory in data" :key="inventory.id"> <!-- todo: connect data with table -->
-        <vs-td style="height: 100px;">
-                        <img v-if="inventory.product.primaryImagePath" style="width:auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                        <img v-if="!inventory.product.primaryImagePath" style="width: auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+        <vs-td style="height: 80px;">
+          <img v-if="inventory.product.primaryImagePath" style="width:auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+          <img v-if="!inventory.product.primaryImagePath" style="width: auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
         </vs-td>
-          <vs-td :data="inventory.product.id"> {{inventory.product.id}} </vs-td>
-          <vs-td :data="inventory.product.name"> {{inventory.product.name}} </vs-td>
-          <vs-td :data="inventory.product.manufacturer"> {{inventory.product.manufacturer}} </vs-td>
+          <vs-td id="productIdCol" :data="inventory.productId"> {{inventory.productId}} </vs-td>
+          <vs-td :data="inventory.productName"> {{inventory.productName}} </vs-td>
+          <vs-td :data="inventory.manufactured"> {{inventory.manufactured}} </vs-td>
           <vs-td :data="inventory.sellBy"> {{inventory.sellBy}} </vs-td>
           <vs-td :data="inventory.bestBefore">{{inventory.bestBefore}} </vs-td>
           <vs-td :data="inventory.expires">{{inventory.expires}} </vs-td>
@@ -65,14 +66,27 @@ export default {
   },
 
   mounted() {
-    api.getBusinessInventory(this.$route.params.id)
-    .then((response) => {
-      this.inventory = response.data;
-    }).catch((err) => {
-      if(err.response.status == 401) {
-        this.$router.push({path: '/login'})
-      }
-    })
+    this.getBusinessInventory();
+  },
+
+  methods: {
+      getBusinessInventory() {
+          api.getBusinessInventory(this.$route.params.id)
+          .then((response) => {
+            this.inventory = response.data;
+            console.log(this.inventory)
+            for(let inventoryItem of this.inventory) {
+              //Issue with sorting using object properties, so pulled required properties into inventory object
+              inventoryItem['productName'] = inventoryItem.product.name;
+              inventoryItem['productId'] = inventoryItem.product.id;
+            }
+
+          }).catch((err) => {
+            if(err.response.status == 401) {
+              this.$router.push({path: '/login'})
+            }
+          })
+    }
   }
 }
 </script>
@@ -112,10 +126,31 @@ export default {
   th {
     background: #1F74FF;
     color: white;
+    font-size: 12px;
   }
 
   #table {
-    margin: 1em;
+    margin: 0.5em;
   }
+
+  #productIdCol {
+    font-size: 10px;
+  }
+
+  #pricePerItemCol {
+    font-size: 11px;
+  }
+
+  td {
+    font-size: 12px;
+    min-width: 80px
+  }
+
+  .dateInTable{
+    width: 110px;
+  }
+
+
+  
 
 </style>

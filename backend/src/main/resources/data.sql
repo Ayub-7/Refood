@@ -104,6 +104,11 @@ INSERT INTO product (id, name, description, manufacturer, recommended_retail_pri
     ('JN8AF5MR1ET433412', 'Juice - Pineapple, 341 Ml', 'ridiculus mus etiam vel augue vestibulum', 'Juicelord', 2.66, '2021-03-09T22:56:37Z', 3),
     ('WAUEH78E77A454447', 'Bread - Focaccia Quarter', 'orci vehicula condimentum curabitur in libero', 'Bread Company', 22.34, '2021-04-05T18:35:12Z', 5);
 
-INSERT INTO inventory (best_before, business_id, price_per_item, product_id, quantity, total_price) VALUES
-    ('2021-05-27T12:00:00Z', 1, 5.00, 'WAUVT64B54N722288', 10, 50.00),
-    ('2021-06-12T12:00:00Z', 1, 5.00, 'W04GP5EC0B1798680', 10, 50.00);
+INSERT INTO inventory (best_before, business_id, expires, manufactured, price_per_item, product_id, quantity, sell_by, total_price) VALUES
+    ('2021-05-27T12:00:00Z', 1, '2021-05-27T12:00:00Z', '2021-01-27T12:00:00Z', 5.00, 'WAUVT64B54N722288', 10, null, 50.00),
+    -- ('2021-05-27T12:00:00Z', 1, '2021-05-27T12:00:00Z', null, 2.00, '07-4957066', 5, null, 30.00);
+    ('2021-08-27T12:00:00Z', 1, '2021-08-27T12:00:00Z', '2020-01-27T12:00:00Z', 3.00, 'W04GP5EC0B1798680', 7, null, 80.00),
+    ('2021-08-27T12:00:00Z', 1, '2021-10-27T12:00:00Z', null, 1.00, 'WAUVT64B54N722288', 9, null, 50.00),
+    ('2021-09-27T12:00:00Z', 1, '2021-11-27T12:00:00Z', null, 6.00, 'WAUVT64B54N722288', 1, null, 50.00);
+
+
