@@ -67,7 +67,6 @@ export default {
   #container {
     width: 75%;
     margin: 1em auto;
-
   }
 
   /* ===== PAGE HEADER ===== */
