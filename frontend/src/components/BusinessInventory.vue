@@ -28,22 +28,38 @@
           <div class="form-group required vs-col" vs-order="2" id="secondColModal">
             <div class="row">
               <label for="bestBefore">Best before</label>
-              <vs-input type="date" id="bestBefore" class="inputx" v-model="bestBefore"/>
+              <vs-input
+                  type="date"
+                  id="bestBefore"
+                  class="inputx"
+                  v-model="bestBefore"/>
             </div>
             <div class="row">
               <label for="listingExpiry">Listing expiry</label>
-              <vs-input type="date" id="listingExpiry" class="inputx" v-model="listExpiry"/>
+              <vs-input
+                  type="date"
+                  id="listingExpiry"
+                  class="inputx"
+                  v-model="listExpiry"/>
             </div>
             <div class="row">
               <label for="manufactureDate">Manufacture date</label>
-              <vs-input type="date" id="manufactureDate" class="inputx" v-model="manufactureDate"/>
+              <vs-input
+                  type="date"
+                  id="manufactureDate"
+                  class="inputx"
+                  v-model="manufactureDate"/>
             </div>
             <div class="row">
               <label for="sellBy">Sell by</label>
-              <vs-input type="date" id="sellBy" class="inputx" v-model="sellBy"/>
+              <vs-input
+                  type="date"
+                  id="sellBy"
+                  class="inputx"
+                  v-model="sellBy"/>
             </div>
           </div>
-          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory">
+          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory; checkForm()">
             <vs-button>Add product</vs-button>
           </div>
         </vs-popup>
@@ -120,7 +136,7 @@ export default {
      * TODO: FOR AYUB
      */
     checkForm: function() {
-
+      console.log(this.quantity);
     },
     addInventory: function() {
       if (this.errors.length === 0) {
