@@ -16,28 +16,31 @@
 
       <!-- Not Logged In -->
       <div v-if="getLoggedInUser() == null" class="navbar-group">
-        <vs-navbar-item index="0">
+        <vs-navbar-item index="0-0">
           <router-link to="/">Register</router-link>
         </vs-navbar-item>
-        <vs-navbar-item index="1">
+        <vs-navbar-item index="0-1">
           <router-link to="/login">Login</router-link>
         </vs-navbar-item>
       </div>
 
       <!-- Logged In -->
       <div v-else class="navbar-group">
-        <vs-navbar-item index="0">
+        <vs-navbar-item index="1-0">
           <router-link :to="{path: '/home'}">Home</router-link>
         </vs-navbar-item>
-        <vs-navbar-item index="2">
+        <vs-navbar-item index="1-2">
           <router-link to="/search">Search</router-link>
         </vs-navbar-item>
         <!-- Acting As User -->
         <div v-if="getActingAsUserId() == null" class="navbar-group">
-          <vs-navbar-item index="1">
+          <vs-navbar-item index="2-0">
+            <router-link to="/marketplace">Marketplace</router-link>
+          </vs-navbar-item>
+          <vs-navbar-item index="2-1">
             <router-link to="/businesses">Register a Business</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="3">
+          <vs-navbar-item index="2-2">
             <router-link :to="{path: `/users/${getLoggedInUser()}`}">Profile</router-link>
           </vs-navbar-item>
         </div>
@@ -95,7 +98,6 @@ import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
 import 'vuesax/dist/vuesax.css';
-// @click="goToUserPage()"
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -144,23 +146,7 @@ const app = {
             mutations.userLogout();
           })
     },
-    toggleMobileMenu: function () {
-      let x = document.getElementById("navLinks");
-      let y = document.getElementById("topBar")
-      if (x.style.display === "block") {
-        x.style.display = "none";
-        y.style.height = "55px";
-      } else {
-        x.style.display = "block";
-        if(store.loggedInUserId){
-          y.style.height = "140px";
-        } else {
-          y.style.height = "105px";
-        }
-      }
-    }
   },
-
 
   beforeMount() {
     api.checkSession()

@@ -1,7 +1,10 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Homepage from '../components/Homepage.vue';
+import Vuesax from 'vuesax';
 
 let wrapper;
+let localVue = createLocalVue();
+localVue.use(Vuesax);
 
 const mockUser = {
     "id": 5,
@@ -52,12 +55,17 @@ const getBussinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
 const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getLoggedInUserId');
 getLoggedInUserIdMethod.mockResolvedValue(mockUser.id);
 
+const $router = {
+    push: jest.fn()
+};
+
 beforeEach(() => {
-    wrapper = shallowMount(Homepage, {
+    wrapper = mount(Homepage, {
         propsData: {},
-        mocks: {},
+        mocks: {$router},
         stubs: ['router-link', 'router-view'],
         methods: {},
+        localVue,
         data () {
             return {
                 userId: mockUser.id,
@@ -91,14 +99,19 @@ describe('Homepage user tests', () => {
         expect(nameTitle.text().includes('Rayna')).toBe(true);
     });
 
-
     test('Go to profile gets called when clicked', () => {
         const profileButton = wrapper.find("#user-profile-btn");
         wrapper.vm.goToProfile = jest.fn();
         profileButton.trigger('click')
         expect(wrapper.vm.goToProfile).toBeCalled();
-    })
+    });
+
+    test('Go to marketplace is present', () => {
+        const profileButton = wrapper.find("#marketplace-btn");
+        expect(profileButton).toBeTruthy();
+    });
 });
+
 
 describe('Homepage business tests', () => {
     beforeEach(() => {
@@ -115,7 +128,7 @@ describe('Homepage business tests', () => {
     });
 
     test('Business\'s name is shown', () => {
-        const busPageTitle = wrapper.find("#name")
+        const busPageTitle = wrapper.find("#business-name")
         expect(busPageTitle.text().includes('Dabshots')).toBe(true);
     });
 
