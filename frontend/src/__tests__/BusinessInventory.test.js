@@ -1,11 +1,16 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import BusinessInventory from '../components/BusinessInventory';
 import Vuesax from 'vuesax';
+import axios from 'axios';
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
-
 let wrapper;
+
+jest.mock("axios");
+axios.get.mockResolvedValue(() => {
+    wrapper.vm.currency = "$";
+});
 
 beforeEach(() => {
    wrapper = mount(BusinessInventory, {
@@ -13,7 +18,9 @@ beforeEach(() => {
        stubs: {},
        methods: {},
        localVue,
-   })
+   });
+
+
 });
 
 afterEach(() => {
