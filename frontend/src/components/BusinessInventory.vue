@@ -12,14 +12,14 @@
     <vs-divider></vs-divider>
     <!-- Table View -->
     <vs-table id="table"
+              v-model="selected"
+              @selected="handleSelect"
               :data="this.inventory"
               noDataText="You don't have any inventory."
               :pagination="true"
-              :maxItems="10"
-              :notSpacer="true"
+              :maxItems="5"
               stripe>
       <template class="table-head" slot="thead" >
-        <vs-th style="border-radius: 8px 0 0 0"> <!-- Image Column --> </vs-th>
         <vs-th sort-key="productId"> ID </vs-th>
         <vs-th sort-key="productName"> Product </vs-th>
         <vs-th class="dateInTable" sort-key="manufactured"> Manufactured </vs-th>
@@ -33,11 +33,13 @@
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="inventory in data" :key="inventory.id"> <!-- todo: connect data with table -->
-        <vs-td style="height: 80px;">
+          <vs-td id="productIdCol" :data="inventory.productId"> 
+          {{inventory.productId}} 
+          <div style="height: 80px">
           <img v-if="inventory.product.primaryImagePath" style="width:auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
           <img v-if="!inventory.product.primaryImagePath" style="width: auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
-        </vs-td>
-          <vs-td id="productIdCol" :data="inventory.productId"> {{inventory.productId}} </vs-td>
+          </div>
+            </vs-td>
           <vs-td :data="inventory.productName"> {{inventory.productName}} </vs-td>
           <vs-td :data="inventory.manufactured"> {{inventory.manufactured}} </vs-td>
           <vs-td :data="inventory.sellBy"> {{inventory.sellBy}} </vs-td>
@@ -62,6 +64,7 @@ export default {
   data: function() {
     return {
       inventory: [],
+      selected: [],
     }
   },
 
@@ -81,12 +84,20 @@ export default {
               inventoryItem['productId'] = inventoryItem.product.id;
             }
 
+            //Default ordering is product name, so all similar products will be next to each other
+            this.inventory = this.inventory.sort((productOne, productTwo) => (productOne.name < productTwo.name) ? 1 : -1)
+
           }).catch((err) => {
             if(err.response.status == 401) {
               this.$router.push({path: '/login'})
             }
           })
+    },
+
+    handleSelect() {
+      console.log(this.selected);
     }
+    
   }
 }
 </script>
@@ -131,6 +142,7 @@ export default {
 
   #table {
     margin: 0.5em;
+    white-space: nowrap;
   }
 
   #productIdCol {
@@ -147,7 +159,7 @@ export default {
   }
 
   .dateInTable{
-    width: 110px;
+    width: 130px;
   }
 
 
