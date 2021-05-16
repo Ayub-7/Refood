@@ -2,7 +2,10 @@
   <ul id="administrators-list">
     <!-- Admin Card -->
     <li class="card" v-for="user in admins" :key="user.id" v-bind:user="user">
-      <button class="admin-name" @click="navigateToUser(user.id)">{{user.firstName}} {{user.middleName}} {{user.lastName}}</button>
+      <button class="admin-name" @click="navigateToUser(user.id)">
+        <b v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </b>
+        <div v-else> {{user.firstName}} {{user.middleName}} {{user.lastName}} </div>
+      </button>
       <button class="removeAdminButton" v-if="isPrimaryAdmin()" @click="removeUserAsAdmin(user)">x</button>
     </li>
   </ul>
@@ -15,11 +18,14 @@ import {store} from "../store"
 const BusinessAdministrators = {
   name: "BusinessAdministrators",
 
+  props: {
+    admins: Array,
+    pAdminId: Number,
+  },
 
   data: function() {
     return {
-      admins: null,
-      primaryAdminId: null
+      primaryAdminId: this.pAdminId,
     }
   },
 
@@ -28,24 +34,32 @@ const BusinessAdministrators = {
      * Remove selected admin user from business.
      * @param user
      */
-    removeUserAsAdmin: function(user) {
+    removeUserAsAdmin: function (user) {
       api.removeUserAsBusinessAdmin(this.$route.params.id, user.id)
-      .then(() => {
-        this.admins = this.admins.filter((admin) => admin.id !== user.id);
-        this.$vs.notify({title:`Successfully removed user`, text:`${user.firstName} was removed as an administrator.`, color:'success'});
-      })
-      .catch((error) => {
-        if (error.response.status === 400) {
-          this.$vs.notify({title:`Failed to remove user`, text:`${user.firstName} is the primary administrator.`, color:'danger'});
-        }
-        throw new Error(`ERROR trying to remove user as admin: ${error}`);
-      });
+          .then(() => {
+            this.admins = this.admins.filter((admin) => admin.id !== user.id);
+            this.$vs.notify({
+              title: `Successfully removed user`,
+              text: `${user.firstName} was removed as an administrator.`,
+              color: 'success'
+            });
+          })
+          .catch((error) => {
+            if (error.response.status === 400) {
+              this.$vs.notify({
+                title: `Failed to remove user`,
+                text: `${user.firstName} is the primary administrator.`,
+                color: 'danger'
+              });
+            }
+            throw new Error(`ERROR trying to remove user as admin: ${error}`);
+          });
     },
 
     /**
      * Navigate page to the user that was clicked on.
      */
-    navigateToUser: function(id) {
+    navigateToUser: function (id) {
       this.$router.push({path: `/users/${id}`})
     },
 
@@ -53,24 +67,10 @@ const BusinessAdministrators = {
      * Checks if the current user is also the primary administrator of this business.
      * @returns {boolean} true if the user is the primary admin, else false.
      */
-    isPrimaryAdmin: function() {
+    isPrimaryAdmin: function () {
       return store.loggedInUserId === this.primaryAdminId;
     },
-
-    /**
-     * Retrieve administrator details.
-     */
-    retrieveAdmins: function() {
-      this.admins = this.$parent.adminList;
-      this.primaryAdminId = this.$parent.business.primaryAdministratorId;
-    }
-
   },
-
-  mounted() {
-    this.retrieveAdmins();
-  },
-
 }
 
 export default BusinessAdministrators;
@@ -88,14 +88,14 @@ export default BusinessAdministrators;
 
   display: inline-flex;
   flex-direction: row;
+  cursor: pointer;
 
   background-color: transparent;
   padding: 10px 20px;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 0.5em 1em;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-
 }
 
 .card:hover {

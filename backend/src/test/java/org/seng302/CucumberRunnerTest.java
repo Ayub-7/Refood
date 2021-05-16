@@ -15,6 +15,5 @@ import org.springframework.test.context.ContextConfiguration;
         features = {"src/test/resources/team900/features/"}, // Where to look for your features
         publish = true
 )
-@SpringBootApplication
 public class CucumberRunnerTest {
 }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- Using label for button since can't rename button text -->
-        <label ref="loadableButton" @click="showModal=true" id='imageSelectBtn' class='button'>Upload image</label>
+        <vs-button ref="loadableButton" @click="showModal=true">Upload image</vs-button>
             <!-- Add user to business as admin modal -->
         <Modal v-if="showModal">
             <div slot="header">
@@ -95,7 +95,7 @@ export default ImageUpload
 
     #fileUpload {
         visibility: hidden;
-        width: 0px;
+        width: 0;
     }
 
     .button{

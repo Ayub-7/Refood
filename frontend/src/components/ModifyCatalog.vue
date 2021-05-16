@@ -38,6 +38,7 @@
               danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
+              value="fdwsd"
               label-placeholder="Manufacturer (required)"
               v-model="manufacturer"/>
         </div>
@@ -90,22 +91,59 @@ const ModifyCatalog = {
   },
   methods: {
     /**
+     * function adds prefilled values for modifying product
+     */
+
+    presetValues: function() {
+      this.productId = store.productToAlterId;
+      this.productName = store.productToAlterName;
+      this.manufacturer = store.productToAlterManufacturer;
+      this.description = store.productToAlterDescription;
+      this.rrp = store.productToAlterRRP;
+    },
+    /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
      * is in the wrong format.
      */
+
     checkForm: function() {
+      var invalidChars = /[^a-zA-Z/ -\d]/i;
+      //var isValidName = !(invalidChars.test(this.productName));
+      //var isValidID = !(invalidChars.test(this.productId));
+      //var isValidManu = !(invalidChars.test(this.manufacturer));
       this.errors = [];
+      if (this.productName.match(invalidChars)) {
+        this.errors.push("invalid-chars");
+      }
+      if (this.productId.match(invalidChars)) {
+        this.errors.push("invalid-chars");
+      }
+      if (this.manufacturer.match(invalidChars)) {
+        this.errors.push("invalid-chars");
+      }
       if (this.productName.length === 0) {
         this.errors.push(this.productName);
+      }
+
+      if (this.productName.length > 28) {
+        this.errors.push("long-name");
       }
 
       if (this.productId.length === 0) {
         this.errors.push(this.productId);
       }
 
+      if (this.productId.length > 17) {
+        this.errors.push("long-id");
+      }
+
       if (this.description.length === 0) {
         this.errors.push('no-desc');
+      }
+
+      if (this.description.length > 70) {
+        this.errors.push('long-desc');
       }
 
       if (this.manufacturer.length === 0) {
@@ -137,6 +175,35 @@ const ModifyCatalog = {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
           text: 'Description is Required.',
+          color: 'danger'
+        });
+      }
+
+      if (this.errors.includes('long-desc')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Description is too long (70 characters MAX).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('long-name')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Name is too long (15 characters MAX).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('long-id')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'ID is too long (17 characters MAX).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('invalid-chars')) {
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Invalid Characters',
           color: 'danger'
         });
       }
@@ -224,6 +291,7 @@ const ModifyCatalog = {
   },
   mounted: function () {
     this.checkUserSession();
+    this.presetValues();
   }
 }
 export default ModifyCatalog;

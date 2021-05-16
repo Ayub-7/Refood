@@ -7,61 +7,83 @@
         type="fund"
         color="#1F74FF"
         text-color="rgba(255,255,255,.6)"
-        active-text-color="rgba(255,255,255,1)">
+        active-text-color="#FFFFFF">
       <div slot="title">
         <vs-navbar-title>
           ReFood
         </vs-navbar-title>
       </div>
-      <vs-navbar-item index="0" v-if="getLoggedInUser() == null">
-        <router-link to="/">Register</router-link>
-      </vs-navbar-item>
-      <vs-navbar-item index="1" v-if="getLoggedInUser() == null">
-        <router-link to="/login">Login</router-link>
-      </vs-navbar-item>
 
-      <vs-navbar-item index="0" v-if="getLoggedInUser() != null">
-        <router-link :to="{path: '/home'}">Home</router-link>
-      </vs-navbar-item>
-      <vs-navbar-item index="1" v-if="getLoggedInUser() != null && getActingAsUserId() == null">
-        <router-link to="/businesses">Register a Business</router-link>
-      </vs-navbar-item>
-      <vs-navbar-item index="2" v-if="getLoggedInUser() != null">
-        <router-link to="/search">Search</router-link>
-      </vs-navbar-item>
-      <vs-navbar-item index="3" v-if="getLoggedInUser() != null && getActingAsUserId() == null">
-        <router-link :to="{path: `/users/${getLoggedInUser()}`}">Profile</router-link>
-      </vs-navbar-item>
-      <vs-navbar-item index="4" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
-        <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
-      </vs-navbar-item>
-      <vs-navbar-item index="5" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
-        <router-link :to="{path: `/addtocatalogue`}">Add To Catalogue</router-link>
-      </vs-navbar-item>
-      <vs-navbar-item index="6" v-if="getLoggedInUser() != null && getActingAsUserId() != null">
-        <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
-      </vs-navbar-item>
-      <div @click="logoutUser()">
-        <vs-navbar-item index="7" v-if="getLoggedInUser() != null">
-          <router-link :to="{path: '/login'}">
-            <span>Logout</span>
-          </router-link>
+      <!-- Not Logged In -->
+      <div v-if="getLoggedInUser() == null" class="navbar-group">
+        <vs-navbar-item index="0-0">
+          <router-link to="/">Register</router-link>
+        </vs-navbar-item>
+        <vs-navbar-item index="0-1">
+          <router-link to="/login">Login</router-link>
         </vs-navbar-item>
       </div>
 
-      <div class="userDetail" v-if="getLoggedInUser() != null">
-        <ActingAs/>
+      <!-- Logged In -->
+      <div v-else class="navbar-group">
+        <vs-navbar-item index="1-0">
+          <router-link :to="{path: '/home'}">Home</router-link>
+        </vs-navbar-item>
+        <vs-navbar-item index="1-2">
+          <router-link to="/search">Search</router-link>
+        </vs-navbar-item>
+        <!-- Acting As User -->
+        <div v-if="getActingAsUserId() == null" class="sub-navbar-group">
+          <vs-navbar-item index="2-0">
+            <router-link to="/marketplace">Marketplace</router-link>
+          </vs-navbar-item>
+          <vs-navbar-item index="2-1">
+            <router-link to="/businesses">Register a Business</router-link>
+          </vs-navbar-item>
+          <vs-navbar-item index="2-2">
+            <router-link :to="{path: `/users/${getLoggedInUser()}`}">Profile</router-link>
+          </vs-navbar-item>
+        </div>
+
+        <!-- Acting As Business -->
+        <div v-else class="sub-navbar-group">
+          <vs-navbar-item index="4">
+            <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
+          </vs-navbar-item>
+          <vs-navbar-item index="5">
+            <router-link :to="{path: `/addtocatalogue`}">Add To Catalogue</router-link>
+          </vs-navbar-item>
+          <vs-navbar-item index="6">
+            <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
+          </vs-navbar-item>
+          <vs-navbar-item index="7">
+            <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
+          </vs-navbar-item>
+        </div>
+
+        <div id="logout-nav" @click="logoutUser()">
+          <vs-navbar-item index="8">
+            <router-link :to="{path: '/login'}">
+              <span>Logout</span>
+            </router-link>
+          </vs-navbar-item>
+        </div>
+
+        <div class="userDetail" v-if="getLoggedInUser() != null">
+          <ActingAs/>
+        </div>
       </div>
 
     </vs-navbar>
 
-
     <div id="view">
       <router-view></router-view>
     </div>
+
     <footer class="info">
       <h4>REFOOD 2021</h4>
     </footer>
+
   </div>
 </template>
 <script>
@@ -76,7 +98,6 @@ import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
 import 'vuesax/dist/vuesax.css';
-// @click="goToUserPage()"
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -125,23 +146,7 @@ const app = {
             mutations.userLogout();
           })
     },
-    toggleMobileMenu: function () {
-      let x = document.getElementById("navLinks");
-      let y = document.getElementById("topBar")
-      if (x.style.display === "block") {
-        x.style.display = "none";
-        y.style.height = "55px";
-      } else {
-        x.style.display = "block";
-        if(store.loggedInUserId){
-          y.style.height = "140px";
-        } else {
-          y.style.height = "105px";
-        }
-      }
-    }
   },
-
 
   beforeMount() {
     api.checkSession()
@@ -184,5 +189,40 @@ export default app;
   background: #E0E0E0;
   /*color: #f5f5f5;*/
 }
+
+.navbar-group {
+  display: flex;
+  flex-direction: row;
+  margin: auto;
+}
+
+.sub-navbar-group {
+  display: flex;
+  flex-direction: row;
+  margin: auto;
+}
+
+.navbar-group >>> li, #logout-nav  {
+  margin: auto; /* Fixes tab height issue */
+}
+
+@media screen and (max-width: 800px) {
+  .navbar-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sub-navbar-group {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  #logout-nav {
+    margin: 0;
+  }
+
+}
+
 
 </style>

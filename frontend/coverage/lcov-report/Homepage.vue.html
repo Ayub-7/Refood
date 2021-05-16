@@ -373,19 +373,8 @@
 <a name='L314'></a><a href='#L314'>314</a>
 <a name='L315'></a><a href='#L315'>315</a>
 <a name='L316'></a><a href='#L316'>316</a>
-<a name='L317'></a><a href='#L317'>317</a>
-<a name='L318'></a><a href='#L318'>318</a>
-<a name='L319'></a><a href='#L319'>319</a>
-<a name='L320'></a><a href='#L320'>320</a>
-<a name='L321'></a><a href='#L321'>321</a>
-<a name='L322'></a><a href='#L322'>322</a>
-<a name='L323'></a><a href='#L323'>323</a>
-<a name='L324'></a><a href='#L324'>324</a>
-<a name='L325'></a><a href='#L325'>325</a>
-<a name='L326'></a><a href='#L326'>326</a>
-<a name='L327'></a><a href='#L327'>327</a>
-<a name='L328'></a><a href='#L328'>328</a>
-<a name='L329'></a><a href='#L329'>329</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L317'></a><a href='#L317'>317</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -440,7 +429,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -499,12 +488,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -566,20 +555,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -719,10 +695,10 @@
       &lt;!-- Welcome message that greets user with their name, or a business administrator with the business name --&gt;
       &lt;div id="name-container"&gt;
         &lt;!-- Shows a different greeting message depending on who the user is acting as --&gt;
-        &lt;div v-if="getBusinessId() != null" id="name"&gt;
+        &lt;div v-if="getBusinessId() != null" class="name" id="business-name"&gt;
           Welcome to your home page, {{getBusinessName()}}!
         &lt;/div&gt;
-        &lt;div v-else id="name"&gt;
+        &lt;div v-else class="name" id="name"&gt;
           Welcome to your home page, {{getUserName()}}!
         &lt;/div&gt;
       &lt;/div&gt;
@@ -732,16 +708,17 @@
         &lt;div id="left-nav" class="sub-container"&gt;
           &lt;!-- Shows a different nav depending on who the user is acting as --&gt;
           &lt;div class="userinfo-container" v-if="getBusinessId()"&gt;
-          &lt;ul id="businfo-content"&gt;
+          &lt;div id="businfo-content"&gt;
             &lt;!-- When each list item is clicked, redirects to the relevant page in the application --&gt;
-            &lt;li class="left-nav-item" id="bus-profile-btn" @click='goToProfile()' style='cursor: pointer; text-decoration: none;'&gt;Business Profile&lt;/li&gt;
-            &lt;li class="left-nav-item" id="bus-catalogue-btn" @click='goToProductCatalogue()' style='cursor: pointer'&gt;Product Catalogue&lt;/li&gt;
-          &lt;/ul&gt;
+            &lt;vs-button class="left-nav-item" id="bus-profile-btn" @click='goToProfile()'&gt;Business Profile&lt;/vs-button&gt;
+            &lt;vs-button class="left-nav-item" id="bus-catalogue-btn" @click='goToProductCatalogue()'&gt;Product Catalogue&lt;/vs-button&gt;
+          &lt;/div&gt;
           &lt;/div&gt;
           &lt;div class="userinfo-container" v-else&gt;
-            &lt;ul id="userinfo-content"&gt;
-              &lt;li class="left-nav-item" id="user-profile-btn" @click='goToProfile()' style='cursor: pointer'&gt;Profile&lt;/li&gt;
-            &lt;/ul&gt;
+            &lt;div id="userinfo-content"&gt;
+              &lt;vs-button class="left-nav-item" id="user-profile-btn" @click='goToProfile()'&gt;Profile&lt;/vs-button&gt;
+              &lt;vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" &gt;Marketplace&lt;/vs-button&gt;
+            &lt;/div&gt;
           &lt;/div&gt;
         &lt;/div&gt;
         &lt;!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented --&gt;
@@ -753,7 +730,7 @@
         &lt;!-- Main element that will display the user a personalized news feed when further features have been implemented --&gt;
         &lt;main&gt;
           &lt;nav id="newsfeed-navbar"&gt;
-            &lt;div id="name" style="text-align: center;"&gt;
+            &lt;div class="name" style="text-align: center;"&gt;
               News Feed
             &lt;/div&gt;
           &lt;/nav&gt;
@@ -918,15 +895,15 @@ export default Homepage;
   text-align: center;
   background-color: transparent;
   padding: 15px 0 15px 0;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 &nbsp;
-#name {
+.name {
   font-size: 32px;
-  padding: 0.5em 0 0.5em 0;
+  padding: 0.5em 0;
   line-height: 1.2em;
 }
 &nbsp;
@@ -943,7 +920,7 @@ export default Homepage;
 &nbsp;
 .sub-container {
   padding: 2em;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }
@@ -959,7 +936,7 @@ export default Homepage;
 &nbsp;
 #watchlist-container h3 {
   font-weight: 400;
-  margin: 0px auto;
+  margin: 0 auto;
   widows: 100%;
 }
 /* News feed styles. */
@@ -968,7 +945,7 @@ main {
   grid-row: 2;
 &nbsp;
   margin: 1em 0 1em 0;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }
@@ -980,7 +957,7 @@ main {
   padding-top: 1em;
   padding-bottom: 1em;
   box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
-  border-radius: 1em;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
 }
 &nbsp;
@@ -991,25 +968,12 @@ main {
 }
 &nbsp;
 .left-nav-item {
+  width: 100%;
+  margin: 0.5em auto;
   text-align: center;
-  color: black;
-  font-weight: 700;
-  font-size: 14px;
   letter-spacing: 1px;
-  text-decoration: none;
-  list-style: none;
-  padding: 10px 0px;
-  margin: 10px;
-  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
-  background-size: 500%;
-  border: none;
-  border-radius: 5rem;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 &nbsp;
-.left-nav-item:hover {
-  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
-}
 &nbsp;
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {
@@ -1048,7 +1012,7 @@ main {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed May 05 2021 12:15:58 GMT+1200 (New Zealand Standard Time)
+                at Sun May 16 2021 22:34:04 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

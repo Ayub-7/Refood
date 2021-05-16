@@ -1,0 +1,33 @@
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import BusinessInventory from '../components/BusinessInventory';
+import Vuesax from 'vuesax';
+
+const localVue = createLocalVue();
+localVue.use(Vuesax);
+
+let wrapper;
+
+let $route = {
+    params: {
+        id: 1,
+    }
+}
+
+beforeEach(() => {
+   wrapper = shallowMount(BusinessInventory, {
+       mocks: {$route},
+       stubs: {},
+       methods: {},
+       localVue,
+   })
+});
+
+afterEach(() => {
+    wrapper.destroy();
+});
+
+describe('Component', () => {
+    test('is a Vue instance', () => {
+        expect(wrapper.isVueInstance).toBeTruthy();
+    });
+});
