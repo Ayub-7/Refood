@@ -129,7 +129,7 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('./' + getImgUrl(product))"/>
                         <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
                       </div>
                     </vs-td>
@@ -281,7 +281,7 @@ const Search = {
 
     getImgUrl(product) {
       if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
+        return '../../../backend/src/main/resources/media/images/businesses/' + product.primaryImagePath.toString().replace("\\", "/")
       } else {
         return '../../public/ProductShoot.jpg'
       }
