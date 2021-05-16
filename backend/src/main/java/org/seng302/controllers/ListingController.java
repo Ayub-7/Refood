@@ -93,6 +93,7 @@ public class ListingController {
             } else { // User is authorized
                 try {
                     Listing newListing = new Listing(inventory, request);
+                    inventoryRepository.updateInventoryQuantity(inventory.getQuantity() - request.getQuantity(), request.getInventoryItemId());
                     listingRepository.save(newListing);
                     return ResponseEntity.status(HttpStatus.CREATED).build();
                 } catch (ValidationException e){

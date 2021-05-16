@@ -26,6 +26,12 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     Inventory findInventoryById(long id);
 
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Inventory i SET quantity = :newQuantity where id = :inventoryId")
+    void updateInventoryQuantity(@Param(value = "newQuantity") int newQuantity,
+                       @Param(value = "inventoryId") long inventoryId);
+
     //Do when modifying inventory required
 //    @Modifying(clearAutomatically = true)
 //    @Transactional
