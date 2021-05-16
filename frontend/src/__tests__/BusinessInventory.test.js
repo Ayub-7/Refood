@@ -12,9 +12,13 @@ axios.get.mockResolvedValue(() => {
     wrapper.vm.currency = "$";
 });
 
+let $log = {
+    debug: jest.fn(),
+}
+
 beforeEach(() => {
    wrapper = mount(BusinessInventory, {
-       mocks: {},
+       mocks: {$log},
        stubs: {},
        methods: {},
        localVue,
