@@ -1,6 +1,5 @@
 <template>
   <vs-card id="container">
-
     <div id="header-container">
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
@@ -30,8 +29,7 @@
           <vs-input type="number" v-model="price"
                     label="Price" min="0"
                     :danger="newListingErrors.price.error"
-                    :danger-text="newListingErrors.price.message"
-                    @blur="validatePrice()"></vs-input>
+                    :danger-text="newListingErrors.price.message"></vs-input>
         </div>
         <div id="listing-qty">
           <div>
@@ -55,8 +53,8 @@
                        label="More Info"></vs-textarea>
         </div>
         <div id="listing-button-group">
-          <vs-button color="success" @click="createNewListing()" style="width: 100px;">Create</vs-button>
-          <vs-button color="danger" style="width: 100px;" @click="newListingPopup = false">Cancel</vs-button>
+          <vs-button id="create-button" color="success" @click="createNewListing()" style="width: 100px;">Create</vs-button>
+          <vs-button id="cancel-button" color="danger" style="width: 100px;" @click="closeNewListing()">Cancel</vs-button>
         </div>
       </div>
     </vs-popup>
@@ -124,10 +122,6 @@ export default {
   },
 
   methods: {
-    validatePrice: function() {
-
-    },
-
     /**
      * Validates the fields for a new public listing.
      * @return true if all of the required fields meet the requirements, false otherwise.
@@ -160,16 +154,23 @@ export default {
       return isValid;
     },
 
+    /**
+     * Checks if the new list form is valid, then creates a new listing to be sent to backend if true.
+     */
     createNewListing: function() {
       if (this.validateNewListing()) {
         alert("It validated. Replace me with functionality.");
       }
-
     },
 
+    /**
+     * Closes the new listing modal, and reset error fields.
+     */
+    closeNewListing: function() {
+      this.newListingPopup = false;
+      Object.values(this.newListingErrors).forEach(input => input.error = false);
+    },
   },
-
-
 }
 </script>
 
@@ -309,6 +310,68 @@ export default {
     #title {
       padding: 0.5em 0 1em 0.5em;
     }
+  }
+
+  @media screen and (max-width: 450px) {
+    .new-listing-modal {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(auto-fit, 1fr);
+      grid-row-gap: 0.5em;
+    }
+
+    #listing-product-id {
+      grid-row: 1;
+      grid-column: 1;
+    }
+
+    #listing-product-name {
+      grid-row: 2;
+      grid-column: 1;
+
+    }
+
+    #listing-divider {
+      grid-row: 3;
+      grid-column: 1;
+    }
+
+    #listing-qty {
+      grid-column: 1;
+      grid-row: 4;
+      margin-bottom: 1em;
+    }
+
+    #listing-price {
+      grid-column: 1;
+      grid-row: 5;
+    }
+
+    #listing-closes {
+      grid-column: 1;
+      grid-row: 6;
+    }
+
+    #listing-moreInfo {
+      grid-row: 7;
+      grid-column: 1;
+    }
+
+    #listing-button-group {
+      grid-row: 8;
+      grid-column: 1;
+
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .textarea >>> textarea {
+      resize: none;
+      min-height: 100px;
+      max-height: 100px;
+      max-width: 100px;
+    }
+
   }
 
 </style>
