@@ -29,9 +29,11 @@ public class Inventory {
     })
     private Product product;
 
+    @JsonIgnore
     @Column(name = "product_id")
     private String productId;
 
+    @JsonIgnore
     @Column(name = "business_id")
     private long businessId;
 
@@ -39,16 +41,16 @@ public class Inventory {
     private double pricePerItem;
     private double totalPrice;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date manufactured;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date sellBy;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date bestBefore;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date expires;
 
     protected Inventory() { }
