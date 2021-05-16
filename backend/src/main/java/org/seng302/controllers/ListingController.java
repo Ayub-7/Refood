@@ -5,9 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.seng302.models.Listing;
-import org.seng302.models.Inventory;
-import org.seng302.models.Business;
+import org.seng302.models.*;
+import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.BusinessRepository;
@@ -18,11 +17,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @RestController
 public class ListingController {
@@ -61,6 +62,44 @@ public class ListingController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(listings);
+    }
+
+
+    /**
+     * Creates a new product and adds it to the product catalogue of the current acting business
+     * Authentication is required, user must be a business admin or a default global admin
+     * @param id unique identifier of the business
+     * @param req the request body for the new listing object
+     * @param session http session which holds the authenticated user
+     * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
+     * @throws JsonProcessingException
+     */
+    @PostMapping("/businesses/{id}/listings")
+    public ResponseEntity<String> createListing(@PathVariable long id, @RequestBody NewListingRequest request, HttpSession session) {
+        Business business = businessRepository.findBusinessById(id);
+        Inventory inventory = inventoryRepository.findInventoryByIdAndBusinessId(request.getInventoryItemId(), id);
+
+        if(inventory == null){ //inventory item doesen't exist for business
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        if (business == null) { // Business does not exist
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        } else {
+            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else { // User is authorized
+                try {
+                    Listing newListing = new Listing(inventory, request);
+                    listingRepository.save(newListing);
+                    return ResponseEntity.status(HttpStatus.CREATED).build();
+                } catch (ValidationException e){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+            }
+        }
     }
 
 }

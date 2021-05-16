@@ -18,11 +18,13 @@ import java.util.List;
 @RepositoryRestResource
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
-    Inventory findInventoryByIdAndProductIdAndBusinessId(long id, String productId, long businessId);
+    Inventory findInventoryByIdAndBusinessId(long id, long businessId);
 
     List<Inventory> findInventoryByProductIdAndBusinessId(String productId, long businessId);
 
     List<Inventory> findInventoryByBusinessId(long businessId);
+
+    Inventory findInventoryById(long id);
 
     //Do when modifying inventory required
 //    @Modifying(clearAutomatically = true)
