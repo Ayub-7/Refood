@@ -33,7 +33,7 @@
           <router-link to="/search">Search</router-link>
         </vs-navbar-item>
         <!-- Acting As User -->
-        <div v-if="getActingAsUserId() == null" class="navbar-group">
+        <div v-if="getActingAsUserId() == null" class="sub-navbar-group">
           <vs-navbar-item index="1">
             <router-link to="/businesses">Register a Business</router-link>
           </vs-navbar-item>
@@ -43,7 +43,7 @@
         </div>
 
         <!-- Acting As Business -->
-        <div v-else class="navbar-group">
+        <div v-else class="sub-navbar-group">
           <vs-navbar-item index="4">
             <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
           </vs-navbar-item>
@@ -210,8 +210,32 @@ export default app;
   margin: auto;
 }
 
+.sub-navbar-group {
+  display: flex;
+  flex-direction: row;
+  margin: auto;
+}
+
 .navbar-group >>> li, #logout-nav  {
   margin: auto; /* Fixes tab height issue */
+}
+
+@media screen and (max-width: 800px) {
+  .navbar-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sub-navbar-group {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  #logout-nav {
+    margin: 0;
+  }
+
 }
 
 

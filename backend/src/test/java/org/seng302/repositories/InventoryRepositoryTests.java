@@ -1,17 +1,20 @@
 package org.seng302.repositories;
 
+import org.junit.After;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.seng302.TestApplication;
-import org.seng302.models.Product;
-import org.seng302.models.Inventory;
+import org.seng302.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -25,48 +28,76 @@ public class InventoryRepositoryTests {
     @Autowired
     private InventoryRepository inventoryRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private BusinessRepository businessRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    private Business business1;
+
+    private Product testProd1;
+
     private Inventory testInven1;
-    private Inventory testInven2;
+
+    private Date dateBefore;
+    private Date dateAfter;
 
     @BeforeEach
     void setUp() {
+
+        Calendar afterCalendar = Calendar.getInstance();
+        afterCalendar.set(2022, 1, 1);
+        dateAfter = afterCalendar.getTime();
+
+        Calendar beforeCalendar = Calendar.getInstance();
+        afterCalendar.set(2020, 1, 1);
+        dateBefore = beforeCalendar.getTime();
+
+        //Need to setup business and product for referential integrity
+        assertThat(businessRepository).isNotNull();
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
+        Business b1 = new Business("AnotherBusiness", "A business", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+        businessRepository.save(b1);
+
+
+        assertThat(productRepository).isNotNull();
+        testProd1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
+        productRepository.save(testProd1);
+
+
         assertThat(inventoryRepository).isNotNull();
-        testInven1 = new Inventory("07-4957066", 1, 5, 2.0, 10.0, new Date("2021-01-28"), new Date("2021-04-28"), new Date("2021-05-28"), new Date("2021-06-28"));
-        testInven2 = new Inventory("55-9986232", 2, 7, 4.0, 28.0, new Date("2021-01-28"), new Date("2021-04-28"), new Date("2021-05-28"), new Date("2021-06-28"));
+        testInven1 = new Inventory("07-4957066", 1, 5, 2.0, 10.0, dateBefore, dateAfter, dateAfter, dateAfter);
 
         inventoryRepository.save(testInven1);
-        inventoryRepository.save(testInven2);
     }
 
-    //@Test
+
+    @Test
     public void saveInventory() {
-        Inventory inventory = new Inventory("12-5088639", 1, 4, 4.0, 16.0, new Date("2021-01-28"), new Date("2021-04-28"), new Date("2021-05-28"), new Date("2021-06-28"));
+        Inventory inventory = new Inventory("07-4957066", 1, 4, 4.0, 16.0, dateBefore, dateAfter, dateAfter, dateAfter);
         inventoryRepository.save(inventory);
 
         // Test if insertion is properly inserting values.
-        Inventory testInventory = inventoryRepository.findInventoryByIdAndProductIdAndBusinessId(3, "12-5088639", 1);
-        assertThat(testInventory.getId()).isEqualTo(inventory.getId());
+        Inventory testInventory = inventoryRepository.findInventoryByIdAndProductIdAndBusinessId(2, "07-4957066", 1);
+        Assertions.assertEquals(testInventory.getId(), inventory.getId());
         assertThat(testInventory.getBusinessId()).isEqualTo(inventory.getBusinessId());
         assertThat(testInventory.getProductId()).isEqualTo(inventory.getProductId());
 
-
-        //test for getting a certain type of product for the same business works
-//        List<Inventory> inventorys = inventoryRepository.findInventoryByProductIdAndBusinessId("12-5088639", 1);
-//        assertThat(testInventory.getId()).isEqualTo(inventory.getId());
-//        assertThat(testInventory.getBusinessId()).isEqualTo(inventory.getBusinessId());
-//        assertThat(testInventory.getProductId()).isEqualTo(inventory.getProductId());
-
-        List<Inventory> inventorys = inventoryRepository.findInventoryByBusinessId(1);
-        assertThat(inventorys.size()).isEqualTo(2);
-        Inventory anotherInventory = new Inventory("13-5699", 1, 2, 3.0, 6.0, new Date("2021-01-28"), new Date("2021-04-28"), new Date("2021-05-28"), new Date("2021-06-28"));
+        //Test insertion properly works
+        List<Inventory> inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
+        assertThat(inventoryItems.size()).isEqualTo(2);
+        Inventory anotherInventory = new Inventory("07-4957066", 1, 2, 3.0, 6.0, dateBefore, dateAfter, dateAfter, dateAfter);
         inventoryRepository.save(anotherInventory);
-
-        inventorys = inventoryRepository.findInventoryByBusinessId(1);
-        assertThat(inventorys.size()).isEqualTo(3);
+        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
+        assertThat(inventoryItems.size()).isEqualTo(3);
 
         // Inserting the same product id and business id.
         inventoryRepository.save(anotherInventory);
-        inventorys = inventoryRepository.findInventoryByBusinessId(1);
-        assertThat(inventorys.size()).isEqualTo(3);
+        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
+        assertThat(inventoryItems.size()).isEqualTo(3);
     }
 }
