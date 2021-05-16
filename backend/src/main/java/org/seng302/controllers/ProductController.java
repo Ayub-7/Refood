@@ -245,6 +245,7 @@ public class ProductController {
         File businessDir = new File(rootImageDir + "business_" + businessId);
         if (businessDir.mkdir()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
+            System.out.println("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
 
         String id = "";
