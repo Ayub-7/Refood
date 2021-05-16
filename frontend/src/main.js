@@ -81,19 +81,6 @@ const routes = [
   {name: ModifyCatalog, path: '/businesses/:id/products/modify', component: ModifyCatalog},
   {path: '/businesses/:id/products', component: ProductCatalogue},
   {path: '/marketplace', component: CommunityMarketplace},
-  {
-    path: '/businesses/:id',
-    name: 'Business',
-    component: Business,
-    children: [
-          {
-            path: 'administrators',
-            name: 'BusinessAdministrators',
-            component: BusinessAdministrators,
-          }
-        ]
-  },
-
   {path: '/businesses/:id', name: 'Business', component: Business},
   {
     path: '*',

@@ -41,6 +41,9 @@
             <div class="row">
               <label for="description">Description</label>
               <vs-textarea
+                  width="200px"
+                  height="50px"
+                  class="description-textarea"
                   id="description"
                   v-model="invDescription">
               </vs-textarea>
@@ -407,6 +410,7 @@ export default {
 
   .textarea >>> textarea {
     resize: none;
+    max-width: 200px;
     min-height: 100px;
     max-height: 100px;
   }
@@ -488,6 +492,13 @@ export default {
     margin-right: 160px;
     margin-left: 5px;
   }
+
+  .description-textarea >>> textarea {
+    resize: none;
+    min-height: 50px;
+    max-height: 50px;
+  }
+
   .row {
     margin-bottom: 15px;
   }
