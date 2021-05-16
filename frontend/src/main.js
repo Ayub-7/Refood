@@ -44,11 +44,11 @@ import Business from "./components/Business.vue";
 import Homepage from "./components/Homepage"
 import ProductCatalogue from "@/components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
+import CommunityMarketplace from "@/components/CommunityMarketplace";
 import BusinessInventory from "@/components/BusinessInventory";
 
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
-//import ModifyCatalog from "@/components/ModifyCatalog";
 
 
 Vue.config.productionTip = false;
@@ -80,6 +80,20 @@ const routes = [
   {path: '/search', component: Search},
   {name: ModifyCatalog, path: '/businesses/:id/products/modify', component: ModifyCatalog},
   {path: '/businesses/:id/products', component: ProductCatalogue},
+  {path: '/marketplace', component: CommunityMarketplace},
+  {
+    path: '/businesses/:id',
+    name: 'Business',
+    component: Business,
+    children: [
+          {
+            path: 'administrators',
+            name: 'BusinessAdministrators',
+            component: BusinessAdministrators,
+          }
+        ]
+  },
+
   {path: '/businesses/:id', name: 'Business', component: Business},
   {
     path: '*',
