@@ -10,14 +10,9 @@
           <div class="form-group required vs-col" vs-order="1" id="firstColModal">
             <div class="row">
               <label for="prodId">Product ID</label>
-              <vs-input
-                  :danger="(errors.includes(prodId))"
-                  danger-text="Product ID is required."
-                  type="text"
-                  class="inputx"
-                  id="prodId"
-                  placeholder="Product ID"
-                  v-model="prodId"/>
+              <vs-select id="prodId" class="selectExample" v-model="prodId">
+                <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
+              </vs-select>
             </div>
             <div class="row">
               <label for="pricePerItem">Price per item</label>
@@ -148,6 +143,7 @@ export default {
     return {
       errors: [],
       inventory: [],
+      products: [],
       prodId:'',
       addNewInv:false,
       pricePerItem: 0.0,
@@ -160,6 +156,17 @@ export default {
       sellBy: ''
 
     }
+  },
+  mounted() {
+    api.getBusinessProducts(this.$route.params.id)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.products = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load products";
+        });
   },
   methods: {
     /**
