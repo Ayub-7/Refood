@@ -43,7 +43,7 @@ public class ProductController {
 
     @Autowired private ObjectMapper mapper;
 
-    @Value("/src/main/resources/media/images/businesses/")
+    @Value("${media.image.business.directory}")
     String rootImageDir;
 
 //    private final ObjectMapper mapper = new ObjectMapper();
@@ -264,10 +264,9 @@ public class ProductController {
             }
         }
 
-        File file = new File("/home/gitlab-runner" + businessDir + "/" + id + imageExtension + "/");
-        File thumbnailFile = new File( "~/home/gitlab-runner" + businessDir + "/" + id + "_thumbnail" + imageExtension);
+        File file = new File(businessDir + "/" + id + imageExtension + "/");
+        File thumbnailFile = new File( businessDir + "/" + id + "_thumbnail" + imageExtension);
         System.out.println(file.getAbsolutePath());
-        System.out.println(System.getenv("PATH"));
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
