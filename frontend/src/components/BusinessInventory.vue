@@ -9,8 +9,8 @@
         <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">
           <div class="form-group required vs-col" vs-order="1" id="firstColModal">
             <div class="row">
-              <label for="prodId">Product ID</label>
-              <vs-select id="prodId" class="selectExample" v-model="prodId">
+              <label for="prodId">Product</label>
+              <vs-select id="prodId" class="selectExample" v-model="prodId" v-on:change="autofill">
                 <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
               </vs-select>
             </div>
@@ -301,6 +301,20 @@ export default {
             }
           this.$log.debug("Error Status:", error)
         })
+      }
+    },
+    autofill: function() {
+      if (this.prodId !== '') {
+        let prodInd = 0;
+        while (prodInd < this.products.length) {
+          if (this.products[prodInd]["id"] === this.prodId) {
+            break;
+          }
+          prodInd++;
+        }
+        console.log(this.products[prodInd])
+        this.pricePerItem = this.products[prodInd]["recommendedRetailPrice"];
+        this.invDescription = this.products[prodInd]["description"];
       }
     }
   }
