@@ -41,7 +41,6 @@ import Register from "./components/Register";
 import Users from "./components/Users.vue";
 import Search from "./components/Search.vue";
 import Business from "./components/Business.vue";
-import BusinessAdministrators from "./components/BusinessAdministrators";
 import Homepage from "./components/Homepage"
 import ProductCatalogue from "@/components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
@@ -81,19 +80,7 @@ const routes = [
   {path: '/search', component: Search},
   {name: ModifyCatalog, path: '/businesses/:id/products/modify', component: ModifyCatalog},
   {path: '/businesses/:id/products', component: ProductCatalogue},
-  {
-    path: '/businesses/:id',
-    name: 'Business',
-    component: Business,
-    children: [
-          {
-            path: 'administrators',
-            name: 'BusinessAdministrators',
-            component: BusinessAdministrators,
-          }
-        ]
-  },
-
+  {path: '/businesses/:id', name: 'Business', component: Business},
   {
     path: '*',
     name: 'catchAll',

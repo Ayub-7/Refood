@@ -1,9 +1,12 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Business from '../Business';
+import Vuesax from 'vuesax';
 
 let wrapper;
+let localVue = createLocalVue();
+localVue.use(Vuesax);
 
-// Mock busibess admin
+// Mock business admin
 const mockAdmin = {
     "id": 9,
     "firstName": "Joete",
@@ -63,34 +66,39 @@ const $vs = {
     notify: jest.fn(),
 };
 
+
 beforeEach(() => {
     wrapper = shallowMount(Business, {
         propsData: {},
         mocks: {$route, $vs},
         stubs: ['router-link', 'router-view'],
         methods: {},
+        localVue
     });
     wrapper.setData({business: mockBusiness});
-
-    const checkSessionMethod = jest.spyOn(Business.methods, 'checkUserSession');
-    checkSessionMethod.mockImplementation(() => {
-        wrapper.vm.user = mockAdmin;
-        wrapper.vm.business = mockBusiness;
-        wrapper.vm.adminList = mockBusiness.administrators;
-
-    });
-
-    const getUserMethod = jest.spyOn(Business.methods, 'getUserInfo');
-    getUserMethod.mockResolvedValue(mockAdmin);
 });
 
 afterEach(() => {
     wrapper.destroy();
 });
 
+
 describe('Business tests', () => {
-    const getBusinessMethod = jest.spyOn(Business.methods, 'getBusiness');
-    getBusinessMethod.mockResolvedValue(mockBusiness);
+    beforeEach(() => {
+        const checkSessionMethod = jest.spyOn(Business.methods, 'checkUserSession');
+        checkSessionMethod.mockImplementation(() => {
+            wrapper.vm.user = mockAdmin;
+            wrapper.vm.business = mockBusiness;
+            wrapper.vm.adminList = mockBusiness.administrators;
+
+        });
+
+        const getUserMethod = jest.spyOn(Business.methods, 'getUserInfo');
+        getUserMethod.mockResolvedValue(mockAdmin);
+
+        const getBusinessMethod = jest.spyOn(Business.methods, 'getBusiness');
+        getBusinessMethod.mockResolvedValue(mockBusiness);
+    });
 
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();

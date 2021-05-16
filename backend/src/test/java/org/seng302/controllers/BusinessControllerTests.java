@@ -1,13 +1,12 @@
 package org.seng302.controllers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
@@ -20,12 +19,12 @@ import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -163,4 +162,34 @@ public class BusinessControllerTests {
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    public void testGetBusiness_returnUnauthorized() throws Exception {
+        mvc.perform(get("/businesses/{id}", business.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetBusiness_returnNotAcceptable() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(99)).thenReturn(null);
+        mvc.perform(get("/businesses/{id}", 99))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetBusiness_returnOk() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+
+        MvcResult result = mvc.perform(get("/businesses/{id}", business.getId()))
+                .andReturn();
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo(mapper.writeValueAsString(business));
+
+    }
+
+
 }
