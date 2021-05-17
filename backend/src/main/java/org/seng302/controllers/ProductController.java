@@ -268,6 +268,8 @@ public class ProductController {
         File thumbnailFile = new File( businessDir + "/" + id + "_thumbnail" + imageExtension);
         System.out.println(file.getAbsolutePath());
         System.out.println(file.canWrite());
+        file.setWritable(true);
+        System.out.println(file.canWrite());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
