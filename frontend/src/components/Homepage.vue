@@ -4,10 +4,10 @@
       <!-- Welcome message that greets user with their name, or a business administrator with the business name -->
       <div id="name-container">
         <!-- Shows a different greeting message depending on who the user is acting as -->
-        <div v-if="getBusinessId() != null" id="name">
+        <div v-if="getBusinessId() != null" class="name" id="business-name">
           Welcome to your home page, {{getBusinessName()}}!
         </div>
-        <div v-else id="name">
+        <div v-else class="name" id="name">
           Welcome to your home page, {{getUserName()}}!
         </div>
       </div>
@@ -17,16 +17,17 @@
         <div id="left-nav" class="sub-container">
           <!-- Shows a different nav depending on who the user is acting as -->
           <div class="userinfo-container" v-if="getBusinessId()">
-          <ul id="businfo-content">
+          <div id="businfo-content">
             <!-- When each list item is clicked, redirects to the relevant page in the application -->
-            <li class="left-nav-item" id="bus-profile-btn" @click='goToProfile()' style='cursor: pointer; text-decoration: none;'>Business Profile</li>
-            <li class="left-nav-item" id="bus-catalogue-btn" @click='goToProductCatalogue()' style='cursor: pointer'>Product Catalogue</li>
-          </ul>
+            <vs-button class="left-nav-item" id="bus-profile-btn" @click='goToProfile()'>Business Profile</vs-button>
+            <vs-button class="left-nav-item" id="bus-catalogue-btn" @click='goToProductCatalogue()'>Product Catalogue</vs-button>
+          </div>
           </div>
           <div class="userinfo-container" v-else>
-            <ul id="userinfo-content">
-              <li class="left-nav-item" id="user-profile-btn" @click='goToProfile()' style='cursor: pointer'>Profile</li>
-            </ul>
+            <div id="userinfo-content">
+              <vs-button class="left-nav-item" id="user-profile-btn" @click='goToProfile()'>Profile</vs-button>
+              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
+            </div>
           </div>
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
@@ -38,7 +39,7 @@
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
         <main>
           <nav id="newsfeed-navbar">
-            <div id="name" style="text-align: center;">
+            <div class="name" style="text-align: center;">
               News Feed
             </div>
           </nav>
@@ -203,15 +204,15 @@ export default Homepage;
   text-align: center;
   background-color: transparent;
   padding: 15px 0 15px 0;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
-#name {
+.name {
   font-size: 32px;
-  padding: 0.5em 0 0.5em 0;
+  padding: 0.5em 0;
   line-height: 1.2em;
 }
 
@@ -228,7 +229,7 @@ export default Homepage;
 
 .sub-container {
   padding: 2em;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }
@@ -244,7 +245,7 @@ export default Homepage;
 
 #watchlist-container h3 {
   font-weight: 400;
-  margin: 0px auto;
+  margin: 0 auto;
   widows: 100%;
 }
 /* News feed styles. */
@@ -253,7 +254,7 @@ main {
   grid-row: 2;
 
   margin: 1em 0 1em 0;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }
@@ -265,7 +266,7 @@ main {
   padding-top: 1em;
   padding-bottom: 1em;
   box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
-  border-radius: 1em;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
 }
 
@@ -276,25 +277,12 @@ main {
 }
 
 .left-nav-item {
+  width: 100%;
+  margin: 0.5em auto;
   text-align: center;
-  color: black;
-  font-weight: 700;
-  font-size: 14px;
   letter-spacing: 1px;
-  text-decoration: none;
-  list-style: none;
-  padding: 10px 0px;
-  margin: 10px;
-  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
-  background-size: 500%;
-  border: none;
-  border-radius: 5rem;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
-.left-nav-item:hover {
-  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
-}
 
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {

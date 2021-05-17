@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>3/12</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>3/12</span>
             </div>
         
             
@@ -189,36 +189,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -234,6 +212,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -241,8 +239,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -303,24 +303,30 @@
   &lt;ul id="administrators-list"&gt;
     &lt;!-- Admin Card --&gt;
     &lt;li class="card" v-for="user in admins" :key="user.id" v-bind:user="user"&gt;
-      &lt;button class="admin-name" @click="navigateToUser(user.id)"&gt;{{user.firstName}} {{user.middleName}} {{user.lastName}}&lt;/button&gt;
+      &lt;button class="admin-name" @click="navigateToUser(user.id)"&gt;
+        &lt;b v-if="primaryAdminId === user.id"&gt; {{user.firstName}} {{user.middleName}} {{user.lastName}} &lt;/b&gt;
+        &lt;div v-else&gt; {{user.firstName}} {{user.middleName}} {{user.lastName}} &lt;/div&gt;
+      &lt;/button&gt;
       &lt;button class="removeAdminButton" v-if="isPrimaryAdmin()" @click="removeUserAsAdmin(user)"&gt;x&lt;/button&gt;
     &lt;/li&gt;
   &lt;/ul&gt;
 &lt;/template&gt;
 &nbsp;
 &lt;script&gt;
-<span class="cstat-no" title="statement not covered" >import api from "../Api";</span>
-<span class="cstat-no" title="statement not covered" >import {store} from "../store"</span>
+import api from "../Api";
+import {store} from "../store"
 &nbsp;
-<span class="cstat-no" title="statement not covered" >const BusinessAdministrators = {</span>
+const BusinessAdministrators = {
   name: "BusinessAdministrators",
 &nbsp;
+  props: {
+    admins: Array,
+    pAdminId: Number,
+  },
 &nbsp;
 <span class="fstat-no" title="function not covered" >  data: function() {</span>
 <span class="cstat-no" title="statement not covered" >    return {</span>
-      admins: null,
-      primaryAdminId: null
+      primaryAdminId: this.pAdminId,
     }
   },
 &nbsp;
@@ -329,24 +335,32 @@
      * Remove selected admin user from business.
      * @param user
      */
-<span class="fstat-no" title="function not covered" >    removeUserAsAdmin: function(user) {</span>
+<span class="fstat-no" title="function not covered" >    removeUserAsAdmin: function (user) {</span>
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      api.removeUserAsBusinessAdmin(this.$route.params.id, user.id)</span></span>
-      .then(() =&gt; {
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >        this.admins = this.admins.filter((admin) =&gt; admin.id !== user.id);</span></span>
-<span class="cstat-no" title="statement not covered" >        this.$vs.notify({title:`Successfully removed user`, text:`${user.firstName} was removed as an administrator.`, color:'success'});</span>
-<span class="fstat-no" title="function not covered" >      })</span>
-      .catch((error) =&gt; {
-<span class="cstat-no" title="statement not covered" >        if (error.response.status === 400) {</span>
-<span class="cstat-no" title="statement not covered" >          this.$vs.notify({title:`Failed to remove user`, text:`${user.firstName} is the primary administrator.`, color:'danger'});</span>
-        }
-<span class="cstat-no" title="statement not covered" >        throw new Error(`ERROR trying to remove user as admin: ${error}`);</span>
-      });
+          .then(() =&gt; {
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >            this.admins = this.admins.filter((admin) =&gt; admin.id !== user.id);</span></span>
+<span class="cstat-no" title="statement not covered" >            this.$vs.notify({</span>
+              title: `Successfully removed user`,
+              text: `${user.firstName} was removed as an administrator.`,
+              color: 'success'
+            });
+<span class="fstat-no" title="function not covered" >          })</span>
+          .catch((error) =&gt; {
+<span class="cstat-no" title="statement not covered" >            if (error.response.status === 400) {</span>
+<span class="cstat-no" title="statement not covered" >              this.$vs.notify({</span>
+                title: `Failed to remove user`,
+                text: `${user.firstName} is the primary administrator.`,
+                color: 'danger'
+              });
+            }
+<span class="cstat-no" title="statement not covered" >            throw new Error(`ERROR trying to remove user as admin: ${error}`);</span>
+          });
     },
 &nbsp;
     /**
      * Navigate page to the user that was clicked on.
      */
-<span class="fstat-no" title="function not covered" >    navigateToUser: function(id) {</span>
+<span class="fstat-no" title="function not covered" >    navigateToUser: function (id) {</span>
 <span class="cstat-no" title="statement not covered" >      this.$router.push({path: `/users/${id}`})</span>
     },
 &nbsp;
@@ -354,24 +368,10 @@
      * Checks if the current user is also the primary administrator of this business.
      * @returns {boolean} true if the user is the primary admin, else false.
      */
-<span class="fstat-no" title="function not covered" >    isPrimaryAdmin: function() {</span>
+<span class="fstat-no" title="function not covered" >    isPrimaryAdmin: function () {</span>
 <span class="cstat-no" title="statement not covered" >      return store.loggedInUserId === this.primaryAdminId;</span>
     },
-&nbsp;
-    /**
-     * Retrieve administrator details.
-     */
-<span class="fstat-no" title="function not covered" >    retrieveAdmins: function() {</span>
-<span class="cstat-no" title="statement not covered" >      this.admins = this.$parent.adminList;</span>
-<span class="cstat-no" title="statement not covered" >      this.primaryAdminId = this.$parent.business.primaryAdministratorId;</span>
-    }
-&nbsp;
   },
-&nbsp;
-<span class="fstat-no" title="function not covered" >  mounted() {</span>
-<span class="cstat-no" title="statement not covered" >    this.retrieveAdmins();</span>
-  },
-&nbsp;
 }
 &nbsp;
 export default BusinessAdministrators;
@@ -389,14 +389,14 @@ export default BusinessAdministrators;
 &nbsp;
   display: inline-flex;
   flex-direction: row;
+  cursor: pointer;
 &nbsp;
   background-color: transparent;
   padding: 10px 20px;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 0.5em 1em;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-&nbsp;
 }
 &nbsp;
 .card:hover {
@@ -427,7 +427,7 @@ export default BusinessAdministrators;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed May 12 2021 20:40:38 GMT+1200 (New Zealand Standard Time)
+                at Sun May 16 2021 22:34:04 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
