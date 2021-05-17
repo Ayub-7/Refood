@@ -1,16 +1,9 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vuex from 'vuex';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Register from '../components/Register';
 import Vuesax from 'vuesax';
-import api from '../Api'
 
 let wrapper;
-let store;
-let actions;
-let mutations;
-let state;
 const localVue = createLocalVue();
-localVue.use(Vuex);
 localVue.use(Vuesax);
 
 // Mocking registered users
@@ -83,27 +76,18 @@ const $route = {
     }
 };
 
+let api = {
+    createUser: jest.fn(),
+}
+
+
 beforeEach(() => {
-    actions = {
-        someAction: jest.fn()
-    };
-    mutations = {
-        someMutation: jest.fn()
-    };
-    state = {
-        key: {}
-    };
-    store = new Vuex.Store({
-        actions,
-        mutations,
-        state,
-    });
-    wrapper = shallowMount(Register, {
+    wrapper = mount(Register, {
         propsData: {},
-        mocks: {$route},
+        mocks: {$route, api},
         stubs: ['router-link', 'router-view'],
         methods: {},
-        store,
+
         localVue,
     });
 });
@@ -184,6 +168,54 @@ describe('Register error checking', () => {
         expect(wrapper.vm.errors).toStrictEqual(['thisisnotaemail.com'])
     })
 
+    test('Handles large bio too large', () => {
+        wrapper.vm.password = 'Potato123!';
+        wrapper.vm.confirm_password = 'Potato123!';
+        wrapper.vm.firstname = 'bob';
+        wrapper.vm.lastname = 'steve';
+        wrapper.vm.dateofbirth = '15/09/0145';
+        wrapper.vm.country = 'New Zealand';
+        wrapper.vm.email = 'thisis@email.com'
+        wrapper.vm.middlename = '';
+        wrapper.vm.nickname = '';
+        let info = "some info";
+        wrapper.vm.bio = info.repeat(10); // 90 characters.
+        wrapper.vm.phonenumber = '027254871';
+        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
+        const registerBtn = wrapper.find('.register-button')
+        registerBtn.trigger('click');
+        expect(wrapper.vm.errors).toStrictEqual([wrapper.vm.bio])
+    })
+});
 
+describe('Method Checking', () => {
+    test("Country is successfully set", () => {
+       wrapper.vm.setCountry("New Zealand");
+       expect(wrapper.vm.country).toBe("New Zealand");
+       expect(wrapper.vm.suggestCountries).toBe(false);
+    });
 
+    test("City is successfully set", () => {
+        wrapper.vm.setCity("Christchurch");
+        expect(wrapper.vm.city).toBe("Christchurch");
+        expect(wrapper.vm.suggestCities).toBe(false);
+    });
+});
+
+describe('Checking age validity', () => {
+    test("Test empty date of birth", () => {
+        expect(wrapper.vm.validAge("")).toBe(false);
+    });
+
+    test("Test successful age older than 13", () => {
+        expect(wrapper.vm.validAge("1990-01-01")).toBe(true);
+    });
+
+    test("Test unsuccessful age younger than 13", () => {
+        expect(wrapper.vm.validAge("2020-01-01")).toBe(false);
+    });
+
+    test("Test successful age exactly 13", () => {
+        expect(wrapper.vm.validAge(Date.now().toString())).toBe(false);
+    });
 });
