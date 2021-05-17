@@ -77,10 +77,10 @@ public class ListingController {
     @PostMapping("/businesses/{id}/listings")
     public ResponseEntity<String> createListing(@PathVariable long id, @RequestBody NewListingRequest request, HttpSession session) {
         Business business = businessRepository.findBusinessById(id);
-        Inventory inventory = inventoryRepository.findInventoryByIdAndBusinessId(request.getInventoryItemId(), id);
+        Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
 
         if(inventory == null){ //inventory item doesen't exist for business
-            System.out.println("hello");
+            System.out.println(request.getInventoryItemId());
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         if (business == null) { // Business does not exist

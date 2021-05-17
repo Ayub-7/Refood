@@ -91,10 +91,6 @@ public class ListingControllerTest {
         Date beforeDate = beforeCalendar.getTime();
 
         inventory1 = new Inventory("07-4957066", 1, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
-        inventory1.setId(1L);
-//        Calendar closingCalendar = Calendar.getInstance();
-//        closingCalendar.set(2022, 2, 3);
-//        Date closingDate = closingCalendar.getTime();
 
         listing1 = new Listing(inventory1, 5, 2.0, "Seller may be interested in offers", new Date(), laterDate);
 
@@ -200,7 +196,7 @@ public class ListingControllerTest {
         //Have as param in here since the request object is null in the test
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
 
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(inventory1.getId(), business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbiddenUser)
@@ -217,7 +213,7 @@ public class ListingControllerTest {
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, DGAAUser)
@@ -238,7 +234,7 @@ public class ListingControllerTest {
     public void testSuccessfulPostListingAsBusinessAdmin() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -255,30 +251,13 @@ public class ListingControllerTest {
                 .andExpect(status().isCreated());
     }
 
-
-    @Test
-    @WithMockUser(roles="USER")
-    public void testPostWithNullInventory() throws Exception {
-        listing1.setInventoryItem(null);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
-
-        mvc.perform(post("/businesses/{id}/listings", business.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(listing1)))
-                .andExpect(status().isBadRequest());
-
-    }
-
     @Test
     @WithMockUser(roles="USER")
     public void testPostWithNoQuantity() throws Exception {
         listing1.setQuantity(0);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -296,7 +275,7 @@ public class ListingControllerTest {
         listing1.setQuantity(8);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -313,7 +292,7 @@ public class ListingControllerTest {
         listing1.setQuantity(-2);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -331,7 +310,7 @@ public class ListingControllerTest {
         listing1.setQuantity(8);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -348,7 +327,7 @@ public class ListingControllerTest {
         listing1.setPrice(-2);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -367,7 +346,7 @@ public class ListingControllerTest {
         listing1.setCloses(laterDate);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryByIdAndBusinessId(1, business.getId())).thenReturn(inventory1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
 
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -375,7 +354,5 @@ public class ListingControllerTest {
                 .content(mapper.writeValueAsString(listing1)))
                 .andExpect(status().isBadRequest());
     }
-
-
 
 }

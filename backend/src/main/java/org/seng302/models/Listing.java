@@ -28,7 +28,8 @@ public class Listing {
     private String moreInfo;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date closes;
 
     /**
