@@ -30,37 +30,37 @@ INSERT INTO address (street_number, street_name, city, region, country, postcode
 
 INSERT INTO user (first_name, middle_name, last_name, nickname, email, bio, date_of_birth, phone_number, password, created, role, address_id) VALUES
     /* 20 users */
-    ('Wilma', 'Janet', 'Sails', 'Open-architected', 'jsails0@go.com', 'Profit-focused scalable moratorium', '1989-02-28', '+57 242 190 0153', 't146MwLm', '2020-08-07T11:35:52Z', 'USER', 1),
-    ('Karrie', 'Salvatore', 'Loyley', 'local area network', 'sloyley1@wordpress.com', 'Quality-focused next generation synergy', '1995-11-06', '+48 864 927 4819', 'VhLBH0', '2020-05-01T13:25:12Z', 'USER', 2),
-    ('Felice', 'Tabbitha', 'Jaeggi', 'intranet', 'tjaeggi2@independent.co.uk', 'Managed foreground budgetary management', '1976-12-06', '+1 659 270 1003', '7o3x3SS', '2020-12-25T06:40:59Z', 'USER', 3),
-    ('Holt', 'Vincent', 'Skelhorne', 'impactful', 'vskelhorne3@washington.edu', 'Extended intermediate budgetary management', '2005-05-08', '+86 537 663 8760', 'hT4e8e65', '2020-06-22T18:17:39Z', 'USER', 4),
-    ('Shermy', 'Pearle', 'Layborn', 'artificial intelligence', 'playborn4@amazon.com', 'Intuitive client-server standardization', '2000-12-30', '+62 527 277 7359', 'VMSR0U', '2020-10-17T13:47:11Z', 'USER', 5),
+    ('Wilma', 'Janet', 'Sails', 'Open-architected', 'jsails0@go.com', 'Profit-focused scalable moratorium', '1989-02-28', '+57 242 190 0153', 't146MwLm', '2020-08-07 11:35:52', 'USER', 1),
+    ('Karrie', 'Salvatore', 'Loyley', 'local area network', 'sloyley1@wordpress.com', 'Quality-focused next generation synergy', '1995-11-06', '+48 864 927 4819', 'VhLBH0', '2020-05-01 13:25:12', 'USER', 2),
+    ('Felice', 'Tabbitha', 'Jaeggi', 'intranet', 'tjaeggi2@independent.co.uk', 'Managed foreground budgetary management', '1976-12-06', '+1 659 270 1003', '7o3x3SS', '2020-12-25 06:40:59', 'USER', 3),
+    ('Holt', 'Vincent', 'Skelhorne', 'impactful', 'vskelhorne3@washington.edu', 'Extended intermediate budgetary management', '2005-05-08', '+86 537 663 8760', 'hT4e8e65', '2020-06-22 18:17:39', 'USER', 4),
+    ('Shermy', 'Pearle', 'Layborn', 'artificial intelligence', 'playborn4@amazon.com', 'Intuitive client-server standardization', '2000-12-30', '+62 527 277 7359', 'VMSR0U', '2020-10-17 13:47:11', 'USER', 5),
     /* Above are primary admins, below are regular admins. */
-    ('Keelby', 'Hersch', 'Ganiclef', 'leading edge', 'hganiclef5@reference.com', 'Future-proofed client-server complexity', '1983-07-17', '+7 599 583 7488', 'KPseG96VKKqd', '2021-03-20T15:05:43Z', 'USER', 6),
-    ('Papageno', 'Batholomew', 'Dolton', 'Persevering', 'bdolton6@liveinternet.ru', 'Advanced bi-directional flexibility', '2000-07-12', '+380 428 944 6622', 'SmEBX59m9Y0', '2020-07-21T15:54:32Z', 'USER', 7),
-    ('Elysee', 'Maurene', 'Took', 'benchmark', 'mtook7@chron.com', 'Team-oriented interactive installation', '1985-11-09', '+234 186 824 2303', 'qADcH893ZcG', '2020-11-01T11:39:42Z', 'USER', 8),
-    ('Ruthe', 'Ogdan', 'Ruit', 'Open-architected', 'oruit8@reddit.com', 'Configurable coherent capacity', '1995-05-10', '+62 283 517 0351', 'KPLrxm2', '2020-09-25T06:01:34Z', 'USER', 9),
-    ('Ruthe', 'Iosep', 'Yoseloff', 'systematic', 'iyoseloff9@elegantthemes.com', 'Multi-tiered static toolset', '2003-05-11', '+420 882 542 6613', 'YOETusNwIdb', '2020-07-17T12:25:47Z', 'USER', 10),
+    ('Keelby', 'Hersch', 'Ganiclef', 'leading edge', 'hganiclef5@reference.com', 'Future-proofed client-server complexity', '1983-07-17', '+7 599 583 7488', 'KPseG96VKKqd', '2021-03-20 15:05:43', 'USER', 6),
+    ('Papageno', 'Batholomew', 'Dolton', 'Persevering', 'bdolton6@liveinternet.ru', 'Advanced bi-directional flexibility', '2000-07-12', '+380 428 944 6622', 'SmEBX59m9Y0', '2020-07-21 15:54:32', 'USER', 7),
+    ('Elysee', 'Maurene', 'Took', 'benchmark', 'mtook7@chron.com', 'Team-oriented interactive installation', '1985-11-09', '+234 186 824 2303', 'qADcH893ZcG', '2020-11-01 11:39:42', 'USER', 8),
+    ('Ruthe', 'Ogdan', 'Ruit', 'Open-architected', 'oruit8@reddit.com', 'Configurable coherent capacity', '1995-05-10', '+62 283 517 0351', 'KPLrxm2', '2020-09-25 06:01:34', 'USER', 9),
+    ('Ruthe', 'Iosep', 'Yoseloff', 'systematic', 'iyoseloff9@elegantthemes.com', 'Multi-tiered static toolset', '2003-05-11', '+420 882 542 6613', 'YOETusNwIdb', '2020-07-17 12:25:47', 'USER', 10),
     /* Rest is normal users. */
-    ('Gris', 'Carlotta', 'Woodwin', 'zero administration', 'cwoodwina@samsung.com', 'Multi-tiered secondary pricing structure', '2005-04-15', '+1 260 493 4589', '5eVUsp6s3g', '2021-03-10T11:55:53Z', 'USER', 11),
-    ('Guinevere', 'Kath', 'Grahamslaw', 'Phased', 'kgrahamslawb@wisc.edu', 'Optimized 6th generation capacity', '1990-08-18', '+235 527 784 2956', 'ME0feNfd', '2020-06-26T05:08:51Z', 'USER', 12),
-    ('Ros', 'Maribel', 'Drable', 'Front-line', 'mdrablec@hc360.com', 'Reduced mobile ability', '1980-09-09', '+506 894 444 0931', 'VdP0lufryC', '2021-01-03T15:22:29Z', 'USER', 13),
-    ('Mellicent', null, 'Foucar', null, 'gfoucard@huffingtonpost.com', null, '1996-08-09', null, 'VdPaJk0luFryC', '2020-07-27T19:54:26Z', 'USER', 14),
-    ('Chiarra', 'Dyanne', 'Phelip', 'context-sensitive', 'dphelipe@godaddy.com', 'Synergized scalable attitude', '2002-01-04', '+93 374 108 2586', 'fZ2KmBsEr0', '2020-04-26T06:23:01Z', 'USER', 15),
+    ('Gris', 'Carlotta', 'Woodwin', 'zero administration', 'cwoodwina@samsung.com', 'Multi-tiered secondary pricing structure', '2005-04-15', '+1 260 493 4589', '5eVUsp6s3g', '2021-03-10 11:55:53', 'USER', 11),
+    ('Guinevere', 'Kath', 'Grahamslaw', 'Phased', 'kgrahamslawb@wisc.edu', 'Optimized 6th generation capacity', '1990-08-18', '+235 527 784 2956', 'ME0feNfd', '2020-06-26 05:08:51', 'USER', 12),
+    ('Ros', 'Maribel', 'Drable', 'Front-line', 'mdrablec@hc360.com', 'Reduced mobile ability', '1980-09-09', '+506 894 444 0931', 'VdP0lufryC', '2021-01-03 15:22:29', 'USER', 13),
+    ('Mellicent', null, 'Foucar', null, 'gfoucard@huffingtonpost.com', null, '1996-08-09', null, 'VdPaJk0luFryC', '2020-07-27 19:54:26', 'USER', 14),
+    ('Chiarra', 'Dyanne', 'Phelip', 'context-sensitive', 'dphelipe@godaddy.com', 'Synergized scalable attitude', '2002-01-04', '+93 374 108 2586', 'fZ2KmBsEr0', '2020-04-26 06:23:01', 'USER', 15),
     ('Mark', null, 'Snibson', null, 'bsnibsonf@eepurl.com', null, '1975-10-26', null, 'VdP0aufrqyC', '2021-03-10T23:48:06Z', 'USER', 16),
-    ('Lexis', 'Dorri', 'Garbert', 'Enhanced', 'dgarbertg@npr.org', 'Balanced multi-state intranet', '1993-08-18', '+63 192 437 4906', 'aC46V7uAs1ur', '2020-07-11T09:33:36Z', 'USER', 17),
-    ('Giselbert', 'Gates', 'Sleney', 'client-server', 'gsleneyh@cbslocal.com', 'Diverse responsive info-mediaries', '1994-11-16', '+7 106 973 4702', 'snqO88', '2020-05-17T16:58:23Z', 'USER', 19),
-    ('Adan', 'Rickey', 'McGilvra', 'Inverse', 'rmcgilvrai@opera.com', 'Public-key static archive', '2003-01-21', '+48 366 279 7985', 'qjMGWWf', '2020-12-17T02:16:35Z', 'USER', 19),
-    ('Pamella', 'Maighdiln', 'Poupard', 'Persevering', 'mpoupardj@bluehost.com', 'Grass-roots asymmetric success', '1992-09-17', '+963 350 483 0624', 'Uq9LpBxyeQ', '2021-04-02T20:24:58Z', 'USER', 20);
+    ('Lexis', 'Dorri', 'Garbert', 'Enhanced', 'dgarbertg@npr.org', 'Balanced multi-state intranet', '1993-08-18', '+63 192 437 4906', 'aC46V7uAs1ur', '2020-07-11 09:33:36', 'USER', 17),
+    ('Giselbert', 'Gates', 'Sleney', 'client-server', 'gsleneyh@cbslocal.com', 'Diverse responsive info-mediaries', '1994-11-16', '+7 106 973 4702', 'snqO88', '2020-05-17 16:58:23', 'USER', 19),
+    ('Adan', 'Rickey', 'McGilvra', 'Inverse', 'rmcgilvrai@opera.com', 'Public-key static archive', '2003-01-21', '+48 366 279 7985', 'qjMGWWf', '2020-12-17 02:16:35', 'USER', 19),
+    ('Pamella', 'Maighdiln', 'Poupard', 'Persevering', 'mpoupardj@bluehost.com', 'Grass-roots asymmetric success', '1992-09-17', '+963 350 483 0624', 'Uq9LpBxyeQ', '2021-04-02 20:24:58', 'USER', 20);
 
 /* Uncomment this line when the password encryption is re-added. */
 UPDATE USER SET password = HASH('SHA256', password);
 
 INSERT INTO business (name, description, created, user_id, business_type, address_id) VALUES
     /* 5 businesses */
-    ('Dabshots', 'Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.', '2020-05-18T21:06:11Z', 1, 'CHARITABLE_ORGANISATION', 21),
+    ('Dabshots', 'Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.', '2020-05-18 21:06:11', 1, 'CHARITABLE_ORGANISATION', 21),
     ('Layo', 'Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.', '2020-08-25T22:22:19Z', 2, 'ACCOMMODATION_AND_FOOD_SERVICES', 22),
-    ('Skinder', 'Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', '2020-09-11T20:50:50Z', 3, 'RETAIL_TRADE', 23),
+    ('Skinder', 'Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', '2020-09-11 20:50:50', 3, 'RETAIL_TRADE', 23),
     ('Skiptube', 'Phasellus in felis.', '2020-10-18T10:30:14Z', 4, 'RETAIL_TRADE', 24),
     ('Photojam', 'Praesent blandit. Nam nulla.', '2020-05-23T08:21:22Z', 5, 'RETAIL_TRADE', 25);
 
