@@ -110,12 +110,12 @@ export default {
       // New Sale Listing Variables
       newListingPopup: false,
       newListingErrors: {
-        price: {error: false, message: "Price cannot be a negative number."},
+        price: {error: false, message: "Price cannot be empty or negative."},
         quantity: {error: false, message: "Please enter a positive quantity."},
         closes: {error: false, message: "Please enter a valid date."}
       },
       quantity: 0,
-      price: 0.00,
+      price: "0",
       moreInfo: "",
       closes: "", // todo: should default to the expiry date of selected item.
     }
@@ -130,7 +130,7 @@ export default {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
 
       let isValid = true;
-      if (this.price < 0) {
+      if (this.price < 0 || this.price == "") {
         this.price = 0.00;
         this.newListingErrors.price.error = true;
         isValid = false;
