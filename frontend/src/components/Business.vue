@@ -48,8 +48,8 @@
 
 <script>
 import api from "../Api";
-import BusinessAdministrators from "@/components/BusinessAdministrators";
-import BusinessListings from "@/components/BusinessListings";
+import BusinessAdministrators from "./BusinessAdministrators.vue";
+import BusinessListings from "./BusinessListings.vue";
 //import {store} from "../store";
 
 const Business = {
