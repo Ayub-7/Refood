@@ -246,7 +246,6 @@ public class ProductController {
         if (businessDir.mkdirs()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
-        System.out.println(Files.isDirectory(Paths.get(rootImageDir + "business_" + businessId)));
 
         String id = "";
         boolean freeImage = false;
@@ -265,7 +264,7 @@ public class ProductController {
             }
         }
 
-        File file = new File(businessDir + "/" + id + imageExtension + "/");
+        File file = new File(businessDir + "/" + id + imageExtension);
         File thumbnailFile = new File( businessDir + "/" + id + "_thumbnail" + imageExtension);
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
         System.out.println(file.getAbsolutePath());
@@ -276,7 +275,7 @@ public class ProductController {
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
         // Save into DB.
-        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
+        Image newImage = new Image(imageName, businessId + id, file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
         if (product.getPrimaryImagePath() == null) {
             if (System.getProperty("os.name").startsWith("windows")) {
