@@ -80,6 +80,7 @@ const Homepage = {
               /* Sets user details in store.js */
               mutations.setUserDateOfBirth(response.data.dateOfBirth);
               mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+              mutations.setUserCountry(response.data.homeAddress.country);
               mutations.setUserBusinesses(this.businesses);
             }).catch((err) => {
           if (err.response.status === 401) {

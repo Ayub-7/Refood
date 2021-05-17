@@ -2,10 +2,16 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import BusinessInventory from '../components/BusinessInventory';
 import Vuesax from 'vuesax';
 
+
 const localVue = createLocalVue();
 localVue.use(Vuesax);
-
 let wrapper;
+
+
+
+let $log = {
+    debug: jest.fn()
+}
 
 let $route = {
     params: {
@@ -15,16 +21,25 @@ let $route = {
 
 beforeEach(() => {
    wrapper = mount(BusinessInventory, {
-       mocks: {$route},
+
+       mocks: {$log, $route},
        stubs: {},
        methods: {},
        localVue,
-   })
+   });
+
+   const getSession = jest.spyOn(BusinessInventory.methods, 'getSession');
+
 
    //TODO: Setup this properly since this is temp fix so it can be merged
    const getBusinessProducts = jest.spyOn(BusinessInventory.methods, "getProducts");
 
+   getSession.mockResolvedValue(() => {
+       wrapper.vm.currency = "$";
+   });
+
    getBusinessProducts.mockResolvedValue([]);
+
 
 });
 

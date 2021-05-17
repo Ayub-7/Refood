@@ -111,7 +111,7 @@
         </div>
         <vs-divider id="listing-divider"></vs-divider>
         <div id="listing-price">
-          <span :class="{currencyAfterError: newListingErrors.price.error, currencyBeforeError: !newListingErrors.price.error}">$</span>
+          <span :class="{currencyAfterError: newListingErrors.price.error, currencyBeforeError: !newListingErrors.price.error}">{{currency}}</span>
           <vs-input type="number" v-model="price"
                     label="Price" min="0"
                     :danger="newListingErrors.price.error"
@@ -187,8 +187,8 @@
 </template>
 
 <script>
+import axios from "axios";
 import api from "../Api";
-// import axios from "axios";
 import {store} from "../store";
 
 export default {
@@ -198,6 +198,7 @@ export default {
     return {
       errors: [],
       inventory: [],
+      currency: "$",
       products: [],
       prodId:'',
       addNewInv:false,
@@ -209,6 +210,7 @@ export default {
       listExpiry: '',
       manufactureDate: '',
       sellBy: '',
+
 
       // New Sale Listing Variables
       newListingPopup: false,
@@ -227,6 +229,7 @@ export default {
 
   mounted() {
     this.getProducts(this.$route.params.id);
+    this.getSession();
   },
 
   methods: {
@@ -294,8 +297,31 @@ export default {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
     },
 
+    /**
+     * Calls get session endpoint to get user country, if successful calls setCurrency ()
+     */
+    getSession: function() {
+      api.checkSession()
+      .then((response) => {
+        //Call set currency inside here to currency is not removed when page refreshes
+        this.setCurrency(response.data.homeAddress.country)
+      }).catch(err => {
+        this.$log.debug(err);
+      })
+    },
 
-
+    /**
+     * Sets display currency based on the user's home country.
+     * User home country is taken from the store.
+     */
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+        .then(response => {
+          this.currency = response.data[0].currencies[0].symbol;
+        }).catch(err => {
+          this.$log.debug(err);
+      });
+    },
 
     /**
      * TODO: FOR AYUB
@@ -446,8 +472,9 @@ export default {
       }
     }
   }
-
 }
+
+
 </script>
 
 <style scoped>
