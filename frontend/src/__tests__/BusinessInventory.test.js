@@ -28,26 +28,25 @@ const mockInventory = [
     }
 ]
 
-const $route = {
-    params: {
-        id: 1
-    }
-};
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
 let wrapper;
 
-// let $route = {
-//     params: {
-//         id: 1,
-//     }
-// }
+let $route = {
+    params: {
+        id: 1,
+    }
+}
+
+let $log = {
+    debug: jest.fn(),
+}
 
 beforeEach(() => {
    wrapper = shallowMount(BusinessInventory, {
-       mocks: {$route},
+       mocks: {$route, $log},
        stubs: {},
        methods: {},
        localVue,
@@ -55,9 +54,8 @@ beforeEach(() => {
 
    const getBusinessInventory = jest.spyOn(BusinessInventory.methods, "getBusinessInventory");
 
-   getBusinessInventory.mockResolvedValue(mockInventory);
+   getBusinessInventory.mockResolvedValue([]);
 
-   wrapper.vm.inventory = mockInventory;
 
 
 
@@ -70,13 +68,5 @@ afterEach(() => {
 describe('Component', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
-    });
-});
-
-describe('Inventory Table', () => {
-    test('Loads appropriate data', async () => {
-        //TODO get this test working, or implement manual tests
-        await wrapper.vm.$nextTick();
-        console.log(wrapper.html())
     });
 });

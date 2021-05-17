@@ -134,8 +134,6 @@
     <vs-divider></vs-divider>
     <!-- Table View -->
     <vs-table id="table"
-              v-model="selected"
-              @selected="handleSelect"
               :data="this.inventory"
               noDataText="You don't have any inventory."
               :pagination="true"
@@ -214,17 +212,8 @@ export default {
   },
 
   mounted() {
-    api.getBusinessProducts(this.$route.params.id)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.products = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load products";
-        });
-
     this.getBusinessInventory();
+    this.getBusinessProducts();
   },
   methods: {
     /**
@@ -375,6 +364,18 @@ export default {
         this.pricePerItem = this.products[prodInd]["recommendedRetailPrice"];
         this.invDescription = this.products[prodInd]["description"];
       }
+    },
+
+    getBusinessProducts() {
+      api.getBusinessProducts(this.$route.params.id)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.products = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load products";
+        });
     },
 
     /** 
