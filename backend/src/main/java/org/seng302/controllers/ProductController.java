@@ -245,7 +245,6 @@ public class ProductController {
         File businessDir = new File(rootImageDir + "business_" + businessId);
         if (businessDir.mkdir()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
-            System.out.println("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
 
         String id = "";
@@ -268,6 +267,7 @@ public class ProductController {
         File file = new File(businessDir + "/" + id + imageExtension + "/");
         File thumbnailFile = new File( businessDir + "/" + id + "_thumbnail" + imageExtension);
         System.out.println(file.getAbsolutePath());
+        System.out.println(file.canWrite());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
