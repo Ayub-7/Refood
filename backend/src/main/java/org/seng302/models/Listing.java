@@ -76,15 +76,19 @@ public class Listing {
 
     private boolean validListingRequest(Inventory inventoryItem, NewListingRequest req) {
         Date today = Calendar.getInstance().getTime();
-        int quantityOfInventory = inventoryItem.getQuantity();
-        if(req.getQuantity() < 1 || req.getPrice() < 0 ) {
+        if(inventoryItem == null){
             return false;
-        } else if (req.getCloses() == null || req.getCloses().before(today)) {
-            return false;
-        } else if(req.getQuantity() > quantityOfInventory){
-            return false;
+        } else {
+            int quantityOfInventory = inventoryItem.getQuantity();
+            if(req.getQuantity() < 1 || req.getPrice() < 0 ) {
+                return false;
+            } else if (req.getCloses() == null || req.getCloses().before(today)) {
+                return false;
+            } else if(req.getQuantity() > quantityOfInventory){
+                return false;
+            }
+            return true;
         }
-        return true;
 
     }
 
