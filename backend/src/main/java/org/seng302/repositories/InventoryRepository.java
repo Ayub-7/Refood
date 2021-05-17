@@ -19,23 +19,10 @@ import java.util.List;
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     Inventory findInventoryByIdAndProductIdAndBusinessId(long id, String productId, long businessId);
+    Inventory findInventoryById(long id);
 
     List<Inventory> findInventoryByProductIdAndBusinessId(String productId, long businessId);
 
     List<Inventory> findInventoryByBusinessId(long businessId);
-
-    //Do when modifying inventory required
-//    @Modifying(clearAutomatically = true)
-//    @Transactional
-//    @Query("UPDATE Inventory p SET id = :newId, name = :name, description = :description, recommended_retail_price = :rrp where id = :prevId")
-//    void updateProduct(@Param(value = "newId") String newId,
-//                       @Param(value = "name") String name,
-//                       @Param(value = "description") String description,
-//                       @Param(value = "rrp") Double rrp,
-//                       @Param(value = "prevId") String prevId);
-
-
-
-
 
 }
