@@ -101,7 +101,8 @@
 
 <script>
 import axios from "axios";
-import {store} from "../store";
+// import {store} from "../store";
+import api from "../Api";
 
 export default {
   name: "BusinessInventory",
@@ -175,12 +176,19 @@ export default {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
     },
 
+    getSession: function() {
+      api.checkSession()
+      .then((response) => {
+        //Call set currency inside here to currency is not removed when page refreshes
+        this.setCurrency(response.data.homeAddress.country)
+      })
+    },
+
     /**
      * Sets display currency based on the user's home country.
      * User home country is taken from the store.
      */
-    setCurrency: function () {
-      let country = store.userCountry;
+    setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
         .then(response => {
           this.currency = response.data[0].currencies[0].symbol;
@@ -191,7 +199,9 @@ export default {
   },
 
   mounted: function() {
-    this.setCurrency();
+    //Call get session first to get user country
+    this.getSession()
+
   },
 }
 </script>
