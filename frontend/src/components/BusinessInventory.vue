@@ -297,11 +297,16 @@ export default {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
     },
 
+    /**
+     * Calls get session endpoint to get user country, if successful calls setCurrency ()
+     */
     getSession: function() {
       api.checkSession()
       .then((response) => {
         //Call set currency inside here to currency is not removed when page refreshes
         this.setCurrency(response.data.homeAddress.country)
+      }).catch(err => {
+        this.$log.debug(err);
       })
     },
 
@@ -317,7 +322,6 @@ export default {
           this.$log.debug(err);
       });
     },
-  },
 
     /**
      * TODO: FOR AYUB
@@ -468,6 +472,7 @@ export default {
       }
     }
   }
+}
 
 
 </script>
