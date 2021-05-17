@@ -15,11 +15,17 @@ let $route = {
 
 beforeEach(() => {
    wrapper = mount(BusinessInventory, {
-       mocks: {},
+       mocks: {$route},
        stubs: {},
        methods: {},
        localVue,
    })
+
+   //TODO: Setup this properly since this is temp fix so it can be merged
+   const getBusinessProducts = jest.spyOn(BusinessInventory.methods, "getProducts");
+
+   getBusinessProducts.mockResolvedValue([]);
+
 });
 
 afterEach(() => {
@@ -80,7 +86,7 @@ describe('New sale listing modal tests', () => {
     });
 
     test("Successfully creates a new form", () => {
-        wrapper.vm.quantity = 5;
+        wrapper.vm.listingQuantity = 5;
         wrapper.vm.price = 5.5;
         wrapper.vm.closes = "2022-01-01T15:00";
         expect(wrapper.vm.validateNewListing()).toBeTruthy();

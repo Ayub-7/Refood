@@ -226,7 +226,17 @@ export default {
 
 
   mounted() {
-    api.getBusinessProducts(this.$route.params.id)
+    this.getProducts(this.$route.params.id);
+  },
+
+  methods: {
+        /**
+     * Validates the fields for a new public listing.
+     * @return true if all of the required fields meet the requirements, false otherwise.
+     */
+
+    getProducts(businessId) {
+      api.getBusinessProducts(this.$route.params.id)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
@@ -235,12 +245,10 @@ export default {
           this.$log.debug(error);
           this.error = "Failed to load products";
         });
-  },
-  methods: {
-        /**
-     * Validates the fields for a new public listing.
-     * @return true if all of the required fields meet the requirements, false otherwise.
-     */
+
+    },
+
+
     validateNewListing: function() {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
 
