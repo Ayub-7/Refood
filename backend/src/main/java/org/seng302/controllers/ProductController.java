@@ -318,7 +318,7 @@ public class ProductController {
         if (product == null || validImage == false) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        String imageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/" + "/business_" + businessId + "/" + imageId;
+        String imageDir = rootImageDir + "/business_" + businessId + "/" + imageId;
         String extension = "";
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
@@ -351,7 +351,6 @@ public class ProductController {
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
     public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session, HttpServletRequest request) throws Exception {
-        String rootImageDir2 = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/";
         String imageExtension = "";
         Business business = businessRepository.findBusinessById(businessId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -377,7 +376,7 @@ public class ProductController {
 
         //finds correct image path
         boolean freeImage = false;
-        String imageDir = rootImageDir2 + "business_" + businessId + "/" + imageId;
+        String imageDir = rootImageDir + "business_" + businessId + "/" + imageId;
         boolean pathExists = false;
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
@@ -391,7 +390,7 @@ public class ProductController {
                 break;
             }
         }
-        File businessDir = new File(rootImageDir2 + "business_" + businessId);
+        File businessDir = new File(rootImageDir + "business_" + businessId);
         File checkFile = new File(businessDir + "/" + imageId + imageExtension);
         File thumbnailFile = new File(businessDir + "/" + imageId + "_thumbnail" + imageExtension);
         if (pathExists == true) {
