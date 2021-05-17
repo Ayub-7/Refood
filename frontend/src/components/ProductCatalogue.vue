@@ -54,7 +54,7 @@
                 :key="product.id">
               <div>
                 <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(product)"/>
+                <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" alt="Product Image" v-bind:src="getImgUrl(product)"/>
                 <img v-if="product.primaryImagePath == null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
@@ -284,8 +284,10 @@ const Search = {
     },
 
     getImgUrl(product) {
-      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/home/gitlab-runner/staging-frontend/dist/img/' + product.primaryImagePath.toString().replace("\\", "/")
+      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+        return '/prod/img/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
+        return '/test/img/' + product.primaryImagePath.toString().replace("\\", "/")
       } else if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString().replace("\\", "/")
       } else {
