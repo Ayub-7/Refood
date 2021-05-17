@@ -335,6 +335,7 @@ export default {
     },
     addInventory: function() {
       if (this.errors.length === 0) {
+        console.log(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
         api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
           .then((response) => {
             this.$log.debug("New catalogue item created:", response.data);

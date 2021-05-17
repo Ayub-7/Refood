@@ -39,11 +39,11 @@ localVue.use(Vuesax);
 
 let wrapper;
 
-let $route = {
-    params: {
-        id: 1,
-    }
-}
+// let $route = {
+//     params: {
+//         id: 1,
+//     }
+// }
 
 beforeEach(() => {
    wrapper = shallowMount(BusinessInventory, {
