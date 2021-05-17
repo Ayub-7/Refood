@@ -4,10 +4,96 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-        <vs-button class="header-button">New Inventory Product</vs-button>
+        <vs-button @click="addNewInv=true" class="header-button">New Inventory Listing</vs-button>
         <vs-button @click="newListingPopup = true" class="header-button">New Item Listing</vs-button>
         <!-- todo: remove this new item listing button when testing done
               - want to make it so there's an action button for each inventory item, with the ability to add a new listing attached.-->
+
+        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">
+        <div class="form-group required vs-col" vs-order="1" id="firstColModal">
+            <div class="row">
+              <label for="prodId">Product</label>
+              <vs-select id="prodId" class="selectExample" v-model="prodId" v-on:change="autofill">
+                <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
+              </vs-select>
+            </div>
+            <div class="row">
+              <label for="pricePerItem">Price per item</label>
+              <vs-input
+                  :danger="(errors.includes(pricePerItem))"
+                  danger-text="Price per item must be greater than zero and numeric."
+                  class="inputx"
+                  id="pricePerItem"
+                  placeholder="Price per item"
+                  v-model="pricePerItem"/>
+            </div>
+            <div class="row">
+              <label for="quantity">Quantity</label>
+              <vs-input-number
+                  :danger="(errors.includes(quantity))"
+                  danger-text="Quantity must be greater than zero."
+                  min="0"
+                  :step="1"
+                  id="quantity"
+                  v-model="quantity"/>
+            </div>
+            <div class="row">
+              <label for="description">Description</label>
+              <vs-textarea
+                  width="200px"
+                  height="50px"
+                  class="description-textarea"
+                  id="description"
+                  v-model="invDescription">
+              </vs-textarea>
+            </div>
+          </div>
+          <div class="form-group required vs-col" vs-order="2" id="secondColModal">
+            <div class="row">
+              <label for="bestBefore">Best before</label>
+              <vs-input
+                  :danger="(errors.includes('past-best'))"
+                  danger-text="Date cannot be in past"
+                  type="date"
+                  id="bestBefore"
+                  class="inputx"
+                  v-model="bestBefore"/>
+            </div>
+            <div class="row">
+              <label for="listingExpiry">Listing expiry</label>
+              <vs-input
+                  :danger="(errors.includes('past-expiry'))"
+                  danger-text="Expiry date is required and cannot be in past"
+                  type="date"
+                  id="listingExpiry"
+                  class="inputx"
+                  v-model="listExpiry"/>
+            </div>
+            <div class="row">
+              <label for="manufactureDate">Manufacture date</label>
+              <vs-input
+                  :danger="(errors.includes('past-manu'))"
+                  danger-text="Date cannot be in past"
+                  type="date"
+                  id="manufactureDate"
+                  class="inputx"
+                  v-model="manufactureDate"/>
+            </div>
+            <div class="row">
+              <label for="sellBy">Sell by</label>
+              <vs-input
+                  :danger="(errors.includes('past-sell'))"
+                  danger-text="Date cannot be in past"
+                  type="date"
+                  id="sellBy"
+                  class="inputx"
+                  v-model="sellBy"/>
+            </div>
+          </div>
+          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory; checkForm()">
+            <vs-button>Add product</vs-button>
+          </div>
+        </vs-popup>
       </div>
     </div>
 
@@ -35,7 +121,7 @@
           <div>
             <label style="font-size: 13.6px">Quantity</label>
             <vs-input-number
-                v-model="quantity"
+                v-model="listingQuantity"
                 :max="10"></vs-input-number> <!-- todo: max based on current inventory amount -->
           </div>
           <div v-show="newListingErrors.quantity.error" style="font-size: 10px; color: #FF4757; text-align: center; position: absolute">{{ newListingErrors.quantity.message }}</div>
@@ -96,52 +182,87 @@
         </vs-tr>
       </template>
     </vs-table>
+
   </vs-card>
 </template>
 
 <script>
 import axios from "axios";
-// import {store} from "../store";
 import api from "../Api";
+import {store} from "../store";
 
 export default {
   name: "BusinessInventory",
 
   data: function() {
     return {
+      errors: [],
       inventory: [],
       currency: "$",
+      products: [],
+      prodId:'',
+      addNewInv:false,
+      pricePerItem: 0.0,
+      totalPrice: 0.0,
+      quantity: 0,
+      invDescription: '',
+      bestBefore: '',
+      listExpiry: '',
+      manufactureDate: '',
+      sellBy: '',
+
 
       // New Sale Listing Variables
       newListingPopup: false,
       newListingErrors: {
-        price: {error: false, message: "Price cannot be a negative number."},
+        price: {error: false, message: "Price cannot be empty or negative."},
         quantity: {error: false, message: "Please enter a positive quantity."},
         closes: {error: false, message: "Please enter a valid date."}
       },
-      quantity: 0,
-      price: 0.00,
+      listingQuantity: 0,
+      price: "0",
       moreInfo: "",
       closes: "", // todo: should default to the expiry date of selected item.
     }
   },
 
+
+  mounted() {
+    this.getProducts(this.$route.params.id);
+    this.getSession();
+  },
+
   methods: {
-    /**
+        /**
      * Validates the fields for a new public listing.
      * @return true if all of the required fields meet the requirements, false otherwise.
      */
+
+    getProducts(businessId) {
+      api.getBusinessProducts(businessId)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.products = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load products";
+        });
+
+    },
+
+
     validateNewListing: function() {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
 
       let isValid = true;
-      if (this.price < 0) {
+      if (this.price < 0 || this.price == "") {
         this.price = 0.00;
         this.newListingErrors.price.error = true;
         isValid = false;
       }
-      if (this.quantity < 1) { // In theory this shouldn't occur (because vs-input-number component will set it to the min/max allowed).
-        this.quantity = 0;
+      if (this.listingQuantity < 1) { // In theory this shouldn't occur (because vs-input-number component will set it to the min/max allowed).
+        this.listingQuantity = 0;
         this.newListingErrors.quantity.error = true;
         isValid = false;
       }
@@ -198,11 +319,156 @@ export default {
     },
   },
 
-  mounted: function() {
-    //Call get session first to get user country
-    this.getSession()
+    /**
+     * TODO: FOR AYUB
+     */
+    checkForm: function() {
+      this.errors = [];
+      var invalidChars = /[^a-zA-Z/ -\d]/i;
+      if (this.prodId.match(invalidChars)) {
+        this.errors.push("invalid-chars");
+      }
 
-  },
+      var today = new Date();
+      var regex = /^[0-9]*(?:\.\d{1,2})?$/;
+      if( !regex.test(this.pricePerItem) ) {
+        this.errors.push(this.pricePerItem);
+      }
+
+      var dateInPast = function(firstDate, secondDate) {
+        if(firstDate.setHours(0,0,0,0) <= secondDate.setHours(0,0,0,0)) {
+          return true;
+        }
+
+        return false;
+      }
+      if (this.bestBefore === '' && this.sellBy === '' && this.manufactureDate === ''
+          && this.listExpiry === '') {
+        this.errors.push('no-dates');
+      }
+
+      if (this.listExpiry === '') {
+        this.errors.push('past-expiry');
+      }
+
+      if (this.prodId.length === 0 || this.errors.includes('invalid-chars')) {
+        this.errors.push(this.prodId);
+      }
+      if (this.pricePerItem <= 0.0) {
+        this.errors.push(this.pricePerItem);
+      }
+      if (this.bestBefore !== '') {
+        var timestamp = Date.parse(this.bestBefore);
+        var dateObject = new Date(timestamp)
+        if (dateInPast(dateObject, today) === true) {
+          this.errors.push('past-date');
+          this.errors.push('past-best');
+        }
+      }
+      if (this.listExpiry !== '') {
+        timestamp = Date.parse(this.listExpiry);
+        dateObject = new Date(timestamp)
+        if (dateInPast(dateObject, today) === true) {
+          this.errors.push('past-date');
+          this.errors.push('past-expiry');
+        }
+      }
+      if (this.manufactureDate !== '') {
+        timestamp = Date.parse(this.manufactureDate);
+        dateObject = new Date(timestamp)
+        if (dateInPast(dateObject, today) === true) {
+          this.errors.push('past-date');
+          this.errors.push('past-manu');
+        }
+      }
+      if (this.sellBy !== '') {
+        timestamp = Date.parse(this.sellBy);
+        dateObject = new Date(timestamp)
+        if (dateInPast(dateObject, today) === true) {
+          this.errors.push('past-date');
+          this.errors.push('past-sell');
+        }
+      }
+      if (this.quantity <= 0) {
+        this.errors.push(this.quantity);
+      }
+      if (this.invDescription.length > 25) {
+        this.errors.push('no-desc');
+      }
+      if (this.errors.includes('no-dates')) {
+        this.$vs.notify({
+          title: 'Failed to create inventory item',
+          text: 'Date is Required.',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('past-date')) {
+        this.$vs.notify({
+          title: 'Failed to create inventory item',
+          text: 'Dates cannot be in the past.',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('no-desc')) {
+        this.$vs.notify({
+          title: 'Failed to create inventory item',
+          text: 'Description (MAX 25 CHARS).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes(this.quantity)) {
+        this.$vs.notify({
+          title: 'Failed to create inventory item',
+          text: 'Quantity must be greater than zero.',
+          color: 'danger'
+        });
+      }
+
+    },
+    addInventory: function() {
+      if (this.errors.length === 0) {
+        api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
+          .then((response) => {
+            this.$log.debug("New catalogue item created:", response.data);
+            this.inventory.push(response.data);
+          }).catch((error) => {
+            if (error.response) {
+              console.log(error);
+              if (error.response.status === 400) {
+                this.$vs.notify( {
+                  title: 'Failed to add an inventory item',
+                  text: 'Incomplete form, or the product does not exist.',
+                  color: 'danger'
+                });
+              } else if (error.response.status === 403) {
+                this.$vs.notify( {
+                  title: 'Failed to add an inventory item',
+                  text: 'You do not have the rights to access this business',
+                  color: 'danger'
+                });
+              }
+              console.log(error.response.status);
+            }
+          this.$log.debug("Error Status:", error)
+        })
+      }
+    },
+    autofill: function() {
+      if (this.prodId !== '') {
+        let prodInd = 0;
+        while (prodInd < this.products.length) {
+          if (this.products[prodInd]["id"] === this.prodId) {
+            break;
+          }
+          prodInd++;
+        }
+        console.log(this.products[prodInd])
+        this.pricePerItem = this.products[prodInd]["recommendedRetailPrice"];
+        this.invDescription = this.products[prodInd]["description"];
+      }
+    }
+  }
+
 }
 </script>
 
@@ -210,7 +476,6 @@ export default {
   #container {
     width: 75%;
     margin: 1em auto;
-
   }
 
   /* ===== PAGE HEADER ===== */
@@ -250,6 +515,7 @@ export default {
 
   .textarea >>> textarea {
     resize: none;
+    max-width: 200px;
     min-height: 100px;
     max-height: 100px;
   }
@@ -330,8 +596,32 @@ export default {
     border-radius: 1em;
   }
 
+  th {
+    background: #1F74FF;
+    color: white;
+  }
+
   #table {
     margin: 1em;
+  }
+
+  /* ===== INVENTORY ADDING MODAL ===== */
+  #firstColModal {
+    margin-right: 160px;
+    margin-left: 5px;
+  }
+
+  .description-textarea >>> textarea {
+    resize: none;
+    min-height: 50px;
+    max-height: 50px;
+  }
+
+  .row {
+    margin-bottom: 15px;
+  }
+  .addButton {
+    align-self: center;
   }
 
   @media screen and (max-width: 850px) {
