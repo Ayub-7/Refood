@@ -121,7 +121,7 @@
           <div>
             <label style="font-size: 13.6px">Quantity</label>
             <vs-input-number
-                v-model="quantity"
+                v-model="listingQuantity"
                 :max="10"></vs-input-number> <!-- todo: max based on current inventory amount -->
           </div>
           <div v-show="newListingErrors.quantity.error" style="font-size: 10px; color: #FF4757; text-align: center; position: absolute">{{ newListingErrors.quantity.message }}</div>
@@ -217,7 +217,7 @@ export default {
         quantity: {error: false, message: "Please enter a positive quantity."},
         closes: {error: false, message: "Please enter a valid date."}
       },
-      quantity: 0,
+      listingQuantity: 0,
       price: "0",
       moreInfo: "",
       closes: "", // todo: should default to the expiry date of selected item.
@@ -250,8 +250,8 @@ export default {
         this.newListingErrors.price.error = true;
         isValid = false;
       }
-      if (this.quantity < 1) { // In theory this shouldn't occur (because vs-input-number component will set it to the min/max allowed).
-        this.quantity = 0;
+      if (this.listingQuantity < 1) { // In theory this shouldn't occur (because vs-input-number component will set it to the min/max allowed).
+        this.listingQuantity = 0;
         this.newListingErrors.quantity.error = true;
         isValid = false;
       }
