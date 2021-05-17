@@ -7,10 +7,10 @@ const localVue = createLocalVue();
 localVue.use(Vuesax);
 let wrapper;
 
-jest.mock("axios");
-axios.get.mockResolvedValue(() => {
-    wrapper.vm.currency = "$";
-});
+// jest.mock("axios");
+// axios.get.mockResolvedValue(() => {
+//     wrapper.vm.currency = "$";
+// });
 
 let $log = {
     debug: jest.fn(),
@@ -24,6 +24,11 @@ beforeEach(() => {
        localVue,
    });
 
+   const getSession = jest.spyOn(BusinessInventory.methods, 'getSession');
+
+   getSession.mockResolvedValue(() => {
+       wrapper.vm.currency = "$";
+   });
 
 });
 
