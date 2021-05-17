@@ -243,7 +243,7 @@ public class ProductController {
 
         // Check if business' own folder directory exists - make directory if false.
         File businessDir = new File(rootImageDir + "business_" + businessId);
-        if (businessDir.mkdir()) {
+        if (businessDir.mkdirs()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
         System.out.println(Files.isDirectory(Paths.get(rootImageDir + "business_" + businessId)));
