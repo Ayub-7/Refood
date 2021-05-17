@@ -266,6 +266,7 @@ public class ProductController {
 
         File file = new File(businessDir + "/" + id + imageExtension + "/");
         File thumbnailFile = new File( businessDir + "/" + id + "_thumbnail" + imageExtension);
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
         System.out.println(file.getAbsolutePath());
         System.out.println(file.canWrite());
         file.setWritable(true);
