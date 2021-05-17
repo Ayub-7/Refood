@@ -9,7 +9,12 @@ export const store = Vue.observable({
     userBusinesses: [],
     actingAsBusinessId: null,
     actingAsBusinessName: null,
-    productToAlterId: null
+    productToAlterId: null,
+    productToAlterName: null,
+    productToAlterDescription: null,
+    productToAlterRRP: null,
+    productToAlterManufacturer: null,
+
 });
 
 
@@ -90,8 +95,12 @@ export const mutations = {
         store.actingAsBusinessName = null;
     },
 
-    setProductToAlter(productId) {
+    setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
         store.productToAlterId = productId;
+        store.productToAlterName = productName;
+        store.productToAlterRRP = productRecommendedRetailPrice;
+        store.productToAlterManufacturer = productManufacturer;
+        store.productToAlterDescription = productDescription;
     }
 
 }

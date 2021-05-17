@@ -67,7 +67,7 @@ export default {
   width: 350px;
   margin: 0 auto;
   padding: 1em 2em;
-  border-radius: 1.5em;
+  border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
 }

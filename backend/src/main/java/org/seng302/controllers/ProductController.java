@@ -43,7 +43,7 @@ public class ProductController {
 
     @Autowired private ObjectMapper mapper;
 
-    @Value("${media.image.business.directory}")
+    @Value("/src/main/resources/media/images/businesses/")
     String rootImageDir;
 
 //    private final ObjectMapper mapper = new ObjectMapper();
@@ -131,7 +131,7 @@ public class ProductController {
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProduct(req, business, false);
+                ArrayList checkProduct = isValidProductPut(req, business, false);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
@@ -178,6 +178,31 @@ public class ProductController {
         returnObjects.add(errorMessage);
         return returnObjects;
     }
+
+    private ArrayList<Object> isValidProductPut(NewProductRequest product, Business business, Boolean isPosting) {
+            boolean isValid = true;
+            String errorMessage = null;
+
+            if (product.getId() == null || product.getId() == "") {
+                errorMessage = "Product id can not be empty";
+                isValid = false;
+            } else if (product.getName() == null || product.getName() == "") {
+                errorMessage = "Product name can not be empty";
+                isValid = false;
+            } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
+                errorMessage = "Product recommended retail price must be at least 0";
+                isValid = false;
+            } else if (product.getDescription() == null || product.getDescription() == "") {
+                errorMessage = "Product must have description";
+                isValid = false;
+            }
+
+            ArrayList returnObjects = new ArrayList();
+            returnObjects.add(isValid);
+            returnObjects.add(errorMessage);
+            return returnObjects;
+        }
+
 
     /**
      * Receives and saves a new image pertaining to a product.
@@ -239,8 +264,10 @@ public class ProductController {
             }
         }
 
-        File file = new File(businessDir + "/" + id + imageExtension);
-        File thumbnailFile = new File(System.getProperty("user.dir") + businessDir + "/" + id + "_thumbnail" + imageExtension);
+        File file = new File("/home/gitlab-runner" + businessDir + "/" + id + imageExtension + "/");
+        File thumbnailFile = new File( "~/home/gitlab-runner" + businessDir + "/" + id + "_thumbnail" + imageExtension);
+        System.out.println(file.getAbsolutePath());
+        System.out.println(System.getenv("PATH"));
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();

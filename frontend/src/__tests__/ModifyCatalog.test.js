@@ -84,11 +84,6 @@ describe('Modify Catalogue form error checking', () => {
         //wrapper.vm.checkForm = jest.fn();
     });
 
-    test('Handles empty modification', () => {
-        const addBtn = wrapper.find('.add-button');
-        addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(5);
-    });
 
     test('Handles no product name modification', () => {
         wrapper.vm.productName = "";

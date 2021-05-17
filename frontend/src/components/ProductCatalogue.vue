@@ -1,7 +1,5 @@
 <template>
-  <div class="main" id="body">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <form class="main1" :key="componentKey">
+  <vs-card class="main">
       <div class="profile-text-inner">
         <div style="display: flex; ">
           <h1 id="pagetitle" class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
@@ -49,7 +47,7 @@
 
 
         <div v-if="displaytype">
-          <div class="grid-container">
+          <div class="grid-container" style="margin: auto">
             
             <div style="position:relative" class="grid-item sub-container" v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
                 v-bind:href="product.id"
@@ -68,7 +66,8 @@
                 <vs-dropdown vs-trigger-click class="actionButton">
                   <vs-button style="width: fit-content;">Actions</vs-button>
                   <vs-dropdown-menu>
-                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
+                          product.manufacturer, product.description)">
                       Modify product
                     </vs-dropdown-item>
 
@@ -144,7 +143,8 @@
                       <vs-dropdown vs-trigger-click>
                         <vs-button>Actions</vs-button>
                         <vs-dropdown-menu>
-                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id)">
+                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
+                          product.manufacturer, product.description)">
                             Modify product
                           </vs-dropdown-item>
 
@@ -181,12 +181,10 @@
         </div>
       </div>
 
-    </form>
-
     <footer>
       "Product shoot" by Aameerule is licensed under CC BY 2.0
     </footer>
-  </div>
+  </vs-card>
 </template>
 
 <script>
@@ -320,8 +318,8 @@ const Search = {
     },
 
     //sets the product to alter id
-    setProductToAlter(productId) {
-      mutations.setProductToAlter(productId);
+    setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
+      mutations.setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription);
     },
     //modifies selected catalog item
     goToModify: function () {
@@ -503,20 +501,16 @@ export default Search;
 
 <style scoped>
 
-.main1{
-  top:-100px;
-}
-
 .title {
   color: #1F74FF;
-  font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   font-size: 23px;
 }
 
 .main {
   background-color: white;
-  top: 1px;
+  width: 90%;
+  margin: 1em auto;
 }
 
 .searchButton {
@@ -529,7 +523,6 @@ export default Search;
   padding-right: 40px;
   padding-bottom: 10px;
   padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
   margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
@@ -556,14 +549,10 @@ export default Search;
   padding-right: 40px;
   padding-bottom: 10px;
   padding-top: 10px;
-  font-family: 'Ubuntu', sans-serif;
   margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
-
-
-
 
 .displaying {
   padding-top: 15px;
@@ -572,7 +561,7 @@ export default Search;
 
 
 .profile-text-inner {
-  margin: 7em auto;
+  margin: 2em auto;
   padding-top: 5em;
   width: 90%;
   height: 80%;
@@ -580,15 +569,19 @@ export default Search;
 
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: repeat(auto-fill, 350px);
+  grid-column-gap: 2em;
+  justify-content: center;
+
   padding: 10px;
-  margin-top: 50px;
+  margin: 50px auto auto 0;
 }
 .grid-item {
   border: 1px solid rgba(0, 0, 0, 0.1);
   font-size: 30px;
   text-align: left;
   margin: 10px;
+  width: 350px;
 }
 .sub-container {
   padding: 0.75em;
