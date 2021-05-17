@@ -91,7 +91,7 @@
                   v-model="sellBy"/>
             </div>
           </div>
-          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory; checkForm()">
+          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory(); checkForm()">
             <vs-button>Add product</vs-button>
           </div>
         </vs-popup>
