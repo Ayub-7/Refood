@@ -236,7 +236,7 @@ export default {
      */
 
     getProducts(businessId) {
-      api.getBusinessProducts(this.$route.params.id)
+      api.getBusinessProducts(businessId)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
