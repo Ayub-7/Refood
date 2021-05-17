@@ -27,7 +27,10 @@ public class User {
     private String lastName;
     private String nickname;
     private String bio;
+
+    @Column(unique = true)
     private String email;
+
     private String dateOfBirth;
     private String phoneNumber;
 
