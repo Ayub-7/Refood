@@ -181,7 +181,7 @@
         </div>
       </div>
       <div class="form-group required vs-col" align="center" id="addButtonEdit">
-        <vs-button>Modify product</vs-button>
+        <vs-button v-on:click="submitModify">Modify product</vs-button>
       </div>
     </vs-popup>
 
@@ -277,6 +277,7 @@ export default {
   data: function() {
     return {
       errors: [],
+      modErrors: [],
       inventory: [],
       products: [],
       prodId:'',
@@ -433,6 +434,9 @@ export default {
           color: 'danger'
         });
       }
+
+    },
+    submitModify: function() {
 
     },
     addInventory: function() {

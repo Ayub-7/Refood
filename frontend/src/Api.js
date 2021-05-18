@@ -189,6 +189,22 @@ export default {
         instance.post(`/businesses/${businessId}/inventory`, {productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires}, {withCredentials: true}),
 
     /**
+     * Adds a new inventory to the current business
+     * @param businessId id of the business to
+     * @param productId product id (chosen by user)
+     * @param quantity quantity of the product
+     * @param pricePerItem price per one item
+     * @param totalPrice total price (It is not pricePerItem times some number)
+     * @param manufactured Manufacture datee
+     * @param sellBy To be sold beforee this date
+     * @param bestBefore To be consumed before this date
+     * @param expires product will expire on this date
+     * @returns {Promise<*>}
+     */
+    modifyInventory: async(businessId, productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires) =>
+        instance.put(`/businesses/${businessId}/inventory`, {productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires}, {withCredentials: true}),
+
+    /**
      * modifies catalog product
      * @param id product id (chosen by user)
      * @param name product name
