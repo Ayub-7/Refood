@@ -273,7 +273,7 @@ public class ProductController {
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
         // Save into DB.
-        Image newImage = new Image(imageName, businessId + id, file.toString(), thumbnailFile.toString());
+        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
         product.addProductImage(newImage);
         if (product.getPrimaryImagePath() == null) {
             if (System.getProperty("os.name").startsWith("windows")) {
