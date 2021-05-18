@@ -37,7 +37,7 @@ module.exports = {
     } else if (process.env.NODE_ENV === 'staging') {
       return "/test/";
     } else {
-      return "/g/";
+      return "";
     }
   })()
 
