@@ -273,9 +273,8 @@ export default {
       if (this.manufactureDate !== '') {
         timestamp = Date.parse(this.manufactureDate);
         dateObject = new Date(timestamp)
-        if (dateInPast(dateObject, today) === true) {
-          this.errors.push('past-date');
-          this.errors.push('past-manu');
+        if (dateInPast(dateObject, today) === false) {
+          this.errors.push('future-date');
         }
       }
       if (this.sellBy !== '') {
@@ -310,6 +309,13 @@ export default {
         this.$vs.notify({
           title: 'Failed to create inventory item',
           text: 'Description (MAX 25 CHARS).',
+          color: 'danger'
+        });
+      }
+      if (this.errors.includes('future-date')) {
+        this.$vs.notify({
+          title: 'Failed to create inventory item',
+          text: 'Dates cannot be in the future',
           color: 'danger'
         });
       }
