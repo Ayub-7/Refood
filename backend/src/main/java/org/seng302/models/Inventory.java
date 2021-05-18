@@ -91,7 +91,10 @@ public class Inventory {
         }
     }
 
-
+    /**
+     * Validates new inventory request, checks fields for appropriate values
+     * @param req request that is going to be checked
+     */
     private boolean validInventoryRequest(NewInventoryRequest req) {
         Date today = Calendar.getInstance().getTime();
         if(req.getQuantity() < 1 || req.getTotalPrice() < 0 || req.getPricePerItem() < 0) {
@@ -108,6 +111,22 @@ public class Inventory {
 
         return true;
 
+    }
+
+    /**
+     * Used when PUT request is happening, replaces all fields with new objects fields..
+     * new object has to be created for validation to happen
+     * @param newInventoryItem New inventory object that is going to replace current entities properties
+     */
+    public void replaceInventoryItem(Inventory newInventoryItem) {
+        this.productId = newInventoryItem.getProductId();
+        this.quantity = newInventoryItem.getQuantity();
+        this.pricePerItem = newInventoryItem.getPricePerItem();
+        this.totalPrice = newInventoryItem.getTotalPrice();
+        this.manufactured = newInventoryItem.getManufactured();
+        this.sellBy = newInventoryItem.getSellBy();
+        this.bestBefore = newInventoryItem.getBestBefore();
+        this.expires = newInventoryItem.getExpires();
     }
 
 }
