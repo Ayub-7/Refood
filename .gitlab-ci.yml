@@ -117,8 +117,7 @@ deploy-staging-frontend:
       - frontend/node_modules
     policy: pull
   script:
-    - rm -rf /home/gitlab-runner/img
-    - mv -f /home/gitlab-runner/staging-frontend/dist/img /home/gitlab-runner
+    - mv -f /home/gitlab-runner/staging-frontend/dist/prod_images /home/gitlab-runner
     - cd frontend
     - export NODE_ENV=staging
     - npm run build
@@ -129,7 +128,7 @@ deploy-staging-frontend:
     - cp ../runner/staging-frontend.sh /home/gitlab-runner/staging-frontend.sh
     - chmod u+x /home/gitlab-runner/staging-frontend.sh
     - sudo systemctl restart seng302-staging-frontend
-    - mv -f /home/gitlab-runner/img /home/gitlab-runner/staging-frontend/dist
+    - mv -f /home/gitlab-runner/prod_images /home/gitlab-runner/staging-frontend/dist
   artifacts:
     paths:
       - frontend/dist
