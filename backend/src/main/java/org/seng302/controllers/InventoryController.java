@@ -105,7 +105,7 @@ public class InventoryController {
 
 
     @PutMapping("/businesses/{businessId}/inventory/{inventoryId}")
-    public ResponseEntity<String> updateInventory(@PathVariable("businessId") long businessId, @PathVariable("inventoryId") long inventoryId, @RequestBody NewInventoryRequest req, HttpSession session) {
+    public ResponseEntity<String> putInventory(@PathVariable("businessId") long businessId, @PathVariable("inventoryId") long inventoryId, @RequestBody NewInventoryRequest req, HttpSession session) {
         Business business = businessRepository.findBusinessById(businessId);
         Inventory inventoryItem = inventoryRepository.findInventoryById(inventoryId);
         Product product = productRepository.findProductByIdAndBusinessId(req.getProductId(), businessId);
