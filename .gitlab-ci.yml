@@ -117,7 +117,7 @@ deploy-staging-frontend:
       - frontend/node_modules
     policy: pull
   script:
-    - rmdir /home/gitlab-runner/img
+    - rm -rf /home/gitlab-runner/img
     - mv -f /home/gitlab-runner/staging-frontend/dist/img /home/gitlab-runner
     - cd frontend
     - export NODE_ENV=staging
