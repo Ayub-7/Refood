@@ -19,13 +19,13 @@
           <div class="userinfo-container" v-if="getBusinessId()">
           <div id="businfo-content">
             <!-- When each list item is clicked, redirects to the relevant page in the application -->
-            <vs-button class="left-nav-item" id="bus-profile-btn" @click='goToProfile()'>Business Profile</vs-button>
-            <vs-button class="left-nav-item" id="bus-catalogue-btn" @click='goToProductCatalogue()'>Product Catalogue</vs-button>
+            <vs-button class="left-nav-item" id="bus-profile-btn" @click.native='goToProfile()'>Business Profile</vs-button>
+            <vs-button class="left-nav-item" id="bus-catalogue-btn" @click.native='goToProductCatalogue()'>Product Catalogue</vs-button>
           </div>
           </div>
           <div class="userinfo-container" v-else>
             <div id="userinfo-content">
-              <vs-button class="left-nav-item" id="user-profile-btn" @click='goToProfile()'>Profile</vs-button>
+              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()'>Profile</vs-button>
               <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
             </div>
           </div>

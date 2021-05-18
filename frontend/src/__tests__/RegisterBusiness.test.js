@@ -1,8 +1,7 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
 import {store} from "../store";
-import Vue from "vue";
 
 let wrapper;
 const localVue = createLocalVue();
@@ -34,7 +33,7 @@ const $router = {
 }
 const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
 beforeEach(() => {
-    wrapper = shallowMount(Business, {
+    wrapper = mount(Business, {
         propsData: {},
         mocks: {$vs, store, $router},
         stubs: [],
@@ -49,13 +48,6 @@ afterEach(() => {
 
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Business Register error checking', () => {
-
-
-    beforeEach(() => {
-        checkAgeMethod.mockImplementation(() => {
-            return true;
-        });
-    });
 
     test('Handles empty Register', () => {
         const registerBtn = wrapper.find('.register-button')
@@ -84,16 +76,57 @@ describe('Business Register error checking', () => {
 });
 
 describe('Business Register user age checking', () => {
-    beforeEach(() => {
-        checkAgeMethod.mockImplementation(() => {
-            return false;
-        });
-    });
-
     test('Handles to young user', () => {
+        wrapper.vm.store.userDateOfBirth = "2010-01-01"
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors.includes('dob')).toBe(true);
     })
+});
+
+describe('Business registration method checking', () => {
+    test("Country is successfully set", () => {
+        wrapper.vm.setCountry("Australia");
+        expect(wrapper.vm.country).toBe("Australia");
+        expect(wrapper.vm.suggestCountries).toBe(false);
+    });
+
+    test("City is successfully set", () => {
+        wrapper.vm.setCity("Christchurch");
+        expect(wrapper.vm.city).toBe("Christchurch");
+        expect(wrapper.vm.suggestCities).toBe(false);
+    });
+});
+
+describe('Checking valid age to register a business', () => {
+    test("Test empty date of birth", () => {
+        wrapper.vm.store.userDateOfBirth = "";
+        expect(wrapper.vm.checkAge()).toBe(false);
+    });
+
+    test("Test successful age older than 16", () => {
+        wrapper.vm.store.userDateOfBirth = "1980-01-01";
+        expect(wrapper.vm.checkAge()).toBe(true);
+    });
+
+    test("Test unsuccessful age younger than 16", () => {
+        wrapper.vm.store.userDateOfBirth = "2020-01-01";
+        expect(wrapper.vm.checkAge("2020-01-01")).toBe(false);
+    });
+
+    test("Test date of birth of now to be invalid", () => {
+        wrapper.vm.store.userDateOfBirth = Date.now().toString();
+        expect(wrapper.vm.checkAge()).toBe(false);
+    });
+});
+
+describe('Check user sessions', () => {
+   test("Not logged in (no userId in store)", () => {
+       wrapper.vm.store.loggedInUserId = null;
+       wrapper.vm.checkLoggedIn();
+       expect(wrapper.vm.$vs.notify).toBeCalled();
+       expect(wrapper.vm.$router.push).toBeCalled();
+   });
+
 });
 

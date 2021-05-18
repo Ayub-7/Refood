@@ -119,7 +119,7 @@
         </div>
         <div id="city">
           <!-- If wanting to test/check suggested item tiles, remove blur. -->
-          <vs-input autocomplete="off" @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
+          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
           <ul v-if="this.suggestCities" class="suggested-box">
             <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -128,7 +128,7 @@
           <vs-input v-model="region" class="form-control" label="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input autocomplete="off" @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label="Country *"></vs-input>
+          <vs-input autocomplete="none" @blur="suggestCountries = false;" :danger="this.errors.includes('country')" danger-text="Country required." :success="country.length > 0" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label="Country *"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -644,6 +644,11 @@ Label styling.
 
 .text-areas {
   margin: auto 0;
+}
+
+.text-areas >>> h4 {
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .text-areas >>> textarea {

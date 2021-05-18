@@ -1,8 +1,8 @@
 <template>
   <vs-card class="main">
       <div class="profile-text-inner">
-        <div style="display: flex; ">
-          <h1 id="pagetitle" class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
+        <div style="display: flex; margin: auto; padding-bottom: 1em;">
+          <h1 id="pagetitle" class="title text-center" style="font-size: 40px;">{{this.business}} Products</h1>
 
           <div style="margin-right: 0; margin-left: auto; display: flex">
             <div class="title" style="margin-top: 5px; margin-right: 10px">
@@ -14,12 +14,13 @@
               <input v-model="displaytype" type="checkbox" checked>
               <span class="slider round"></span>
             </label>
-
           </div>
         </div>
-        <div style="display: flex; ">
+        <vs-divider></vs-divider>
+
+        <div style="display: flex; margin-bottom: 1em;">
           <div style="display: flex;">
-            <h2 class="title" style="margin-top: 5px; margin-right: 10px">Sort By: </h2>
+            <h2 class="title" style="margin: auto;">Sort By: </h2>
             <select v-model="selected">
               <option disabled value="">Please select one</option>
               <option value="id">ID</option>
@@ -28,11 +29,14 @@
               <option value="recommendedRetailPrice">Recommended Retail Price</option>
               <option value="created">Date Created</option>
             </select>
-            <vs-button @click="sortByName(null, selected, 0);">Sort</vs-button>
+            <vs-button @click="sortByName(null, selected, 0);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+
+            <ImageUpload :businessId=businessId :products=products style="margin: 0 0.5em; width: 100px;"/>
+            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" style="margin: 0 0.5em; width: 100px;">Inventory</vs-button>
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
-          <tfoot style="margin-right: 0; margin-left: auto">
+          <tfoot style="margin: auto 0 auto auto">
           <tr>
             <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
             <div  v-if="filteredproducts.length > 10">
@@ -42,8 +46,7 @@
           </tr>
           </tfoot>
         </div>
-        <ImageUpload :businessId=businessId :products=products style="margin: 50px; font-size: 15px"/>
-        <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)">Inventory</vs-button>
+
 
 
         <div v-if="displaytype">
@@ -513,56 +516,25 @@ export default Search;
   margin: 1em auto;
 }
 
-.searchButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  margin-left: 35%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-#modify {
-  background: #1F74FF;
-  color: white;
-  padding: 0.8em;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-#modify:hover {
-  background: #30487c
-}
-
 .prevNextSearchButton {
   cursor: pointer;
   border-radius: 5em;
   color: #fff;
   background: #1F74FF;
   border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  padding: 10px 40px;
   margin-left: 35%;
   font-size: 13px;
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
 }
 
 .displaying {
-  padding-top: 15px;
   text-align: right;
 }
 
 
 .profile-text-inner {
   margin: 2em auto;
-  padding-top: 5em;
   width: 90%;
   height: 80%;
 }
