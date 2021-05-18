@@ -98,6 +98,93 @@
       </div>
     </div>
 
+    <!-- MODIFY INVENTORY MODAL -->
+    <vs-popup :active.sync="ModifyInvPopup" classContent="popup-example"  title="Modify Inventory Product">
+      <div class="form-group required vs-col" vs-order="1" id="firstColModal">
+        <div class="row">
+          <label for="prodId">Product</label>
+          <vs-input
+            v-model="productEdit"
+          />
+        </div>
+        <div class="row">
+          <label for="pricePerItem">Price per item</label>
+          <vs-input
+              :danger="(errors.includes(pricePerItem))"
+              danger-text="Price per item must be greater than zero and numeric."
+              class="inputx"
+              id="pricePerItemEdit"
+              placeholder="Price per item"
+              v-model="pricePerItemEdit"/>
+        </div>
+        <div class="row">
+          <label for="quantity">Quantity</label>
+          <vs-input-number
+              :danger="(errors.includes(quantity))"
+              danger-text="Quantity must be greater than zero."
+              min="0"
+              :step="1"
+              id="quantityEdit"
+              v-model="quantityEdit"/>
+        </div>
+        <div class="row">
+          <label for="description">Description</label>
+          <vs-textarea
+              width="200px"
+              height="50px"
+              class="description-textarea"
+              id="descriptionEdit"
+              v-model="invDescriptionEdit">
+          </vs-textarea>
+        </div>
+      </div>
+      <div class="form-group required vs-col" vs-order="2" id="secondColModal">
+        <div class="row">
+          <label for="bestBefore">Best before</label>
+          <vs-input
+              :danger="(errors.includes('past-best'))"
+              danger-text="Date cannot be in past"
+              type="date"
+              id="bestBeforeEdit"
+              class="inputx"
+              v-model="bestBeforeEdit"/>
+        </div>
+        <div class="row">
+          <label for="listingExpiry">Listing expiry</label>
+          <vs-input
+              :danger="(errors.includes('past-expiry'))"
+              danger-text="Expiry date is required and cannot be in past"
+              type="date"
+              id="listingExpiryEdit"
+              class="inputx"
+              v-model="listExpiryEdit"/>
+        </div>
+        <div class="row">
+          <label for="manufactureDate">Manufacture date</label>
+          <vs-input
+              :danger="(errors.includes('past-manu'))"
+              danger-text="Date cannot be in past"
+              type="date"
+              id="manufactureDateEdit"
+              class="inputx"
+              v-model="manufactureDateEdit"/>
+        </div>
+        <div class="row">
+          <label for="sellBy">Sell by</label>
+          <vs-input
+              :danger="(errors.includes('past-sell'))"
+              danger-text="Date cannot be in past"
+              type="date"
+              id="sellByEdit"
+              class="inputx"
+              v-model="sellByEdit"/>
+        </div>
+      </div>
+      <div class="form-group required vs-col" align="center" id="addButtonEdit">
+        <vs-button>Modify product</vs-button>
+      </div>
+    </vs-popup>
+
     <!-- NEW LISTING MODAL -->
     <vs-popup :active.sync="newListingPopup"
               title="Create a new listing">
@@ -168,6 +255,8 @@
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
           <vs-td :data="inventory.pricePerItem">{{inventory.pricePerItem}} </vs-td>
           <vs-td :data="inventory.totalPrice">{{inventory.totalPrice}}</vs-td>
+          <vs-button @click="addPrefills(inventory.productName, inventory.manufactured, inventory.sellBy, inventory.bestBefore,
+          inventory.expires, inventory.quantity, inventory.pricePerItem); ModifyInvPopup = true" class="header-button1">Edit</vs-button>
           <vs-td> </vs-td>
         </vs-tr>
       </template>
@@ -196,6 +285,16 @@ export default {
       totalPrice: 0.0,
       quantity: 0,
 
+      ModifyInvPopup: false,
+      productEdit: '',
+      bestBeforeEdit: '',
+      listExpiryEdit: '',
+      manufactureDateEdit: '',
+      sellByEdit: '',
+      invDescriptionEdit: '',
+      pricePerItemEdit: 0.0,
+      quantityEdit: 0,
+
       invDescription: '',
       bestBefore: '',
       listExpiry: '',
@@ -216,9 +315,17 @@ export default {
     this.getBusinessProducts();
   },
   methods: {
-    /**
-     * TODO: FOR AYUB
-     */
+    addPrefills: function(productName, manufactured, sellBy, bestBefore,
+    expires, quantity, pricePerItem) {
+      this.productEdit = productName;
+      this.manufactureDateEdit = manufactured;
+      this.sellByEdit = sellBy;
+      this.bestBeforeEdit = bestBefore;
+      this.listExpiryEdit = expires;
+      this.quantityEdit = quantity;
+      this.pricePerItemEdit = pricePerItem;
+    },
+
     checkForm: function() {
       this.errors = [];
       var invalidChars = /[^a-zA-Z/ -\d]/i;
@@ -441,6 +548,10 @@ export default {
 
   .header-button {
     margin: 0 1em;
+  }
+  .header-button1 {
+    margin: 0 1em;
+    margin-top: 40px;
   }
 
   /* ===== NEW LISTING DIALOG/PROMPT ====== */
