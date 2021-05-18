@@ -335,6 +335,12 @@ export default {
           .then((response) => {
             this.$log.debug("New catalogue item created:", response.data);
             this.inventory.push(response.data);
+            this.addNewInv = false;
+            this.getBusinessInventory();
+            this.$vs.notify( {
+              title: `Item successfully added to the business' inventory`,
+              color: 'success'
+            });
           }).catch((error) => {
             if (error.response) {
               console.log(error);
