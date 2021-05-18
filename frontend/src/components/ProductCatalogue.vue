@@ -285,9 +285,9 @@ const Search = {
 
     getImgUrl(product) {
       if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/img/' + product.primaryImagePath.toString().replace("\\", "/")
+        return '/img/' + product.primaryImagePath.toString().replace("\\", "/")
       } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/img/' + product.primaryImagePath.toString().replace("\\", "/")
+        return '/img/' + product.primaryImagePath.toString().replace("\\", "/")
       } else if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString().replace("\\", "/")
       } else {
