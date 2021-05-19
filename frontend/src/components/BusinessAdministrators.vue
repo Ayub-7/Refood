@@ -1,9 +1,12 @@
 <template>
   <ul id="administrators-list">
     <!-- Admin Card -->
-    <li class="card" v-for="user in admins" :key="user.id" v-bind:user="user">
-      <button class="admin-name" @click="navigateToUser(user.id)">{{user.firstName}} {{user.middleName}} {{user.lastName}}</button>
-      <button class="removeAdminButton" v-if="isPrimaryAdmin()" @click="removeUserAsAdmin(user)">x</button>
+    <li class="card" v-for="user in admins" :key="user.id" v-bind:user="user" @click="navigateToUser(user.id)">
+      <div class="admin-name">
+        <b v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </b>
+        <div v-else> {{user.firstName}} {{user.middleName}} {{user.lastName}} </div>
+      </div>
+      <vs-icon icon="close" class="removeAdminButton" v-if="isPrimaryAdmin()" v-on:click.stop="removeUserAsAdmin(user)"></vs-icon>
     </li>
   </ul>
 </template>
@@ -17,11 +20,12 @@ const BusinessAdministrators = {
 
   props: {
     admins: Array,
+    pAdminId: Number,
   },
 
   data: function() {
     return {
-      primaryAdminId: null
+      primaryAdminId: this.pAdminId,
     }
   },
 
@@ -76,42 +80,43 @@ export default BusinessAdministrators;
 
 #administrators-list {
   padding: 1em;
+  display: flex;
+  flex-wrap: wrap;
+
 }
 
 /* Card CSS */
 .card {
-  max-width: 40%;
+  min-width: 150px;
 
   display: inline-flex;
   flex-direction: row;
+  cursor: pointer;
 
   background-color: transparent;
   padding: 10px 20px;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 0.5em 1em;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-
 }
 
 .card:hover {
   box-shadow: 0 0.5em 1em rgba(0,1,1,.25);
 }
 
-.card >>> .admin-name {
+.admin-name {
   align-content: center;
-  padding: 0 1em;
+  padding: 0 0.5em;
 }
 
-.card >>> .removeAdminButton {
-  color: black;
-  font-size: 16px;
+.removeAdminButton {
+  margin: auto;
   opacity: 0.3;
   padding: 0 4px;
-
 }
 
-.card >>> .removeAdminButton:hover {
+.removeAdminButton:hover {
   opacity: 1;
 }
 

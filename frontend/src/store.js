@@ -6,10 +6,16 @@ export const store = Vue.observable({
     role: null,
     userDateOfBirth: null,
     userName: null,
+    userCountry: null,
     userBusinesses: [],
     actingAsBusinessId: null,
     actingAsBusinessName: null,
-    productToAlterId: null
+    productToAlterId: null,
+    productToAlterName: null,
+    productToAlterDescription: null,
+    productToAlterRRP: null,
+    productToAlterManufacturer: null,
+
 });
 
 
@@ -72,6 +78,10 @@ export const mutations = {
         store.userName = userName;
     },
 
+    setUserCountry(country) {
+        store.userCountry = country;
+    },
+
     setUserDateOfBirth(userDateOfBirth) {
         store.userDateOfBirth = userDateOfBirth;
     },
@@ -90,8 +100,12 @@ export const mutations = {
         store.actingAsBusinessName = null;
     },
 
-    setProductToAlter(productId) {
+    setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
         store.productToAlterId = productId;
+        store.productToAlterName = productName;
+        store.productToAlterRRP = productRecommendedRetailPrice;
+        store.productToAlterManufacturer = productManufacturer;
+        store.productToAlterDescription = productDescription;
     }
 
 }
