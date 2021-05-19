@@ -30,8 +30,11 @@ package org.seng302;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
+import org.seng302.models.Inventory;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
+import org.seng302.repositories.ListingRepository;
+import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.SchedAdminCheck;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +43,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-
+import java.util.Calendar;
 
 /**
  * This spring component runs at application startup to do some initialisation
@@ -53,6 +56,8 @@ public class MainApplicationRunner implements ApplicationRunner {
   private UserRepository userRepository;
   private BusinessRepository businessRepository;
   @Autowired private ProductRepository productRepository;
+  @Autowired private ListingRepository listingRepository;
+  @Autowired private InventoryRepository inventoryRepository;
 
   private SchedAdminCheck schedAdminCheck;
 
@@ -128,5 +133,34 @@ public class MainApplicationRunner implements ApplicationRunner {
     productRepository.save(p3);
     productRepository.save(p4);
 
+
+//    //setup test dates
+//    Calendar calendar = Calendar.getInstance();
+//    Date dateCreated = calendar.getTime();
+//    calendar.add(Calendar.YEAR, 2);
+//    Date dateCloses = calendar.getTime();
+
+//    // Test Data for Inventory
+//    Inventory i1 = new Inventory("07-4957066", 1, 50,1.00,50.00,dateCreated,dateCloses, dateCloses, dateCloses);
+//    Inventory i2 = new Inventory("55-9986232", 1, 50,1.00,50.00,dateCreated,dateCloses, dateCloses, dateCloses);
+//    Inventory i3 = new Inventory("55-9986231", 2, 50,1.00,50.00,dateCreated,dateCloses, dateCloses, dateCloses);
+//    Inventory i4 = new Inventory("12-5088639", 2, 50,1.00,50.00,dateCreated,dateCloses, dateCloses, dateCloses);
+//
+//    inventoryRepository.save(i1);
+//    inventoryRepository.save(i2);
+//    inventoryRepository.save(i3);
+//    inventoryRepository.save(i4);
+//
+//
+//    //test Data for Listings...
+//    Listing l1 = new Listing(i1, 12, 12.00, "test more info", dateCreated, dateCloses);
+//    Listing l2 = new Listing(i2, 12, 12.00, "test more info", dateCreated, dateCloses);
+//    Listing l3 = new Listing(i3, 12, 12.00, "test more info", dateCreated, dateCloses);
+//    Listing l4 = new Listing(i4, 12, 12.00, "test more info", dateCreated, dateCloses);
+//
+//    listingRepository.save(l1);
+//    listingRepository.save(l2);
+//    listingRepository.save(l3);
+//    listingRepository.save(l4);
   }
 }
