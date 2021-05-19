@@ -1,6 +1,10 @@
 <template>
   <div>
-    Insert Design Here.
+    <vs-tabs alignment="center">
+      <vs-tab label="For Sale"><div></div></vs-tab>
+      <vs-tab label="Wanted"><div></div></vs-tab>
+      <vs-tab label="Exchange"><div></div></vs-tab>
+    </vs-tabs>
   </div>
 </template>
 
@@ -11,5 +15,9 @@ export default {
 </script>
 
 <style scoped>
+
+vs-tab {
+  color: #1F74FF;
+}
 
 </style>
