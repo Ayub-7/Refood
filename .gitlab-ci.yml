@@ -168,7 +168,10 @@ deploy-production-frontend:
       - frontend/node_modules
     policy: pull
   script:
+    - mkdir -p /home/gitlab-runner/staging-frontend/dist/prod_images
+    - mv -f /home/gitlab-runner/staging-frontend/dist/prod_images /home/gitlab-runner
     - cd frontend
+    - export NODE_ENV=production
     - npm run build-prod
     - rm -rf /home/gitlab-runner/production-frontend/ || true
     - mkdir /home/gitlab-runner/production-frontend/
@@ -176,6 +179,8 @@ deploy-production-frontend:
     - cp ../runner/production-frontend.sh /home/gitlab-runner/production-frontend.sh
     - chmod u+x /home/gitlab-runner/production-frontend.sh
     - sudo systemctl restart seng302-production-frontend
+    - mv -f /home/gitlab-runner/prod_images /home/gitlab-runner/staging-frontend/dist
+
   artifacts:
     paths:
       - frontend/dist

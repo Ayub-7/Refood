@@ -31,7 +31,7 @@ INSERT INTO address (street_number, street_name, city, region, country, postcode
 INSERT INTO user (first_name, middle_name, last_name, nickname, email, bio, date_of_birth, phone_number, password, created, role, address_id) VALUES
     /* 20 users */
     ('Wilma', 'Janet', 'Sails', 'Open-architected', 'jsails0@go.com', 'Profit-focused scalable moratorium', '1989-02-28', '+57 242 190 0153', 't146MwLm', '2020-08-07 11:35:52', 'USER', 1),
-    ('Karrie', 'Salvatore', 'Loyley', 'local area network', 'sloyley1@wordpress.com', 'Quality-focused next generation synergy', '1995-11-06', '+48 864 927 4819', '    ', '2020-05-01 13:25:12', 'USER', 2),
+    ('Karrie', 'Salvatore', 'Loyley', 'local area network', 'sloyley1@wordpress.com', 'Quality-focused next generation synergy', '1995-11-06', '+48 864 927 4819', 'VhLBH0', '2020-05-01 13:25:12', 'USER', 2),
     ('Felice', 'Tabbitha', 'Jaeggi', 'intranet', 'tjaeggi2@independent.co.uk', 'Managed foreground budgetary management', '1976-12-06', '+1 659 270 1003', '7o3x3SS', '2020-12-25 06:40:59', 'USER', 3),
     ('Holt', 'Vincent', 'Skelhorne', 'impactful', 'vskelhorne3@washington.edu', 'Extended intermediate budgetary management', '2005-05-08', '+86 537 663 8760', 'hT4e8e65', '2020-06-22 18:17:39', 'USER', 4),
     ('Shermy', 'Pearle', 'Layborn', 'artificial intelligence', 'playborn4@amazon.com', 'Intuitive client-server standardization', '2000-12-30', '+62 527 277 7359', 'VMSR0U', '2020-10-17 13:47:11', 'USER', 5),
