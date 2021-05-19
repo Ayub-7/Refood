@@ -5,185 +5,193 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
+
         <vs-button @click="addNewInv=true" class="header-button">New Inventory Listing</vs-button>
+<!--        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">-->
+        <div v-if="addNewInv">
+          <InventoryForm :item="null" :isCreate="true" :addNewInv="true"></InventoryForm>
+        </div>
+
+<!--        </vs-popup>-->
+
         <vs-button @click="newListingPopup = true" class="header-button">New Item Listing</vs-button>
         <!-- todo: remove this new item listing button when testing done
               - want to make it so there's an action button for each inventory item, with the ability to add a new listing attached.-->
 
-        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">
-        <div class="form-group required vs-col" vs-order="1" id="firstColModal">
-            <div class="row">
-              <label for="prodId">Product</label>
-              <vs-select id="prodId" class="selectExample" v-model="prodId" v-on:change="autofill">
-                <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
-              </vs-select>
-            </div>
-            <div class="row">
-              <label for="pricePerItem">Price per item</label>
-              <vs-input
-                  :danger="(errors.includes(pricePerItem))"
-                  danger-text="Price per item must be greater than zero and numeric."
-                  class="inputx"
-                  id="pricePerItem"
-                  placeholder="Price per item"
-                  v-model="pricePerItem"/>
-            </div>
-            <div class="row">
-              <label for="quantity">Quantity</label>
-              <vs-input-number
-                  :danger="(errors.includes(quantity))"
-                  danger-text="Quantity must be greater than zero."
-                  min="0"
-                  :step="1"
-                  id="quantity"
-                  v-model="quantity"/>
-            </div>
-            <div class="row">
-              <label for="description">Description</label>
-              <vs-textarea
-                  width="200px"
-                  height="50px"
-                  class="description-textarea"
-                  id="description"
-                  v-model="invDescription">
-              </vs-textarea>
-            </div>
-          </div>
-          <div class="form-group required vs-col" vs-order="2" id="secondColModal">
-            <div class="row">
-              <label for="bestBefore">Best before</label>
-              <vs-input
-                  :danger="(errors.includes('past-best'))"
-                  danger-text="Date cannot be in past"
-                  type="date"
-                  id="bestBefore"
-                  class="inputx"
-                  v-model="bestBefore"/>
-            </div>
-            <div class="row">
-              <label for="listingExpiry">Listing expiry</label>
-              <vs-input
-                  :danger="(errors.includes('past-expiry'))"
-                  danger-text="Expiry date is required and cannot be in past"
-                  type="date"
-                  id="listingExpiry"
-                  class="inputx"
-                  v-model="listExpiry"/>
-            </div>
-            <div class="row">
-              <label for="manufactureDate">Manufacture date</label>
-              <vs-input
-                  :danger="(errors.includes('past-manu'))"
-                  danger-text="Date cannot be in past"
-                  type="date"
-                  id="manufactureDate"
-                  class="inputx"
-                  v-model="manufactureDate"/>
-            </div>
-            <div class="row">
-              <label for="sellBy">Sell by</label>
-              <vs-input
-                  :danger="(errors.includes('past-sell'))"
-                  danger-text="Date cannot be in past"
-                  type="date"
-                  id="sellBy"
-                  class="inputx"
-                  v-model="sellBy"/>
-            </div>
-          </div>
-          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory(); checkForm()">
-            <vs-button>Add product</vs-button>
-          </div>
-        </vs-popup>
+<!--        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">-->
+<!--        <div class="form-group required vs-col" vs-order="1" id="firstColModal">-->
+<!--            <div class="row">-->
+<!--              <label for="prodId">Product</label>-->
+<!--              <vs-select id="prodId" class="selectExample" v-model="prodId" v-on:change="autofill">-->
+<!--                <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>-->
+<!--              </vs-select>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--              <label for="pricePerItem">Price per item</label>-->
+<!--              <vs-input-->
+<!--                  :danger="(errors.includes(pricePerItem))"-->
+<!--                  danger-text="Price per item must be greater than zero and numeric."-->
+<!--                  class="inputx"-->
+<!--                  id="pricePerItem"-->
+<!--                  placeholder="Price per item"-->
+<!--                  v-model="pricePerItem"/>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--              <label for="quantity">Quantity</label>-->
+<!--              <vs-input-number-->
+<!--                  :danger="(errors.includes(quantity))"-->
+<!--                  danger-text="Quantity must be greater than zero."-->
+<!--                  min="0"-->
+<!--                  :step="1"-->
+<!--                  id="quantity"-->
+<!--                  v-model="quantity"/>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--              <label for="description">Description</label>-->
+<!--              <vs-textarea-->
+<!--                  width="200px"-->
+<!--                  height="50px"-->
+<!--                  class="description-textarea"-->
+<!--                  id="description"-->
+<!--                  v-model="invDescription">-->
+<!--              </vs-textarea>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group required vs-col" vs-order="2" id="secondColModal">-->
+<!--            <div class="row">-->
+<!--              <label for="bestBefore">Best before</label>-->
+<!--              <vs-input-->
+<!--                  :danger="(errors.includes('past-best'))"-->
+<!--                  danger-text="Date cannot be in past"-->
+<!--                  type="date"-->
+<!--                  id="bestBefore"-->
+<!--                  class="inputx"-->
+<!--                  v-model="bestBefore"/>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--              <label for="listingExpiry">Listing expiry</label>-->
+<!--              <vs-input-->
+<!--                  :danger="(errors.includes('past-expiry'))"-->
+<!--                  danger-text="Expiry date is required and cannot be in past"-->
+<!--                  type="date"-->
+<!--                  id="listingExpiry"-->
+<!--                  class="inputx"-->
+<!--                  v-model="listExpiry"/>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--              <label for="manufactureDate">Manufacture date</label>-->
+<!--              <vs-input-->
+<!--                  :danger="(errors.includes('past-manu'))"-->
+<!--                  danger-text="Date cannot be in past"-->
+<!--                  type="date"-->
+<!--                  id="manufactureDate"-->
+<!--                  class="inputx"-->
+<!--                  v-model="manufactureDate"/>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--              <label for="sellBy">Sell by</label>-->
+<!--              <vs-input-->
+<!--                  :danger="(errors.includes('past-sell'))"-->
+<!--                  danger-text="Date cannot be in past"-->
+<!--                  type="date"-->
+<!--                  id="sellBy"-->
+<!--                  class="inputx"-->
+<!--                  v-model="sellBy"/>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory(); checkForm()">-->
+<!--            <vs-button>Add product</vs-button>-->
+<!--          </div>-->
+<!--        </vs-popup>-->
       </div>
     </div>
 
     <!-- MODIFY INVENTORY MODAL -->
-    <vs-popup :active.sync="ModifyInvPopup" classContent="popup-example"  title="Modify Inventory Product">
-      <div class="form-group required vs-col" vs-order="1" id="firstColModal">
-        <div class="row">
-          <label for="prodId">Product</label>
-          <vs-input
-            v-model="productEdit"
-          />
-        </div>
-        <div class="row">
-          <label for="pricePerItem">Price per item</label>
-          <vs-input
-              :danger="(errors.includes(pricePerItem))"
-              danger-text="Price per item must be greater than zero and numeric."
-              class="inputx"
-              id="pricePerItemEdit"
-              placeholder="Price per item"
-              v-model="pricePerItemEdit"/>
-        </div>
-        <div class="row">
-          <label for="quantity">Quantity</label>
-          <vs-input-number
-              :danger="(errors.includes(quantity))"
-              danger-text="Quantity must be greater than zero."
-              min="0"
-              :step="1"
-              id="quantityEdit"
-              v-model="quantityEdit"/>
-        </div>
-        <div class="row">
-          <label for="description">Description</label>
-          <vs-textarea
-              width="200px"
-              height="50px"
-              class="description-textarea"
-              id="descriptionEdit"
-              v-model="invDescriptionEdit">
-          </vs-textarea>
-        </div>
-      </div>
-      <div class="form-group required vs-col" vs-order="2" id="secondColModal">
-        <div class="row">
-          <label for="bestBefore">Best before</label>
-          <vs-input
-              :danger="(errors.includes('past-best'))"
-              danger-text="Date cannot be in past"
-              type="date"
-              id="bestBeforeEdit"
-              class="inputx"
-              v-model="bestBeforeEdit"/>
-        </div>
-        <div class="row">
-          <label for="listingExpiry">Listing expiry</label>
-          <vs-input
-              :danger="(errors.includes('past-expiry'))"
-              danger-text="Expiry date is required and cannot be in past"
-              type="date"
-              id="listingExpiryEdit"
-              class="inputx"
-              v-model="listExpiryEdit"/>
-        </div>
-        <div class="row">
-          <label for="manufactureDate">Manufacture date</label>
-          <vs-input
-              :danger="(errors.includes('past-manu'))"
-              danger-text="Date cannot be in past"
-              type="date"
-              id="manufactureDateEdit"
-              class="inputx"
-              v-model="manufactureDateEdit"/>
-        </div>
-        <div class="row">
-          <label for="sellBy">Sell by</label>
-          <vs-input
-              :danger="(errors.includes('past-sell'))"
-              danger-text="Date cannot be in past"
-              type="date"
-              id="sellByEdit"
-              class="inputx"
-              v-model="sellByEdit"/>
-        </div>
-      </div>
-      <div class="form-group required vs-col" align="center" id="addButtonEdit">
-        <vs-button v-on:click="submitModify">Modify product</vs-button>
-      </div>
-    </vs-popup>
+<!--    <vs-popup :active.sync="ModifyInvPopup" classContent="popup-example"  title="Modify Inventory Product">-->
+<!--      <div class="form-group required vs-col" vs-order="1" id="firstColModal">-->
+<!--        <div class="row">-->
+<!--          <label for="prodId">Product</label>-->
+<!--          <vs-input-->
+<!--            v-model="productEdit"-->
+<!--          />-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <label for="pricePerItem">Price per item</label>-->
+<!--          <vs-input-->
+<!--              :danger="(errors.includes(pricePerItem))"-->
+<!--              danger-text="Price per item must be greater than zero and numeric."-->
+<!--              class="inputx"-->
+<!--              id="pricePerItemEdit"-->
+<!--              placeholder="Price per item"-->
+<!--              v-model="pricePerItemEdit"/>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <label for="quantity">Quantity</label>-->
+<!--          <vs-input-number-->
+<!--              :danger="(errors.includes(quantity))"-->
+<!--              danger-text="Quantity must be greater than zero."-->
+<!--              min="0"-->
+<!--              :step="1"-->
+<!--              id="quantityEdit"-->
+<!--              v-model="quantityEdit"/>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <label for="description">Description</label>-->
+<!--          <vs-textarea-->
+<!--              width="200px"-->
+<!--              height="50px"-->
+<!--              class="description-textarea"-->
+<!--              id="descriptionEdit"-->
+<!--              v-model="invDescriptionEdit">-->
+<!--          </vs-textarea>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div class="form-group required vs-col" vs-order="2" id="secondColModal">-->
+<!--        <div class="row">-->
+<!--          <label for="bestBefore">Best before</label>-->
+<!--          <vs-input-->
+<!--              :danger="(errors.includes('past-best'))"-->
+<!--              danger-text="Date cannot be in past"-->
+<!--              type="date"-->
+<!--              id="bestBeforeEdit"-->
+<!--              class="inputx"-->
+<!--              v-model="bestBeforeEdit"/>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <label for="listingExpiry">Listing expiry</label>-->
+<!--          <vs-input-->
+<!--              :danger="(errors.includes('past-expiry'))"-->
+<!--              danger-text="Expiry date is required and cannot be in past"-->
+<!--              type="date"-->
+<!--              id="listingExpiryEdit"-->
+<!--              class="inputx"-->
+<!--              v-model="listExpiryEdit"/>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <label for="manufactureDate">Manufacture date</label>-->
+<!--          <vs-input-->
+<!--              :danger="(errors.includes('past-manu'))"-->
+<!--              danger-text="Date cannot be in past"-->
+<!--              type="date"-->
+<!--              id="manufactureDateEdit"-->
+<!--              class="inputx"-->
+<!--              v-model="manufactureDateEdit"/>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <label for="sellBy">Sell by</label>-->
+<!--          <vs-input-->
+<!--              :danger="(errors.includes('past-sell'))"-->
+<!--              danger-text="Date cannot be in past"-->
+<!--              type="date"-->
+<!--              id="sellByEdit"-->
+<!--              class="inputx"-->
+<!--              v-model="sellByEdit"/>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div class="form-group required vs-col" align="center" id="addButtonEdit">-->
+<!--        <vs-button v-on:click="submitModify">Modify product</vs-button>-->
+<!--      </div>-->
+<!--    </vs-popup>-->
 
     <!-- NEW LISTING MODAL -->
     <vs-popup :active.sync="newListingPopup"
@@ -255,8 +263,17 @@
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
           <vs-td :data="inventory.pricePerItem">{{inventory.pricePerItem}} </vs-td>
           <vs-td :data="inventory.totalPrice">{{inventory.totalPrice}}</vs-td>
-          <vs-button @click="addPrefills(inventory.productName, inventory.manufactured, inventory.sellBy, inventory.bestBefore,
-          inventory.expires, inventory.quantity, inventory.pricePerItem); ModifyInvPopup = true" class="header-button1">Edit</vs-button>
+
+<!--          @click="addPrefills(inventory.productName, inventory.manufactured, inventory.sellBy, inventory.bestBefore,-->
+<!--          inventory.expires, inventory.quantity, inventory.pricePerItem);-->
+          <vs-button @click="ModifyInvPopup = true" class="header-button1">Edit</vs-button>
+          <div v-if="ModifyInvPopup">
+            <InventoryForm :item="inventory" :isCreate="false" :addNewInv="true"></InventoryForm>
+          </div>
+
+<!--          <vs-popup :active.sync="ModifyInvPopup" classContent="popup-example"  title="Modify Inventory Product">-->
+<!--            <InventoryForm v-if="ModifyInvPopup" :item="inventory" :isCreate="false"></InventoryForm>-->
+<!--          </vs-popup>-->
           <vs-td> </vs-td>
         </vs-tr>
       </template>
@@ -270,10 +287,11 @@ import api from "../Api";
 
 // import axios from "axios";
 import {store} from "../store";
+import InventoryForm from "@/components/InventoryForm";
 
 export default {
   name: "BusinessInventory",
-
+  components: {InventoryForm},
   data: function() {
     return {
       errors: [],
