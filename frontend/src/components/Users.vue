@@ -38,6 +38,7 @@
           <div id="address">
             <div class="sub-header">Home Address</div>
               <div id="street-address">{{ user.homeAddress.streetNumber }} {{ user.homeAddress.streetName }}</div>
+              <div id="suburb">{{ user.homeAddress.suburb }}</div>
               <div id="city">{{ user.homeAddress.city }}</div>
               <div id="region">{{ user.homeAddress.region }}</div>
               <div id="country">{{ user.homeAddress.country }}</div>
