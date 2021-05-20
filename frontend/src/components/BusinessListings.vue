@@ -15,27 +15,28 @@
     </div>
     <vs-divider></vs-divider>
 
-    <!-- GRID VIEW -->
+    <!-- ===== GRID VIEW ===== -->
     <div v-if="!tableView" id="grid-view">
-      <vs-card class="listing-card">
+      <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
         <div class="listing-header">
-          <vs-image style="background-color: black; width:50px; height: 50px"></vs-image>
+          <vs-image style="background-color: black; min-width: 50px; max-width:50px; max-height: 50px"></vs-image>
           <div style="margin: auto 4px;">
-            <div style="font-size: 16px;">Product Name</div>
-            <div>30x</div>
+            <div style="font-size: 14px;"><b>{{ listing.productName }}</b></div>
+            <div>{{ listing.quantity }}x</div>
           </div>
         </div>
-        <vs-divider></vs-divider>
+        <div> Closes: {{ listing.closes }}</div>
+        <vs-divider style="margin-top: 0"></vs-divider>
         <div>
-          Seller may be willing to consider near offers.
+          {{ listing.moreInfo }}
         </div>
         <div slot="footer" class="grid-card-footer">
-          Listed: 2021-05-12s
+          Listed: {{ listing.created }}
         </div>
       </vs-card>
     </div>
 
-    <!-- TABLE VIEW -->
+    <!-- ===== TABLE VIEW ===== -->
     <div v-else id="table-view">
       <vs-table
           :data="listings"
@@ -44,21 +45,21 @@
           stripe>
         <template slot="thead">
           <vs-th style="border-radius: 8px 0 0 0"> <!-- Product Image Thumbnail --> </vs-th>
-          <vs-th> Product </vs-th>
-          <vs-th> Qty </vs-th>
-          <vs-th> Closes </vs-th>
-          <vs-th> Listed </vs-th>
+          <vs-th sort-key="productName"> Product </vs-th>
+          <vs-th sort-key="quantity"> Qty </vs-th>
+          <vs-th sort-key="closes"> Closes </vs-th>
+          <vs-th sort-key="created"> Listed </vs-th>
           <vs-th style="border-radius: 0 8px 0 0"> Additional Info </vs-th>
         </template>
         <template slot-scope="{data}">
-          <vs-tr v-for="listing in data" :key="listing"> <!-- todo: connect data with table -->
-            <vs-td> </vs-td>
-            <vs-td> </vs-td>
-            <vs-td> </vs-td>
-            <vs-td> </vs-td>
-            <vs-td> </vs-td>
-            <vs-td> </vs-td>
-            <vs-td> </vs-td>
+          <vs-tr v-for="listing in data" :key="listing.id">
+            <!-- <vs-image width=100 height=100 :src="listing.inventoryItem.product.images[0].filename"></vs-image> TODO: THIS GOES BELOW-->
+            <vs-td></vs-td>
+            <vs-td>{{ listing.productName }}</vs-td>
+            <vs-td>{{ listing.quantity }}x</vs-td>
+            <vs-td>{{ listing.closes }}</vs-td>
+            <vs-td>{{ listing.created }}</vs-td>
+            <vs-td>{{ listing.moreInfo }}</vs-td>
           </vs-tr>
         </template>
       </vs-table>
@@ -68,9 +69,14 @@
 </template>
 
 <script>
+import api from "../Api";
 
 export default {
   name: "BusinessListings",
+
+  props: {
+    businessId: Number,
+  },
 
   data: function() {
     return {
@@ -83,6 +89,31 @@ export default {
     }
   },
 
+  methods: {
+    /**
+     * Retrieves the sale listings of this business.
+     */
+    getListings: function() {
+      api.getBusinessListings(this.businessId)
+        .then((res) => {
+          this.listings = res.data;
+          // Add product name to listing object to make it accessible for table to sort.
+          this.listings = this.listings.map(listing => {
+            listing.productName = listing.inventoryItem.product.name;
+            return listing;
+          })
+        })
+        .catch((error) => {
+          this.$log.error(error);
+        });
+    },
+
+
+  },
+
+  mounted: function() {
+    this.getListings();
+  },
 }
 </script>
 
@@ -109,6 +140,7 @@ export default {
 
   .listing-card {
     width: 200px;
+    height: 225px;
     margin: 0 0.5em 1em 0.5em;
   }
 
@@ -120,7 +152,12 @@ export default {
 
   .grid-card-footer {
     font-size: 12px;
-    padding-bottom: 8px;
+  }
+
+  .listing-card >>> footer {
+    margin-left: 0;
+    margin-right: auto;
+    right: auto;
   }
 
 </style>

@@ -34,7 +34,7 @@
         <!-- Sub Navigation Bar -->
         <vs-tabs id="business-navbar"> <!-- id="business-navbar" -->
           <vs-tab class="business-nav-item" label="Listings">
-            <BusinessListings/>
+            <BusinessListings :business-id="business.id"/>
           </vs-tab>
           <vs-tab class="business-nav-item" label="Administrators">
             <BusinessAdministrators :admins="adminList" :pAdminId="business.primaryAdministratorId"/>
