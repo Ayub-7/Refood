@@ -1,9 +1,20 @@
 <template>
   <div id="listings-container">
-    <div id="header-container">
-      <vs-select id="header-sort" v-model="selectedSort" label="Sort">
-        <vs-select-item v-for="sort in sortOptions" :key="sort" :value="sort" :text="sort"/>
-      </vs-select>
+    <div :class="{'header-container-grid': !tableView, 'header-container-table': tableView}">
+      <div v-show="!tableView" style="display: inline-flex">
+        <vs-select @change="sortListingsByKey" id="header-sort" v-model="selectedSort" label="Sort">
+          <vs-select-item v-for="sort in sortOptions" :key="sort" :value="sort" :text="sort"/>
+        </vs-select>
+        <vs-button id="sort-button"
+                   type="line"
+                   :icon="sortDirection === 'desc' ? 'expand_more' : 'expand_less'"
+                   @click="changeSortDirection(); sortListingsByKey();"
+                   icon-after>
+          <span v-if="sortDirection === 'desc'">Descending</span>
+          <span v-else>Ascending</span>
+        </vs-button>
+      </div>
+
 
       <div style="display: inline-flex; margin: auto 0 0.5em 0;">
         <div style="padding: 0 1em; font-size: 14px;"> View </div>
@@ -81,11 +92,13 @@ export default {
   data: function() {
     return {
       listings: [],
+      tableView: false, // Default grid-card option.
 
       sortOptions: ["Listing Date", "Closing Date", "Product Name"], // Not implemented yet.
       selectedSort: null,
+      sortDirection: "desc",
 
-      tableView: false, // Default grid-card option.
+
     }
   },
 
@@ -108,7 +121,29 @@ export default {
         });
     },
 
+    /**
+     * Change sort direction to ascending/descending for grid view only.
+     */
+    changeSortDirection: function() {
+      this.sortDirection = this.sortDirection === "desc" ? "asc" : "desc";
+    },
 
+    /**
+     * Changes sort view of the listings for grid view only.
+     */
+    sortListingsByKey: function() {
+      let selectedKey;
+      let sortKeyDirection = this.sortDirection;
+      if (this.selectedSort === "Closing Date") selectedKey = "closes";
+      else if (this.selectedSort === "Product Name") selectedKey = "productName";
+      else selectedKey = "created";
+
+      this.listings.sort(function(a, b) {
+          if (a[selectedKey] < b[selectedKey]) return sortKeyDirection === "desc" ? 1 : -1;
+          if (a[selectedKey] > b[selectedKey]) return sortKeyDirection === "desc" ? -1 : 1;
+          return 0;
+      });
+    },
   },
 
   mounted: function() {
@@ -124,24 +159,42 @@ export default {
     margin: 1em auto;
   }
 
-  #header-container {
+  .header-container-grid {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
   }
 
+  .header-container-table {
+    padding-top: 25px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+
+  #sort-button {
+    top: 5px;
+    margin: auto auto 0 auto;
+  }
+
+
   /* === LISTING CARD ==== */
   #grid-view {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 225px);
     justify-content: space-around;
-    margin: auto;
+  }
+
+  #grid-view::after {
+    content: "";
+    flex: auto;
   }
 
   .listing-card {
     width: 200px;
     height: 225px;
-    margin: 0 0.5em 1em 0.5em;
+    margin: 0.5em 1em;
   }
 
   .listing-header {

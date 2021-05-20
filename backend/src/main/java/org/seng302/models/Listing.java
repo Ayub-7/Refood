@@ -29,7 +29,7 @@ public class Listing {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date closes;
 
     /**
