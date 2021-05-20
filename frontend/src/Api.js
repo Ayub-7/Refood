@@ -201,8 +201,8 @@ export default {
      * @param expires product will expire on this date
      * @returns {Promise<*>}
      */
-    modifyInventory: async(businessId, productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires) =>
-        instance.put(`/businesses/${businessId}/inventory`, {productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires}, {withCredentials: true}),
+    modifyInventory: async(businessId, inventoryId, productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires) =>
+        instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, {productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires}, {withCredentials: true}),
 
     /**
      * modifies catalog product

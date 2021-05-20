@@ -5,14 +5,8 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-
-<!--        <vs-button @click="addNewInv=true" class="header-button">New Inventory Listing</vs-button>-->
-<!--        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">-->
-<!--        <div v-if="addNewInv">-->
-<!--          <InventoryForm :item="null" :isCreate="true" :addNewInv="true"></InventoryForm>-->
-<!--        </div>-->
+        <!-- Add to inventory modal -->
         <AddToInventory @submitted="onSuccess"></AddToInventory>
-
         <vs-button @click="newListingPopup = true" class="header-button">New Item Listing</vs-button>
         <!-- todo: remove this new item listing button when testing done
               - want to make it so there's an action button for each inventory item, with the ability to add a new listing attached.-->
@@ -89,18 +83,10 @@
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
           <vs-td :data="inventory.pricePerItem">{{inventory.pricePerItem}}</vs-td>
           <vs-td :data="inventory.totalPrice">{{inventory.totalPrice}}</vs-td>
-
-<!--          @click="addPrefills(inventory.productName, inventory.manufactured, inventory.sellBy, inventory.bestBefore,-->
-<!--          inventory.expires, inventory.quantity, inventory.pricePerItem);-->
-          <ModifyInventory @submitted="onSuccess" :item="inventory"></ModifyInventory>
-<!--          <vs-button @click="ModifyInvPopup = true" class="header-button1">Edit</vs-button>-->
-<!--          <div v-if="ModifyInvPopup">-->
-<!--            <InventoryForm :item="inventory" :isCreate="false" :addNewInv="true"></InventoryForm>-->
-<!--          </div>-->
-
-<!--          <vs-popup :active.sync="ModifyInvPopup" classContent="popup-example"  title="Modify Inventory Product">-->
-<!--            <InventoryForm v-if="ModifyInvPopup" :item="inventory" :isCreate="false"></InventoryForm>-->
-<!--          </vs-popup>-->
+          <!-- Modify inventory modal, with inventory sent as prop to autofill form -->
+          <div class="modifyBtn">
+            <ModifyInventory @submitted="onSuccess" :item="inventory"></ModifyInventory>
+          </div>
           <vs-td> </vs-td>
         </vs-tr>
       </template>

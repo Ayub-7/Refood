@@ -8,13 +8,6 @@
           <vs-select id="prodId" class="selectExample" v-model="invenForm.prodId" disabled>
             <vs-select-item :value="product.id" :disabld="product.id = item.prodId" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
           </vs-select>
-<!--          <vs-select-->
-<!--              disabled-->
-<!--              class="selectExample"-->
-<!--              v-model="invenForm.productName"-->
-<!--          >-->
-<!--            <vs-select-item :key="index" :disabled="index==2" :value="item.value" :text="item.text" v-for="item,index in options3" />-->
-<!--          </vs-select>-->
         </div>
         <div class="row">
           <label for="pricePerItem">Price per item</label>
@@ -224,9 +217,9 @@ export default {
           });
     },
     updateInventory: function() {
+      console.log(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry);
       if (this.errors.length === 0) {
-        //console.log(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
-        api.modifyInventory(store.actingAsBusinessId, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
+        api.modifyInventory(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
             .then((response) => {
               this.$log.debug("Inventory item updated:", response.data);
               //this.inventory.push(response.data);
@@ -240,6 +233,7 @@ export default {
           if (error.response) {
             console.log(error);
             if (error.response.status === 400) {
+              console.log(error.response);
               this.$vs.notify( {
                 title: 'Failed to add an inventory item',
                 text: 'Incomplete form, or the product does not exist.',
