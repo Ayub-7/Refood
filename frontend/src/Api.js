@@ -183,10 +183,28 @@ export default {
      * @param sellBy To be sold beforee this date
      * @param bestBefore To be consumed before this date
      * @param expires product will expire on this date
-     * @returns {Promise<*>}
      */
     createInventory: async(businessId, productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires) =>
         instance.post(`/businesses/${businessId}/inventory`, {productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires}, {withCredentials: true}),
+
+    /**
+     * Obtains the inventory of the said business from the database
+     * @param businessId the id of the said business
+     */
+    getInventory: async(businessId) =>
+        instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true}),
+
+    /**
+     * Adds a new listing for the said business' marketplace
+     * @param businessId the id of the said business
+     * @param inventoryItemId the id of the inventory item
+     * @param quantity the quantity of the products
+     * @param price the total price of the listing
+     * @param moreInfo OPTIONAL: Info about listing
+     * @param closes Closing date
+     */
+    createListing: async(businessId, inventoryItemId, quantity, price, moreInfo, closes) =>
+        instance.post(`/businesses/${businessId}/listing`, {inventoryItemId, quantity, price, moreInfo, closes}, {withCredentials: true}),
 
     /**
      * modifies catalog product

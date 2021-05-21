@@ -101,13 +101,17 @@
     <vs-popup :active.sync="newListingPopup"
               title="Create a new listing">
       <div class="new-listing-modal">
-        <div id="listing-product-id">
-          <div class="sub-header">Product ID</div>
-          <div style="font-size: 18px;">ABC-123</div>
+        <div class="row">
+          <label for="InvId">Inventory Item ID</label>
+          <!-- TODO: add v-on:change to change Product name -->
+          <vs-select id="InvId" class="selectExample" v-model="invItem" v-on:change="changeInvVals">
+            <vs-select-item :value="invItem" :text="invItem.id" v-for="invItem in inventory" v-bind:href="invItem.id" :key="invItem.id"/>
+          </vs-select>
         </div>
         <div id="listing-product-name">
-          <div class="sub-header">Product Name</div>
-          <div style="font-size: 18px;">Bean of Cans - Placeholder Name</div>
+          <div class="sub-header">Inventory Item Name</div>
+          <div style="font-size: 18px;" v-if="invItem.length !== 0">{{ invItem.product.name }}</div>
+          <div style="font-size: 18px;" v-else></div>
         </div>
         <vs-divider id="listing-divider"></vs-divider>
         <div id="listing-price">
@@ -201,6 +205,7 @@ export default {
       currency: "$",
       products: [],
       prodId:'',
+      invItem:[],
       addNewInv:false,
       pricePerItem: 0.0,
       totalPrice: 0.0,
@@ -229,6 +234,7 @@ export default {
 
   mounted() {
     this.getProducts(this.$route.params.id);
+    this.getInventory(this.$route.params.id);
     this.getSession();
   },
 
@@ -250,8 +256,23 @@ export default {
         });
 
     },
-
-
+    getInventory: function(businessId) {
+      api.getInventory(businessId)
+          .then((response) => {
+            this.$log.debug("Inventory loaded: " + response.data);
+            this.inventory = response.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to load inventory";
+          });
+    },
+    changeInvVals: function() {
+      if (this.invItem !== undefined) {
+        this.price = this.invItem.totalPrice;
+        this.listingQuantity = this.invItem.quantity;
+      }
+    },
     validateNewListing: function() {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
 
@@ -285,7 +306,31 @@ export default {
      */
     createNewListing: function() {
       if (this.validateNewListing()) {
-        alert("It validated. Replace me with functionality.");
+        if (this.errors.length === 0) {
+          api.createListing(store.actingAsBusinessId, this.listingQuantity, this.price, this.moreInfo, this.closes)
+              .then((response) => {
+                this.$log.debug("New listing has been posted:", response.data);
+              }).catch((error) => {
+            if (error.response) {
+              console.log(error);
+              if (error.response.status === 400) {
+                this.$vs.notify( {
+                  title: 'Failed to add a listing',
+                  text: 'Incomplete form, or the product does not exist.',
+                  color: 'danger'
+                });
+              } else if (error.response.status === 403) {
+                this.$vs.notify( {
+                  title: 'Failed to add a listing',
+                  text: 'You do not have the rights to access this business',
+                  color: 'danger'
+                });
+              }
+              console.log(error.response.status);
+            }
+            this.$log.debug("Error Status:", error)
+          })
+        }
       }
     },
 
@@ -322,10 +367,6 @@ export default {
           this.$log.debug(err);
       });
     },
-
-    /**
-     * TODO: FOR AYUB
-     */
     checkForm: function() {
       this.errors = [];
       var invalidChars = /[^a-zA-Z/ -\d]/i;
@@ -434,7 +475,7 @@ export default {
         api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
           .then((response) => {
             this.$log.debug("New catalogue item created:", response.data);
-            this.inventory.push(response.data);
+            this.getInventory(this.$route.params.id)
           }).catch((error) => {
             if (error.response) {
               console.log(error);
