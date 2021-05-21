@@ -22,6 +22,7 @@
             <div class="sub-header">Address</div>
             <div id="street-address">{{ business.address.streetNumber }} {{ business.address.streetName }}</div>
             <div id="city">{{ business.address.city }}</div>
+            <div id="suburb">{{ business.address.suburb }}</div>
             <div id="region">{{ business.address.region }}</div>
             <div id="country">{{ business.address.country }}</div>
             <div id="postcode">{{ business.address.postcode }}</div>

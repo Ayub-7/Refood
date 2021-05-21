@@ -18,11 +18,19 @@ import java.util.List;
 @RepositoryRestResource
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
-    Inventory findInventoryByIdAndProductIdAndBusinessId(long id, String productId, long businessId);
+    Inventory findInventoryByIdAndBusinessId(long id, long businessId);
 
     List<Inventory> findInventoryByProductIdAndBusinessId(String productId, long businessId);
 
     List<Inventory> findInventoryByBusinessId(long businessId);
+
+    Inventory findInventoryById(long id);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Inventory i SET quantity = :newQuantity where id = :inventoryId")
+    void updateInventoryQuantity(@Param(value = "newQuantity") int newQuantity,
+                       @Param(value = "inventoryId") long inventoryId);
 
     //Do when modifying inventory required
 //    @Modifying(clearAutomatically = true)

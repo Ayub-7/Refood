@@ -2,9 +2,13 @@ package org.seng302.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.seng302.models.requests.NewInventoryRequest;
+import org.seng302.models.requests.NewListingRequest;
 
+import javax.xml.bind.ValidationException;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Calendar;
 
 /**
  * Entity class that represents a listing for the sale of some product from a business' inventory.
@@ -24,7 +28,8 @@ public class Listing {
     private String moreInfo;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date closes;
 
     /**
@@ -45,8 +50,48 @@ public class Listing {
         this.closes = closes;
     }
 
+
     /**
      * Empty constructor for JPA use.
      */
     protected Listing() {}
+
+
+    /**
+     * Used for when a new product request is called.
+     * @param inventoryItem the inventory item object that is being listed for sale
+     * @param newListingRequest The request body information that was mapped into a newListingRequest.
+     */
+    public Listing(Inventory inventoryItem, NewListingRequest newListingRequest) throws ValidationException {
+        if(this.validListingRequest(inventoryItem, newListingRequest)){
+            this.inventoryItem = inventoryItem;
+            this.quantity = newListingRequest.getQuantity();
+            this.price = newListingRequest.getPrice();
+            this.moreInfo = newListingRequest.getMoreInfo();
+            this.created = new Date();
+            this.closes = newListingRequest.getCloses();
+        } else {
+            throw new ValidationException("Listing request item is not valid!");
+        }
+    }
+
+    private boolean validListingRequest(Inventory inventoryItem, NewListingRequest req) {
+        Date today = Calendar.getInstance().getTime();
+        if(inventoryItem == null){
+            return false;
+        } else {
+            int quantityOfInventory = inventoryItem.getQuantity();
+            if(req.getQuantity() < 1 || req.getPrice() < 0 ) {
+                return false;
+            } else if (req.getCloses() == null || req.getCloses().before(today)) {
+                return false;
+            } else if(req.getQuantity() > quantityOfInventory){
+                return false;
+            }
+            return true;
+        }
+
+    }
+
+
 }

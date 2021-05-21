@@ -113,4 +113,9 @@ INSERT INTO inventory (best_before, business_id, expires, manufactured, price_pe
     ('2021-09-27T12:00:00Z', 1, '2021-11-27T12:00:00Z', '2021-01-27T12:00:00Z', 6.00, 'WAUVT64B54N722288', 1, null, 50.00),
     ('2021-09-27T12:00:00Z', 1, '2021-11-27T12:00:00Z', '2021-01-27T12:00:00Z', 6.00, 'WAUVT64B54N722288', 1, null, 50.00);
 
+INSERT INTO listing (closes, created, more_info, price, quantity, inventory_item_id) VALUES
+    ('2021-09-27T12:00:00Z', '2021-01-27T12:00:00Z', 'test listing', 10, 3, 1);
+
+
+
 

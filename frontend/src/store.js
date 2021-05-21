@@ -6,6 +6,7 @@ export const store = Vue.observable({
     role: null,
     userDateOfBirth: null,
     userName: null,
+    userCountry: null,
     userBusinesses: [],
     actingAsBusinessId: null,
     actingAsBusinessName: null,
@@ -75,6 +76,10 @@ export const mutations = {
 
     setUserName(userName) {
         store.userName = userName;
+    },
+
+    setUserCountry(country) {
+        store.userCountry = country;
     },
 
     setUserDateOfBirth(userDateOfBirth) {
