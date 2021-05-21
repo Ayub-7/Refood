@@ -14,9 +14,8 @@
           <span v-else>Ascending</span>
         </vs-button>
       </div>
-
-
-      <div style="display: inline-flex; margin: auto 0 0.5em 0;">
+      <!-- ====== LISTINGS OPTIONS MENU ===== -->
+      <div id="view-switch">
         <div style="padding: 0 1em; font-size: 14px;"> View </div>
         <vs-switch id="table-switch" v-model="tableView" style="margin: auto 0; width: 50px">
           <span slot="on">Table</span>
@@ -29,18 +28,21 @@
     <!-- ===== GRID VIEW ===== -->
     <div v-if="!tableView" id="grid-view">
       <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
+        <div style="margin: 2px 4px; font-size: 12px; font-weight: bold">{{ listing.productName }}</div>
         <div class="listing-header">
-          <vs-image style="background-color: black; min-width: 50px; max-width:50px; max-height: 50px"></vs-image>
-          <div style="margin: auto 4px;">
-            <div style="font-size: 14px;"><b>{{ listing.productName }}</b></div>
+          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" :src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
+          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" :src="getImgUrl(listing.inventoryItem.product)"/>
+          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" src="require('../../public/ProductShoot.jpg')"/>
+          <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
+            <div>{{ currencySymbol }}{{ listing.price }}</div>
             <div>{{ listing.quantity }}x</div>
           </div>
         </div>
-        <div> Closes: {{ listing.closes }}</div>
+
+        <div style="font-size: 12px"> Closes: {{ listing.closes }}</div>
         <vs-divider style="margin-top: 0"></vs-divider>
-        <div>
-          {{ listing.moreInfo }}
-        </div>
+
+        <div>{{ listing.moreInfo }}</div>
         <div slot="footer" class="grid-card-footer">
           Listed: {{ listing.created }}
         </div>
@@ -57,6 +59,7 @@
         <template slot="thead">
           <vs-th style="border-radius: 8px 0 0 0"> <!-- Product Image Thumbnail --> </vs-th>
           <vs-th sort-key="productName"> Product </vs-th>
+          <vs-th sort-key="price"> Price </vs-th>
           <vs-th sort-key="quantity"> Qty </vs-th>
           <vs-th sort-key="closes"> Closes </vs-th>
           <vs-th sort-key="created"> Listed </vs-th>
@@ -64,9 +67,13 @@
         </template>
         <template slot-scope="{data}">
           <vs-tr v-for="listing in data" :key="listing.id">
-            <!-- <vs-image width=100 height=100 :src="listing.inventoryItem.product.images[0].filename"></vs-image> TODO: THIS GOES BELOW-->
-            <vs-td></vs-td>
+            <vs-td>
+              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" :src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
+              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" :src="getImgUrl(listing.inventoryItem.product)"/>
+              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" src="require('../../public/ProductShoot.jpg')"/>
+            </vs-td>
             <vs-td>{{ listing.productName }}</vs-td>
+            <vs-td>{{ currencySymbol }}{{ listing.price }}</vs-td>
             <vs-td>{{ listing.quantity }}x</vs-td>
             <vs-td>{{ listing.closes }}</vs-td>
             <vs-td>{{ listing.created }}</vs-td>
@@ -81,12 +88,14 @@
 
 <script>
 import api from "../Api";
+import axios from "axios";
 
 export default {
   name: "BusinessListings",
 
   props: {
     businessId: Number,
+    country: String,
   },
 
   data: function() {
@@ -98,7 +107,7 @@ export default {
       selectedSort: null,
       sortDirection: "desc",
 
-
+      currencySymbol: "$",
     }
   },
 
@@ -119,6 +128,22 @@ export default {
         .catch((error) => {
           this.$log.error(error);
         });
+    },
+
+    isDevelopment() {
+      return (process.env.NODE_ENV === 'development')
+    },
+
+    getImgUrl(product) {
+      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
+        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null) {
+        return product.primaryImagePath.toString().replace("\\", "/")
+      } else {
+        return '../../public/ProductShoot.jpg'
+      }
     },
 
     /**
@@ -144,10 +169,23 @@ export default {
           return 0;
       });
     },
+
+    /**
+     * Sets display currency based on the user's home country.
+     */
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then(response => {
+            this.currencySymbol = response.data[0].currencies[0].symbol;
+          }).catch(err => {
+        this.$log.debug(err);
+      });
+    },
   },
 
   mounted: function() {
     this.getListings();
+    this.setCurrency(this.country);
   },
 }
 </script>
@@ -172,17 +210,30 @@ export default {
     justify-content: flex-end;
   }
 
+  #view-switch {
+    display: flex;
+    margin: auto 0 0.5em 0;
+  }
 
   #sort-button {
     top: 5px;
     margin: auto auto 0 auto;
   }
 
+  .image {
+    min-width: 50px;
+    max-width: 50px;
+    max-height: 50px;
+
+    border-radius: 4px;
+    margin: 0 0 auto 0;
+  }
+
 
   /* === LISTING CARD ==== */
   #grid-view {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 225px);
+    grid-template-columns: repeat(auto-fit, 250px);
     justify-content: space-around;
   }
 
@@ -192,7 +243,7 @@ export default {
   }
 
   .listing-card {
-    width: 200px;
+    width: 225px;
     height: 225px;
     margin: 0.5em 1em;
   }
@@ -211,6 +262,16 @@ export default {
     margin-left: 0;
     margin-right: auto;
     right: auto;
+  }
+
+  @media screen and (max-width: 500px) {
+    .header-container-grid {
+      flex-direction: column;
+    }
+
+    #view-switch {
+      margin-top: 0.5em;
+    }
   }
 
 </style>
