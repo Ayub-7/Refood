@@ -289,7 +289,7 @@ export default {
       if (this.quantity <= 0) {
         this.errors.push(this.quantity);
       }
-      if (this.invDescription.length > 25) {
+      if (this.invDescription.length > 100) {
         this.errors.push('no-desc');
       }
       if (this.errors.includes('no-dates')) {
@@ -309,7 +309,7 @@ export default {
       if (this.errors.includes('no-desc')) {
         this.$vs.notify({
           title: 'Failed to create inventory item',
-          text: 'Description (MAX 25 CHARS).',
+          text: 'Description is too long (>100 characters).',
           color: 'danger'
         });
       }
