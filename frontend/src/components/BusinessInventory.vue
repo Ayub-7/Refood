@@ -307,7 +307,7 @@ export default {
     createNewListing: function() {
       if (this.validateNewListing()) {
         if (this.errors.length === 0) {
-          api.createListing(store.actingAsBusinessId, this.listingQuantity, this.price, this.moreInfo, this.closes)
+          api.createListing(store.actingAsBusinessId, this.invItem.id, this.listingQuantity, this.price, this.moreInfo, this.closes)
               .then((response) => {
                 this.$log.debug("New listing has been posted:", response.data);
               }).catch((error) => {

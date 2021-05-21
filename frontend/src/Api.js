@@ -204,7 +204,7 @@ export default {
      * @param closes Closing date
      */
     createListing: async(businessId, inventoryItemId, quantity, price, moreInfo, closes) =>
-        instance.post(`/businesses/${businessId}/listing`, {inventoryItemId, quantity, price, moreInfo, closes}, {withCredentials: true}),
+        instance.post(`/businesses/${businessId}/listings`, {inventoryItemId, quantity, price, moreInfo, closes}, {withCredentials: true}),
 
     /**
      * modifies catalog product
