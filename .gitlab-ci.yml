@@ -95,6 +95,12 @@ deploy-staging-backend:
     - mkdir /home/gitlab-runner/staging-backend/
     - cp -r ./build/libs /home/gitlab-runner/staging-backend
     - cp ../runner/staging-backend.sh /home/gitlab-runner/staging-backend.sh
+    # environment variables added to file
+    - echo "export DB_URL=${DB_URL_STAGING}" >> /home/gitlab-runner/staging-backend/env_var.txt
+    - echo "export DB_USERNAME=${DB_USERNAME}" >> /home/gitlab-runner/staging-backend/env_var.txt
+    - echo "export DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/staging-backend/env_var.txt
+    - echo "export DGAA_EMAIL=${DGAA_EMAIL}" >> /home/gitlab-runner/staging-backend/env_var.txt
+    - echo "export DGAA_PASSWORD=${DGAA_PASSWORD}" >> /home/gitlab-runner/staging-backend/env_var.txt
     - chmod u+x /home/gitlab-runner/staging-backend.sh
     - sudo systemctl restart seng302-staging-backend
   artifacts:
@@ -111,6 +117,8 @@ deploy-staging-frontend:
       - frontend/node_modules
     policy: pull
   script:
+    - mkdir -p /home/gitlab-runner/staging-frontend/dist/prod_images
+    - mv -f /home/gitlab-runner/staging-frontend/dist/prod_images /home/gitlab-runner
     - cd frontend
     - export NODE_ENV=staging
     - npm run build
@@ -121,6 +129,7 @@ deploy-staging-frontend:
     - cp ../runner/staging-frontend.sh /home/gitlab-runner/staging-frontend.sh
     - chmod u+x /home/gitlab-runner/staging-frontend.sh
     - sudo systemctl restart seng302-staging-frontend
+    - mv -f /home/gitlab-runner/prod_images /home/gitlab-runner/staging-frontend/dist
   artifacts:
     paths:
       - frontend/dist
@@ -136,6 +145,12 @@ deploy-production-backend:
     - mkdir /home/gitlab-runner/production-backend/
     - cp -r ./build/libs /home/gitlab-runner/production-backend
     - cp ../runner/production-backend.sh /home/gitlab-runner/production-backend.sh
+    # environment variables added to file
+    - echo "export DB_URL=${DB_URL_PROD}" >> /home/gitlab-runner/production-backend/env_var.txt
+    - echo "export DB_USERNAME=${DB_USERNAME}" >> /home/gitlab-runner/production-backend/env_var.txt
+    - echo "export DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/production-backend/env_var.txt
+    - echo "export DGAA_EMAIL=${DGAA_EMAIL}" >> /home/gitlab-runner/production-backend/env_var.txt
+    - echo "export DGAA_PASSWORD=${DGAA_PASSWORD}" >> /home/gitlab-runner/production-backend/env_var.txt
     - chmod u+x /home/gitlab-runner/production-backend.sh
     - sudo systemctl restart seng302-production-backend
   artifacts:
@@ -153,7 +168,10 @@ deploy-production-frontend:
       - frontend/node_modules
     policy: pull
   script:
+    - mkdir -p /home/gitlab-runner/production-frontend/dist/prod_images
+    - mv -f /home/gitlab-runner/production-frontend/dist/prod_images /home/gitlab-runner
     - cd frontend
+    - export NODE_ENV=production
     - npm run build-prod
     - rm -rf /home/gitlab-runner/production-frontend/ || true
     - mkdir /home/gitlab-runner/production-frontend/
@@ -161,6 +179,8 @@ deploy-production-frontend:
     - cp ../runner/production-frontend.sh /home/gitlab-runner/production-frontend.sh
     - chmod u+x /home/gitlab-runner/production-frontend.sh
     - sudo systemctl restart seng302-production-frontend
+    - mv -f /home/gitlab-runner/prod_images /home/gitlab-runner/production-frontend/dist
+
   artifacts:
     paths:
       - frontend/dist

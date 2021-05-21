@@ -92,7 +92,7 @@ public class Product {
             }
         }
         String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("business_"));
-        if (primaryPath.equals(this.primaryImagePath.replace("/", "\\"))) {
+        if ((primaryPath.equals(this.primaryImagePath.replace("/", "\\")) && System.getProperty("os.name").startsWith("Windows")) || primaryPath.equals(this.primaryImagePath)) {
             if (this.images.size() > 0) {
                 Image primary = this.images.get(0);
                 String primaryFilename = primary.getFileName();

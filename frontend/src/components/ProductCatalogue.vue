@@ -56,7 +56,8 @@
                 v-bind:href="product.id"
                 :key="product.id">
               <div>
-                <img v-if="product.primaryImagePath != null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" alt="Product Image" v-bind:src="getImgUrl(product)"/>
                 <img v-if="product.primaryImagePath == null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
               </div>
               <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
@@ -132,7 +133,8 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(product)"/>
                         <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
                       </div>
                     </vs-td>
@@ -256,6 +258,9 @@ const Search = {
   },
 
   methods: {
+    isDevelopment() {
+      return (process.env.NODE_ENV === 'development')
+    },
 
     setPrimaryImage(product, image) {
       this.imageId = image.id;
@@ -282,7 +287,11 @@ const Search = {
     },
 
     getImgUrl(product) {
-      if (product.primaryImagePath != null) {
+      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
+        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString().replace("\\", "/")
       } else {
         return '../../public/ProductShoot.jpg'
