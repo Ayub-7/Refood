@@ -19,7 +19,7 @@
         <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
       </vs-select>
 
-      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
+      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description" :counter="140"/>
 
       <vs-divider style="grid-row: 4;"></vs-divider>
       <div class="label-control">Address</div>
@@ -107,8 +107,8 @@ const BusinessRegister = {
       }
 
       if (this.description != null) {
-        if (this.description.length > 40) {
-          this.errors.push(this.description);
+        if (this.description.length > 140) {
+          this.errors.push('description');
         }
       }
 
@@ -128,11 +128,11 @@ const BusinessRegister = {
       if (this.errors.length >= 1) {
         if(this.errors.includes("dob") && this.errors.length === 1){
           this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
-        } else if (this.errors.includes(this.description)) {
+        } else if (this.errors.includes('description')) {
           this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
           this.$vs.notify({
             title: 'Failed to create business',
-            text: 'description must be less that 40 characters.',
+            text: 'description must be less that 140 characters.',
             color: 'danger'
           });
         } else {

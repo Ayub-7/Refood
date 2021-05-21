@@ -158,7 +158,7 @@
               :maxItems="5"
               stripe>
       <template class="table-head" slot="thead" >
-        <vs-th sort-key="productId"> ID </vs-th>
+        <vs-th sort-key="productId" style="border-radius: 8px 0 0 0"> ID </vs-th>
         <vs-th sort-key="productName"> Product </vs-th>
         <vs-th class="dateInTable" sort-key="manufactured"> Manufactured </vs-th>
         <vs-th class="dateInTable" sort-key="sellBy"> Sell By </vs-th>
@@ -174,8 +174,9 @@
           <vs-td id="productIdCol" :data="inventory.productId">
           {{inventory.productId}}
           <div style="height: 80px">
-          <img v-if="inventory.product.primaryImagePath" style="width:auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-          <img v-if="!inventory.product.primaryImagePath" style="width: auto; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+            <img v-if="inventory.product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(inventory.product))"/>
+            <img v-if="inventory.product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(inventory.product)"/>
+            <img v-if="!inventory.product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
           </div>
             </vs-td>
           <vs-td :data="inventory.productName"> {{inventory.productName}} </vs-td>
@@ -239,22 +240,21 @@ export default {
 
 
   mounted() {
-    this.getProducts(this.$route.params.id);
-    this.getInventory(this.$route.params.id);
     this.getSession();
+    this.getProducts(this.$route.params.id);
+    this.getBusinessInventory();
   },
 
   methods: {
-        /**
-     * Validates the fields for a new public listing.
-     * @return true if all of the required fields meet the requirements, false otherwise.
-     */
+    isDevelopment() {
+      return (process.env.NODE_ENV === 'development')
+    },
 
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
+          this.$log.debug("Data loaded: ", this.products);
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -262,23 +262,17 @@ export default {
         });
 
     },
-    getInventory: function(businessId) {
-      api.getInventory(businessId)
-          .then((response) => {
-            this.$log.debug("Inventory loaded: " + response.data);
-            this.inventory = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load inventory";
-          });
-    },
+
     changeInvVals: function() {
       if (this.invItem !== undefined) {
         this.price = this.invItem.totalPrice;
         this.listingQuantity = this.invItem.quantity;
       }
     },
+    /**
+     * Validates the fields for a new public listing.
+     * @return true if all of the required fields meet the requirements, false otherwise.
+     */
     validateNewListing: function() {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
 
@@ -305,6 +299,19 @@ export default {
       }
 
       return isValid;
+    },
+
+    getImgUrl(product) {
+      console.log("PRODUCTT: " + product);
+      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
+        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null) {
+        return product.primaryImagePath.toString().replace("\\", "/")
+      } else {
+        return '../../public/ProductShoot.jpg'
+      }
     },
 
     /**
@@ -525,17 +532,6 @@ export default {
       }
     },
 
-    getBusinessProducts() {
-      api.getBusinessProducts(this.$route.params.id)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.products = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load products";
-        });
-    },
 
     /**
      * Calls API get businessInventory function, also adds new fields to inventory object for sorting and sets default order
