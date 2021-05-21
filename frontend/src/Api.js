@@ -254,5 +254,7 @@ export default {
      * @param imageId
      * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
      */
-    deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true})
+    deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
+
+    getBusinessInventory: (businessId) => instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true})
 }

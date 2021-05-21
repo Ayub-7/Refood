@@ -90,7 +90,7 @@
                   v-model="sellBy"/>
             </div>
           </div>
-          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory; checkForm()">
+          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory(); checkForm()">
             <vs-button>Add product</vs-button>
           </div>
         </vs-popup>
@@ -152,36 +152,41 @@
     <vs-divider></vs-divider>
     <!-- Table View -->
     <vs-table id="table"
-              data="inventory"
+              :data="this.inventory"
               noDataText="You don't have any inventory."
               :pagination="true"
-              :maxItems="10"
+              :maxItems="5"
               stripe>
       <template class="table-head" slot="thead" >
-        <vs-th style="border-radius: 8px 0 0 0"> <!-- Image Column --> </vs-th>
-        <vs-th> ID </vs-th>
-        <vs-th> Product </vs-th>
-        <vs-th> Manufacturer </vs-th>
-        <vs-th> Sell By </vs-th>
-        <vs-th> Best Before </vs-th>
-        <vs-th> Expires </vs-th>
-        <vs-th> Qty </vs-th>
-        <vs-th> Price Per Item </vs-th>
-        <vs-th> Total Price </vs-th>
+        <vs-th sort-key="productId" style="border-radius: 8px 0 0 0"> ID </vs-th>
+        <vs-th sort-key="productName"> Product </vs-th>
+        <vs-th class="dateInTable" sort-key="manufactured"> Manufactured </vs-th>
+        <vs-th class="dateInTable" sort-key="sellBy"> Sell By </vs-th>
+        <vs-th class="dateInTable" sort-key="bestBefore"> Best Before </vs-th>
+        <vs-th class="dateInTable" sort-key="expires"> Expires </vs-th>
+        <vs-th sort-key="quantity"> Qty </vs-th>
+        <vs-th id="pricePerItemCol"  sort-key="pricePerItem"> Price Per Item </vs-th>
+        <vs-th sort-key="totalPrice"> Total Price </vs-th>
         <vs-th style="border-radius: 0 8px 0 0"> <!-- Action Button Column --> </vs-th>
       </template>
       <template slot-scope="{data}">
-        <vs-tr v-for="listing in data" :key="listing"> <!-- todo: connect data with table -->
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
-          <vs-td> </vs-td>
+        <vs-tr v-for="inventory in data" :key="inventory.id"> <!-- todo: connect data with table -->
+          <vs-td id="productIdCol" :data="inventory.productId">
+          {{inventory.productId}}
+          <div style="height: 80px">
+            <img v-if="inventory.product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(inventory.product))"/>
+            <img v-if="inventory.product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(inventory.product)"/>
+            <img v-if="!inventory.product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+          </div>
+            </vs-td>
+          <vs-td :data="inventory.productName"> {{inventory.productName}} </vs-td>
+          <vs-td :data="inventory.manufactured"> {{inventory.manufactured}} </vs-td>
+          <vs-td :data="inventory.sellBy"> {{inventory.sellBy}} </vs-td>
+          <vs-td :data="inventory.bestBefore">{{inventory.bestBefore}} </vs-td>
+          <vs-td :data="inventory.expires">{{inventory.expires}} </vs-td>
+          <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
+          <vs-td :data="inventory.pricePerItem">{{inventory.pricePerItem}} </vs-td>
+          <vs-td :data="inventory.totalPrice">{{inventory.totalPrice}}</vs-td>
           <vs-td> </vs-td>
         </vs-tr>
       </template>
@@ -210,6 +215,7 @@ export default {
       pricePerItem: 0.0,
       totalPrice: 0.0,
       quantity: 0,
+
       invDescription: '',
       bestBefore: '',
       listExpiry: '',
@@ -228,27 +234,27 @@ export default {
       price: "0",
       moreInfo: "",
       closes: "", // todo: should default to the expiry date of selected item.
+
     }
   },
 
 
   mounted() {
-    this.getProducts(this.$route.params.id);
-    this.getInventory(this.$route.params.id);
     this.getSession();
+    this.getProducts(this.$route.params.id);
+    this.getBusinessInventory();
   },
 
   methods: {
-        /**
-     * Validates the fields for a new public listing.
-     * @return true if all of the required fields meet the requirements, false otherwise.
-     */
+    isDevelopment() {
+      return (process.env.NODE_ENV === 'development')
+    },
 
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
           this.products = response.data;
+          this.$log.debug("Data loaded: ", this.products);
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -256,23 +262,17 @@ export default {
         });
 
     },
-    getInventory: function(businessId) {
-      api.getInventory(businessId)
-          .then((response) => {
-            this.$log.debug("Inventory loaded: " + response.data);
-            this.inventory = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load inventory";
-          });
-    },
+
     changeInvVals: function() {
       if (this.invItem !== undefined) {
         this.price = this.invItem.totalPrice;
         this.listingQuantity = this.invItem.quantity;
       }
     },
+    /**
+     * Validates the fields for a new public listing.
+     * @return true if all of the required fields meet the requirements, false otherwise.
+     */
     validateNewListing: function() {
       Object.values(this.newListingErrors).forEach(input => input.error = false);
 
@@ -299,6 +299,19 @@ export default {
       }
 
       return isValid;
+    },
+
+    getImgUrl(product) {
+      console.log("PRODUCTT: " + product);
+      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
+        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null) {
+        return product.primaryImagePath.toString().replace("\\", "/")
+      } else {
+        return '../../public/ProductShoot.jpg'
+      }
     },
 
     /**
@@ -475,7 +488,13 @@ export default {
         api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
           .then((response) => {
             this.$log.debug("New catalogue item created:", response.data);
-            this.getInventory(this.$route.params.id)
+            this.inventory.push(response.data);
+            this.addNewInv = false;
+            this.getBusinessInventory();
+            this.$vs.notify( {
+              title: `Item successfully added to the business' inventory`,
+              color: 'success'
+            });
           }).catch((error) => {
             if (error.response) {
               console.log(error);
@@ -511,6 +530,31 @@ export default {
         this.pricePerItem = this.products[prodInd]["recommendedRetailPrice"];
         this.invDescription = this.products[prodInd]["description"];
       }
+    },
+
+
+    /**
+     * Calls API get businessInventory function, also adds new fields to inventory object for sorting and sets default order
+    */
+    getBusinessInventory() {
+      api.getBusinessInventory(this.$route.params.id)
+      .then((response) => {
+        this.inventory = response.data;
+        console.log(this.inventory)
+        for(let inventoryItem of this.inventory) {
+          //Issue with sorting using object properties, so pulled required properties into inventory object
+          inventoryItem['productName'] = inventoryItem.product.name;
+          inventoryItem['productId'] = inventoryItem.product.id;
+        }
+
+        //Default ordering is product name, so all similar products will be next to each other
+        this.inventory = this.inventory.sort((productOne, productTwo) => (productOne.name < productTwo.name) ? 1 : -1)
+
+      }).catch((err) => {
+        if(err.response.status == 401) {
+          this.$router.push({path: '/login'})
+        }
+      })
     }
   }
 }
@@ -645,11 +689,33 @@ export default {
   th {
     background: #1F74FF;
     color: white;
+    font-size: 12px;
   }
 
   #table {
-    margin: 1em;
+    margin: 0.5em;
+    white-space: nowrap;
   }
+
+  #productIdCol {
+    font-size: 10px;
+  }
+
+  #pricePerItemCol {
+    font-size: 11px;
+  }
+
+  td {
+    font-size: 12px;
+    min-width: 80px
+  }
+
+  .dateInTable{
+    width: 130px;
+  }
+
+
+
 
   /* ===== INVENTORY ADDING MODAL ===== */
   #firstColModal {

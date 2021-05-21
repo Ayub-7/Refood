@@ -43,7 +43,7 @@ public class ProductController {
 
     @Autowired private ObjectMapper mapper;
 
-    @Value("/src/main/resources/media/images/businesses/")
+    @Value("${media.image.business.directory}")
     String rootImageDir;
 
 //    private final ObjectMapper mapper = new ObjectMapper();
@@ -243,9 +243,10 @@ public class ProductController {
 
         // Check if business' own folder directory exists - make directory if false.
         File businessDir = new File(rootImageDir + "business_" + businessId);
-        if (businessDir.mkdir()) {
+        if (businessDir.mkdirs()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
+        System.out.println();
 
         String id = "";
         boolean freeImage = false;
@@ -264,10 +265,10 @@ public class ProductController {
             }
         }
 
-        File file = new File("/home/gitlab-runner" + businessDir + "/" + id + imageExtension + "/");
-        File thumbnailFile = new File( "~/home/gitlab-runner" + businessDir + "/" + id + "_thumbnail" + imageExtension);
+        File file = new File(businessDir + "/" + id + imageExtension);
+        File thumbnailFile = new File( businessDir + "/" + id + "_thumbnail" + imageExtension);
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
         System.out.println(file.getAbsolutePath());
-        System.out.println(System.getenv("PATH"));
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
@@ -317,7 +318,7 @@ public class ProductController {
         if (product == null || validImage == false) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        String imageDir = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/" + "/business_" + businessId + "/" + imageId;
+        String imageDir = rootImageDir + "/business_" + businessId + "/" + imageId;
         String extension = "";
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
@@ -350,7 +351,6 @@ public class ProductController {
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
     public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session, HttpServletRequest request) throws Exception {
-        String rootImageDir2 = System.getProperty("user.dir") + "/src/main/resources/media/images/businesses/";
         String imageExtension = "";
         Business business = businessRepository.findBusinessById(businessId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -376,7 +376,7 @@ public class ProductController {
 
         //finds correct image path
         boolean freeImage = false;
-        String imageDir = rootImageDir2 + "business_" + businessId + "/" + imageId;
+        String imageDir = rootImageDir + "business_" + businessId + "/" + imageId;
         boolean pathExists = false;
         List<String> extensions = new ArrayList<>();
         extensions.add(".png");
@@ -390,7 +390,7 @@ public class ProductController {
                 break;
             }
         }
-        File businessDir = new File(rootImageDir2 + "business_" + businessId);
+        File businessDir = new File(rootImageDir + "business_" + businessId);
         File checkFile = new File(businessDir + "/" + imageId + imageExtension);
         File thumbnailFile = new File(businessDir + "/" + imageId + "_thumbnail" + imageExtension);
         if (pathExists == true) {

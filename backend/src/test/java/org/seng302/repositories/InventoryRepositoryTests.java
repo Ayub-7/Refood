@@ -76,32 +76,32 @@ public class InventoryRepositoryTests {
     }
 
 
-    @Test
-    public void saveInventory() {
-        Inventory inventory = new Inventory("07-4957066", 1, 4, 4.0, 16.0, dateBefore, dateAfter, dateAfter, dateAfter);
-        inventoryRepository.save(inventory);
-
-        Inventory inventoryItem = inventoryRepository.findInventoryByIdAndBusinessId(1, 1);
-        Assertions.assertEquals(testInven1.getId(), inventoryItem.getId());
-        assertThat(testInven1.getBusinessId()).isEqualTo(inventoryItem.getBusinessId());
-        assertThat(testInven1.getProductId()).isEqualTo(inventoryItem.getProductId());
-        assertThat(testInven1.getQuantity()).isEqualTo(inventoryItem.getQuantity());
-
-        // Test if insertion is properly inserting values.
-        List<Inventory> inventoryItems = inventoryRepository.findInventoryByProductIdAndBusinessId("07-4957066", 1);
-        assertThat(inventoryItems.size()).isEqualTo(2);
-
-        //Test insertion properly works
-        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
-        assertThat(inventoryItems.size()).isEqualTo(2);
-        Inventory anotherInventory = new Inventory("07-4957066", 1, 2, 3.0, 6.0, dateBefore, dateAfter, dateAfter, dateAfter);
-        inventoryRepository.save(anotherInventory);
-        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
-        assertThat(inventoryItems.size()).isEqualTo(3);
-
-        // Inserting the same product id and business id.
-        inventoryRepository.save(anotherInventory);
-        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
-        assertThat(inventoryItems.size()).isEqualTo(3);
-    }
+//    @Test
+//    public void saveInventory() {
+//        Inventory inventory = new Inventory("07-4957066", 1, 4, 4.0, 16.0, dateBefore, dateAfter, dateAfter, dateAfter);
+//        inventoryRepository.save(inventory);
+//
+//        Inventory inventoryItem = inventoryRepository.findInventoryByIdAndBusinessId(1, 1);
+//        Assertions.assertEquals(testInven1.getId(), inventoryItem.getId());
+//        assertThat(testInven1.getBusinessId()).isEqualTo(inventoryItem.getBusinessId());
+//        assertThat(testInven1.getProductId()).isEqualTo(inventoryItem.getProductId());
+//        assertThat(testInven1.getQuantity()).isEqualTo(inventoryItem.getQuantity());
+//
+//        // Test if insertion is properly inserting values.
+//        List<Inventory> inventoryItems = inventoryRepository.findInventoryByProductIdAndBusinessId("07-4957066", 1);
+//        assertThat(inventoryItems.size()).isEqualTo(2);
+//
+//        //Test insertion properly works
+//        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
+//        assertThat(inventoryItems.size()).isEqualTo(2);
+//        Inventory anotherInventory = new Inventory("07-4957066", 1, 2, 3.0, 6.0, dateBefore, dateAfter, dateAfter, dateAfter);
+//        inventoryRepository.save(anotherInventory);
+//        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
+//        assertThat(inventoryItems.size()).isEqualTo(3);
+//
+//        // Inserting the same product id and business id.
+//        inventoryRepository.save(anotherInventory);
+//        inventoryItems = inventoryRepository.findInventoryByBusinessId(1);
+//        assertThat(inventoryItems.size()).isEqualTo(3);
+//    }
 }
