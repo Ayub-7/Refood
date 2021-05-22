@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Business from '../Business';
 import Vuesax from 'vuesax';
 
@@ -66,16 +66,21 @@ const $vs = {
     notify: jest.fn(),
 };
 
+const $log = {
+    error: jest.fn(),
+    debug: jest.fn(),
+}
+
 
 beforeEach(() => {
-    wrapper = shallowMount(Business, {
+    wrapper = mount(Business, {
         propsData: {},
-        mocks: {$route, $vs},
+        mocks: {$route, $vs, $log},
         stubs: ['router-link', 'router-view'],
         methods: {},
         localVue
     });
-    wrapper.setData({business: mockBusiness});
+    wrapper.setData({business: mockBusiness, user: mockAdmin});
 });
 
 afterEach(() => {

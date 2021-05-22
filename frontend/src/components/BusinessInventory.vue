@@ -321,28 +321,30 @@ export default {
       if (this.validateNewListing()) {
         if (this.errors.length === 0) {
           api.createListing(store.actingAsBusinessId, this.invItem.id, this.listingQuantity, this.price, this.moreInfo, this.closes)
-              .then((response) => {
-                this.$log.debug("New listing has been posted:", response.data);
-              }).catch((error) => {
-            if (error.response) {
-              console.log(error);
-              if (error.response.status === 400) {
-                this.$vs.notify( {
-                  title: 'Failed to add a listing',
-                  text: 'Incomplete form, or the product does not exist.',
-                  color: 'danger'
-                });
-              } else if (error.response.status === 403) {
-                this.$vs.notify( {
-                  title: 'Failed to add a listing',
-                  text: 'You do not have the rights to access this business',
-                  color: 'danger'
-                });
+            .then((response) => {
+              this.$log.debug("New listing has been posted:", response.data);
+            })
+            .catch((error) => {
+              if (error.response) {
+                console.log(error);
+                if (error.response.status === 400) {
+                  this.$vs.notify( {
+                    title: 'Failed to add a listing',
+                    text: 'Incomplete form, or the product does not exist.',
+                    color: 'danger'
+                  });
+                }
+                else if (error.response.status === 403) {
+                  this.$vs.notify( {
+                    title: 'Failed to add a listing',
+                    text: 'You do not have the rights to access this business',
+                    color: 'danger'
+                  });
+                }
+                console.log(error.response.status);
               }
-              console.log(error.response.status);
-            }
-            this.$log.debug("Error Status:", error)
-          })
+              this.$log.debug("Error Status:", error)
+            });
         }
       }
     },
