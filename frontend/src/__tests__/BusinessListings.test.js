@@ -2,6 +2,7 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import BusinessListings from "../components/BusinessListings";
 import Vuesax from 'vuesax';
 import api from "../Api";
+import axios from "axios";
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
@@ -10,7 +11,15 @@ let wrapper;
 
 let $log = {
     error: jest.fn(),
+    debug: jest.fn(),
 }
+
+axios.get = jest.fn(() => {
+   return Promise.resolve({data: [{
+        currencies: [{symbol: "€"}],
+       }]}
+   );
+});
 
 let listingData = [
     {
@@ -121,5 +130,28 @@ describe("Functionality tests", () => {
        wrapper.vm.changeSortDirection();
        expect(wrapper.vm.sortDirection).toBe("desc");
    });
+
+   test("Currency is set properly", () => {
+      wrapper.vm.setCurrency("France");
+      expect(wrapper.vm.currencySymbol).toBe("€");
+   });
+
+    test("Sort direction successfully changes", async () => {
+        expect(wrapper.vm.sortDirection).toBe("desc");
+        let sortButton = wrapper.find("#sort-button");
+        expect(sortButton).toBeTruthy();
+
+        await sortButton.trigger("click");
+        expect(wrapper.vm.sortDirection).toBe("asc");
+    });
+
+    test("Product image url is retrieved", () => {
+        let url = wrapper.vm.getImgUrl(listingData[0].inventoryItem.product);
+        expect(url).toBeTruthy();
+
+        let emptyProduct = {primaryImagePath: null};
+        url = wrapper.vm.getImgUrl(emptyProduct);
+        expect(url).toBe('../../public/ProductShoot.jpg');
+    });
 
 });

@@ -1,6 +1,7 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import Business from '../Business';
+import Business from '../components/Business';
 import Vuesax from 'vuesax';
+import api from '../Api';
 
 let wrapper;
 let localVue = createLocalVue();
@@ -71,6 +72,9 @@ const $log = {
     debug: jest.fn(),
 }
 
+api.checkSession = jest.fn().mockResolvedValue({data: {id: 1}});
+api.getBusinessFromId = jest.fn().mockResolvedValue({data: mockBusiness});
+api.getUserFromID = jest.fn().mockResolvedValue({data: mockAdmin});
 
 beforeEach(() => {
     wrapper = mount(Business, {
@@ -125,3 +129,19 @@ describe("Successful login", () => {
         expect(wrapper.find('#business-navbar').exists()).toBe(true)
     });
 })
+
+describe("Functionality tests", () => {
+    test("Check session is called", () => {
+        expect(api.checkSession).toBeCalled();
+    });
+
+    test("Check GET user info is called and sets data", () => {
+        expect(api.getUserFromID).toBeCalled();
+        expect(wrapper.vm.user).toBe(mockAdmin);
+    });
+
+    test("Check GET business is being called and sets data", () => {
+        expect(api.getBusinessFromId).toBeCalled();
+        expect(wrapper.vm.business).toBe(mockBusiness);
+    });
+});
