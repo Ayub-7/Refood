@@ -2,7 +2,9 @@
   <div>
     <vs-tabs alignment="center">
       <vs-tab label="For Sale">
-        <MarketplaceGrid :cardData="testData" />
+        <div>
+          <MarketplaceGrid :cardData="testData" />
+        </div>
       </vs-tab>
       <vs-tab label="Wanted">
         <div>
@@ -22,10 +24,13 @@
 import MarketplaceGrid from './MarketplaceGrid.vue'
 export default {
   name: "CommunityMarketplace",
-  components: {MarketplaceGrid},
+  components: {
+    MarketplaceGrid
+  },
 
   data: () => {
     return {
+      // TEST DATA FOR NOW, ONCE PROPER IMPLEMATION OF CARDS IS MADE THIS CAN BE REMOVED
       testData: [
         {
           id: 1,
@@ -81,7 +86,7 @@ export default {
               {
               id: 5,
               name: 'steam'
-              }
+              }           
           ]
         },
         
