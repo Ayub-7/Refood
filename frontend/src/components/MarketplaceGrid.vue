@@ -64,7 +64,7 @@ export default {
 #cardDescription {
   margin-top: 10px;
   height: 120px;
-  overflow-y: scroll;
+  overflow-y: auto;
 
 }
 
@@ -79,7 +79,7 @@ export default {
   margin-top: 10px;
   width: 100%;
   height: 50px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 
