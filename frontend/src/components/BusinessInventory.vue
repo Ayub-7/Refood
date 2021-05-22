@@ -185,8 +185,8 @@
           <vs-td :data="inventory.bestBefore">{{inventory.bestBefore}} </vs-td>
           <vs-td :data="inventory.expires">{{inventory.expires}} </vs-td>
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
-          <vs-td :data="inventory.pricePerItem">{{inventory.pricePerItem}} </vs-td>
-          <vs-td :data="inventory.totalPrice">{{inventory.totalPrice}}</vs-td>
+          <vs-td :data="inventory.pricePerItem">{{currency}}{{inventory.pricePerItem}} </vs-td>
+          <vs-td :data="inventory.totalPrice">{{currency}}{{inventory.totalPrice}}</vs-td>
           <vs-td> </vs-td>
         </vs-tr>
       </template>
