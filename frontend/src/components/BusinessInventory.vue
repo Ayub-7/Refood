@@ -103,7 +103,6 @@
       <div class="new-listing-modal">
         <div class="row">
           <label for="InvId">Inventory Item ID</label>
-          <!-- TODO: add v-on:change to change Product name -->
           <vs-select id="InvId" class="selectExample" v-model="invItem" v-on:change="changeInvVals">
             <vs-select-item :value="invItem" :text="invItem.id + ': ' + invItem.productName" v-for="invItem in getInventory()" v-bind:href="invItem.id" :key="invItem.id"/>
           </vs-select>
@@ -273,7 +272,7 @@ export default {
       if (this.invItem !== undefined) {
         this.price = this.invItem.pricePerItem;
         this.listingQuantityMax = this.invItem.quantity;
-        this.closes = this.invItem.expires;
+        this.closes = this.invItem.expires + 'T00:00';
       }
     },
     /**
