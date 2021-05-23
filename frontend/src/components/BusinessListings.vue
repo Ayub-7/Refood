@@ -32,7 +32,7 @@
         <div class="listing-header">
           <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" :src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
           <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" :src="getImgUrl(listing.inventoryItem.product)"/>
-          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" src="require('../../public/ProductShoot.jpg')"/>
+          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" :src="require('../../public/ProductShoot.jpg')"/>
           <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
             <div>{{ currencySymbol }}{{ listing.price }}</div>
             <div>{{ listing.quantity }}x</div>
@@ -70,7 +70,7 @@
             <vs-td>
               <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" :src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
               <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" :src="getImgUrl(listing.inventoryItem.product)"/>
-              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" src="require('../../public/ProductShoot.jpg')"/>
+              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" :src="require('../../public/ProductShoot.jpg')"/>
             </vs-td>
             <vs-td>{{ listing.productName }}</vs-td>
             <vs-td>{{ currencySymbol }}{{ listing.price }}</vs-td>
