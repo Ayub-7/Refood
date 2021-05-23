@@ -30,9 +30,9 @@
       <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
         <div style="margin: 2px 4px; font-size: 12px; font-weight: bold">{{ listing.productName }}</div>
         <div class="listing-header">
-          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" :src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
-          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" :src="getImgUrl(listing.inventoryItem.product)"/>
-          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" :src="require('../../public/ProductShoot.jpg')"/>
+          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
+          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
+          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" v-bind:src="require('../../public/ProductShoot.jpg')"/>
           <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
             <div>{{ currencySymbol }}{{ listing.price }}</div>
             <div>{{ listing.quantity }}x</div>
@@ -68,9 +68,9 @@
         <template slot-scope="{data}">
           <vs-tr v-for="listing in data" :key="listing.id">
             <vs-td>
-              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" :src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
-              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" :src="getImgUrl(listing.inventoryItem.product)"/>
-              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" :src="require('../../public/ProductShoot.jpg')"/>
+              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
+              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
+              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath" class="image" v-bind:src="require('../../public/ProductShoot.jpg')"/>
             </vs-td>
             <vs-td>{{ listing.productName }}</vs-td>
             <vs-td>{{ currencySymbol }}{{ listing.price }}</vs-td>

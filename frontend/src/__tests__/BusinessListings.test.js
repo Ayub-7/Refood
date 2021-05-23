@@ -1,4 +1,4 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import {mount, createLocalVue, shallowMount} from '@vue/test-utils';
 import BusinessListings from "../components/BusinessListings";
 import Vuesax from 'vuesax';
 import api from "../Api";
@@ -35,7 +35,8 @@ let listingData = [
                         "filename": "/media/images/23987192387509-123908794328.png",
                         "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
                     }
-                ]
+                ],
+                "primaryImagePath": "business_2/image_1.jpg"
             },
         },
         "quantity": 3,
@@ -76,7 +77,7 @@ api.getBusinessListings = jest.fn(() => {
 });
 
 beforeEach(() => {
-    wrapper = mount(BusinessListings, {
+    wrapper = shallowMount(BusinessListings, {
         propsData: {
             businessId: 1,
         },
@@ -146,7 +147,7 @@ describe("Functionality tests", () => {
     });
 
     test("Product image url is retrieved", () => {
-        let url = wrapper.vm.getImgUrl(listingData[0].inventoryItem.product);
+        let url = wrapper.vm.getImgUrl(wrapper.vm.listings[0].inventoryItem.product);
         expect(url).toBeTruthy();
 
         let emptyProduct = {primaryImagePath: null};
