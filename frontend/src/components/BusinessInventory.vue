@@ -321,23 +321,26 @@ export default {
       if (this.validateNewListing()) {
         if (this.errors.length === 0) {
           api.createListing(store.actingAsBusinessId, this.invItem.id, this.listingQuantity, this.price, this.moreInfo, this.closes)
-              .then((response) => {
-                this.$log.debug("New listing has been posted:", response.data);
-                this.$vs.notify( {
-                  title: 'Listing successfully posted',
-                  color: 'success'
-                })
-                this.newListingPopup = false;
-              }).catch((error) => {
-            if (error.response) {
-              console.log(error);
-              if (error.response.status === 400) {
-                this.$vs.notify( {
-                  title: 'Failed to add a listing',
-                  text: 'Incomplete form, or the product does not exist.',
-                  color: 'danger'
-                });
-              } else if (error.response.status === 403) {
+            .then((response) => {
+              this.$log.debug("New listing has been posted:", response.data);
+              this.$vs.notify({
+                title: 'Listing successfully posted',
+                color: 'success'
+              });
+              this.newListingPopup = false;
+            })
+            .catch((error) => {
+              if (error.response) {
+                console.log(error);
+                if (error.response.status === 400) {
+                  this.$vs.notify({
+                    title: 'Failed to add a listing',
+                    text: 'Incomplete form, or the product does not exist.',
+                    color: 'danger'
+                  });
+                }
+              }
+              else if (error.response.status === 403) {
                 this.$vs.notify( {
                   title: 'Failed to add a listing',
                   text: 'You do not have the rights to access this business',
