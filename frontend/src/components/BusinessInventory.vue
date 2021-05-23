@@ -344,10 +344,8 @@ export default {
                   color: 'danger'
                 });
               }
-              console.log(error.response.status);
-            }
-            this.$log.debug("Error Status:", error)
-          })
+              this.$log.debug("Error Status:", error)
+            });
         }
       }
     },
@@ -375,7 +373,6 @@ export default {
 
     /**
      * Sets display currency based on the user's home country.
-     * User home country is taken from the store.
      */
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
