@@ -84,8 +84,8 @@ describe('New sale listing modal tests', () => {
 
    test("No changes to input fields - reject form", () => {
        expect(wrapper.vm.validateNewListing()).toBeFalsy();
-       expect(wrapper.vm.newListingErrors.price.error).toBe(false);
-       expect(wrapper.vm.newListingErrors.quantity.error).toBe(true);
+       expect(wrapper.vm.newListingErrors.price.error).toBe(true);
+       expect(wrapper.vm.newListingErrors.quantity.error).toBe(false);
        expect(wrapper.vm.newListingErrors.closes.error).toBe(true);
    });
 
@@ -94,22 +94,8 @@ describe('New sale listing modal tests', () => {
 
         expect(wrapper.vm.validateNewListing()).toBeFalsy();
         expect(wrapper.vm.newListingErrors.price.error).toBe(true);
-        expect(wrapper.vm.newListingErrors.quantity.error).toBe(true);
+        expect(wrapper.vm.newListingErrors.quantity.error).toBe(false);
         expect(wrapper.vm.newListingErrors.closes.error).toBe(true);
-    });
-
-    test("Invalid form with bad quantity", () => {
-        wrapper.vm.quantity = -1;
-        expect(wrapper.vm.validateNewListing()).toBeFalsy();
-        expect(wrapper.vm.newListingErrors.quantity.error).toBe(true);
-
-        wrapper.vm.quantity = 0;
-        expect(wrapper.vm.validateNewListing()).toBeFalsy();
-        expect(wrapper.vm.newListingErrors.quantity.error).toBe(true);
-
-        wrapper.vm.quantity = null;
-        expect(wrapper.vm.validateNewListing()).toBeFalsy();
-        expect(wrapper.vm.newListingErrors.quantity.error).toBe(true);
     });
 
     test("Invalid form with bad date", () => {
@@ -119,7 +105,6 @@ describe('New sale listing modal tests', () => {
 
         wrapper.vm.closes = "2020-05-31T14:00";
         expect(wrapper.vm.validateNewListing()).toBeFalsy();
-        expect(wrapper.vm.newListingErrors.quantity.error).toBe(true);
     });
 
     test("Successfully creates a new form", () => {

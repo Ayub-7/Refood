@@ -273,6 +273,7 @@ export default {
       if (this.invItem !== undefined) {
         this.price = this.invItem.pricePerItem;
         this.listingQuantityMax = this.invItem.quantity;
+        this.closes = this.invItem.expires;
       }
     },
     /**
@@ -286,11 +287,6 @@ export default {
       if (this.price < 0 || this.price == "") {
         this.price = 0.00;
         this.newListingErrors.price.error = true;
-        isValid = false;
-      }
-      if (this.listingQuantity < 1) { // In theory this shouldn't occur (because vs-input-number component will set it to the min/max allowed).
-        this.listingQuantity = 0;
-        this.newListingErrors.quantity.error = true;
         isValid = false;
       }
       if (this.closes === "" || this.closes == null) {
@@ -333,6 +329,7 @@ export default {
                   title: 'Listing successfully posted',
                   color: 'success'
                 })
+                this.newListingPopup = false;
               }).catch((error) => {
             if (error.response) {
               console.log(error);
