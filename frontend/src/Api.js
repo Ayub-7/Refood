@@ -256,5 +256,14 @@ export default {
      */
     deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
 
+    // === BUSINESS INVENTORY LISTINGS
+
+    /**
+     * Retrieves a business' sale listings.
+     * @param businessId Id of business.
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of listings. 401, 406 otherwise.
+     */
+    getBusinessListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials: true}),
+
     getBusinessInventory: (businessId) => instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true})
 }
