@@ -115,7 +115,6 @@ describe('New sale listing modal tests', () => {
         expect(wrapper.vm.newListingErrors.quantity.error).toBe(false);
         expect(wrapper.vm.newListingErrors.closes.error).toBe(false);
         expect(wrapper.vm.newListingErrors.price.error).toBe(false);
-        expect(wrapper.vm.newListingPopup).toBe(false);
     });
 
     test("New Listing closes on button click", async () => {
