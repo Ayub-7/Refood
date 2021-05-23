@@ -115,6 +115,7 @@ describe('New sale listing modal tests', () => {
         expect(wrapper.vm.newListingErrors.quantity.error).toBe(false);
         expect(wrapper.vm.newListingErrors.closes.error).toBe(false);
         expect(wrapper.vm.newListingErrors.price.error).toBe(false);
+        expect(wrapper.vm.newListingPopup).toBe(false);
     });
 
     test("New Listing closes on button click", async () => {
@@ -127,4 +128,14 @@ describe('New sale listing modal tests', () => {
         expect(wrapper.vm.newListingErrors.closes.error).toBe(false);
         expect(wrapper.vm.newListingErrors.price.error).toBe(false);
     });
+
+    test("Form autocomplete calculates product attribute fields", () => {
+        let invItem = mockInventory[0];
+        wrapper.vm.invItem = invItem;
+        wrapper.vm.changeInvVals();
+
+        expect(wrapper.vm.price).toBe(invItem.pricePerItem);
+        expect(wrapper.vm.listingQuantityMax).toBe(invItem.quantity);
+        expect(wrapper.vm.closes).toBe(invItem.expires + 'T00:00');
+    })
 });
