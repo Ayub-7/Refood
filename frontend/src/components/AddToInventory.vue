@@ -4,13 +4,13 @@
     <vs-popup classContent="popup-example"  title="Add new inventory item" :active.sync="addNewInv">
       <div class="form-group required vs-col" vs-order="1" id="firstColModal">
         <div class="row">
-          <label for="prodId">Product</label>
+          <label for="prodId">Product *</label>
           <vs-select id="prodId" class="selectExample" v-model="invenForm.prodId" v-on:change="autofill">
             <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
           </vs-select>
         </div>
         <div class="row">
-          <label for="pricePerItem">Price per item</label>
+          <label for="pricePerItem">Price per item *</label>
           <vs-input
               :danger="(errors.includes(invenForm.pricePerItem))"
               danger-text="Price per item must be greater than zero and numeric."
@@ -20,7 +20,17 @@
               v-model="invenForm.pricePerItem"/>
         </div>
         <div class="row">
-          <label for="quantity">Quantity</label>
+          <label for="totalPrice">Total price *</label>
+          <vs-input
+              :danger="(errors.includes(invenForm.totalPrice))"
+              danger-text="Total price must be greater than zero and numeric."
+              class="inputx"
+              id="totalPrice"
+              placeholder="Price per item"
+              v-model="invenForm.totalPrice"/>
+        </div>
+        <div class="row">
+          <label for="quantity">Quantity *</label>
           <vs-input-number
               :danger="(errors.includes(invenForm.quantity))"
               danger-text="Quantity must be greater than zero."
@@ -32,7 +42,7 @@
       </div>
       <div class="form-group required vs-col" vs-order="2" id="secondColModal">
         <div class="row">
-          <label for="bestBefore">Best before</label>
+          <label for="bestBefore">Best before *</label>
           <vs-input
               :danger="(errors.includes('past-best'))"
               danger-text="Date cannot be in past"
@@ -42,7 +52,7 @@
               v-model="invenForm.bestBefore"/>
         </div>
         <div class="row">
-          <label for="listingExpiry">Listing expiry</label>
+          <label for="listingExpiry">Listing expiry *</label>
           <vs-input
               :danger="(errors.includes('past-expiry'))"
               danger-text="Expiry date is required and cannot be in past"
@@ -52,7 +62,7 @@
               v-model="invenForm.listExpiry"/>
         </div>
         <div class="row">
-          <label for="manufactureDate">Manufacture date</label>
+          <label for="manufactureDate">Manufacture date *</label>
           <vs-input
               :danger="(errors.includes('past-manu'))"
               danger-text="Date cannot be in past"
@@ -62,7 +72,7 @@
               v-model="invenForm.manufactureDate"/>
         </div>
         <div class="row">
-          <label for="sellBy">Sell by</label>
+          <label for="sellBy">Sell by *</label>
           <vs-input
               :danger="(errors.includes('past-sell'))"
               danger-text="Date cannot be in past"
@@ -72,7 +82,7 @@
               v-model="invenForm.sellBy"/>
         </div>
       </div>
-      <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory(); checkForm()">
+      <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory()">
         <vs-button>Add product</vs-button>
       </div>
     </vs-popup>
@@ -94,7 +104,8 @@ export default {
         bestBefore: '',
         listExpiry: '',
         manufactureDate: '',
-        sellBy: ''
+        sellBy: '',
+        totalPrice: 0.0
       },
       addNewInv: false,
       item: null,
@@ -202,7 +213,10 @@ export default {
           color: 'danger'
         });
       }
-
+      if (this.errors.length > 0) {
+        return false;
+      }
+      return true;
     },
     autofill: function() {
       if (this.invenForm.prodId !== '') {
@@ -217,7 +231,7 @@ export default {
       }
     },
     addInventory: function() {
-      if (this.errors.length === 0) {
+      if (this.checkForm()) {
         //console.log(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
         api.createInventory(store.actingAsBusinessId, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
             .then((response) => {
