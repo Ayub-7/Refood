@@ -1,6 +1,5 @@
 <template>
-    <div>
-    <vs-card id="cardContainer">
+    <div id="grid-container" style="margin: auto">
         <div>
           <vs-row id="marketRow">
             <!-- Change vs-lg to 2 if you want 6 per row or 3 if you want 4 per row -->
@@ -26,14 +25,12 @@
             </vs-col>
           </vs-row>
         </div>
-    </vs-card>
     </div>
 </template>
 
 <script>
 export default {
     props: ['cardData']
-
 }
 </script>
 
@@ -49,12 +46,6 @@ export default {
 #cardTitle {
   font-weight: bold;
   font-size: 17px;
-}
-
-#cardContainer {
-  padding: 15px;
-  width: 90%;
-  margin: auto;
 }
 
 #cardTitle {
