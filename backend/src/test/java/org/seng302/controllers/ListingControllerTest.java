@@ -21,12 +21,15 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -93,88 +96,42 @@ public class ListingControllerTest {
         inventory1 = new Inventory("07-4957066", 1, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
         newListingRequest = new NewListingRequest(inventory1.getId(), 2, 2.99, "more info", laterDate);
         listing1 = new Listing(inventory1, 5, 2.0, "Seller may be interested in offers", new Date(), laterDate);
-
+        listingRepository.save(listing1);
         assertThat(business.getAdministrators().size()).isEqualTo(2);
     }
 
     //Get listings tests
 
-//    @Test
-//    public void testNoAuthGetListing() throws Exception {
-//        mvc.perform(get("/businesses/{id}/listings", business.getId()))
-//                .andExpect(status().isUnauthorized());
-//    }
-//
-//    @Test
-//    @WithMockUser(roles="USER")
-//    public void testForbiddenUserGetListing() throws Exception {
-//        User forbiddenUser = new User("email@email.com", "password", Role.USER);
-//        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-//        mvc.perform(get("/businesses/{id}/listings", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbiddenUser))
-//                .andExpect(status().isForbidden());
-//    }
-//
-//    @Test
-//    @WithMockUser(roles="USER")
-//    public void testGetInventoryForNullBusiness() throws Exception {
-//        User user = new User("email@email.com", "password", Role.USER);
-//        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
-//        mvc.perform(get("/businesses/{id}/inventory", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-//                .andExpect(status().isNotAcceptable());
-//    }
-//
-//    @Test
-//    @WithMockUser(roles="USER")
-//    public void testGlobalAdminGetInventory() throws Exception {
-//        User defaultGlobalAdmin = new User("email@email.com", "password", Role.DGAA);
-//        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-//        mvc.perform(get("/businesses/{id}/inventory", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, defaultGlobalAdmin))
-//                .andExpect(status().isOk());
-//
-//        User globalAdmin = new User("email@email.com", "password", Role.GAA);
-//        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-//        mvc.perform(get("/businesses/{id}/inventory", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, globalAdmin))
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    @WithMockUser(roles="USER")
-//    public void testBusinessAdminGetInventory() throws Exception {
-//        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-//        mvc.perform(get("/businesses/{id}/inventory", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
-//                .andExpect(status().isOk());
-//
-//        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-//        mvc.perform(get("/businesses/{id}/inventory", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    @WithMockUser(roles="USER")
-//    public void testPostProductAsGlobalAdmin() throws Exception {
-//        User DGAAUser = new User("email@email.com", "password", Role.DGAA);
-//        User GAAUser = new User("email2@email.com", "password", Role.GAA);
-//
-//        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-//        mvc.perform(post("/businesses/{id}/products", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, DGAAUser)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(mapper.writeValueAsString(product1)))
-//                .andExpect(status().isCreated());
-//
-//        mvc.perform(post("/businesses/{id}/products", business.getId())
-//                .sessionAttr(User.USER_SESSION_ATTRIBUTE, GAAUser)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(mapper.writeValueAsString(product1)))
-//                .andExpect(status().isCreated());
-//    }
+    @Test
+    public void testNoAuthGetListing() throws Exception {
+        mvc.perform(get("/businesses/{id}/listings", business.getId()))
+                .andExpect(status().isUnauthorized());
+    }
 
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testSuccessfulGetBusinessListings() throws Exception {
+        List<Listing> listingList = new ArrayList<>();
+        listingList.add(listing1);
+
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(listingRepository.findListingsByInventoryItem(inventory1)).thenReturn(listingList);
+
+        mvc.perform(get("/businesses/{id}/listings", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testGetListingForNullBusiness() throws Exception {
+        User user = new User("email@email.com", "password", Role.USER);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
+        mvc.perform(get("/businesses/{id}/inventory", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
 
     //
     ////Inventory POST tests
