@@ -1,4 +1,4 @@
-import {mount, createLocalVue, shallowMount} from '@vue/test-utils';
+import {mount, createLocalVue} from '@vue/test-utils';
 import BusinessListings from "../components/BusinessListings";
 import Vuesax from 'vuesax';
 import api from "../Api";
@@ -77,7 +77,7 @@ api.getBusinessListings = jest.fn(() => {
 });
 
 beforeEach(() => {
-    wrapper = shallowMount(BusinessListings, {
+    wrapper = mount(BusinessListings, {
         propsData: {
             businessId: 1,
         },

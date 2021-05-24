@@ -103,9 +103,8 @@
       <div class="new-listing-modal">
         <div class="row">
           <label for="InvId">Inventory Item ID</label>
-          <!-- TODO: add v-on:change to change Product name -->
           <vs-select id="InvId" class="selectExample" v-model="invItem" v-on:change="changeInvVals">
-            <vs-select-item :value="invItem" :text="invItem.id" v-for="invItem in inventory" v-bind:href="invItem.id" :key="invItem.id"/>
+            <vs-select-item :value="invItem" :text="invItem.id + ': ' + invItem.productName" v-for="invItem in getInventory()" v-bind:href="invItem.id" :key="invItem.id"/>
           </vs-select>
         </div>
         <div id="listing-product-name">
@@ -126,7 +125,8 @@
             <label style="font-size: 13.6px">Quantity</label>
             <vs-input-number
                 v-model="listingQuantity"
-                :max="10"></vs-input-number> <!-- todo: max based on current inventory amount -->
+                :max="listingQuantityMax"
+                :min="1"></vs-input-number>
           </div>
           <div v-show="newListingErrors.quantity.error" style="font-size: 10px; color: #FF4757; text-align: center; position: absolute">{{ newListingErrors.quantity.message }}</div>
         </div>
@@ -185,8 +185,8 @@
           <vs-td :data="inventory.bestBefore">{{inventory.bestBefore}} </vs-td>
           <vs-td :data="inventory.expires">{{inventory.expires}} </vs-td>
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
-          <vs-td :data="inventory.pricePerItem">{{currency}}{{inventory.pricePerItem}} </vs-td>
-          <vs-td :data="inventory.totalPrice">{{currency}}{{inventory.totalPrice}}</vs-td>
+          <vs-td :data="inventory.pricePerItem">{{currency}} {{inventory.pricePerItem}} </vs-td>
+          <vs-td :data="inventory.totalPrice">{{currency}} {{inventory.totalPrice}}</vs-td>
           <vs-td> </vs-td>
         </vs-tr>
       </template>
@@ -230,11 +230,11 @@ export default {
         quantity: {error: false, message: "Please enter a positive quantity."},
         closes: {error: false, message: "Please enter a valid date."}
       },
-      listingQuantity: 0,
-      price: "0",
+      listingQuantity: 1,
+      listingQuantityMax: 0,
+      price: 0.0,
       moreInfo: "",
-      closes: "", // todo: should default to the expiry date of selected item.
-
+      closes: "",
     }
   },
 
@@ -250,6 +250,10 @@ export default {
       return (process.env.NODE_ENV === 'development')
     },
 
+    getInventory() {
+      let filteredInventory = this.inventory.filter(item => (item.quantity>0));
+      return filteredInventory;
+    },
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
@@ -265,8 +269,9 @@ export default {
 
     changeInvVals: function() {
       if (this.invItem !== undefined) {
-        this.price = this.invItem.totalPrice;
-        this.listingQuantity = this.invItem.quantity;
+        this.price = this.invItem.pricePerItem;
+        this.listingQuantityMax = this.invItem.quantity;
+        this.closes = this.invItem.expires + 'T00:00';
       }
     },
     /**
@@ -280,11 +285,6 @@ export default {
       if (this.price < 0 || this.price == "") {
         this.price = 0.00;
         this.newListingErrors.price.error = true;
-        isValid = false;
-      }
-      if (this.listingQuantity < 1) { // In theory this shouldn't occur (because vs-input-number component will set it to the min/max allowed).
-        this.listingQuantity = 0;
-        this.newListingErrors.quantity.error = true;
         isValid = false;
       }
       if (this.closes === "" || this.closes == null) {
@@ -323,25 +323,29 @@ export default {
           api.createListing(store.actingAsBusinessId, this.invItem.id, this.listingQuantity, this.price, this.moreInfo, this.closes)
             .then((response) => {
               this.$log.debug("New listing has been posted:", response.data);
+              this.$vs.notify({
+                title: 'Listing successfully posted',
+                color: 'success'
+              });
+              this.newListingPopup = false;
             })
             .catch((error) => {
               if (error.response) {
                 console.log(error);
                 if (error.response.status === 400) {
-                  this.$vs.notify( {
+                  this.$vs.notify({
                     title: 'Failed to add a listing',
                     text: 'Incomplete form, or the product does not exist.',
                     color: 'danger'
                   });
                 }
-                else if (error.response.status === 403) {
-                  this.$vs.notify( {
-                    title: 'Failed to add a listing',
-                    text: 'You do not have the rights to access this business',
-                    color: 'danger'
-                  });
-                }
-                console.log(error.response.status);
+              }
+              else if (error.response.status === 403) {
+                this.$vs.notify( {
+                  title: 'Failed to add a listing',
+                  text: 'You do not have the rights to access this business',
+                  color: 'danger'
+                });
               }
               this.$log.debug("Error Status:", error)
             });
@@ -486,6 +490,7 @@ export default {
     },
     addInventory: function() {
       if (this.errors.length === 0) {
+        this.totalPrice = this.quantity * this.pricePerItem;
         api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
           .then((response) => {
             this.$log.debug("New catalogue item created:", response.data);
