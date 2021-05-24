@@ -137,9 +137,7 @@ vs-tab {
 }
 
 .profile-text-inner {
-  margin-top: 10px;
-  width: 95%;
-  height: 85%;
+  margin: 1em;
 }
 
 .main {
