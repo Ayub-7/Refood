@@ -1,6 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AddToInventory from '../components/AddToInventory';
-import BusinessInventory from '../components/BusinessInventory';
 import Vuesax from 'vuesax';
 
 
@@ -118,7 +117,6 @@ describe('Component', () => {
     });
 
     test('Past sell by date error', () => {
-        console.log(wrapper.vm.products)
         wrapper.vm.invenForm.sellBy = '01-01-2000';
         wrapper.vm.checkForm();
         expect(wrapper.vm.errors.includes('past-date')).toBeTruthy();
