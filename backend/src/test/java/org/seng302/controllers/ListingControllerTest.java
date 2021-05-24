@@ -128,7 +128,7 @@ public class ListingControllerTest {
     public void testGetListingForNullBusiness() throws Exception {
         User user = new User("email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
-        mvc.perform(get("/businesses/{id}/inventory", business.getId())
+        mvc.perform(get("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
     }
