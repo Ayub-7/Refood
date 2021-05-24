@@ -116,14 +116,13 @@ export default {
   methods: {
     checkForm: function() {
       this.errors = [];
-      var invalidChars = /[^a-zA-Z/ -\d]/i;
-      if (this.invenForm.prodId.match(invalidChars)) {
+      var today = new Date();
+      const invalidChars = /^([a-zA-Z0-9\u0600-\u06FF\u0660-\u0669\u06F0-\u06F9 _.-]+)$/;
+      if (!invalidChars.test(this.invenForm.prodId)) {
         this.errors.push("invalid-chars");
       }
 
-      var today = new Date();
-      var regex = /^[0-9]*(?:\.\d{1,2})?$/;
-      if( !regex.test(this.invenForm.pricePerItem) ) {
+      if((typeof this.invenForm.pricePerItem) !== "number") {
         this.errors.push(this.invenForm.pricePerItem);
       }
 
