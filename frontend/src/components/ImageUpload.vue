@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- Using label for button since can't rename button text -->
-        <vs-button ref="loadableButton" @click="showModal=true">Upload image</vs-button>
+        <vs-button ref="loadableButton" @click="showModal=true">Upload Image</vs-button>
             <!-- Add user to business as admin modal -->
         <Modal v-if="showModal">
             <div slot="header">

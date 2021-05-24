@@ -1,26 +1,20 @@
 <template>
   <vs-card class="main">
       <div class="profile-text-inner">
-        <div style="display: flex; margin: auto; padding-bottom: 1em;">
-          <h1 id="pagetitle" class="title text-center" style="font-size: 40px;">{{this.business}} Products</h1>
-
-          <div style="margin-right: 0; margin-left: auto; display: flex">
-            <div class="title" style="margin-top: 5px; margin-right: 10px">
-              <p v-if="displaytype">Grid</p>
-              <p v-if="!displaytype">List</p>
-            </div>
-
-            <label class="switch" >
-              <input v-model="displaytype" type="checkbox" checked>
-              <span class="slider round"></span>
-            </label>
+        <div style="display: flex; justify-content: space-between">
+          <div id="page-title">Product Catalogue</div>
+          <div style="display: flex;">
+            <vs-button class="header-button">Add Product</vs-button>
+            <ImageUpload :businessId=businessId :products=products class="header-button" />
+            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button">Inventory</vs-button>
           </div>
         </div>
+
         <vs-divider></vs-divider>
 
         <div style="display: flex; margin-bottom: 1em;">
           <div style="display: flex;">
-            <h2 class="title" style="margin: auto;">Sort By: </h2>
+            <h2 style="margin: auto; padding-right: 4px;">Sort By </h2>
             <select v-model="selected">
               <option disabled value="">Please select one</option>
               <option value="id">ID</option>
@@ -31,42 +25,60 @@
             </select>
             <vs-button @click="sortByName(null, selected, 0);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
 
-            <ImageUpload :businessId=businessId :products=products style="margin: 0 0.5em; width: 100px;"/>
-            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" style="margin: 0 0.5em; width: 100px;">Inventory</vs-button>
+           <div style="display: flex">
+              <div class="title" style="margin-top: 5px; margin-right: 10px">
+                <p v-if="displaytype">Grid</p>
+                <p v-if="!displaytype">List</p>
+              </div>
+
+              <label class="switch" >
+                <input v-model="displaytype" type="checkbox" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
-          <tfoot style="margin: auto 0 auto auto">
-          <tr>
-            <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
-            <div  v-if="filteredproducts.length > 10">
-              <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
-              <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
+          <div style="margin: auto 0 auto auto">
+          <div>
+            <div class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</div>
+            <div v-if="filteredproducts.length > 10">
+              <div><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></div>
+              <div><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></div>
             </div>
-          </tr>
-          </tfoot>
+          </div>
+          </div>
         </div>
 
 
 
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
-            
-            <div style="position:relative" class="grid-item sub-container" v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
-                v-bind:href="product.id"
-                :key="product.id">
-              <div>
-                <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-                <img v-if="product.primaryImagePath == null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+            <vs-card style="position:relative"
+                    class="grid-item"
+                    v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
+                    v-bind:href="product.id"
+                    :key="product.id">
+
+              <div slot="media">
+                <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
+                <img v-if="product.primaryImagePath == null" class="grid-image" src="ProductShoot.jpg"/>
               </div>
-              <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
-              
-                <div style="display: flex;">
-                  <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
-                  <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
+
+              <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
+                <div style="display: flex; flex-direction: column; justify-content: space-between">
+                  <div style="font-size: 16px; font-weight: bold;  text-align: justify;">{{ product.name }} </div>
+                  <p>{{ product.id }}</p>
                 </div>
-                <!-- Actions Dropdown -->
+                <vs-divider></vs-divider>
+                <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
+                <p style="font-size: 14px; margin-bottom: 20px;">Created: {{ product.created }} </p>
+                <div style="height: 75px">{{ product.description }} </div>
+              </div>
+
+              <div slot="footer" class="grid-item-footer">
+                <div style="color: #1F74FF; font-size: 25pt; font-weight: bold; margin: auto 0" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </div>
                 <vs-dropdown vs-trigger-click class="actionButton">
                   <vs-button style="width: fit-content;">Actions</vs-button>
                   <vs-dropdown-menu>
@@ -74,7 +86,6 @@
                           product.manufacturer, product.description)">
                       Modify product
                     </vs-dropdown-item>
-
                     <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                       <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
                         {{pImage.name}}
@@ -86,16 +97,10 @@
                         {{pImage.name}}
                       </vs-dropdown-item>
                     </vs-dropdown-group>
-
                   </vs-dropdown-menu>
                 </vs-dropdown>
-
-                <p style="font-size: 20pt; font-weight: bold;  text-align: justify;">{{ product.name }} </p>
-                <p style="font-size: 14pt; text-align: justify; margin-bottom: 20px;">{{ product.manufacturer }} </p>
-                <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #1F74FF; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
-            </div>
+            </vs-card>
           </div>
         </div>
 
@@ -135,7 +140,7 @@
                       <div>
                         <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                         <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(product)"/>
-                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;  border-radius: 1em;" src="ProductShoot.jpg"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -195,9 +200,9 @@
 <script>
 import api from "../Api";
 import {store, mutations} from "../store";
-//import {store} from "../store"
 import ImageUpload from "./ImageUpload";
 import axios from "axios";
+
 const Search = {
   name: "Search",
 
@@ -228,7 +233,6 @@ const Search = {
   },
 
   /**
-   *
    * api.getBusinessProducts() queries the test back-end (json-server)
    * at /businesses/${businessId}/products which returns a JSON object list of test products which can
    * be filtered by the webpage.
@@ -297,6 +301,7 @@ const Search = {
         return '../../public/ProductShoot.jpg'
       }
     },
+
     getUserInfo: function(userId) {
       if(store.loggedInUserId != null) {
         api.getUserFromID(userId) //Get user data
@@ -333,6 +338,7 @@ const Search = {
     setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
       mutations.setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription);
     },
+
     //modifies selected catalog item
     goToModify: function () {
       this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/modify`})
@@ -513,10 +519,14 @@ export default Search;
 
 <style scoped>
 
-.title {
-  color: #1F74FF;
-  font-weight: bold;
-  font-size: 23px;
+#page-title {
+  font-size: 30px;
+  margin: auto 0;
+}
+
+.header-button {
+  margin: 0 1em;
+  min-width: 100px;
 }
 
 .main {
@@ -544,33 +554,45 @@ export default Search;
 
 .profile-text-inner {
   margin: 2em auto;
-  width: 90%;
-  height: 80%;
+  width: 95%;
 }
+
+/* ===== GRID CARD ===== */
 
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 350px);
   grid-column-gap: 2em;
-  justify-content: center;
 
-  padding: 10px;
   margin: 50px auto auto 0;
 }
+
 .grid-item {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
   font-size: 30px;
   text-align: left;
   margin: 10px;
   width: 350px;
 }
-.sub-container {
-  padding: 0.75em;
-  border-radius: 1.5em;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+
+.grid-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px 4px 0 0;
 }
 
+.grid-item-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.grid-item >>> footer {
+  padding-bottom: 1em;
+  margin-bottom: 4px;
+}
+
+/* ===== ===== ===== */
 
 .switch {
   position: relative;

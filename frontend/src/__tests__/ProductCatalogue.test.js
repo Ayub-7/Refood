@@ -1,7 +1,9 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import ProductCatalogue from "../components/ProductCatalogue";
 import Vuesax from 'vuesax';
 import {store} from "../store";
+import api from "../Api";
+import axios from "axios";
 
 let wrapper;
 
@@ -44,28 +46,87 @@ const mockBusiness =
         "created": "2020-05-18 21:06:11"
     };
 
+const mockProducts = [
+    {
+        "id": "WATT-420-BEANS",
+        "name": "Watties Baked Beans - 420g can",
+        "description": "Baked Beans as they should be.",
+        "manufacturer": "Heinz Wattie's Limited",
+        "recommendedRetailPrice": 2.2,
+        "created": "2021-05-24T11:44:21.028Z",
+        "images": [
+            {
+                "id": 1234,
+                "filename": "/media/images/23987192387509-123908794328.png",
+                "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+            }
+        ]
+    },
+    {
+        "id": "SPK-123",
+        "name": "Sour Patch Kids",
+        "description": "They're even sourer and sweeter when expired.",
+        "manufacturer": "Food Things Ltd.",
+        "recommendedRetailPrice": 2.49,
+        "created": "2021-05-22T11:44:21.028Z",
+        "images": [
+            {
+                "id": 1235,
+                "filename": "/media/images/23987192387509-123908794328.png",
+                "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+            }
+        ]
+    }
+];
+
+axios.get = jest.fn(() => {
+    return Promise.resolve({data: [{
+            currencies: [{symbol: "€", code: "EUR"}],
+        }]}
+    );
+});
+
+jest.mock("../Api.js", () => jest.fn);
+api.checkSession =  jest.fn(() => {
+    return Promise.resolve({
+        data: {
+            id: 7,
+        }
+    });
+});
+
+api.getBusinessProducts = jest.fn(() => {
+    return Promise.resolve({
+        data: mockProducts
+    });
+});
+
+
 let $log = {
     debug: jest.fn(),
     error: jest.fn()
 }
 
+let $route = {
+    params: {
+        id: 7,
+    }
+}
+
 const getUserMethod = jest.spyOn(ProductCatalogue.methods, 'getUserInfo');
 beforeEach(() => {
-    wrapper = shallowMount(ProductCatalogue, {
+    wrapper = mount(ProductCatalogue, {
         propsData: {},
-        mocks: {store, $log},
+        mocks: {store, $log, $route},
         stubs: ['router-link', 'router-view'],
         methods: {},
-        // components: CurrencyInput,
         localVue,
         data () {
             return {
-                userId: mockUser.id,
                 business: mockBusiness,
                 actingAsBusinessId: null
             }
         }
-
     });
 
     getUserMethod.mockImplementation(() =>{
@@ -85,9 +146,38 @@ describe('Component', () => {
     });
 });
 
-describe('ProductCatalogue business tests', () => {
-    test('Business\'s name is shown in the title', () => {
-        const busPageTitle = wrapper.find("#pagetitle")
-        expect(busPageTitle.text().includes('Products')).toBe(true);
+describe('UI tests', () => {
+   test("Correct number of grid cards is displayed", () => {
+       let items = wrapper.findAll(".grid-item");
+       expect(items.length).toBe(mockProducts.length);
+   }) ;
+});
+
+
+describe('Functionality tests', () => {
+    test("Data is initialized and set properly.",  () => {
+        expect(wrapper.vm.userId).toBe(7);
+        expect(wrapper.vm.products).toBe(mockProducts);
+        expect(wrapper.vm.filteredproducts).toBe(mockProducts);
+        expect(api.checkSession).toBeCalled();
+        expect(api.getBusinessProducts).toBeCalled();
+        console.log(wrapper.html());
     });
+
+    test("Currency is set properly", async () => {
+        await wrapper.vm.setCurrency("France");
+        expect(wrapper.vm.currencySymbol).toBe("€");
+    });
+
+    test("Product item image url is retrieved", () => {
+        let url = wrapper.vm.getImgUrl(wrapper.vm.products[0]);
+        expect(url).toBeTruthy();
+
+        let emptyProduct = {primaryImagePath: null};
+        url = wrapper.vm.getImgUrl(emptyProduct);
+        expect(url).toBe('../../public/ProductShoot.jpg');
+    });
+
+
+
 });
