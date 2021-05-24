@@ -49,7 +49,7 @@ beforeEach(() => {
         mocks: {$route, $log},
         stubs: {},
         methods: {},
-        propsData: mockInventory,
+        propsData: {'item': mockInventory[0]},
         localVue,
     })
     wrapper.vm.products = [{
@@ -94,6 +94,10 @@ describe('Component', () => {
     });
 
     test('No date error', () => {
+        wrapper.vm.invenForm.sellBy = '';
+        wrapper.vm.invenForm.listExpiry = '';
+        wrapper.vm.invenForm.bestBefore = '';
+        wrapper.vm.invenForm.manufactureDate = '';
         wrapper.vm.checkForm();
         expect(wrapper.vm.errors.includes('no-dates')).toBeTruthy();
         expect(wrapper.vm.errors.includes('past-expiry')).toBeTruthy();
@@ -131,10 +135,4 @@ describe('Component', () => {
         expect(wrapper.vm.errors.includes('past-date')).toBeTruthy();
         expect(wrapper.vm.errors.includes('past-sell')).toBeTruthy();
     });
-
-    test('Autofill', () => {
-        wrapper.vm.invenForm.prodId = "W04GP5EC0B1798680";
-        wrapper.vm.autofill();
-        expect(wrapper.vm.invenForm.pricePerItem).toEqual(88.93);
-    })
 });

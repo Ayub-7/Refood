@@ -126,8 +126,7 @@ export default {
 
         return false;
       }
-      if (this.invenForm.bestBefore === '' && this.invenForm.sellBy === '' && this.invenForm.manufactureDate === ''
-          && this.listExpiry === '') {
+      if (this.invenForm.manufactureDate === '' && this.invenForm.bestBefore === '' && this.invenForm.sellBy === '' && this.invenForm.listExpiry === '') {
         this.errors.push('no-dates');
       }
 
@@ -142,7 +141,7 @@ export default {
         this.errors.push(this.pricePerItem);
       }
       if (this.invenForm.bestBefore !== '') {
-        var timestamp = Date.parse(this.bestBefore);
+        var timestamp = Date.parse(this.invenForm.bestBefore);
         var dateObject = new Date(timestamp)
         if (dateInPast(dateObject, today) === true) {
           this.errors.push('past-date');
@@ -252,16 +251,21 @@ export default {
         })
       }
     },
+    setCurrentItem(item) {
+      if (item !== undefined) {
+        this.invenForm.prodId = item.productId;
+        this.invenForm.manufactureDate = item.manufactured;
+        this.invenForm.sellBy = item.sellBy;
+        this.invenForm.bestBefore = item.bestBefore;
+        this.invenForm.listExpiry = item.expires;
+        this.invenForm.quantity = item.quantity;
+        this.invenForm.pricePerItem = item.pricePerItem;
+      }
+    },
   },
   mounted(){
     this.getBusinessProducts();
-    this.invenForm.prodId = this.item.productId;
-    this.invenForm.manufactureDate = this.item.manufactured;
-    this.invenForm.sellBy = this.item.sellBy;
-    this.invenForm.bestBefore = this.item.bestBefore;
-    this.invenForm.listExpiry = this.item.expires;
-    this.invenForm.quantity = this.item.quantity;
-    this.invenForm.pricePerItem = this.item.pricePerItem;
+    this.setCurrentItem(this.item);
   }
 }
 </script>
