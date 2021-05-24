@@ -1,5 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AddToInventory from '../components/AddToInventory';
+import BusinessInventory from '../components/BusinessInventory';
 import Vuesax from 'vuesax';
 
 

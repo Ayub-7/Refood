@@ -90,8 +90,8 @@
 </template>
 
 <script>
-import api from "@/Api";
-import {store} from "@/store";
+import api from "../Api.js";
+import {store} from "../store.js";
 
 export default {
   name: "AddToInventory",

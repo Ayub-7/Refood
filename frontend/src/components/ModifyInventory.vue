@@ -83,8 +83,8 @@
 </template>
 
 <script>
-import api from "@/Api";
-import {store} from "@/store";
+import api from "../Api";
+import {store} from "../store";
 
 export default {
   name: "ModifyInventory",

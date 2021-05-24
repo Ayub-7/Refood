@@ -100,8 +100,8 @@ import api from "../Api";
 
 // import axios from "axios";
 import {store} from "../store";
-import AddToInventory from "@/components/AddToInventory";
-import ModifyInventory from "@/components/ModifyInventory";
+import AddToInventory from "./AddToInventory";
+import ModifyInventory from "./ModifyInventory";
 
 export default {
   name: "BusinessInventory",
