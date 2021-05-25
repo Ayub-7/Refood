@@ -77,7 +77,7 @@ api.getBusinessListings = jest.fn(() => {
 });
 
 beforeEach(() => {
-    wrapper = shallowMount(BusinessListings, {
+    wrapper = mount(BusinessListings, {
         propsData: {
             businessId: 1,
         },

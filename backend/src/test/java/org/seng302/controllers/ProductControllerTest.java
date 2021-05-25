@@ -256,7 +256,7 @@ public class ProductControllerTest {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(product1)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isCreated());
 
         product1.setDescription("");
 
@@ -264,7 +264,7 @@ public class ProductControllerTest {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(product1)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isCreated());
     }
 
     @Test

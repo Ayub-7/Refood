@@ -43,12 +43,10 @@
         </div>
         <div id="description">
           <vs-textarea
-              :danger="(errors.includes('no-desc'))"
-              danger-text="Description is Required."
               class="form-control"
               type="text"
               width="400px"
-              label="Description (required)"
+              label="Description"
               v-model="description"/>
         </div>
       </div>
@@ -98,10 +96,6 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
-      if (this.description.length === 0) {
-        this.errors.push('no-desc');
-      }
-
       if (this.manufacturer.length === 0) {
         this.errors.push('no-manu');
       }
@@ -126,13 +120,6 @@ const AddToCatalogue = {
             color: 'danger'
           });
         }
-      }
-      if (this.errors.includes('no-desc')) {
-        this.$vs.notify({
-          title: 'Failed to create catalogue item',
-          text: 'Description is Required.',
-          color: 'danger'
-        });
       }
     },
     /**
