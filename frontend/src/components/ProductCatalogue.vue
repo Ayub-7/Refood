@@ -553,10 +553,10 @@ export default Search;
   grid-template-columns: repeat(auto-fill, 350px);
   grid-column-gap: 2em;
   justify-content: center;
-
   padding: 10px;
   margin: 50px auto auto 0;
 }
+
 .grid-item {
   border: 1px solid rgba(0, 0, 0, 0.1);
   font-size: 30px;
