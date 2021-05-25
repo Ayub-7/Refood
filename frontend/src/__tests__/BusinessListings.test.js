@@ -1,4 +1,4 @@
-import {mount, createLocalVue, shallowMount} from '@vue/test-utils';
+import {mount, createLocalVue} from '@vue/test-utils';
 import BusinessListings from "../components/BusinessListings";
 import Vuesax from 'vuesax';
 import api from "../Api";

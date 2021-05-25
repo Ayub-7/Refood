@@ -4,113 +4,28 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-        <vs-button @click="addNewInv=true" class="header-button">New Inventory Listing</vs-button>
+        <!-- Add to inventory modal -->
+        <AddToInventory @submitted="onSuccess"></AddToInventory>
         <vs-button @click="newListingPopup = true" class="header-button">New Item Listing</vs-button>
-        <!-- todo: remove this new item listing button when testing done
-              - want to make it so there's an action button for each inventory item, with the ability to add a new listing attached.-->
-
-        <vs-popup classContent="popup-example"  title="Add a product to your inventory" :active.sync="addNewInv">
-        <div class="form-group required vs-col" vs-order="1" id="firstColModal">
-            <div class="row">
-              <label for="prodId">Product *</label>
-              <vs-select id="prodId" class="selectExample" v-model="prodId" v-on:change="autofill">
-                <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
-              </vs-select>
-            </div>
-            <div class="row">
-              <label for="pricePerItem">Price per item *</label>
-              <vs-input
-                  :danger="(errors.includes(pricePerItem))"
-                  danger-text="Price per item must be greater than zero and numeric."
-                  class="inputx"
-                  id="pricePerItem"
-                  placeholder="Price per item"
-                  v-model="pricePerItem"/>
-            </div>
-            <div class="row">
-              <label for="totalPrice">Total price *</label>
-              <vs-input
-                  :danger="(errors.includes(totalPrice))"
-                  danger-text="Total price must be greater than zero and numeric."
-                  class="inputx"
-                  id="totalPrice"
-                  placeholder="Price per item"
-                  v-model="totalPrice"/>
-            </div>
-            <div class="row">
-              <label for="quantity">Quantity *</label>
-              <vs-input-number
-                  :danger="(errors.includes(quantity))"
-                  danger-text="Quantity must be greater than zero."
-                  min="0"
-                  :step="1"
-                  id="quantity"
-                  v-model="quantity"/>
-            </div>
-          </div>
-          <div class="form-group required vs-col" vs-order="2" id="secondColModal">
-            <div class="row">
-              <label for="bestBefore">Best before</label>
-              <vs-input
-                  :danger="(errors.includes('past-best'))"
-                  danger-text="Date cannot be in past"
-                  type="date"
-                  id="bestBefore"
-                  class="inputx"
-                  v-model="bestBefore"/>
-            </div>
-            <div class="row">
-              <label for="listingExpiry">Listing expiry *</label>
-              <vs-input
-                  :danger="(errors.includes('past-expiry'))"
-                  danger-text="Expiry date is required and cannot be in past"
-                  type="date"
-                  id="listingExpiry"
-                  class="inputx"
-                  v-model="listExpiry"/>
-            </div>
-            <div class="row">
-              <label for="manufactureDate">Manufacture date</label>
-              <vs-input
-                  :danger="(errors.includes('past-manu'))"
-                  danger-text="Date cannot be in past"
-                  type="date"
-                  id="manufactureDate"
-                  class="inputx"
-                  v-model="manufactureDate"/>
-            </div>
-            <div class="row">
-              <label for="sellBy">Sell by</label>
-              <vs-input
-                  :danger="(errors.includes('past-sell'))"
-                  danger-text="Date cannot be in past"
-                  type="date"
-                  id="sellBy"
-                  class="inputx"
-                  v-model="sellBy"/>
-            </div>
-          </div>
-          <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory()">
-            <vs-button>Add product</vs-button>
-          </div>
-        </vs-popup>
       </div>
     </div>
 
-    <!-- ===== NEW LISTING MODAL ===== -->
+    <!-- NEW LISTING MODAL -->
     <vs-popup :active.sync="newListingPopup"
               title="Create a new listing">
       <div class="new-listing-modal">
         <div class="row">
           <label for="InvId">Inventory Item ID</label>
-          <!-- TODO: add v-on:change to change Product name -->
           <vs-select id="InvId" class="selectExample" v-model="invItem" v-on:change="changeInvVals">
-            <vs-select-item :value="invItem" :text="invItem.id" v-for="invItem in inventory" v-bind:href="invItem.id" :key="invItem.id"/>
+            <vs-select-item :value="invItem" :text="' (' + invItem.id +') '+ invItem.productName" v-for="invItem in getInventory()" v-bind:href="invItem.id" :key="invItem.id"/>
           </vs-select>
         </div>
         <div id="listing-product-name">
           <div class="sub-header">Inventory Item Name</div>
-          <div style="font-size: 18px;" v-if="invItem.length !== 0">{{ invItem.product.name }}</div>
+          <div style="font-size: 18px; text-align: left; font-weight: bold" v-if="invItem.length !== 0">{{ invItem.product.name }}</div>
+          <div style="font-size: 10px; text-align: left" v-if="invItem.length !== 0">Price {{ invItem.pricePerItem }}</div>
+          <div style="font-size: 10px; text-align: left" v-if="invItem.length !== 0">Qty {{ invItem.quantity }}</div>
+
           <div style="font-size: 18px;" v-else></div>
         </div>
         <vs-divider id="listing-divider"></vs-divider>
@@ -126,7 +41,8 @@
             <label style="font-size: 13.6px">Quantity</label>
             <vs-input-number
                 v-model="listingQuantity"
-                :max="10"></vs-input-number> <!-- todo: max based on current inventory amount -->
+                :max="listingQuantityMax"
+                :min="1"></vs-input-number>
           </div>
           <div v-show="newListingErrors.quantity.error" style="font-size: 10px; color: #FF4757; text-align: center; position: absolute">{{ newListingErrors.quantity.message }}</div>
         </div>
@@ -158,7 +74,8 @@
               :maxItems="5"
               stripe>
       <template class="table-head" slot="thead" >
-        <vs-th sort-key="productId" style="border-radius: 8px 0 0 0"> ID </vs-th>
+        <vs-th sort-key="id" style="border-radius: 8px 0 0 0; width: 40px;"> ID</vs-th>
+        <vs-th sort-key="productId" > Image </vs-th>
         <vs-th sort-key="productName"> Product </vs-th>
         <vs-th class="dateInTable" sort-key="manufactured"> Manufactured </vs-th>
         <vs-th class="dateInTable" sort-key="sellBy"> Sell By </vs-th>
@@ -170,7 +87,8 @@
         <vs-th style="border-radius: 0 8px 0 0"> <!-- Action Button Column --> </vs-th>
       </template>
       <template slot-scope="{data}">
-        <vs-tr v-for="inventory in data" :key="inventory.id"> <!-- todo: connect data with table -->
+        <vs-tr v-for="inventory in data" :key="inventory.id">
+          <vs-td :data="inventory.id" style=" text-align: center; font-weight: bold; font-size: 10pt"> ({{inventory.id}}) </vs-td>
           <vs-td id="productIdCol" :data="inventory.productId">
           {{inventory.productId}}
           <div style="height: 80px">
@@ -185,9 +103,9 @@
           <vs-td :data="inventory.bestBefore">{{inventory.bestBefore}} </vs-td>
           <vs-td :data="inventory.expires">{{inventory.expires}} </vs-td>
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
-          <vs-td :data="inventory.pricePerItem">{{currency}}{{inventory.pricePerItem}} </vs-td>
-          <vs-td :data="inventory.totalPrice">{{currency}}{{inventory.totalPrice}}</vs-td>
-          <vs-td> </vs-td>
+          <vs-td :data="inventory.pricePerItem">{{currency}} {{inventory.pricePerItem}} </vs-td>
+          <vs-td :data="inventory.totalPrice">{{currency}} {{inventory.totalPrice}}</vs-td>
+          <vs-td><ModifyInventory @submitted="onSuccess" :item="inventory"></ModifyInventory></vs-td>
         </vs-tr>
       </template>
     </vs-table>
@@ -199,29 +117,19 @@
 import axios from "axios";
 import api from "../Api";
 import {store} from "../store";
+import AddToInventory from "./AddToInventory";
+import ModifyInventory from "./ModifyInventory";
 
 export default {
   name: "BusinessInventory",
-
+  components: {AddToInventory, ModifyInventory},
   data: function() {
     return {
       errors: [],
       inventory: [],
       currency: "$",
       products: [],
-      prodId:'',
       invItem:[],
-      addNewInv:false,
-      pricePerItem: 0.0,
-      totalPrice: 0.0,
-      quantity: 0,
-
-
-      bestBefore: '',
-      listExpiry: '',
-      manufactureDate: '',
-      sellBy: '',
-
 
       // New Sale Listing Variables
       newListingPopup: false,
@@ -230,26 +138,34 @@ export default {
         quantity: {error: false, message: "Please enter a positive quantity."},
         closes: {error: false, message: "Please enter a valid date."}
       },
-      listingQuantity: 0,
-      price: "0",
+      listingQuantity: 1,
+      listingQuantityMax: 0,
+      price: 0.0,
       moreInfo: "",
-      closes: "", // todo: should default to the expiry date of selected item.
-
+      closes: "",
     }
   },
 
-
   mounted() {
     this.getSession();
-    this.getProducts(this.$route.params.id);
     this.getBusinessInventory();
+    this.getProducts(this.$route.params.id);
+
   },
 
   methods: {
+    onSuccess() {
+      this.getBusinessInventory();
+    },
+
     isDevelopment() {
       return (process.env.NODE_ENV === 'development')
     },
 
+    getInventory() {
+      let filteredInventory = this.inventory.filter(item => (item.quantity>0));
+      return filteredInventory;
+    },
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
@@ -265,8 +181,9 @@ export default {
 
     changeInvVals: function() {
       if (this.invItem !== undefined) {
-        this.price = this.invItem.totalPrice;
-        this.listingQuantity = this.invItem.quantity;
+        this.price = this.invItem.pricePerItem;
+        this.listingQuantityMax = this.invItem.quantity;
+        this.closes = this.invItem.expires + 'T00:00';
       }
     },
     /**
@@ -280,11 +197,6 @@ export default {
       if (this.price < 0 || this.price == "") {
         this.price = 0.00;
         this.newListingErrors.price.error = true;
-        isValid = false;
-      }
-      if (this.listingQuantity < 1) { // In theory this shouldn't occur (because vs-input-number component will set it to the min/max allowed).
-        this.listingQuantity = 0;
-        this.newListingErrors.quantity.error = true;
         isValid = false;
       }
       if (this.closes === "" || this.closes == null) {
@@ -323,25 +235,29 @@ export default {
           api.createListing(store.actingAsBusinessId, this.invItem.id, this.listingQuantity, this.price, this.moreInfo, this.closes)
             .then((response) => {
               this.$log.debug("New listing has been posted:", response.data);
+              this.$vs.notify({
+                title: 'Listing successfully posted',
+                color: 'success'
+              });
+              this.newListingPopup = false;
             })
             .catch((error) => {
               if (error.response) {
                 console.log(error);
                 if (error.response.status === 400) {
-                  this.$vs.notify( {
+                  this.$vs.notify({
                     title: 'Failed to add a listing',
                     text: 'Incomplete form, or the product does not exist.',
                     color: 'danger'
                   });
                 }
-                else if (error.response.status === 403) {
-                  this.$vs.notify( {
-                    title: 'Failed to add a listing',
-                    text: 'You do not have the rights to access this business',
-                    color: 'danger'
-                  });
-                }
-                console.log(error.response.status);
+              }
+              else if (error.response.status === 403) {
+                this.$vs.notify( {
+                  title: 'Failed to add a listing',
+                  text: 'You do not have the rights to access this business',
+                  color: 'danger'
+                });
               }
               this.$log.debug("Error Status:", error)
             });
@@ -381,162 +297,8 @@ export default {
           this.$log.debug(err);
       });
     },
-    checkForm: function() {
-      this.errors = [];
-      var invalidChars = /[^a-zA-Z/ -\d]/i;
-      if (this.prodId.match(invalidChars)) {
-        this.errors.push("invalid-chars");
-      }
 
-      var today = new Date();
-      var regex = /^[0-9]*(?:\.\d{1,2})?$/;
-      if( !regex.test(this.pricePerItem) ) {
-        this.errors.push(this.pricePerItem);
-      }
-
-      var dateInPast = function(firstDate, secondDate) {
-        if(firstDate.setHours(0,0,0,0) <= secondDate.setHours(0,0,0,0)) {
-          return true;
-        }
-
-        return false;
-      }
-      if (this.bestBefore === '' && this.sellBy === '' && this.manufactureDate === ''
-          && this.listExpiry === '') {
-        this.errors.push('no-dates');
-      }
-
-      if (this.listExpiry === '') {
-        this.errors.push('past-expiry');
-      }
-
-      if (this.prodId.length === 0 || this.errors.includes('invalid-chars')) {
-        this.errors.push(this.prodId);
-      }
-      if (this.pricePerItem <= 0.0) {
-        this.errors.push(this.pricePerItem);
-      }
-      if (this.bestBefore !== '') {
-        var timestamp = Date.parse(this.bestBefore);
-        var dateObject = new Date(timestamp)
-        if (dateInPast(dateObject, today) === true) {
-          this.errors.push('past-date');
-          this.errors.push('past-best');
-        }
-      }
-      if (this.listExpiry !== '') {
-        timestamp = Date.parse(this.listExpiry);
-        dateObject = new Date(timestamp)
-        if (dateInPast(dateObject, today) === true) {
-          this.errors.push('past-date');
-          this.errors.push('past-expiry');
-        }
-      }
-      if (this.manufactureDate !== '') {
-        timestamp = Date.parse(this.manufactureDate);
-        dateObject = new Date(timestamp)
-        if (dateInPast(dateObject, today) === true) {
-          this.errors.push('past-date');
-          this.errors.push('past-manu');
-        }
-      }
-      if (this.sellBy !== '') {
-        timestamp = Date.parse(this.sellBy);
-        dateObject = new Date(timestamp)
-        if (dateInPast(dateObject, today) === true) {
-          this.errors.push('past-date');
-          this.errors.push('past-sell');
-        }
-      }
-      if (this.quantity <= 0) {
-        this.errors.push(this.quantity);
-      }
-
-      if (this.errors.includes('no-dates')) {
-        this.$vs.notify({
-          title: 'Failed to create inventory item',
-          text: 'Date is Required.',
-          color: 'danger'
-        });
-      }
-      if (this.errors.includes('past-date')) {
-        this.$vs.notify({
-          title: 'Failed to create inventory item',
-          text: 'Dates cannot be in the past.',
-          color: 'danger'
-        });
-      }
-      if (this.errors.includes('no-desc')) {
-        this.$vs.notify({
-          title: 'Failed to create inventory item',
-          text: 'Description (MAX 25 CHARS).',
-          color: 'danger'
-        });
-      }
-      if (this.errors.includes(this.quantity)) {
-        this.$vs.notify({
-          title: 'Failed to create inventory item',
-          text: 'Quantity must be greater than zero.',
-          color: 'danger'
-        });
-      }
-
-
-      if (this.errors.length > 0) {
-        return false;
-      }
-      return true;
-
-    },
-    addInventory: function() {
-      if (this.checkForm()) {
-        api.createInventory(store.actingAsBusinessId, this.prodId, this.quantity, this.pricePerItem, this.totalPrice, this.manufactureDate, this.sellBy, this.bestBefore, this.listExpiry)
-          .then((response) => {
-            this.$log.debug("New catalogue item created:", response.data);
-            this.inventory.push(response.data);
-            this.addNewInv = false;
-            this.getBusinessInventory();
-            this.$vs.notify( {
-              title: `Item successfully added to the business' inventory`,
-              color: 'success'
-            });
-          }).catch((error) => {
-            if (error.response) {
-              console.log(error);
-              if (error.response.status === 400) {
-                this.$vs.notify( {
-                  title: 'Failed to add an inventory item',
-                  text: 'Incomplete form, or the product does not exist.',
-                  color: 'danger'
-                });
-              } else if (error.response.status === 403) {
-                this.$vs.notify( {
-                  title: 'Failed to add an inventory item',
-                  text: 'You do not have the rights to access this business',
-                  color: 'danger'
-                });
-              }
-              console.log(error.response.status);
-            }
-          this.$log.debug("Error Status:", error)
-        })
-      }
-    },
-    autofill: function() {
-      if (this.prodId !== '') {
-        let prodInd = 0;
-        while (prodInd < this.products.length) {
-          if (this.products[prodInd]["id"] === this.prodId) {
-            break;
-          }
-          prodInd++;
-        }
-        this.pricePerItem = this.products[prodInd]["recommendedRetailPrice"];
-      }
-    },
-
-
-    /**
+    /** 
      * Calls API get businessInventory function, also adds new fields to inventory object for sorting and sets default order
     */
     getBusinessInventory() {
@@ -590,6 +352,10 @@ export default {
 
   .header-button {
     margin: 0 1em;
+  }
+  .header-button1 {
+    margin: 0 1em;
+    margin-top: 40px;
   }
 
   /* ===== NEW LISTING DIALOG/PROMPT ====== */
