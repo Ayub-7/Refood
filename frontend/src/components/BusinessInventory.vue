@@ -108,7 +108,7 @@
             <vs-dropdown vs-trigger-click>
               <vs-button>Actions</vs-button>
               <vs-dropdown-menu>
-                <vs-dropdown-item @click="openModifyModal(inventory)">Edit</vs-dropdown-item>
+                <vs-dropdown-item @click="openModifyModal(inventory)">Modify</vs-dropdown-item>
                 <vs-dropdown-item @click="openNewListingModal(inventory)">New Listing</vs-dropdown-item>
               </vs-dropdown-menu>
             </vs-dropdown>
