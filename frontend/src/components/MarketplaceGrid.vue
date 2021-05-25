@@ -31,21 +31,6 @@
 <script>
 export default {
     props: ['cardData'],
-    methods: {
-      /**
-       * Retrieves the image url link for the given product.
-       * @param product the product to retrieve the image for.
-       * @return a string link to the product image, or the default image if it doesn't have a product.
-       **/
-      getImgUrl() {
-        if (process.env.NODE_ENV !== 'staging') {
-          return '/prod/ProductShoot.jpg';
-        }
-        else {
-          return '../../public/ProductShoot.jpg';
-        }
-      },
-    }
 }
 </script>
 
