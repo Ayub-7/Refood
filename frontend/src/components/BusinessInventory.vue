@@ -84,10 +84,10 @@
           <vs-td :data="inventory.pricePerItem">{{inventory.pricePerItem}}</vs-td>
           <vs-td :data="inventory.totalPrice">{{inventory.totalPrice}}</vs-td>
           <!-- Modify inventory modal, with inventory sent as prop to autofill form -->
-          <div class="modifyBtn">
-            <ModifyInventory @submitted="onSuccess" :item="inventory"></ModifyInventory>
-          </div>
-          <vs-td> </vs-td>
+          <vs-td><ModifyInventory @submitted="onSuccess" :item="inventory"></ModifyInventory></vs-td>
+<!--          <div class="modifyBtn">-->
+<!--            -->
+<!--          </div>-->
         </vs-tr>
       </template>
     </vs-table>
