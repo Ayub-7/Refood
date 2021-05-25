@@ -32,8 +32,8 @@
         <div class="listing-header">
           <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
           <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
-          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment" class="image" src="ProductShoot.jpg"/>
-          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && !isDevelopment" class="image" :src="require('../../public/ProductShoot.jpg')"/>
+          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
+          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment() != true" class="image" :src="getImgUrl(true)"/>
           <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
             <div>{{ currencySymbol }}{{ listing.price }}</div>
             <div>{{ listing.quantity }}x</div>
@@ -71,8 +71,8 @@
             <vs-td>
               <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
               <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
-              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment" class="image" src="ProductShoot.jpg"/>
-              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && !isDevelopment" class="image" :src="require('../../public/ProductShoot.jpg')"/>
+              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
+              <img alt="Product Image" v-if="isDevelopment() !== true && !listing.inventoryItem.product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
             </vs-td>
             <vs-td>{{ listing.productName }}</vs-td>
             <vs-td>{{ currencySymbol }}{{ listing.price }}</vs-td>
@@ -137,7 +137,11 @@ export default {
     },
 
     getImgUrl(product) {
-      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+      if (product === true && process.env.NODE_ENV !== 'staging') {
+        return '/prod/ProductShoot.jpg';
+      } else if (product === true) {
+        return '/test/ProductShoot.jpg';
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
       } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
         return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
