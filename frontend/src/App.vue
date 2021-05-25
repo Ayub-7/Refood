@@ -47,16 +47,13 @@
 
         <!-- Acting As Business -->
         <div v-else class="sub-navbar-group">
-          <vs-navbar-item index="4">
+          <vs-navbar-item index="3-0">
             <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="5">
-            <router-link :to="{path: `/addtocatalogue`}">Add To Catalogue</router-link>
-          </vs-navbar-item>
-          <vs-navbar-item index="6">
+          <vs-navbar-item index="3-1">
             <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="7">
+          <vs-navbar-item index="3-2">
             <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
           </vs-navbar-item>
         </div>

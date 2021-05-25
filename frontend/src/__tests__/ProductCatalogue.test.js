@@ -23,8 +23,12 @@ const mockUser = {
     "email": "bdolton6@liveinternet.ru",
     "dateOfBirth": "2000-07-12",
     "phoneNumber": "+380 428 944 6622",
-    "homeAddress": "44 Ramsey Court",
-}
+    "homeAddress": {
+        // Remove unnecessary fields.
+        "country": "France",
+    },
+};
+
 const mockBusiness =
     {
         "id": 7,
@@ -101,6 +105,12 @@ api.getBusinessProducts = jest.fn(() => {
     });
 });
 
+api.getUserFromID = jest.fn(() => {
+    return Promise.resolve({
+        data: mockUser,
+    });
+});
+
 
 let $log = {
     debug: jest.fn(),
@@ -113,11 +123,15 @@ let $route = {
     }
 }
 
-const getUserMethod = jest.spyOn(ProductCatalogue.methods, 'getUserInfo');
+let $router = {
+    push: jest.fn(),
+}
+
+
 beforeEach(() => {
     wrapper = mount(ProductCatalogue, {
         propsData: {},
-        mocks: {store, $log, $route},
+        mocks: {store, $log, $route, $router},
         stubs: ['router-link', 'router-view'],
         methods: {},
         localVue,
@@ -127,12 +141,6 @@ beforeEach(() => {
                 actingAsBusinessId: null
             }
         }
-    });
-
-    getUserMethod.mockImplementation(() =>{
-        wrapper.vm.user = mockUser;
-        wrapper.vm.currencyCode = "NZD";
-        wrapper.vm.currencySymbol = "$"
     });
 });
 
@@ -150,7 +158,8 @@ describe('UI tests', () => {
    test("Correct number of grid cards is displayed", () => {
        let items = wrapper.findAll(".grid-item");
        expect(items.length).toBe(mockProducts.length);
-   }) ;
+   });
+
 });
 
 
@@ -161,7 +170,9 @@ describe('Functionality tests', () => {
         expect(wrapper.vm.filteredproducts).toBe(mockProducts);
         expect(api.checkSession).toBeCalled();
         expect(api.getBusinessProducts).toBeCalled();
-        console.log(wrapper.html());
+
+        expect(wrapper.vm.user).toBe(mockUser);
+        expect(wrapper.vm.currencySymbol).toBe("€");
     });
 
     test("Currency is set properly", async () => {
@@ -177,7 +188,6 @@ describe('Functionality tests', () => {
         url = wrapper.vm.getImgUrl(emptyProduct);
         expect(url).toBe('../../public/ProductShoot.jpg');
     });
-
 
 
 });

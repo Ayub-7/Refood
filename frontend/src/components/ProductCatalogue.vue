@@ -1,37 +1,39 @@
 <template>
   <vs-card class="main">
       <div class="profile-text-inner">
-        <div style="display: flex; justify-content: space-between">
+        <div id="header-container">
           <div id="page-title">Product Catalogue</div>
-          <div style="display: flex;">
-            <vs-button class="header-button">Add Product</vs-button>
+          <div id="header-menu">
+            <vs-button class="header-button" :to="{path: `/addtocatalogue`}">Add Product</vs-button>
             <ImageUpload :businessId=businessId :products=products class="header-button" />
-            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button">Inventory</vs-button>
+            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button" style="margin-right: 0;">Inventory</vs-button>
           </div>
         </div>
 
         <vs-divider></vs-divider>
 
-        <div style="display: flex; margin-bottom: 1em;">
-          <div style="display: flex;">
-            <h2 style="margin: auto; padding-right: 4px;">Sort By </h2>
-            <select v-model="selected">
-              <option disabled value="">Please select one</option>
-              <option value="id">ID</option>
-              <option value="name">Product Name</option>
-              <option value="description">Description</option>
-              <option value="recommendedRetailPrice">Recommended Retail Price</option>
-              <option value="created">Date Created</option>
-            </select>
-            <vs-button @click="sortByName(null, selected, 0);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+        <div id="catalogue-options">
+          <div id="sort-container">
+            <div style="display: flex;">
+              <h2 style="margin: auto; padding-right: 4px;">Sort By </h2>
+              <select v-model="selected">
+                <option disabled value="">Please select one</option>
+                <option value="id">ID</option>
+                <option value="name">Product Name</option>
+                <option value="description">Description</option>
+                <option value="recommendedRetailPrice">Recommended Retail Price</option>
+                <option value="created">Date Created</option>
+              </select>
+              <vs-button @click="sortByName(null, selected, 0);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+            </div>
 
-           <div style="display: flex">
+           <div class="switch-container">
               <div class="title" style="margin-top: 5px; margin-right: 10px">
                 <p v-if="displaytype">Grid</p>
                 <p v-if="!displaytype">List</p>
               </div>
 
-              <label class="switch" >
+              <label class="switch">
                 <input v-model="displaytype" type="checkbox" checked>
                 <span class="slider round"></span>
               </label>
@@ -39,14 +41,12 @@
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
-          <div style="margin: auto 0 auto auto">
-          <div>
+          <div id="grid-pagination">
             <div class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</div>
-            <div v-if="filteredproducts.length > 10">
-              <div><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></div>
-              <div><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></div>
+            <div v-if="filteredproducts.length > 10" style="display: flex;">
+              <vs-button type="border" class='prevNextSearchButton' @click="decreaseSearchRange()">Previous</vs-button>
+              <vs-button type="border" class='prevNextSearchButton' @click="increaseSearchRange()">Next</vs-button>
             </div>
-          </div>
           </div>
         </div>
 
@@ -54,8 +54,7 @@
 
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
-            <vs-card style="position:relative"
-                    class="grid-item"
+            <vs-card class="grid-item"
                     v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
                     v-bind:href="product.id"
                     :key="product.id">
@@ -74,13 +73,13 @@
                 <vs-divider></vs-divider>
                 <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
                 <p style="font-size: 14px; margin-bottom: 20px;">Created: {{ product.created }} </p>
-                <div style="height: 75px">{{ product.description }} </div>
+                <div style="height: 75px; font-size: 14px">{{ product.description }} </div>
               </div>
 
               <div slot="footer" class="grid-item-footer">
-                <div style="color: #1F74FF; font-size: 25pt; font-weight: bold; margin: auto 0" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </div>
+                <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </div>
                 <vs-dropdown vs-trigger-click class="actionButton">
-                  <vs-button style="width: fit-content;">Actions</vs-button>
+                  <vs-button style="width: fit-content;" type="flat">Actions</vs-button>
                   <vs-dropdown-menu>
                     <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
                           product.manufacturer, product.description)">
@@ -110,9 +109,9 @@
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" search>
+            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" stripe>
                 <template slot="thead" style="background:blue">
-                  <vs-th sort-key="id">
+                  <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
                   </vs-th >
                   <vs-th sort-key="name">
@@ -130,7 +129,7 @@
                   <vs-th sort-key="created">
                     <div>Date Created</div>
                   </vs-th>
-                  <vs-th><!-- Actions Column --></vs-th>
+                  <vs-th style="border-radius: 0 4px 0 0;"><!-- Actions Column --></vs-th>
                 </template>
 
                 <template slot-scope="{data}">
@@ -138,9 +137,9 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                        <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(product)"/>
-                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;  border-radius: 1em;" src="ProductShoot.jpg"/>
+                        <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 4px;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 4px;" v-bind:src="getImgUrl(product)"/>
+                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;  border-radius: 4px;" src="ProductShoot.jpg"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -153,7 +152,7 @@
                       <vs-dropdown vs-trigger-click>
                         <vs-button>Actions</vs-button>
                         <vs-dropdown-menu>
-                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
+                          <vs-dropdown-item id="modify-dropdown" @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
                           product.manufacturer, product.description)">
                             Modify product
                           </vs-dropdown-item>
@@ -181,9 +180,10 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
-                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
-                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
+                    <td><vs-button class='prevNextSearchButton' type='border' @click="decreaseSearchRange()">Previous</vs-button></td>
+                    <td><vs-button class='prevNextSearchButton' type='border' @click="increaseSearchRange()">Next</vs-button></td>
                   </tr>
                   </tfoot>
                 </template>
@@ -221,7 +221,7 @@ const Search = {
       enableTable: false,
       resultTrack: "",
       productSearchIndexMin: 0,
-      productSearchIndexMax: 10,
+      productSearchIndexMax: 12,
       business: null,
       businessId: null,
       displaytype: true,
@@ -524,6 +524,23 @@ export default Search;
   margin: auto 0;
 }
 
+#header-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+#header-menu {
+  display: flex;
+}
+
+#sort-container {
+  display: flex;
+}
+
+.switch-container {
+  display: flex;
+}
+
 .header-button {
   margin: 0 1em;
   min-width: 100px;
@@ -536,19 +553,13 @@ export default Search;
 }
 
 .prevNextSearchButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding: 10px 40px;
-  margin-left: 35%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  margin-left: 1em;
+  width: 100px;
 }
 
 .displaying {
   text-align: right;
+  margin: auto;
 }
 
 
@@ -561,10 +572,11 @@ export default Search;
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 350px);
+  justify-content: space-around;
+  grid-template-columns: repeat(auto-fill, 375px);
   grid-column-gap: 2em;
 
-  margin: 50px auto auto 0;
+  margin: 50px auto auto auto;
 }
 
 .grid-item {
@@ -572,7 +584,7 @@ export default Search;
   font-size: 30px;
   text-align: left;
   margin: 10px;
-  width: 350px;
+  max-width: 350px;
 }
 
 .grid-image {
@@ -593,6 +605,16 @@ export default Search;
 }
 
 /* ===== ===== ===== */
+
+#catalogue-options {
+  display: flex;
+  margin-bottom: 1em;
+}
+
+#grid-pagination {
+  margin: auto 0 auto auto;
+  display: flex;
+}
 
 .switch {
   position: relative;
@@ -661,6 +683,51 @@ th {
 
 .actionButton {
   text-align: left;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 900px) {
+  #catalogue-options {
+    flex-direction: column;
+  }
+
+  #grid-pagination {
+    margin: 1em auto 0 0;
+  }
+
+}
+
+@media screen and (max-width: 625px) {
+  .main {
+    width: 95%;
+  }
+
+  #header-container {
+    flex-direction: column;
+    margin: auto;
+  }
+
+  #page-title {
+    margin: auto;
+  }
+
+  #header-menu {
+    margin: 2em auto 0 auto;
+    justify-content: space-evenly;
+  }
+
+  .header-button {
+    min-width: 0;
+    margin: 0 4px;
+  }
+
+  #sort-container {
+    flex-direction: column;
+  }
+
+  .switch-container {
+    margin: 1em auto;
+  }
 }
 
 </style>
