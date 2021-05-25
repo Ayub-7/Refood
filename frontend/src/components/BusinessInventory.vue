@@ -148,8 +148,9 @@ export default {
 
   mounted() {
     this.getSession();
-    this.getProducts(this.$route.params.id);
     this.getBusinessInventory();
+    this.getProducts(this.$route.params.id);
+
   },
 
   methods: {

@@ -179,7 +179,7 @@ export default {
         timestamp = Date.parse(this.invenForm.manufactureDate);
         dateObject = new Date(timestamp)
         if (dateInFuture(dateObject, today) === true) {
-          this.errors.push('past-date');
+          this.errors.push('future-date');
           this.errors.push('future-manu');
         }
       }
