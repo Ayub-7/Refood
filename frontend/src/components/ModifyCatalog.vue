@@ -100,6 +100,8 @@ const ModifyCatalog = {
      */
 
     checkForm: function() {
+      //Should have constants for max values
+
       var invalidChars = /[^a-zA-Z/ -\d]/i;
       //var isValidName = !(invalidChars.test(this.productName));
       //var isValidID = !(invalidChars.test(this.productId));
@@ -118,7 +120,7 @@ const ModifyCatalog = {
         this.errors.push(this.productName);
       }
 
-      if (this.productName.length > 25) {
+      if (this.productName.length > 50) {
         this.errors.push("long-name");
       }
 
@@ -174,21 +176,21 @@ const ModifyCatalog = {
       if (this.errors.includes('long-desc')) {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
-          text: 'Description is too long (70 characters MAX).',
+          text: 'Description is too long (200 characters MAX).',
           color: 'danger'
         });
       }
       if (this.errors.includes('long-name')) {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
-          text: 'Name is too long (15 characters MAX).',
+          text: 'Name is too long (50 characters MAX).',
           color: 'danger'
         });
       }
       if (this.errors.includes('long-id')) {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
-          text: 'ID is too long (17 characters MAX).',
+          text: 'ID is too long (20 characters MAX).',
           color: 'danger'
         });
       }
