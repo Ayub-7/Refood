@@ -4,22 +4,10 @@ import Vuesax from 'vuesax';
 import api from "../Api";
 import axios from "axios";
 
-const localVue = createLocalVue();
-localVue.use(Vuesax);
-
 let wrapper;
 
-let $log = {
-    error: jest.fn(),
-    debug: jest.fn(),
-}
-
-axios.get = jest.fn(() => {
-   return Promise.resolve({data: [{
-        currencies: [{symbol: "€"}],
-       }]}
-   );
-});
+const localVue = createLocalVue();
+localVue.use(Vuesax);
 
 let listingData = [
     {
@@ -71,10 +59,23 @@ let listingData = [
     }
 ]
 
+axios.get = jest.fn(() => {
+   return Promise.resolve({data: [{
+        currencies: [{symbol: "€"}],
+       }]}
+   );
+});
+
+
 jest.mock("../Api.js", () => jest.fn);
 api.getBusinessListings = jest.fn(() => {
     return Promise.resolve({data: listingData, status: 200});
 });
+
+let $log = {
+    error: jest.fn(),
+    debug: jest.fn(),
+}
 
 beforeEach(() => {
     wrapper = mount(BusinessListings, {
