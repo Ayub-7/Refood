@@ -129,8 +129,7 @@ describe('New sale listing modal tests', () => {
 
     test("Form autocomplete calculates product attribute fields", () => {
         let invItem = mockInventory[0];
-        wrapper.vm.invItem = invItem;
-        wrapper.vm.changeInvVals();
+        wrapper.vm.openNewListingModal(invItem);
 
         expect(wrapper.vm.price).toBe(invItem.pricePerItem);
         expect(wrapper.vm.listingQuantityMax).toBe(invItem.quantity);
