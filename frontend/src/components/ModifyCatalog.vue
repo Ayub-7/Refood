@@ -1,4 +1,5 @@
 <template>
+<!-- THIS SHOULD BE USED AS A COMPONENT INSTEAD OF A WHOLE PAGE, THIS NEEDS TO BE TURNED INTO A MODAL ON THE PRODUCT CATALOGUE PAGE -->
   <div class="card">
     <h3 class="card-header">Modify Catalog Product</h3>
     <form>
@@ -77,6 +78,7 @@ const ModifyCatalog = {
   components: {CurrencyInput},
   data: function () {
     return {
+      product: null,
       user: null,
       errors: [],
       productName: "",
@@ -90,17 +92,7 @@ const ModifyCatalog = {
     };
   },
   methods: {
-    /**
-     * function adds prefilled values for modifying product
-     */
 
-    presetValues: function() {
-      this.productId = store.productToAlterId;
-      this.productName = store.productToAlterName;
-      this.manufacturer = store.productToAlterManufacturer;
-      this.description = store.productToAlterDescription;
-      this.rrp = store.productToAlterRRP;
-    },
     /**
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * The function also updates the errors list that will be displayed on the page if at least one of the input boxes
@@ -108,6 +100,8 @@ const ModifyCatalog = {
      */
 
     checkForm: function() {
+      //Should have constants for max values
+
       var invalidChars = /[^a-zA-Z/ -\d]/i;
       //var isValidName = !(invalidChars.test(this.productName));
       //var isValidID = !(invalidChars.test(this.productId));
@@ -126,7 +120,7 @@ const ModifyCatalog = {
         this.errors.push(this.productName);
       }
 
-      if (this.productName.length > 28) {
+      if (this.productName.length > 50) {
         this.errors.push("long-name");
       }
 
@@ -134,7 +128,7 @@ const ModifyCatalog = {
         this.errors.push(this.productId);
       }
 
-      if (this.productId.length > 17) {
+      if (this.productId.length > 20) {
         this.errors.push("long-id");
       }
 
@@ -142,7 +136,7 @@ const ModifyCatalog = {
         this.errors.push('no-desc');
       }
 
-      if (this.description.length > 70) {
+      if (this.description.length > 200) {
         this.errors.push('long-desc');
       }
 
@@ -182,21 +176,21 @@ const ModifyCatalog = {
       if (this.errors.includes('long-desc')) {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
-          text: 'Description is too long (70 characters MAX).',
+          text: 'Description is too long (200 characters MAX).',
           color: 'danger'
         });
       }
       if (this.errors.includes('long-name')) {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
-          text: 'Name is too long (15 characters MAX).',
+          text: 'Name is too long (50 characters MAX).',
           color: 'danger'
         });
       }
       if (this.errors.includes('long-id')) {
         this.$vs.notify({
           title: 'Failed to create catalogue item',
-          text: 'ID is too long (17 characters MAX).',
+          text: 'ID is too long (20 characters MAX).',
           color: 'danger'
         });
       }
@@ -216,9 +210,8 @@ const ModifyCatalog = {
       //Use creatItem function of API to POST user data to backend
       //https://www.npmjs.com/package/json-server
       if(this.errors.length === 0){
-        var RRPUSD = this.convertRRPtoUSD(this.rrp);
-
-        api.modifyProduct(store.actingAsBusinessId, store.productToAlterId, this.productId, this.productName, this.description, this.manufacturer, RRPUSD)
+        // var RRPUSD = this.convertRRPtoUSD(this.rrp);
+        api.modifyProduct(this.$route.params.id, this.$route.params.productId , this.productId, this.productName, this.description, this.manufacturer, this.rrp)
             .then((response) => {
               this.$log.debug("catalogue item modified:", response.data);
               this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
@@ -227,15 +220,39 @@ const ModifyCatalog = {
             if(error.response.status === 400){
               this.$vs.notify({title:'Failed to modify catalogue item', text:'Product ID is already in use', color:'danger'});
             }
-            console.log(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         });
       }
     },
 
+    /**
+     * Calls API getBusinessProducts, filters to get product from route, then sets prefilled values to be the products values
+     */
+
+    getProduct: function() {
+      api.getBusinessProducts(this.$route.params.id)
+      .then((response) => {
+        this.product = response.data.filter(x => x.id == this.$route.params.productId)[0] //Get product that matches id in route param
+        if (this.product == null) {
+          this.$router.push({path: `/businesses/${this.$route.params.id}/products`})
+        }
+        this.productId = this.product.id;
+        this.productName = this.product.name;
+        this.manufacturer = this.product.manufacturer;
+        this.description = this.product.description;
+        this.rrp = this.product.recommendedRetailPrice
+      }).catch((err) => {
+        if (err.response.status === 401) {
+          this.$router.push({name: 'LoginPage'});
+        } else {
+          this.$log.error("Couldn't get product to preload values" + err);
+        }
+      })
+    },
+
     cancel: function(){
-      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
+      this.$router.push({path: `/businesses/${this.$route.params.id}/products`});
     },
 
     getUserInfo: function (userId) {
@@ -277,6 +294,7 @@ const ModifyCatalog = {
       api.checkSession()
           .then((response) => {
             this.getUserInfo(response.data.id);
+            this.getProduct();
           })
           .catch((error) => {
             this.$log.error("Error checking sessions: " + error);
@@ -284,14 +302,15 @@ const ModifyCatalog = {
           });
     },
     convertRRPtoUSD: function (rrp) {
-      console.log(this.currencyMultiplier*rrp + " " + this.currencyMultiplier);
 
       return this.currencyMultiplier*rrp;
     }
   },
-  mounted: function () {
+  mounted() {
+
     this.checkUserSession();
-    this.presetValues();
+    
+    // this.presetValues();
   }
 }
 export default ModifyCatalog;

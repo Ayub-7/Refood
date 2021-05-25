@@ -17,6 +17,15 @@ localVue.use(Vuesax);
 //     notify: jest.fn()
 // }
 
+
+// Mocking $route
+const $route = {
+    params: {
+        id: 1,
+        productId: 'test'
+    }
+};
+
 store.loggedInUserId = 5;
 
 //Mock user
@@ -41,12 +50,16 @@ let $log = {
 beforeEach(() => {
     wrapper = shallowMount(ModifyCatalogue, {
         propsData: {},
-        mocks: {store, $log},
+        mocks: {store, $log, $route},
         stubs: ['router-link', 'router-view'],
         methods: {},
         // components: CurrencyInput,
         localVue,
     });
+
+    let getProduct = jest.spyOn(ModifyCatalogue.methods, 'getProduct');
+
+    getProduct.mockImplementation(() => {})
 
     const checkSessionMethod = jest.spyOn(ModifyCatalogue.methods, 'checkUserSession');
     checkSessionMethod.mockImplementation(() => {

@@ -135,7 +135,7 @@ public class ProductController {
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
-                    productRepository.updateProduct(req.getId(), req.getName(), req.getDescription(), req.getRecommendedRetailPrice(), productId);
+                    productRepository.updateProduct(req.getId(), req.getName(), req.getDescription(), req.getRecommendedRetailPrice(), req.getManufacturer(), productId);
                     return ResponseEntity.status(HttpStatus.OK).build();
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);

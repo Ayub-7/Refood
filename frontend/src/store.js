@@ -100,12 +100,4 @@ export const mutations = {
         store.actingAsBusinessName = null;
     },
 
-    setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
-        store.productToAlterId = productId;
-        store.productToAlterName = productName;
-        store.productToAlterRRP = productRecommendedRetailPrice;
-        store.productToAlterManufacturer = productManufacturer;
-        store.productToAlterDescription = productDescription;
-    }
-
 }
