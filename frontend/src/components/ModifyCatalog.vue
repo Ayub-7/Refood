@@ -226,16 +226,14 @@ const ModifyCatalog = {
 
     /**
      * Calls API getBusinessProducts, filters to get product from route, then sets prefilled values to be the products values
-     * @param businessId id of business, usually retrieved from route parameters
-     * @param productId id of product, usually retrieved from route parameters
      */
 
-    getProduct(businessId, productId) {
-      api.getBusinessProducts(businessId)
+    getProduct: function() {
+      api.getBusinessProducts(this.$route.params.id)
       .then((response) => {
-        this.product = response.data.filter(x => x.id == productId)[0] //Get product that matches id in route param
+        this.product = response.data.filter(x => x.id == this.$route.params.productId)[0] //Get product that matches id in route param
         if (this.product == null) {
-          this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`})
+          this.$router.push({path: `/businesses/${this.$route.params.id}/products`})
         }
         this.productId = this.product.id;
         this.productName = this.product.name;
@@ -243,11 +241,7 @@ const ModifyCatalog = {
         this.description = this.product.description;
         this.rrp = this.product.recommendedRetailPrice
       }).catch((err) => {
-        if(err.response.status == 401) {
-          this.$router.push({name:'LoginPage'});
-        } else {
-          this.$log.error("Couldnt preload productInformation");
-        }
+        console.log(err);
       })
     },
 
@@ -306,8 +300,9 @@ const ModifyCatalog = {
     }
   },
   mounted() {
+
     this.checkUserSession();
-    this.getProduct(this.$route.params.id, this.$route.params.productId);
+    this.getProduct();
     
     // this.presetValues();
   }
