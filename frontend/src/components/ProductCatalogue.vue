@@ -261,7 +261,6 @@ const Search = {
 
   methods: {
     isDevelopment() {
-      console.log(process.env.NODE_ENV)
       return (process.env.NODE_ENV === 'development')
     },
 
@@ -296,10 +295,8 @@ const Search = {
      **/
     getImgUrl(product) {
       if (product === true && process.env.NODE_ENV !== 'staging') {
-        console.log('prod');
         return '/prod/ProductShoot.jpg';
       } else if (product === true) {
-        console.log('test');
         return '/test/ProductShoot.jpg';
       } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
@@ -308,7 +305,6 @@ const Search = {
       } else if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString().replace("\\", "/")
       } else {
-        console.log('should be');
         return '../../public/ProductShoot.jpg'
       }
     },
