@@ -91,7 +91,7 @@ describe('Add To Catalogue form error checking', () => {
     test('Handles empty Register', () => {
         const addBtn = wrapper.find('.add-button');
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(5);
+        expect(wrapper.vm.errors.length).toBe(4);
     });
 
     test('Handles no product name', () => {
@@ -142,7 +142,7 @@ describe('Add To Catalogue form error checking', () => {
         expect(wrapper.vm.errors.length).toBe(1);
     });
 
-    test('Handles no description, manufacturer', () => {
+    test('Handles no manufacturer', () => {
         wrapper.vm. productName = "Big Tyre";
         wrapper.vm.productId = "BB";
         wrapper.vm.description = "";
@@ -151,7 +151,7 @@ describe('Add To Catalogue form error checking', () => {
 
         const addBtn = wrapper.find('.add-button')
         addBtn.trigger('click');
-        expect(wrapper.vm.errors.length).toBe(2);
+        expect(wrapper.vm.errors.length).toBe(1);
     });
 });
 
