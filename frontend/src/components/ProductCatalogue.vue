@@ -12,8 +12,20 @@
         <vs-divider></vs-divider>
 
         <div id="catalogue-options">
+          <div class="switch-container">
+            <div class="title" style="margin-top: 5px; margin-right: 10px">
+              <p v-if="displaytype">Grid</p>
+              <p v-if="!displaytype">List</p>
+            </div>
+
+            <label class="switch">
+              <input v-model="displaytype" type="checkbox" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+
           <div id="sort-container">
-            <div style="display: flex;">
+            <div v-show="displaytype" style="display: flex;">
               <h2 style="margin: auto; padding-right: 4px;">Sort By </h2>
               <select v-model="selected">
                 <option disabled value="">Please select one</option>
@@ -24,18 +36,6 @@
                 <option value="created">Date Created</option>
               </select>
               <vs-button @click="sortByName(null, selected, 0);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
-            </div>
-
-           <div class="switch-container">
-              <div class="title" style="margin-top: 5px; margin-right: 10px">
-                <p v-if="displaytype">Grid</p>
-                <p v-if="!displaytype">List</p>
-              </div>
-
-              <label class="switch">
-                <input v-model="displaytype" type="checkbox" checked>
-                <span class="slider round"></span>
-              </label>
             </div>
           </div>
 
@@ -210,23 +210,19 @@ const Search = {
 
   data: function() {
     return {
-      errors: [],
-      toggle: [1,1,1,1,1],
-      searchbar: "",
-      searchbarResults: "",
       products: [],
-      filteredproducts: [],
-      reducedproducts: [],
-      enableTable: false,
-      resultTrack: "",
-      productSearchIndexMin: 0,
-      productSearchIndexMax: 12,
       business: null,
       businessId: null,
+
+      errors: [],
+      toggle: [1,1,1,1,1],
+      filteredproducts: [],
+      enableTable: false,
+      productSearchIndexMin: 0,
+      productSearchIndexMax: 12,
       displaytype: true,
       currencySymbol: "",
       selected: "",
-      componentKey: 0,
 
       selectedProduct: null, // Used to select product to upload image to.
     };
@@ -354,33 +350,6 @@ const Search = {
     },
 
     /**
-     * Searches for the products in the database by calling the API function with an SQL query to find the
-     * products based on the input in the search box.
-     */
-    searchProducts: function () {
-      this.productSearchIndexMin = 0;
-      this.productSearchIndexMax = 10;
-      if (this.searchbar.length > 0) {
-        this.enableTable = true;
-        this.resultTrack = this.searchbar;
-        api
-            .searchQuery(this.searchbar)
-            .then((response) => {
-              this.$log.debug("Data loaded: ", response.data);
-              this.products = response.data;
-              this.filteredproducts = response.data;
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-              this.error = "Failed to load products";
-            })
-            .finally(() => (this.loading = false));
-      } else {
-        this.errors.push("Please enter input the product you want to search for");
-      }
-    },
-
-    /**
      * makes the checkproduct an administrator
      * if they are already, revoke privledges...
      */
@@ -401,6 +370,7 @@ const Search = {
      * @param index references the toggle state list in the data object (int)
      */
     sortByName: function (event, JSONField) {
+
       const indexarray = ["id", "name", "description", "recommendedRetailPrice", "created"];
 
       //toggles the classlist (arrow up or down) in the child DOM element: <i/>
@@ -457,18 +427,6 @@ const Search = {
             this.toggle[index]=1;
           }
         }
-      }
-    },
-
-    /**
-     * Filters the SQL query results to be displayed on this webpage.
-     */
-    filterproducts: function () {
-      if (this.searchbar && this.resultTrack == this.searchbar) {
-        this.filteredproducts = this.products.filter((item) => {
-          return (item.firstName + " " + item.middleName + " " + item.lastName).includes(this.searchbar) || (item.firstName + " " + item.lastName).includes(this.searchbar);
-        });
-
       }
     },
 
@@ -583,6 +541,7 @@ export default Search;
 
 .switch-container {
   display: flex;
+  margin-right: 2em;
 }
 
 .header-button {
