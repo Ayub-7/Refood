@@ -12,7 +12,7 @@
         <div class="row">
           <label for="pricePerItem">Price per item</label>
           <vs-input
-              :danger="(errors.includes(invenForm.pricePerItem))"
+              :danger="(errors.includes('pricePerItem'))"
               danger-text="Price per item must be greater than zero and numeric."
               class="inputx"
               id="pricePerItem"
@@ -114,8 +114,8 @@ export default {
         this.errors.push("invalid-chars");
       }
 
-      if((typeof this.invenForm.pricePerItem) !== "number") {
-        this.errors.push(this.invenForm.pricePerItem);
+      if(isNaN(this.invenForm.pricePerItem)) {
+        this.errors.push('pricePerItem');
       }
 
       var dateInPast = function(firstDate, secondDate) {
@@ -147,7 +147,7 @@ export default {
         this.errors.push(this.invenForm.prodId);
       }
       if (this.invenForm.pricePerItem <= 0.0) {
-        this.errors.push(this.invenForm.pricePerItem);
+        this.errors.push('pricePerItem');
       }
       if (this.invenForm.bestBefore !== '') {
         var timestamp = Date.parse(this.invenForm.bestBefore);
