@@ -55,6 +55,7 @@ public class InventoryControllerTests {
     private Business business;
     private Product product1;
     private Inventory inventory1;
+    private Inventory existingInventoryItem;
 
 
     @BeforeEach
@@ -87,6 +88,9 @@ public class InventoryControllerTests {
         Date beforeDate = beforeCalendar.getTime();
 
         inventory1 = new Inventory("07-4957066", 1, 1, 2.0, 5.0, beforeDate, laterDate, laterDate, laterDate);
+
+        existingInventoryItem = new Inventory("07-4957066", 1, 20, 2.0, 5.0, beforeDate, laterDate, laterDate, laterDate);
+        inventoryRepository.save(existingInventoryItem);
 
         assertThat(business.getAdministrators().size()).isEqualTo(2);
     }
@@ -275,6 +279,165 @@ public class InventoryControllerTests {
                 .andExpect(status().isBadRequest());
 
     }
+
+
+    //
+    //// INVENTORY PUT TESTS
+    //
+
+    @Test
+    public void testNoAuthPutInventory() throws Exception {
+        mvc.perform(put("/businesses/{businessId}/inventory/{productId}", business.getId(), existingInventoryItem.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testForbiddenUserPutInventory() throws Exception {
+        User forbiddenUser = new User("email@email.com", "password", Role.USER);
+
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+
+        //Have as param in here since the request object is null in the test
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+
+        Mockito.when(inventoryRepository.findInventoryById(0)).thenReturn(existingInventoryItem);
+
+        mvc.perform(put("/businesses/{businessId}/inventory/{productId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbiddenUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutInventoryAsGlobalAdmin() throws Exception {
+        User DGAAUser = new User("email@email.com", "password", Role.DGAA);
+        User GAAUser = new User("email2@email.com", "password", Role.GAA);
+
+
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+
+        //Have as param in here since the request object is null in the test
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+
+        Mockito.when(inventoryRepository.findInventoryById(0)).thenReturn(existingInventoryItem);
+
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, DGAAUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, GAAUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testSuccessfulPutInventoryAsBusinessAdmin() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+
+        //Have as param in here since the request object is null in the test
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+
+        Mockito.when(inventoryRepository.findInventoryById(0)).thenReturn(existingInventoryItem);
+
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isOk());
+
+        User businessSecondaryAdmin = new User("email@email.com", "password", Role.USER);
+        business.getAdministrators().add(businessSecondaryAdmin);
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, businessSecondaryAdmin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutWithNoExpiry() throws Exception {
+        inventory1.setExpires(null);
+
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        //Have as param in here since the request object is null in the test
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+        Mockito.when(inventoryRepository.findInventoryById(0)).thenReturn(existingInventoryItem);
+
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutWithExpiryOnly() throws Exception {
+        inventory1.setBestBefore(null);
+        inventory1.setManufactured(null);
+        inventory1.setSellBy(null);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        //Have as param in here since the request object is null in the test
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+        Mockito.when(inventoryRepository.findInventoryById(0)).thenReturn(existingInventoryItem);
+
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutWithNoQuantity() throws Exception {
+        inventory1.setQuantity(0);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        //Have as param in here since the request object is null in the test
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+        Mockito.when(inventoryRepository.findInventoryById(0)).thenReturn(existingInventoryItem);
+
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isBadRequest());
+
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    public void testPutWithNegativeTotalPrice() throws Exception {
+        inventory1.setTotalPrice(-1);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        //Have as param in here since the request object is null in the test
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+        Mockito.when(inventoryRepository.findInventoryById(0)).thenReturn(existingInventoryItem);
+
+        mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isBadRequest());
+
+    }
+
+
 
 
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewInventoryRequest;
 
+import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ProductRepository;
@@ -99,7 +100,37 @@ public class InventoryController {
                 }
             }
         }
+    }
 
 
+
+    @PutMapping("/businesses/{businessId}/inventory/{inventoryId}")
+    public ResponseEntity<String> putInventory(@PathVariable("businessId") long businessId, @PathVariable("inventoryId") long inventoryId, @RequestBody NewInventoryRequest req, HttpSession session) {
+        Business business = businessRepository.findBusinessById(businessId);
+        Inventory inventoryItem = inventoryRepository.findInventoryById(inventoryId);
+        Product product = productRepository.findProductByIdAndBusinessId(req.getProductId(), businessId);
+
+        if (business == null || inventoryItem == null || product == null) { // Business or product does not exist
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } else {
+            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else { // User is authorized
+                try {
+                    Inventory newInventoryItem = new Inventory(req, businessId);
+
+                    //Replace current entity properties with new properites then save into repository
+                    inventoryItem.replaceInventoryItem(newInventoryItem);
+                    inventoryRepository.save(inventoryItem);
+
+                    return ResponseEntity.status(HttpStatus.OK).build();
+                } catch (ValidationException e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+            }
+        }
     }
 }
