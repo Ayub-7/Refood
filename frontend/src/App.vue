@@ -93,7 +93,6 @@ import Login from "./components/Login";
 import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
 import AddToCatalogue from "@/components/AddToCatalogue";
-import CurrencyInput from "@/components/CurrencyInput";
 import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
@@ -108,7 +107,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue, CurrencyInput
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue,
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods

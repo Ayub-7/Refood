@@ -59,14 +59,13 @@
 </template>
 
 <script>
-import CurrencyInput from "../components/CurrencyInput";
 import api from "../Api";
 import axios from "axios";
 import {store} from "../store";
 
 const AddToCatalogue = {
   name: "AddToCatalogue",
-  components: {CurrencyInput},
+
   data: function () {
     return {
       user: null,
@@ -230,7 +229,7 @@ Card styling.
   background-color: white;
   margin: 1em auto;
   padding: 0.5em 0 0.5em 0;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }

@@ -28,16 +28,17 @@
     <!-- ===== GRID VIEW ===== -->
     <div v-if="!tableView" id="grid-view">
       <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
-        <div style="margin: 2px 4px; font-size: 12px; font-weight: bold">{{ listing.productName }}</div>
-        <div class="listing-header">
+
+        <div slot="media">
           <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
           <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
           <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
           <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment() != true" class="image" :src="getImgUrl(true)"/>
-          <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
-            <div>{{ currencySymbol }}{{ listing.price }}</div>
-            <div>{{ listing.quantity }}x</div>
-          </div>
+        </div>
+        <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.productName }}</div>
+        <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
+          <div>{{ currencySymbol }}{{ listing.price }}</div>
+          <div>{{ listing.quantity }}x</div>
         </div>
 
         <div style="font-size: 12px"> Closes: {{ listing.closes }}</div>
@@ -69,9 +70,9 @@
         <template slot-scope="{data}">
           <vs-tr v-for="listing in data" :key="listing.id">
             <vs-td>
-              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
-              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
-              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
+              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
+              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="table-image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
+              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg"/>
               <img alt="Product Image" v-if="isDevelopment() !== true && !listing.inventoryItem.product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
             </vs-td>
             <vs-td>{{ listing.productName }}</vs-td>
@@ -226,10 +227,11 @@ export default {
     margin: auto auto 0 auto;
   }
 
-  .image {
-    min-width: 50px;
-    max-width: 50px;
-    max-height: 50px;
+  .table-image {
+    min-width: 75px;
+    max-width: 75px;
+    height: 75px;
+    object-fit: cover;
 
     border-radius: 4px;
     margin: 0 0 auto 0;
@@ -250,15 +252,18 @@ export default {
 
   .listing-card {
     width: 225px;
-    height: 225px;
+    height: 400px;
     margin: 0.5em 1em;
   }
 
-  .listing-header {
-    display: flex;
-    justify-content: flex-start;
-    padding: 4px 0 0 0;
+  .image {
+    height: 150px;
+    object-fit: cover;
+
+    border-radius: 4px;
+    margin: 0 0 auto 0;
   }
+
 
   .grid-card-footer {
     font-size: 12px;
