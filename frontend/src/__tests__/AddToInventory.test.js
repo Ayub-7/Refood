@@ -81,7 +81,7 @@ describe('Component', () => {
     test('Invalid PricePerItem error', () => {
         wrapper.vm.invenForm.pricePerItem = 'B';
         wrapper.vm.checkForm();
-        expect(wrapper.vm.errors.includes(wrapper.vm.invenForm.pricePerItem)).toBeTruthy();
+        expect(wrapper.vm.errors.includes('pricePerItem')).toBeTruthy();
     });
 
     test('No date error', () => {
