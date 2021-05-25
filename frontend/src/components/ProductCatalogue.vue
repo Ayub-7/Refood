@@ -60,8 +60,8 @@
               <div slot="media">
                 <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                 <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-                <img alt="Product Image" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
-                <img alt="Product Image" v-if="isDevelopment() != true && !product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
+                <img v-if="!product.primaryImagePath && isDevelopment()" class="grid-image" src="ProductShoot.jpg"/>
+                <img v-if="!isDevelopment() && !product.primaryImagePath" class="grid-image" :src="getImgUrl(true)"/>
               </div>
 
               <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
@@ -141,8 +141,8 @@
                       <div>
                         <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                         <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)"/>
-                        <img alt="Product Image" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
-                        <img alt="Product Image" v-if="isDevelopment() !== true && !product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
+                        <img v-if="!product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg"/>
+                        <img v-if="!isDevelopment() && !product.primaryImagePath" class="table-image" :src="getImgUrl(true)"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -261,6 +261,7 @@ const Search = {
 
   methods: {
     isDevelopment() {
+      console.log(process.env.NODE_ENV)
       return (process.env.NODE_ENV === 'development')
     },
 
@@ -295,8 +296,10 @@ const Search = {
      **/
     getImgUrl(product) {
       if (product === true && process.env.NODE_ENV !== 'staging') {
+        console.log('prod');
         return '/prod/ProductShoot.jpg';
       } else if (product === true) {
+        console.log('test');
         return '/test/ProductShoot.jpg';
       } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
@@ -305,6 +308,7 @@ const Search = {
       } else if (product.primaryImagePath != null) {
         return product.primaryImagePath.toString().replace("\\", "/")
       } else {
+        console.log('should be');
         return '../../public/ProductShoot.jpg'
       }
     },
