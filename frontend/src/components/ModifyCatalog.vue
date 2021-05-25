@@ -240,7 +240,7 @@ const ModifyCatalog = {
         this.manufacturer = this.product.manufacturer;
         this.description = this.product.description;
         this.rrp = this.product.recommendedRetailPrice
-      }).catch(() => {
+      }).catch((err) => {
         if (err.response.status === 401) {
           this.$router.push({name: 'LoginPage'});
         } else {
