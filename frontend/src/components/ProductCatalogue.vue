@@ -420,7 +420,7 @@ const Search = {
 
         let index = indexarray.indexOf(JSONField);
 
-        if (index > 0) {
+        if (index >= 0) {
           if (this.toggle[index]) {
             this.filteredproducts.reverse();
             this.toggle[index]=0;
