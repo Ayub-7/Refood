@@ -66,13 +66,13 @@
 
               <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
                 <div style="display: flex; flex-direction: column; justify-content: space-between">
-                  <div style="font-size: 16px; font-weight: bold;  text-align: justify;">{{ product.name }} </div>
+                  <div style="font-size: 16px; font-weight: bold;  text-align: justify; word-break: break-all;">{{ product.name }} </div>
                   <p>{{ product.id }}</p>
                 </div>
                 <vs-divider></vs-divider>
                 <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
                 <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
-                <div style="height: 75px; font-size: 14px; overflow-y: auto;">{{ product.description }} </div>
+                <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
               </div>
 
               <div slot="footer" class="grid-item-footer">
@@ -80,8 +80,7 @@
                 <vs-dropdown vs-trigger-click class="actionButton">
                   <vs-button style="width: fit-content;" type="flat">Actions</vs-button>
                   <vs-dropdown-menu>
-                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
-                          product.manufacturer, product.description)">
+                    <vs-dropdown-item @click="goToModify(product.id);">
                       Modify product
                     </vs-dropdown-item>
                     <vs-dropdown-item @click="openImageUpload(product)">
@@ -155,8 +154,7 @@
                       <vs-dropdown vs-trigger-click>
                         <vs-button>Actions</vs-button>
                         <vs-dropdown-menu>
-                          <vs-dropdown-item id="modify-dropdown" @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
-                          product.manufacturer, product.description)">
+                          <vs-dropdown-item id="modify-dropdown" @click="goToModify(product.id);">
                             Modify product
                           </vs-dropdown-item>
                           <vs-dropdown-item @click="openImageUpload(product)">
@@ -204,7 +202,7 @@
 
 <script>
 import api from "../Api";
-import {store, mutations} from "../store";
+import {store} from "../store";
 import axios from "axios";
 
 const Search = {
@@ -345,14 +343,11 @@ const Search = {
       return store.actingAsBusinessName
     },
 
-    //sets the product to alter id
-    setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
-      mutations.setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription);
-    },
 
     //modifies selected catalog item
-    goToModify: function () {
-      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/modify`})
+    goToModify (productId) {
+      console.log(productId)
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`})
     },
 
     /**
