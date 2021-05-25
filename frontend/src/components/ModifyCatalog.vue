@@ -240,8 +240,12 @@ const ModifyCatalog = {
         this.manufacturer = this.product.manufacturer;
         this.description = this.product.description;
         this.rrp = this.product.recommendedRetailPrice
-      }).catch((err) => {
-        console.log(err);
+      }).catch(() => {
+        if (err.response.status === 401) {
+          this.$router.push({name: 'LoginPage'});
+        } else {
+          this.$log.error("Couldn't get product to preload values" + err);
+        }
       })
     },
 
@@ -288,6 +292,7 @@ const ModifyCatalog = {
       api.checkSession()
           .then((response) => {
             this.getUserInfo(response.data.id);
+            this.getProduct();
           })
           .catch((error) => {
             this.$log.error("Error checking sessions: " + error);
@@ -302,7 +307,6 @@ const ModifyCatalog = {
   mounted() {
 
     this.checkUserSession();
-    this.getProduct();
     
     // this.presetValues();
   }
