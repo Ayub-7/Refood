@@ -160,6 +160,15 @@ describe('UI tests', () => {
        expect(items.length).toBe(mockProducts.length);
    });
 
+    test('uploadImage is called when new file uploaded', async () => {
+        wrapper.vm.uploadImage = jest.fn();
+
+        expect(wrapper.find('#fileUpload').exists()).toBe(true);
+        await wrapper.find('#fileUpload').trigger('change');
+
+        expect(wrapper.vm.uploadImage).toBeCalled();
+    });
+
 });
 
 
@@ -188,6 +197,4 @@ describe('Functionality tests', () => {
         url = wrapper.vm.getImgUrl(emptyProduct);
         expect(url).toBe('../../public/ProductShoot.jpg');
     });
-
-
 });

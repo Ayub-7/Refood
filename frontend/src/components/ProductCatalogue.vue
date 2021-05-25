@@ -5,7 +5,6 @@
           <div id="page-title">Product Catalogue</div>
           <div id="header-menu">
             <vs-button class="header-button" :to="{path: `/addtocatalogue`}">Add Product</vs-button>
-            <ImageUpload :businessId=businessId :products=products class="header-button" />
             <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button" style="margin-right: 0;">Inventory</vs-button>
           </div>
         </div>
@@ -51,7 +50,6 @@
         </div>
 
 
-
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
             <vs-card class="grid-item"
@@ -72,8 +70,8 @@
                 </div>
                 <vs-divider></vs-divider>
                 <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
-                <p style="font-size: 14px; margin-bottom: 20px;">Created: {{ product.created }} </p>
-                <div style="height: 75px; font-size: 14px">{{ product.description }} </div>
+                <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
+                <div style="height: 75px; font-size: 14px; overflow-y: auto;">{{ product.description }} </div>
               </div>
 
               <div slot="footer" class="grid-item-footer">
@@ -84,6 +82,9 @@
                     <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
                           product.manufacturer, product.description)">
                       Modify product
+                    </vs-dropdown-item>
+                    <vs-dropdown-item @click="openImageUpload(product)">
+                      Add Image
                     </vs-dropdown-item>
                     <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                       <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
@@ -114,7 +115,7 @@
                   <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
                   </vs-th >
-                  <vs-th sort-key="name">
+                  <vs-th sort-key="name" style="min-width: 100px">
                      <div>Product Name</div>
                   </vs-th>
                   <vs-th sort-key="description">
@@ -137,9 +138,9 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 4px;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                        <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 4px;" v-bind:src="getImgUrl(product)"/>
-                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;  border-radius: 4px;" src="ProductShoot.jpg"/>
+                        <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)"/>
+                        <img v-if="!product.primaryImagePath" class="table-image" src="ProductShoot.jpg"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -156,13 +157,14 @@
                           product.manufacturer, product.description)">
                             Modify product
                           </vs-dropdown-item>
-
+                          <vs-dropdown-item @click="openImageUpload(product)">
+                            Add Image
+                          </vs-dropdown-item>
                           <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
                                 {{pImage.name}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
-
                           <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
                                 {{pImage.name}}
@@ -194,21 +196,18 @@
     <footer>
       "Product shoot" by Aameerule is licensed under CC BY 2.0
     </footer>
+    <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
   </vs-card>
 </template>
 
 <script>
 import api from "../Api";
 import {store, mutations} from "../store";
-import ImageUpload from "./ImageUpload";
 import axios from "axios";
 
 const Search = {
   name: "Search",
 
-  components: {
-    ImageUpload
-  },
   data: function() {
     return {
       errors: [],
@@ -226,9 +225,10 @@ const Search = {
       businessId: null,
       displaytype: true,
       currencySymbol: "",
-      currencyCode: "",
       selected: "",
       componentKey: 0,
+
+      selectedProduct: null, // Used to select product to upload image to.
     };
   },
 
@@ -290,6 +290,11 @@ const Search = {
       });
     },
 
+    /**
+     * Retrieves the image url link for the given product.
+     * @param product the product to retrieve the image for.
+     * @return a string link to the product image, or the default image if it doesn't have a product.
+     **/
     getImgUrl(product) {
       if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
@@ -316,11 +321,15 @@ const Search = {
       }
     },
 
+    /**
+     * Calls the third-party RESTCountries API to retrieve currency information based on user home country.
+     * Sets the currency symbol view to the retrieved data.
+     * @param country the country to obtain the currency symbol from.
+     **/
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
           .then( response => {
             this.currencySymbol = response.data[0].currencies[0].symbol;
-            this.currencyCode = response.data[0].currencies[0].code;
           }).catch( err => {
         console.log("Error with getting cities from REST Countries." + err);
       });
@@ -375,7 +384,6 @@ const Search = {
      * makes the checkproduct an administrator
      * if they are already, revoke privledges...
      */
-
     toggleAdmin: function (currentproduct) {
       if (currentproduct.role == 'product') {
         //currentproduct.id = true;
@@ -464,8 +472,6 @@ const Search = {
       }
     },
 
-
-
     /**
      * Helper function to control the number of search range values.
      * It increments Minimum and Maximum search index by 10 as long as the maximum search index does not exceed
@@ -491,6 +497,44 @@ const Search = {
         let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
         this.productSearchIndexMin -= minMaxDiff;
         this.productSearchIndexMax -= minMaxDiff;
+      }
+    },
+
+    /**
+     * Trigger the file upload box to appear.
+     * Used for when the actions dropdown add image action is clicked.
+     */
+    openImageUpload: function(product) {
+      this.selectedProduct = product;
+      this.$refs.fileUpload.click();
+    },
+
+    /**
+     * Upload product image when image is uploaded on web page
+     * @param e Event object which contains file uploaded
+     */
+    uploadImage: function(e) {
+      //Setup FormData object to send in request
+      this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
+      for (let image of e.target.files) {
+        const fd = new FormData();
+        fd.append('filename', image, image.name);
+        api.postProductImage(this.businessId, this.selectedProduct.id, fd)
+          .then(() => { //On success
+            this.$vs.notify({title:`Image for ${this.selectedProduct.id} was uploaded`, color:'success'});
+          })
+          .catch((error) => { //On fail
+            if (error.response.status === 400) {
+              this.$vs.notify({title:`Image failed to upload`, color:'danger'});
+            } else if (error.response.status === 500) {
+              this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
+            }
+            this.$log.debug("HERHEHRE");
+          })
+          .finally(() => {
+            this.$vs.loading.close();
+            location.reload();
+        })
       }
     }
 
@@ -542,7 +586,7 @@ export default Search;
 }
 
 .header-button {
-  margin: 0 1em;
+  margin: 0 0.5em;
   min-width: 100px;
 }
 
@@ -588,9 +632,9 @@ export default Search;
 }
 
 .grid-image {
-  width: 100%;
-  height: 100%;
+  height: 225px;
   border-radius: 4px 4px 0 0;
+  object-fit: cover;
 }
 
 .grid-item-footer {
@@ -679,6 +723,13 @@ input:checked + .slider:before {
 th {
   background: #1F74FF;
   color: white;
+}
+
+.table-image {
+  width: 100%;
+  height: 100px;
+  border-radius: 4px 4px 0 0;
+  object-fit: cover;
 }
 
 .actionButton {
