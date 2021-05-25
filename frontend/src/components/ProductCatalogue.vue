@@ -60,7 +60,8 @@
               <div slot="media">
                 <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                 <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-                <img v-if="product.primaryImagePath == null" class="grid-image" src="ProductShoot.jpg"/>
+                <img alt="Product Image" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
+                <img alt="Product Image" v-if="isDevelopment() != true && !product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
               </div>
 
               <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
@@ -140,7 +141,8 @@
                       <div>
                         <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                         <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)"/>
-                        <img v-if="!product.primaryImagePath" class="table-image" src="ProductShoot.jpg"/>
+                        <img alt="Product Image" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
+                        <img alt="Product Image" v-if="isDevelopment() !== true && !product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -292,7 +294,11 @@ const Search = {
      * @return a string link to the product image, or the default image if it doesn't have a product.
      **/
     getImgUrl(product) {
-      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+      if (product === true && process.env.NODE_ENV !== 'staging') {
+        return '/prod/ProductShoot.jpg';
+      } else if (product === true) {
+        return '/test/ProductShoot.jpg';
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
       } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
         return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
