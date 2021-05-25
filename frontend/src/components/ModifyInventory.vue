@@ -75,7 +75,7 @@
       <div class="form-group required vs-col" align="center" id="addButton" @click="updateInventory(); checkForm()">
         <vs-button>Update product</vs-button>
       </div>
-      <div class="form-group required vs-col" align="center" id="cancelButton" @click="modifyInv=false">
+      <div class="form-group required vs-col" align="center" id="cancelButton" @click="modifyInv=false" style="margin-left: 5px;">
         <vs-button>Cancel</vs-button>
       </div>
     </vs-popup>
