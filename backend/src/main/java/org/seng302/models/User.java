@@ -101,11 +101,17 @@ public class User {
 
     /**
      * Alternative constructor with just the barebones fields required. Used to create a DGAA.
+     * @param firstName firstname of the user
+     * @param lastName surname of the user
+     * @param homeAddress address of the user
      * @param email unique identifier to login with.
      * @param password to login with - to be hashed.
      * @param role designated website role of user.
      */
-    public User(String email, String password, Role role) throws NoSuchAlgorithmException {
+    public User(String firstName, String lastName, Address homeAddress, String email, String password, Role role) throws NoSuchAlgorithmException {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.homeAddress = homeAddress;
         this.email = email;
         this.role = role;
         this.created = new Date();
