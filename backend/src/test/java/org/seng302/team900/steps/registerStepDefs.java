@@ -65,7 +65,8 @@ public class registerStepDefs {
 
     @Given("User attempts to register with an email that is already registered")
     public void userAttemptsToRegisterWithAnEmailThatIsAlreadyRegistered() throws JsonProcessingException, NoSuchAlgorithmException {
-        Mockito.when(userRepository.findUserByEmail("jeffgold@hotmail.com")).thenReturn(new User("jeffgold@hotmail.com", "Potato1!", Role.USER));
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        Mockito.when(userRepository.findUserByEmail("jeffgold@hotmail.com")).thenReturn(new User("Jeff", "Goldblum", addr, "jeffgold@hotmail.com", "Potato1!", Role.USER));
     }
 
     @Then("They are notified that the email they tried to register with is already registered")
@@ -90,7 +91,8 @@ public class registerStepDefs {
 
     @When("They successfully register with the password {string}")
     public void theySuccessfullyRegister(String password) throws NoSuchAlgorithmException, ParseException, JsonProcessingException {
-        Mockito.when(userRepository.findUserByEmail("jeffgold@hotmail.com")).thenReturn(new User("jeffgold@hotmail.com", password, Role.USER));
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        Mockito.when(userRepository.findUserByEmail("jeffgold@hotmail.com")).thenReturn(new User("Jeff", "Goldblum", addr, "jeffgold@hotmail.com", "Potato1!", Role.USER));
         em = "jeffgold@hotmail.com";
         pass = password;
     }

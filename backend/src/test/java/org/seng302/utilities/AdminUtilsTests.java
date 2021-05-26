@@ -7,6 +7,7 @@ import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.Address;
 import org.seng302.repositories.UserRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -41,7 +42,8 @@ public class AdminUtilsTests {
     @Test
     public void testAlreadyExistingDGAA() throws NoSuchAlgorithmException {
         List<User> adminList = new ArrayList<>();
-        adminList.add(new User("dgaa@test.com", "testpasword123", Role.DGAA));
+        Address dgaaAddr = new Address(null, null, null, null, null, "New Zealand", "8041");
+        adminList.add(new User("Test", "DGAA", dgaaAddr, "dgaa@test.com", "testpasword123", Role.DGAA));
         Mockito.when(userRepository.findAllByRole(Role.DGAA)).thenReturn(adminList);
 
         adminUtils.checkForDefaultGlobalAdmin(userRepository);

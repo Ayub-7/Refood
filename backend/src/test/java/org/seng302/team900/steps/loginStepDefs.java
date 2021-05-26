@@ -12,6 +12,7 @@ import org.seng302.controllers.UserController;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.Address;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.repositories.UserRepository;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -44,7 +45,8 @@ public class loginStepDefs {
     
     @Before
     public void setup() throws Exception {
-        this.user = new User("johnsmith@yahoo.com", "Potato1!", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        this.user = new User("John", "Smith", addr, "johnsmith@yahoo.com", "Potato1!", Role.USER);
         this.userRepository = Mockito.mock(UserRepository.class);
         this.userController = new UserController(this.userRepository, this.userFinder);
     }
