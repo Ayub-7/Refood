@@ -1,17 +1,16 @@
 <template>
   <div class="main" id="body">
     <div id="search">
-
-      <input type="search" placeholder="Search for user" name="searchbar" v-model="searchbar">
-      <vs-button id="submitSearch" type="border" @click="searchUsers">Search</vs-button>
+      <vs-input class="search-input" type="search" placeholder="Search for user" name="searchbar" v-model="searchbar" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearch" size="large" type="border" @click="searchUsers">Search</vs-button>
     </div>
 
 
     <div v-if="users.length" id="userTable">
-      <vs-table :data="this.users" pagination max-items="10">
+      <vs-table :data="this.users" max-items="10" pagination stripe >
         <template slot="thead" id="tableHeader">
 
-          <vs-th sort-key="firstName">
+          <vs-th sort-key="firstName" style="border-radius: 4px 0 0 0;">
             First name
           </vs-th>
           <vs-th sort-key="lastName">
@@ -28,7 +27,7 @@
           </vs-th>
 
           <!-- Extra header for go to profile button -->
-          <vs-th>
+          <vs-th style="border-radius: 0 4px 0 0;">
           </vs-th>
 
           <vs-th v-if="isDGAA">Is Admin</vs-th>
@@ -44,7 +43,7 @@
 
             <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
 
-            <vs-td :data="data[indextr].firstName">{{data[indextr].lastName}}</vs-td>
+            <vs-td :data="data[indextr].lastName">{{data[indextr].lastName}}</vs-td>
 
             <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
 
@@ -53,7 +52,7 @@
             <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
 
             <vs-td>
-              <div id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</div>
+              <vs-button id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
 
             <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
@@ -240,7 +239,6 @@ export default Search;
 }
 
 #search {
-  font-family: 'Ubuntu', sans-serif;
   font-weight: bold;
   height: 10em;
   display: flex;
@@ -248,17 +246,22 @@ export default Search;
   align-items: center;
 }
 
-
 #search input {
-  font-size: 30px;
+  font-size: 24px;
+}
+
+.search-input >>> .vs-inputx {
+  font-size: 18px;
+}
+
+.search-input >>> span {
+  font-size: 18px;
+  margin: 4px 0;
 }
 
 #goToProfileButton {
-  background:#1F74FF;
-  text-align: center;
-  color: white;
-  border-radius: 1.5em;
   cursor: pointer;
+  height: 35px;
 }
 
 #userTable {
@@ -271,7 +274,11 @@ export default Search;
   border-style: solid;
   border-color: white;
   padding: 1em;
+}
 
+#submitSearch {
+  margin-left: 0.5em;
+  height: 3em;
 }
 
 tr {
@@ -281,10 +288,6 @@ tr {
 th {
   background: #1F74FF;
   color: white;
-}
-
-.main1{
-  top:-100px;
 }
 
 .main {
@@ -311,8 +314,6 @@ th {
     color: white;
     font-size: 10px
   }
-
-
 }
 
 

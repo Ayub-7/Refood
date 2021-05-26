@@ -135,7 +135,7 @@ public class ProductController {
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
-                    productRepository.updateProduct(req.getId(), req.getName(), req.getDescription(), req.getRecommendedRetailPrice(), productId);
+                    productRepository.updateProduct(req.getId(), req.getName(), req.getDescription(), req.getRecommendedRetailPrice(), req.getManufacturer(), productId);
                     return ResponseEntity.status(HttpStatus.OK).build();
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
@@ -167,9 +167,6 @@ public class ProductController {
             isValid = false;
         } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
             errorMessage = "Product recommended retail price must be at least 0";
-            isValid = false;
-        } else if (product.getDescription() == null || product.getDescription() == "") {
-            errorMessage = "Product must have description";
             isValid = false;
         }
 
@@ -246,7 +243,6 @@ public class ProductController {
         if (businessDir.mkdirs()) {
             logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
         }
-        System.out.println();
 
         String id = "";
         boolean freeImage = false;

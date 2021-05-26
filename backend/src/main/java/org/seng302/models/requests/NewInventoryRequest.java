@@ -27,7 +27,6 @@ public class NewInventoryRequest {
         this.manufactured = manufactured;
         this.sellBy = sellBy;
         this.bestBefore = bestBefore;
-        this.manufactured = manufactured;
         this.expires = expires;
     }
 }

@@ -1,5 +1,4 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vuex from 'vuex';
 import Login from '../components/Login';
 import Vuesax from 'vuesax';
 
@@ -9,7 +8,6 @@ let actions;
 let mutations;
 let state;
 const localVue = createLocalVue();
-localVue.use(Vuex);
 localVue.use(Vuesax);
 
 const $router = {
@@ -26,11 +24,6 @@ beforeEach(() => {
     state = {
         key: {}
     };
-    store = new Vuex.Store({
-        actions,
-        mutations,
-        state,
-    });
     wrapper = shallowMount(Login, {
         propsData: {},
         mocks: {$router},

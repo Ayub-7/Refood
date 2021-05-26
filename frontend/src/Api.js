@@ -183,10 +183,44 @@ export default {
      * @param sellBy To be sold beforee this date
      * @param bestBefore To be consumed before this date
      * @param expires product will expire on this date
-     * @returns {Promise<*>}
      */
     createInventory: async(businessId, productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires) =>
         instance.post(`/businesses/${businessId}/inventory`, {productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires}, {withCredentials: true}),
+
+    /**
+     * Obtains the inventory of the said business from the database
+     * @param businessId the id of the said business
+     */
+    getInventory: async(businessId) =>
+        instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true}),
+
+    /**
+     * Adds a new listing for the said business' marketplace
+     * @param businessId the id of the said business
+     * @param inventoryItemId the id of the inventory item
+     * @param quantity the quantity of the products
+     * @param price the total price of the listing
+     * @param moreInfo OPTIONAL: Info about listing
+     * @param closes Closing date
+     */
+    createListing: async(businessId, inventoryItemId, quantity, price, moreInfo, closes) =>
+        instance.post(`/businesses/${businessId}/listings`, {inventoryItemId, quantity, price, moreInfo, closes}, {withCredentials: true}),
+
+    /**
+     * Adds a new inventory to the current business
+     * @param businessId id of the business to
+     * @param productId product id (chosen by user)
+     * @param quantity quantity of the product
+     * @param pricePerItem price per one item
+     * @param totalPrice total price (It is not pricePerItem times some number)
+     * @param manufactured Manufacture datee
+     * @param sellBy To be sold beforee this date
+     * @param bestBefore To be consumed before this date
+     * @param expires product will expire on this date
+     * @returns {Promise<*>}
+     */
+    modifyInventory: async(businessId, inventoryId, productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires) =>
+        instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, {productId, quantity, pricePerItem, totalPrice, manufactured, sellBy, bestBefore, expires}, {withCredentials: true}),
 
     /**
      * modifies catalog product
@@ -236,5 +270,16 @@ export default {
      * @param imageId
      * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code.
      */
-    deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true})
+    deletePrimaryImage: (businessId, productId, imageId) => instance.delete(`businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
+
+    // === BUSINESS INVENTORY LISTINGS
+
+    /**
+     * Retrieves a business' sale listings.
+     * @param businessId Id of business.
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of listings. 401, 406 otherwise.
+     */
+    getBusinessListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials: true}),
+
+    getBusinessInventory: (businessId) => instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true})
 }

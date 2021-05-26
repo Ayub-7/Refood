@@ -14,6 +14,7 @@ import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
 import org.seng302.models.User;
+import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
@@ -25,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -191,5 +193,43 @@ public class BusinessControllerTests {
 
     }
 
+    @Test
+    @WithMockUser
+    public void testCreateBusiness_returnCreated() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Some Business", "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+
+        mvc.perform(post("/businesses")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser
+    public void testInvalidCreateBusiness_returnBadRequest() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest(null, "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+
+        mvc.perform(post("/businesses")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+
+        testBusiness.setName("Valid Name");
+        testBusiness.setBusinessType(null);
+        mvc.perform(post("/businesses")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+
+        testBusiness.setName(null);
+        mvc.perform(post("/businesses")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+    }
 
 }

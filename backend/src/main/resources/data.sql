@@ -104,6 +104,22 @@ INSERT INTO product (id, name, description, manufacturer, recommended_retail_pri
     ('JN8AF5MR1ET433412', 'Juice - Pineapple, 341 Ml', 'ridiculus mus etiam vel augue vestibulum', 'Juicelord', 2.66, '2021-03-09 22:56:37', 3),
     ('WAUEH78E77A454447', 'Bread - Focaccia Quarter', 'orci vehicula condimentum curabitur in libero', 'Bread Company', 22.34, '2021-04-05 18:35:12', 5);
 
-INSERT INTO inventory (best_before, business_id, price_per_item, product_id, quantity, total_price) VALUES
-    ('2021-05-27 12:00:00', 1, 5.00, 'WAUVT64B54N722288', 10, 50.00),
-    ('2021-06-12 12:00:00', 1, 5.00, 'W04GP5EC0B1798680', 10, 50.00);
+
+INSERT INTO inventory (best_before, business_id, expires, manufactured, price_per_item, product_id, quantity, sell_by, total_price) VALUES
+    ('2021-05-27 12:00:00', 1, '2021-05-27 12:00:00', '2021-01-27 12:00:00', 5.00, 'WAUVT64B54N722288', 10, '2021-05-25 12:00:00', 50.00),
+    ('2021-08-27 12:00:00', 1, '2021-08-27 12:00:00', '2020-01-27 12:00:00', 3.00, 'W04GP5EC0B1798680', 7, null, 80.00),
+    ('2021-08-27 12:00:00', 1, '2021-10-27 12:00:00', '2021-01-27 12:00:00', 1.00, 'WAUVT64B54N722288', 9, null, 50.00),
+    ('2021-09-27 12:00:00', 1, '2021-11-27 12:00:00', '2021-01-27 12:00:00', 6.00, 'WAUVT64B54N722288', 1, null, 50.00),
+    ('2021-09-27 12:00:00', 1, '2021-11-27 12:00:00', '2021-01-27 12:00:00', 6.00, 'WAUVT64B54N722288', 1, null, 50.00),
+    ('2021-09-27 12:00:00', 1, '2021-11-27 12:00:00', '2021-01-27 12:00:00', 6.00, 'WAUVT64B54N722288', 1, null, 50.00);
+
+INSERT INTO listing (closes, created, more_info, price, quantity, inventory_item_id) VALUES
+    ('2021-09-22 12:00:00', '2021-01-27 12:00:00', 'Not negotiable.', 10, 3, 1),
+    ('2021-10-27 12:00:00', '2021-01-28 12:00:00', 'Could be negotiable.', 10, 5, 1),
+    ('2021-11-12 12:00:00', '2021-02-01 12:00:00', 'Price is negotiable.', 10, 5, 1),
+    ('2021-09-08 12:00:00', '2021-02-02 12:00:00', 'Contact us for more information.', 15.5, 1, 2),
+    ('2021-10-19 12:00:00', '2021-02-03 12:00:00', 'Do not contact us for more information.', 5.99, 2, 2);
+
+
+
+

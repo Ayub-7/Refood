@@ -38,6 +38,7 @@
           <div id="address">
             <div class="sub-header">Home Address</div>
               <div id="street-address">{{ user.homeAddress.streetNumber }} {{ user.homeAddress.streetName }}</div>
+              <div id="suburb">{{ user.homeAddress.suburb }}</div>
               <div id="city">{{ user.homeAddress.city }}</div>
               <div id="region">{{ user.homeAddress.region }}</div>
               <div id="country">{{ user.homeAddress.country }}</div>
@@ -212,7 +213,7 @@ export default Users;
 
 #container {
   display: grid;
-  grid-template-columns: 1fr 1fr 3fr 1fr;
+  grid-template-columns: 1fr 1fr 4fr 1fr;
   grid-template-rows: 1fr auto;
   grid-column-gap: 1em;
   margin: auto;
@@ -377,6 +378,7 @@ main {
 }
 
 .card >>> .card-description {
+  grid-column: 1/3;
   font-size: 12px;
   padding: 0.5em 0 0.5em 0;
 }

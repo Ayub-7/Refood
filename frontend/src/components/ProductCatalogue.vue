@@ -1,77 +1,91 @@
 <template>
   <vs-card class="main">
       <div class="profile-text-inner">
-        <div style="display: flex; ">
-          <h1 id="pagetitle" class="title text-center" style="font-size: 40px; margin-bottom: 50px; ">{{this.business}} Products</h1>
+        <div id="header-container">
+          <div id="page-title">Product Catalogue</div>
+          <div id="header-menu">
+            <vs-button class="header-button" :to="{path: `/addtocatalogue`}">Add Product</vs-button>
+            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button" style="margin-right: 0;">Inventory</vs-button>
+          </div>
+        </div>
 
-          <div style="margin-right: 0; margin-left: auto; display: flex">
+        <vs-divider></vs-divider>
+
+        <div id="catalogue-options">
+          <div class="switch-container">
             <div class="title" style="margin-top: 5px; margin-right: 10px">
               <p v-if="displaytype">Grid</p>
               <p v-if="!displaytype">List</p>
             </div>
 
-            <label class="switch" >
+            <label class="switch">
               <input v-model="displaytype" type="checkbox" checked>
               <span class="slider round"></span>
             </label>
-
           </div>
-        </div>
-        <div style="display: flex; ">
-          <div style="display: flex;">
-            <h2 class="title" style="margin-top: 5px; margin-right: 10px">Sort By: </h2>
-            <select v-model="selected">
-              <option disabled value="">Please select one</option>
-              <option value="id">ID</option>
-              <option value="name">Product Name</option>
-              <option value="description">Description</option>
-              <option value="recommendedRetailPrice">Recommended Retail Price</option>
-              <option value="created">Date Created</option>
-            </select>
-            <vs-button @click="sortByName(null, selected, 0);">Sort</vs-button>
+
+          <div id="sort-container">
+            <div v-show="displaytype" style="display: flex;">
+              <h2 style="margin: auto; padding-right: 4px;">Sort By </h2>
+              <select v-model="selected">
+                <option disabled value="">Please select one</option>
+                <option value="id">ID</option>
+                <option value="name">Product Name</option>
+                <option value="description">Description</option>
+                <option value="recommendedRetailPrice">Recommended Retail Price</option>
+                <option value="created">Date Created</option>
+              </select>
+              <vs-button @click="sortByName(null, selected, 0);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+            </div>
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
-          <tfoot style="margin-right: 0; margin-left: auto">
-          <tr>
-            <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
-            <div  v-if="filteredproducts.length > 10">
-              <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
-              <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
+          <div id="grid-pagination">
+            <div class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</div>
+            <div v-if="filteredproducts.length > 10" style="display: flex;">
+              <vs-button type="border" class='prevNextSearchButton' @click="decreaseSearchRange()">Previous</vs-button>
+              <vs-button type="border" class='prevNextSearchButton' @click="increaseSearchRange()">Next</vs-button>
             </div>
-          </tr>
-          </tfoot>
+          </div>
         </div>
-        <ImageUpload :businessId=businessId :products=products style="margin: 50px; font-size: 15px"/>
-        <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)">Inventory</vs-button>
 
 
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
-            
-            <div style="position:relative" class="grid-item sub-container" v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
-                v-bind:href="product.id"
-                :key="product.id">
-              <div>
-                <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-                <img v-if="product.primaryImagePath == null" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+            <vs-card class="grid-item"
+                    v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
+                    v-bind:href="product.id"
+                    :key="product.id">
+
+              <div slot="media">
+                <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
+                <img v-if="!product.primaryImagePath && isDevelopment()" class="grid-image" src="ProductShoot.jpg"/>
+                <img v-if="!isDevelopment() && !product.primaryImagePath" class="grid-image" :src="getImgUrl(true)"/>
               </div>
-              <div style="font-family: 'Ubuntu', sans-serif; font-size: 13pt; margin: 10px;  line-height: 1.5; display:flex; flex-direction: column;">
-              
-                <div style="display: flex;">
-                  <p><a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a></p>
-                  <p style="margin-right: 0; margin-left: auto">{{ product.created }} </p>
+
+              <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
+                <div style="display: flex; flex-direction: column; justify-content: space-between">
+                  <div style="font-size: 16px; font-weight: bold;  text-align: justify; word-break: break-all;">{{ product.name }} </div>
+                  <p>{{ product.id }}</p>
                 </div>
-                <!-- Actions Dropdown -->
+                <vs-divider></vs-divider>
+                <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
+                <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
+                <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
+              </div>
+
+              <div slot="footer" class="grid-item-footer">
+                <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </div>
                 <vs-dropdown vs-trigger-click class="actionButton">
-                  <vs-button style="width: fit-content;">Actions</vs-button>
+                  <vs-button style="width: fit-content;" type="flat">Actions</vs-button>
                   <vs-dropdown-menu>
-                    <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
-                          product.manufacturer, product.description)">
+                    <vs-dropdown-item @click="goToModify(product.id);">
                       Modify product
                     </vs-dropdown-item>
-
+                    <vs-dropdown-item @click="openImageUpload(product)">
+                      Add Image
+                    </vs-dropdown-item>
                     <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                       <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
                         {{pImage.name}}
@@ -83,16 +97,10 @@
                         {{pImage.name}}
                       </vs-dropdown-item>
                     </vs-dropdown-group>
-
                   </vs-dropdown-menu>
                 </vs-dropdown>
-
-                <p style="font-size: 20pt; font-weight: bold;  text-align: justify;">{{ product.name }} </p>
-                <p style="font-size: 14pt; text-align: justify; margin-bottom: 20px;">{{ product.manufacturer }} </p>
-                <p style="font-size: 15pt; margin-bottom: 35px">{{ product.description }} </p>
-                <p style="color: #1F74FF; font-size: 25pt; font-weight: bold; position: absolute; bottom: 15px;" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </p>
               </div>
-            </div>
+            </vs-card>
           </div>
         </div>
 
@@ -102,12 +110,12 @@
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" search>
+            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" stripe>
                 <template slot="thead" style="background:blue">
-                  <vs-th sort-key="id">
+                  <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
                   </vs-th >
-                  <vs-th sort-key="name">
+                  <vs-th sort-key="name" style="min-width: 100px">
                      <div>Product Name</div>
                   </vs-th>
                   <vs-th sort-key="description">
@@ -122,7 +130,7 @@
                   <vs-th sort-key="created">
                     <div>Date Created</div>
                   </vs-th>
-                  <vs-th><!-- Actions Column --></vs-th>
+                  <vs-th style="border-radius: 0 4px 0 0;"><!-- Actions Column --></vs-th>
                 </template>
 
                 <template slot-scope="{data}">
@@ -130,9 +138,10 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath != null && isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                        <img v-if="product.primaryImagePath != null && !isDevelopment()" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(product)"/>
-                        <img v-if="!product.primaryImagePath" style="width: 100%; height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+                        <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                        <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)"/>
+                        <img v-if="!product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg"/>
+                        <img v-if="!isDevelopment() && !product.primaryImagePath" class="table-image" :src="getImgUrl(true)"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -145,17 +154,17 @@
                       <vs-dropdown vs-trigger-click>
                         <vs-button>Actions</vs-button>
                         <vs-dropdown-menu>
-                          <vs-dropdown-item @click="goToModify(); setProductToAlter(product.id, product.name, product.recommendedRetailPrice,
-                          product.manufacturer, product.description)">
+                          <vs-dropdown-item id="modify-dropdown" @click="goToModify(product.id);">
                             Modify product
                           </vs-dropdown-item>
-
+                          <vs-dropdown-item @click="openImageUpload(product)">
+                            Add Image
+                          </vs-dropdown-item>
                           <vs-dropdown-group vs-label="Change Primary Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="setPrimaryImage(product, pImage);">
                                 {{pImage.name}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
-
                           <vs-dropdown-group vs-label="Delete An Image" vs-collapse>
                               <vs-dropdown-item v-for="pImage in product.images" :key="pImage" @click="deleteImage(product, pImage);">
                                 {{pImage.name}}
@@ -173,9 +182,10 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
-                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="decreaseSearchRange()" value='Prev'/></td>
-                    <td><input class='row-md-2 prevNextSearchButton' type='button' @click="increaseSearchRange()" value='Next'/></td>
+                    <td><vs-button class='prevNextSearchButton' type='border' @click="decreaseSearchRange()">Previous</vs-button></td>
+                    <td><vs-button class='prevNextSearchButton' type='border' @click="increaseSearchRange()">Next</vs-button></td>
                   </tr>
                   </tfoot>
                 </template>
@@ -186,46 +196,39 @@
     <footer>
       "Product shoot" by Aameerule is licensed under CC BY 2.0
     </footer>
+    <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
   </vs-card>
 </template>
 
 <script>
 import api from "../Api";
-import {store, mutations} from "../store";
-//import {store} from "../store"
-import ImageUpload from "./ImageUpload";
+import {store} from "../store";
 import axios from "axios";
+
 const Search = {
   name: "Search",
 
-  components: {
-    ImageUpload
-  },
   data: function() {
     return {
-      errors: [],
-      toggle: [1,1,1,1,1],
-      searchbar: "",
-      searchbarResults: "",
       products: [],
-      filteredproducts: [],
-      reducedproducts: [],
-      enableTable: false,
-      resultTrack: "",
-      productSearchIndexMin: 0,
-      productSearchIndexMax: 10,
       business: null,
       businessId: null,
+
+      errors: [],
+      toggle: [1,1,1,1,1],
+      filteredproducts: [],
+      enableTable: false,
+      productSearchIndexMin: 0,
+      productSearchIndexMax: 12,
       displaytype: true,
       currencySymbol: "",
-      currencyCode: "",
       selected: "",
-      componentKey: 0,
+
+      selectedProduct: null, // Used to select product to upload image to.
     };
   },
 
   /**
-   *
    * api.getBusinessProducts() queries the test back-end (json-server)
    * at /businesses/${businessId}/products which returns a JSON object list of test products which can
    * be filtered by the webpage.
@@ -283,8 +286,17 @@ const Search = {
       });
     },
 
+    /**
+     * Retrieves the image url link for the given product.
+     * @param product the product to retrieve the image for.
+     * @return a string link to the product image, or the default image if it doesn't have a product.
+     **/
     getImgUrl(product) {
-      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+      if (product === true && process.env.NODE_ENV !== 'staging') {
+        return '/prod/ProductShoot.jpg';
+      } else if (product === true) {
+        return '/test/ProductShoot.jpg';
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
       } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
         return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
@@ -294,6 +306,7 @@ const Search = {
         return '../../public/ProductShoot.jpg'
       }
     },
+
     getUserInfo: function(userId) {
       if(store.loggedInUserId != null) {
         api.getUserFromID(userId) //Get user data
@@ -308,11 +321,15 @@ const Search = {
       }
     },
 
+    /**
+     * Calls the third-party RESTCountries API to retrieve currency information based on user home country.
+     * Sets the currency symbol view to the retrieved data.
+     * @param country the country to obtain the currency symbol from.
+     **/
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
           .then( response => {
             this.currencySymbol = response.data[0].currencies[0].symbol;
-            this.currencyCode = response.data[0].currencies[0].code;
           }).catch( err => {
         console.log("Error with getting cities from REST Countries." + err);
       });
@@ -326,47 +343,17 @@ const Search = {
       return store.actingAsBusinessName
     },
 
-    //sets the product to alter id
-    setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription) {
-      mutations.setProductToAlter(productId, productName, productRecommendedRetailPrice, productManufacturer, productDescription);
-    },
-    //modifies selected catalog item
-    goToModify: function () {
-      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/modify`})
-    },
 
-    /**
-     * Searches for the products in the database by calling the API function with an SQL query to find the
-     * products based on the input in the search box.
-     */
-    searchProducts: function () {
-      this.productSearchIndexMin = 0;
-      this.productSearchIndexMax = 10;
-      if (this.searchbar.length > 0) {
-        this.enableTable = true;
-        this.resultTrack = this.searchbar;
-        api
-            .searchQuery(this.searchbar)
-            .then((response) => {
-              this.$log.debug("Data loaded: ", response.data);
-              this.products = response.data;
-              this.filteredproducts = response.data;
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-              this.error = "Failed to load products";
-            })
-            .finally(() => (this.loading = false));
-      } else {
-        this.errors.push("Please enter input the product you want to search for");
-      }
+    //modifies selected catalog item
+    goToModify (productId) {
+      console.log(productId)
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`})
     },
 
     /**
      * makes the checkproduct an administrator
      * if they are already, revoke privledges...
      */
-
     toggleAdmin: function (currentproduct) {
       if (currentproduct.role == 'product') {
         //currentproduct.id = true;
@@ -384,6 +371,7 @@ const Search = {
      * @param index references the toggle state list in the data object (int)
      */
     sortByName: function (event, JSONField) {
+
       const indexarray = ["id", "name", "description", "recommendedRetailPrice", "created"];
 
       //toggles the classlist (arrow up or down) in the child DOM element: <i/>
@@ -432,7 +420,7 @@ const Search = {
 
         let index = indexarray.indexOf(JSONField);
 
-        if (index > 0) {
+        if (index >= 0) {
           if (this.toggle[index]) {
             this.filteredproducts.reverse();
             this.toggle[index]=0;
@@ -442,20 +430,6 @@ const Search = {
         }
       }
     },
-
-    /**
-     * Filters the SQL query results to be displayed on this webpage.
-     */
-    filterproducts: function () {
-      if (this.searchbar && this.resultTrack == this.searchbar) {
-        this.filteredproducts = this.products.filter((item) => {
-          return (item.firstName + " " + item.middleName + " " + item.lastName).includes(this.searchbar) || (item.firstName + " " + item.lastName).includes(this.searchbar);
-        });
-
-      }
-    },
-
-
 
     /**
      * Helper function to control the number of search range values.
@@ -482,6 +456,44 @@ const Search = {
         let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
         this.productSearchIndexMin -= minMaxDiff;
         this.productSearchIndexMax -= minMaxDiff;
+      }
+    },
+
+    /**
+     * Trigger the file upload box to appear.
+     * Used for when the actions dropdown add image action is clicked.
+     */
+    openImageUpload: function(product) {
+      this.selectedProduct = product;
+      this.$refs.fileUpload.click();
+    },
+
+    /**
+     * Upload product image when image is uploaded on web page
+     * @param e Event object which contains file uploaded
+     */
+    uploadImage: function(e) {
+      //Setup FormData object to send in request
+      this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
+      for (let image of e.target.files) {
+        const fd = new FormData();
+        fd.append('filename', image, image.name);
+        api.postProductImage(this.businessId, this.selectedProduct.id, fd)
+          .then(() => { //On success
+            this.$vs.notify({title:`Image for ${this.selectedProduct.id} was uploaded`, color:'success'});
+          })
+          .catch((error) => { //On fail
+            if (error.response.status === 400) {
+              this.$vs.notify({title:`Image failed to upload`, color:'danger'});
+            } else if (error.response.status === 500) {
+              this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
+            }
+            this.$log.debug("HERHEHRE");
+          })
+          .finally(() => {
+            this.$vs.loading.close();
+            location.reload();
+        })
       }
     }
 
@@ -510,10 +522,32 @@ export default Search;
 
 <style scoped>
 
-.title {
-  color: #1F74FF;
-  font-weight: bold;
-  font-size: 23px;
+#page-title {
+  font-size: 30px;
+  margin: auto 0;
+}
+
+#header-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+#header-menu {
+  display: flex;
+}
+
+#sort-container {
+  display: flex;
+}
+
+.switch-container {
+  display: flex;
+  margin-right: 2em;
+}
+
+.header-button {
+  margin: 0 0.5em;
+  min-width: 100px;
 }
 
 .main {
@@ -522,83 +556,69 @@ export default Search;
   margin: 1em auto;
 }
 
-.searchButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  margin-left: 35%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-}
-#modify {
-  background: #1F74FF;
-  color: white;
-  padding: 0.8em;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-#modify:hover {
-  background: #30487c
-}
-
 .prevNextSearchButton {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  margin-left: 35%;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  margin-left: 1em;
+  width: 100px;
 }
 
 .displaying {
-  padding-top: 15px;
   text-align: right;
+  margin: auto;
 }
 
 
 .profile-text-inner {
   margin: 2em auto;
-  padding-top: 5em;
-  width: 90%;
-  height: 80%;
+  width: 95%;
 }
+
+/* ===== GRID CARD ===== */
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 350px);
+  justify-content: space-around;
+  grid-template-columns: repeat(auto-fill, 375px);
   grid-column-gap: 2em;
-  justify-content: center;
 
-  padding: 10px;
-  margin: 50px auto auto 0;
+  margin: 50px auto auto auto;
 }
+
 .grid-item {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
   font-size: 30px;
   text-align: left;
   margin: 10px;
-  width: 350px;
-}
-.sub-container {
-  padding: 0.75em;
-  border-radius: 1.5em;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+  max-width: 350px;
 }
 
+.grid-image {
+  height: 225px;
+  border-radius: 4px 4px 0 0;
+  object-fit: cover;
+}
+
+.grid-item-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.grid-item >>> footer {
+  padding-bottom: 1em;
+  margin-bottom: 4px;
+}
+
+/* ===== ===== ===== */
+
+#catalogue-options {
+  display: flex;
+  margin-bottom: 1em;
+}
+
+#grid-pagination {
+  margin: auto 0 auto auto;
+  display: flex;
+}
 
 .switch {
   position: relative;
@@ -665,8 +685,60 @@ th {
   color: white;
 }
 
+.table-image {
+  width: 100%;
+  height: 100px;
+  border-radius: 4px 4px 0 0;
+  object-fit: cover;
+}
+
 .actionButton {
   text-align: left;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 900px) {
+  #catalogue-options {
+    flex-direction: column;
+  }
+
+  #grid-pagination {
+    margin: 1em auto 0 0;
+  }
+
+}
+
+@media screen and (max-width: 625px) {
+  .main {
+    width: 95%;
+  }
+
+  #header-container {
+    flex-direction: column;
+    margin: auto;
+  }
+
+  #page-title {
+    margin: auto;
+  }
+
+  #header-menu {
+    margin: 2em auto 0 auto;
+    justify-content: space-evenly;
+  }
+
+  .header-button {
+    min-width: 0;
+    margin: 0 4px;
+  }
+
+  #sort-container {
+    flex-direction: column;
+  }
+
+  .switch-container {
+    margin: 1em auto;
+  }
 }
 
 </style>

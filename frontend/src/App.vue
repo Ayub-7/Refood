@@ -9,9 +9,12 @@
         text-color="rgba(255,255,255,.6)"
         active-text-color="#FFFFFF">
       <div slot="title">
-        <vs-navbar-title>
-          ReFood
-        </vs-navbar-title>
+        <router-link :to="{path: '/home'}">
+          <vs-navbar-title style="color: white">
+            ReFood
+          </vs-navbar-title>
+        </router-link>
+
       </div>
 
       <!-- Not Logged In -->
@@ -47,16 +50,13 @@
 
         <!-- Acting As Business -->
         <div v-else class="sub-navbar-group">
-          <vs-navbar-item index="4">
+          <vs-navbar-item index="3-0">
             <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="5">
-            <router-link :to="{path: `/addtocatalogue`}">Add To Catalogue</router-link>
-          </vs-navbar-item>
-          <vs-navbar-item index="6">
+          <vs-navbar-item index="3-1">
             <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="7">
+          <vs-navbar-item index="3-2">
             <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
           </vs-navbar-item>
         </div>
@@ -93,7 +93,6 @@ import Login from "./components/Login";
 import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
 import AddToCatalogue from "@/components/AddToCatalogue";
-import CurrencyInput from "@/components/CurrencyInput";
 import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
@@ -108,7 +107,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue, CurrencyInput
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue,
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods

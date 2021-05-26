@@ -6,49 +6,56 @@
                 :danger="this.errors.includes('businessName')"
                 type="text"
                 class="form-control"
-                label-placeholder="Business Name (Required)"
+                label="Business Name *"
                 v-model="businessName"/>
       <vs-select
           width="90%"
           id="business-type"
           :danger="this.errors.includes('businessType')"
           class="form-control"
-          label="Select Business Type (Required)"
+          label="Business Type *"
           v-model="businessType"
           autocomplete >
         <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
       </vs-select>
 
+      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description" :counter="140"/>
+
+      <vs-divider style="grid-row: 4;"></vs-divider>
+      <div class="label-control">Address</div>
+
       <div id="address-container">
         <div id="street-number">
-          <vs-input v-model="streetNumber" class="form-control" label-placeholder="Street Number"></vs-input>
+          <vs-input v-model="streetNumber" class="form-control" label="Street Number"></vs-input>
         </div>
         <div id="street-address">
-          <vs-input v-model="streetAddress" class="form-control" label-placeholder="Street Address"></vs-input>
+          <vs-input v-model="streetAddress" class="form-control" label="Street Address"></vs-input>
+        </div>
+        <div id="suburb">
+          <vs-input v-model="suburb" class="form-control" label="Suburb"></vs-input>
         </div>
         <div id="postcode">
-          <vs-input v-model="postcode" class="form-control" label-placeholder="Postcode"></vs-input>
+          <vs-input v-model="postcode" class="form-control" label="Postcode"></vs-input>
         </div>
         <div id="city">
           <!-- If wanting to test/check suggested item tiles, remove blur. -->
-          <vs-input @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label-placeholder="City"></vs-input>
+          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
           <ul v-if="this.suggestCities" class="suggested-box">
             <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
         </div>
         <div id="region">
-          <vs-input v-model="region" class="form-control" label-placeholder="Region"></vs-input>
+          <vs-input v-model="region" class="form-control" label="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label-placeholder="Country (Required)"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label="Country *"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
         </div>
       </div>
 
-      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description"/>
-      <button type="button" class="register-button" @click="checkForm(); createBusinessInfo()">Register</button>
+      <vs-button class="register-button" @click="checkForm(); createBusinessInfo()">Register</vs-button>
     </form>
   </div>
 </template>
@@ -69,6 +76,7 @@ const BusinessRegister = {
 
       streetNumber: "",
       streetAddress: "",
+      suburb: "",
       postcode: "",
       city: "",
       region: "",
@@ -99,8 +107,8 @@ const BusinessRegister = {
       }
 
       if (this.description != null) {
-        if (this.description.length > 40) {
-          this.errors.push(this.description);
+        if (this.description.length > 140) {
+          this.errors.push('description');
         }
       }
 
@@ -116,15 +124,14 @@ const BusinessRegister = {
         this.errors.push('businessType');
       }
 
-
       if (this.errors.length >= 1) {
         if(this.errors.includes("dob") && this.errors.length === 1){
           this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
-        } else if (this.errors.includes(this.description)) {
+        } else if (this.errors.includes('description')) {
           this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
           this.$vs.notify({
             title: 'Failed to create business',
-            text: 'description must be less that 40 characters.',
+            text: 'description must be less that 140 characters.',
             color: 'danger'
           });
         } else {
@@ -143,6 +150,7 @@ const BusinessRegister = {
         let businessAddress = {
           streetNumber: this.streetNumber,
           streetName: this.streetAddress,
+          suburb: this.suburb,
           city: this.city,
           region: this.region,
           country: this.country,
@@ -150,23 +158,25 @@ const BusinessRegister = {
         };
 
         api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
-            .then((response) => {
-              api.actAsBusiness(response.data.businessId)
-                  .then((busResponse) => {
-                    this.$log.debug("New business created:", busResponse.data);
-                    mutations.setActingAsBusiness(response.data.businessId, this.businessName);
-                    this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
-                  }).catch((error) => {
+          .then((response) => {
+            api.actAsBusiness(response.data.businessId)
+              .then((busResponse) => {
+                this.$log.debug("New business created:", busResponse.data);
+                mutations.setActingAsBusiness(response.data.businessId, this.businessName);
+                this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+              })
+              .catch((error) => {
                 this.$log.debug(error.response.message);
               });
-            }).catch((error) => {
-          if(error.response) {
-            this.$log.debug(error.response.status);
-            this.$log.debug(error.response.message);
-            this.errors.push("Access token is missing/invalid");
-          }
-          this.$log.debug("Error Status:", error)
-        });
+          })
+          .catch((error) => {
+            if(error.response) {
+              this.$log.debug(error.response.status);
+              this.$log.debug(error.response.message);
+              this.errors.push("Access token is missing/invalid");
+            }
+            this.$log.debug("Error Status:", error)
+          });
       }},
 
     /**
@@ -263,8 +273,6 @@ const BusinessRegister = {
     },
   },
 
-
-
   mounted: function () {
     api.checkSession()
         .then((response) => {
@@ -286,7 +294,7 @@ export default BusinessRegister;
   position: absolute;
   display: inline-block;
   list-style: none;
-  width: 225px;
+  width: 300px;
 }
 
 .suggested-item {
@@ -304,25 +312,23 @@ export default BusinessRegister;
   background: lightgray;
 }
 
+.label-control {
+  font-weight: 700;
+  font-size: 16px;
+  margin: auto auto 0.5em auto;
+}
+
 .register-button {
   margin: 1em auto;
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding: 10px 40px;
-  font-family: 'Ubuntu', sans-serif;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  width: 150px;
 }
 
 .card {
-  max-width: 650px;
+  max-width: 800px;
   background-color: white;
   margin: 1em auto;
   padding: 0.5em 0 0.5em 0;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 
@@ -359,21 +365,20 @@ form {
 }
 
 .form-control {
-  font-family: 'Ubuntu', sans-serif;
   margin: 0.25em auto;
   width: 90%;
-
 }
 
 #business-name {
   padding: 0;
 }
 
+/* ===== ADDRESS CONTAINER ===== */
 #address-container {
   display: grid;
-  grid-template-columns: repeat(2, 2fr) repeat(3, 3fr);
-  grid-template-rows: repeat(3, auto);
-
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(auto-fit, auto);
+  margin: 0 1.5em;
 }
 
 vs-input {
@@ -382,45 +387,122 @@ vs-input {
 
 #street-number {
   grid-row: 1;
-  grid-column: 1 / 3;
+  grid-column: 1;
 }
 
 #street-address {
   grid-row: 1;
-  grid-column: 3 / 6;
+  grid-column: 2;
+}
+
+#suburb {
+  grid-row: 1;
+  grid-column: 3;
 }
 
 #city {
   grid-row: 2;
-  grid-column: 3 / 6;
+  grid-column: 2 / 4;
+  margin: auto 0;
+}
+
+#city >>> .vs-input {
+  width: 95%;
 }
 
 #region {
   grid-row: 3;
-  grid-column: 1 / 3;
+  grid-column: 1;
 }
 
 #country {
   grid-row: 3;
-  grid-column: 3 / 6;
+  grid-column: 2 / 4;
+}
+
+#country >>> .vs-input {
+  width: 95%;
 }
 
 #postcode {
   grid-row: 2;
-  grid-column: 1 / 3;
+  grid-column: 1;
 }
 
 .text-areas {
   margin-top: 1em;
-  width: 90%;
-  font-family: 'Ubuntu', sans-serif;
-  font-size: 14px;
 }
 
-@media screen and (max-width: 600px) {
+.text-areas >>> h4 {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.text-areas >>> textarea {
+  max-width: 500px;
+  min-height: 70px;
+  max-height: 70px;
+}
+
+@media screen and (max-width: 825px) {
   .card {
     width: 90%;
   }
+}
+
+@media screen and (max-width: 600px) {
+  #address-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(auto-fit, auto);
+    margin: 0 1.5em;
+  }
+
+  #street-number {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #street-address {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  #suburb {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  #postcode {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  #city {
+    grid-column: 1;
+    grid-row: 5;
+  }
+
+  #city >>> .vs-input {
+    margin: 0 1em;
+    width: auto;
+  }
+
+  #region {
+    grid-column: 1;
+    grid-row: 6;
+  }
+
+  #country {
+    grid-column: 1;
+    grid-row: 7;
+  }
+
+  #country >>> .vs-input {
+    margin: 0 1em;
+    width: auto;
+  }
+
 }
 
 </style>

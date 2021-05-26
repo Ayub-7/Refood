@@ -43,12 +43,10 @@
         </div>
         <div id="description">
           <vs-textarea
-              :danger="(errors.includes('no-desc'))"
-              danger-text="Description is Required."
               class="form-control"
               type="text"
               width="400px"
-              label="Description (required)"
+              label="Description"
               v-model="description"/>
         </div>
       </div>
@@ -61,14 +59,13 @@
 </template>
 
 <script>
-import CurrencyInput from "../components/CurrencyInput";
 import api from "../Api";
 import axios from "axios";
 import {store} from "../store";
 
 const AddToCatalogue = {
   name: "AddToCatalogue",
-  components: {CurrencyInput},
+
   data: function () {
     return {
       user: null,
@@ -98,10 +95,6 @@ const AddToCatalogue = {
         this.errors.push(this.productId);
       }
 
-      if (this.description.length === 0) {
-        this.errors.push('no-desc');
-      }
-
       if (this.manufacturer.length === 0) {
         this.errors.push('no-manu');
       }
@@ -127,10 +120,20 @@ const AddToCatalogue = {
           });
         }
       }
-      if (this.errors.includes('no-desc')) {
+      if (this.productName.length > 25) {
+        this.errors.push('long-prodName');
         this.$vs.notify({
           title: 'Failed to create catalogue item',
-          text: 'Description is Required.',
+          text: 'Product name is too long! Make sure it is 25 characters or less',
+          color: 'danger'
+        });
+      }
+
+      if (this.description.length > 140) {
+        this.errors.push('long-desc');
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Description is too long! Make sure it is 140 characters or less',
           color: 'danger'
         });
       }
@@ -243,7 +246,7 @@ Card styling.
   background-color: white;
   margin: 1em auto;
   padding: 0.5em 0 0.5em 0;
-  border-radius: 20px;
+  border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
