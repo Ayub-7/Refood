@@ -6,7 +6,6 @@
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
         <!-- Add to inventory modal -->
         <AddToInventory @submitted="onSuccess"></AddToInventory>
-        <vs-button @click="newListingPopup = true" class="header-button">New Item Listing</vs-button>
       </div>
     </div>
 
@@ -14,19 +13,17 @@
     <vs-popup :active.sync="newListingPopup"
               title="Create a new listing">
       <div class="new-listing-modal">
-        <div class="row">
-          <label for="InvId">Inventory Item ID</label>
-          <vs-select id="InvId" class="selectExample" v-model="invItem" v-on:change="changeInvVals">
-            <vs-select-item :value="invItem" :text="' (' + invItem.id +') '+ invItem.productName" v-for="invItem in getInventory()" v-bind:href="invItem.id" :key="invItem.id"/>
-          </vs-select>
+        <div class="row" v-if="invItem != null">
+          <img v-if="invItem != null && invItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(invItem.product))"/>
+          <img v-if="invItem != null && invItem.product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(invItem.product)"/>
+          <img v-if="invItem != null && !invItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
+          <img v-if="invItem != null && !isDevelopment() && !invItem.product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
+
         </div>
         <div id="listing-product-name">
           <div class="sub-header">Inventory Item Name</div>
-          <div style="font-size: 18px; text-align: left; font-weight: bold" v-if="invItem.length !== 0">{{ invItem.product.name }}</div>
-          <div style="font-size: 10px; text-align: left" v-if="invItem.length !== 0">Price {{ invItem.pricePerItem }}</div>
-          <div style="font-size: 10px; text-align: left" v-if="invItem.length !== 0">Qty {{ invItem.quantity }}</div>
-
-          <div style="font-size: 18px;" v-else></div>
+          <div style="font-size: 18px; text-align: center; font-weight: bold" v-if="invItem != null">{{ invItem.product.name }}</div>
+          <div v-if="invItem != null">{{ invItem.productId }}</div>
         </div>
         <vs-divider id="listing-divider"></vs-divider>
         <div id="listing-price">
@@ -44,6 +41,7 @@
                 :max="listingQuantityMax"
                 :min="1"></vs-input-number>
           </div>
+          <div v-if="invItem != null" style="font-size: 10px; text-align: center; position: absolute">Max: {{ invItem.quantity }}</div>
           <div v-show="newListingErrors.quantity.error" style="font-size: 10px; color: #FF4757; text-align: center; position: absolute">{{ newListingErrors.quantity.message }}</div>
         </div>
         <div id="listing-closes">
@@ -105,11 +103,20 @@
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
           <vs-td :data="inventory.pricePerItem">{{currency}} {{inventory.pricePerItem}} </vs-td>
           <vs-td :data="inventory.totalPrice">{{currency}} {{inventory.totalPrice}}</vs-td>
-          <vs-td><ModifyInventory @submitted="onSuccess" :item="inventory"></ModifyInventory></vs-td>
+          <vs-td>
+
+            <vs-dropdown vs-trigger-click>
+              <vs-button>Actions</vs-button>
+              <vs-dropdown-menu>
+                <vs-dropdown-item @click="openModifyModal(inventory)">Modify</vs-dropdown-item>
+                <vs-dropdown-item @click="openNewListingModal(inventory)">New Listing</vs-dropdown-item>
+              </vs-dropdown-menu>
+            </vs-dropdown>
+          </vs-td>
         </vs-tr>
       </template>
     </vs-table>
-
+    <ModifyInventory ref="modifyInventoryModal" @submitted="onSuccess" :item="activeModifyItem"></ModifyInventory>
   </vs-card>
 </template>
 
@@ -129,9 +136,13 @@ export default {
       inventory: [],
       currency: "$",
       products: [],
-      invItem:[],
+      invItem: null,
+
+      modifyModal: false,
+      activeModifyItem: null,
 
       // New Sale Listing Variables
+      newListingInventoryItem: null,
       newListingPopup: false,
       newListingErrors: {
         price: {error: false, message: "Price cannot be empty or negative."},
@@ -154,6 +165,26 @@ export default {
   },
 
   methods: {
+
+    /**
+     * Opens the new listing modal, sets fields to default to the selected item data.
+     */
+    openNewListingModal(inventory) {
+      this.invItem = inventory;
+      console.log(this.invItem);
+      this.price = this.invItem.pricePerItem;
+      this.listingQuantityMax = this.invItem.quantity;
+      this.closes = this.invItem.expires + 'T00:00';
+      this.newListingPopup = true;
+    },
+
+    /**
+     * Opens the modify inventory modal by calling the open function inside the component.
+     */
+    openModifyModal(inventory) {
+      this.$refs.modifyInventoryModal.open(inventory);
+    },
+
     onSuccess() {
       this.getBusinessInventory();
     },
@@ -179,13 +210,7 @@ export default {
 
     },
 
-    changeInvVals: function() {
-      if (this.invItem !== undefined) {
-        this.price = this.invItem.pricePerItem;
-        this.listingQuantityMax = this.invItem.quantity;
-        this.closes = this.invItem.expires + 'T00:00';
-      }
-    },
+
     /**
      * Validates the fields for a new public listing.
      * @return true if all of the required fields meet the requirements, false otherwise.
@@ -213,9 +238,17 @@ export default {
       return isValid;
     },
 
+    /**
+     * Retrieves the image url link for the given product.
+     * @param product the product to retrieve the image for.
+     * @return a string link to the product image, or the default image if it doesn't have a product.
+     **/
     getImgUrl(product) {
-      console.log("PRODUCTT: " + product);
-      if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+      if (product === true && process.env.NODE_ENV !== 'staging') {
+        return '/prod/ProductShoot.jpg';
+      } else if (product === true) {
+        return '/test/ProductShoot.jpg';
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
       } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
         return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
@@ -225,6 +258,7 @@ export default {
         return '../../public/ProductShoot.jpg'
       }
     },
+
 
     /**
      * Checks if the new list form is valid, then creates a new listing to be sent to backend if true.
@@ -391,6 +425,7 @@ export default {
     grid-column: 2;
 
     text-align: center;
+    margin: auto;
   }
 
   #listing-divider {
@@ -483,7 +518,20 @@ export default {
     width: 130px;
   }
 
+  .table-image {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
 
+  .image {
+    margin: auto;
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
 
 
   /* ===== INVENTORY ADDING MODAL ===== */
@@ -499,7 +547,7 @@ export default {
   }
 
   .row {
-    margin-bottom: 15px;
+    margin: auto;
   }
   .addButton {
     align-self: center;

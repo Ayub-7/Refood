@@ -1,6 +1,6 @@
 <template>
   <div id="form-outer">
-    <vs-button @click="addNewInv=true" class="header-button">New Inventory Listing</vs-button>
+    <vs-button @click="addNewInv=true" class="header-button">New Inventory Item</vs-button>
     <vs-popup classContent="popup-example"  title="Add new inventory item" :active.sync="addNewInv">
       <div class="form-group required vs-col" vs-order="1" id="firstColModal" >
         <div class="row">
@@ -16,7 +16,6 @@
               danger-text="Price per item must be greater than zero and numeric."
               class="inputx"
               id="pricePerItem"
-              placeholder="Price per item"
               v-model="invenForm.pricePerItem"
               v-on:change="updateTotalPrice"/>
         </div>
@@ -27,7 +26,6 @@
               danger-text="Total price must be greater than zero and numeric."
               class="inputx"
               id="totalPrice"
-              placeholder="Price per item"
               v-model="invenForm.totalPrice"/>
         </div>
         <div class="row">
@@ -157,7 +155,6 @@ export default {
         this.errors.push(this.invenForm.prodId);
       }
       if (this.invenForm.pricePerItem <= 0.0) {
-        console.log("WAAAAAAAAAA");
         this.errors.push('pricePerItem');
       }
       if (this.invenForm.bestBefore !== '') {
