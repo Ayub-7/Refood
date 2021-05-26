@@ -102,17 +102,15 @@ const ModifyCatalog = {
       //Should have constants for max values
 
       var invalidChars = /[^a-zA-Z/ -\d]/i;
-      //var isValidName = !(invalidChars.test(this.productName));
-      //var isValidID = !(invalidChars.test(this.productId));
-      //var isValidManu = !(invalidChars.test(this.manufacturer));
+      var invalidName = /[^a-zA-Z,/ -\d]/i;
       this.errors = [];
-      if (this.productName.match(invalidChars)) {
+      if (this.productName.match(invalidName)) {
         this.errors.push("invalid-chars");
       }
       if (this.productId.match(invalidChars)) {
         this.errors.push("invalid-chars");
       }
-      if (this.manufacturer.match(invalidChars)) {
+      if (this.manufacturer.match(invalidName)) {
         this.errors.push("invalid-chars");
       }
       if (this.productName.length === 0) {

@@ -71,7 +71,8 @@ public class UserControllerTests {
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
-        user = new User("johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        user = new User("John", "Smith", addr, "johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
 
     }
 
@@ -416,7 +417,8 @@ public class UserControllerTests {
     @Test
     @WithMockUser(roles="DGAA")
     public void testSuccessfulMakeAdmin() throws Exception {
-        User adminUser = new User("dgaaEmail@email.com", "dgaa123", Role.DGAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User adminUser = new User("New", "DGAA", addr, "dgaaEmail@email.com", "dgaa123", Role.DGAA);
         adminUser.setId(5);
 
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
@@ -456,7 +458,8 @@ public class UserControllerTests {
     @Test
     @WithMockUser(roles="DGAA")
     public void testConflictRevokeAdmin() throws Exception {
-        User adminUser = new User("dgaaEmail@email.com", "dgaa123", Role.DGAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User adminUser = new User("New", "DGAA", addr, "dgaaEmail@email.com", "dgaa123", Role.DGAA);
         adminUser.setId(5);
 
         Mockito.when(userRepository.findUserById(adminUser.getId())).thenReturn(adminUser);
@@ -468,7 +471,8 @@ public class UserControllerTests {
     @Test
     @WithMockUser(roles="DGAA")
     public void testSuccessfulRevokeAdmin() throws Exception {
-        User adminUser = new User("dgaaEmail@email.com", "dgaa123", Role.DGAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User adminUser = new User("New", "DGAA", addr, "dgaaEmail@email.com", "dgaa123", Role.DGAA);
         adminUser.setId(5);
 
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);

@@ -64,7 +64,8 @@ public class ProductControllerTest {
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
-        user = new User("testemail@email.com", "testpassword", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        user = new User("New", "User", addr, "testemail@email.com", "testpassword", Role.USER);
         user.setId(1L);
 
         Address businessAddress = new Address(null, null, null, null, "New Zealand", null);
@@ -119,7 +120,8 @@ public class ProductControllerTest {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
 
-        User nonAdminUser = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User nonAdminUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
 
         mvc.perform(get("/businesses/{id}/products", business.getId())
@@ -137,7 +139,8 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(roles="USER")
     public void testForbiddenUserPostProduct() throws Exception {
-        User forbiddenUser = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(post("/businesses/{id}/products", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbiddenUser)
@@ -149,8 +152,9 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(roles="USER")
     public void testPostProductAsGlobalAdmin() throws Exception {
-        User DGAAUser = new User("email@email.com", "password", Role.DGAA);
-        User GAAUser = new User("email2@email.com", "password", Role.GAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
+        User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(post("/businesses/{id}/products", business.getId())
@@ -176,7 +180,8 @@ public class ProductControllerTest {
                 .content(mapper.writeValueAsString(product1)))
                 .andExpect(status().isCreated());
 
-        User businessSecondaryAdmin = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User businessSecondaryAdmin = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         business.getAdministrators().add(businessSecondaryAdmin);
         mvc.perform(post("/businesses/{id}/products", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, businessSecondaryAdmin)
@@ -291,7 +296,8 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(roles="USER")
     public void testForbiddenUserPutProduct() throws Exception {
-        User forbiddenUser = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
         mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
@@ -305,8 +311,9 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(roles="USER")
     public void testPutProductAsGlobalAdmin() throws Exception {
-        User DGAAUser = new User("email@email.com", "password", Role.DGAA);
-        User GAAUser = new User("email2@email.com", "password", Role.GAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
+        User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
@@ -336,7 +343,8 @@ public class ProductControllerTest {
                 .content(mapper.writeValueAsString(productUpdate)))
                 .andExpect(status().isOk());
 
-        User businessSecondaryAdmin = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User businessSecondaryAdmin = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         business.getAdministrators().add(businessSecondaryAdmin);
         mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, businessSecondaryAdmin)
@@ -458,7 +466,8 @@ public class ProductControllerTest {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isCreated());
 
-        User gaaUser = new User("fake@fakemail.com", "testpass", Role.GAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User gaaUser = new User("test", "GAA", addr, "fake@fakemail.com", "testpass", Role.GAA);
 
         mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
                 .file(image)
@@ -512,7 +521,8 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest());
 
         // Forbidden Account
-        User anotherUser = new User("fake@fakemail.com", "testpass", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User anotherUser = new User("test", "user", addr, "fake@fakemail.com", "testpass", Role.USER);
         mvc.perform(multipart("/businesses/{businessId}/products/{productId}/images", business.getId(), product1.getId())
                 .file(badTypeFile)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
@@ -546,7 +556,8 @@ public class ProductControllerTest {
                 .andExpect(status().isNotAcceptable());
 
         //forbidden user
-        User forbidden = new User("test@gmail.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User forbidden = new User("test", "user", addr, "test@gmail.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
@@ -574,7 +585,8 @@ public class ProductControllerTest {
                 .andExpect(status().isOk());
 
         // DGAA not owner of business
-        User gaa = new User("test@tester.com", "password", Role.GAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User gaa = new User("test", "GAA", addr, "test@tester.com", "password", Role.GAA);
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
                 .andExpect(status().isOk());

@@ -136,7 +136,7 @@
                 <template slot-scope="{data}">
                   <vs-tr :key="product.id" v-for="product in data">
                     <vs-td style="width: 20px; padding-right: 10px">
-                      <a v-bind:href="'/products?id='+ product.id">{{ product.id }}</a>
+                      <a style="color: rgb(0,0,238);">{{ product.id }}</a>
                       <div>
                         <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
                         <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)"/>

@@ -104,7 +104,8 @@ public class InventoryControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testForbiddenUserGetInventory() throws Exception {
-        User forbiddenUser = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "New Zealand", "1234");
+        User forbiddenUser = new User("Bad", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(get("/businesses/{id}/inventory", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbiddenUser))
@@ -114,7 +115,8 @@ public class InventoryControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testGetInventoryForNullBusiness() throws Exception {
-        User user = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User user = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
         mvc.perform(get("/businesses/{id}/inventory", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
@@ -124,13 +126,14 @@ public class InventoryControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testGlobalAdminGetInventory() throws Exception {
-        User defaultGlobalAdmin = new User("email@email.com", "password", Role.DGAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User defaultGlobalAdmin = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(get("/businesses/{id}/inventory", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, defaultGlobalAdmin))
                 .andExpect(status().isOk());
 
-        User globalAdmin = new User("email@email.com", "password", Role.GAA);
+        User globalAdmin = new User("New", "GAA", addr, "email@email.com", "password", Role.GAA);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(get("/businesses/{id}/inventory", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, globalAdmin))
@@ -164,7 +167,8 @@ public class InventoryControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testForbiddenUserPostInventory() throws Exception {
-        User forbiddenUser = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
 
@@ -181,8 +185,9 @@ public class InventoryControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testPostInventoryAsGlobalAdmin() throws Exception {
-        User DGAAUser = new User("email@email.com", "password", Role.DGAA);
-        User GAAUser = new User("email2@email.com", "password", Role.GAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
+        User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
@@ -211,7 +216,8 @@ public class InventoryControllerTests {
                 .content(mapper.writeValueAsString(inventory1)))
                 .andExpect(status().isCreated());
 
-        User businessSecondaryAdmin = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User businessSecondaryAdmin = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         business.getAdministrators().add(businessSecondaryAdmin);
         mvc.perform(post("/businesses/{id}/inventory", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, businessSecondaryAdmin)
@@ -294,7 +300,8 @@ public class InventoryControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testForbiddenUserPutInventory() throws Exception {
-        User forbiddenUser = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
 
@@ -314,8 +321,9 @@ public class InventoryControllerTests {
     @Test
     @WithMockUser(roles="USER")
     public void testPutInventoryAsGlobalAdmin() throws Exception {
-        User DGAAUser = new User("email@email.com", "password", Role.DGAA);
-        User GAAUser = new User("email2@email.com", "password", Role.GAA);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
+        User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
 
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -355,7 +363,8 @@ public class InventoryControllerTests {
                 .content(mapper.writeValueAsString(inventory1)))
                 .andExpect(status().isOk());
 
-        User businessSecondaryAdmin = new User("email@email.com", "password", Role.USER);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User businessSecondaryAdmin = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         business.getAdministrators().add(businessSecondaryAdmin);
         mvc.perform(put("/businesses/{id}/inventory/{inventoryId}", business.getId(), existingInventoryItem.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, businessSecondaryAdmin)

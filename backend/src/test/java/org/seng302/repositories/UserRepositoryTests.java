@@ -29,6 +29,7 @@ public class UserRepositoryTests {
 
 
     private User testUser;
+    private User anotherUser;
 
     @BeforeEach
     void setUp() throws NoSuchAlgorithmException {
@@ -36,7 +37,7 @@ public class UserRepositoryTests {
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         Address a2 = new Address("620","Sutherland Lane","Dalai", null,"China", null);
         testUser = new User("Wileen", "YEP", "Tilsley","Diverse", "hybrid orchestration","wtilsley0@rakuten.co.jp","1921-10-08","+86 815 603 3959",a1, "zWkb3AeLn3lc");
-        User anotherUser = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784",a2,"HGD0nAJNjSD");
+        anotherUser = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784",a2,"HGD0nAJNjSD");
         userRepository.save(testUser);
         userRepository.save(anotherUser);
     }

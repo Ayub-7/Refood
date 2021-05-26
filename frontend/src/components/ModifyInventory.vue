@@ -1,6 +1,5 @@
 <template>
   <div id="form-outer">
-    <vs-button @click="modifyInv=true" class="header-button">Edit</vs-button>
     <vs-popup classContent="popup-example"  title="Modify Inventory Item" :active.sync="modifyInv">
       <div class="form-group required vs-col" vs-order="1" id="firstColModal">
         <div class="row">
@@ -76,7 +75,7 @@
         <vs-button>Update product</vs-button>
       </div>
       <div class="form-group required vs-col" align="center" id="cancelButton" @click="modifyInv=false" style="margin-left: 5px;">
-        <vs-button>Cancel</vs-button>
+        <vs-button type="border">Cancel</vs-button>
       </div>
     </vs-popup>
   </div>
@@ -88,8 +87,10 @@ import {store} from "../store";
 
 export default {
   name: "ModifyInventory",
+
   data() {
     return {
+      item: null,
       invenForm: {
         prodId: '',
         pricePerItem: 0.0,
@@ -104,8 +105,15 @@ export default {
       errors: [],
     }
   },
-  props: ['item'],
+
   methods: {
+    open: function(inventory) {
+      this.item = inventory;
+      this.getBusinessProducts();
+      this.setCurrentItem(this.item);
+      this.modifyInv = true;
+    },
+
     checkForm: function() {
       this.errors = [];
       var today = new Date();
@@ -238,6 +246,7 @@ export default {
               this.$log.debug("Inventory item updated:", response.data);
               //this.inventory.push(response.data);
               this.addNewInv = false;
+              this.modifyInv = false;
               this.$emit('submitted');
               this.$vs.notify( {
                 title: `Item successfully modified`,
@@ -278,10 +287,6 @@ export default {
       }
     },
   },
-  mounted(){
-    this.getBusinessProducts();
-    this.setCurrentItem(this.item);
-  }
 }
 </script>
 

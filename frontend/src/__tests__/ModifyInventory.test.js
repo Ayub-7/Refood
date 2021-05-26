@@ -52,7 +52,7 @@ beforeEach(() => {
         propsData: {'item': mockInventory[0]},
         localVue,
     })
-    wrapper.vm.products = [{
+    wrapper.vm.item = {
         "id": "W04GP5EC0B1798680",
         "name": "Compound - Mocha",
         "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
@@ -61,7 +61,7 @@ beforeEach(() => {
         "created": "2021-01-11 20:54:46",
         "images": [],
         "primaryImagePath": null
-    }];
+    };
 
     // const getBusinessInventory = jest.spyOn(BusinessInventory.methods, "getBusinessInventory");
     //

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.Address;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,8 @@ public class AdminUtils {
         List<User> dgaaUsers = userRepository.findAllByRole(Role.DGAA);
 
         if (dgaaUsers.size() < 1) {
-            User dgaa = new User(DGAA_EMAIL, DGAA_PASSWORD, Role.DGAA);
+            Address dgaaAddr = new Address(null, null, null, null, null, "New Zealand", "8041");
+            User dgaa = new User("Default", "Global Admin", dgaaAddr, DGAA_EMAIL, DGAA_PASSWORD, Role.DGAA);
             userRepository.save(dgaa);
             logger.error("A DGAA was not found in the user database, and a new DGAA user has been created and inserted.");
         }
