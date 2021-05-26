@@ -120,6 +120,23 @@ const AddToCatalogue = {
           });
         }
       }
+      if (this.productName.length > 25) {
+        this.errors.push('long-prodName');
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Product name is too long! Make sure it is 25 characters or less',
+          color: 'danger'
+        });
+      }
+
+      if (this.description.length > 140) {
+        this.errors.push('long-desc');
+        this.$vs.notify({
+          title: 'Failed to create catalogue item',
+          text: 'Description is too long! Make sure it is 140 characters or less',
+          color: 'danger'
+        });
+      }
     },
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
