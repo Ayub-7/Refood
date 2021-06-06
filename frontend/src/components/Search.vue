@@ -170,43 +170,44 @@ const Search = {
      */
     searchUsers: function () {
       if (this.searchbar === "") return;
+      this.$vs.loading();
+      api.searchQuery(this.searchbar)
+        .then((response) => {
+          this.users = response.data;
+          this.users = this.users.filter(x => typeof(x) == "object")
 
-      api
-          .searchQuery(this.searchbar)
-          .then((response) => {
-            this.users = response.data;
-            this.users = this.users.filter(x => typeof(x) == "object")
+          //Need to set properties of user object so they can be sorted by
+          for(let user of this.users) {
+            user.country = user.homeAddress.country;
+            user.city = user.homeAddress.city;
+          }
 
-            //Need to set properties of user object so they can be sorted by
-            for(let user of this.users) {
-              user.country = user.homeAddress.country;
-              user.city = user.homeAddress.city;
+          if(this.users.length < 10) {
+            this.userSearchIndexMin = 1;
+            this.userSearchIndexMax = this.users.length;
+            if(this.users.length == 0){
+              this.userSearchIndexMin = 0;
             }
+          } else {
+            this.userSearchIndexMin = 1;
+            this.userSearchIndexMax = 10;
+          }
 
-            if(this.users.length < 10) {
-              this.userSearchIndexMin = 1;
-              this.userSearchIndexMax = this.users.length;
-              if(this.users.length == 0){
-                this.userSearchIndexMin = 0;
-              }
-            } else {
-              this.userSearchIndexMin = 1;
-              this.userSearchIndexMax = 10;
-            }
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load users";
+        })
+        .finally(() => {
+          this.$vs.loading.close();
+          if(!this.tableLoaded){
+            document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load users";
-          }).finally(() => {
-        if(!this.tableLoaded){
-          document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+            //Event listeners for vuesax buttons on table since they're generated afterwards
+            document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
+            document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
 
-          //Event listeners for vuesax buttons on table since they're generated afterwards
-          document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
-          document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
-
-          this.tableLoaded = true;
+            this.tableLoaded = true;
         }
       })
     },
