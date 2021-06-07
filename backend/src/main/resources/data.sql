@@ -1,28 +1,4 @@
-INSERT INTO business (name, description, created, user_id, business_type, address_id) VALUES
-    /* 5 businesses */
-    ('Dabshots', 'Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.', '2020-05-18 21:06:11', 1, 'CHARITABLE_ORGANISATION', 21),
-    ('Layo', 'Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.', '2020-08-25 22:22:19', 2, 'ACCOMMODATION_AND_FOOD_SERVICES', 22),
-    ('Skinder', 'Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', '2020-09-11 20:50:50', 3, 'RETAIL_TRADE', 23),
-    ('Skiptube', 'Phasellus in felis.', '2020-10-18 10:30:14', 4, 'RETAIL_TRADE', 24),
-    ('Photojam', 'Praesent blandit. Nam nulla.', '2020-05-23 08:21:22', 5, 'RETAIL_TRADE', 25);
-
-
-INSERT INTO business_admins (business_id, user_id) VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5),
-    (3, 7),
-    (5, 9),
-    (4, 6),
-    (5, 8),
-    (2, 9),
-    (2, 1),
-    (3, 1);
-
-
-
+/* File currently not being used. */
 INSERT INTO product (id, name, description, manufacturer, recommended_retail_price, created, business_id) VALUES
     /* 20 products */
     ('WAUEH98E37A680027', 'Wine - White, Pinot Grigio', 'integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero non mattis pulvinar', 'Bubbletube', 51.63, '2021-01-27 16:07:14', 2),
