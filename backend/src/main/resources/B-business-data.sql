@@ -1624,4 +1624,3 @@ insert into business_admins (business_id, user_id) values (137, 1162);
 insert into business_admins (business_id, user_id) values (190, 1438);
 insert into business_admins (business_id, user_id) values (463, 1868);
 insert into business_admins (business_id, user_id) values (79, 1565);
-
