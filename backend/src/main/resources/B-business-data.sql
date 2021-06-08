@@ -527,7 +527,7 @@ insert into business (name, description, created, user_id, business_type, addres
 insert into business (name, description, created, user_id, business_type, address_id) values ('Topicware', null, '2020-09-19 14:49:10', 709, 'CHARITABLE_ORGANISATION', 10042);
 insert into business (name, description, created, user_id, business_type, address_id) values ('Shuffledrive', 'Nunc purus.', '2020-12-03 09:47:56', 410, 'RETAIL_TRADE', 10043);
 insert into business (name, description, created, user_id, business_type, address_id) values ('Rhyzio', 'Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl.', '2020-09-25 22:50:36', 529, 'CHARITABLE_ORGANISATION', 10044);
-insert into business (name, description, created, user_id, business_type, address_id) values ('Wordpedia', null, '2020-09-12 12:55:26', 711, 'NON_PROFIT_ORGANISATION', 10045);
+insert into business (name, description, created, user_id, business_type, address_id) values ('Wollies', null, '2020-09-12 12:55:26', 711, 'NON_PROFIT_ORGANISATION', 10045);
 insert into business (name, description, created, user_id, business_type, address_id) values ('Raviga', null, '2020-01-18 15:53:27', 342, 'RETAIL_TRADE', 10046);
 insert into business (name, description, created, user_id, business_type, address_id) values ('Kwideo', 'In hac habitasse platea dictumst.', '2020-12-24 08:12:13', 677, 'ACCOMMODATION_AND_FOOD_SERVICES', 10047);
 insert into business (name, description, created, user_id, business_type, address_id) values ('Trupe', 'Donec ut dolor.', '2020-04-18 23:39:10', 551, 'RETAIL_TRADE', 10048);
@@ -1011,6 +1011,18 @@ insert into business (name, description, created, user_id, business_type, addres
 
 insert into business_admins (business_id, user_id) values
 /* Primary Business Admins */
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(3, 7),
+(5, 9),
+(4, 6),
+(5, 8),
+(2, 9),
+(2, 1),
+(3, 1),
 (6,113),
 (7,890),
 (8,200),
