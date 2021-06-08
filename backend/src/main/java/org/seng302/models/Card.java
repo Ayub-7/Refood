@@ -1,8 +1,9 @@
 package org.seng302.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-//import org.seng302.models.requests.NewCardRequest;
+import org.seng302.models.requests.NewCardRequest;
 
 import javax.xml.bind.ValidationException;
 import javax.persistence.*;
@@ -40,7 +41,9 @@ public class Card {
     private Date created;
     private String keywords; //comma delimited? Or use a List?
 
-    private MarketplaceSection cardType; //ForSale, wanted, exchange
+    @JsonIgnore
+    @Column(name = "card_type")
+    private MarketplaceSection section; //ForSale, wanted, exchange
 
     /**
      * Constructor for a new card object
@@ -50,16 +53,16 @@ public class Card {
      * @param description
      * @param created
      * @param keywords
-     * @param cardType
+     * @param section
      */
-    public Card(String userName, Address userHomeAddress, String title, String description, Date created, String keywords, MarketplaceSection cardType ) {
+    public Card(String userName, Address userHomeAddress, String title, String description, Date created, String keywords, MarketplaceSection section ) {
         this.userName = userName;
         this.userHomeAddress = userHomeAddress;
         this.title = title;
         this.description = description;
         this.created = created;
         this.keywords = keywords;
-        this.cardType = cardType;
+        this.section = section;
     }
 
 
@@ -69,44 +72,32 @@ public class Card {
     protected Card() {
     }
 
-
     /**
-     * Used for when a new card request is called.
+     * New Card request uses the minimum attributes and a reference to the User who created the card for initialization
+     * It creates a userName based on the user's first and last names
+     * It creates a generalized address user the user's real address
      *
-     * @param inventoryItem     the inventory item object that is being listed for sale
-     * @param newListingRequest The request body information that was mapped into a newListingRequest.
+     * @param newCardRequest
      */
-    /*
-    public Listing(Inventory inventoryItem, NewListingRequest newListingRequest) throws ValidationException {
-        if (this.validListingRequest(inventoryItem, newListingRequest)) {
-            this.inventoryItem = inventoryItem;
-            this.quantity = newListingRequest.getQuantity();
-            this.price = newListingRequest.getPrice();
-            this.moreInfo = newListingRequest.getMoreInfo();
-            this.created = new Date();
-            this.closes = newListingRequest.getCloses();
-        } else {
-            throw new ValidationException("Listing request item is not valid!");
-        }
+    public Card(NewCardRequest newCardRequest) {
+        User user = newCardRequest.getUser();
+        Address userAddress = user.getHomeAddress();
+
+        Address generalAddress = new Address(null, null,
+                userAddress.getSuburb(),
+                userAddress.getCity(),
+                userAddress.getRegion(),
+                userAddress.getCountry(),
+                userAddress.getPostcode());
+
+        this.userName = user.getFirstName() + user.getLastName();
+        this.userHomeAddress = generalAddress;
+        this.title = newCardRequest.getTitle();
+        this.description = newCardRequest.getDescription();
+        this.created = new Date();
+        this.keywords = newCardRequest.getKeywords();
+        this.section = newCardRequest.getSection();
     }
 
-    private boolean validListingRequest(Inventory inventoryItem, NewListingRequest req) {
-        Date today = Calendar.getInstance().getTime();
-        if (inventoryItem == null) {
-            return false;
-        } else {
-            int quantityOfInventory = inventoryItem.getQuantity();
-            if (req.getQuantity() < 1 || req.getPrice() < 0) {
-                return false;
-            } else if (req.getCloses() == null || req.getCloses().before(today)) {
-                return false;
-            } else if (req.getQuantity() > quantityOfInventory) {
-                return false;
-            }
-            return true;
-        }
-
-    }
-*/
 
 }
