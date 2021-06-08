@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Calendar;
 import org.seng302.models.*;
 import java.util.List;
+import org.seng302.models.Address;
 
 /**
  * Entity class for a user created card
@@ -26,7 +27,6 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     private String userName;
 
     @OneToOne(cascade = CascadeType.ALL)

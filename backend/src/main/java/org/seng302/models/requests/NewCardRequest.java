@@ -1,6 +1,8 @@
 package org.seng302.models.requests;
 
 import java.util.Date;
+import org.seng302.models.*;
+import org.seng302.models.Address;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
