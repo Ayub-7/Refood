@@ -148,6 +148,11 @@ const Users = {
         });
     },
 
+    /**
+     * Calculates the length of time since the user's registration date, outputting a string value.
+     * @param registerDate time and date of when the user registered.
+     * @return {string} string description of how long it has been since they have registered.
+     */
     calculateDuration: function(registerDate) {
       const TimeElapsed = Date.now();
       const today = new Date(TimeElapsed);
@@ -176,8 +181,14 @@ const Users = {
           this.user = response.data;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
         }).catch((err) => {
-          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-          this.$router.push({path: "/login"}); //If user not logged in send to login page
+          if (err.response.status === 401) {
+            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+            this.$router.push({path: "/login"}); //If user not logged in send to login page
+          }
+          else if (err.response.status === 406) {
+            this.$vs.notify({title:'User not found', text:'This user does not exist.', color:'danger'});
+            this.$router.push({path: "/home"}); //If user is logged in, but non-existent user
+          }
           throw new Error(`Error trying to get user info from id: ${err}`);
       });
     },
@@ -190,6 +201,11 @@ const Users = {
       this.$router.push({path: `/businesses/${business.id}`})
     },
 
+    /**
+     * Checks if the left-side options menu should show by checking the number of businesses
+     * has primary administrator access to.
+     * @returns {boolean} if there is one or more businesses, return true, else false.
+     */
     showOptionsMenu: function() {
       if (this.userViewingBusinesses < 1) {
         return false
@@ -200,7 +216,7 @@ const Users = {
   },
 
   mounted: function () {
-  //On page load call getUserInfo function to get user information
+    //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
     this.getUserInfo(userId);
   },
