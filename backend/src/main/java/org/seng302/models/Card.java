@@ -13,6 +13,8 @@ import org.seng302.models.*;
 import java.util.List;
 import org.seng302.models.Address;
 
+import java.util.Calendar;
+
 /**
  * Entity class for a user created card
  *
@@ -28,39 +30,35 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String userName;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
-    private Address userHomeAddress; //only city and suburb...
-
+    private User user
     private String title;
     private String description;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
-    private String keywords; //comma delimited? Or use a List?
+    private Date displayPeriodEnd;
+    private String keywords;
 
     @JsonIgnore
-    @Column(name = "card_type")
-    private MarketplaceSection section; //ForSale, wanted, exchange
+    @Column(name = "section")
+    private MarketplaceSection section;
 
     /**
      * Constructor for a new card object
-     * @param userName
-     * @param userHomeAddress
-     * @param title
-     * @param description
-     * @param created
-     * @param keywords
-     * @param section
+     * @param user User that created the card
+     * @param title Card's title
+     * @param description Card's dectiption field
+     * @param created Date the card was created
+     * @param displayPeriodEnd Date the card will be removed
+     * @param keywords Hashtags that describe the card
+     * @param section The Card's Marketplace section (see the Enum, MarketplaceSection.java)
      */
-    public Card(String userName, Address userHomeAddress, String title, String description, Date created, String keywords, MarketplaceSection section ) {
-        this.userName = userName;
-        this.userHomeAddress = userHomeAddress;
+    public Card(User user, String title, String description, Date created, Date displayPeriodEnd, String keywords, MarketplaceSection section ) {
+        this.user = user;
         this.title = title;
         this.description = description;
         this.created = created;
+        this.displayPeriodEnd = displayPeriodEnd;
         this.keywords = keywords;
         this.section = section;
     }
@@ -74,29 +72,41 @@ public class Card {
 
     /**
      * New Card request uses the minimum attributes and a reference to the User who created the card for initialization
-     * It creates a userName based on the user's first and last names
-     * It creates a generalized address user the user's real address
+     * This intializer converts a NewCardRequest to a Card entity
+     * The date created is set to the date this constructor is called.
      *
-     * @param newCardRequest
+     * @param newCardRequest see NewCardRequest.java. Creates a new card using minimum fields
      */
     public Card(NewCardRequest newCardRequest) {
-        User user = newCardRequest.getUser();
-        Address userAddress = user.getHomeAddress();
 
-        Address generalAddress = new Address(null, null,
-                userAddress.getSuburb(),
-                userAddress.getCity(),
-                userAddress.getRegion(),
-                userAddress.getCountry(),
-                userAddress.getPostcode());
 
-        this.userName = user.getFirstName() + user.getLastName();
-        this.userHomeAddress = generalAddress;
+        this.user = newCardRequest.getUser();
         this.title = newCardRequest.getTitle();
         this.description = newCardRequest.getDescription();
         this.created = new Date();
+        this.displayPeriodEnd = getDisplayPeriodEndDate();
         this.keywords = newCardRequest.getKeywords();
         this.section = newCardRequest.getSection();
+    }
+
+    /**
+     * getDisplayPeriodEndDate calculates the time a Card's display period will end
+     * This is set to two weeks/14 days.
+     * To change, alter the const displayPeriod in the function.
+     *
+     * Since this is called when a new card is created, the displayPeriodEndDate is
+     * displayPeriod days after the current date.
+     *
+     * @return displayPeriodEndDate The date the card will expire
+     */
+    private Date getDisplayPeriodEndDate () {
+        const int displayPeriod = 14;
+
+        Calendar displayPeriodEndCalendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
+        Date displayPeriodEndDate = calendar.getTime();
+
+        return displayPeriodEndDate
     }
 
 
