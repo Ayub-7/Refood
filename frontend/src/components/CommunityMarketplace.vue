@@ -15,26 +15,26 @@
         </div>
       </div>
       <vs-divider></vs-divider>
-    <vs-tabs alignment="center">
-      <vs-tab label="For Sale">
-        <div>
-          <MarketplaceGrid v-if="displaytype" :cardData="testData" />
-          <MarketplaceTable v-if="!displaytype" :tableData="testData" />
-        </div>
-      </vs-tab>
-      <vs-tab label="Wanted">
-        <div>
-          <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1, 4)" />
-          <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1, 4)" />
-        </div>
-      </vs-tab>
-      <vs-tab label="Exchange">
-        <div>
-          <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1,2)" />
-          <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1,2)" />
-        </div>
-      </vs-tab>
-    </vs-tabs>
+      <vs-tabs alignment="center">
+        <vs-tab label="For Sale">
+          <div>
+            <MarketplaceGrid v-if="displaytype" :cardData="testData" />
+            <MarketplaceTable v-if="!displaytype" :tableData="testData" />
+          </div>
+        </vs-tab>
+        <vs-tab label="Wanted">
+          <div>
+            <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1, 4)" />
+            <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1, 4)" />
+          </div>
+        </vs-tab>
+        <vs-tab label="Exchange">
+          <div>
+            <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1,2)" />
+            <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1,2)" />
+          </div>
+        </vs-tab>
+      </vs-tabs>
     </div>
   </vs-card>
 </template>
@@ -60,7 +60,7 @@ export default {
             {
               id: 1,
               name: 'beans'
-              }
+            }
           ]
         },
         {
@@ -71,7 +71,7 @@ export default {
             {
               id: 2,
               name: 'waste'
-              }
+            }
           ]
         },
         {
@@ -82,11 +82,11 @@ export default {
             {
               id: 3,
               name: 'carr'
-              },
-                     {
+            },
+            {
               id: 4,
               name: 'vroom'
-              }
+            }
           ]
         },
 
@@ -98,18 +98,18 @@ export default {
             {
               id: 3,
               name: 'rats'
-              },
-                     {
+            },
+            {
               id: 4,
               name: 'game'
-              },
-              {
+            },
+            {
               id: 5,
               name: 'steam'
-              }           
+            }
           ]
         },
-        
+
       ]
     }
   }
