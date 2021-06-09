@@ -6,6 +6,10 @@ import org.junit.runner.RunWith;
 import org.seng302.TestApplication;
 import org.seng302.models.Address;
 import org.seng302.models.Card;
+import org.seng302.models.User;
+import org.seng302.models.requests.NewCardRequest;
+import org.seng302.models.requests.NewUserRequest;
+
 import org.seng302.models.MarketplaceSection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -32,24 +36,36 @@ public class CardRepositoryTests {
     @Autowired
     private CardRepository cardRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+
     private Card testCard1;
     private Card testCard2;
     private String keywords;
+    private User testUser;
 
     @BeforeEach
     void setUp() {
         cardRepository.deleteAll();
         cardRepository.flush();
+        userRepository.deleteAll();
+        userRepository.flush();
 
+
+        assertThat(userRepository).isNotNull();
         assertThat(cardRepository).isNotNull();
+
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
-        Address a2 = new Address("620","Sutherland Lane","Dalai", null,"China", null);
         keywords = "card, test, asdf";
 
-        testCard1 = new Card("test user", a1, "Card title 1", "Card description 1", new Date(), keywords, MarketplaceSection.FORSALE);
+        NewCardRequest newCardRequest1 = new NewCardRequest(null, "Card title 1", "Card description 1", keywords, MarketplaceSection.FORSALE);
+        NewCardRequest newCardRequest2 = new NewCardRequest(null, "Card title 2", "Card description 2", keywords, MarketplaceSection.FORSALE);
+
+        testCard1 = new Card(newCardRequest1);
         cardRepository.save(testCard1);
 
-        testCard2 = new Card("test user", a1, "Card title 2", "Card description 2", new Date(), keywords, MarketplaceSection.FORSALE);
+        testCard2 = new Card(newCardRequest2);
         cardRepository.save(testCard2);
 
     }

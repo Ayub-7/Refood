@@ -30,7 +30,10 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private User user
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user")
+    private User user;
     private String title;
     private String description;
 
@@ -78,8 +81,6 @@ public class Card {
      * @param newCardRequest see NewCardRequest.java. Creates a new card using minimum fields
      */
     public Card(NewCardRequest newCardRequest) {
-
-
         this.user = newCardRequest.getUser();
         this.title = newCardRequest.getTitle();
         this.description = newCardRequest.getDescription();
@@ -100,13 +101,13 @@ public class Card {
      * @return displayPeriodEndDate The date the card will expire
      */
     private Date getDisplayPeriodEndDate () {
-        const int displayPeriod = 14;
+        int displayPeriod = 14;
 
         Calendar displayPeriodEndCalendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
-        Date displayPeriodEndDate = calendar.getTime();
+        displayPeriodEndCalendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
+        Date displayPeriodEndDate = displayPeriodEndCalendar.getTime();
 
-        return displayPeriodEndDate
+        return displayPeriodEndDate;
     }
 
 
