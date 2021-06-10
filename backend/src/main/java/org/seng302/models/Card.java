@@ -36,7 +36,7 @@ public class Card {
     private Date displayPeriodEnd;
     private String keywords;
 
-    @JsonIgnore
+    @Enumerated(EnumType.STRING)
     @Column(name = "section")
     private MarketplaceSection section;
 
@@ -44,7 +44,7 @@ public class Card {
      * Constructor for a new card object
      * @param user User that created the card
      * @param title Card's title
-     * @param description Card's dectiption field
+     * @param description Card's description field
      * @param created Date the card was created
      * @param displayPeriodEnd Date the card will be removed
      * @param keywords Hashtags that describe the card
