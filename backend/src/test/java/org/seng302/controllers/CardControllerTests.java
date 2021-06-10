@@ -33,6 +33,7 @@ public class CardControllerTests {
     private CardController cardController;
     @MockBean
     private CardRepository cardRepository;
+
     @Autowired
     private ObjectMapper mapper;
 

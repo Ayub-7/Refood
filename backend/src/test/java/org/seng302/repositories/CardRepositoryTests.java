@@ -59,6 +59,8 @@ public class CardRepositoryTests {
         Address a2 = new Address(null, null, null, null, "Australia", null);
         User testUser = new User("Wileen", "YEP", "Tilsley","Diverse", "hybrid orchestration","wtilsley0@rakuten.co.jp","1921-10-08","+86 815 603 3959",a1, "zWkb3AeLn3lc");
         User user2 = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784",a2,"HGD0nAJNjSD");
+        userRepository.save(testUser);
+        userRepository.save(user2);
 
         keywords = "card, test, asdf";
 

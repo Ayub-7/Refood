@@ -27,12 +27,14 @@ public class UserRepositoryTests {
     @Autowired
     private UserRepository userRepository;
 
-
     private User testUser;
     private User anotherUser;
 
     @BeforeEach
     void setUp() throws NoSuchAlgorithmException {
+        userRepository.deleteAll();
+        userRepository.flush();
+
         assertThat(userRepository).isNotNull();
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         Address a2 = new Address("620","Sutherland Lane","Dalai", null,"China", null);
@@ -47,7 +49,7 @@ public class UserRepositoryTests {
         User found = userRepository.findUserByEmail("wtilsley0@rakuten.co.jp");
         assertThat(found.getEmail()).isEqualTo(testUser.getEmail());
         assertThat(found.getPassword()).isEqualTo(testUser.getPassword());
-        assertThat(found.getId()).isEqualTo(1);
+        assertThat(found.getId()).isEqualTo(testUser.getId());
 
         User notFound = userRepository.findUserByEmail("nonexistingemail@aol.com");
         assertThat(notFound).isNull();

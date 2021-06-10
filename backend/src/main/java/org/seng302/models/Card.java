@@ -5,14 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.seng302.models.requests.NewCardRequest;
 
-import javax.xml.bind.ValidationException;
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Calendar;
-import org.seng302.models.*;
-import java.util.List;
-import org.seng302.models.Address;
-
 import java.util.Calendar;
 
 /**
