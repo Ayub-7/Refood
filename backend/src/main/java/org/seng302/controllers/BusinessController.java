@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class BusinessController {
@@ -48,9 +47,10 @@ public class BusinessController {
     }
 
     /**
-     * Post request mapping to create a new Business
-     * @param req Request body
-     * @return ResponseEntity
+     * Post request mapping to create a new business.
+     * @param req DTO containing the new request information.
+     * @param session the current user session.
+     * @return ResponseEntity 401 if no auth (handled by spring sec), 400 if there are errors in the request, 201 otherwise.
      */
     @PostMapping("/businesses")
     public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) throws JsonProcessingException {
@@ -62,7 +62,7 @@ public class BusinessController {
         if (isValidBusiness(business)) {
             businessRepository.save(business);
             BusinessIdResponse businessIdResponse = new BusinessIdResponse(business.getId(), business.getBusinessType());
-            System.out.println(businessIdResponse);
+
             String jsonString = mapper.writeValueAsString(businessIdResponse);
             return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
         } else {
@@ -113,6 +113,14 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).build(); // 200
     }
 
+    /**
+     * A PUT request that removes a user from being an administrator of a given business.
+     * @param userIdRequest DTO class that contains the user id to remove from the business.
+     * @param id the unique business id.
+     * @param session current user session.
+     * @return 406 if business doesn't exist, 403 if user making the request is not the primary admin, or DGAA,
+     * 400 if there is an error in user being removed, 200 otherwise.
+     */
     @PutMapping("/businesses/{id}/removeAdministrator")
     public ResponseEntity<String> removeUserBusinessAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
         long userId = userIdRequest.getUserId();
@@ -162,13 +170,12 @@ public class BusinessController {
     }
 
     /**
-     *
-     * @param req http request
-     * @param session users current session
+     * Checks the current session of the currently controlled business.
+     * @param session business' current session
      * @return ResponseEntity containing the business object for the current session
      */
     @GetMapping("/checkbusinesssession")
-    public ResponseEntity<Business> checkbusinesssession(HttpServletRequest req, HttpSession session) {
+    public ResponseEntity<Business> checkBusinessSession(HttpSession session) {
         Business business = (Business) session.getAttribute("business");
         if(business != null){
             return ResponseEntity.status(HttpStatus.OK).body(business);

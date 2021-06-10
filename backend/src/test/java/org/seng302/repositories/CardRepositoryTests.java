@@ -46,26 +46,29 @@ public class CardRepositoryTests {
     private User testUser;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws NoSuchAlgorithmException {
         cardRepository.deleteAll();
         cardRepository.flush();
         userRepository.deleteAll();
         userRepository.flush();
 
-
         assertThat(userRepository).isNotNull();
         assertThat(cardRepository).isNotNull();
 
-        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
+        Address a1 = new Address(null, null, null, null, "New Zealand", null);
+        Address a2 = new Address(null, null, null, null, "Australia", null);
+        User testUser = new User("Wileen", "YEP", "Tilsley","Diverse", "hybrid orchestration","wtilsley0@rakuten.co.jp","1921-10-08","+86 815 603 3959",a1, "zWkb3AeLn3lc");
+        User user2 = new User("Gannon", "YEP", "Tynemouth", "Exclusive", "6th generation intranet", "gtynemouth1@indiatimes.com","1996-03-31","+62 140 282 1784",a2,"HGD0nAJNjSD");
+
         keywords = "card, test, asdf";
 
-        NewCardRequest newCardRequest1 = new NewCardRequest(null, "Card title 1", "Card description 1", keywords, MarketplaceSection.FORSALE);
-        NewCardRequest newCardRequest2 = new NewCardRequest(null, "Card title 2", "Card description 2", keywords, MarketplaceSection.FORSALE);
+        NewCardRequest newCardRequest1 = new NewCardRequest(1, "Card title 1", "Card description 1", keywords, MarketplaceSection.FORSALE);
+        NewCardRequest newCardRequest2 = new NewCardRequest(2, "Card title 2", "Card description 2", keywords, MarketplaceSection.FORSALE);
 
-        testCard1 = new Card(newCardRequest1);
+        testCard1 = new Card(newCardRequest1, testUser);
         cardRepository.save(testCard1);
 
-        testCard2 = new Card(newCardRequest2);
+        testCard2 = new Card(newCardRequest2, user2);
         cardRepository.save(testCard2);
 
     }

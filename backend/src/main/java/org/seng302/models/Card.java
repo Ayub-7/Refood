@@ -31,8 +31,8 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
     private String title;
     private String description;
@@ -77,11 +77,11 @@ public class Card {
      * New Card request uses the minimum attributes and a reference to the User who created the card for initialization
      * This intializer converts a NewCardRequest to a Card entity
      * The date created is set to the date this constructor is called.
-     *
      * @param newCardRequest see NewCardRequest.java. Creates a new card using minimum fields
+     * @param user the user object that is creating the new community card.
      */
-    public Card(NewCardRequest newCardRequest) {
-        this.user = newCardRequest.getUser();
+    public Card(NewCardRequest newCardRequest, User user) {
+        this.user = user;
         this.title = newCardRequest.getTitle();
         this.description = newCardRequest.getDescription();
         this.created = new Date();
