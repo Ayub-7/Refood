@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.ValidationException;
 
 /**
  * Controller class that handles the endpoints of community marketplace cards.
@@ -41,23 +42,20 @@ public class CardController {
     public ResponseEntity<String> addCard(@RequestBody NewCardRequest newCardRequest, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
-        // Checking card info is valid/has required fields.
-        if (newCardRequest.getSection() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Marketplace section is missing.");
-        }
-
-        if (newCardRequest.getKeywords() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Card keywords is missing.");
-        }
-
         // Attempting to create a card for somebody else.
         if (newCardRequest.getCreatorId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Card newCard = new Card(newCardRequest, currentUser);
-        cardRepository.save(newCard);
+        Card newCard;
+        try { // Attempt to create a new card.
+            newCard = new Card(newCardRequest, currentUser);
+        }
+        catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        }
 
+        cardRepository.save(newCard);
         CardIdResponse cardIdResponse = new CardIdResponse(newCard.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(cardIdResponse));
     }

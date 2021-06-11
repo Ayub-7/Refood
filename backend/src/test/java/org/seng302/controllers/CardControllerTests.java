@@ -72,8 +72,32 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_noKeywords_returnBadRequest() throws Exception {
-        cardRequest.setKeywords(null);
+    public void testPostCard_noTitle_returnBadRequest() throws Exception {
+        cardRequest.setTitle(null);
+
+        mvc.perform(post("/cards")
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser)
+                .content(mapper.writeValueAsString(cardRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testPostCard_shortTitle_returnBadRequest() throws Exception {
+        cardRequest.setTitle("A");
+
+        mvc.perform(post("/cards")
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser)
+                .content(mapper.writeValueAsString(cardRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testPostCard_titleTooLong_returnBadRequest() throws Exception {
+        cardRequest.setTitle("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
         mvc.perform(post("/cards")
                 .contentType("application/json")

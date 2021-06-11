@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,7 +47,7 @@ public class CardRepositoryTests {
     private User testUser;
 
     @BeforeEach
-    void setUp() throws NoSuchAlgorithmException {
+    void setUp() throws NoSuchAlgorithmException, ValidationException {
         cardRepository.deleteAll();
         cardRepository.flush();
         userRepository.deleteAll();
