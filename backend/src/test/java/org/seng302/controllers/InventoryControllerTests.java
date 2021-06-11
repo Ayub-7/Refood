@@ -1,14 +1,12 @@
 package org.seng302.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.ca.Cal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
-import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ProductRepository;
@@ -30,7 +28,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.mockito.ArgumentMatchers.*;
 
 @WebMvcTest(controllers = InventoryController.class)
 @ContextConfiguration(classes = TestApplication.class)

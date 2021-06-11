@@ -4,15 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.seng302.models.requests.NewCardRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import javax.xml.bind.ValidationException;
 import javax.persistence.*;
+import javax.xml.bind.ValidationException;
 import java.util.Date;
-import java.util.Calendar;
-import org.seng302.models.*;
-import java.util.List;
-import org.seng302.models.Address;
-
 import java.util.Calendar;
 
 /**
@@ -31,8 +28,8 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
     private String title;
     private String description;
@@ -42,7 +39,7 @@ public class Card {
     private Date displayPeriodEnd;
     private String keywords;
 
-    @JsonIgnore
+    @Enumerated(EnumType.STRING)
     @Column(name = "section")
     private MarketplaceSection section;
 
@@ -50,7 +47,7 @@ public class Card {
      * Constructor for a new card object
      * @param user User that created the card
      * @param title Card's title
-     * @param description Card's dectiption field
+     * @param description Card's description field
      * @param created Date the card was created
      * @param displayPeriodEnd Date the card will be removed
      * @param keywords Hashtags that describe the card
@@ -77,17 +74,49 @@ public class Card {
      * New Card request uses the minimum attributes and a reference to the User who created the card for initialization
      * This intializer converts a NewCardRequest to a Card entity
      * The date created is set to the date this constructor is called.
-     *
      * @param newCardRequest see NewCardRequest.java. Creates a new card using minimum fields
+     * @param user the user object that is creating the new community card.
      */
-    public Card(NewCardRequest newCardRequest) {
-        this.user = newCardRequest.getUser();
-        this.title = newCardRequest.getTitle();
-        this.description = newCardRequest.getDescription();
-        this.created = new Date();
-        this.displayPeriodEnd = getDisplayPeriodEndDate();
-        this.keywords = newCardRequest.getKeywords();
-        this.section = newCardRequest.getSection();
+    public Card(NewCardRequest newCardRequest, User user) throws ValidationException {
+        try {
+            if (validateNewCard(newCardRequest)) {
+                this.user = user;
+                this.title = newCardRequest.getTitle();
+                this.description = newCardRequest.getDescription();
+                this.created = new Date();
+                this.displayPeriodEnd = getDisplayPeriodEndDate();
+                this.keywords = newCardRequest.getKeywords();
+                this.section = newCardRequest.getSection();
+            }
+        }
+        catch (ValidationException exception) {
+            throw new ValidationException(exception.getMessage());
+        }
+    }
+
+    /**
+     * Validates a new card object being created from a NewCardRequest DTO.
+     * @param newCardRequest DTO class containing the info for a new card entity
+     * @return true if the card information is valid.
+     * @throws ValidationException if any of the card information is invalid.
+     */
+    private boolean validateNewCard(NewCardRequest newCardRequest) throws ValidationException {
+        if (newCardRequest.getTitle() == null) {
+            throw new ValidationException("Title cannot be null");
+        }
+
+        if (newCardRequest.getTitle().length() < 2) {
+            throw new ValidationException("Title length is too short");
+        }
+
+        if (newCardRequest.getTitle().length() > 25) {
+            throw new ValidationException("Title length is too long");
+        }
+
+        if (newCardRequest.getSection() == null) {
+            throw new ValidationException("Marketplace section is missing");
+        }
+        return true;
     }
 
     /**
