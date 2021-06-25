@@ -1,3 +1,4 @@
+
 /*
  * Created on Wed Feb 10 2021
  *
@@ -281,5 +282,17 @@ export default {
      */
     getBusinessListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials: true}),
 
-    getBusinessInventory: (businessId) => instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true})
+    getBusinessInventory: (businessId) => instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true}),
+    /**
+     * Creates a new card. of type:
+     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+     *
+     * @param newCardRequest
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code:
+     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 201 otherwise
+     */
+    createCard: async(newCardRequest) =>
+        instance.post('cards', {newCardRequest}, {withCredentials: true}),
+
 }
