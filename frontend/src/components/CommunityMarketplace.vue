@@ -56,7 +56,7 @@ export default {
   data: () => {
     return {
       displaytype: true,
-      userSession: null,
+      userSession: "",
       //test data for create card
       newCardTest: {
         "creatorId": "2",
@@ -162,6 +162,7 @@ export default {
                 this.$vs.notify({title:'Error', text:errormsg+'invalid data', color:'danger', position:'top-center'});
               }
             }
+            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
           });
     },
     /**
@@ -172,14 +173,15 @@ export default {
           .then((response) => {
             this.userSession = response.data;
           }).catch(err => {
-        this.$log.debug(err);
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+          this.$log.error("Error checking sessions: " + err);
       })
 
     }
   },
 
   mounted() {
-    this.getSession()
+    //this.getSession()
   }
 
 }

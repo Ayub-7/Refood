@@ -41,8 +41,6 @@ public class CardController {
     @PostMapping("/cards")
     public ResponseEntity<String> addCard(@RequestBody NewCardRequest newCardRequest, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        System.out.println("new card: "+newCardRequest);
-        System.out.println("user: "+currentUser);
 
         // Attempting to create a card for somebody else.
         if (newCardRequest.getCreatorId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
