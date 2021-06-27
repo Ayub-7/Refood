@@ -165,6 +165,7 @@ export default {
             this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
           });
     },
+
     /**
      * obtains the user's account details to create a new card.
      */
