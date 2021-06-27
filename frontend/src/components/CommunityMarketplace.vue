@@ -146,11 +146,10 @@ export default {
     createNewCard(card) {
 
       card.creatorId = this.userSession.id;
-      console.log(card);
 
       api.createCard(card.creatorId, card.title, card.description, card.keywords, card.section)
           .then((res) => {
-            console.log(res);
+            this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success', position:'top-center'});
           })
           .catch((error) => {
             let errormsg = "error creating new card: ";
