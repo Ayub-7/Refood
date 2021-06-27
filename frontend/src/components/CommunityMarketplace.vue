@@ -56,7 +56,7 @@ export default {
   data: () => {
     return {
       displaytype: true,
-      userSession: "",
+      userSession: null,
       //test data for create card
       newCardTest: {
         "creatorId": "2",
@@ -144,10 +144,7 @@ export default {
 
      */
     createNewCard(card) {
-
-      card.creatorId = this.userSession.id;
-
-      api.createCard(card.creatorId, card.title, card.description, card.keywords, card.section)
+      api.createCard(this.userSession.id, card.title, card.description, card.keywords, card.section)
           .then((res) => {
             this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success', position:'top-center'});
           })
@@ -169,20 +166,21 @@ export default {
     /**
      * obtains the user's account details to create a new card.
      */
-    getSession() {
+    getSession: function () {
       api.checkSession()
           .then((response) => {
             this.userSession = response.data;
-          }).catch(err => {
-          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-          this.$log.error("Error checking sessions: " + err);
-      })
-
+          })
+          .catch((error) => {
+            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+            this.$log.error("Error checking sessions: " + error);
+          });
     }
   },
 
+
   mounted() {
-    //this.getSession()
+    this.getSession()
   }
 
 }

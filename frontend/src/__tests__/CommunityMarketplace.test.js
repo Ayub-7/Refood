@@ -19,6 +19,12 @@ beforeEach(() => {
         // },
         localVue,
     });
+
+    const getSession = jest.spyOn(CommunityMarketplace.methods, 'getSession');
+    getSession.mockResolvedValue(() => {
+        wrapper.vm.userSession.id = 2;
+    });
+
 });
 
 afterEach(() => {
