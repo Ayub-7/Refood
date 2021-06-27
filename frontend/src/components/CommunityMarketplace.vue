@@ -35,6 +35,10 @@
           </div>
         </vs-tab>
       </vs-tabs>
+      <vs-divider></vs-divider>
+
+      <vs-button id="create-card-button" color="success" @click="createNewCard(newCardTest)" >Create New Card Test</vs-button>
+
     </div>
   </vs-card>
 </template>
@@ -42,6 +46,8 @@
 <script>
 import MarketplaceGrid from './MarketplaceGrid.vue'
 import MarketplaceTable from './MarketplaceTable.vue';
+import api from "../Api";
+
 export default {
   name: "CommunityMarketplace",
   components: {
@@ -50,6 +56,16 @@ export default {
   data: () => {
     return {
       displaytype: true,
+      userSession: null,
+      //test data for create card
+      newCardTest: {
+        "creatorId": "2",
+        "title": "1989 S13 Silvia RB25DET",
+        "description": "No wof reg, send it",
+        "keywords": "Nissan, Silvia, S13, RB25DET",
+        "section": "ForSale"
+      },
+
       // TEST DATA FOR NOW, ONCE PROPER IMPLEMATION OF CARDS IS MADE THIS CAN BE REMOVED
       testData: [
         {
@@ -112,7 +128,61 @@ export default {
 
       ]
     }
+  },
+
+  methods: {
+
+    /**
+     * Creates a new card. of type:
+     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+     *
+     *
+     * @param card
+     *
+     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 201 otherwise
+
+     */
+    createNewCard(card) {
+
+      card.creatorId = this.userSession.id;
+      console.log(card);
+
+      api.createCard(card.creatorId, card.title, card.description, card.keywords, card.section)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((error) => {
+            let errormsg = "error creating new card: ";
+            if (error) {
+              if (error.response.status === 401 || error.response.status === 403 ) {
+                this.$vs.notify({title:'Error', text:errormsg+'user account error', color:'danger', position:'top-center'});
+              }
+
+              if (error.response.status === 400) {
+                this.$vs.notify({title:'Error', text:errormsg+'invalid data', color:'danger', position:'top-center'});
+              }
+            }
+          });
+    },
+    /**
+     * obtains the user's account details to create a new card.
+     */
+    getSession() {
+      api.checkSession()
+          .then((response) => {
+            this.userSession = response.data;
+          }).catch(err => {
+        this.$log.debug(err);
+      })
+
+    }
+  },
+
+  mounted() {
+    this.getSession()
   }
+
 }
 
 </script>
