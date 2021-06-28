@@ -149,9 +149,42 @@ public class CardControllerTests {
 
     @Test
     public void testGetCards_noAuth_returnUnauthorized() throws Exception {
-        mvc.perform(post("/cards")
+        mvc.perform(get("/cards")
                 .param("section", "ForSale"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @WithMockUser
+    public void testGetCards_noParam_returnBadRequest() throws Exception {
+        mvc.perform(get("/cards"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetCards_emptyParam_returnBadRequest() throws Exception {
+        mvc.perform(get("/cards")
+                .param("section", ""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetCards_invalidParam_returnBadRequest() throws Exception {
+        mvc.perform(get("/cards")
+                .param("section", "InvalidSectionName"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetCards_returnOk() throws Exception {
+        mvc.perform(get("/cards")
+                .param("section", "ForSale"))
+                .andExpect(status().isOk());
+    }
+
+
 
 }
