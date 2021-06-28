@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
@@ -13,13 +12,11 @@ import org.seng302.repositories.BusinessRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -31,7 +28,6 @@ public class ListingController {
 
     @Autowired private BusinessRepository businessRepository;
 
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private ListingRepository listingRepository;
@@ -69,7 +65,7 @@ public class ListingController {
      * Creates a new product and adds it to the product catalogue of the current acting business
      * Authentication is required, user must be a business admin or a default global admin
      * @param id unique identifier of the business
-     * @param req the request body for the new listing object
+     * @param request the request body for the new listing object
      * @param session http session which holds the authenticated user
      * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
      * @throws JsonProcessingException
