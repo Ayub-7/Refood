@@ -85,4 +85,25 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }
 
+
+    /**
+     * GET endpoint, returns detailed information about a single card given an ID
+     *
+     * Preconditions: Given card ID is of type Long and is for a card that exists in database
+     * Postconditions: Card information is returned in HTTP request
+     *
+     * @param cardId ID of card to be retrieved from DB
+     * @return 200 if valid card, 400 if bad formatted ID, 401 if unauthorized, 406 if ID isn't in DB
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @GetMapping("/cards/{cardId}")
+    public ResponseEntity<String> getCardById (@PathVariable Long cardId) throws JsonProcessingException {
+        Card card = cardRepository.findCardById(cardId);
+        if(card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
+    }
+
 }

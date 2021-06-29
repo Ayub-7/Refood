@@ -29,8 +29,7 @@ package org.seng302;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.models.*;
-import org.seng302.models.Inventory;
+
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ProductRepository;
 import org.seng302.repositories.ListingRepository;
@@ -42,8 +41,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.Calendar;
 
 /**
  * This spring component runs at application startup to do some initialisation

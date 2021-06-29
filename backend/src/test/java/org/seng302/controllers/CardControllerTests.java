@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
@@ -18,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,22 +43,18 @@ public class CardControllerTests {
     private NewCardRequest cardRequest;
     private Card card1;
     private Card card2;
+    private Card card;
 
     @BeforeEach
-    public void setup() throws NoSuchAlgorithmException {
+    public void setup() throws NoSuchAlgorithmException, ValidationException {
         testUser = new User("Rayna", "YEP", "Dalgety", "", "" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ATQWJM");
         testUser.setId(1);
         anotherUser = new User("Bob", "", "Loblaw", "", "", "bblaw@email.com", "2006-03-30","+7 684 622 5902", new Address(null, null, null, null, "New Zealand", null), "ATQWJM");
         anotherUser.setId(2);
         cardRequest = new NewCardRequest(testUser.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2022, Calendar.JANUARY, 1);
-        Date closeDate = calendar.getTime();
+        card = new Card(cardRequest, testUser);
 
-
-        Card card1 = new Card(testUser, "Honda", "Car", new Date(), closeDate, "Vehicle", MarketplaceSection.FORSALE);
-        Card card2 = new Card(testUser, "Toy Car", "Hot Tyres", new Date(), closeDate, "Vehicle", MarketplaceSection.WANTED);
     }
 
     @Test
@@ -187,4 +185,42 @@ public class CardControllerTests {
 
 
 
+
+    //GET by ID tests
+
+    @Test
+    public void testGetCardById_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(get("/cards/{id}", card.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetCardById_asUser_returnOk() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(get("/cards/{id}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetCardById_badId_returnNotAcceptable() throws Exception {
+        //If no card found repository will give null
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
+
+        mvc.perform(get("/cards/{id}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetCardById_idNotLong_returnNotAcceptable() throws Exception {
+        //Any value that isn't long will throw 400, just making sure with a float
+        mvc.perform(get("/cards/{id}", 1.1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isBadRequest());
+    }
 }
