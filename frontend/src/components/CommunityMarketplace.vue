@@ -1,8 +1,10 @@
 <template>
   <vs-card class="main">
     <div class="profile-text-inner">
+      <!-- TODO: Remove when actual button is added -->
+      <vs-button @click="openModal">Add to market (test for now)</vs-button>
       <div style="display: flex; margin: auto; padding-bottom: 1em;">
-        <div id="title" style="font-size: 30px; margin: auto 8px;">Community Marketplace</div>
+        <div id="title" style="font-size: 30px; margin: auto 8px;" >Community Marketplace</div>
         <div style="margin-right: 0; margin-left: auto; display: flex">
           <div class="title" style="margin-top: 5px; margin-right: 10px">
             <p v-if="displaytype">Grid</p>
@@ -33,22 +35,31 @@
             <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1,2)" />
             <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1,2)" />
           </div>
+          
         </vs-tab>
       </vs-tabs>
     </div>
+  <MarketplaceAddCard :showingAddCardModal="showingAddCardModal" @closeModal="closeModal" />
+
   </vs-card>
+
 </template>
 
 <script>
 import MarketplaceGrid from './MarketplaceGrid.vue'
-import MarketplaceTable from './MarketplaceTable.vue';
+import MarketplaceTable from './MarketplaceTable.vue'
+import MarketplaceAddCard from './MarketplaceAddCard.vue'
 export default {
   name: "CommunityMarketplace",
   components: {
-    MarketplaceGrid, MarketplaceTable
+    MarketplaceGrid, MarketplaceTable, MarketplaceAddCard
   },
+
   data: () => {
     return {
+      showingAddCardModal: false,
+
+
       displaytype: true,
       // TEST DATA FOR NOW, ONCE PROPER IMPLEMATION OF CARDS IS MADE THIS CAN BE REMOVED
       testData: [
@@ -112,7 +123,24 @@ export default {
 
       ]
     }
-  }
+  },
+  methods: {
+    /**
+    * Method for closing modal, sets variable to false. This gets called on a custom event 'closeModal' that is triggered in MarketplaceAddCard 
+    */
+    closeModal: function() {
+      this.showingAddCardModal = false;
+    },
+
+    /**
+    * Method for opening modal by setting state variable
+    */
+    openModal: function() {
+      //Have to set to false first because vuesax pop-ups have an issue where if you click the X the activesync stays true
+      this.showingAddCardModal = false;
+      this.showingAddCardModal = true;
+    }
+  },
 }
 
 </script>
