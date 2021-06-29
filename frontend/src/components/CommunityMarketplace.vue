@@ -18,20 +18,20 @@
       <vs-tabs alignment="center">
         <vs-tab label="For Sale">
           <div>
-            <MarketplaceGrid v-if="displaytype" :cardData="testData" />
-            <MarketplaceTable v-if="!displaytype" :tableData="testData" />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData="testData" />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData="testData" />
           </div>
         </vs-tab>
         <vs-tab label="Wanted">
           <div>
-            <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1, 4)" />
-            <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1, 4)" />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData="testData.slice(1, 4)" />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData="testData.slice(1, 4)" />
           </div>
         </vs-tab>
         <vs-tab label="Exchange">
           <div>
-            <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1,2)" />
-            <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1,2)" />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData="testData.slice(1,2)" />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData="testData.slice(1,2)" />
           </div>
         </vs-tab>
       </vs-tabs>
@@ -62,8 +62,24 @@ export default {
         "creatorId": "2",
         "title": "1989 S13 Silvia RB25DET",
         "description": "No wof reg, send it",
-        "keywords": "Nissan, Silvia, S13, RB25DET",
-        "section": "ForSale"
+        keywords: [
+          {
+            id: 6,
+            name: 'Nissan'
+          },
+          {
+            id: 7,
+            name: 'Silvia'
+          },
+          {
+            id: 8,
+            name: 'RB25DET'
+          },
+          {
+            id: 9,
+            name: 'S13'
+          }],
+        section: "ForSale"
       },
 
       // TEST DATA FOR NOW, ONCE PROPER IMPLEMATION OF CARDS IS MADE THIS CAN BE REMOVED
@@ -144,22 +160,41 @@ export default {
 
      */
     createNewCard(card) {
+      //adapt the test data
+      card.creatorId = this.userSession.id;
+      card.keywords = JSON.stringify(card.keywords);
+
+      console.log(card);
+
       api.createCard(this.userSession.id, card.title, card.description, card.keywords, card.section)
           .then((res) => {
-            this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success', position:'top-center'});
+            this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success'});
+            //add the new card to the list
+            //let newcard =
+            card.id = res.data.cardId;
+            card.keywords = JSON.parse(card.keywords);
+            this.testData.push(card)
+            console.log(res.data);
           })
           .catch((error) => {
-            let errormsg = "error creating new card: ";
+            let errormsg = "ERROR creating new card: ";
             if (error) {
-              if (error.response.status === 401 || error.response.status === 403 ) {
-                this.$vs.notify({title:'Error', text:errormsg+'user account error', color:'danger', position:'top-center'});
-              }
+              if (error.response) {
+                if (error.response.status === 401 || error.response.status === 403) {
+                  this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                }
 
-              if (error.response.status === 400) {
-                this.$vs.notify({title:'Error', text:errormsg+'invalid data', color:'danger', position:'top-center'});
+                if (error.response.status === 400) {
+                  this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                }
+              } else {
+                this.$vs.notify({
+                  title: 'Error',
+                  text: 'ERROR trying to obtain user info from session:',
+                  color: 'danger'
+                });
               }
             }
-            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
           });
     },
 
