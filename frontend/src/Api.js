@@ -281,5 +281,20 @@ export default {
      */
     getBusinessListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials: true}),
 
-    getBusinessInventory: (businessId) => instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true})
+    /**
+     * Retrieves a business' inventory data.
+     * @param businessId the unique id of the business.
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of listings. 401, 403, 406 otherwise.
+     */
+    getBusinessInventory: (businessId) => instance.get(`/businesses/${businessId}/inventory`, {withCredentials: true}),
+
+    // === MARKETPLACE CARDS
+
+    /**
+     * Retrieves community marketplace cards from a given section.
+     * @param section the name of the section to retrieve the cards from.
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
+     */
+    getCardsBySection: (section) => instance.get(`/cards`, {params: {section: section}, withCredentials: true}),
+
 }
