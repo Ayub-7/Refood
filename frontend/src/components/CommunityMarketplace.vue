@@ -39,7 +39,7 @@
         </vs-tab>
       </vs-tabs>
     </div>
-  <MarketplaceAddCard :showingAddCardModal="showingAddCardModal" @closeModal="closeModal" />
+  <MarketplaceAddCard ref="marketplaceAddCard" />
 
   </vs-card>
 
@@ -57,7 +57,6 @@ export default {
 
   data: () => {
     return {
-      showingAddCardModal: false,
 
 
       displaytype: true,
@@ -126,19 +125,17 @@ export default {
   },
   methods: {
     /**
-    * Method for closing modal, sets variable to false. This gets called on a custom event 'closeModal' that is triggered in MarketplaceAddCard 
+    * Method for closing modal, calls method in child component to open modal
     */
     closeModal: function() {
-      this.showingAddCardModal = false;
+      this.$refs.marketplaceAddCard.closeModal();
     },
 
     /**
-    * Method for opening modal by setting state variable
+    * Method for opening modal, calls method in child component to open modal
     */
     openModal: function() {
-      //Have to set to false first because vuesax pop-ups have an issue where if you click the X the activesync stays true
-      this.showingAddCardModal = false;
-      this.showingAddCardModal = true;
+      this.$refs.marketplaceAddCard.openModal();
     }
   },
 }

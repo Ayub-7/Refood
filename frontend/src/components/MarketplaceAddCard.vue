@@ -1,18 +1,18 @@
 <template>
-  <vs-popup id="addCardModal" title="Add Card To Marketplace" :active.sync="showingAddCardModal">
+  <vs-popup id="addCardModal" title="Add Card To Marketplace" :active.sync="showing">
 
     <!-- Section selection -->
     <vs-row class="addCardField">
-    <vs-col vs-w="2" class="addCardHeader">Section</vs-col>
+    <vs-col vs-w="2" vs-xs="12" class="addCardHeader">Section <span class="required">*</span></vs-col>
     <vs-select vs-w="10" v-model="section">
-        <vs-select-item v-for="section in avaliableSections" :key="section" :text="section" :value="section"/>
+        <vs-select-item v-for="section in avaliableSections" :key="section.key" :text="section.key" :value="section.value"/>
     </vs-select>
     </vs-row>
 
     <!-- Card name -->
     <vs-row class="addCardField">
-        <vs-col id="title" vs-w="2">
-            <div class="addCardHeader" >Title</div>
+        <vs-col id="title" vs-w="2" vs-xs="12">
+            <div class="addCardHeader" >Title <span class="required">*</span> </div> 
         </vs-col> 
         <vs-col vs-w="9">
             <vs-input v-model="title" class="addCardInput"></vs-input>
@@ -27,7 +27,7 @@
 
     <!-- Card keywords -->
     <vs-row class="addCardField">
-        <vs-col vs-w="2">
+        <vs-col vs-w="2" vs-xs="12">
             <div class="addCardHeader">Keywords</div>
         </vs-col> 
         <vs-col vs-w="9">
@@ -45,14 +45,18 @@
 
 <script>
 export default {
-    props: ['showingAddCardModal'],
 
 
     data: function() {
         return {
-            avaliableSections: ['For Sale', 'Wanted', 'Exchange'],
+            showing: false,
+            avaliableSections: [
+                {key:'For Sale', value:'ForSale'},
+                {key:'Wanted', value:'Wanted'},
+                {key:'Exchange', value: 'Exchange'}
+            ],
 
-            section: 'For Sale',
+            section: null,
             title: '',
             description: '',
             keywords: '',
@@ -71,12 +75,18 @@ export default {
         },
 
         /** 
-        * Method to close modal, emits 'close' event to parent component which then sets 'showingAddCardModal' to false
-        * Also clears form
+        * Closes modal by setting showing to false (which is linked to Card :active-sync)
         */
         closeModal() {
-            this.$emit('closeModal');
-            setTimeout(this.resetData, 500);
+            this.showing = false;
+        },
+
+        /** 
+        * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
+        */
+        openModal() {
+            this.resetData();
+            this.showing = true;
         },
 
         /**
@@ -84,7 +94,7 @@ export default {
         */
         resetData() {
 
-            this.section = 'For Sale';
+            this.section = null;
             this.title = '';
             this.description = '';
             this.keywords = '';
@@ -115,6 +125,10 @@ export default {
     width: 150px;
 }
 
+.required {
+    color: red;
+}
+
 #buttons {
     text-align: center;
 }
@@ -122,6 +136,9 @@ export default {
 
 #description {
     height: 150px;
+    max-height: 150px;
+    min-height: 150px;
 }
+
 
 </style>
