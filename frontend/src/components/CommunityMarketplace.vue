@@ -1,8 +1,10 @@
 <template>
   <vs-card class="main">
     <div class="profile-text-inner">
+      <!-- TODO: Remove when actual button is added -->
+      <vs-button @click="openModal">Add to market (test for now)</vs-button>
       <div style="display: flex; margin: auto; padding-bottom: 1em;">
-        <div id="title" style="font-size: 30px; margin: auto 8px;">Community Marketplace</div>
+        <div id="title" style="font-size: 30px; margin: auto 8px;" >Community Marketplace</div>
         <div style="margin-right: 0; margin-left: auto; display: flex">
           <div class="title" style="margin-top: 5px; margin-right: 10px">
             <p v-if="displaytype">Grid</p>
@@ -33,6 +35,7 @@
             <MarketplaceGrid v-if="displaytype" v-bind:cardData="testData.slice(1,2)" />
             <MarketplaceTable v-if="!displaytype" v-bind:tableData="testData.slice(1,2)" />
           </div>
+
         </vs-tab>
       </vs-tabs>
       <vs-divider></vs-divider>
@@ -40,21 +43,29 @@
       <vs-button id="create-card-button" color="success" @click="createNewCard(newCardTest)" >Create New Card Test</vs-button>
 
     </div>
+  <MarketplaceAddCard ref="marketplaceAddCard" />
+
   </vs-card>
+
 </template>
 
 <script>
 import MarketplaceGrid from './MarketplaceGrid.vue'
+import MarketplaceTable from './MarketplaceTable.vue'
+import MarketplaceAddCard from './MarketplaceAddCard.vue'
 import MarketplaceTable from './MarketplaceTable.vue';
 import api from "../Api";
 
 export default {
   name: "CommunityMarketplace",
   components: {
-    MarketplaceGrid, MarketplaceTable
+    MarketplaceGrid, MarketplaceTable, MarketplaceAddCard
   },
+
   data: () => {
     return {
+
+
       displaytype: true,
       userSession: null,
       //test data for create card
@@ -147,7 +158,12 @@ export default {
   },
 
   methods: {
-
+    /**
+    * Method for opening modal, calls method in child component to open modal
+    */
+    openModal: function() {
+      this.$refs.marketplaceAddCard.openModal();
+    },
     /**
      * Creates a new card. of type:
      * (long creatorId, String title, String description, String keywords, MarketplaceSection section)

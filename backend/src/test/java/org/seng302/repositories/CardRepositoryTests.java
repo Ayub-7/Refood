@@ -2,27 +2,22 @@ package org.seng302.repositories;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.seng302.TestApplication;
 import org.seng302.models.Address;
 import org.seng302.models.Card;
 import org.seng302.models.User;
 import org.seng302.models.requests.NewCardRequest;
-import org.seng302.models.requests.NewUserRequest;
 
 import org.seng302.models.MarketplaceSection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -112,7 +107,7 @@ public class CardRepositoryTests {
      */
     @Test
     public void findInventoryBySectionExpectsList() {
-        List<Card> cardList = cardRepository.findInventoryBySection(MarketplaceSection.FORSALE);
+        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.FORSALE);
         assertThat(cardList.size()).isEqualTo(2);
     }
 
@@ -124,7 +119,7 @@ public class CardRepositoryTests {
      */
     @Test
     public void findInventoryBySectionExpectsEmptyList() {
-        List<Card> cardList = cardRepository.findInventoryBySection(MarketplaceSection.WANTED);
+        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED);
         assertThat(cardList.size()).isEqualTo(0);
     }
 }

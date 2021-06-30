@@ -43,5 +43,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      * @param section enum of MarketplaceSection
      * @return List<Card> a list of cards matching section
      */
-    List<Card> findInventoryBySection(MarketplaceSection section);
+    List<Card> findAllBySection(MarketplaceSection section);
+
 }
