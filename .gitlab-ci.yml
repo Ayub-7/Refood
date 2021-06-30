@@ -156,6 +156,7 @@ deploy-production-backend:
   artifacts:
     paths:
       - backend/build/libs
+      - backend/build/jacoco
   only:
     - tags
     - master
