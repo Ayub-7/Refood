@@ -125,13 +125,6 @@ export default {
   },
   methods: {
     /**
-    * Method for closing modal, calls method in child component to open modal
-    */
-    closeModal: function() {
-      this.$refs.marketplaceAddCard.closeModal();
-    },
-
-    /**
     * Method for opening modal, calls method in child component to open modal
     */
     openModal: function() {
