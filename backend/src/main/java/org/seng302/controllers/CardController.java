@@ -11,9 +11,7 @@ import org.seng302.repositories.CardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
@@ -58,6 +56,27 @@ public class CardController {
         cardRepository.save(newCard);
         CardIdResponse cardIdResponse = new CardIdResponse(newCard.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(cardIdResponse));
+    }
+
+
+    /**
+     * GET endpoint, returns detailed information about a single card given an ID
+     *
+     * Preconditions: Given card ID is of type Long and is for a card that exists in database
+     * Postconditions: Card information is returned in HTTP request
+     *
+     * @param cardId ID of card to be retrieved from DB
+     * @return 200 if valid card, 400 if bad formatted ID, 401 if unauthorized, 406 if ID isn't in DB
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @GetMapping("/cards/{cardId}")
+    public ResponseEntity<String> getCardById (@PathVariable Long cardId) throws JsonProcessingException {
+        Card card = cardRepository.findCardById(cardId);
+        if(card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
 
 }

@@ -37,6 +37,8 @@ public class Image {
      */
     public static String getContentTypeExtension(String contentType) throws InvalidImageExtensionException {
         switch (contentType) {
+            default:
+                throw new InvalidImageExtensionException("Unsupported extension type.");
             case "image/png":
                 return ".png";
             case "image/jpeg":
@@ -44,7 +46,6 @@ public class Image {
             case "image/gif":
                 return ".gif";
         }
-        throw new InvalidImageExtensionException("Unsupported extension type.");
     }
 
     public String getId() {
