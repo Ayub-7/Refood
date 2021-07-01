@@ -94,7 +94,7 @@ export default {
 
 <style scoped>
 
-tab {
+vs-tab {
   color: #1F74FF;
 }
 
