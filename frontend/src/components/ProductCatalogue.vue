@@ -242,10 +242,10 @@ const Search = {
         this.business = this.getBusinessName();
 
         api.getBusinessProducts(this.businessId)
-            .then((response) => {
-              this.$log.debug("Data loaded: ", response.data);
-              this.products = response.data;
-              this.filteredproducts = response.data;
+            .then((innerResponse) => {
+              this.$log.debug("Data loaded: ", innerResponse.data);
+              this.products = innerResponse.data;
+              this.filteredproducts = innerResponse.data;
             })
             .catch((error) => {
               this.$log.debug(error);

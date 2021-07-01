@@ -46,9 +46,6 @@ export default {
 #cardTitle {
   font-weight: bold;
   font-size: 17px;
-}
-
-#cardTitle {
   height: 50px;
 }
 
