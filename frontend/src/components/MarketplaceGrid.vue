@@ -9,7 +9,7 @@
                 <vs-card actionable>
                   <div slot="media" id="cardHeader">
                     <!-- Default image for now -->
-                    <img id="marketImage" src="../../public/ProductShoot.jpg" />
+                    <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
                   </div>
                   <div>
                     <div id="cardTitle">{{card.title}}</div>
@@ -17,7 +17,7 @@
                     <div id="cardDescription">{{card.description}}</div>
                     <!-- Keyword display -->
                       <div id="keywordWrapper">
-                        <div id="cardKeywords"  v-for="keyword in card.keywords" :key="keyword.id" >#{{keyword.name}}</div>
+                        <div id="cardKeywords"  v-for="keyword in card.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
                       </div>
                   </div>
                 </vs-card>
@@ -46,9 +46,6 @@ export default {
 #cardTitle {
   font-weight: bold;
   font-size: 17px;
-}
-
-#cardTitle {
   height: 50px;
 }
 

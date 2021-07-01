@@ -23,13 +23,13 @@
                 <vs-td style="width: 20px; min-width: 100px; padding-right: 10px; text-align: center;">
                   <a href="#">{{ item.id }}</a>
                   <div>
-                    <img id="marketImage" style="width: 100%; height: 100%; border-radius: 1em;" src="../../public/ProductShoot.jpg" />
+                    <img id="marketImage" style="width: 100%; height: 100%; border-radius: 1em;" src="../../public/ProductShoot.jpg" alt="Business' inventory"/>
                   </div>
                 </vs-td>
                 <vs-td>{{ item.title }} </vs-td>
                 <vs-td>{{ item.description }} </vs-td>
                 <vs-td>
-                    <div id="cardKeywords"  v-for="keyword in item.keywords" :key="keyword.id" >#{{keyword.name}}</div>
+                    <div id="cardKeywords"  v-for="keyword in item.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
                 </vs-td>
                 <td>
                   <!-- Effectively repeated above, should refactor at some point. -->
@@ -81,7 +81,7 @@ th {
   color: white;
 }
 
-vs-table {
+table {
   width: 100%;
 }
 

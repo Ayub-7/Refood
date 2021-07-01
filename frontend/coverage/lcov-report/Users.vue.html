@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">55.26% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>21/38</span>
+                <span class='fraction'>21/42</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">30% </span>
+                <span class="strong">21.43% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/10</span>
+                <span class='fraction'>3/14</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">55.26% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>21/38</span>
+                <span class='fraction'>21/42</span>
             </div>
         
             
@@ -527,7 +527,23 @@
 <a name='L468'></a><a href='#L468'>468</a>
 <a name='L469'></a><a href='#L469'>469</a>
 <a name='L470'></a><a href='#L470'>470</a>
-<a name='L471'></a><a href='#L471'>471</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -678,6 +694,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -708,6 +729,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -717,6 +744,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1147,6 +1179,11 @@ const Users = {
         });
     },
 &nbsp;
+    /**
+     * Calculates the length of time since the user's registration date, outputting a string value.
+     * @param registerDate time and date of when the user registered.
+     * @return {string} string description of how long it has been since they have registered.
+     */
     calculateDuration: function(registerDate) {
       const TimeElapsed = Date.now();
       const today = new Date(TimeElapsed);
@@ -1175,8 +1212,14 @@ const Users = {
 <span class="cstat-no" title="statement not covered" >          this.user = response.data;</span>
 <span class="cstat-no" title="statement not covered" >          this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));</span>
 <span class="fstat-no" title="function not covered" >        }).catch((err) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});</span>
-<span class="cstat-no" title="statement not covered" >          this.$router.push({path: "/login"}); //If user not logged in send to login page</span>
+<span class="cstat-no" title="statement not covered" >          if (err.response.status === 401) {</span>
+<span class="cstat-no" title="statement not covered" >            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});</span>
+<span class="cstat-no" title="statement not covered" >            this.$router.push({path: "/login"}); //If user not logged in send to login page</span>
+<span class="cstat-no" title="statement not covered" >          }</span>
+          else if (err.response.status === 406) {
+<span class="cstat-no" title="statement not covered" >            this.$vs.notify({title:'User not found', text:'This user does not exist.', color:'danger'});</span>
+<span class="cstat-no" title="statement not covered" >            this.$router.push({path: "/home"}); //If user is logged in, but non-existent user</span>
+          }
 <span class="cstat-no" title="statement not covered" >          throw new Error(`Error trying to get user info from id: ${err}`);</span>
       });
     },
@@ -1189,6 +1232,11 @@ const Users = {
 <span class="cstat-no" title="statement not covered" >      this.$router.push({path: `/businesses/${business.id}`})</span>
     },
 &nbsp;
+    /**
+     * Checks if the left-side options menu should show by checking the number of businesses
+     * has primary administrator access to.
+     * @returns {boolean} if there is one or more businesses, return true, else false.
+     */
     showOptionsMenu: function() {
 <span class="missing-if-branch" title="if path not taken" >I</span>      if (this.userViewingBusinesses &lt; 1) {
 <span class="cstat-no" title="statement not covered" >        return false</span>
@@ -1199,7 +1247,7 @@ const Users = {
   },
 &nbsp;
   mounted: function () {
-  //On page load call getUserInfo function to get user information
+    //On page load call getUserInfo function to get user information
     let userId = this.$route.params.id
     this.getUserInfo(userId);
   },
@@ -1474,7 +1522,7 @@ main {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Jun 09 2021 14:42:02 GMT+1200 (New Zealand Standard Time)
+                at Thu Jul 01 2021 14:50:20 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

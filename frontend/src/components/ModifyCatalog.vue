@@ -277,8 +277,8 @@ const ModifyCatalog = {
             const url = "https://free.currconv.com/api/v7/convert?q="+query+"&compact=ultra&apiKey=a67b4ad2aba59aca187c"
             axios
                 .get(url)
-                .then(response => {
-                  this.currencyMultiplier = response.data[query];
+                .then(innerResponse => {
+                  this.currencyMultiplier = innerResponse.data[query];
                 }).catch( err => {
               this.$log.error("Error with getting multiplier from REST Currencies." + err);
 
