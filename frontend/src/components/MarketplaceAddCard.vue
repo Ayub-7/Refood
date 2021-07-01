@@ -4,7 +4,8 @@
     <!-- Section selection -->
     <vs-row class="addCardField">
     <vs-col vs-w="2" vs-xs="12" class="addCardHeader">Section <span class="required">*</span></vs-col>
-    <vs-select vs-w="10" v-model="section">
+    <vs-select vs-w="10" v-model="section" :danger="(errors.includes('no-section'))"
+               danger-text="You must choose a section.">
         <vs-select-item v-for="section in avaliableSections" :key="section.key" :text="section.key" :value="section.value"/>
     </vs-select>
     </vs-row>
@@ -15,7 +16,8 @@
             <div class="addCardHeader" >Title <span class="required">*</span> </div> 
         </vs-col> 
         <vs-col vs-w="9">
-            <vs-input v-model="title" class="addCardInput"></vs-input>
+            <vs-textarea v-model="title" rows="1" class="addCardInput" :counter="50" :danger="(errors.includes('no-title'))"
+                         danger-text="You must write a title"></vs-textarea>
         </vs-col>
     </vs-row>
 
@@ -55,23 +57,72 @@ export default {
                 {key:'Wanted', value:'Wanted'},
                 {key:'Exchange', value: 'Exchange'}
             ],
-
             section: null,
             title: '',
             description: '',
             keywords: '',
-            
+            errors: [],
         }
     },
 
 
     methods: {
+        /**
+         * Preconditions: User clicks add to invetory button
+         *
+         **/
+        checkForm(){
+          this.errors = [];
+
+          if (this.section === null) {
+            this.errors.push('no-section');
+          }
+
+          if (this.title === '') {
+            this.errors.push('no-title');
+          }
+
+          if (this.title.length > 50){
+            this.errors.push('long-title');
+          }
+
+          if (this.errors.includes('no-section')) {
+            this.$vs.notify({
+              title: 'Failed to add card',
+              text: 'Section is Required.',
+              color: 'danger'
+            });
+          }
+          if (this.errors.includes('no-title')) {
+            this.$vs.notify({
+              title: 'Failed to add card',
+              text: 'Title is required',
+              color: 'danger'
+            });
+          }
+
+          if (this.errors.includes('long-title')) {
+            this.$vs.notify({
+              title: 'Failed to add card',
+              text: 'Title exceeds max length',
+              color: 'danger'
+            });
+          }
+          if (this.errors.length > 0) {
+            return false;
+          }
+          return true;
+        },
+
+
         /** 
         * Template for POST request method
         */
         addToMarketplace() {
+          if (this.checkForm()) {
             console.log(this.section, this.title, this.description, this.keywords);
             this.closeModal();
+          }
         },
 
         /** 
