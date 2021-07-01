@@ -1,4 +1,4 @@
-<template>
+<template lang="html">
   <vs-popup id="addCardModal" title="Add Card To Marketplace" :active.sync="showing">
 
     <!-- Section selection -->
@@ -26,14 +26,18 @@
         <div class="addCardHeader">Description</div>
         <vs-textarea v-model="description" id="description"></vs-textarea>
     </vs-row>
-
     <!-- Card keywords -->
     <vs-row class="addCardField">
         <vs-col vs-w="2" vs-xs="12">
             <div class="addCardHeader">Keywords</div>
         </vs-col> 
         <vs-col vs-w="9">
-            <vs-input v-model="keywords" class="addCardInput"></vs-input>
+          <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordList">
+            <vs-chip v-for="keyword in keywordList" v-bind:key="keyword.value" @click="remove(keyword)"
+                     closable>{{keyword}}
+            </vs-chip>
+          </vs-chips>
+<!--            <vs-input v-model="keywords" class="addCardInput"></vs-input>-->
         </vs-col>
     </vs-row>
 
@@ -60,6 +64,7 @@ export default {
             section: null,
             title: '',
             description: '',
+            keywordList: [],
             keywords: '',
             errors: [],
         }
@@ -67,11 +72,18 @@ export default {
 
 
     methods: {
+        remove(item) {
+          this.keywordList.splice(this.keywordList.indexOf(item), 1)
+        },
         /**
          * Preconditions: User clicks add to invetory button
          *
          **/
         checkForm(){
+          this.keywords= '';
+          for(let i = 0; i < this.keywordList.length; i++){
+            this.keywords += this.keywordList[i] + " ";
+          }
           this.errors = [];
 
           if (this.section === null) {
@@ -81,6 +93,7 @@ export default {
           if (this.title === '') {
             this.errors.push('no-title');
           }
+
 
           if (this.title.length > 50){
             this.errors.push('long-title');
