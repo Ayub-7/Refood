@@ -81,7 +81,7 @@ th {
   color: white;
 }
 
-vs-table {
+table {
   width: 100%;
 }
 
