@@ -17,9 +17,7 @@
                     <div id="cardDescription">{{card.description}}</div>
                     <!-- Keyword display -->
                       <div id="keywordWrapper">
-                        <div id="cardKeywords"  v-for="keyword in card.keywords" :key="keyword.id" >#{{keyword.name}}</div>
-
-                        v-for="(list, index) in lists"
+                        <div id="cardKeywords"  v-for="keyword in getKeywords(card.keywords)" :key="keyword.id" >#{{keyword.name}}</div>
                       </div>
                   </div>
                 </vs-card>
@@ -32,7 +30,22 @@
 
 <script>
 export default {
-    props: ['cardData'],
+  props: ['cardData'],
+  methods: {
+
+    getKeywords: function(keywords) {
+      keywords = keywords.split(" ");
+      let tmpKeywords = [];
+
+      for(let i=0;i<keywords.length;i++) {
+        let keyword = {};
+        keyword.key = i;
+        keyword.name = keywords[i];
+        tmpKeywords.push(keyword);
+      }
+      return tmpKeywords; // keywords.split(" ")
+    }
+  }
 }
 </script>
 

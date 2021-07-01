@@ -1,8 +1,6 @@
 <template>
   <vs-card class="main">
     <div class="profile-text-inner">
-      <!-- TODO: Remove when actual button is added -->
-      <vs-button @click="openModal">Add to market (test for now)</vs-button>
       <div style="display: flex; margin: auto; padding-bottom: 1em;">
         <div id="title" style="font-size: 30px; margin: auto 8px;" >Community Marketplace</div>
         <div style="margin-right: 0; margin-left: auto; display: flex">
@@ -17,35 +15,39 @@
         </div>
       </div>
       <vs-divider></vs-divider>
+      <div>Sort By: </div>
+      <vs-button @click="openModal">Add to market (test for now)</vs-button>
+      <vs-divider></vs-divider>
+
       <vs-tabs alignment="center">
         <vs-tab label="For Sale">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionForSale />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionForSale />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionForSale.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionForSale.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
+          </div>
+          <div class="center">
           </div>
         </vs-tab>
         <vs-tab label="Wanted">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionWanted />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionWanted />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionWanted.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionWanted.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
           </div>
         </vs-tab>
         <vs-tab label="Exchange">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionExchange />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionExchange />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionExchange.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionExchange.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
           </div>
 
         </vs-tab>
       </vs-tabs>
-      <vs-divider></vs-divider>
-
-      <vs-button id="create-card-button" color="success" @click="createNewCard(newCardTest)" >Create New Card Test</vs-button>
-
+        <vs-pagination v-model="currentPage" :total="sectionForSale.length/itemPerPage"/>
     </div>
   <MarketplaceAddCard ref="marketplaceAddCard" />
-
   </vs-card>
+
+
 
 </template>
 
@@ -67,6 +69,9 @@ export default {
       sectionForSale: "",
       sectionWanted: "",
       sectionExchange: "",
+      currentPage: 1,
+      itemPerPage: 12,
+
       //test data for create card
       newCardTest: {
         "creatorId": "2",
@@ -118,11 +123,7 @@ export default {
       api.getCards('ForSale')
           .then((response) => {
             console.log(response.data)
-            for (var card of response.data) {
-              console.log(card)
-              card.keywords = JSON.parse(card.keywords);
-              this.sectionForSale.push(card);
-            }
+            this.sectionForSale = response.data;
           })
           .catch((error) => {
             this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
