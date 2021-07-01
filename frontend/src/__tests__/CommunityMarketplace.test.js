@@ -55,6 +55,8 @@ beforeEach(() => {
         methods: {},
         localVue,
     });
+
+    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {

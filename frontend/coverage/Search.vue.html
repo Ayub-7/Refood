@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">22.92% </span>
+                <span class="strong">22% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/48</span>
+                <span class='fraction'>11/50</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">22.92% </span>
+                <span class="strong">22% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/48</span>
+                <span class='fraction'>11/50</span>
             </div>
         
             
@@ -377,7 +377,8 @@
 <a name='L318'></a><a href='#L318'>318</a>
 <a name='L319'></a><a href='#L319'>319</a>
 <a name='L320'></a><a href='#L320'>320</a>
-<a name='L321'></a><a href='#L321'>321</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -549,15 +550,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -565,19 +560,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -869,43 +871,44 @@ const Search = {
      */
 <span class="fstat-no" title="function not covered" >    searchUsers: function () {</span>
 <span class="cstat-no" title="statement not covered" >      if (this.searchbar === "") return;</span>
+<span class="cstat-no" title="statement not covered" >      this.$vs.loading();</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      api.searchQuery(this.searchbar)</span></span>
+        .then((response) =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.users = response.data;</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >          this.users = this.users.filter(x =&gt; typeof(x) == "object")</span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      api</span></span>
-          .searchQuery(this.searchbar)
-          .then((response) =&gt; {
-<span class="cstat-no" title="statement not covered" >            this.users = response.data;</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >            this.users = this.users.filter(x =&gt; typeof(x) == "object")</span></span>
+          //Need to set properties of user object so they can be sorted by
+<span class="cstat-no" title="statement not covered" >          for(let user of this.users) {</span>
+<span class="cstat-no" title="statement not covered" >            user.country = user.homeAddress.country;</span>
+<span class="cstat-no" title="statement not covered" >            user.city = user.homeAddress.city;</span>
+          }
 &nbsp;
-            //Need to set properties of user object so they can be sorted by
-<span class="cstat-no" title="statement not covered" >            for(let user of this.users) {</span>
-<span class="cstat-no" title="statement not covered" >              user.country = user.homeAddress.country;</span>
-<span class="cstat-no" title="statement not covered" >              user.city = user.homeAddress.city;</span>
+<span class="cstat-no" title="statement not covered" >          if(this.users.length &lt; 10) {</span>
+<span class="cstat-no" title="statement not covered" >            this.userSearchIndexMin = 1;</span>
+<span class="cstat-no" title="statement not covered" >            this.userSearchIndexMax = this.users.length;</span>
+<span class="cstat-no" title="statement not covered" >            if(this.users.length == 0){</span>
+<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMin = 0;</span>
             }
+          } else {
+<span class="cstat-no" title="statement not covered" >            this.userSearchIndexMin = 1;</span>
+<span class="cstat-no" title="statement not covered" >            this.userSearchIndexMax = 10;</span>
+          }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >            if(this.users.length &lt; 10) {</span>
-<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMin = 1;</span>
-<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMax = this.users.length;</span>
-<span class="cstat-no" title="statement not covered" >              if(this.users.length == 0){</span>
-<span class="cstat-no" title="statement not covered" >                this.userSearchIndexMin = 0;</span>
-              }
-            } else {
-<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMin = 1;</span>
-<span class="cstat-no" title="statement not covered" >              this.userSearchIndexMax = 10;</span>
-            }
+<span class="fstat-no" title="function not covered" >        })</span>
+        .catch((error) =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.$log.debug(error);</span>
+<span class="cstat-no" title="statement not covered" >          this.error = "Failed to load users";</span>
+<span class="fstat-no" title="function not covered" >        })</span>
+        .finally(() =&gt; {
+<span class="cstat-no" title="statement not covered" >          this.$vs.loading.close();</span>
+<span class="cstat-no" title="statement not covered" >          if(!this.tableLoaded){</span>
+<span class="cstat-no" title="statement not covered" >            document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing</span>
 &nbsp;
-<span class="fstat-no" title="function not covered" >          })</span>
-          .catch((error) =&gt; {
-<span class="cstat-no" title="statement not covered" >            this.$log.debug(error);</span>
-<span class="cstat-no" title="statement not covered" >            this.error = "Failed to load users";</span>
-<span class="fstat-no" title="function not covered" >          }).finally(() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if(!this.tableLoaded){</span>
-<span class="cstat-no" title="statement not covered" >          document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing</span>
+            //Event listeners for vuesax buttons on table since they're generated afterwards
+<span class="cstat-no" title="statement not covered" >            document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);</span>
+<span class="cstat-no" title="statement not covered" >            document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);</span>
 &nbsp;
-          //Event listeners for vuesax buttons on table since they're generated afterwards
-<span class="cstat-no" title="statement not covered" >          document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);</span>
-<span class="cstat-no" title="statement not covered" >          document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >          this.tableLoaded = true;</span>
+<span class="cstat-no" title="statement not covered" >            this.tableLoaded = true;</span>
         }
       })
     },
@@ -1024,7 +1027,7 @@ th {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Jun 09 2021 14:42:02 GMT+1200 (New Zealand Standard Time)
+                at Thu Jul 01 2021 14:50:20 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
