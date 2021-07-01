@@ -29,7 +29,7 @@
                 <vs-td>{{ item.title }} </vs-td>
                 <vs-td>{{ item.description }} </vs-td>
                 <vs-td>
-                    <div id="cardKeywords"  v-for="keyword in item.keywords" :key="keyword.id" >#{{keyword.name}}</div>
+                    <div id="cardKeywords"  v-for="keyword in item.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
                 </vs-td>
                 <td>
                   <!-- Effectively repeated above, should refactor at some point. -->

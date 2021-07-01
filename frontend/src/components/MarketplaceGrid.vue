@@ -17,7 +17,7 @@
                     <div id="cardDescription">{{card.description}}</div>
                     <!-- Keyword display -->
                       <div id="keywordWrapper">
-                        <div id="cardKeywords"  v-for="keyword in card.keywords" :key="keyword.id" >#{{keyword.name}}</div>
+                        <div id="cardKeywords"  v-for="keyword in card.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
                       </div>
                   </div>
                 </vs-card>

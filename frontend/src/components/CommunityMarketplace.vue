@@ -9,7 +9,7 @@
             <p v-if="!displayType">List</p>
           </div>
           <label class="switch" >
-            <input v-model="displayType" type="checkbox" checked>
+            <input id="display-type-button" v-model="displayType" type="checkbox" @click="displayType=!displayType" checked>
             <span class="slider round"></span>
           </label>
         </div>
@@ -42,7 +42,7 @@
 <script>
 import MarketplaceGrid from './MarketplaceGrid.vue'
 import MarketplaceTable from './MarketplaceTable.vue';
-import api from "@/Api";
+import api from "../Api";
 
 export default {
   name: "CommunityMarketplace",
@@ -67,8 +67,7 @@ export default {
       this.cards = [];
       api.getCardsBySection(section)
         .then((res) => {
-          console.log("LENGTH: " + res.data.length);
-          this.cards = res.data.slice(1, 100); // TEMPORARY UNTIL WE CAN PAGINATE THE DATA COMING IN.
+          this.cards = res.data.slice(0, 100); // todo: TEMPORARY UNTIL WE CAN PAGINATE THE DATA COMING IN.
         })
         .catch((error) => {
           console.log(error);
