@@ -14,10 +14,10 @@
               title="Create a new listing">
       <div class="new-listing-modal">
         <div class="row" v-if="invItem != null">
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(invItem.product))"/>
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(invItem.product)"/>
-          <img v-if="invItem != null && !invItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
-          <img v-if="invItem != null && !isDevelopment() && !invItem.product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
+          <img v-if="invItem != null && invItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(invItem.product))" alt="Business' inventory"/>
+          <img v-if="invItem != null && invItem.product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(invItem.product)" alt="Business' inventory"/>
+          <img v-if="invItem != null && !invItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Business' inventory"/>
+          <img v-if="invItem != null && !isDevelopment() && !invItem.product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Business' inventory"/>
 
         </div>
         <div id="listing-product-name">
@@ -90,9 +90,9 @@
           <vs-td id="productIdCol" :data="inventory.productId">
           {{inventory.productId}}
           <div style="height: 80px">
-            <img v-if="inventory.product.primaryImagePath != null && isDevelopment()" style=" height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(inventory.product))"/>
-            <img v-if="inventory.product.primaryImagePath != null && !isDevelopment()" style="height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(inventory.product)"/>
-            <img v-if="!inventory.product.primaryImagePath" style="height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+            <img v-if="inventory.product.primaryImagePath != null && isDevelopment()" style=" height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(inventory.product))" alt="Business' inventory"/>
+            <img v-if="inventory.product.primaryImagePath != null && !isDevelopment()" style="height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(inventory.product)" alt="Business' inventory"/>
+            <img v-if="!inventory.product.primaryImagePath" style="height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')" alt="Business' inventory"/>
           </div>
             </vs-td>
           <vs-td :data="inventory.productName"> {{inventory.productName}} </vs-td>

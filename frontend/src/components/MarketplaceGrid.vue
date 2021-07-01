@@ -9,7 +9,7 @@
                 <vs-card actionable>
                   <div slot="media" id="cardHeader">
                     <!-- Default image for now -->
-                    <img id="marketImage" src="../../public/ProductShoot.jpg" />
+                    <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
                   </div>
                   <div>
                     <div id="cardTitle">{{card.title}}</div>

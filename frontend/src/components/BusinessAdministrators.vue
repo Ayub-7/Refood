@@ -3,7 +3,7 @@
     <!-- Admin Card -->
     <li class="card" v-for="user in admins" :key="user.id" v-bind:user="user" @click="navigateToUser(user.id)">
       <div class="admin-name">
-        <b v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </b>
+        <strong v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </strong>
         <div v-else> {{user.firstName}} {{user.middleName}} {{user.lastName}} </div>
       </div>
       <vs-icon icon="close" class="removeAdminButton" v-if="isPrimaryAdmin()" v-on:click.stop="removeUserAsAdmin(user)"></vs-icon>
