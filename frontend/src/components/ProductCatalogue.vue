@@ -59,7 +59,7 @@
 
               <div slot="media">
                 <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
-                <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)" alt="Product image"/>
+                <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
                 <img v-if="!product.primaryImagePath && isDevelopment()" class="grid-image" src="ProductShoot.jpg" alt="Product image"/>
                 <img v-if="!isDevelopment() && !product.primaryImagePath" class="grid-image" :src="getImgUrl(true)" alt="Product image"/>
               </div>

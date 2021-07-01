@@ -14,10 +14,10 @@
               title="Create a new listing">
       <div class="new-listing-modal">
         <div class="row" v-if="invItem != null">
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(invItem.product))" alt="Business' inventory"/>
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(invItem.product)" alt="Business' inventory"/>
-          <img v-if="invItem != null && !invItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Business' inventory"/>
-          <img v-if="invItem != null && !isDevelopment() && !invItem.product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Business' inventory"/>
+          <img v-if="invItem != null && invItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(invItem.product))" alt="Product image"/>
+          <img v-if="invItem != null && invItem.product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(invItem.product)"/>
+          <img v-if="invItem != null && !invItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
+          <img v-if="invItem != null && !isDevelopment() && !invItem.product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
 
         </div>
         <div id="listing-product-name">
