@@ -18,6 +18,8 @@
                     <!-- Keyword display -->
                       <div id="keywordWrapper">
                         <div id="cardKeywords"  v-for="keyword in card.keywords" :key="keyword.id" >#{{keyword.name}}</div>
+
+                        v-for="(list, index) in lists"
                       </div>
                   </div>
                 </vs-card>

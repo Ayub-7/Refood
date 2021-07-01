@@ -44,6 +44,8 @@
 </template>
 
 <script>
+import api from "@/Api";
+
 export default {
 
 
@@ -55,6 +57,7 @@ export default {
                 {key:'Wanted', value:'Wanted'},
                 {key:'Exchange', value: 'Exchange'}
             ],
+            userSession: null,
 
             section: null,
             title: '',
@@ -71,8 +74,66 @@ export default {
         */
         addToMarketplace() {
             console.log(this.section, this.title, this.description, this.keywords);
+
+
             this.closeModal();
         },
+
+
+      /**
+       * obtains the user's account details to create a new card.
+       */
+      getSession: function () {
+        api.checkSession()
+            .then((response) => {
+              this.userSession = response.data;
+            })
+            .catch((error) => {
+              this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+              this.$log.error("Error checking sessions: " + error);
+            });
+      },
+
+      /**
+       * Creates a new card. of type:
+       * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+       *
+       *
+       * @param card
+       *
+       * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+       * 400 if there are errors with data, 201 otherwise
+
+       */
+      createNewCard(card) {
+        //adapt the test data
+        card.creatorId = this.userSession.id;
+
+        api.createCard(this.userSession.id, this.title, this.description, this.keywords, this.section)
+            .then((res) => {
+              this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success'});
+            })
+            .catch((error) => {
+              let errormsg = "ERROR creating new card: ";
+              if (error) {
+                if (error.response) {
+                  if (error.response.status === 401 || error.response.status === 403) {
+                    this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                  }
+
+                  if (error.response.status === 400) {
+                    this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                  }
+                } else {
+                  this.$vs.notify({
+                    title: 'Error',
+                    text: 'ERROR trying to obtain user info from session:',
+                    color: 'danger'
+                  });
+                }
+              }
+            });
+      },
 
         /** 
         * Closes modal by setting showing to false (which is linked to Card :active-sync)
@@ -86,7 +147,9 @@ export default {
         */
         openModal() {
             this.resetData();
-            this.showing = true;
+          this.getSession();
+
+          this.showing = true;
         },
 
         /**

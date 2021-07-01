@@ -20,20 +20,20 @@
       <vs-tabs alignment="center">
         <vs-tab label="For Sale">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData="testData" />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData="testData" />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionForSale />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionForSale />
           </div>
         </vs-tab>
         <vs-tab label="Wanted">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData="testData.slice(1, 4)" />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData="testData.slice(1, 4)" />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionWanted />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionWanted />
           </div>
         </vs-tab>
         <vs-tab label="Exchange">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData="testData.slice(1,2)" />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData="testData.slice(1,2)" />
+            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionExchange />
+            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionExchange />
           </div>
 
         </vs-tab>
@@ -53,7 +53,6 @@
 import MarketplaceGrid from './MarketplaceGrid.vue'
 import MarketplaceTable from './MarketplaceTable.vue'
 import MarketplaceAddCard from './MarketplaceAddCard.vue'
-import MarketplaceTable from './MarketplaceTable.vue';
 import api from "../Api";
 
 export default {
@@ -64,10 +63,10 @@ export default {
 
   data: () => {
     return {
-
-
       displaytype: true,
-      userSession: null,
+      sectionForSale: "",
+      sectionWanted: "",
+      sectionExchange: "",
       //test data for create card
       newCardTest: {
         "creatorId": "2",
@@ -92,68 +91,6 @@ export default {
           }],
         section: "ForSale"
       },
-
-      // TEST DATA FOR NOW, ONCE PROPER IMPLEMATION OF CARDS IS MADE THIS CAN BE REMOVED
-      testData: [
-        {
-          id: 1,
-          title: 'Beans',
-          description: 'I need to get rid of these beans someone please buy them $1000 ono' ,
-          keywords: [
-            {
-              id: 1,
-              name: 'beans'
-            }
-          ]
-        },
-        {
-          id: 2,
-          title: 'Waste Food',
-          description: 'We have a lot of waste food that needs to be sold ',
-          keywords: [
-            {
-              id: 2,
-              name: 'waste'
-            }
-          ]
-        },
-        {
-          id: 3,
-          title: 'Silvia s14 SR20DET',
-          description: '21k flat no cheaper first in first serve S14 Facelift •SR20DET (TURBO) •Body has done 199xxxkm •Engine had a rebuild done at 197xxxkm •New reconditioned TURBO  •Has current WOF REG AND CERT  •Lowered on adjustable suspension •On mags Any questions please ask',
-          keywords: [
-            {
-              id: 3,
-              name: 'carr'
-            },
-            {
-              id: 4,
-              name: 'vroom'
-            }
-          ]
-        },
-
-        {
-          id: 4,
-          title: 'Bad Rats: the Rats\' Revenge Steam Key',
-          description: 'Bad Rats: The Rats\' Revenge is a 2009 puzzle video game developed by Invent4 Entertainment. Over a string of levels, the player places a set of rats and static objects to guide a ball towards a trap that kills a cat',
-          keywords: [
-            {
-              id: 3,
-              name: 'rats'
-            },
-            {
-              id: 4,
-              name: 'game'
-            },
-            {
-              id: 5,
-              name: 'steam'
-            }
-          ]
-        },
-
-      ]
     }
   },
 
@@ -164,74 +101,57 @@ export default {
     openModal: function() {
       this.$refs.marketplaceAddCard.openModal();
     },
-    /**
-     * Creates a new card. of type:
-     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
-     *
-     *
-     * @param card
-     *
-     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
-     * 400 if there are errors with data, 201 otherwise
 
-     */
-    createNewCard(card) {
-      //adapt the test data
-      card.creatorId = this.userSession.id;
-      card.keywords = JSON.stringify(card.keywords);
 
-      console.log(card);
-
-      api.createCard(this.userSession.id, card.title, card.description, card.keywords, card.section)
-          .then((res) => {
-            this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success'});
-            //add the new card to the list
-            //let newcard =
-            card.id = res.data.cardId;
-            card.keywords = JSON.parse(card.keywords);
-            this.testData.push(card)
-            console.log(res.data);
+    getCards: function (section) {
+      api.getCards(section)
+          .then((response) => {
+            return response.data;
           })
           .catch((error) => {
-            let errormsg = "ERROR creating new card: ";
-            if (error) {
-              if (error.response) {
-                if (error.response.status === 401 || error.response.status === 403) {
-                  this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
-                }
-
-                if (error.response.status === 400) {
-                  this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
-                }
-              } else {
-                this.$vs.notify({
-                  title: 'Error',
-                  text: 'ERROR trying to obtain user info from session:',
-                  color: 'danger'
-                });
-              }
-            }
+            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
+            this.$log.error("Error" + error);
           });
     },
 
-    /**
-     * obtains the user's account details to create a new card.
-     */
-    getSession: function () {
-      api.checkSession()
+    getAllCards: function () {
+      api.getCards('ForSale')
           .then((response) => {
-            this.userSession = response.data;
+            console.log(response.data)
+            for (var card of response.data) {
+              console.log(card)
+              card.keywords = JSON.parse(card.keywords);
+              this.sectionForSale.push(card);
+            }
           })
           .catch((error) => {
-            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-            this.$log.error("Error checking sessions: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
+            this.$log.error("Error" + error);
+          });
+
+      api.getCards('Wanted')
+          .then((response) => {
+            this.sectionWanted = response.data;
+          })
+          .catch((error) => {
+            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
+            this.$log.error("Error" + error);
+          });
+
+      api.getCards('Exchange')
+          .then((response) => {
+            this.sectionExchange = response.data;
+          })
+          .catch((error) => {
+            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
+            this.$log.error("Error" + error);
           });
     }
   },
 
 
   mounted() {
-    this.getSession()
+    this.getAllCards();
   }
 
 }
