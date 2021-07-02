@@ -36,6 +36,7 @@ public class Card {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date displayPeriodEnd;
     private String keywords;
 
@@ -135,9 +136,19 @@ public class Card {
         Calendar displayPeriodEndCalendar = Calendar.getInstance();
         displayPeriodEndCalendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
         Date displayPeriodEndDate = displayPeriodEndCalendar.getTime();
-
         return displayPeriodEndDate;
     }
+
+    /**
+     * Updates display period by getting date 2 weeks in future and setting display period to that
+     * Preconditions: None
+     * Postconditions: Display period is updated
+     */
+    public void updateDisplayPeriodEndDate() {
+        Date newDate = getDisplayPeriodEndDate();
+        this.setDisplayPeriodEnd(newDate);
+    }
+
 
 
 }

@@ -44,5 +44,4 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      * @return List<Card> a list of cards matching section
      */
     List<Card> findAllBySection(MarketplaceSection section);
-
 }
