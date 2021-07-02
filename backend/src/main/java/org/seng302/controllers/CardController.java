@@ -122,13 +122,13 @@ public class CardController {
     public ResponseEntity<String> extendDisplayPeriodById (@PathVariable Long cardId, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         Card card = cardRepository.findCardById(cardId);
-        // Attempting to create a card for somebody else.
-        if (card.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
         // Attempting to create a copy of a card that does not exist
         if (card == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        // Attempting to create a card for somebody else.
+        if (card.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         // Creating a copy of the old card with extended date
         card.updateDisplayPeriodEndDate();
