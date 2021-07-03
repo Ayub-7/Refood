@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = InventoryController.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class InventoryControllerTests {
+class InventoryControllerTests {
 
     @Autowired
     private MockMvc mvc;
@@ -93,14 +93,14 @@ public class InventoryControllerTests {
     }
 
     @Test
-    public void testNoAuthGetInventory() throws Exception {
+    void testNoAuthGetInventory() throws Exception {
         mvc.perform(get("/businesses/{id}/inventory", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenUserGetInventory() throws Exception {
+    void testForbiddenUserGetInventory() throws Exception {
         Address addr = new Address(null, null, null, null, null, "New Zealand", "1234");
         User forbiddenUser = new User("Bad", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -111,7 +111,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testGetInventoryForNullBusiness() throws Exception {
+    void testGetInventoryForNullBusiness() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User user = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
@@ -122,7 +122,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testGlobalAdminGetInventory() throws Exception {
+    void testGlobalAdminGetInventory() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User defaultGlobalAdmin = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -139,7 +139,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testBusinessAdminGetInventory() throws Exception {
+    void testBusinessAdminGetInventory() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(get("/businesses/{id}/inventory", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
@@ -156,14 +156,14 @@ public class InventoryControllerTests {
     //
 
     @Test
-    public void testNoAuthPostInventory() throws Exception {
+    void testNoAuthPostInventory() throws Exception {
         mvc.perform(post("/businesses/{id}/inventory", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenUserPostInventory() throws Exception {
+    void testForbiddenUserPostInventory() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
 
@@ -181,7 +181,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostInventoryAsGlobalAdmin() throws Exception {
+    void testPostInventoryAsGlobalAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
         User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
@@ -204,7 +204,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulPostInventoryAsBusinessAdmin() throws Exception {
+    void testSuccessfulPostInventoryAsBusinessAdmin() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         mvc.perform(post("/businesses/{id}/inventory", business.getId())
@@ -226,7 +226,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithNoExpiry() throws Exception {
+    void testPostWithNoExpiry() throws Exception {
         inventory1.setExpires(null);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
@@ -240,7 +240,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithExpiryOnly() throws Exception {
+    void testPostWithExpiryOnly() throws Exception {
         inventory1.setBestBefore(null);
         inventory1.setManufactured(null);
         inventory1.setSellBy(null);
@@ -256,7 +256,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithNoQuantity() throws Exception {
+    void testPostWithNoQuantity() throws Exception {
         inventory1.setQuantity(0);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
@@ -271,7 +271,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithNegativeTotalPrice() throws Exception {
+    void testPostWithNegativeTotalPrice() throws Exception {
         inventory1.setTotalPrice(-1);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
@@ -289,14 +289,14 @@ public class InventoryControllerTests {
     //
 
     @Test
-    public void testNoAuthPutInventory() throws Exception {
+    void testNoAuthPutInventory() throws Exception {
         mvc.perform(put("/businesses/{businessId}/inventory/{productId}", business.getId(), existingInventoryItem.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenUserPutInventory() throws Exception {
+    void testForbiddenUserPutInventory() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
 
@@ -317,7 +317,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutInventoryAsGlobalAdmin() throws Exception {
+    void testPutInventoryAsGlobalAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
         User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
@@ -346,7 +346,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulPutInventoryAsBusinessAdmin() throws Exception {
+    void testSuccessfulPutInventoryAsBusinessAdmin() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
 
         //Have as param in here since the request object is null in the test
@@ -373,7 +373,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutWithNoExpiry() throws Exception {
+    void testPutWithNoExpiry() throws Exception {
         inventory1.setExpires(null);
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -391,7 +391,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutWithExpiryOnly() throws Exception {
+    void testPutWithExpiryOnly() throws Exception {
         inventory1.setBestBefore(null);
         inventory1.setManufactured(null);
         inventory1.setSellBy(null);
@@ -410,7 +410,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutWithNoQuantity() throws Exception {
+    void testPutWithNoQuantity() throws Exception {
         inventory1.setQuantity(0);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         //Have as param in here since the request object is null in the test
@@ -428,7 +428,7 @@ public class InventoryControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutWithNegativeTotalPrice() throws Exception {
+    void testPutWithNegativeTotalPrice() throws Exception {
         inventory1.setTotalPrice(-1);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         //Have as param in here since the request object is null in the test
