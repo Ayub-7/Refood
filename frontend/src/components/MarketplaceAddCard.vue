@@ -76,7 +76,7 @@ export default {
           this.keywordList.splice(this.keywordList.indexOf(item), 1)
         },
         /**
-         * Preconditions: User clicks add to invetory button
+         * Preconditions: User clicks add to inventory button
          *
          **/
         checkForm(){
@@ -154,7 +154,7 @@ export default {
         },
 
         /**
-        * Method for reseting form data, gets called when modal closes 
+        * Method for resetting form data, gets called when modal closes
         */
         resetData() {
 

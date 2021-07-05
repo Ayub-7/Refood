@@ -54,4 +54,30 @@ describe('Component', () => {
         wrapper.vm.checkForm();
         expect(wrapper.vm.errors.includes('long-title')).toBeTruthy();
     });
+
+    test('Valid card', () => {
+       wrapper.vm.section = "Wanted";
+       wrapper.vm.title = "Volkswagen Golf GTi mk5";
+       expect(wrapper.vm.checkForm()).toBeTruthy();
+    });
+
+    test('Open modal', () => {
+        wrapper.vm.openModal();
+        expect(wrapper.vm.showing).toBeTruthy();
+    });
+
+    test('Reset values', () => {
+        wrapper.vm.openModal();
+        expect(wrapper.vm.section).toEqual(null);
+        expect(wrapper.vm.title.length).toEqual(0);
+        expect(wrapper.vm.description.length).toEqual(0);
+    });
+
+    test('Close modal after successful submission', () => {
+        wrapper.vm.section = "Wanted";
+        wrapper.vm.title = "Volkswagen Golf GTi mk5";
+        expect(wrapper.vm.checkForm()).toBeTruthy();
+        wrapper.vm.addToMarketplace();
+        expect(wrapper.vm.showing).toBeFalsy();
+    });
 });
