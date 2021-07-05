@@ -5,7 +5,7 @@
       <!-- Far left side options menu-->
       <div id="options-bar" v-if="showOptionsMenu()">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <vs-button class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
+        <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
       </div>
 
       <div id="name-container">
@@ -77,12 +77,12 @@
       </div>
 
       <div id="modal-footer" slot="footer">
-        <vs-button class="modal-button modal-cancel-button" @click="closeModal()">
+        <button class="modal-button modal-cancel-button" @click="closeModal()">
           Cancel
-        </vs-button>
-        <vs-button class="modal-button modal-ok-button" id="add-user" @click="addUserToBusiness()">
+        </button>
+        <button class="modal-button modal-ok-button" id="add-user" @click="addUserToBusiness()">
           Add
-        </vs-button>
+        </button>
       </div>
     </Modal>
 
@@ -207,8 +207,10 @@ const Users = {
      * @returns {boolean} if there is one or more businesses, return true, else false.
      */
     showOptionsMenu: function() {
-      return this.userViewingBusinesses >= 1;
-
+      if (this.userViewingBusinesses < 1) {
+        return false
+      }
+      return true
     },
 
   },

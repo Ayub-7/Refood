@@ -27,6 +27,10 @@ export default {
         openModal: function() {
           this.showing = true;
         },
+        /**
+         * Converts seconds to date
+         */
+
       }
 }
 </script>
