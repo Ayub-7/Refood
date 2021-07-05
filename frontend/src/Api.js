@@ -299,9 +299,9 @@ export default {
 
     /**
      * Deletes a community marketplace card.
-     * @param id the id of the card to delete.
+     * @param cardId the id of the card to delete.
      * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
      */
-    deleteCard: async(id, userId) => instance.delete(`/cards/${id}`, {id, userId}, withCredentials: true}),
+    deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
 
 }
