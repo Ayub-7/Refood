@@ -124,7 +124,7 @@ public class CardController {
      */
     @GetMapping("/users/{userId}/cards")
     public ResponseEntity<String> getUserCards (@PathVariable Long userId) throws JsonProcessingException {
-        var user = userRepository.findUserById(userId);
+        User user = userRepository.findUserById(userId);
         if (user == null) return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
 
         List<Card> cards = cardRepository.findCardsByUser(user);

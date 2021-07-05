@@ -12,6 +12,7 @@ import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,6 +35,8 @@ class CardControllerTests {
     private CardController cardController;
     @MockBean
     private CardRepository cardRepository;
+    @MockBean
+    private UserRepository userRepository;
 
     @Autowired
     private ObjectMapper mapper;
