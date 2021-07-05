@@ -3,6 +3,8 @@
     <div id="search">
       <vs-input class="search-input" type="search" placeholder="Search for user" name="searchbar" v-model="searchbar" style="width: 400px; font-size: 24px" size="large"/>
       <vs-button id="submitSearch" size="large" type="border" @click="searchUsers">Search</vs-button>
+      <vs-input class="search-input" type="search" placeholder="Search for business" name="searchbarB" v-model="searchbarB" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchBusiness" size="large" type="border">Search</vs-button>
     </div>
 
 
@@ -81,6 +83,7 @@ const Search = {
     return {
       tableLoaded: false,
       searchbar: "",
+      searchbarB: "",
       mobileMode: false,
       errors: [],
       users: [],
@@ -278,6 +281,12 @@ export default Search;
 }
 
 #submitSearch {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  height: 3em;
+}
+
+#submitSearchBusiness {
   margin-left: 0.5em;
   height: 3em;
 }
