@@ -22,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
-public class UserRepositoryTests {
+class UserRepositoryTests {
 
     @Autowired
     private UserRepository userRepository;
@@ -45,7 +45,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void findUsers() {
+    void findUsers() {
         User found = userRepository.findUserByEmail("wtilsley0@rakuten.co.jp");
         assertThat(found.getEmail()).isEqualTo(testUser.getEmail());
         assertThat(found.getPassword()).isEqualTo(testUser.getPassword());

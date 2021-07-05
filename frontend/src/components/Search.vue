@@ -1,8 +1,10 @@
 <template>
   <div class="main" id="body">
     <div id="search">
-      <vs-input class="search-input" type="search" placeholder="Search for user" name="searchbar" v-model="searchbar" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearch" size="large" type="border" @click="searchUsers">Search</vs-button>
+      <vs-input class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers">Search</vs-button>
+      <vs-input class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchBusiness" size="large" type="border">Search</vs-button>
     </div>
 
 
@@ -80,7 +82,8 @@ const Search = {
   data: function() {
     return {
       tableLoaded: false,
-      searchbar: "",
+      searchbarUser: "",
+      searchbarBusiness: "",
       mobileMode: false,
       errors: [],
       users: [],
@@ -169,9 +172,9 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-      if (this.searchbar === "") return;
+      if (this.searchbarUser === "") return;
       this.$vs.loading();
-      api.searchQuery(this.searchbar)
+      api.searchQuery(this.searchbarUser)
         .then((response) => {
           this.users = response.data;
           this.users = this.users.filter(x => typeof(x) == "object")
@@ -277,7 +280,13 @@ export default Search;
   padding: 1em;
 }
 
-#submitSearch {
+#submitSearchUser {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  height: 3em;
+}
+
+#submitSearchBusiness {
   margin-left: 0.5em;
   height: 3em;
 }

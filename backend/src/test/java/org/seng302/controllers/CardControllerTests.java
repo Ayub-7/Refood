@@ -26,7 +26,7 @@ import java.util.Date;
 
 @WebMvcTest(controllers = CardController.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class CardControllerTests {
+class CardControllerTests {
 
     @Autowired
     private MockMvc mvc;
@@ -58,7 +58,7 @@ public class CardControllerTests {
     }
 
     @Test
-    public void testPostCard_noAuth_returnUnauthorized() throws Exception {
+    void testPostCard_noAuth_returnUnauthorized() throws Exception {
         mvc.perform(post("/cards")
             .contentType("application/json")
             .content(mapper.writeValueAsString(cardRequest)))
@@ -67,7 +67,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_wrongCreatorId_returnForbidden() throws Exception {
+    void testPostCard_wrongCreatorId_returnForbidden() throws Exception {
         mvc.perform(post("/cards")
                 .contentType("application/json")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser)
@@ -77,7 +77,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_noTitle_returnBadRequest() throws Exception {
+    void testPostCard_noTitle_returnBadRequest() throws Exception {
         cardRequest.setTitle(null);
 
         mvc.perform(post("/cards")
@@ -89,7 +89,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_shortTitle_returnBadRequest() throws Exception {
+    void testPostCard_shortTitle_returnBadRequest() throws Exception {
         cardRequest.setTitle("A");
 
         mvc.perform(post("/cards")
@@ -101,7 +101,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_titleTooLong_returnBadRequest() throws Exception {
+    void testPostCard_titleTooLong_returnBadRequest() throws Exception {
         cardRequest.setTitle("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
         mvc.perform(post("/cards")
@@ -113,7 +113,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_noSection_returnBadRequest() throws Exception {
+    void testPostCard_noSection_returnBadRequest() throws Exception {
         cardRequest.setSection(null);
 
         mvc.perform(post("/cards")
@@ -125,7 +125,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_returnCreated() throws Exception {
+    void testPostCard_returnCreated() throws Exception {
         mvc.perform(post("/cards")
                 .contentType("application/json")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser)
@@ -135,7 +135,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testPostCard_asDgaa_returnCreated() throws Exception {
+    void testPostCard_asDgaa_returnCreated() throws Exception {
         anotherUser.setRole(Role.DGAA);
 
         mvc.perform(post("/cards")
@@ -146,7 +146,7 @@ public class CardControllerTests {
     }
 
     @Test
-    public void testGetCards_noAuth_returnUnauthorized() throws Exception {
+    void testGetCards_noAuth_returnUnauthorized() throws Exception {
         mvc.perform(get("/cards")
                 .param("section", "ForSale"))
                 .andExpect(status().isUnauthorized());
@@ -154,14 +154,14 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testGetCards_noParam_returnBadRequest() throws Exception {
+    void testGetCards_noParam_returnBadRequest() throws Exception {
         mvc.perform(get("/cards"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithMockUser
-    public void testGetCards_emptyParam_returnBadRequest() throws Exception {
+    void testGetCards_emptyParam_returnBadRequest() throws Exception {
         mvc.perform(get("/cards")
                 .param("section", ""))
                 .andExpect(status().isBadRequest());
@@ -169,7 +169,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testGetCards_invalidParam_returnBadRequest() throws Exception {
+    void testGetCards_invalidParam_returnBadRequest() throws Exception {
         mvc.perform(get("/cards")
                 .param("section", "InvalidSectionName"))
                 .andExpect(status().isBadRequest());
@@ -177,7 +177,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testGetCards_returnOk() throws Exception {
+    void testGetCards_returnOk() throws Exception {
         mvc.perform(get("/cards")
                 .param("section", "ForSale"))
                 .andExpect(status().isOk());
@@ -189,14 +189,14 @@ public class CardControllerTests {
     //GET by ID tests
 
     @Test
-    public void testGetCardById_noAuth_returnUnauthorized() throws Exception {
+    void testGetCardById_noAuth_returnUnauthorized() throws Exception {
         mvc.perform(get("/cards/{id}", card.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-    public void testGetCardById_asUser_returnOk() throws Exception {
+    void testGetCardById_asUser_returnOk() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(get("/cards/{id}", card.getId())
@@ -206,7 +206,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testGetCardById_badId_returnNotAcceptable() throws Exception {
+    void testGetCardById_badId_returnNotAcceptable() throws Exception {
         //If no card found repository will give null
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
 
@@ -217,7 +217,7 @@ public class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testGetCardById_idNotLong_returnNotAcceptable() throws Exception {
+    void testGetCardById_idNotLong_returnNotAcceptable() throws Exception {
         //Any value that isn't long will throw 400, just making sure with a float
         mvc.perform(get("/cards/{id}", 1.1)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))

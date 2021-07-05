@@ -34,23 +34,23 @@ import java.security.NoSuchAlgorithmException;
  */
 @WebMvcTest(controllers = BusinessController.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class BusinessControllerTests {
+class BusinessControllerTests {
 
     @Autowired
-    private MockMvc mvc;
+    MockMvc mvc;
     @InjectMocks
-    private BusinessController businessController;
+    BusinessController businessController;
     @MockBean
-    private BusinessRepository businessRepository;
+    BusinessRepository businessRepository;
     @MockBean
-    private UserRepository userRepository;
+    UserRepository userRepository;
     @Autowired
-    private ObjectMapper mapper;
+    ObjectMapper mapper;
 
-    private User ownerUser;
-    private User adminUser;
-    private User user;
-    private Business business;
+    User ownerUser;
+    User adminUser;
+    User user;
+    Business business;
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
@@ -71,7 +71,7 @@ public class BusinessControllerTests {
     }
 
     @Test
-    public void testNoAuthMakeUserAdmin() throws Exception {
+    void testNoAuthMakeUserAdmin() throws Exception {
         UserIdRequest userIdReq = new UserIdRequest(user.getId());
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
                 .contentType("application/json").sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
@@ -81,7 +81,7 @@ public class BusinessControllerTests {
 
     @Test
     @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
-    public void testMakeUserAdmin() throws Exception {
+    void testMakeUserAdmin() throws Exception {
         UserIdRequest userIdReq = new UserIdRequest(user.getId());
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -117,7 +117,7 @@ public class BusinessControllerTests {
     }
 
     @Test
-    public void testNoAuthRemoveUserAdmin() throws Exception {
+    void testNoAuthRemoveUserAdmin() throws Exception {
         UserIdRequest userIdReq = new UserIdRequest(user.getId());
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
@@ -128,7 +128,7 @@ public class BusinessControllerTests {
 
     @Test
     @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
-    public void testRemoveUserAdmin() throws Exception {
+    void testRemoveUserAdmin() throws Exception {
         UserIdRequest adminUserIdReq = new UserIdRequest(adminUser.getId());
 
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -165,14 +165,14 @@ public class BusinessControllerTests {
     }
 
     @Test
-    public void testGetBusiness_returnUnauthorized() throws Exception {
+    void testGetBusiness_returnUnauthorized() throws Exception {
         mvc.perform(get("/businesses/{id}", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-    public void testGetBusiness_returnNotAcceptable() throws Exception {
+    void testGetBusiness_returnNotAcceptable() throws Exception {
         Mockito.when(businessRepository.findBusinessById(99)).thenReturn(null);
         mvc.perform(get("/businesses/{id}", 99))
                 .andExpect(status().isNotAcceptable());
@@ -180,7 +180,7 @@ public class BusinessControllerTests {
 
     @Test
     @WithMockUser
-    public void testGetBusiness_returnOk() throws Exception {
+    void testGetBusiness_returnOk() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
 
         MvcResult result = mvc.perform(get("/businesses/{id}", business.getId()))
@@ -194,7 +194,7 @@ public class BusinessControllerTests {
 
     @Test
     @WithMockUser
-    public void testCreateBusiness_returnCreated() throws Exception {
+    void testCreateBusiness_returnCreated() throws Exception {
         NewBusinessRequest testBusiness = new NewBusinessRequest("Some Business", "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
 
         mvc.perform(post("/businesses")
@@ -206,7 +206,7 @@ public class BusinessControllerTests {
 
     @Test
     @WithMockUser
-    public void testInvalidCreateBusiness_returnBadRequest() throws Exception {
+    void testInvalidCreateBusiness_returnBadRequest() throws Exception {
         NewBusinessRequest testBusiness = new NewBusinessRequest(null, "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
 
         mvc.perform(post("/businesses")
