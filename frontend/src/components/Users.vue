@@ -5,7 +5,7 @@
       <!-- Far left side options menu-->
       <div id="options-bar" v-if="showOptionsMenu()">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
+        <vs-button class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
       </div>
 
       <div id="name-container">
@@ -77,12 +77,12 @@
       </div>
 
       <div id="modal-footer" slot="footer">
-        <button class="modal-button modal-cancel-button" @click="closeModal()">
+        <vs-button class="modal-button modal-cancel-button" @click="closeModal()">
           Cancel
-        </button>
-        <button class="modal-button modal-ok-button" id="add-user" @click="addUserToBusiness()">
+        </vs-button>
+        <vs-button class="modal-button modal-ok-button" id="add-user" @click="addUserToBusiness()">
           Add
-        </button>
+        </vs-button>
       </div>
     </Modal>
 
@@ -207,10 +207,8 @@ const Users = {
      * @returns {boolean} if there is one or more businesses, return true, else false.
      */
     showOptionsMenu: function() {
-      if (this.userViewingBusinesses < 1) {
-        return false
-      }
-      return true
+      return this.userViewingBusinesses >= 1;
+
     },
 
   },
@@ -254,7 +252,7 @@ export default Users;
   cursor: pointer;
 
   text-align: center;
-  color: black;
+  color: white;
   font-weight: 500;
   font-size: 14px;
   letter-spacing: 1px;
@@ -455,7 +453,7 @@ main {
 
 .modal-ok-button {
   text-align: center;
-  color: black;
+  color: white;
 
   width: 100px;
   margin: 0 1em;
@@ -470,7 +468,7 @@ main {
 
 .modal-cancel-button {
   text-align: center;
-  color: black;
+  color: white;
 
   width: 100px;
   margin: 0 1em;

@@ -1,7 +1,7 @@
 <template>
   <div id="tableContainer">
         <vs-row id="tableRow">
-          <vs-table :data="tableData" style="border-spacing: 0px 20px; margin: 1em" search>
+          <vs-table v-model="selected" @selected="handleSelected" :data="tableData" style="border-spacing: 0 20px; margin: 1em" search>
             <template slot="thead" style="background:blue">
               <vs-th sort-key="id" style="text-align: center;">
                 <div>ID</div>
@@ -19,7 +19,7 @@
             </template>
 
             <template slot-scope="{data}">
-              <vs-tr :key="item.id" v-for="item in data">
+              <vs-tr :key="item.id" v-for="item in data" :data="item">
                 <vs-td style="width: 20px; min-width: 100px; padding-right: 10px; text-align: center;">
                   <a href="#">{{ item.id }}</a>
                   <div>
@@ -27,7 +27,7 @@
                   </div>
                 </vs-td>
                 <vs-td>{{ item.title }} </vs-td>
-                <vs-td>{{ item.description }} </vs-td>
+                <vs-td >{{ item.description }} </vs-td>
                 <vs-td>
                     <div id="cardKeywords"  v-for="keyword in item.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
                 </vs-td>
@@ -38,13 +38,33 @@
             </template>
           </vs-table>
         </vs-row>
+    <CardModal ref="cardModal" :selectedCard="selectedItem" />
   </div>
 </template>
 
 <script>
-export default {
-  props: ['tableData']
+import CardModal from './CardModal.vue'
 
+export default {
+  data: function() {
+    return {
+      selectedItem: null,
+    }
+  },
+  components: {
+    CardModal
+  },
+  props: ['tableData'],
+  methods: {
+    /**
+     * Method for opening card modal, calls method in child component to open modal
+     */
+    handleSelected(item) {
+      this.selectedItem = item;
+      console.log(this.selectedItem);
+      this.$refs.cardModal.openModal();
+    }
+  }
 }
 </script>
 
@@ -83,14 +103,6 @@ th {
 
 table {
   width: 100%;
-}
-
-.vs-con-table {
-  background: none;
-}
-
-.vs-component.vs-con-table.vs-table-primary {
-  margin: 0px !important;
 }
 
 ::-webkit-scrollbar-thumb {
