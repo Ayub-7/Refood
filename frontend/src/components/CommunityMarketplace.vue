@@ -18,19 +18,19 @@
       </div>
       <vs-divider></vs-divider>
       <vs-tabs alignment="center">
-        <vs-tab label="For Sale" @click="getSectionCards('ForSale')">
+        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards" />
             <MarketplaceTable v-if="!displayType" :tableData="cards" />
           </div>
         </vs-tab>
-        <vs-tab label="Wanted" @click="getSectionCards('Wanted')">
+        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards" />
             <MarketplaceTable v-if="!displayType" :tableData="cards" />
           </div>
         </vs-tab>
-        <vs-tab label="Exchange" @click="getSectionCards('Exchange')">
+        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards" />
             <MarketplaceTable v-if="!displayType" :tableData="cards" />
@@ -106,7 +106,15 @@ export default {
 
 <style scoped>
 
-vs-tab {
+#saleTab {
+  color: #1F74FF;
+}
+
+#wantedTab {
+  color: #1F74FF;
+}
+
+#exchangeTab {
   color: #1F74FF;
 }
 
