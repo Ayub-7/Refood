@@ -54,7 +54,6 @@ public class CardControllerTests {
         cardRequest = new NewCardRequest(testUser.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         card = new Card(cardRequest, testUser);
-
     }
 
     @Test
@@ -223,4 +222,61 @@ public class CardControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isBadRequest());
     }
+
+
+    //DELETE by ID tests
+
+    @Test
+    public void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(delete("/cards/{cardId}", card.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_wrongCreatorId_returnForbidden() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_asCreator() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_asDGAA() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        anotherUser.setRole(Role.DGAA);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_badId_returnNotAcceptable() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+
+
+
+
+
 }
