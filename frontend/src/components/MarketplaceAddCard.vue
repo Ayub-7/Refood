@@ -37,7 +37,6 @@
                      closable>{{keyword}}
             </vs-chip>
           </vs-chips>
-<!--            <vs-input v-model="keywords" class="addCardInput"></vs-input>-->
         </vs-col>
     </vs-row>
 
@@ -77,7 +76,7 @@ export default {
         },
         /**
          * Preconditions: User clicks add to inventory button
-         *
+         * Postconditions:
          **/
         checkForm(){
           this.keywords= '';
