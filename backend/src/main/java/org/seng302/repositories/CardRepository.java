@@ -46,10 +46,12 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findAllBySection(MarketplaceSection section);
 
     /**
-     * Delete a  Card by it's ID
+     * Delete a Card by it's ID
      *
      * @param id
+     * @return long number of records deleted
      */
-    void deleteCardById(long id);
+    @Transactional
+    long deleteCardById(long id);
 
 }
