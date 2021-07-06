@@ -31,12 +31,14 @@ public class CardController {
     private static final Logger logger = LogManager.getLogger(CardController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
+    private UserRepository userRepository;
     private CardRepository cardRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
+    public CardController(UserRepository userRepository, CardRepository cardRepository) {
+        this.userRepository = userRepository;
+        this.cardRepository = cardRepository;
+    }
 
     /**
      * POST/Creates a new card to store in the database that will go onto the community marketplace.
