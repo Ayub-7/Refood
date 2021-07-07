@@ -9,7 +9,7 @@
             <p v-if="!displayType">List</p>
           </div>
           <label class="switch">
-            <input v-model="displayType" type="checkbox" checked>
+            <input id="display-type-button" v-model="displayType" type="checkbox" @click="displayType=!displayType" checked>
             <span class="slider round"></span>
           </label>
         </div>
@@ -36,7 +36,7 @@
       <vs-tabs alignment="center" v-model="tabIndex">
         <vs-tab label="For Sale" @click="getSectionCards('ForSale')">
           <div>
-            <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid  v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
             <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
