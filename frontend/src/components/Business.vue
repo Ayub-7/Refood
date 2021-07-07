@@ -32,7 +32,7 @@
 
       <main>
         <!-- Sub Navigation Bar -->
-        <vs-tabs id="business-navbar"> <!-- id="business-navbar" -->
+        <vs-tabs id="business-navbar">
           <vs-tab class="business-nav-item" label="Listings">
             <BusinessListings :business-id="business.id" :country="user.homeAddress.country"/>
           </vs-tab>

@@ -1,43 +1,55 @@
 <template>
   <vs-card class="main">
-    <div class="profile-text-inner">
-      <div style="display: flex; margin: auto; padding-bottom: 1em;">
-        <div id="title" style="font-size: 30px; margin: auto 8px;" >Community Marketplace</div>
-        <div style="margin-right: 0; margin-left: auto; display: flex">
-          <div class="title" style="margin-top: 5px; margin-right: 10px">
+    <div class="container">
+      <div class="title-container">
+        <h1 id="title" class="title-left title" >Community Marketplace</h1>
+        <div class="title-right">
+          <div class="menu-title" style="margin-top: 5px; margin-right: 10px">
             <p v-if="displaytype">Grid</p>
             <p v-if="!displaytype">List</p>
           </div>
-          <label class="switch" >
+          <label class="switch">
             <input v-model="displaytype" type="checkbox" checked>
             <span class="slider round"></span>
           </label>
         </div>
       </div>
       <vs-divider></vs-divider>
-      <div>Sort By: </div>
-      <vs-button @click="openModal">Add to market (test for now)</vs-button>
+
+
+      <div class="title-container">
+
+        <div class="title-left" >
+          <vs-select class="selectExample" v-model="selectSortBy">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="item, index in optionsSortBy" onclick="console.log(value)"/>
+          </vs-select>
+          <vs-button @click="sortData();" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+
+        </div>
+        <div class="title-right">
+          <vs-button @click="openModal">Add a New Item</vs-button>
+        </div>
+      </div>
+
       <vs-divider></vs-divider>
 
       <vs-tabs alignment="center">
-        <vs-tab label="For Sale">
+        <vs-tab label="For Sale" @click="getSectionCards('ForSale')">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionForSale.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionForSale.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
-          </div>
-          <div class="center">
+            <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab label="Wanted">
+        <vs-tab label="Wanted" @click="getSectionCards('Wanted')">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionWanted.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionWanted.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
+            <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab label="Exchange">
+        <vs-tab label="Exchange" @click="getSectionCards('Exchange')">
           <div>
-            <MarketplaceGrid v-if="displaytype" v-bind:cardData=sectionExchange.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
-            <MarketplaceTable v-if="!displaytype" v-bind:tableData=sectionExchange.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) />
+            <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
           </div>
 
         </vs-tab>
@@ -71,88 +83,46 @@ export default {
       sectionExchange: "",
       currentPage: 1,
       itemPerPage: 12,
+      currentSection: "ForSale",
+      cards: [],
 
-      //test data for create card
-      newCardTest: {
-        "creatorId": "2",
-        "title": "1989 S13 Silvia RB25DET",
-        "description": "No wof reg, send it",
-        keywords: [
-          {
-            id: 6,
-            name: 'Nissan'
-          },
-          {
-            id: 7,
-            name: 'Silvia'
-          },
-          {
-            id: 8,
-            name: 'RB25DET'
-          },
-          {
-            id: 9,
-            name: 'S13'
-          }],
-        section: "ForSale"
-      },
     }
   },
 
   methods: {
+    getSectionCards: function(section) {
+      this.$vs.loading({
+        container: ".vs-tabs",
+      });
+      this.cards = [];
+      api.getCardsBySection(section)
+          .then((res) => {
+            this.cards = res.data.slice(0, 100); // todo: TEMPORARY UNTIL WE CAN PAGINATE THE DATA COMING IN.
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
+          });
+    },
+
     /**
     * Method for opening modal, calls method in child component to open modal
     */
     openModal: function() {
       this.$refs.marketplaceAddCard.openModal();
     },
-
-
-    getCards: function (section) {
-      api.getCards(section)
-          .then((response) => {
-            return response.data;
-          })
-          .catch((error) => {
-            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
-            this.$log.error("Error" + error);
-          });
-    },
-
-    getAllCards: function () {
-      api.getCards('ForSale')
-          .then((response) => {
-            console.log(response.data)
-            this.sectionForSale = response.data;
-          })
-          .catch((error) => {
-            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
-            this.$log.error("Error" + error);
-          });
-
-      api.getCards('Wanted')
-          .then((response) => {
-            this.sectionWanted = response.data;
-          })
-          .catch((error) => {
-            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
-            this.$log.error("Error" + error);
-          });
-
-      api.getCards('Exchange')
-          .then((response) => {
-            this.sectionExchange = response.data;
-          })
-          .catch((error) => {
-            this.$vs.notify({title:'Error', text:'ERROR getting cards:', color:'danger'});
-            this.$log.error("Error" + error);
-          });
-    }
-  },
-
+   },
 
   mounted() {
-    this.getAllCards();
+    api.checkSession()
+        .then(() => {
+          this.getSectionCards("ForSale");
+        })
+        .catch((error) => {
+          this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+        });
   }
 
 }
@@ -178,7 +148,7 @@ vs-tab {
   box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
-.profile-text-inner {
+.container {
   margin: 1em;
 }
 

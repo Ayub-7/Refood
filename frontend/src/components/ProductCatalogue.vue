@@ -58,10 +58,10 @@
                     :key="product.id">
 
               <div slot="media">
-                <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
+                <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
                 <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-                <img v-if="!product.primaryImagePath && isDevelopment()" class="grid-image" src="ProductShoot.jpg"/>
-                <img v-if="!isDevelopment() && !product.primaryImagePath" class="grid-image" :src="getImgUrl(true)"/>
+                <img v-if="!product.primaryImagePath && isDevelopment()" class="grid-image" src="ProductShoot.jpg" alt="Product image"/>
+                <img v-if="!isDevelopment() && !product.primaryImagePath" class="grid-image" :src="getImgUrl(true)" alt="Product image"/>
               </div>
 
               <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
@@ -138,10 +138,10 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a style="color: rgb(0,0,238);">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                        <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)"/>
-                        <img v-if="!product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg"/>
-                        <img v-if="!isDevelopment() && !product.primaryImagePath" class="table-image" :src="getImgUrl(true)"/>
+                        <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
+                        <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)" alt="Product image"/>
+                        <img v-if="!product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg" alt="Product image"/>
+                        <img v-if="!isDevelopment() && !product.primaryImagePath" class="table-image" :src="getImgUrl(true)" alt="Product image"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -242,10 +242,10 @@ const Search = {
         this.business = this.getBusinessName();
 
         api.getBusinessProducts(this.businessId)
-            .then((response) => {
-              this.$log.debug("Data loaded: ", response.data);
-              this.products = response.data;
-              this.filteredproducts = response.data;
+            .then((innerResponse) => {
+              this.$log.debug("Data loaded: ", innerResponse.data);
+              this.products = innerResponse.data;
+              this.filteredproducts = innerResponse.data;
             })
             .catch((error) => {
               this.$log.debug(error);

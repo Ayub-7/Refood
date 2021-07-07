@@ -314,8 +314,8 @@ const Register = {
               this.$log.debug("New item created:", response.data);
               mutations.setUserLoggedIn(response.data.userId, response.data.role); //Store user info into program state, used for later calls
               api.login(this.email, this.password)
-                  .then((response) => {
-                    mutations.setUserLoggedIn(response.data.userId, response.data.role);
+                  .then((innerResponse) => {
+                    mutations.setUserLoggedIn(innerResponse.data.userId, innerResponse.data.role);
                     //LOAD USER PAGE, USING ROUTER
                     this.$router.push({path: '/home'})
                   }).catch((error) => {

@@ -1,5 +1,4 @@
 <template>
-  <!-- <h1> Basic Login Form</h1> -->
   <div id="main">
 
     <p id="sign">Sign In</p>
