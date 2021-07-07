@@ -231,4 +231,21 @@ class BusinessControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void noSessionBusinessSearch() throws Exception {
+        MvcResult results = mvc.perform(get("/users/search")
+                .param("searchQuery", "Pizza"))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+    }
+
+    @Test
+    @WithMockUser
+    void loggedInBusinessSearch() throws Exception {
+        MvcResult results = mvc.perform(get("/users/search")
+                .param("searchQuery", "Pizza"))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+    }
+
 }

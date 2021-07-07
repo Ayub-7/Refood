@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.finders.BusinessFinder;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RestController
 public class BusinessController {
@@ -33,6 +35,8 @@ public class BusinessController {
 
     @Autowired
     private UserRepository userRepository;
+
+    private BusinessFinder businessFinder;
 
     /**
      * Get request mapping for getting business by id
@@ -186,6 +190,17 @@ public class BusinessController {
         } else {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(business);
         }
+    }
 
+    @GetMapping("/businesses/search")
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            logger.debug("Searching for businesses...");
+            List<Business> businesses = businessFinder.findBusinesses(query);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
     }
 }

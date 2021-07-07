@@ -14,12 +14,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-enum Logic {
-    NONE,
-    AND,
-    OR;
-}
-
 /**
  * Class containing methods to search for users with specific query params.
  */
