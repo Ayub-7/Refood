@@ -226,4 +226,44 @@ class CardControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isBadRequest());
     }
+
+
+
+    //Get user cards endpoint
+
+    @Test
+    void testGetUserCards_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(get("/users/{id}/cards", 1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserCards_auth_returnOk() throws Exception {
+        int userId = 1;
+        Mockito.when(userRepository.findUserById(userId)).thenReturn(testUser);
+        mvc.perform(get("/users/{id}/cards", userId)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserCards_noUser_returnNotAcceptable() throws Exception {
+        int userId = 1;
+        Mockito.when(userRepository.findUserById(userId)).thenReturn(null);
+        mvc.perform(get("/users/{id}/cards", userId)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserCards_badId_returnBadRequest() throws Exception {
+
+        mvc.perform(get("/users/{id}/cards", 1.1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isBadRequest());
+    }
 }
