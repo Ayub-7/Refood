@@ -122,7 +122,24 @@ export default {
       this.cards = [];
       api.getCardsBySection(section)
           .then((res) => {
-            this.cards = res.data.slice(0, 100); // todo: TEMPORARY UNTIL WE CAN PAGINATE THE DATA COMING IN.
+            this.cards = res.data;//.slice(0, 100);
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
+          });
+    },
+
+    getSectionCardSlice: function(section) {
+      this.$vs.loading({
+        container: ".vs-tabs",
+      });
+      this.cards = [];
+      api.getCardsBySection(section)
+          .then((res) => {
+            this.cards = res.data.slice(0, 100);
           })
           .catch((error) => {
             console.log(error);
