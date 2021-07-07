@@ -108,7 +108,7 @@ export default {
         {text:'Showing 40 Per Page',value:'40'},
         {text:'Showing 80 Per Page',value:'80'},
       ],
-      selectSortBy: 'title',
+      selectSortBy: 'created',
       selectSortByPrevious: '',
       toggleDirection: -1,
     }
@@ -122,25 +122,11 @@ export default {
       this.cards = [];
       api.getCardsBySection(section)
           .then((res) => {
-            this.cards = res.data;//.slice(0, 100);
-            console.log(this.cards);
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .finally(() => {
-            this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
-          });
-    },
-
-    getSectionCardSlice: function(section) {
-      this.$vs.loading({
-        container: ".vs-tabs",
-      });
-      this.cards = [];
-      api.getCardsBySection(section)
-          .then((res) => {
             this.cards = res.data;
+
+            //Sort by creation date
+            this.sortData('created');
+            console.log(this.cards)
           })
           .catch((error) => {
             console.log(error);
@@ -148,6 +134,7 @@ export default {
           .finally(() => {
             this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
           });
+
     },
 
     /**

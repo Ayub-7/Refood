@@ -14,8 +14,8 @@
                   <div>
                     <div id="cardCreationDate">{{card.created}}</div>
 
-                    <div id="cardUserName">{{card.user.firstName+" "+card.user.lastName}}</div>
-                    <div id="cardUserAddress">{{getGeneralAddress(card.user.homeAddress)}}</div>
+                    <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
+                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{getGeneralAddress(card.user.homeAddress)}}</div>
 
 
                     <div id="cardTitle">{{card.title}}</div>
