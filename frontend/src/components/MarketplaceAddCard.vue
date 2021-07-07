@@ -69,49 +69,21 @@ export default {
 
 
     methods: {
-        /** 
-        * Template for POST request method
-        */
-        addToMarketplace() {
-            console.log(this.section, this.title, this.description, this.keywords);
-
-
-            this.closeModal();
-        },
-
-
-      /**
-       * obtains the user's account details to create a new card.
-       */
-      getSession: function () {
-        api.checkSession()
-            .then((response) => {
-              this.userSession = response.data;
-            })
-            .catch((error) => {
-              this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-              this.$log.error("Error checking sessions: " + error);
-            });
-      },
 
       /**
        * Creates a new card. of type:
        * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
        *
-       *
-       * @param card
-       *
        * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
        * 400 if there are errors with data, 201 otherwise
 
        */
-      createNewCard(card) {
-        //adapt the test data
-        card.creatorId = this.userSession.id;
-
+      addToMarketplace() {
         api.createCard(this.userSession.id, this.title, this.description, this.keywords, this.section)
             .then((res) => {
               this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success'});
+              //card.id = res.data.cardId;
+              //this.$parent.$data.cards.push(card)
             })
             .catch((error) => {
               let errormsg = "ERROR creating new card: ";
@@ -133,6 +105,22 @@ export default {
                 }
               }
             });
+        this.closeModal();
+      },
+
+      /**
+       * obtains the user's account details to create a new card.
+       */
+      getSession() {
+        api.checkSession()
+            .then((response) => {
+              this.userSession = response.data;
+              console.log(this.userSession);
+            })
+            .catch((error) => {
+              this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+              this.$log.error("Error checking sessions: " + error);
+            });
       },
 
         /** 
@@ -146,7 +134,7 @@ export default {
         * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
         */
         openModal() {
-            this.resetData();
+          this.resetData();
           this.getSession();
 
           this.showing = true;
