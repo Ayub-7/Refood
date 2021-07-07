@@ -57,11 +57,11 @@
 
       <div class="title-container">
         <div class="title-centre">
-          <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.1)"/>
+          <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.4)"/>
         </div>
 
         <div class="title-right">
-          <vs-select class="selectExample" v-model="itemPerPage">
+          <vs-select class="selectExample" v-model="itemPerPage" @click="currentPage=1;">
             <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsItemsPerPage" />
           </vs-select>
         </div>
