@@ -5,11 +5,11 @@
         <h1 id="title" class="title-left title" >Community Marketplace</h1>
         <div class="title-right">
           <div class="menu-title" style="margin-top: 5px; margin-right: 10px">
-            <p v-if="displaytype">Grid</p>
-            <p v-if="!displaytype">List</p>
+            <p v-if="displayType">Grid</p>
+            <p v-if="!displayType">List</p>
           </div>
           <label class="switch">
-            <input v-model="displaytype" type="checkbox" checked>
+            <input v-model="displayType" type="checkbox" checked>
             <span class="slider round"></span>
           </label>
         </div>
@@ -21,9 +21,9 @@
 
         <div class="title-left" >
           <vs-select class="selectExample" v-model="selectSortBy">
-            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="item, index in optionsSortBy" onclick="console.log(value)"/>
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy" onclick="console.log(value)"/>
           </vs-select>
-          <vs-button @click="sortData();" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+          <vs-button @click="sortData(selectSortBy);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
 
         </div>
         <div class="title-right">
@@ -54,8 +54,20 @@
 
         </vs-tab>
       </vs-tabs>
-        <vs-pagination v-model="currentPage" :total="sectionForSale.length/itemPerPage"/>
+
+      <div class="title-container">
+        <div class="title-centre">
+          <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.1)"/>
+        </div>
+
+        <div class="title-right">
+          <vs-select class="selectExample" v-model="itemPerPage">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsItemsPerPage" />
+          </vs-select>
+        </div>
+      </div>
     </div>
+
   <MarketplaceAddCard ref="marketplaceAddCard" />
   </vs-card>
 
@@ -77,15 +89,27 @@ export default {
 
   data: () => {
     return {
-      displaytype: true,
-      sectionForSale: "",
-      sectionWanted: "",
-      sectionExchange: "",
+      displayType: true,
       currentPage: 1,
-      itemPerPage: 12,
+      itemPerPage: 10,
+
       currentSection: "ForSale",
       cards: [],
 
+      optionsSortBy:[
+        {text:'Title',value:'title'},
+        {text:'Date Created',value:'created'},
+        {text:'Keywords',value:'keywords'},
+      ],
+      optionsItemsPerPage:[
+        {text:'Showing 10 Per Page',value:'10'},
+        {text:'Showing 20 Per Page',value:'20'},
+        {text:'Showing 40 Per Page',value:'40'},
+        {text:'Showing 80 Per Page',value:'80'},
+      ],
+      selectSortBy: 'title',
+      selectSortByPrevious: '',
+      toggleDirection: 1,
     }
   },
 
@@ -113,6 +137,20 @@ export default {
     openModal: function() {
       this.$refs.marketplaceAddCard.openModal();
     },
+
+    /**
+     * Sort the cards by the [field] input.
+     * Assumes the [field] can be sorted via a simple comparison
+     *
+     * @param field
+     */
+    sortData: function (field) {
+      let direction = this.toggleDirection;
+      console.log(direction);
+      this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field] < cardTwo[field]) ? direction : -direction);
+      this.toggleDirection = this.toggleDirection*-1;
+    }
+
    },
 
   mounted() {
@@ -233,6 +271,41 @@ input:checked + .slider:before {
   justify-content: space-around;
 }
 
+
+.title-container {
+  display: flex;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 1em;
+}
+.title-left {
+  margin-right: auto;
+  margin-left: 0;
+  display: flex;
+}
+
+.title-centre {
+  margin-right: auto;
+  margin-left: auto;
+  display: flex;
+}
+
+.title-right{
+  margin-right: 0;
+  margin-left: auto;
+  display: flex;
+}
+
+
+.menu-title {
+  margin: auto;
+  padding-right: 4px;
+  font-size: 20px;
+}
+
+.title {
+  font-size: 30px;
+}
 
 
 
