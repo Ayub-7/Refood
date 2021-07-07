@@ -84,6 +84,8 @@ export default {
               this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success'});
               //card.id = res.data.cardId;
               //this.$parent.$data.cards.push(card)
+              this.$emit('submitted');
+
             })
             .catch((error) => {
               let errormsg = "ERROR creating new card: ";

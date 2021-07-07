@@ -21,19 +21,19 @@
 
         <div class="title-left" >
           <vs-select class="selectExample" v-model="selectSortBy">
-            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy" onclick="console.log(value)"/>
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy"/>
           </vs-select>
           <vs-button @click="sortData(selectSortBy);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
 
         </div>
         <div class="title-right">
-          <vs-button @click="openModal">Add a New Item</vs-button>
+          <vs-button @click="openModal" >Add a New Item</vs-button>
         </div>
       </div>
 
       <vs-divider></vs-divider>
 
-      <vs-tabs alignment="center">
+      <vs-tabs alignment="center" v-model="tabIndex">
         <vs-tab label="For Sale" @click="getSectionCards('ForSale')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-  <MarketplaceAddCard ref="marketplaceAddCard" />
+  <MarketplaceAddCard ref="marketplaceAddCard" @submitted="onSuccess"/>
   </vs-card>
 
 
@@ -92,6 +92,7 @@ export default {
       displayType: true,
       currentPage: 1,
       itemPerPage: 10,
+      tabIndex: 0,
 
       currentSection: "ForSale",
       cards: [],
@@ -109,7 +110,7 @@ export default {
       ],
       selectSortBy: 'title',
       selectSortByPrevious: '',
-      toggleDirection: 1,
+      toggleDirection: -1,
     }
   },
 
@@ -129,6 +130,31 @@ export default {
           .finally(() => {
             this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
           });
+    },
+
+    /**
+     * Reloads the data upon sucessful add card.
+     * ForSale, Wanted, Exchange
+     *
+     * @field tabIndex must track this.tabIndex
+     */
+    onSuccess(tabIndex) {
+      let sectionName = "";
+      switch (tabIndex) {
+        case 1:
+          sectionName = "Wanted"
+          break;
+        case 2:
+          sectionName = "Exchange"
+          break;
+        default:
+          sectionName = "ForSale"
+          break;
+      }
+      console.log("sectionName")
+      console.log(sectionName)
+
+      this.getSectionCards(sectionName);
     },
 
     /**
