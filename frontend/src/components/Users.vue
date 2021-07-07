@@ -5,6 +5,7 @@
       <!-- Far left side options menu-->
       <div id="options-bar" v-if="showOptionsMenu()">
         <div class="sub-header" style="text-align: center"> Options </div>
+        <div class="options-card" id="option-view-activity"  @click="openMarketModal()"> View Marketplace activity </div>
         <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
       </div>
 
@@ -64,6 +65,41 @@
       </main>
   </div>
 
+    <!-- show users marketplace activity modal -->
+    <modal v-if="showMarketModal">
+      <div slot="header">
+        Marketplace Activity
+      </div>
+      <div slot="body">
+        <div class="container">
+          <vs-tabs alignment="center">
+            <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
+              <div>
+                <MarketplaceGrid :cardData="cards" />
+              </div>
+            </vs-tab>
+            <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
+              <div>
+                <MarketplaceGrid :cardData="cards" />
+              </div>
+            </vs-tab>
+            <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
+              <div>
+                <MarketplaceGrid :cardData="cards" />
+              </div>
+
+            </vs-tab>
+          </vs-tabs>
+        </div>
+      </div>
+      <div slot="footer">
+        <button class="modal-button modal-cancel-button" @click="closeMarketModal()">
+          Close
+        </button>
+      </div>
+
+    </modal>
+
     <!-- Add user to business as admin modal -->
     <Modal v-if="showModal">
       <div slot="header">
@@ -95,19 +131,26 @@ import Modal from "./Modal";
 import api from "../Api";
 const moment = require('moment');
 import {store} from "../store";
+import MarketplaceGrid from "@/components/MarketplaceGrid";
+import MarketplaceTable from "@/components/MarketplaceTable";
+import MarketplaceAddCard from "@/components/MarketplaceAddCard";
 
 
 const Users = {
   name: "Profile",
-  components: {Modal},
+  components: {Modal, MarketplaceGrid, MarketplaceTable, MarketplaceAddCard
+  },
   data: function () {
     return {
       user: null,
       businesses: [],
       userViewingBusinesses: [],
-
+      showMarketModal: false,
       showModal: false,
-      selectedBusiness: null
+      selectedBusiness: null,
+      displayType: true,
+      currentSection: "ForSale",
+      cards: []
     };
   },
 
@@ -121,10 +164,53 @@ const Users = {
     },
 
     /**
+     * gets default card data
+     * TODO: edit so that users cards are shown only
+     */
+    getSectionCards: function(section) {
+      this.$vs.loading({
+        container: ".vs-tabs",
+      });
+      this.cards = [];
+      api.getCardsBySection(section)
+          .then((res) => {
+            this.cards = res.data.slice(0, 100); // todo: TEMPORARY UNTIL WE CAN PAGINATE THE DATA COMING IN.
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
+          });
+    },
+
+    /**
+     * Show the modal box (marketplace activity).
+     * Having a separate function to just open the modal is good for testing.
+     */
+    openMarketModal: function() {
+      this.showMarketModal = true;
+      api.checkSession()
+          .then(() => {
+            this.getSectionCards("ForSale");
+          })
+          .catch((error) => {
+            this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+          });
+    },
+
+    /**
      * Close the pop-up box with no consequences.
      */
     closeModal: function() {
       this.showModal = false;
+    },
+
+    /**
+     * Close the pop-up box with no consequences.
+     */
+    closeMarketModal: function() {
+      this.showMarketModal = false;
     },
 
     /**
