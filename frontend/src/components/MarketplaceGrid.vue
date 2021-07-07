@@ -12,6 +12,12 @@
                     <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
                   </div>
                   <div>
+                    <div id="cardCreationDate">{{card.created}}</div>
+
+                    <div id="cardUserName">{{card.user.firstName+" "+card.user.lastName}}</div>
+                    <div id="cardUserAddress">{{getGeneralAddress(card.user.homeAddress)}}</div>
+
+
                     <div id="cardTitle">{{card.title}}</div>
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
@@ -32,6 +38,12 @@
 export default {
   props: ['cardData'],
   methods: {
+    /**
+     * Converts the space separated keywords to a JSON object recognized by the keywordWrapper
+     *
+     * @param keywords
+     * @returns {[]}
+     */
 
     getKeywords: function(keywords) {
       keywords = keywords.split(" ");
@@ -44,6 +56,24 @@ export default {
         tmpKeywords.push(keyword);
       }
       return tmpKeywords; // keywords.split(" ")
+    },
+
+
+    getGeneralAddress: function (homeAddress) {
+      let addressStr = "";
+      if(homeAddress.country) {
+        addressStr += homeAddress.country;
+      }
+
+      if(homeAddress.city) {
+        addressStr += ", " + homeAddress.city;
+      }
+
+      if(homeAddress.suburb) {
+        addressStr += ", " + homeAddress.suburb;
+      }
+
+      return addressStr
     }
   }
 }
@@ -58,6 +88,22 @@ export default {
   height: auto;
 }
 
+#cardCreationDate {
+  font-weight: lighter;
+  font-size: 10px;
+  height: 20px;
+}
+
+#cardUserName {
+  font-size: 10px;
+  height: 15px;
+}
+
+#cardUserAddress {
+  font-size: 10px;
+  height: 40px;
+}
+
 #cardTitle {
   font-weight: bold;
   font-size: 17px;
@@ -68,7 +114,6 @@ export default {
   margin-top: 10px;
   height: 120px;
   overflow-y: auto;
-
 }
 
 #cardKeywords {

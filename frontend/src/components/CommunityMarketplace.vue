@@ -123,6 +123,7 @@ export default {
       api.getCardsBySection(section)
           .then((res) => {
             this.cards = res.data;//.slice(0, 100);
+            console.log(this.cards);
           })
           .catch((error) => {
             console.log(error);
@@ -139,7 +140,7 @@ export default {
       this.cards = [];
       api.getCardsBySection(section)
           .then((res) => {
-            this.cards = res.data.slice(0, 100);
+            this.cards = res.data;
           })
           .catch((error) => {
             console.log(error);
