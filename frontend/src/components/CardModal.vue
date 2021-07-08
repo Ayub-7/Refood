@@ -14,6 +14,10 @@
     <vs-divider></vs-divider>
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>
+      <!-- Add delete button if user is card owner -->
+      <div v-if="selectedCard.user.id == userId">
+        <vs-button id="card-modal-message-button" @click="deleteCard()">Delete</vs-button>
+      </div>
       <vs-button id="card-modal-message-button">Message</vs-button>
     </div>
 
@@ -21,12 +25,15 @@
 </template>
 
 <script>
+import api from "../Api";
+
 export default {
   name: "CardModal",
   props: ['selectedCard'],
   data: function() {
     return {
       showing: false,
+      userId: null
     }
   },
   methods:
@@ -43,9 +50,33 @@ export default {
         toStringDate: function (timestamp) {
           const dateFull = new Date(timestamp);
           return dateFull.toDateString();
+        },
+
+        getUserId: function() {
+          api.checkSession()
+              .then((response) => {
+                this.userId = response.data.id;
+              })
+              .catch((error) => {
+                this.$log.error("Error checking sessions: " + error);
+                this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+              });
+        },
+
+        deleteCard: function() {
+          api.deleteCard(this.selectedCard.id)
+          .then(() => {
+            this.$vs.notify({title:'Success', text:'Card deleted', color:'success'});
+          }).catch((error) => {
+            this.$log.error("Error deleting card: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR deleting card', color:'danger'});
+          });
         }
 
-      }
+      },
+  mounted: function(){
+    this.getUserId();
+  }
 }
 </script>
 
@@ -71,6 +102,7 @@ export default {
 
 #card-modal-bottom {
   display: flex;
+  margin-left: 20px;
   flex-wrap: wrap;
 }
 
