@@ -254,7 +254,7 @@ export default Users;
   cursor: pointer;
 
   text-align: center;
-  color: black;
+  color: white;
   font-weight: 500;
   font-size: 14px;
   letter-spacing: 1px;
@@ -455,7 +455,7 @@ main {
 
 .modal-ok-button {
   text-align: center;
-  color: black;
+  color: white;
 
   width: 100px;
   margin: 0 1em;
@@ -470,7 +470,7 @@ main {
 
 .modal-cancel-button {
   text-align: center;
-  color: black;
+  color: white;
 
   width: 100px;
   margin: 0 1em;
