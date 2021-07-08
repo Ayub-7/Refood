@@ -31,14 +31,12 @@
                 <vs-td>
                     <div id="cardKeywords"  v-for="keyword in item.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
                 </vs-td>
-                <td>
-                  <!-- Effectively repeated above, should refactor at some point. -->
-                </td>
               </vs-tr>
             </template>
           </vs-table>
         </vs-row>
-    <CardModal ref="cardModal" :selectedCard="selectedItem" />
+<!--    <CardModal ref="cardModal" :key="item.id" v-for="item in tableData" :selectedCard="item" />-->
+    <CardModal ref="cardModal" v-if="selectedItem != null" :selectedCard="selectedItem" />
   </div>
 </template>
 
@@ -63,7 +61,7 @@ export default {
       this.selectedItem = item;
       console.log(this.selectedItem);
       this.$refs.cardModal.openModal();
-    }
+    },
   }
 }
 </script>

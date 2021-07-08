@@ -25,8 +25,7 @@
             </vs-col>
           </vs-row>
         </div>
-
-      <CardModal ref="cardModal" :selectedCard="selectedCard" />
+      <CardModal id="cardModal" ref="cardModal" v-if="selectedCard != null" :selectedCard='selectedCard' />
     </div>
 </template>
 

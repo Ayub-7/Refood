@@ -1,6 +1,6 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
-import Users from '../Users';
-import {store} from '../../store';
+import Users from '../components/Users';
+import {store} from '../store';
 import Vuesax from 'vuesax';
 import VueRouter from 'vue-router';
 
