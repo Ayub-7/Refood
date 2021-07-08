@@ -66,39 +66,41 @@
   </div>
 
     <!-- show users marketplace activity modal -->
-    <modal v-if="showMarketModal">
-      <div slot="header">
-        Marketplace Activity
-      </div>
-      <div slot="body">
+    <vs-popup :active.sync="showMarketModal" title="Marketplace Activity">
+      <div>
         <div class="container">
-          <vs-tabs alignment="center">
+          <vs-tabs id="marketCards" alignment="center" v-model="tabIndex">
             <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
               <div>
-                <MarketplaceGrid :cardData="cards" />
+                <MarketplaceGrid :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
               </div>
             </vs-tab>
             <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
               <div>
-                <MarketplaceGrid :cardData="cards" />
+                <MarketplaceGrid :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
               </div>
             </vs-tab>
             <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
               <div>
-                <MarketplaceGrid :cardData="cards" />
+                <MarketplaceGrid :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
               </div>
 
             </vs-tab>
           </vs-tabs>
+          <div class="title-container">
+            <div class="title-centre">
+              <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.4)"/>
+            </div>
+          </div>
         </div>
       </div>
-      <div slot="footer">
-        <button class="modal-button modal-cancel-button" @click="closeMarketModal()">
+      <div>
+        <vs-button color="danger"  @click="closeMarketModal()">
           Close
-        </button>
+        </vs-button>
       </div>
 
-    </modal>
+    </vs-popup>
 
     <!-- Add user to business as admin modal -->
     <Modal v-if="showModal">
@@ -142,6 +144,10 @@ const Users = {
   },
   data: function () {
     return {
+      currentPage: 1,
+      itemPerPage: 3,
+      tabIndex: 0,
+
       user: null,
       businesses: [],
       userViewingBusinesses: [],
@@ -313,6 +319,10 @@ export default Users;
 
 <style scoped>
 
+#marketCards {
+  width: 670px;
+}
+
 #container {
   display: grid;
   grid-template-columns: 1fr 1fr 4fr 1fr;
@@ -454,6 +464,8 @@ main {
   grid-template-columns: auto auto;
   grid-template-rows: auto auto auto;
 }
+
+
 
 .card:hover {
   box-shadow: 0 0.5em 1em rgba(0,1,1,.25);
