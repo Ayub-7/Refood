@@ -131,16 +131,13 @@
 <script>
 import Modal from "./Modal";
 import api from "../Api";
-const moment = require('moment');
 import {store} from "../store";
-import MarketplaceGrid from "@/components/MarketplaceGrid";
-import MarketplaceTable from "@/components/MarketplaceTable";
-import MarketplaceAddCard from "@/components/MarketplaceAddCard";
-
+import MarketplaceGrid from '../components/MarketplaceGrid';
+const moment = require('moment');
 
 const Users = {
   name: "Profile",
-  components: {Modal, MarketplaceGrid, MarketplaceTable, MarketplaceAddCard
+  components: {Modal, MarketplaceGrid
   },
   data: function () {
     return {
