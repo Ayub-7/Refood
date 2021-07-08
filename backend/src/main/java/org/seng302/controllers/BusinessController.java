@@ -151,7 +151,7 @@ public class BusinessController {
     }
 
     /**
-     *
+     * Retrieves the business information, and stores the information in the session for the user to act as.
      * @param businessIdRequest DTO containing the buinessId to make the user act as.
      * @param session current authenticated login session of the user.
      * @return a response entity with the appropriate status code.
