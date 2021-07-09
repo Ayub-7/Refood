@@ -34,7 +34,32 @@ public class BusinessFinder {
         return terms;
     }
 
-    private List<Business> queryProcess(ArrayList<String> terms) {
+    private Predicate criteriaBuilder(String term, boolean isLike) {
+        //Obtains criteria
+
+        if (isLike) {
+            String[] subTerms = term.split(" ");
+            List<Predicate> subTermPredicates = new ArrayList<>();
+
+            for (String subTerm : subTerms) {
+                subTerm = subTerm.strip().toLowerCase();
+                Predicate criteria = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("name")), subTerm);
+                subTermPredicates.add(criteria);
+            }
+
+            Predicate combinedCriteria = subTermPredicates.get(0);
+            for (int i = 1; i < subTerms.length; i++) {
+                combinedCriteria = criteriaBuilder.and(combinedCriteria, subTermPredicates.get(i));
+            }
+
+            return combinedCriteria;
+        } else {
+            term = term.strip().toLowerCase();
+            return criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
+        }
+    }
+
+    private List<Business> queryProcess(ArrayList<String> terms, boolean isLike) {
         List<Predicate> criteriaList = new ArrayList<>();
         Logic logic = Logic.NONE;
         short consecutive = 0;
@@ -55,20 +80,8 @@ public class BusinessFinder {
                 } else {
                     consecutive++;
                 }
-                String[] subTerms = term.split(" ");
 
-                List<Predicate> subTermPredicates = new ArrayList<>();
-                for (String subTerm : subTerms) {
-                    subTerm = subTerm.strip().toLowerCase();
-                    Predicate c1 = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("name")), subTerm);
-                    Predicate criteria = criteriaBuilder.or(c1);
-                    subTermPredicates.add(criteria);
-                }
-
-                Predicate combinedCriteria = subTermPredicates.get(0);
-                for (int i = 1; i < subTerms.length; i++) {
-                    combinedCriteria = criteriaBuilder.and(combinedCriteria, subTermPredicates.get(i));
-                }
+                Predicate combinedCriteria = this.criteriaBuilder(term, isLike);
 
                 if (criteriaList.size() == 0) {
                     logic = Logic.NONE;
@@ -93,14 +106,19 @@ public class BusinessFinder {
             }
         }
         criteriaQuery.where(criteriaList.get(0));
-        List<Business> businesses = entityManager.createQuery(criteriaQuery).getResultList();
+        return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
     public List<Business> findBusinesses(String query) {
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Business.class);
         businessRoot = criteriaQuery.from(Business.class);
-        ArrayList<String> keywords = this.searchQueryKeywords(query);
+        ArrayList<String> terms = this.searchQueryKeywords(query);
+        List<Business> businesses = this.queryProcess(terms, false);
+        List<Business> partialBusinesses = this.queryProcess(terms, true);
+        partialBusinesses.removeAll(businesses);
+        businesses.addAll(partialBusinesses);
+        return businesses;
     }
 
 }
