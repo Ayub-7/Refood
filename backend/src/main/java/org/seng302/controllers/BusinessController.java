@@ -193,14 +193,14 @@ public class BusinessController {
     }
 
     @GetMapping("/businesses/search")
-    public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query, HttpSession session) {
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query, HttpSession session) throws JsonProcessingException {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
             logger.debug("Searching for businesses...");
             List<Business> businesses = businessFinder.findBusinesses(query);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
         }
     }
 }

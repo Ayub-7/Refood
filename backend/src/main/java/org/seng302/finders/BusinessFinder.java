@@ -1,7 +1,6 @@
 package org.seng302.finders;
 
 import org.seng302.models.Business;
-import org.seng302.models.User;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -27,7 +26,7 @@ public class BusinessFinder {
 
     private ArrayList<String> searchQueryKeywords(String query) {
         ArrayList<String> terms = new ArrayList<>();
-        Matcher matcher = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(query);
+        Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
         while (matcher.find()) {
             terms.add(matcher.group().replace("\"", ""));
         }
@@ -83,7 +82,7 @@ public class BusinessFinder {
 
                 Predicate combinedCriteria = this.criteriaBuilder(term, isLike);
 
-                if (criteriaList.size() == 0) {
+                if (criteriaList.isEmpty()) {
                     logic = Logic.NONE;
                     criteriaList.add(combinedCriteria);
                 }
