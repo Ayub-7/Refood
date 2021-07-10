@@ -139,5 +139,15 @@ public class Card {
         return displayPeriodEndDate;
     }
 
+    /**
+     * Updates display period by getting date 2 weeks in future and setting display period to that
+     * Preconditions: None
+     * Postconditions: Display period is updated
+     */
+    public void updateDisplayPeriodEndDate() {
+        Date newDate = getDisplayPeriodEndDate();
+        this.setDisplayPeriodEnd(newDate);
+    }
+
 
 }

@@ -107,6 +107,36 @@ public class CardController {
     }
 
     /**
+     * PUT endpoint, extends cards display period by two weeks
+     *
+     * Preconditions: User must be logged in, User must be the creator of the card, the card must exist
+     * Postconditions: Card display period is extended by two weeks
+     *
+     * @param cardId Id of the card that is going to be extended
+     * @param session User session of user that is updating card
+     * @return 200 if updated, 406 if ID does not exist, 401 if unauthorized, 403 if not creator or GAA
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @PutMapping("/cards/{cardId}/extenddisplayperiod")
+    public ResponseEntity<String> extendDisplayPeriodById (@PathVariable Long cardId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Card card = cardRepository.findCardById(cardId);
+        // Attempting to create a copy of a card that does not exist
+        if (card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        // Attempting to create a card for somebody else.
+        if (card.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        // Creating a copy of the old card with extended date
+        card.updateDisplayPeriodEndDate();
+        cardRepository.save(card);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    /**
      * DELETE endpoint, deletes a single card given an ID
      *
      * Preconditions: Given card ID is of type Long is for a card that exists in database and the logged in user is
