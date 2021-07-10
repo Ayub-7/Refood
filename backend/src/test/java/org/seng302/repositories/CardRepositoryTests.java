@@ -12,12 +12,17 @@ import org.seng302.models.MarketplaceSection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestConstructor;
 
 import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -42,7 +47,7 @@ class CardRepositoryTests {
     private User testUser;
 
     @BeforeEach
-    void setUp() throws NoSuchAlgorithmException, ValidationException {
+    void setUp() throws NoSuchAlgorithmException, ValidationException, ParseException {
         cardRepository.deleteAll();
         cardRepository.flush();
         userRepository.deleteAll();
@@ -67,6 +72,10 @@ class CardRepositoryTests {
         cardRepository.save(testCard1);
 
         testCard2 = new Card(newCardRequest2, user2);
+
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = format.parse("1/1/2021");
+        testCard2.setDisplayPeriodEnd(date);
         cardRepository.save(testCard2);
 
     }
@@ -121,5 +130,13 @@ class CardRepositoryTests {
     void findInventoryBySectionExpectsEmptyList() {
         List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED);
         assertThat(cardList.size()).isEqualTo(0);
+    }
+
+
+    @Test
+    void findExpiredCardsYep() {
+        Date date = new Date();
+        List<Card> cards = cardRepository.findAllByDisplayPeriodEndBefore(date);
+        assertThat(cards.size()).isEqualTo(1);
     }
 }

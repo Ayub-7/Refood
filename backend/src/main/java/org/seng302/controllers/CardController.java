@@ -4,20 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.models.Card;
-import org.seng302.models.MarketplaceSection;
-import org.seng302.models.Role;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,6 +32,9 @@ public class CardController {
 
     @Autowired
     private CardRepository cardRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
 
     /**
@@ -106,4 +110,29 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
 
+    @GetMapping("/users/{userId}/cards/notifications")
+    public ResponseEntity<String> getExpiredCards (@PathVariable Long userId) throws JsonProcessingException {
+        List<Notification> notifications = notificationRepository.findNotificationsByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
+    }
+
+    @Scheduled(fixedDelay = 30000, initialDelay = 1000)
+    private void updateExpiredCards() {
+        logger.info("Checking for expired cards");
+        Date date = new Date();
+        List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
+
+        for (Card card: expiredCards) {
+            Notification exists = notificationRepository.findNotificationByCardId(card.getId());
+            if (exists == null) {
+                Long userId = card.getUser().getId();
+                Long cardId = card.getId();
+                String title = card.getTitle();
+                Date displayPeriodEnd = card.getDisplayPeriodEnd();
+                Notification notification = new Notification(userId, cardId, title, displayPeriodEnd);
+                notificationRepository.save(notification);
+            }
+        }
+        logger.info("Number of expired cards: " + notificationRepository.findAll().size());
+    }
 }

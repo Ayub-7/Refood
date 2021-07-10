@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import org.seng302.models.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,5 +45,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      * @return List<Card> a list of cards matching section
      */
     List<Card> findAllBySection(MarketplaceSection section);
+
+
+
+    List<Card> findAllByDisplayPeriodEndBefore(Date date);
 
 }
