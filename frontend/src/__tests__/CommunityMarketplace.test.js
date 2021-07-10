@@ -70,17 +70,14 @@ describe('Component', () => {
     });
 });
 
-
-describe('CommunityMarketplace toggle tests', () => {
-    test('Grid view is shown at first', () => {
-        const gridContainer = wrapper.find("#grid-container")
-        expect(gridContainer.exists()).toBe(true);
-    });
-});
-
 describe('CommunityMarketplace toggle tests', () => {
     beforeEach(() => {
         wrapper.vm.displaytype = false;
+    });
+
+    test('Grid view is shown at first', () => {
+        const gridContainer = wrapper.find("#grid-container")
+        expect(gridContainer.exists()).toBe(true);
     });
 
     test('Table view is shown when slider toggled', async () => {

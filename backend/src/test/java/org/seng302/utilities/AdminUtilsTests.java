@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ContextConfiguration(classes = TestApplication.class)
-public class AdminUtilsTests {
+class AdminUtilsTests {
 
     private UserRepository userRepository;
     private AdminUtils adminUtils;
@@ -32,7 +32,7 @@ public class AdminUtilsTests {
     }
 
     @Test
-    public void testCreateDGAA() throws NoSuchAlgorithmException {
+    void testCreateDGAA() throws NoSuchAlgorithmException {
         Mockito.when(userRepository.findAllByRole(Role.DGAA)).thenReturn(new ArrayList<>());
         adminUtils.checkForDefaultGlobalAdmin(userRepository);
         Mockito.verify(userRepository, Mockito.times(1)).findAllByRole(Role.DGAA);
@@ -40,7 +40,7 @@ public class AdminUtilsTests {
     }
 
     @Test
-    public void testAlreadyExistingDGAA() throws NoSuchAlgorithmException {
+    void testAlreadyExistingDGAA() throws NoSuchAlgorithmException {
         List<User> adminList = new ArrayList<>();
         Address dgaaAddr = new Address(null, null, null, null, null, "New Zealand", "8041");
         adminList.add(new User("Test", "DGAA", dgaaAddr, "dgaa@test.com", "testpasword123", Role.DGAA));

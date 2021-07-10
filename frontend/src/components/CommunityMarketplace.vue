@@ -2,7 +2,7 @@
   <vs-card class="main">
       <!-- TODO: Remove when actual button is added -->
       <div class="container">
-        <vs-button @click="openModal">Add to market (test for now)</vs-button>
+        <vs-button @click="openAddModal">Add to market (test for now)</vs-button>
         <div style="display: flex; margin: auto; padding-bottom: 1em;">
         <div id="title" style="font-size: 30px; margin: auto 8px;" >Community Marketplace</div>
         <div style="margin-right: 0; margin-left: auto; display: flex">
@@ -18,19 +18,19 @@
       </div>
       <vs-divider></vs-divider>
       <vs-tabs alignment="center">
-        <vs-tab label="For Sale" @click="getSectionCards('ForSale')">
+        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards" />
             <MarketplaceTable v-if="!displayType" :tableData="cards" />
           </div>
         </vs-tab>
-        <vs-tab label="Wanted" @click="getSectionCards('Wanted')">
+        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards" />
             <MarketplaceTable v-if="!displayType" :tableData="cards" />
           </div>
         </vs-tab>
-        <vs-tab label="Exchange" @click="getSectionCards('Exchange')">
+        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards" />
             <MarketplaceTable v-if="!displayType" :tableData="cards" />
@@ -83,11 +83,11 @@ export default {
         });
     },
     /**
-     * Method for opening modal, calls method in child component to open modal
+     * Method for opening add card modal, calls method in child component to open modal
      */
-    openModal: function() {
+    openAddModal: function() {
       this.$refs.marketplaceAddCard.openModal();
-    }
+    },
   },
 
   mounted() {
@@ -106,7 +106,15 @@ export default {
 
 <style scoped>
 
-vs-tab {
+#saleTab {
+  color: #1F74FF;
+}
+
+#wantedTab {
+  color: #1F74FF;
+}
+
+#exchangeTab {
   color: #1F74FF;
 }
 
@@ -131,10 +139,6 @@ vs-tab {
   background-color: white;
   width: 75%;
   margin: 1em auto;
-}
-
-.vs-divider {
-  margin-bottom: 0px;
 }
 
 .switch {
@@ -195,17 +199,6 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-}
-
-#header-container {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 4px;
-}
-
-#header-buttongroup {
-  display: inline-flex;
-  justify-content: space-around;
 }
 
 

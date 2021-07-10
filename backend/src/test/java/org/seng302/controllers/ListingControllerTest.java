@@ -42,7 +42,7 @@ import static org.mockito.ArgumentMatchers.*;
 @WebMvcTest(controllers = ListingController.class)
 @ContextConfiguration(classes = TestApplication.class)
 
-public class ListingControllerTest {
+class ListingControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -103,7 +103,7 @@ public class ListingControllerTest {
     //Get listings tests
 
     @Test
-    public void testNoAuthGetListing() throws Exception {
+    void testNoAuthGetListing() throws Exception {
         mvc.perform(get("/businesses/{id}/listings", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
@@ -111,7 +111,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulGetBusinessListings() throws Exception {
+    void testSuccessfulGetBusinessListings() throws Exception {
         List<Listing> listingList = new ArrayList<>();
         listingList.add(listing1);
 
@@ -125,7 +125,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testGetListingForNullBusiness() throws Exception {
+    void testGetListingForNullBusiness() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User user = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
@@ -139,14 +139,14 @@ public class ListingControllerTest {
     //
 
     @Test
-    public void testNoAuthPostListing() throws Exception {
+    void testNoAuthPostListing() throws Exception {
         mvc.perform(post("/businesses/{id}/listings", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenUserPostListing() throws Exception {
+    void testForbiddenUserPostListing() throws Exception {
         Address addr = new Address(null, null, null, null, null, "New Zealand", "1234");
         User forbiddenUser = new User("Bad", "User", addr, "email@email.com", "password", Role.USER);
 
@@ -164,7 +164,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostListingAsGlobalAdmin() throws Exception {
+    void testPostListingAsGlobalAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
         User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
@@ -189,7 +189,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulPostListingAsBusinessAdmin() throws Exception {
+    void testSuccessfulPostListingAsBusinessAdmin() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
@@ -212,7 +212,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithNoQuantity() throws Exception {
+    void testPostWithNoQuantity() throws Exception {
         listing1.setQuantity(0);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
@@ -228,7 +228,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithQuantityLargerThanInventoryQuantity() throws Exception {
+    void testPostWithQuantityLargerThanInventoryQuantity() throws Exception {
         //inventory quantity is 10
         inventory1.setQuantity(4);
         listing1.setQuantity(8);
@@ -246,7 +246,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithNegativeQuantity() throws Exception {
+    void testPostWithNegativeQuantity() throws Exception {
         //inventory quantity is 10
         listing1.setQuantity(-2);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -263,7 +263,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithQuantityEqualToInventoryQuantity() throws Exception {
+    void testPostWithQuantityEqualToInventoryQuantity() throws Exception {
         //inventory quantity is 10
         inventory1.setQuantity(8);
         newListingRequest.setQuantity(8);
@@ -282,7 +282,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithNegativePrice() throws Exception {
+    void testPostWithNegativePrice() throws Exception {
         listing1.setPrice(-2);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
@@ -297,7 +297,7 @@ public class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostWithClosingDateInPast() throws Exception {
+    void testPostWithClosingDateInPast() throws Exception {
         Calendar pastDate = Calendar.getInstance();
         pastDate.set(2020, 1, 1);
         Date laterDate = pastDate.getTime();

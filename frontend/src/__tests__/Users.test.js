@@ -1,8 +1,9 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
-import Users from '../Users';
-import {store} from '../../store';
+import Users from '../components/Users';
+import {store} from '../store';
 import Vuesax from 'vuesax';
 import VueRouter from 'vue-router';
+import api from "../Api";
 
 
 let wrapper;
@@ -56,6 +57,14 @@ const mockBusinesses = [
         "created": "2021-04-07 01:09:35"
     }
 ]
+
+api.makeUserBusinessAdmin = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+
+api.getUserFromID = jest.fn(() => {
+    return Promise.resolve({data: mockUser, status: 200});
+});
 
 const $route = {
     params: {
@@ -141,10 +150,27 @@ describe('Business link tests with businesses', () =>  {
         expect(wrapper.vm.goToBusinessPage).toBeCalled();
 
     })
-})
+});
 
 describe('Business link tests without businesses', () =>  {
     test('Business names don\'t appear', () => {
         expect(wrapper.find('#card').exists()).toBe(false)
+    });
+});
+
+
+describe('User details tests', () =>  {
+    beforeEach(() => {
+        wrapper.setData({businesses: []});
+        wrapper.setData({selectedBusiness: mockBusinesses});
+    });
+    test('Successful addition to business', async () => {
+        expect(wrapper.vm.businesses.length).toEqual(0);
+        await wrapper.vm.addUserToBusiness();
+        expect(wrapper.vm.businesses.length).toEqual(1);
+    });
+    test('User already an admin', async () => {
+        let testdata = await wrapper.vm.getUserInfo(5);
+        expect(testdata).toEqual(mockUser);
     });
 })

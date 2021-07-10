@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
-public class ProductRepositoryTests {
+class ProductRepositoryTests {
 
     @Autowired
     private ProductRepository productRepository;
@@ -35,7 +35,7 @@ public class ProductRepositoryTests {
     }
 
     @Test
-    public void saveProduct() {
+    void saveProduct() {
         Product product = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", "Some Manufacturer", 43.66, new Date());
         productRepository.save(product);
 
