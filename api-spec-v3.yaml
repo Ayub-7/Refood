@@ -1168,7 +1168,33 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
-
+  '/messages/{id}':
+    delete:
+      tags:
+        - 'UCM8: Contacting other marketplace users'
+        - 'Users'
+      summary: Delete a message
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: query
+          name: id
+          description: Message ID
+          schema:
+            type: integer
+          required: true
+          example: 5
+      responses:
+        '200':
+          description: Message deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: "Forbidden: Returned when a user tries to delete a message that they are not the receiver of AND the user is not a D/GAA"
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
 components:
   securitySchemes:
