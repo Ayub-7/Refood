@@ -297,4 +297,11 @@ export default {
      */
     getCardsBySection: (section) => instance.get(`/cards`, {params: {section: section}, withCredentials: true}),
 
+    /**
+     * Deletes a community marketplace card.
+     * @param cardId the id of the card to delete.
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
+     */
+    deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
+
 }

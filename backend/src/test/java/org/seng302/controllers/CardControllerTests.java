@@ -48,11 +48,10 @@ class CardControllerTests {
     private Card card;
     private Address addr;
 
+
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException, ValidationException {
         addr = new Address(null, null, null, null, null, "Australia", "12345");
-
-
         testUser = new User("Rayna", "YEP", "Dalgety", "", "" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ATQWJM");
         testUser.setId(1);
         anotherUser = new User("Bob", "", "Loblaw", "", "", "bblaw@email.com", "2006-03-30","+7 684 622 5902", new Address(null, null, null, null, "New Zealand", null), "ATQWJM");
@@ -60,7 +59,6 @@ class CardControllerTests {
         cardRequest = new NewCardRequest(testUser.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         card = new Card(cardRequest, testUser);
-
     }
 
     @Test
@@ -230,6 +228,57 @@ class CardControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+
+    //DELETE by ID tests
+
+    @Test
+    public void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(delete("/cards/{cardId}", card.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_wrongCreatorId_returnForbidden() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_asCreator() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_asDGAA() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        anotherUser.setRole(Role.DGAA);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_badId_returnNotAcceptable() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
     @Test
     public void testExtendCard_noAuth_returnUnauthorized() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
@@ -281,4 +330,11 @@ class CardControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isNotAcceptable());
     }
+
+
+
+
+
+
+
 }
