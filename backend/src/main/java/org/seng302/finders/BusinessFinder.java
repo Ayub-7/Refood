@@ -35,7 +35,6 @@ public class BusinessFinder {
 
     private Predicate criteriaBuilder(String term, boolean isLike) {
         //Obtains criteria
-
         if (isLike) {
             String[] subTerms = term.split(" ");
             List<Predicate> subTermPredicates = new ArrayList<>();
@@ -113,11 +112,15 @@ public class BusinessFinder {
         criteriaQuery = criteriaBuilder.createQuery(Business.class);
         businessRoot = criteriaQuery.from(Business.class);
         ArrayList<String> terms = this.searchQueryKeywords(query);
-        List<Business> businesses = this.queryProcess(terms, false);
-        List<Business> partialBusinesses = this.queryProcess(terms, true);
-        partialBusinesses.removeAll(businesses);
-        businesses.addAll(partialBusinesses);
-        return businesses;
+        if (terms.size() > 0) {
+            List<Business> businesses = this.queryProcess(terms, false);
+            List<Business> partialBusinesses = this.queryProcess(terms, true);
+            partialBusinesses.removeAll(businesses);
+            businesses.addAll(partialBusinesses);
+            return businesses;
+        } else {
+            return entityManager.createQuery(criteriaQuery).getResultList();
+        }
     }
 
 }
