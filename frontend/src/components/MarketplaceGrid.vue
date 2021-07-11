@@ -70,7 +70,7 @@ export default {
     openCardModal: function(card) {
       this.selectedCard = card;
       this.$refs.cardModal.openModal();
-    }
+    },
     /**
      * Converts the space separated keywords to a JSON object recognized by the keywordWrapper
      *
