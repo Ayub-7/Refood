@@ -41,7 +41,7 @@
     </vs-row>
 
     <div id="buttons">
-        <vs-button class="addCardButton" @click="addToMarketplace()">Add To Marketplace</vs-button>
+        <vs-button class="addCardButton" @click="checkForm(); addToMarketplace()">Add To Marketplace</vs-button>
         <vs-button class="addCardButton" @click="closeModal()">Cancel</vs-button>
     </div>
 
@@ -139,35 +139,35 @@ export default {
 
        */
       addToMarketplace() {
-        api.createCard(this.userSession.id, this.title, this.description, this.keywords, this.section)
-            .then((res) => {
-              this.$vs.notify({title:'Success', text: `created new card: ${res.data.cardId}`, color:'success'});
-              //card.id = res.data.cardId;
-              //this.$parent.$data.cards.push(card)
-              this.$emit('submitted');
+        if (this.checkForm()) {
+          api.createCard(this.userSession.id, this.title, this.description, this.keywords, this.section)
+              .then((res) => {
+                this.$vs.notify({title: 'Success', text: `created new card: ${res.data.cardId}`, color: 'success'});
+                this.$emit('submitted');
 
-            })
-            .catch((error) => {
-              let errormsg = "ERROR creating new card: ";
-              if (error) {
-                if (error.response) {
-                  if (error.response.status === 401 || error.response.status === 403) {
-                    this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
-                  }
+              })
+              .catch((error) => {
+                let errormsg = "ERROR creating new card: ";
+                if (error) {
+                  if (error.response) {
+                    if (error.response.status === 401 || error.response.status === 403) {
+                      this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                    }
 
-                  if (error.response.status === 400) {
-                    this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                    if (error.response.status === 400) {
+                      this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                    }
+                  } else {
+                    this.$vs.notify({
+                      title: 'Error',
+                      text: 'ERROR trying to obtain user info from session:',
+                      color: 'danger'
+                    });
                   }
-                } else {
-                  this.$vs.notify({
-                    title: 'Error',
-                    text: 'ERROR trying to obtain user info from session:',
-                    color: 'danger'
-                  });
                 }
-              }
-            });
-        this.closeModal();
+              });
+          this.closeModal();
+        }
       },
 
       /**
@@ -177,7 +177,6 @@ export default {
         api.checkSession()
             .then((response) => {
               this.userSession = response.data;
-              console.log(this.userSession);
             })
             .catch((error) => {
               this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});

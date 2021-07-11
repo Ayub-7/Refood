@@ -24,7 +24,7 @@
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
                     <!-- Keyword display -->
-                      <div id="keywordWrapper">
+                      <div v-if="card.keywords" id="keywordWrapper">
                         <div id="cardKeywords"  v-for="keyword in getKeywords(card.keywords)" :key="keyword.id" >#{{keyword.name}}</div>
                       </div>
                   </div>
@@ -54,12 +54,8 @@ export default {
     CardModal
   },
   watch: {
-    "cardData": function(val, oldVal) {
-      console.log("new: %s, old: %s", val, oldVal);
-      this.cards = val;
-      console.log(this.checkCardList(val));
-      console.log("checkCardList");
-
+    "cardData": function(val) {
+      this.cards = this.checkCardList(val);
     }
   },
   methods: {
@@ -120,13 +116,8 @@ export default {
     checkCardList: function(cards) {
       cards.forEach(function (card, index) {
         if (!card.user.firstName) {
-          console.log('%d: %s', index, card);
-
           api.getUserFromID(card.user)
               .then((response) => {
-                console.log("index+response");
-                console.log(response.data);
-
                 cards[index].user = response.data;
               }).catch((err) => {
             if (err.response.status === 406) {
@@ -140,12 +131,6 @@ export default {
       return cards;
     }
   },
-
-  mounted() {
-    console.log("marketplace grid");
-    //console.log(this.myCards);
-    //this.checkCardList();
-  }
 }
 
 

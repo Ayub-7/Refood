@@ -110,7 +110,7 @@ export default {
       ],
       selectSortBy: 'created',
       selectSortByPrevious: '',
-      toggleDirection: -1,
+      toggleDirection: 1,
     }
   },
 
@@ -126,7 +126,6 @@ export default {
 
             //Sort by creation date
             this.sortData('created');
-            console.log(this.cards)
           })
           .catch((error) => {
             console.log(error);
@@ -156,9 +155,6 @@ export default {
           sectionName = "ForSale"
           break;
       }
-      console.log("sectionName")
-      console.log(sectionName)
-
       this.getSectionCards(sectionName);
     },
 
@@ -177,7 +173,6 @@ export default {
      */
     sortData: function (field) {
       let direction = this.toggleDirection;
-      console.log(direction);
       this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field] < cardTwo[field]) ? direction : -direction);
       this.toggleDirection = this.toggleDirection*-1;
     }
