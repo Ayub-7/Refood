@@ -40,7 +40,7 @@
 <script>
 import CardModal from './CardModal.vue'
 
-import api from "@/Api";
+import api from "../Api";
 
 export default {
   props: ['cardData'],

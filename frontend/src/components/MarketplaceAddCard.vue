@@ -63,7 +63,7 @@ export default {
                 {key:'Exchange', value: 'Exchange'}
             ],
             userSession: null,
-
+            id: null,
             section: null,
             title: '',
             description: '',
@@ -140,7 +140,7 @@ export default {
        */
       addToMarketplace() {
         if (this.checkForm()) {
-          api.createCard(this.userSession.id, this.title, this.description, this.keywords, this.section)
+          api.createCard(this.id, this.title, this.description, this.keywords, this.section)
               .then((res) => {
                 this.$vs.notify({title: 'Success', text: `created new card: ${res.data.cardId}`, color: 'success'});
                 this.$emit('submitted');
@@ -177,6 +177,7 @@ export default {
         api.checkSession()
             .then((response) => {
               this.userSession = response.data;
+              this.id = response.data.id;
             })
             .catch((error) => {
               this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
