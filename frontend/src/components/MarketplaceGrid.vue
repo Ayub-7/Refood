@@ -3,7 +3,7 @@
         <div>
           <vs-row id="marketRow">
             <!-- Change vs-lg to 2 if you want 6 per row or 3 if you want 4 per row -->
-            <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cardData" :key="card.id">
+            <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cards" :key="card.id">
               <div style="margin: 10px; width: 90%;">
                 <!-- Marketplace Card -->
                 <vs-card actionable>
@@ -15,6 +15,8 @@
                     <div id="cardCreationDate">{{card.created}}</div>
 
                     <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
+                    <div id="cardUserDebug" v-if="!card.user.firstName">{{card}}</div>
+
                     <div id="cardUserAddress" v-if="card.user.homeAddress">{{getGeneralAddress(card.user.homeAddress)}}</div>
 
 
@@ -35,8 +37,24 @@
 </template>
 
 <script>
+import api from "@/Api";
+
 export default {
   props: ['cardData'],
+  data: function () {
+    return {
+      cards: this.cardData
+    }
+  },
+  watch: {
+    "cardData": function(val, oldVal) {
+      console.log("new: %s, old: %s", val, oldVal);
+      this.cards = val;
+      console.log(this.checkCardList(val));
+      console.log("checkCardList");
+
+    }
+  },
   methods: {
     /**
      * Converts the space separated keywords to a JSON object recognized by the keywordWrapper
@@ -74,7 +92,44 @@ export default {
       }
 
       return addressStr
+    },
+
+    /**
+     * checks the data integrity of the list of cards
+     * ie every card includes a user
+     * if not, it will get one from the database and update the card list
+     *
+     * assumes the user id attribute is not null.
+     *
+     */
+    checkCardList: function(cards) {
+      cards.forEach(function (card, index) {
+        if (!card.user.firstName) {
+          console.log('%d: %s', index, card);
+
+          api.getUserFromID(card.user)
+              .then((response) => {
+                console.log("index+response");
+                console.log(response.data);
+
+                cards[index].user = response.data;
+              }).catch((err) => {
+            if (err.response.status === 406) {
+              this.$vs.notify({title:'User not found: '+card.user, text:'This user does not exist.', color:'danger'});
+            }
+            throw new Error(`Error trying to get user info from id: ${err}`);
+          });
+
+        }
+      });
+      return cards;
     }
+  },
+
+  mounted() {
+    console.log("marketplace grid");
+    //console.log(this.myCards);
+    //this.checkCardList();
   }
 }
 </script>
