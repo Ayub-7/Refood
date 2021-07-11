@@ -36,6 +36,7 @@ public class BusinessController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
     private BusinessFinder businessFinder;
 
     /**
@@ -193,14 +194,9 @@ public class BusinessController {
     }
 
     @GetMapping("/businesses/search")
-    public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query, HttpSession session) throws JsonProcessingException {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } else {
-            logger.debug("Searching for businesses...");
-            List<Business> businesses = businessFinder.findBusinesses(query);
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
-        }
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
+        logger.debug("Searching for businesses...");
+        List<Business> businesses = businessFinder.findBusinesses(query);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
     }
 }

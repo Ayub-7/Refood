@@ -8,8 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.BusinessFinder;
 import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
@@ -46,6 +48,8 @@ class BusinessControllerTests {
     UserRepository userRepository;
     @Autowired
     ObjectMapper mapper;
+    @MockBean
+    private BusinessFinder businessFinder;
 
     User ownerUser;
     User adminUser;
@@ -242,6 +246,7 @@ class BusinessControllerTests {
     @Test
     @WithMockUser
     void loggedInBusinessSearch() throws Exception {
+        System.out.println("Searching for businesses...");
         MvcResult results = mvc.perform(get("/businesses/search")
                 .param("searchQuery", "Pizza"))
                 .andReturn();
