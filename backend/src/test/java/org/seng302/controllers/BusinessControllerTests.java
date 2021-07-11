@@ -17,6 +17,7 @@ import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
 import org.seng302.models.User;
+import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -29,7 +30,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -322,6 +326,38 @@ class BusinessControllerTests {
 
     }
 
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testActAsBusinessUserOwns() throws Exception {
+        BusinessIdRequest businessIdRequest = new BusinessIdRequest(business.getId());
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(post("/actasbusiness")
+                .contentType("application/json").sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
+                .content(mapper.writeValueAsString(businessIdRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testActAsNewBusiness() throws Exception {
+        BusinessIdRequest businessIdRequest = new BusinessIdRequest(0);
+        Mockito.when(businessRepository.findBusinessById(0)).thenReturn(business);
+        mvc.perform(post("/actasbusiness")
+                .contentType("application/json").sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
+                .content(mapper.writeValueAsString(businessIdRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testActAsBusinessDoesntExist() throws Exception {
+        BusinessIdRequest businessIdRequest = new BusinessIdRequest(business.getId());
+        Mockito.when(businessRepository.findBusinessById(2)).thenReturn(null);
+        mvc.perform(post("/actasbusiness")
+                .contentType("application/json").sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
+                .content(mapper.writeValueAsString(businessIdRequest)))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     void noSessionBusinessSearch() throws Exception {

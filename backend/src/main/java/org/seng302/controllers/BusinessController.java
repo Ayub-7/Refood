@@ -186,10 +186,10 @@ public class BusinessController {
     @GetMapping("/checkbusinesssession")
     public ResponseEntity<Business> checkBusinessSession(HttpSession session) {
         Business business = (Business) session.getAttribute("business");
-        if(business != null){
+        if (business != null) {
             return ResponseEntity.status(HttpStatus.OK).body(business);
         } else {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(business);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
         }
     }
 
