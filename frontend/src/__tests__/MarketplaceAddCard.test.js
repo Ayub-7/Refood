@@ -1,7 +1,6 @@
 import {mount, createLocalVue } from '@vue/test-utils';
 import MarketplaceAddCard from '../components/MarketplaceAddCard.vue';
 import Vuesax from 'vuesax';
-import api from "../Api";
 
 let wrapper;
 let localVue = createLocalVue();
@@ -66,12 +65,7 @@ describe('Component', () => {
         expect(wrapper.vm.showing).toBeTruthy();
     });
 
-    test('Reset values', () => {
-        wrapper.vm.openModal();
-        expect(wrapper.vm.section).toEqual(null);
-        expect(wrapper.vm.title.length).toEqual(0);
-        expect(wrapper.vm.description.length).toEqual(0);
-    });
+
 
     test('Close modal after successful submission', () => {
         wrapper.vm.section = "Wanted";

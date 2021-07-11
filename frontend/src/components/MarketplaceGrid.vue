@@ -4,7 +4,7 @@
           <vs-row id="marketRow">
             <!-- Change vs-lg to 2 if you want 6 per row or 3 if you want 4 per row -->
             <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cards" :key="card.id">
-              <div style="margin: 10px; width: 90%;">
+              <div style="margin: 10px; width: 90%;" @click="openCardModal(card)">
                 <!-- Marketplace Card -->
                 <vs-card>
                   <div slot="media" id="cardHeader">
@@ -15,8 +15,6 @@
                     <div id="cardCreationDate">{{card.created}}</div>
 
                     <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
-                    <div id="cardUserDebug" v-if="!card.user.firstName">{{card}}</div>
-
                     <div id="cardUserAddress" v-if="card.user.homeAddress">{{getGeneralAddress(card.user.homeAddress)}}</div>
 
 
