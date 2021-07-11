@@ -41,7 +41,7 @@
     </vs-row>
 
     <div id="buttons">
-        <vs-button class="addCardButton" @click="checkForm(); addToMarketplace()">Add To Marketplace</vs-button>
+        <vs-button class="addCardButton" @click="addToMarketplace()">Add To Marketplace</vs-button>
         <vs-button class="addCardButton" @click="closeModal()">Cancel</vs-button>
     </div>
 
