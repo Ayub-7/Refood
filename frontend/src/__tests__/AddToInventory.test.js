@@ -1,6 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AddToInventory from '../components/AddToInventory';
 import Vuesax from 'vuesax';
+import api from "../Api";
 
 
 const mockInventory = [
@@ -28,6 +29,24 @@ const mockInventory = [
     }
 ]
 
+const mockProducts = [{
+    "id": "W04GP5EC0B1798680",
+    "name": "Compound - Mocha",
+    "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
+    "manufacturer": "Nestle",
+    "recommendedRetailPrice": 88.93,
+    "created": "2021-01-11 20:54:46",
+    "images": [],
+    "primaryImagePath": null
+}];
+
+api.createInventory = jest.fn(() => {
+    return Promise.resolve({data: mockInventory, status: 200});
+});
+
+api.getBusinessProducts = jest.fn(() => {
+    return Promise.resolve({data: mockProducts, status: 200});
+});
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
@@ -51,16 +70,7 @@ beforeEach(() => {
         methods: {},
         localVue,
     })
-    wrapper.vm.products = [{
-        "id": "W04GP5EC0B1798680",
-        "name": "Compound - Mocha",
-        "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
-        "manufacturer": "Nestle",
-        "recommendedRetailPrice": 88.93,
-        "created": "2021-01-11 20:54:46",
-        "images": [],
-        "primaryImagePath": null
-    }];
+    wrapper.vm.products = mockProducts;
 });
 
 afterEach(() => {
@@ -127,5 +137,27 @@ describe('Component', () => {
         wrapper.vm.invenForm.prodId = "W04GP5EC0B1798680";
         wrapper.vm.autofill();
         expect(wrapper.vm.invenForm.pricePerItem).toEqual(88.93);
-    })
+    });
+
+    test('Successful inventory addition', async () => {
+        wrapper.vm.invenForm.prodId = "W04GP5EC0B1798680";
+        wrapper.vm.invenForm.quantity = 7;
+        wrapper.vm.invenForm.pricePerItem = 3;
+        wrapper.vm.invenForm.totalPrice = 88.93;
+        wrapper.vm.invenForm.manufactureDate = '2020-01-27';
+        wrapper.vm.invenForm.sellBy = null;
+        wrapper.vm.invenForm.bestBefore = "2021-08-27";
+        wrapper.vm.invenForm.listExpiry = "2021-08-27";
+        wrapper.vm.addNewInv = true;
+        let testResult = await wrapper.vm.addInventory();
+        expect(wrapper.vm.addNewInv).toBeFalsy();
+    });
+
+    test('Successful retrieval of products', async () => {
+        wrapper.setData({products: []});
+        expect(wrapper.vm.products.length).toEqual(0)
+        await wrapper.vm.getBusinessProducts();
+        expect(wrapper.vm.products.length).toEqual(1)
+        expect(wrapper.vm.products[0]).toEqual(mockProducts[0])
+    });
 });

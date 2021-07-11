@@ -27,7 +27,7 @@ import java.util.List;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
-public class CardRepositoryTests {
+class CardRepositoryTests {
 
     @Autowired
     private CardRepository cardRepository;
@@ -78,7 +78,7 @@ public class CardRepositoryTests {
      * returned by findCardById(testCards.id)
      */
     @Test
-    public void findCardByIdExpectsEquals() {
+    void findCardByIdExpectsEquals() {
         Card card1 = cardRepository.findCardById(testCard1.getId());
         assertThat(card1).isEqualTo(testCard1);
 
@@ -93,7 +93,7 @@ public class CardRepositoryTests {
      * returns all card with matching keywords (2)
      */
     @Test
-    public void findInventoryByCardTypeExpectsEquals() {
+    void findInventoryByCardTypeExpectsEquals() {
         List<Card> cardList = cardRepository.findCardsByKeywords(keywords);
         assertThat(cardList.size()).isEqualTo(2);
 
@@ -106,7 +106,7 @@ public class CardRepositoryTests {
      * returns all cards in the marketplace FORSALE section (2)
      */
     @Test
-    public void findInventoryBySectionExpectsList() {
+    void findInventoryBySectionExpectsList() {
         List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.FORSALE);
         assertThat(cardList.size()).isEqualTo(2);
     }
@@ -118,8 +118,25 @@ public class CardRepositoryTests {
      * returns all cards in the marketplace WANTED section (0)
      */
     @Test
-    public void findInventoryBySectionExpectsEmptyList() {
+    void findInventoryBySectionExpectsEmptyList() {
         List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED);
         assertThat(cardList.size()).isEqualTo(0);
     }
+
+    /**
+     * test deleteCardId Expects that
+     * the previously saved testCard is
+     *
+     * deleted by deleteCardById(testCard.id)
+     */
+    @Test
+    public void deleteCardByIdExpectsEmptyList() {
+        cardRepository.deleteCardById(testCard1.getId());
+        Card card1 = cardRepository.findCardById(testCard1.getId());
+        assertThat(card1).isEqualTo(null);
+
+    }
+
+
+
 }

@@ -1,10 +1,11 @@
-<template>
+<template lang="html">
   <vs-popup id="addCardModal" title="Add Card To Marketplace" :active.sync="showing">
 
     <!-- Section selection -->
     <vs-row class="addCardField">
     <vs-col vs-w="2" vs-xs="12" class="addCardHeader">Section <span class="required">*</span></vs-col>
-    <vs-select vs-w="10" v-model="section">
+    <vs-select vs-w="10" v-model="section" :danger="(errors.includes('no-section'))"
+               danger-text="You must choose a section.">
         <vs-select-item v-for="section in avaliableSections" :key="section.key" :text="section.key" :value="section.value"/>
     </vs-select>
     </vs-row>
@@ -15,7 +16,8 @@
             <div class="addCardHeader" >Title <span class="required">*</span> </div> 
         </vs-col> 
         <vs-col vs-w="9">
-            <vs-input v-model="title" class="addCardInput"></vs-input>
+            <vs-textarea v-model="title" rows="1" class="addCardInput" :counter="50" :danger="(errors.includes('no-title'))"
+                         danger-text="You must write a title"></vs-textarea>
         </vs-col>
     </vs-row>
 
@@ -24,14 +26,17 @@
         <div class="addCardHeader">Description</div>
         <vs-textarea v-model="description" id="description"></vs-textarea>
     </vs-row>
-
     <!-- Card keywords -->
     <vs-row class="addCardField">
         <vs-col vs-w="2" vs-xs="12">
             <div class="addCardHeader">Keywords</div>
         </vs-col> 
         <vs-col vs-w="9">
-            <vs-input v-model="keywords" class="addCardInput"></vs-input>
+          <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordList">
+            <vs-chip v-for="keyword in keywordList" v-bind:key="keyword.value" @click="remove(keyword)"
+                     closable>{{keyword}}
+            </vs-chip>
+          </vs-chips>
         </vs-col>
     </vs-row>
 
@@ -62,13 +67,68 @@ export default {
             section: null,
             title: '',
             description: '',
+            keywordList: [],
             keywords: '',
-            
+            errors: [],
         }
     },
 
 
     methods: {
+      remove(item) {
+        this.keywordList.splice(this.keywordList.indexOf(item), 1)
+      },
+      /**
+       * Preconditions: User clicks add to inventory button
+       * Postconditions:
+       **/
+      checkForm(){
+        this.keywords= '';
+        for(let i = 0; i < this.keywordList.length; i++){
+          this.keywords += this.keywordList[i] + " ";
+        }
+        this.errors = [];
+
+        if (this.section === null) {
+          this.errors.push('no-section');
+        }
+
+        if (this.title === '') {
+          this.errors.push('no-title');
+        }
+
+
+        if (this.title.length > 50){
+          this.errors.push('long-title');
+        }
+
+        if (this.errors.includes('no-section')) {
+          this.$vs.notify({
+            title: 'Failed to add card',
+            text: 'Section is Required.',
+            color: 'danger'
+          });
+        }
+        if (this.errors.includes('no-title')) {
+          this.$vs.notify({
+            title: 'Failed to add card',
+            text: 'Title is required',
+            color: 'danger'
+          });
+        }
+
+        if (this.errors.includes('long-title')) {
+          this.$vs.notify({
+            title: 'Failed to add card',
+            text: 'Title exceeds max length',
+            color: 'danger'
+          });
+        }
+        if (this.errors.length > 0) {
+          return false;
+        }
+        return true;
+      },
 
       /**
        * Creates a new card. of type:
@@ -125,7 +185,7 @@ export default {
             });
       },
 
-        /** 
+        /**
         * Closes modal by setting showing to false (which is linked to Card :active-sync)
         */
         closeModal() {
@@ -143,7 +203,7 @@ export default {
         },
 
         /**
-        * Method for reseting form data, gets called when modal closes 
+        * Method for resetting form data, gets called when modal closes
         */
         resetData() {
 

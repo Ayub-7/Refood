@@ -32,7 +32,7 @@ import java.util.List;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
-public class ListingRepositoryTests {
+class ListingRepositoryTests {
 
     @Autowired
     private ListingRepository listingRepository;
@@ -85,7 +85,7 @@ public class ListingRepositoryTests {
     }
 
     @Test
-    public void findListingByInventoryItem() {
+    void findListingByInventoryItem() {
         // Test if insertion is properly inserting values.
         List<Listing> testCheckListings = listingRepository.findListingsByInventoryItem(testInven1);
         //get the first element of the returned list

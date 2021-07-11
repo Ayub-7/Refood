@@ -6,7 +6,7 @@
             <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cards" :key="card.id">
               <div style="margin: 10px; width: 90%;">
                 <!-- Marketplace Card -->
-                <vs-card actionable>
+                <vs-card>
                   <div slot="media" id="cardHeader">
                     <!-- Default image for now -->
                     <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
@@ -33,18 +33,25 @@
             </vs-col>
           </vs-row>
         </div>
+      <CardModal id="cardModal" ref="cardModal" v-if="selectedCard != null" :selectedCard='selectedCard' />
     </div>
 </template>
 
 <script>
+import CardModal from './CardModal.vue'
+
 import api from "@/Api";
 
 export default {
   props: ['cardData'],
   data: function () {
     return {
-      cards: this.cardData
+      cards: this.cardData,
+      selectedCard: null
     }
+  },
+  components: {
+    CardModal
   },
   watch: {
     "cardData": function(val, oldVal) {
@@ -56,6 +63,14 @@ export default {
     }
   },
   methods: {
+
+    /**
+     * Method for opening card modal, calls method in child component to open modal
+     */
+    openCardModal: function(card) {
+      this.selectedCard = card;
+      this.$refs.cardModal.openModal();
+    }
     /**
      * Converts the space separated keywords to a JSON object recognized by the keywordWrapper
      *
@@ -132,6 +147,8 @@ export default {
     //this.checkCardList();
   }
 }
+
+
 </script>
 
 <style>

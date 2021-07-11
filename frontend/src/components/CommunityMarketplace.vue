@@ -33,20 +33,20 @@
 
       <vs-divider></vs-divider>
 
-      <vs-tabs alignment="center" v-model="tabIndex">
-        <vs-tab label="For Sale" @click="getSectionCards('ForSale')">
+      <vs-tabs alignment="center">
+        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
           <div>
             <MarketplaceGrid  v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
             <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab label="Wanted" @click="getSectionCards('Wanted')">
+        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
             <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab label="Exchange" @click="getSectionCards('Exchange')">
+        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
           <div>
             <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
             <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
@@ -200,7 +200,15 @@ export default {
 
 <style scoped>
 
-vs-tab {
+#saleTab {
+  color: #1F74FF;
+}
+
+#wantedTab {
+  color: #1F74FF;
+}
+
+#exchangeTab {
   color: #1F74FF;
 }
 
@@ -225,10 +233,6 @@ vs-tab {
   background-color: white;
   width: 75%;
   margin: 1em auto;
-}
-
-.vs-divider {
-  margin-bottom: 0px;
 }
 
 .switch {
@@ -289,17 +293,6 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-}
-
-#header-container {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 4px;
-}
-
-#header-buttongroup {
-  display: inline-flex;
-  justify-content: space-around;
 }
 
 

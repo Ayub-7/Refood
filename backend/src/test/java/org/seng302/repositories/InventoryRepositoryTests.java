@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
-public class InventoryRepositoryTests {
+class InventoryRepositoryTests {
 
     @Autowired
     private InventoryRepository inventoryRepository;
@@ -82,7 +82,7 @@ public class InventoryRepositoryTests {
 
 
     @Test
-    public void saveInventory() {
+    void saveInventory() {
         Inventory inventoryItem = inventoryRepository.findInventoryByIdAndBusinessId(testInven1.getId(), testInven1.getBusinessId());
 
         Assertions.assertEquals(testInven1.getId(), inventoryItem.getId());
