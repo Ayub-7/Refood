@@ -168,12 +168,13 @@ export default {
     /**
      * Sort the cards by the [field] input.
      * Assumes the [field] can be sorted via a simple comparison
+     * if the field is anything other than 'created', it will attempt to convert to uppercase before sorting
      *
      * @param field
      */
     sortData: function (field) {
       let direction = this.toggleDirection;
-      this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field] < cardTwo[field]) ? direction : -direction);
+      this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field].toUpperCase() < cardTwo[field].toUpperCase()) ? direction : -direction);
       this.toggleDirection = this.toggleDirection*-1;
     }
 
