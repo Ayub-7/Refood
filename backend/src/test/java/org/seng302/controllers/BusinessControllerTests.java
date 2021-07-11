@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,7 +96,12 @@ class BusinessControllerTests {
                 .contentType("application/json").sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(userIdReq)))
                 .andExpect(status().isOk());
+    }
 
+    @Test
+    @WithMockUser
+    void makeOwnerAdmin() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         // Attempt to make owner admin.
         Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(ownerUser);
         UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
@@ -104,6 +110,26 @@ class BusinessControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void makeNullAdmin() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        // Attempt to make owner admin.
+        Mockito.when(userRepository.findUserById(10)).thenReturn(null);
+        mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
+                .content(mapper.writeValueAsString(10)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void makeAdminOfNonExistentBusiness() throws Exception {
+        Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(ownerUser);
+        UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
 
         // Test for non-existent business.
         mvc.perform(put("/businesses/{id}/makeAdministrator", 100)
@@ -111,12 +137,29 @@ class BusinessControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isNotAcceptable());
+    }
 
+    @Test
+    @WithMockUser
+    void makeAdminWithNoneOwnerPrivileges() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        // Non-primary admin user test.
+        mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .content(mapper.writeValueAsString(user)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="GAA") // ownerUser - only for auth purposes.
+    void makeAdminWithNoDGAAPrivileges() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         // Non-primary admin user test.
         mvc.perform(put("/businesses/{id}/makeAdministrator", business.getId())
                 .contentType("application/json")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
-                .content(mapper.writeValueAsString(user)))
+                .content(mapper.writeValueAsString(ownerUser)))
                 .andExpect(status().isForbidden());
     }
 
@@ -143,24 +186,71 @@ class BusinessControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(adminUserIdReq)))
                 .andExpect(status().isOk());
+    }
 
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testRemovePrimaryAdminAsAdmin() throws Exception {
         // Attempt to remove primary admin's rights.
         Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(ownerUser);
         UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isBadRequest());
+    }
 
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testRemoveNullAsAdmin() throws Exception {
+        // Attempt to remove primary admin's rights.
+        Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(null);
+        UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
+                .content(mapper.writeValueAsString(ownerUserId)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testRemoveNonAdminAsAdmin() throws Exception {
+        // Attempt to remove primary admin's rights.
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        UserIdRequest userId = new UserIdRequest(user.getId());
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
+                .content(mapper.writeValueAsString(userId)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testRemoveAdminFromNoneExistingBusiness() throws Exception {
         // Test for non-existent business.
+        Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(ownerUser);
+        UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
         mvc.perform(put("/businesses/{id}/removeAdministrator", 100)
                 .contentType("application/json")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser)
                 .content(mapper.writeValueAsString(ownerUserId)))
                 .andExpect(status().isNotAcceptable());
+    }
 
+
+    @Test
+    @WithMockUser(username="rdalgety3@ocn.ne.jp", password="ATQWJM", roles="USER") // ownerUser - only for auth purposes.
+    void testRemoveNonePrimaryAdmin() throws Exception {
         // Non-primary admin user test.
+        Mockito.when(userRepository.findUserById(ownerUser.getId())).thenReturn(ownerUser);
+        UserIdRequest ownerUserId = new UserIdRequest(ownerUser.getId());
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(put("/businesses/{id}/removeAdministrator", business.getId())
                 .contentType("application/json")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
@@ -212,28 +302,26 @@ class BusinessControllerTests {
     @WithMockUser
     void testInvalidCreateBusiness_returnBadRequest() throws Exception {
         NewBusinessRequest testBusiness = new NewBusinessRequest(null, "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-
-        mvc.perform(post("/businesses")
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(testBusiness))
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-                .andExpect(status().isBadRequest());
-
-        testBusiness.setName("Valid Name");
-        testBusiness.setBusinessType(null);
-        mvc.perform(post("/businesses")
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(testBusiness))
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-                .andExpect(status().isBadRequest());
-
-        testBusiness.setName(null);
         mvc.perform(post("/businesses")
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(testBusiness))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isBadRequest());
     }
+
+
+    @Test
+    @WithMockUser
+    void testCreateBusinessWithNullBusinessType() throws Exception  {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Valid Name", "Some Description", business.getAddress(), null);
+        mvc.perform(post("/businesses")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+
+    }
+
 
     @Test
     void noSessionBusinessSearch() throws Exception {
@@ -246,7 +334,6 @@ class BusinessControllerTests {
     @Test
     @WithMockUser
     void loggedInBusinessSearch() throws Exception {
-        System.out.println("Searching for businesses...");
         MvcResult results = mvc.perform(get("/businesses/search")
                 .param("searchQuery", "Pizza"))
                 .andReturn();
