@@ -223,4 +223,11 @@ class CardControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @WithMockUser
+    void testGetExpiredCards_Successful() throws Exception {
+
+
+    }
 }

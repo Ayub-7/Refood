@@ -18,8 +18,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
 
 /**
  * Controller class that handles the endpoints of community marketplace cards.
@@ -110,18 +114,32 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
 
+    /**
+     * GET endpoint, retrieves all the expired cards of a user and
+     * sends expired card notifications to the frontend to be displayed on the users home page feed.
+     * @param userId
+     * @return A list of notifications and code 200, 401 or 403.
+     * @throws JsonProcessingException
+     */
     @GetMapping("/users/{userId}/cards/notifications")
-    public ResponseEntity<String> getExpiredCards (@PathVariable Long userId) throws JsonProcessingException {
+    public ResponseEntity<String> getExpiredCards (@PathVariable Long userId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (currentUser.getId() != userId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         List<Notification> notifications = notificationRepository.findNotificationsByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
     }
 
-    @Scheduled(fixedDelay = 30000, initialDelay = 1000)
+    /**
+     * Checks for expired cards and creates notification objects for each expired card without a current notification.
+     * Function is run every 10 minutes.
+     */
+    @Scheduled(fixedDelay = 600000, initialDelay = 0)
     private void updateExpiredCards() {
         logger.info("Checking for expired cards");
         Date date = new Date();
         List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
-
         for (Card card: expiredCards) {
             Notification exists = notificationRepository.findNotificationByCardId(card.getId());
             if (exists == null) {
@@ -133,6 +151,8 @@ public class CardController {
                 notificationRepository.save(notification);
             }
         }
-        logger.info("Number of expired cards: " + notificationRepository.findAll().size());
+        int repositorySize = notificationRepository.findAll().size();
+        String message = MessageFormat.format("Number of expired cards: {0}", repositorySize);
+        logger.info(message);
     }
 }

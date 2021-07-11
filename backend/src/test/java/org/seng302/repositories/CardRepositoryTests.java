@@ -134,9 +134,14 @@ class CardRepositoryTests {
 
 
     @Test
-    void findExpiredCardsYep() {
+    void findExpiredCards() {
         Date date = new Date();
         List<Card> cards = cardRepository.findAllByDisplayPeriodEndBefore(date);
         assertThat(cards.size()).isEqualTo(1);
+    }
+
+    @Test
+    void findExpiredCardsExpectNone() {
+
     }
 }
