@@ -159,10 +159,10 @@ public class ProductController {
         if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
             errorMessage = "A product already exists with this ID";
             isValid = false;
-        } else if (product.getId() == null || product.getId() == "") {
+        } else if (product.getId() == null || product.getId().equals("")) {
             errorMessage = "Product id can not be empty";
             isValid = false;
-        } else if (product.getName() == null || product.getName() == "") {
+        } else if (product.getName() == null || product.getName().equals("")) {
             errorMessage = "Product name can not be empty";
             isValid = false;
         } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
@@ -180,16 +180,16 @@ public class ProductController {
             boolean isValid = true;
             String errorMessage = null;
 
-            if (product.getId() == null || product.getId() == "") {
+            if (product.getId() == null || product.getId().equals("")) {
                 errorMessage = "Product id can not be empty";
                 isValid = false;
-            } else if (product.getName() == null || product.getName() == "") {
+            } else if (product.getName() == null || product.getName().equals("")) {
                 errorMessage = "Product name can not be empty";
                 isValid = false;
             } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
                 errorMessage = "Product recommended retail price must be at least 0";
                 isValid = false;
-            } else if (product.getDescription() == null || product.getDescription() == "") {
+            } else if (product.getDescription() == null || product.getDescription().equals("")) {
                 errorMessage = "Product must have description";
                 isValid = false;
             }
@@ -388,17 +388,14 @@ public class ProductController {
         }
         File businessDir = new File(rootImageDir + "business_" + businessId);
         File checkFile = new File(businessDir + "/" + imageId + imageExtension);
-        File thumbnailFile = new File(businessDir + "/" + imageId + "_thumbnail" + imageExtension);
-        if (pathExists == true) {
+        if (pathExists) {
             product.deleteProductImage(imageId);
             productRepository.save(product);
-            checkFile.delete();
-            thumbnailFile.delete();
+            Files.delete(Paths.get(businessDir + "/" + imageId + imageExtension));
+            Files.delete(Paths.get(businessDir + "/" + imageId + "_thumbnail" + imageExtension));
             System.out.println("File "
             + checkFile.toString()
             + " successfully removed");
-                freeImage = true;
-
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
         }

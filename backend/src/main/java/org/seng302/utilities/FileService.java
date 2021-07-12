@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.io.*;
+import java.util.Objects;
 
 /**
  * Service class that deals with file writing and saving.
@@ -29,11 +30,14 @@ public class FileService {
      */
     public void uploadImage(File file, byte[] bytes) throws IOException {
         logger.info("Uploading Image at " + file);
-
         file.createNewFile();
-        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));
-        stream.write(bytes);
-        stream.close();
+        BufferedOutputStream stream = null;
+        try {
+            stream = new BufferedOutputStream(new FileOutputStream((file)));
+            stream.write(bytes);
+        } finally {
+            Objects.requireNonNull(stream).close();
+        }
     }
 
     /**
