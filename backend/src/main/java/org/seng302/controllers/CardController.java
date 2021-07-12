@@ -11,8 +11,10 @@ import org.seng302.models.User;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +31,14 @@ public class CardController {
     private static final Logger logger = LogManager.getLogger(CardController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
+    private UserRepository userRepository;
     private CardRepository cardRepository;
 
+    @Autowired
+    public CardController(UserRepository userRepository, CardRepository cardRepository) {
+        this.userRepository = userRepository;
+        this.cardRepository = cardRepository;
+    }
 
     /**
      * POST/Creates a new card to store in the database that will go onto the community marketplace.
@@ -106,6 +113,27 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
 
+
+    /**
+     * GET endpoint, returns detailed information about a cards belonging to a specific User
+     *
+     * Preconditions: User ID given is for a user that exists
+     * Postconditions: All cards belonging to the user are returned
+     *
+     * @param userId ID of user whose cards we want to retrieve
+     * @return 200 if valid user, 400 if bad formatted ID, 401 if unauthorized, 406 if user doesn't exist
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @GetMapping("/users/{userId}/cards")
+    public ResponseEntity<String> getUserCards (@PathVariable Long userId) throws JsonProcessingException {
+        User user = userRepository.findUserById(userId);
+        if (user == null) return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+
+        List<Card> cards = cardRepository.findCardsByUser(user);
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(cards));
+    }
+
     /**
      * PUT endpoint, extends cards display period by two weeks
      *
@@ -166,6 +194,7 @@ public class CardController {
         cardRepository.deleteCardById(cardId);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
+
 
 
 }

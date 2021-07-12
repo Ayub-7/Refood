@@ -14,6 +14,7 @@ import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,6 +37,8 @@ class CardControllerTests {
     private CardController cardController;
     @MockBean
     private CardRepository cardRepository;
+    @MockBean
+    private UserRepository userRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -229,7 +232,44 @@ class CardControllerTests {
     }
 
 
-    //DELETE by ID tests
+
+    //Get user cards endpoint
+
+    @Test
+    void testGetUserCards_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(get("/users/{id}/cards", 1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserCards_auth_returnOk() throws Exception {
+        int userId = 1;
+        Mockito.when(userRepository.findUserById(userId)).thenReturn(testUser);
+        mvc.perform(get("/users/{id}/cards", userId)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserCards_noUser_returnNotAcceptable() throws Exception {
+        int userId = 1;
+        Mockito.when(userRepository.findUserById(userId)).thenReturn(null);
+        mvc.perform(get("/users/{id}/cards", userId)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserCards_badId_returnBadRequest() throws Exception {
+
+        mvc.perform(get("/users/{id}/cards", 1.1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     public void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
@@ -254,18 +294,6 @@ class CardControllerTests {
 
         mvc.perform(delete("/cards/{cardId}", card.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser
-    public void testDeleteCard_asDGAA() throws Exception {
-        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
-
-        anotherUser.setRole(Role.DGAA);
-
-        mvc.perform(delete("/cards/{cardId}", card.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
                 .andExpect(status().isOk());
     }
 
@@ -332,9 +360,16 @@ class CardControllerTests {
     }
 
 
+    @Test
+    @WithMockUser
+    public void testDeleteCard_asDGAA() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
+        anotherUser.setRole(Role.DGAA);
 
-
-
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isOk());
+    }
 
 }
