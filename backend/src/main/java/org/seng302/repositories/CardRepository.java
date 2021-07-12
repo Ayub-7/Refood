@@ -7,6 +7,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import org.seng302.models.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -49,4 +50,12 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      */
     List<Card> findCardsByUser(User user);
 
+    /**
+     * Delete a Card by it's ID
+     *
+     * @param id
+     * @return long number of records deleted
+     */
+    @Transactional
+    long deleteCardById(long id);
 }

@@ -134,4 +134,67 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(cards));
     }
 
+    /**
+     * PUT endpoint, extends cards display period by two weeks
+     *
+     * Preconditions: User must be logged in, User must be the creator of the card, the card must exist
+     * Postconditions: Card display period is extended by two weeks
+     *
+     * @param cardId Id of the card that is going to be extended
+     * @param session User session of user that is updating card
+     * @return 200 if updated, 406 if ID does not exist, 401 if unauthorized, 403 if not creator or GAA
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @PutMapping("/cards/{cardId}/extenddisplayperiod")
+    public ResponseEntity<String> extendDisplayPeriodById (@PathVariable Long cardId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Card card = cardRepository.findCardById(cardId);
+        // Attempting to create a copy of a card that does not exist
+        if (card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        // Attempting to create a card for somebody else.
+        if (card.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        // Creating a copy of the old card with extended date
+        card.updateDisplayPeriodEndDate();
+        cardRepository.save(card);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    /**
+     * DELETE endpoint, deletes a single card given an ID
+     *
+     * Preconditions: Given card ID is of type Long is for a card that exists in database and the logged in user is
+     * the creator the given card
+     * Postconditions: Card is deleted from the database
+     *
+     * @param cardId ID of card to be retrieved from DB
+     * @param session the current user session
+     * @return 401 if not logged in (handled by spring sec), 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 200 otherwise.
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @DeleteMapping("/cards/{cardId}")
+    public ResponseEntity<String> deleteCardById (@PathVariable Long cardId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        Card card = cardRepository.findCardById(cardId);
+        if(card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User cardCreator = card.getUser();
+        // Attempting to create a card for somebody else.
+        if(cardCreator.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        cardRepository.deleteCardById(cardId);
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
+    }
+
+
+
 }
