@@ -49,7 +49,7 @@ public class ListingController {
         }
         List<Inventory> inventoryList = inventoryRepository.findInventoryByBusinessId(id);
 
-        List<Listing> listings = new ArrayList<Listing>();
+        List<Listing> listings = new ArrayList<>();
 
         //Iterate over reach inventory item to get the corresponding listing (if any)
         for (Inventory inventoryItem : inventoryList) {
@@ -76,13 +76,13 @@ public class ListingController {
         Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
 
         if(inventory == null){ //inventory item doesen't exist for business
-            System.out.println(request.getInventoryItemId());
+            logger.debug(request.getInventoryItemId());
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         if (business == null) { // Business does not exist
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products

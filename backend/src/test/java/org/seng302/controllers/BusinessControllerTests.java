@@ -14,6 +14,7 @@ import org.seng302.models.Address;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
 import org.seng302.models.User;
+import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -228,6 +229,53 @@ class BusinessControllerTests {
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(testBusiness))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testActAsBusiness_returnUnauthorized() throws Exception {
+        BusinessIdRequest req = new BusinessIdRequest();
+        req.setBusinessId(1);
+        mvc.perform(post("/actasbusiness")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(req)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testActAsBusiness_noBusiness_returnOk() throws Exception {
+        BusinessIdRequest req = new BusinessIdRequest();
+        req.setBusinessId(0);
+        mvc.perform(post("/actasbusiness")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testActAsBusiness_withBusiness_returnOk() throws Exception {
+        BusinessIdRequest req = new BusinessIdRequest();
+        req.setBusinessId(1);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(post("/actasbusiness")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testActAsBusiness_withInvalidBusinessId_returnBadRequest() throws Exception {
+        BusinessIdRequest req = new BusinessIdRequest();
+        req.setBusinessId(1);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(null);
+        mvc.perform(post("/actasbusiness")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest());
     }
 

@@ -1,6 +1,5 @@
 package org.seng302.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +26,7 @@ import java.nio.file.Paths;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -45,8 +45,6 @@ public class ProductController {
 
     @Value("${media.image.business.directory}")
     String rootImageDir;
-
-//    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Retrieves all of the products in the business' product catalogue.
@@ -69,7 +67,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
-
     /**
      * Creates a new product and adds it to the product catalogue of the current acting business
      * Authentication is required, user must be a business admin or a default global admin
@@ -77,7 +74,6 @@ public class ProductController {
      * @param req the request body for the new product object
      * @param session http session which holds the authenticated user
      * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
-     * @throws JsonProcessingException
      */
     @PostMapping("/businesses/{id}/products")
     public ResponseEntity<String> createProduct(@PathVariable long id, @RequestBody NewProductRequest req, HttpSession session) {
@@ -86,13 +82,13 @@ public class ProductController {
         if (business == null) { // Business does not exist
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProduct(req, business, true);
+                ArrayList<Object> checkProduct = isValidProduct(req, business, true);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if (isValid) {
@@ -125,13 +121,13 @@ public class ProductController {
         if (business == null || product == null) { // Business or product does not exist
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProductPut(req, business, false);
+                ArrayList<Object> checkProduct = isValidProductPut(req, business, false);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
@@ -170,7 +166,7 @@ public class ProductController {
             isValid = false;
         }
 
-        ArrayList returnObjects = new ArrayList();
+        ArrayList<Object> returnObjects = new ArrayList<>();
         returnObjects.add(isValid);
         returnObjects.add(errorMessage);
         return returnObjects;
@@ -194,7 +190,7 @@ public class ProductController {
                 isValid = false;
             }
 
-            ArrayList returnObjects = new ArrayList();
+            ArrayList<Object> returnObjects = new ArrayList<>();
             returnObjects.add(isValid);
             returnObjects.add(errorMessage);
             return returnObjects;
@@ -207,7 +203,7 @@ public class ProductController {
      * @param businessId unique identifier of the business that the image is relating to.
      * @param productId product identifier that the image is relating to.
      * @param image a multipart image of the file
-     * @return ResponseEntity with the appriate status codes - 201, 400, 403, 406.
+     * @return ResponseEntity with the appropriate status codes - 201, 400, 403, 406.
      * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
@@ -232,7 +228,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
         }
         try { // Throw error if the file is not an image.
-            imageExtension = Image.getContentTypeExtension(image.getContentType());
+            imageExtension = Image.getContentTypeExtension(Objects.requireNonNull(image.getContentType()));
         }
         catch (InvalidImageExtensionException exception) {
             throw new InvalidImageExtensionException(exception.getMessage());
@@ -285,10 +281,10 @@ public class ProductController {
 
     /**
      * Sets the primary image for a product from a previously saved image.
-     * @param businessId
-     * @param productId
-     * @param imageId
-     * @return
+     * @param businessId unique identifier of the business that the image is relating to.
+     * @param productId product identifier that the image is relating to.
+     * @param imageId a multipart image of the file
+     * @return ResponseEntity with the appropriate status codes - 200, 401, 403, 406.
      */
     @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
     public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) throws IOException {
@@ -303,15 +299,16 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Boolean validImage = false;
+        boolean validImage = false;
         if (product != null) {
             for (Image image: product.getImages()) {
                 if (imageId.equals(image.getId())) {
                     validImage = true;
+                    break;
                 }
             }
         }
-        if (product == null || validImage == false) {
+        if (product == null || !validImage) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         String imageDir = rootImageDir + "/business_" + businessId + "/" + imageId;

@@ -122,4 +122,21 @@ class CardRepositoryTests {
         List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED);
         assertThat(cardList.size()).isEqualTo(0);
     }
+
+    /**
+     * test deleteCardId Expects that
+     * the previously saved testCard is
+     *
+     * deleted by deleteCardById(testCard.id)
+     */
+    @Test
+    public void deleteCardByIdExpectsEmptyList() {
+        cardRepository.deleteCardById(testCard1.getId());
+        Card card1 = cardRepository.findCardById(testCard1.getId());
+        assertThat(card1).isEqualTo(null);
+
+    }
+
+
+
 }

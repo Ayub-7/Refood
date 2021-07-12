@@ -31,8 +31,9 @@ public class Card {
     private String title;
     private String description;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date created;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date displayPeriodEnd;
     private String keywords;
 
@@ -132,7 +133,6 @@ public class Card {
         Calendar displayPeriodEndCalendar = Calendar.getInstance();
         displayPeriodEndCalendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
         Date displayPeriodEndDate = displayPeriodEndCalendar.getTime();
-
         return displayPeriodEndDate;
     }
 

@@ -2,6 +2,8 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
@@ -21,6 +23,8 @@ import javax.servlet.http.HttpSession;
 
 @RestController
 public class BusinessController {
+
+    private static final Logger logger = LogManager.getLogger(BusinessController.class.getName());
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -66,7 +70,7 @@ public class BusinessController {
             String jsonString = mapper.writeValueAsString(businessIdResponse);
             return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
         } else {
-            System.out.println(owner.getId());
+            logger.debug(owner.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -147,7 +151,7 @@ public class BusinessController {
     }
 
     /**
-     *
+     * Retrieves the business information, and stores the information in the session for the user to act as.
      * @param businessIdRequest DTO containing the buinessId to make the user act as.
      * @param session current authenticated login session of the user.
      * @return a response entity with the appropriate status code.
