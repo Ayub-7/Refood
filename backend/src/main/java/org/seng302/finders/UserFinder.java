@@ -151,7 +151,7 @@ public class UserFinder {
         criteriaQuery = criteriaBuilder.createQuery(User.class);
         userRoot = criteriaQuery.from(User.class);
         ArrayList<String> terms = this.searchQueryKeywords(query);
-        if (terms.size() == 0) {
+        if (terms.size() > 0) {
             List<User> users = this.queryProcess(terms, false);
             List<User> partialUsers = this.queryProcess(terms, true);
             partialUsers.removeAll(users);
