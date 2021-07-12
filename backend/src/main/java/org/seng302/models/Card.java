@@ -1,11 +1,8 @@
 package org.seng302.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.seng302.models.requests.NewCardRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import javax.persistence.*;
 import javax.xml.bind.ValidationException;
