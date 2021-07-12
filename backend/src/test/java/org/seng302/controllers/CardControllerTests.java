@@ -47,9 +47,12 @@ class CardControllerTests {
     private Card card1;
     private Card card2;
     private Card card;
+    private Address addr;
+
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException, ValidationException {
+        addr = new Address(null, null, null, null, null, "Australia", "12345");
         testUser = new User("Rayna", "YEP", "Dalgety", "", "" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ATQWJM");
         testUser.setId(1);
         anotherUser = new User("Bob", "", "Loblaw", "", "", "bblaw@email.com", "2006-03-30","+7 684 622 5902", new Address(null, null, null, null, "New Zealand", null), "ATQWJM");
@@ -265,5 +268,93 @@ class CardControllerTests {
         mvc.perform(get("/users/{id}/cards", 1.1)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(delete("/cards/{cardId}", card.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_wrongCreatorId_returnForbidden() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_asCreator() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_badId_returnNotAcceptable() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    public void testExtendCard_noAuth_returnUnauthorized() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId()))
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    @WithMockUser
+    public void testExtendCard_isGAA_returnOk() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
+
+        mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, GAAUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testExtendCard_isCreator_returnOk() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testExtendCard_notCreatorOrGAA_returnForbidden() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    public void testExtendCard_IdNotExist_returnUnacceptable() throws Exception {
+        //If no card found repository will give null
+        Mockito.when(cardRepository.findCardById(999)).thenReturn(null);
+
+        mvc.perform(put("/cards/{id}/extenddisplayperiod", 999)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
     }
 }
