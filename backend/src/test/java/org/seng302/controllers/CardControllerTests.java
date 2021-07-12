@@ -357,4 +357,18 @@ class CardControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isNotAcceptable());
     }
+
+
+    @Test
+    @WithMockUser
+    public void testDeleteCard_asDGAA() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+
+        anotherUser.setRole(Role.DGAA);
+
+        mvc.perform(delete("/cards/{cardId}", card.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isOk());
+    }
+
 }
