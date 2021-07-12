@@ -24,6 +24,11 @@ public class BusinessFinder {
     private CriteriaBuilder criteriaBuilder;
     private Root<Business> businessRoot;
 
+    /**
+     * Helper function to break down query into subqueries
+     * @param query Query to be broken. (It cannot take empty strings)
+     * @return ArrayList of subqueries
+     */
     private ArrayList<String> searchQueryKeywords(String query) {
         ArrayList<String> terms = new ArrayList<>();
         Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
@@ -33,9 +38,16 @@ public class BusinessFinder {
         return terms;
     }
 
+    /**
+     * Builds criteria to help with querying businesses
+     * @param term query used for filtering businesses
+     * @param isLike If true, it will require that a business' name either matches the query or part of its name has the query in it.
+     *               Otherwise, the query must exactly match the business name.
+     * @return Predicate that will be used to query businesses
+     */
     private Predicate criteriaBuilder(String term, boolean isLike) {
         //Obtains criteria
-        if (isLike) {
+        if (!isLike) {
             String[] subTerms = term.split(" ");
             List<Predicate> subTermPredicates = new ArrayList<>();
 
@@ -57,6 +69,13 @@ public class BusinessFinder {
         }
     }
 
+    /**
+     * This method is used twice in this class to filter the exact matching results and to filter similar results.
+     * @param terms List of subqueries to be used for searching.
+     * @param isLike If true, it will return results with things that contains query as a whole word or a part of a word.
+     *               Otherwise, it will return results that exactly match the query
+     * @return Return a list of businesses
+     */
     private List<Business> queryProcess(ArrayList<String> terms, boolean isLike) {
         List<Predicate> criteriaList = new ArrayList<>();
         Logic logic = Logic.NONE;
@@ -107,6 +126,11 @@ public class BusinessFinder {
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
+    /**
+     * The only publicly available method to access outside of this class to search for businesses.
+     * @param query The search query to be used to filter search results
+     * @return Will return all businesses if query is blank, otherwise will filter according to what is in the query
+     */
     public List<Business> findBusinesses(String query) {
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Business.class);

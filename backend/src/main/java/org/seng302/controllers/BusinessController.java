@@ -193,6 +193,11 @@ public class BusinessController {
         }
     }
 
+    /**
+     * Searches for businesses, with credintials
+     * @param query A string with the search's query
+     * @return Http status code and list of businesses with name/names matching request.
+     */
     @GetMapping("/businesses/search")
     public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
