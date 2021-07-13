@@ -4,8 +4,6 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-        <!-- Add to inventory modal -->
-        <AddToInventory @submitted="onSuccess"></AddToInventory>
       </div>
     </div>
 
@@ -124,12 +122,11 @@
 import axios from "axios";
 import api from "../Api";
 import {store} from "../store";
-import AddToInventory from "./AddToInventory";
 import ModifyInventory from "./ModifyInventory";
 
 export default {
   name: "BusinessInventory",
-  components: {AddToInventory, ModifyInventory},
+  components: {ModifyInventory},
   data: function() {
     return {
       errors: [],
@@ -499,6 +496,10 @@ export default {
   #table {
     margin: 0.5em;
     white-space: nowrap;
+  }
+
+  #table >>> .vs-con-tbody {
+    min-height: 640px;
   }
 
   #productIdCol {

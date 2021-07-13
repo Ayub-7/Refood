@@ -1,20 +1,21 @@
 <template>
   <div id="form-outer">
     <vs-button @click="addNewInv=true" class="header-button">New Inventory Item</vs-button>
-    <vs-popup classContent="popup-example"  title="Add new inventory item" :active.sync="addNewInv">
-      <div class="form-group required vs-col" vs-order="1" id="firstColModal" >
-        <div class="row">
-          <label for="prodId">Product *</label>
-          <vs-select id="prodId" class="selectExample" v-model="invenForm.prodId" v-on:change="autofill">
-            <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
-          </vs-select>
-        </div>
+    <vs-popup classContent="popup-example"  title="Add New Inventory Entry" :active.sync="addNewInv">
+
+      <div id="product-name">
+        <div class="sub-header">Product</div>
+        <div style="font-size: 18px; text-align: center; font-weight: bold">{{ product.name }}</div>
+        <div>{{ product.id }}</div>
+      </div>
+      <vs-divider/>
+
+      <div class="form-group vs-col" vs-order="1" id="firstColModal" >
         <div class="row">
           <label for="pricePerItem">Price per item *</label>
           <vs-input
               :danger="(errors.includes('pricePerItem'))"
               danger-text="Price per item must be greater than zero and numeric."
-              class="inputx"
               id="pricePerItem"
               v-model="invenForm.pricePerItem"
               v-on:change="updateTotalPrice"/>
@@ -22,9 +23,9 @@
         <div class="row">
           <label for="totalPrice">Total price *</label>
           <vs-input
+              type="number"
               :danger="(errors.includes(invenForm.totalPrice))"
               danger-text="Total price must be greater than zero and numeric."
-              class="inputx"
               id="totalPrice"
               v-model="invenForm.totalPrice"/>
         </div>
@@ -40,50 +41,46 @@
               v-on:change="updateTotalPrice"/>
         </div>
       </div>
-      <div class="form-group required vs-col" vs-order="2" id="secondColModal">
+      <div class="form-group vs-col" vs-order="2" id="secondColModal">
         <div class="row">
-          <label for="bestBefore">Best before</label>
+          <label for="bestBefore">Best Before</label>
           <vs-input
               :danger="(errors.includes('past-best'))"
               danger-text="Date cannot be in past"
               type="date"
               id="bestBefore"
-              class="inputx"
               v-model="invenForm.bestBefore"/>
         </div>
         <div class="row">
-          <label for="listingExpiry">Listing expiry *</label>
+          <label for="expiryDate">Expiry Date *</label>
           <vs-input
               :danger="(errors.includes('past-expiry'))"
               danger-text="Expiry date is required and cannot be in past"
               type="date"
-              id="listingExpiry"
-              class="inputx"
+              id="expiryDate"
               v-model="invenForm.listExpiry"/>
         </div>
         <div class="row">
-          <label for="manufactureDate">Manufacture date</label>
+          <label for="manufactureDate">Manufacture Date</label>
           <vs-input
               :danger="(errors.includes('future-manu'))"
               danger-text="Date cannot be in the future"
               type="date"
               id="manufactureDate"
-              class="inputx"
               v-model="invenForm.manufactureDate"/>
         </div>
         <div class="row">
-          <label for="sellBy">Sell by</label>
+          <label for="sellBy">Sell By</label>
           <vs-input
               :danger="(errors.includes('past-sell'))"
               danger-text="Date cannot be in past"
               type="date"
               id="sellBy"
-              class="inputx"
               v-model="invenForm.sellBy"/>
         </div>
       </div>
-      <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory()">
-        <vs-button>Add product</vs-button>
+      <div class="form-group required vs-col" align="center" id="addButton">
+        <vs-button @click="addInventory">Add To Inventory</vs-button>
       </div>
     </vs-popup>
   </div>
@@ -111,9 +108,24 @@ export default {
       item: null,
       products: [],
       errors: [],
+
+      product: null,
     }
+
   },
   methods: {
+    /**
+     * Opens the modal, prefills any inputs that need to prefilled.
+     */
+    open: function(product) {
+      this.errors = [];
+      this.product = product;
+      this.invenForm.pricePerItem = product.recommendedRetailPrice;
+      this.invenForm.prodId = product.id;
+
+      this.addNewInv = true;
+    },
+
     checkForm: function() {
       this.errors = [];
       var today = new Date();
@@ -227,23 +239,12 @@ export default {
       }
       return true;
     },
+
     updateTotalPrice: function() {
       console.log(this.invenForm.quantity);
       this.invenForm.totalPrice = this.invenForm.quantity * this.invenForm.pricePerItem;
     },
-    autofill: function() {
-      if (this.invenForm.prodId !== '') {
-        let prodInd = 0;
-        while (prodInd < this.products.length) {
-          if (this.products[prodInd]["id"] === this.invenForm.prodId) {
-            break;
-          }
-          prodInd++;
-        }
-        this.invenForm.pricePerItem = this.products[prodInd]["recommendedRetailPrice"];
-        this.updateTotalPrice();
-      }
-    },
+
     addInventory: function() {
       if (this.checkForm()) {
         console.log("DEBUG: adding to inventory...")
@@ -292,7 +293,9 @@ export default {
           this.$log.debug("Error Status:", error);
         })
       }
+      console.log(this.errors);
     },
+
     getBusinessProducts() {
       api.getBusinessProducts(store.actingAsBusinessId)
           .then((response) => {
@@ -311,7 +314,9 @@ export default {
     getActingAsBusinessId() {
       return store.actingAsBusinessId;
     },
+
   },
+
   mounted(){
     this.getBusinessProducts();
   }
@@ -320,6 +325,19 @@ export default {
 
 
 <style>
+#product-name {
+  grid-row: 1;
+  grid-column: 2;
+
+  text-align: center;
+  margin: auto;
+}
+
+.sub-header {
+  font-size: 12px;
+  color: gray;
+}
+
 #firstColModal {
   margin-right: 160px;
   margin-left: 5px;
@@ -333,10 +351,6 @@ export default {
 
 .row {
   margin-bottom: 15px;
-}
-
-.addButton {
-  align-self: center;
 }
 
 .vs-popup--header {
