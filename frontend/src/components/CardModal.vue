@@ -67,12 +67,12 @@ export default {
           api.deleteCard(this.selectedCard.id)
           .then(() => {
             this.$vs.notify({title:'Success', text:'Card deleted', color:'success'});
+            this.$router.push({path: '/marketplace'});
           }).catch((error) => {
             this.$log.error("Error deleting card: " + error);
             this.$vs.notify({title:'Error', text:'ERROR deleting card', color:'danger'});
           });
         }
-
       },
   mounted: function(){
     this.getUserId();

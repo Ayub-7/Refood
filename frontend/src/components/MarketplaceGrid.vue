@@ -51,6 +51,8 @@ export default {
       this.$refs.cardModal.openModal();
     }
   }
+
+
 }
 
 
