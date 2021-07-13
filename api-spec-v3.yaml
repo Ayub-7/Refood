@@ -40,6 +40,7 @@ tags:
   - name: 'UCM5: Find my cards'
   - name: 'UCM6: Keyword management'
   - name: 'UCM7: Keyword search'
+  - name: 'UCM8: Contacting other marketplace users'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -1130,10 +1131,70 @@ paths:
                 type: array
                 items: 
                   $ref: '#/components/schemas/Card'
-        '400': 
+        '400':
           $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+
+  '/users/{id}/messages':
+    get:
+      tags:
+      - 'UCM8: Contacting other marketplace users'
+      - 'Users'
+      summary: Get a specific user's messages
+      security:
+        - CookieAuth:
+          - globalApplicationAdmin
+          - defaultGlobalApplicationAdmin
+      parameters:
+        - in: query
+          name: id
+          description: User ID
+          schema:
+            type: integer
+          required: true
+          example: 5
+      responses:
+        '200':
+          description: Request successful, a (possibly empty) list of messages is returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
+  '/messages/{id}':
+    delete:
+      tags:
+        - 'UCM8: Contacting other marketplace users'
+        - 'Users'
+      summary: Delete a message
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: query
+          name: id
+          description: Message ID
+          schema:
+            type: integer
+          required: true
+          example: 5
+      responses:
+        '200':
+          description: Message deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: "Forbidden: Returned when a user tries to delete a message that they are not the receiver of AND the user is not a D/GAA"
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
 components:
   securitySchemes:
@@ -1417,7 +1478,7 @@ components:
           description: List of images of a product (implemented in U16).
           items:
             $ref: '#/components/schemas/Image'
-      
+
     Business: 
       type: object
       description: Business account entity
@@ -1560,7 +1621,7 @@ components:
           description: '(Implemented in U6): A list of businesses for which the user is an administrator'
           items:
             $ref: '#/components/schemas/Business'
-            
+
     Message:
       type: object
       description: Represents a single message item sent from one user to another.
