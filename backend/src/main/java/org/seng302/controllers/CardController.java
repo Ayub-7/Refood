@@ -11,8 +11,10 @@ import org.seng302.models.User;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +31,14 @@ public class CardController {
     private static final Logger logger = LogManager.getLogger(CardController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
+    private UserRepository userRepository;
     private CardRepository cardRepository;
 
+    @Autowired
+    public CardController(UserRepository userRepository, CardRepository cardRepository) {
+        this.userRepository = userRepository;
+        this.cardRepository = cardRepository;
+    }
 
     /**
      * POST/Creates a new card to store in the database that will go onto the community marketplace.
@@ -108,6 +115,26 @@ public class CardController {
 
 
     /**
+     * GET endpoint, returns detailed information about a cards belonging to a specific User
+     *
+     * Preconditions: User ID given is for a user that exists
+     * Postconditions: All cards belonging to the user are returned
+     *
+     * @param userId ID of user whose cards we want to retrieve
+     * @return 200 if valid user, 400 if bad formatted ID, 401 if unauthorized, 406 if user doesn't exist
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @GetMapping("/users/{userId}/cards")
+    public ResponseEntity<String> getUserCards (@PathVariable Long userId) throws JsonProcessingException {
+        User user = userRepository.findUserById(userId);
+        if (user == null) return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+
+        List<Card> cards = cardRepository.findCardsByUser(user);
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(cards));
+    }
+
+    /**
      * PUT endpoint, extends cards display period by two weeks
      *
      * Preconditions: User must be logged in, User must be the creator of the card, the card must exist
@@ -135,5 +162,39 @@ public class CardController {
         cardRepository.save(card);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
+    /**
+     * DELETE endpoint, deletes a single card given an ID
+     *
+     * Preconditions: Given card ID is of type Long is for a card that exists in database and the logged in user is
+     * the creator the given card
+     * Postconditions: Card is deleted from the database
+     *
+     * @param cardId ID of card to be retrieved from DB
+     * @param session the current user session
+     * @return 401 if not logged in (handled by spring sec), 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 200 otherwise.
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @DeleteMapping("/cards/{cardId}")
+    public ResponseEntity<String> deleteCardById (@PathVariable Long cardId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        Card card = cardRepository.findCardById(cardId);
+        if(card == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User cardCreator = card.getUser();
+        // Attempting to create a card for somebody else.
+        if(cardCreator.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        cardRepository.deleteCardById(cardId);
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
+    }
+
+
 
 }

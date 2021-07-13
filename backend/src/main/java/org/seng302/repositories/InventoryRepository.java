@@ -1,6 +1,5 @@
 package org.seng302.repositories;
 
-import org.seng302.models.Product;
 import org.seng302.models.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
