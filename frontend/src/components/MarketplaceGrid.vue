@@ -7,10 +7,6 @@
               <div style="margin: 10px; width: 90%;" @click="openCardModal(card)">
                 <!-- Marketplace Card -->
                 <vs-card>
-                  <div slot="media" id="cardHeader">
-                    <!-- Default image for now -->
-                    <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
-                  </div>
                   <div>
                     <div id="cardCreationDate">{{card.created}}</div>
 
@@ -68,12 +64,12 @@ export default {
     /**
      * Converts the space separated keywords to a JSON object recognized by the keywordWrapper
      *
-     * @param keywords
-     * @returns {[]}
+     * @param keywords  space separated keywords
+     * @returns {[]}    JSON object
      */
 
     getKeywords: function(keywords) {
-      keywords = keywords.split(" ");
+      keywords = keywords.trimEnd().split(/\s+/);
       let tmpKeywords = [];
 
       for(let i=0;i<keywords.length;i++) {
@@ -82,9 +78,15 @@ export default {
         keyword.name = keywords[i];
         tmpKeywords.push(keyword);
       }
-      return tmpKeywords; // keywords.split(" ")
+      return tmpKeywords;
     },
 
+    /**
+     * Translates the user's address into a general address string, listing only the country, city and suburb.\
+     *
+     * @param homeAddress   User's home address
+     * @returns String      General address string
+     */
 
     getGeneralAddress: function (homeAddress) {
       let addressStr = "";
@@ -104,7 +106,7 @@ export default {
     },
 
     /**
-     * checks the data integrity of the list of cards
+     * Checks the data integrity of the list of cards
      * ie every card includes a user
      * if not, it will get one from the database and update the card list
      *

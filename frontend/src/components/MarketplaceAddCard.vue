@@ -93,7 +93,7 @@ export default {
           this.errors.push('no-section');
         }
 
-        if (this.title === '') {
+        if (this.title.length <= 2) {
           this.errors.push('no-title');
         }
 
@@ -112,7 +112,7 @@ export default {
         if (this.errors.includes('no-title')) {
           this.$vs.notify({
             title: 'Failed to add card',
-            text: 'Title is required',
+            text: 'Title is required or is too short',
             color: 'danger'
           });
         }
@@ -211,6 +211,7 @@ export default {
             this.title = '';
             this.description = '';
             this.keywords = '';
+            this.keywordList = [];
         }
     }
 }

@@ -139,12 +139,13 @@ export default {
     /**
      * Reloads the data upon sucessful add card.
      * ForSale, Wanted, Exchange
+     * orders the cards by newly created first
      *
      * @field tabIndex must track this.tabIndex
      */
-    onSuccess(tabIndex) {
+    onSuccess() {
       let sectionName = "";
-      switch (tabIndex) {
+      switch (this.tabIndex) {
         case 1:
           sectionName = "Wanted"
           break;
@@ -156,6 +157,9 @@ export default {
           break;
       }
       this.getSectionCards(sectionName);
+      this.selectSortBy = 'created';
+      this.toggleDirection = -1;
+      this.sortData(this.selectSortBy);
     },
 
     /**

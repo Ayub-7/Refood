@@ -110,7 +110,7 @@ public class Card {
             throw new ValidationException("Title length is too short");
         }
 
-        if (newCardRequest.getTitle().length() > 25) {
+        if (newCardRequest.getTitle().length() > 50) {
             throw new ValidationException("Title length is too long");
         }
 
