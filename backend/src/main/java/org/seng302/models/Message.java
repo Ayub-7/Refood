@@ -23,6 +23,9 @@ public class Message {
     @OneToOne
     private Card card;
 
+    @OneToOne
+    private User receiver;
+
     private String description;
 
     private Date sent;

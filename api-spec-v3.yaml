@@ -1170,15 +1170,15 @@ paths:
   '/users/{id}/messages':
     get:
       tags:
-      - 'UCM8: Contacting other marketplace users'
-      - 'Users'
+        - 'UCM8: Contacting other marketplace users'
+        - 'Users'
       summary: Get a specific user's messages
       security:
         - CookieAuth:
-          - globalApplicationAdmin
-          - defaultGlobalApplicationAdmin
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
       parameters:
-        - in: query
+        - in: path
           name: id
           description: User ID
           schema:
@@ -1210,7 +1210,7 @@ paths:
             - globalApplicationAdmin
             - defaultGlobalApplicationAdmin
       parameters:
-        - in: query
+        - in: path
           name: id
           description: Message ID
           schema:
@@ -1510,7 +1510,7 @@ components:
           items:
             $ref: '#/components/schemas/Image'
 
-    Business: 
+    Business:
       type: object
       description: Business account entity
       required:
@@ -1660,6 +1660,7 @@ components:
         - description
         - senderId
         - cardId
+        - receiverId
       properties:
         id:
           type: integer
@@ -1672,6 +1673,13 @@ components:
           writeOnly: true
           description: Unique user ID of the sender. Should only be used to create a new Message entity.
         sender:
+          $ref: '#/components/schemas/User'
+        receiverId:
+          type: integer
+          example: 100
+          writeOnly: true
+          description: Unique user ID of the message receiver. Should only be used to create a new Message entity.
+        receiver:
           $ref: '#/components/schemas/User'
         cardId:
           type: integer
