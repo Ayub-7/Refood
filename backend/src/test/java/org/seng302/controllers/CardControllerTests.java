@@ -12,6 +12,7 @@ import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,8 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @WebMvcTest(controllers = CardController.class)
 @ContextConfiguration(classes = TestApplication.class)
@@ -34,6 +37,8 @@ class CardControllerTests {
     private CardController cardController;
     @MockBean
     private CardRepository cardRepository;
+    @MockBean
+    private NotificationRepository notificationRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -44,6 +49,8 @@ class CardControllerTests {
     private Card card1;
     private Card card2;
     private Card card;
+    private Notification notification;
+    private List<Notification> notifications;
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException, ValidationException {
@@ -54,7 +61,9 @@ class CardControllerTests {
         cardRequest = new NewCardRequest(testUser.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         card = new Card(cardRequest, testUser);
-
+        notification = new Notification(testUser.getId(), card.getId(), card.getTitle(), card.getDisplayPeriodEnd());
+        notifications = new ArrayList<Notification>();
+        notifications.add(notification);
     }
 
     @Test
@@ -227,7 +236,18 @@ class CardControllerTests {
     @Test
     @WithMockUser
     void testGetExpiredCards_Successful() throws Exception {
+        Mockito.when(notificationRepository.findNotificationsByUserId(testUser.getId())).thenReturn(notifications);
 
+        mvc.perform(get("/users/{userId}/cards/notifications", testUser.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
 
+    @Test
+    @WithMockUser
+    void testGetExpiredCards_Forbidden() throws Exception {
+        mvc.perform(get("/users/{userId}/cards/notifications", anotherUser.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isForbidden());
     }
 }

@@ -25,6 +25,9 @@ public class Notification {
     @Column(name = "status")
     private NotificationStatus status;
 
+    /**
+     * Empty constructor for JPA use.
+     */
     protected Notification() {
     }
 

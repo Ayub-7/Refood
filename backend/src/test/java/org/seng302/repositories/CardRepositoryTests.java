@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -132,7 +133,10 @@ class CardRepositoryTests {
         assertThat(cardList.size()).isEqualTo(0);
     }
 
-
+    /**
+     * Test that expects the card repository method findAllByDisplayPeriodEndBefore(Date)
+     * returns all the expired cards.
+     */
     @Test
     void findExpiredCards() {
         Date date = new Date();
@@ -140,8 +144,19 @@ class CardRepositoryTests {
         assertThat(cards.size()).isEqualTo(1);
     }
 
+    /**
+     * Edge case test for the repository method retrieving all
+     * expired cards where 0 is always expected as the expiry date is
+     * set to 2020.
+     */
     @Test
     void findExpiredCardsExpectNone() {
-
+        Date current = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(current);
+        calendar.set(Calendar.YEAR, 2020);
+        Date date = calendar.getTime();
+        List<Card> cards = cardRepository.findAllByDisplayPeriodEndBefore(date);
+        assertThat(cards.size()).isZero();
     }
 }
