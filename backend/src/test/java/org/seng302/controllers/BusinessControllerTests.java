@@ -365,6 +365,7 @@ class BusinessControllerTests {
                 .param("searchQuery", "Pizza"))
                 .andReturn();
         assert results.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+    }
 
     @Test
     @WithMockUser
@@ -373,50 +374,11 @@ class BusinessControllerTests {
                 .param("searchQuery", "Pizza"))
                 .andReturn();
         assert results.getResponse().getStatus() == HttpStatus.OK.value();
-
-
-    void testActAsBusiness_returnUnauthorized() throws Exception {
-        BusinessIdRequest req = new BusinessIdRequest();
-        req.setBusinessId(1);
-        mvc.perform(post("/actasbusiness")
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(req)))
-                .andExpect(status().isUnauthorized());
     }
 
-    void testActAsBusiness_noBusiness_returnOk() throws Exception {
-        BusinessIdRequest req = new BusinessIdRequest();
-        req.setBusinessId(0);
-        mvc.perform(post("/actasbusiness")
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
-    }
 
-    @Test
-    @WithMockUser
-    void testActAsBusiness_withBusiness_returnOk() throws Exception {
-        BusinessIdRequest req = new BusinessIdRequest();
-        req.setBusinessId(1);
 
-        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
-        mvc.perform(post("/actasbusiness")
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
-    }
 
-    @Test
-    @WithMockUser
-    void testActAsBusiness_withInvalidBusinessId_returnBadRequest() throws Exception {
-        BusinessIdRequest req = new BusinessIdRequest();
-        req.setBusinessId(1);
 
-        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(null);
-        mvc.perform(post("/actasbusiness")
-                .contentType("application/json")
-                .content(mapper.writeValueAsString(req)))
-                .andExpect(status().isBadRequest());
-    }
 
 }
