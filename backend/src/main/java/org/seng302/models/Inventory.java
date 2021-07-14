@@ -7,10 +7,8 @@ import org.seng302.models.requests.NewInventoryRequest;
 
 import javax.persistence.*;
 import javax.xml.bind.ValidationException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Entity class that holds the information of a businesss product inventory.

@@ -1,6 +1,7 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Users from '../components/Users';
 import {store} from '../store';
+//import MarketplaceGrid from "@/components/MarketplaceGrid";
 import Vuesax from 'vuesax';
 import VueRouter from 'vue-router';
 import api from "../Api";
