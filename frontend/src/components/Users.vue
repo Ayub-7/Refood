@@ -66,32 +66,10 @@
   </div>
 
     <!-- show users marketplace activity modal -->
-    <vs-popup :active.sync="showMarketModal" title="Marketplace Activity">
+    <vs-popup :active.sync="showMarketModal" title="Marketplace Activity" id="market-card-modal">
       <div>
         <div class="container">
-          <vs-tabs id="marketCards" alignment="center" v-model="tabIndex">
-            <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
-              <div>
-                <MarketplaceGrid :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-              </div>
-            </vs-tab>
-            <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
-              <div>
-                <MarketplaceGrid :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-              </div>
-            </vs-tab>
-            <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
-              <div>
-                <MarketplaceGrid :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-              </div>
-
-            </vs-tab>
-          </vs-tabs>
-          <div class="title-container">
-            <div class="title-centre">
-              <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.4)"/>
-            </div>
-          </div>
+          <MarketplaceGrid :cardData="cards"></MarketplaceGrid>
         </div>
       </div>
     </vs-popup>
@@ -164,20 +142,20 @@ const Users = {
      * gets default card data
      * TODO: edit so that users cards are shown only
      */
-    getSectionCards: function(section) {
+    getUserCards: function(id) {
       this.$vs.loading({
-        container: ".vs-tabs",
+        container: ".vs-popup",
       });
       this.cards = [];
-      api.getCardsBySection(section)
+      api.getUserCards(id)
           .then((res) => {
-            this.cards = res.data.slice(0, 100); // todo: TEMPORARY UNTIL WE CAN PAGINATE THE DATA COMING IN.
+            this.cards = res.data;
           })
           .catch((error) => {
             console.log(error);
           })
           .finally(() => {
-            this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
+            this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
           });
     },
 
@@ -189,7 +167,7 @@ const Users = {
       this.showMarketModal = true;
       api.checkSession()
           .then(() => {
-            this.getSectionCards("ForSale");
+            this.getUserCards(this.user.id);
           })
           .catch((error) => {
             this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
@@ -309,6 +287,10 @@ export default Users;
 </script>
 
 <style scoped>
+
+#market-card-modal >>> .vs-popup {
+  width: 700px;
+}
 
 #marketCards {
   width: 670px;

@@ -304,4 +304,6 @@ export default {
      */
     deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
 
+    getUserCards: (userId) => instance.get(`/users/${userId}/cards`, {withCredentials: true}),
+
 }
