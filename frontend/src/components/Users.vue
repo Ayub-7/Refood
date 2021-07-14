@@ -5,7 +5,7 @@
       <!-- Far left side options menu-->
       <div id="options-bar" v-if="showOptionsMenu()">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <div class="options-card" id="option-view-activity"  @click="openMarketModal()"> View Marketplace activity </div>
+        <div class="options-card" id="option-view-activity"  @click="openMarketModal()">Marketplace Cards</div>
         <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
       </div>
 
@@ -94,12 +94,6 @@
           </div>
         </div>
       </div>
-      <div>
-        <vs-button color="danger"  @click="closeMarketModal()">
-          Close
-        </vs-button>
-      </div>
-
     </vs-popup>
 
     <!-- Add user to business as admin modal -->
@@ -142,7 +136,7 @@ const Users = {
   data: function () {
     return {
       currentPage: 1,
-      itemPerPage: 3,
+      itemPerPage: 4,
       tabIndex: 0,
 
       user: null,
