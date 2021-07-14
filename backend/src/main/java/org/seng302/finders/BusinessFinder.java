@@ -1,7 +1,6 @@
 package org.seng302.finders;
 
 import org.seng302.models.Business;
-import org.seng302.models.User;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -15,19 +14,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Class containing methods to search for users with specific query params.
- */
 @Component
-public class UserFinder {
+public class BusinessFinder {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    private CriteriaQuery<User> criteriaQuery;
+    private CriteriaQuery<Business> criteriaQuery;
     private CriteriaBuilder criteriaBuilder;
-    private Root<User> userRoot;
-
+    private Root<Business> businessRoot;
 
     /**
      * Helper function to break down query into subqueries
@@ -43,26 +38,22 @@ public class UserFinder {
         return terms;
     }
 
-
     /**
-     * This method is used to build queries to filter Users based on firstname, middlename, lastname, and nickname.
-     * @param term Subquery to filter with.
-     * @param isLike If true, the subquery could be part of someone's name.
-     *               Otherwise, the subquery has to exactly match the name.
-     * @return Predicate that will be used to query users.
+     * Builds criteria to help with querying businesses
+     * @param term query used for filtering businesses
+     * @param isLike If true, it will require that a business' name either matches the query or part of its name has the query in it.
+     *               Otherwise, the query must exactly match the business name.
+     * @return Predicate that will be used to query businesses
      */
     private Predicate criteriaBuilder(String term, boolean isLike) {
+        //Obtains criteria
         if (!isLike) {
             String[] subTerms = term.split(" ");
             List<Predicate> subTermPredicates = new ArrayList<>();
 
             for (String subTerm : subTerms) {
                 subTerm = subTerm.strip().toLowerCase();
-                Predicate c1 = criteriaBuilder.equal(criteriaBuilder.lower(userRoot.get("firstName")), subTerm);
-                Predicate c2 = criteriaBuilder.equal(criteriaBuilder.lower(userRoot.get("lastName")), subTerm);
-                Predicate c3 = criteriaBuilder.equal(criteriaBuilder.lower(userRoot.get("middleName")), subTerm);
-                Predicate c4 = criteriaBuilder.equal(criteriaBuilder.lower(userRoot.get("nickname")), subTerm);
-                Predicate criteria = criteriaBuilder.or(c1, c2, c3, c4);
+                Predicate criteria = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("name")), subTerm);
                 subTermPredicates.add(criteria);
             }
 
@@ -74,23 +65,18 @@ public class UserFinder {
             return combinedCriteria;
         } else {
             term = term.strip().toLowerCase();
-            Predicate p1 = criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("firstName")), "%" + term + "%");
-            Predicate p2 = criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("lastName")), "%" + term + "%");
-            Predicate p3 = criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("middleName")), "%" + term + "%");
-            Predicate p4 = criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("nickname")), "%" + term + "%");
-            return criteriaBuilder.or(p1, p2, p3, p4);
+            return criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
         }
     }
 
-
     /**
-     * This method is used to query Users to match the query exactly or contain the query.
-     * @param terms ArrayList of subqueries to be used for querying
-     * @param isLike If true, will get all results that contain the query.
-     *               Otherwise, will get results that exactly match the query
-     * @return List of Users
+     * This method is used twice in this class to filter the exact matching results and to filter similar results.
+     * @param terms List of subqueries to be used for searching.
+     * @param isLike If true, it will return results with things that contains query as a whole word or a part of a word.
+     *               Otherwise, it will return results that exactly match the query
+     * @return Return a list of businesses
      */
-    private List<User> queryProcess(ArrayList<String> terms, boolean isLike) {
+    private List<Business> queryProcess(ArrayList<String> terms, boolean isLike) {
         List<Predicate> criteriaList = new ArrayList<>();
         Logic logic = Logic.NONE;
         short consecutive = 0;
@@ -140,25 +126,25 @@ public class UserFinder {
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
-
     /**
-     * Searches for users by exact name, quoted names, then like names. Search results are case insensitive.
-     * @param query string query containing the names requesting to be searched.
-     * @return A list of users matching the query.
+     * The only publicly available method to access outside of this class to search for businesses.
+     * @param query The search query to be used to filter search results
+     * @return Will return all businesses if query is blank, otherwise will filter according to what is in the query
      */
-    public List<User> queryByName(String query) {
+    public List<Business> findBusinesses(String query) {
         criteriaBuilder = entityManager.getCriteriaBuilder();
-        criteriaQuery = criteriaBuilder.createQuery(User.class);
-        userRoot = criteriaQuery.from(User.class);
+        criteriaQuery = criteriaBuilder.createQuery(Business.class);
+        businessRoot = criteriaQuery.from(Business.class);
         ArrayList<String> terms = this.searchQueryKeywords(query);
         if (terms.size() > 0) {
-            List<User> users = this.queryProcess(terms, false);
-            List<User> partialUsers = this.queryProcess(terms, true);
-            partialUsers.removeAll(users);
-            users.addAll(partialUsers);
-            return users;
+            List<Business> businesses = this.queryProcess(terms, false);
+            List<Business> partialBusinesses = this.queryProcess(terms, true);
+            partialBusinesses.removeAll(businesses);
+            businesses.addAll(partialBusinesses);
+            return businesses;
         } else {
             return entityManager.createQuery(criteriaQuery).getResultList();
         }
     }
+
 }
