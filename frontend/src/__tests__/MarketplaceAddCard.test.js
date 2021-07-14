@@ -16,6 +16,8 @@ let $log = {
     debug: jest.fn(),
 }
 
+api.checkSession = jest.fn().mockResolvedValue({data: {id: 1}});
+
 beforeEach(() => {
     wrapper = mount(MarketplaceAddCard, {
         mocks: {$route, $log},
@@ -76,6 +78,7 @@ describe('Component', () => {
     test('Close modal after successful submission', () => {
         wrapper.vm.section = "Wanted";
         wrapper.vm.title = "Volkswagen Golf GTi mk5";
+        wrapper.vm.id = 7;
         expect(wrapper.vm.checkForm()).toBeTruthy();
         wrapper.vm.addToMarketplace();
         expect(wrapper.vm.showing).toBeFalsy();

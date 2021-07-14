@@ -1,13 +1,22 @@
 <template>
   <div id="tableContainer">
         <vs-row id="tableRow">
-          <vs-table v-model="selected" @selected="handleSelected" :data="tableData" style="border-spacing: 0 20px; margin: 1em" search>
+          <vs-table v-model="selectedItem" @selected="handleSelected" :data="tableData" style="border-spacing: 0 20px; margin: 1em" search>
             <template slot="thead" style="background:blue">
               <vs-th sort-key="id" style="text-align: center;">
                 <div>ID</div>
               </vs-th>
+              <vs-th sort-key="created">
+                <div>Date</div>
+              </vs-th >
+              <vs-th sort-key="user.firstName">
+                <div>Name</div>
+              </vs-th >
+              <vs-th sort-key="user.address">
+                <div>Address</div>
+              </vs-th >
               <vs-th sort-key="title">
-                <div>title</div>
+                <div>Title</div>
               </vs-th >
               <vs-th sort-key="description">
                 <div>Description</div>
@@ -19,34 +28,39 @@
             </template>
 
             <template slot-scope="{data}">
-              <vs-tr :key="item.id" v-for="item in data" :data="item">
-                <vs-td style="width: 20px; min-width: 100px; padding-right: 10px; text-align: center;">
-                  <a href="#">{{ item.id }}</a>
-                  <div>
-                    <img id="marketImage" style="width: 100%; height: 100%; border-radius: 1em;" src="../../public/ProductShoot.jpg" alt="Business' inventory"/>
-                  </div>
+              <vs-tr :key="card.id" v-for="card in data" :data="card">
+                <vs-td >
+                  <a href="#">{{ card.id }}</a>
                 </vs-td>
-                <vs-td>{{ item.title }} </vs-td>
-                <vs-td >{{ item.description }} </vs-td>
-                <vs-td>
-                    <div id="cardKeywords"  v-for="keyword in item.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
+                <vs-td id="cardCreationDate">{{card.created}}</vs-td>
+
+                <vs-td id="cardUserName">{{card.user.firstName+" "+card.user.lastName}}</vs-td>
+                <vs-td id="cardUserAddress" v-if="card.user.homeAddress">{{MarketpalceCommon.getGeneralAddress(card.user.homeAddress)}}</vs-td>
+                <vs-td id="cardUserNoAddress" v-if="!card.user.homeAddress"></vs-td>
+
+                <vs-td>{{ card.title }} </vs-td>
+                <vs-td style="min-width: 500px;" >{{ card.description }} </vs-td>
+
+                <vs-td v-if="card.keywords" id="keywordWrapper">
+                  <div id="cardKeywords"  v-for="keyword in MarketpalceCommon.getKeywords(card.keywords)" :key="keyword.id" >#{{keyword.name}}</div>
                 </vs-td>
               </vs-tr>
             </template>
           </vs-table>
         </vs-row>
-<!--    <CardModal ref="cardModal" :key="item.id" v-for="item in tableData" :selectedCard="item" />-->
     <CardModal ref="cardModal" v-if="selectedItem != null" :selectedCard="selectedItem" />
   </div>
 </template>
 
 <script>
 import CardModal from './CardModal.vue'
+import MarketpalceCommon from "./MarketpalceCommon.js";
 
 export default {
   data: function() {
     return {
       selectedItem: null,
+      MarketpalceCommon
     }
   },
   components: {
@@ -59,7 +73,6 @@ export default {
      */
     handleSelected(item) {
       this.selectedItem = item;
-      console.log(this.selectedItem);
       this.$refs.cardModal.openModal();
     },
   }
@@ -99,6 +112,9 @@ th {
   color: white;
 }
 
+td {
+  max-width: 100px;
+}
 table {
   width: 100%;
 }
