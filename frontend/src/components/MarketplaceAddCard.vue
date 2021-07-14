@@ -143,7 +143,7 @@ export default {
           api.createCard(this.id, this.title, this.description, this.keywords, this.section)
               .then((res) => {
                 this.$vs.notify({title: 'Success', text: `created new card: ${res.data.cardId}`, color: 'success'});
-                this.$emit('submitted');
+                this.$emit('submitted', this.section);
 
               })
               .catch((error) => {

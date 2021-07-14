@@ -33,7 +33,7 @@
 
       <vs-divider></vs-divider>
 
-      <vs-tabs alignment="center">
+      <vs-tabs alignment="center" v-model="tabIndex">
         <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
           <div>
             <MarketplaceGrid  v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
@@ -139,23 +139,26 @@ export default {
     /**
      * Reloads the data upon sucessful add card.
      * ForSale, Wanted, Exchange
-     * orders the cards by newly created first
+     * Orders the cards by newly created first
+     * Tab changes to the new card's section
      *
      * @field tabIndex must track this.tabIndex
      */
-    onSuccess() {
-      let sectionName = "";
-      switch (this.tabIndex) {
-        case 1:
-          sectionName = "Wanted"
+    onSuccess(sectionName) {
+      console.log(sectionName + this.tabIndex)
+      switch (sectionName) {
+        case "Wanted":
+          this.tabIndex = 1;
           break;
-        case 2:
-          sectionName = "Exchange"
+        case "Exchange":
+          this.tabIndex = 2;
           break;
         default:
-          sectionName = "ForSale"
+          this.tabIndex = 0;
+          sectionName = "ForSale";
           break;
       }
+
       this.getSectionCards(sectionName);
       this.selectSortBy = 'created';
       this.toggleDirection = -1;
