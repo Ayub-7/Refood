@@ -176,7 +176,7 @@ describe('Functionality tests', () => {
     test("Data is initialized and set properly.",  () => {
         expect(wrapper.vm.userId).toBe(7);
         expect(wrapper.vm.products).toBe(mockProducts);
-        expect(wrapper.vm.filteredproducts).toBe(mockProducts);
+        expect(wrapper.vm.filteredProducts).toBe(mockProducts);
         expect(api.checkSession).toBeCalled();
         expect(api.getBusinessProducts).toBeCalled();
 

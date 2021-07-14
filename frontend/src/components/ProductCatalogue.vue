@@ -70,7 +70,7 @@
                   <p>{{ product.id }}</p>
                 </div>
                 <vs-divider></vs-divider>
-                <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
+                <div style="font-size: 16px; font-weight: bold; height: 24px;">{{ product.manufacturer }} </div>
                 <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
                 <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
               </div>
@@ -211,7 +211,7 @@
 import api from "../Api";
 import {store} from "../store";
 import axios from "axios";
-import AddToInventory from "@/components/AddToInventory";
+import AddToInventory from "./AddToInventory";
 
 const Search = {
   name: "Search",
@@ -361,10 +361,11 @@ const Search = {
     },
 
 
-    //modifies selected catalog item
-    goToModify (productId) {
-      console.log(productId)
-      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`})
+    /**
+     * Redirects page to the 'modify product' page with the given product ID.
+     */
+    goToModify: function(productId) {
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`});
     },
 
     /**

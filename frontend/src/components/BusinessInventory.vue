@@ -194,6 +194,7 @@ export default {
       let filteredInventory = this.inventory.filter(item => (item.quantity>0));
       return filteredInventory;
     },
+
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
@@ -336,21 +337,23 @@ export default {
       api.getBusinessInventory(this.$route.params.id)
       .then((response) => {
         this.inventory = response.data;
-        console.log(this.inventory)
+
         for(let inventoryItem of this.inventory) {
           //Issue with sorting using object properties, so pulled required properties into inventory object
           inventoryItem['productName'] = inventoryItem.product.name;
           inventoryItem['productId'] = inventoryItem.product.id;
         }
-
         //Default ordering is product name, so all similar products will be next to each other
         this.inventory = this.inventory.sort((productOne, productTwo) => (productOne.name < productTwo.name) ? 1 : -1)
 
-      }).catch((err) => {
-        if(err.response.status == 401) {
-          this.$router.push({path: '/login'})
-        }
       })
+      .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 401) {
+            this.$router.push({path: '/login'})
+          }
+        }
+      });
     }
   }
 }
@@ -536,7 +539,7 @@ export default {
 
 
   /* ===== INVENTORY ADDING MODAL ===== */
-  #firstColModal {
+  #first-col-modal {
     margin-right: 160px;
     margin-left: 5px;
   }

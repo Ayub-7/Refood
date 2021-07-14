@@ -1,8 +1,6 @@
 <template>
-  <div id="form-outer">
-    <vs-button @click="addNewInv=true" class="header-button">New Inventory Item</vs-button>
-    <vs-popup classContent="popup-example"  title="Add New Inventory Entry" :active.sync="addNewInv">
-
+  <div id="form-outer" v-if="product != null">
+    <vs-popup title="Add New Inventory Entry" :active.sync="addNewInv">
       <div id="product-name">
         <div class="sub-header">Product</div>
         <div style="font-size: 18px; text-align: center; font-weight: bold">{{ product.name }}</div>
@@ -10,15 +8,15 @@
       </div>
       <vs-divider/>
 
-      <div class="form-group vs-col" vs-order="1" id="firstColModal" >
+      <div class="vs-col" vs-order="1" id="first-col-modal" >
         <div class="row">
           <label for="pricePerItem">Price per item *</label>
           <vs-input
+              type="number"
               :danger="(errors.includes('pricePerItem'))"
               danger-text="Price per item must be greater than zero and numeric."
               id="pricePerItem"
-              v-model="invenForm.pricePerItem"
-              v-on:change="updateTotalPrice"/>
+              v-model="invenForm.pricePerItem"/>
         </div>
         <div class="row">
           <label for="totalPrice">Total price *</label>
@@ -34,14 +32,13 @@
           <vs-input-number
               :danger="(errors.includes(invenForm.quantity))"
               danger-text="Quantity must be greater than zero."
-              min="0"
+              :min="1"
               :step="1"
               id="quantity"
-              v-model="invenForm.quantity"
-              v-on:change="updateTotalPrice"/>
+              v-model="invenForm.quantity"/>
         </div>
       </div>
-      <div class="form-group vs-col" vs-order="2" id="secondColModal">
+      <div class="vs-col" vs-order="2" id="second-col-modal">
         <div class="row">
           <label for="bestBefore">Best Before</label>
           <vs-input
@@ -79,7 +76,7 @@
               v-model="invenForm.sellBy"/>
         </div>
       </div>
-      <div class="form-group required vs-col" align="center" id="addButton">
+      <div class="required vs-col" align="center" id="addButton">
         <vs-button @click="addInventory">Add To Inventory</vs-button>
       </div>
     </vs-popup>
@@ -94,22 +91,20 @@ export default {
   name: "AddToInventory",
   data() {
     return {
+      product: null,
       invenForm: {
         prodId: '',
         pricePerItem: 0.0,
         totalPrice: 0.0,
-        quantity: 0,
+        quantity: 1,
         bestBefore: '',
         listExpiry: '',
         manufactureDate: '',
         sellBy: '',
       },
-      addNewInv: false,
-      item: null,
-      products: [],
-      errors: [],
 
-      product: null,
+      addNewInv: false,
+      errors: [],
     }
 
   },
@@ -126,6 +121,10 @@ export default {
       this.addNewInv = true;
     },
 
+    /**
+     * Checks the form inputs, validating the inputted values.
+     * @return boolean true if no errors found, false otherwise.
+     */
     checkForm: function() {
       this.errors = [];
       var today = new Date();
@@ -166,9 +165,11 @@ export default {
       if (this.invenForm.prodId.length === 0 || this.errors.includes('invalid-chars')) {
         this.errors.push(this.invenForm.prodId);
       }
+
       if (this.invenForm.pricePerItem <= 0.0) {
         this.errors.push('pricePerItem');
       }
+
       if (this.invenForm.bestBefore !== '') {
         var timestamp = Date.parse(this.invenForm.bestBefore);
         var dateObject = new Date(timestamp)
@@ -177,6 +178,7 @@ export default {
           this.errors.push('past-best');
         }
       }
+
       if (this.invenForm.listExpiry !== '') {
         timestamp = Date.parse(this.invenForm.listExpiry);
         dateObject = new Date(timestamp)
@@ -185,6 +187,7 @@ export default {
           this.errors.push('past-expiry');
         }
       }
+
       if (this.invenForm.manufactureDate !== '') {
         timestamp = Date.parse(this.invenForm.manufactureDate);
         dateObject = new Date(timestamp)
@@ -193,6 +196,7 @@ export default {
           this.errors.push('future-manu');
         }
       }
+
       if (this.invenForm.sellBy !== '') {
         timestamp = Date.parse(this.invenForm.sellBy);
         dateObject = new Date(timestamp)
@@ -201,6 +205,7 @@ export default {
           this.errors.push('past-sell');
         }
       }
+
       if (this.invenForm.quantity <= 0) {
         this.errors.push(this.invenForm.quantity);
       }
@@ -212,6 +217,7 @@ export default {
           color: 'danger'
         });
       }
+
       if (this.errors.includes('past-date')) {
         this.$vs.notify({
           title: 'Failed to create inventory item',
@@ -227,6 +233,7 @@ export default {
           color: 'danger'
         });
       }
+
       if (this.errors.includes(this.quantity)) {
         this.$vs.notify({
           title: 'Failed to create inventory item',
@@ -234,20 +241,25 @@ export default {
           color: 'danger'
         });
       }
+
       if (this.errors.length > 0) {
         return false;
       }
       return true;
     },
 
+    /**
+     * Updates the total price value when either quantity or price per item changes.
+     */
     updateTotalPrice: function() {
-      console.log(this.invenForm.quantity);
-      this.invenForm.totalPrice = this.invenForm.quantity * this.invenForm.pricePerItem;
+      this.invenForm.totalPrice = (this.invenForm.quantity * this.invenForm.pricePerItem).toFixed(2);
     },
 
+    /**
+     * Saves the inventory to the backend (if input fields are valid).
+     */
     addInventory: function() {
       if (this.checkForm()) {
-        console.log("DEBUG: adding to inventory...")
         api.createInventory(store.actingAsBusinessId, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
@@ -258,54 +270,40 @@ export default {
                 title: `Item successfully added to the business' inventory`,
                 color: 'success'
               });
-            }).catch((error) => {
-          if (error.response) {
-            console.log(error);
-            if (error.response.status === 400) {
-              if (this.getActingAsBusinessId() == null) {
+            })
+            .catch((error) => {
+              if (error.response) {
+                if (error.response.status === 400) {
+                  if (this.getActingAsBusinessId() == null) {
+                    this.$vs.notify({
+                      title: 'Failed to add an inventory item',
+                      text: 'User is not a business administrator',
+                      color: 'danger'
+                    });
+                  } else {
+                    this.$vs.notify({
+                      title: 'Failed to add an inventory item',
+                      text: 'Incomplete form, or the product does not exist.',
+                      color: 'danger'
+                    });
+                  }
+                } else if (error.response.status === 403) {
                 this.$vs.notify({
                   title: 'Failed to add an inventory item',
-                  text: 'User is not a business administrator',
+                  text: 'You do not have the rights to access this business',
                   color: 'danger'
                 });
-              } else {
-                this.$vs.notify({
-                  title: 'Failed to add an inventory item',
-                  text: 'Incomplete form, or the product does not exist.',
-                  color: 'danger'
-                });
-              }
-            } else if (error.response.status === 403) {
-            this.$vs.notify({
-              title: 'Failed to add an inventory item',
-              text: 'You do not have the rights to access this business',
-              color: 'danger'
+                } else if (error.response.status === 404) {
+                  this.$vs.notify({
+                    title: 'Failed to add an inventory item',
+                    text: 'There was a problem adding the inventory item to the database',
+                    color: 'danger'
+                  });
+                }
+            }
+            this.$log.debug("Error Status:", error);
             });
-          } else if (error.response.status === 404) {
-            this.$vs.notify({
-              title: 'Failed to add an inventory item',
-              text: 'There was a problem adding the inventory item to the database',
-              color: 'danger'
-            });
-          }
-          console.log(error.response.status);
-        }
-          this.$log.debug("Error Status:", error);
-        })
       }
-      console.log(this.errors);
-    },
-
-    getBusinessProducts() {
-      api.getBusinessProducts(store.actingAsBusinessId)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.products = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load products";
-          });
     },
 
     /**
@@ -317,8 +315,14 @@ export default {
 
   },
 
-  mounted(){
-    this.getBusinessProducts();
+  watch: {
+    "invenForm.quantity": function() {
+      this.updateTotalPrice();
+    },
+
+    "invenForm.pricePerItem": function() {
+      this.updateTotalPrice();
+    },
   }
 }
 </script>
@@ -338,7 +342,7 @@ export default {
   color: gray;
 }
 
-#firstColModal {
+#first-col-modal {
   margin-right: 160px;
   margin-left: 5px;
 }
@@ -353,21 +357,27 @@ export default {
   margin-bottom: 15px;
 }
 
-.vs-popup--header {
-  background-color: #1F74FF;
-  color: #FFFFFF;
-}
-
-.vs-popup-primary >>> header {
-  background-color: #1F74FF;
-  color: #FFFFFF;
-}
-
 .textarea >>> textarea {
   resize: none;
   max-width: 200px;
   min-height: 100px;
   max-height: 100px;
+}
+
+@media screen and (max-width: 630px) {
+  .vs-popup--content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  div#first-col-modal {
+    margin: 0 auto;
+  }
+
+  #second-col-modal {
+    margin: 0 auto;
+  }
+
 }
 
 
