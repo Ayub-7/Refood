@@ -106,7 +106,7 @@ class CardControllerTests {
     @Test
     @WithMockUser
     void testPostCard_titleTooLong_returnBadRequest() throws Exception {
-        cardRequest.setTitle("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        cardRequest.setTitle("ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZZ");
 
         mvc.perform(post("/cards")
                 .contentType("application/json")

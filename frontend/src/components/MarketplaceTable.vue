@@ -75,7 +75,6 @@ export default {
       this.selectedItem = item;
       this.$refs.cardModal.openModal();
     },
-
   }
 }
 </script>
