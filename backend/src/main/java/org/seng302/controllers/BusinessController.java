@@ -201,7 +201,28 @@ public class BusinessController {
     @GetMapping("/businesses/search")
     public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
-        List<Business> businesses = businessFinder.findBusinesses(query);
+        List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query));
+
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
+    }
+
+
+    /**
+     * Sets businesses administered to null for each admin, there is an issue with how our backend serializes business objects and if it encountered
+     * a business object inside there it would replace every other instance of that object with the business name
+     * @param businesses List of businesses that needs businessesAdministered removed
+     * @return List of businesses with businessesAdministered field set to null
+     */
+    private List<Business> removeBusinessesAdministered(List<Business> businesses) {
+        logger.debug("Removing businessesAdministered...");
+        for(Business business: businesses) {
+            List<User> admins = business.getAdministrators();
+            for(User admin: admins) {
+                admin.setBusinessesAdministered(null);
+            }
+        }
+
+        logger.debug("businessesAdministered removed");
+        return businesses;
     }
 }
