@@ -1,6 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Login from '../components/Login';
 import Vuesax from 'vuesax';
+import api from '../Api';
 
 let wrapper;
 let store;
@@ -77,3 +78,6 @@ describe('Login error checking', () => {
   
 });
 
+describe("Logging in", () => {
+
+})
