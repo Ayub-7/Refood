@@ -2,6 +2,8 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
 import {store} from "../store";
+import api from "../Api";
+import axios from "axios";
 
 let wrapper;
 const localVue = createLocalVue();
@@ -44,6 +46,49 @@ beforeEach(() => {
         methods: {},
         localVue,
     });
+});
+const mockBusiness = {
+    "businessId": 1,
+    "administrators": [
+        {
+            "id": 5,
+            "firstName": "Rayna",
+            "middleName": "YEP",
+            "lastName": "Dalgety",
+            "nickname": "Universal",
+            "bio": "zero tolerance task-force",
+            "email": "rdalgety3@ocn.ne.jp",
+            "dateOfBirth": "1999-02-28",
+            "phoneNumber": "+7 684 622 5902",
+            "homeAddress": "44 Ramsey Court",
+            "created": "2021-04-05 00:11:04",
+            "role": "USER",
+            "businessesAdministered": [1]
+        }
+    ],
+    "name": "Refood's Pizzas",
+    "description": "We make Uni's cheapest pizza",
+    "address": "420 Main South Road",
+    "businessType": "Accommodation and Food Services",
+    "created": "2021-04-03 23:29:50"
+}
+let mockBusinessAddress = {
+    streetNumber: 420,
+    streetName: "Main South Road",
+    suburb: "Hornby",
+    city: "Christchurch",
+    region: "Canterbury",
+    country: "New Zealand",
+    postcode: 6969,
+};
+api.createBusiness = jest.fn(() => {
+    return Promise.resolve({data: mockBusiness, status: 200});
+});
+api.actAsBusiness = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+api.getUserFromID = jest.fn(() => {
+    return Promise.resolve({data: mockUser, status: 200});
 });
 
 afterEach(() => {
@@ -131,6 +176,30 @@ describe('Check user sessions', () => {
        expect(wrapper.vm.$vs.notify).toBeCalled();
        expect(wrapper.vm.$router.push).toBeCalled();
    });
+});
 
+describe('Creating business', () => {
+   test("Successful", async () => {
+       wrapper.vm.businessName = "Refood Pizzas";
+       wrapper.vm.description = "We make Uni's cheapest pizza";
+       wrapper.vm.businessType = "Accommodation and Food Services";
+       await wrapper.vm.createBusinessInfo();
+       expect(wrapper.vm.$router.push).toBeCalled();
+   });
+
+   test("Unsuccessful", async () => {
+       api.createBusiness = jest.fn(() => {
+           return Promise.reject(new Error("Bad request"));
+       });
+       await wrapper.vm.createBusinessInfo();
+       expect(wrapper.vm.$log.debug).toBeCalled();
+   });
+});
+
+describe("Get user info", () => {
+   test("Successful", async () => {
+       await wrapper.vm.getUserInfo(5);
+       expect(wrapper.vm.user).toEqual(mockUser);
+   })
 });
 
