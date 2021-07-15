@@ -1,7 +1,6 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Users from '../components/Users';
 import {store} from '../store';
-//import MarketplaceGrid from "@/components/MarketplaceGrid";
 import Vuesax from 'vuesax';
 import VueRouter from 'vue-router';
 import api from "../Api";
@@ -80,8 +79,6 @@ localVue.use(VueRouter);
 const router = new VueRouter();
 
 beforeEach(() => {
-
-
     wrapper = shallowMount(Users, {
         localVue,
         router,
@@ -115,18 +112,21 @@ describe('User profile page tests', () => {
     });
 
     test('addUserToBusiness function is called', async () => {
+        wrapper.vm.userViewingBusinesses = ["test"];
+
         wrapper.vm.addUserToBusiness = jest.fn();
-        const openModalMethod = jest.spyOn(Users.methods, 'openModal')
+        const openModalMethod = jest.spyOn(Users.methods, 'openModal');
         openModalMethod.mockImplementation(() => {
             wrapper.vm.showModal = true;
         });
 
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('#option-add-to-business').exists()).toBe(true);
         wrapper.find('#option-add-to-business').trigger('click');
 
         await wrapper.vm.$nextTick(); // lets the wrapper go through the v-for loop.
 
+        console.log(wrapper.html());
         expect(wrapper.find('#add-user').exists()).toBe(true);
         wrapper.find('#add-user').trigger('click');
 

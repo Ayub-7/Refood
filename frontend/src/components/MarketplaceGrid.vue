@@ -12,6 +12,7 @@
                     <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
                   </div>
                   <div>
+                    <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
                     <div id="cardTitle">{{card.title}}</div>
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
@@ -25,7 +26,7 @@
             </vs-col>
           </vs-row>
         </div>
-      <CardModal id="cardModal" ref="cardModal" v-if="selectedCard != null" :selectedCard='selectedCard' />
+      <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" :selectedCard='selectedCard' />
     </div>
 </template>
 
@@ -41,7 +42,15 @@ export default {
   components: {
     CardModal
   },
-  props: ['cardData'],
+  props: {
+      cardData: {
+        type: Array,
+      },
+      showSection: {
+        default: false,
+        type: Boolean,
+      }
+  },
   methods: {
     /**
      * Method for opening card modal, calls method in child component to open modal
@@ -49,8 +58,18 @@ export default {
     openCardModal: function(card) {
       this.selectedCard = card;
       this.$refs.cardModal.openModal();
-    }
+    },
+
+    /**
+     * Displays the section - checks if it is 'ForSale', if so, return the string with a space, return normally otherwise.
+     * @param section card section.
+     */
+    displaySection: function(section) {
+      if (section === "ForSale") return "For Sale";
+      return section;
+    },
   }
+
 }
 
 
@@ -63,6 +82,11 @@ export default {
 #marketImage {
   width: 100%;
   height: auto;
+}
+
+.section {
+  font-size: 12px;
+  color: gray;
 }
 
 #cardTitle {

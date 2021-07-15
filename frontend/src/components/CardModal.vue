@@ -90,6 +90,10 @@ export default {
 
 <style scoped>
 
+#cardModal >>> .con-vs-popup {
+  z-index: 10000;
+}
+
 .inline {
   display: inline-block;
   position: relative;

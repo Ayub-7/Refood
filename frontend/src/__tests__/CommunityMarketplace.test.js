@@ -51,7 +51,7 @@ beforeEach(() => {
     wrapper = mount(CommunityMarketplace, {
         propsData: {},
         mocks: {$vs},
-        stubs: ['router-link', 'router-view'],
+        stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         localVue,
     });

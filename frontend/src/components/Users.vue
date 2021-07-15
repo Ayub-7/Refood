@@ -3,10 +3,10 @@
     <div id="container" v-if="this.user != null">
 
       <!-- Far left side options menu-->
-      <div id="options-bar" v-if="showOptionsMenu()">
+      <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <div class="options-card" id="option-view-activity"  @click="openMarketModal()">Marketplace Cards</div>
-        <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
+        <vs-button class="options-card" id="option-view-activity" @click="openMarketModal()">Marketplace Cards</vs-button>
+        <vs-button class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
       </div>
 
       <div id="name-container">
@@ -55,6 +55,7 @@
 
       <!-- Right Content Side -->
       <main>
+        <div class="sub-header" id="businesses-header">Businesses</div>
         <ul id="business-list">
           <li class="card" v-for="business in businesses" :key="business.id" v-bind:business="business" @click="goToBusinessPage(business)">
             <div class="card-name">{{ business.name }}</div>
@@ -67,10 +68,9 @@
 
     <!-- show users marketplace activity modal -->
     <vs-popup :active.sync="showMarketModal" title="Marketplace Activity" id="market-card-modal">
-      <div>
-        <div class="container">
-          <MarketplaceGrid :cardData="cards"></MarketplaceGrid>
-        </div>
+      <div class="container">
+        <MarketplaceGrid :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
+        <vs-pagination :max="5" :total="Math.round(cards.length/4)" v-model="currentCardPage"></vs-pagination>
       </div>
     </vs-popup>
 
@@ -105,17 +105,18 @@ import Modal from "./Modal";
 import api from "../Api";
 import {store} from "../store";
 import MarketplaceGrid from '../components/MarketplaceGrid';
+import CardModal from "../components/CardModal";
 const moment = require('moment');
 
 const Users = {
   name: "Profile",
-  components: {Modal, MarketplaceGrid
+  components: {
+    Modal, MarketplaceGrid, CardModal
   },
   data: function () {
     return {
-      currentPage: 1,
-      itemPerPage: 4,
-      tabIndex: 0,
+      // Pagination
+      currentCardPage: 1,
 
       user: null,
       businesses: [],
@@ -124,8 +125,9 @@ const Users = {
       showModal: false,
       selectedBusiness: null,
       displayType: true,
-      currentSection: "ForSale",
-      cards: []
+      cards: [],
+
+      displayOptions: false,
     };
   },
 
@@ -139,8 +141,7 @@ const Users = {
     },
 
     /**
-     * gets default card data
-     * TODO: edit so that users cards are shown only
+     * Retrieves all the cards that the user has created.
      */
     getUserCards: function(id) {
       this.$vs.loading({
@@ -152,7 +153,10 @@ const Users = {
             this.cards = res.data;
           })
           .catch((error) => {
-            console.log(error);
+            if (error.response) {
+              this.$vs.notify({title: "Error retrieving cards", color: "danger"});
+            }
+            this.$log.debug(error);
           })
           .finally(() => {
             this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
@@ -179,13 +183,6 @@ const Users = {
      */
     closeModal: function() {
       this.showModal = false;
-    },
-
-    /**
-     * Close the pop-up box with no consequences.
-     */
-    closeMarketModal: function() {
-      this.showMarketModal = false;
     },
 
     /**
@@ -241,6 +238,7 @@ const Users = {
           }
           this.user = response.data;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
+          this.showOptionsMenu();
         }).catch((err) => {
           if (err.response.status === 401) {
             this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
@@ -262,18 +260,6 @@ const Users = {
       this.$router.push({path: `/businesses/${business.id}`})
     },
 
-    /**
-     * Checks if the left-side options menu should show by checking the number of businesses
-     * has primary administrator access to.
-     * @returns {boolean} if there is one or more businesses, return true, else false.
-     */
-    showOptionsMenu: function() {
-      if (this.userViewingBusinesses < 1) {
-        return false
-      }
-      return true
-    },
-
   },
 
   mounted: function () {
@@ -289,11 +275,16 @@ export default Users;
 <style scoped>
 
 #market-card-modal >>> .vs-popup {
-  width: 700px;
+  width: 1200px;
 }
 
-#marketCards {
-  width: 670px;
+#market-card-modal {
+  z-index: 100;
+}
+
+#option-view-activity {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 #container {
@@ -315,31 +306,12 @@ export default Users;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
   margin: 1em 0 1em 0;
-
 }
-
 
 .options-card {
-  cursor: pointer;
-
-  text-align: center;
-  color: white;
-  font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 1px;
-  text-decoration: none;
-
-  padding: 10px 20px;
-  margin: 1em;
-  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
-  background-size: 500%;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-}
-
-.options-card:hover {
-  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
+  width: 100%;
+  padding: 12px 20px;
+  margin: 0.5em auto;
 }
 
 /* Name Header */
@@ -421,8 +393,12 @@ main {
 }
 
 /* Business Card Component Related */
+#businesses-header {
+  padding: 1em 3em 0 3em;
+}
+
 #business-list {
-  padding: 1em;
+  padding: 0 1em;
 }
 
 .card {
@@ -430,15 +406,13 @@ main {
   padding: 1em;
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
-  margin: 1em;
+  margin: 0 1em 1em 1em;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 
   display: grid;
   grid-template-columns: auto auto;
   grid-template-rows: auto auto auto;
 }
-
-
 
 .card:hover {
   box-shadow: 0 0.5em 1em rgba(0,1,1,.25);
@@ -469,6 +443,7 @@ main {
   font-size: 12px;
   padding: 0.5em 0 0.5em 0;
 }
+
 
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {
