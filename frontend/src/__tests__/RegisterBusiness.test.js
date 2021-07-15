@@ -3,7 +3,6 @@ import Business from '../components/BusinessRegister';
 import Vuesax from 'vuesax';
 import {store} from "../store";
 import api from "../Api";
-import axios from "axios";
 
 let wrapper;
 const localVue = createLocalVue();
@@ -187,13 +186,13 @@ describe('Creating business', () => {
        expect(wrapper.vm.$router.push).toBeCalled();
    });
 
-   // test("Unsuccessful", async () => {
-   //     api.createBusiness = jest.fn(() => {
-   //         return Promise.reject(new Error("Bad request"));
-   //     });
-   //     await wrapper.vm.createBusinessInfo();
-   //     expect(wrapper.vm.$log.debug).toBeCalled();
-   // });
+   test("Unsuccessful", async () => {
+       api.createBusiness = jest.fn(() => {
+           return Promise.reject(new Error("Bad request")).catch();
+       });
+       await wrapper.vm.createBusinessInfo();
+       expect(wrapper.vm.$log.debug).toBeCalled();
+   });
 });
 
 describe("Get user info", () => {
