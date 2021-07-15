@@ -1,10 +1,19 @@
 <template>
   <div id="form-outer" v-if="product != null">
     <vs-popup title="Add New Inventory Entry" :active.sync="addNewInv">
-      <div id="product-name">
-        <div class="sub-header">Product</div>
-        <div style="font-size: 18px; text-align: center; font-weight: bold">{{ product.name }}</div>
-        <div>{{ product.id }}</div>
+      <!-- Product Image -->
+      <div id="header-row">
+        <div style="margin: auto;">
+          <img v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
+          <img v-if="product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
+          <img v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
+          <img v-if="!isDevelopment() && !product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
+        </div>
+        <div id="product-name">
+          <div class="sub-header">Product</div>
+          <div style="font-size: 18px; text-align: center; font-weight: bold">{{ product.name }}</div>
+          <div>{{ product.id }}</div>
+        </div>
       </div>
       <vs-divider/>
 
@@ -110,15 +119,50 @@ export default {
   },
   methods: {
     /**
-     * Opens the modal, prefills any inputs that need to prefilled.
+     * Opens the modal, prefills any inputs that need to prefilled, and clears any other already filled in inputs.
      */
     open: function(product) {
       this.errors = [];
+      this.invenForm.sellBy = '';
+      this.invenForm.bestBefore = '';
+      this.invenForm.manufactureDate = '';
+      this.invenForm.sellBy = '';
+      this.invenForm.quantity = 1;
+
       this.product = product;
       this.invenForm.pricePerItem = product.recommendedRetailPrice;
       this.invenForm.prodId = product.id;
+      this.updateTotalPrice();
 
       this.addNewInv = true;
+    },
+
+    /**
+     * Checks if the current web environment is in development mode.
+     */
+    isDevelopment() {
+      return (process.env.NODE_ENV === 'development')
+    },
+
+    /**
+     * Retrieves the image url link for the given product.
+     * @param product the product to retrieve the image for.
+     * @return a string link to the product image, or the default image if it doesn't have a product.
+     **/
+    getImgUrl(product) {
+      if (product === true && process.env.NODE_ENV !== 'staging') {
+        return '/prod/ProductShoot.jpg';
+      } else if (product === true) {
+        return '/test/ProductShoot.jpg';
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
+        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null) {
+        return product.primaryImagePath.toString().replace("\\", "/")
+      } else {
+        return '../../public/ProductShoot.jpg'
+      }
     },
 
     /**
@@ -329,6 +373,20 @@ export default {
 
 
 <style>
+
+#header-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.image {
+  margin: auto;
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
 #product-name {
   grid-row: 1;
   grid-column: 2;

@@ -186,6 +186,9 @@ export default {
       this.getBusinessInventory();
     },
 
+    /**
+     * Checks if the current web environment is in development mode.
+     */
     isDevelopment() {
       return (process.env.NODE_ENV === 'development')
     },

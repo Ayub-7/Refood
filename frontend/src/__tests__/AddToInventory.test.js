@@ -155,6 +155,14 @@ describe('Component', () => {
         expect(wrapper.vm.product).toBe(mockProduct);
     });
 
+    test("Product image url is retrieved", () => {
+        let url = wrapper.vm.getImgUrl(wrapper.vm.product);
+        expect(url).toBeTruthy();
+    });
 
-
+    test("Default image product url is retrieved", () => {
+        let emptyProduct = {primaryImagePath: null};
+        let url = wrapper.vm.getImgUrl(emptyProduct);
+        expect(url).toBe('../../public/ProductShoot.jpg');
+    });
 });
