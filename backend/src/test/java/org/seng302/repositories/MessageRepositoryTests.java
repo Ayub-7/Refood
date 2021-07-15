@@ -1,6 +1,7 @@
 package org.seng302.repositories;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
-public class MessageRepositoryTests {
+class MessageRepositoryTests {
 
     @Autowired
     private MessageRepository messageRepository;
@@ -74,6 +75,30 @@ public class MessageRepositoryTests {
 
         testMessage1 = new Message(testSender1, testReceiver1, testCard1, "Message description 1", date);
         testMessage2 = new Message(testSender2, testReceiver2, testCard2, "Message description 2", date);
+    }
 
+    /**
+     * Test findMessageById Expects that:
+     * The previously saved testMessages are
+     * returned by findMessageById(testMessages.id)
+     */
+    @Test
+    void findMessageByIdExpectsEquals() {
+        Message message1 = messageRepository.findMessageById(testMessage1.getId());
+        assertThat(message1).isEqualTo(testMessage1);
+        Message message2 = messageRepository.findMessageById(testMessage2.getId());
+        assertThat(message2).isEqualTo(testMessage2);
+    }
+
+    /**
+     * Test deleteMessageById Expects that:
+     * The sent message is
+     * deleted by deleteMessageById(testMessage1.id)
+     */
+    @Test
+    void deleteMessageByIdExpectsNullObject() {
+        messageRepository.deleteMessageById(testMessage1.getId());
+        Message message1 = messageRepository.findMessageById(testMessage1.getId());
+        assertThat(message1).isNull();
     }
 }
