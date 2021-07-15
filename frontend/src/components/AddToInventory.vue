@@ -126,7 +126,7 @@ export default {
       this.invenForm.sellBy = '';
       this.invenForm.bestBefore = '';
       this.invenForm.manufactureDate = '';
-      this.invenForm.sellBy = '';
+      this.invenForm.listExpiry = '';
       this.invenForm.quantity = 1;
 
       this.product = product;
