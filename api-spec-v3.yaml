@@ -1198,7 +1198,40 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
-
+    post:
+      tags:
+        - 'UCM8: Contacting other marketplace users'
+        - 'Users'
+      summary: Send a message to a specific user
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: User ID
+          schema:
+            type: integer
+          required: true
+          example: 5
+      responses:
+        '201':
+          description: Post successful, message has been sent to the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Returned if a user who is not a GAA tries to send a message from somebody else.
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
   '/messages/{id}':
     delete:
       tags:
