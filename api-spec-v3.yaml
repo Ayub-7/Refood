@@ -994,7 +994,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
-          description: 'Forbidden: Returned when a user tries to update a card they do not own ABD the user is not a global application admin'
+          description: 'Forbidden: Returned when a user tries to update a card they do not own AND the user is not a global application admin'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
