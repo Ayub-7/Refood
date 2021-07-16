@@ -14,7 +14,9 @@
     <vs-divider></vs-divider>
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>
-      <vs-button class="card-modal-message-button" @click="messaging=true" v-if="messaging==false">Message</vs-button>
+
+      <vs-button class="card-modal-edit-button" v-if="userId === selectedCard.user.id">Edit Card</vs-button>
+      <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=false" v-else>Cancel</vs-button>
     </div>
 
@@ -25,11 +27,12 @@
     </div>
     </transition>
 
-
   </vs-popup>
 </template>
 
 <script>
+import api from "../Api.js";
+
 export default {
   name: "CardModal",
   props: ['selectedCard'],
@@ -37,7 +40,9 @@ export default {
     return {
       showing: false,
       messaging: false,
-      message: ''
+      message: '',
+
+      userId: -1,
     }
   },
   methods:
@@ -48,7 +53,9 @@ export default {
         openModal: function() {
           this.resetState();
           this.showing = true;
+          this.getCurrentUserId();
         },
+
         /**
          * Converts seconds to date
          */
@@ -66,6 +73,19 @@ export default {
           console.log("Implement Me", cardId, message);
         },
 
+        /**
+         * Retrieves and sets the userId to the current user.
+         * Used to determine if the owner of the card is the current user.
+         */
+        getCurrentUserId: function() {
+          api.checkSession()
+            .then((res) => {
+              this.userId = res.data.id;
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+            });
+        },
 
         /**
          * Resets state of messaging information
@@ -120,9 +140,10 @@ export default {
   top: 7px;
 }
 
-.card-modal-message-button {
+.card-modal-message-button, .card-modal-edit-button {
   flex: 0%;
 }
+
 
 #card-modal-message {
   margin-top: 10px;
