@@ -177,28 +177,28 @@ describe('Check user sessions', () => {
    });
 });
 
-// describe('Creating business', () => {
-//    test("Successful", async () => {
-//        wrapper.vm.businessName = "Refood Pizzas";
-//        wrapper.vm.description = "We make Uni's cheapest pizza";
-//        wrapper.vm.businessType = "Accommodation and Food Services";
-//        await wrapper.vm.createBusinessInfo();
-//        expect(wrapper.vm.$router.push).toBeCalled();
-//    });
-//
-//    test("Unsuccessful", async () => {
-//        api.createBusiness = jest.fn(() => {
-//            return Promise.reject(new Error("Bad request")).catch();
-//        });
-//        await wrapper.vm.createBusinessInfo();
-//        expect(wrapper.vm.$log.debug).toBeCalled();
-//    });
-// });
-//
-// describe("Get user info", () => {
-//    test("Successful", async () => {
-//        await wrapper.vm.getUserInfo(5);
-//        expect(wrapper.vm.user).toEqual(mockUser);
-//    })
-// });
+describe('Creating business', () => {
+   test("Successful", async () => {
+       wrapper.vm.businessName = "Refood Pizzas";
+       wrapper.vm.description = "We make Uni's cheapest pizza";
+       wrapper.vm.businessType = "Accommodation and Food Services";
+       await wrapper.vm.createBusinessInfo();
+       expect(wrapper.vm.$router.push).toBeCalled();
+   });
+
+   test("Unsuccessful", async () => {
+       api.createBusiness = jest.fn(() => {
+           return Promise.reject(new Error("Bad request")).catch();
+       });
+       await wrapper.vm.createBusinessInfo();
+       expect(wrapper.vm.$log.debug).toBeCalled();
+   });
+});
+
+describe("Get user info", () => {
+   test("Successful", async () => {
+       await wrapper.vm.getUserInfo(5);
+       expect(wrapper.vm.user).toEqual(mockUser);
+   })
+});
 
