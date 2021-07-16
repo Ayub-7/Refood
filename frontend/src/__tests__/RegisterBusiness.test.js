@@ -80,9 +80,6 @@ let mockBusinessAddress = {
     country: "New Zealand",
     postcode: 6969,
 };
-api.createBusiness = jest.fn(() => {
-    return Promise.resolve({data: mockBusiness, status: 200});
-});
 api.actAsBusiness = jest.fn(() => {
     return Promise.resolve({status: 200});
 });
@@ -179,6 +176,9 @@ describe('Check user sessions', () => {
 
 describe('Creating business', () => {
    test("Successful", async () => {
+       api.createBusiness = jest.fn(() => {
+           return Promise.resolve({data: mockBusiness, status: 200});
+       });
        wrapper.vm.businessName = "Refood Pizzas";
        wrapper.vm.description = "We make Uni's cheapest pizza";
        wrapper.vm.businessType = "Accommodation and Food Services";
