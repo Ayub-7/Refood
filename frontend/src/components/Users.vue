@@ -5,7 +5,7 @@
       <!-- Far left side options menu-->
       <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <vs-button class="options-card" id="option-view-activity" @click="openMarketModal()">Marketplace Cards</vs-button>
+        <vs-button class="options-card" id="option-view-cards" @click="openMarketModal()">Marketplace Cards</vs-button>
         <vs-button class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
       </div>
 
@@ -197,11 +197,13 @@ const Users = {
           this.closeModal();
         })
         .catch((error) => {
-          if (error.response.status === 400) {
-            this.$vs.notify({title:`Failed to add user to ${this.selectedBusiness.name}`, text:`${this.user.firstName} is already an administrator.`, color:'danger'});
-          }
-          else {
-            throw new Error(`Error trying to add user to business: ${error.response.status}`);
+          if (error.response) {
+            if (error.response.status === 400) {
+              this.$vs.notify({title:`Failed to add user to ${this.selectedBusiness.name}`, text:`${this.user.firstName} is already an administrator.`, color:'danger'});
+            }
+            else {
+              throw new Error(`Error trying to add user to business: ${error.response.status}`);
+            }
           }
         });
     },
@@ -240,13 +242,15 @@ const Users = {
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
           this.showOptionsMenu();
         }).catch((err) => {
-          if (err.response.status === 401) {
-            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-            this.$router.push({path: "/login"}); //If user not logged in send to login page
-          }
-          else if (err.response.status === 406) {
-            this.$vs.notify({title:'User not found', text:'This user does not exist.', color:'danger'});
-            this.$router.push({path: "/home"}); //If user is logged in, but non-existent user
+          if (err.response) {
+            if (err.response.status === 401) {
+              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+              this.$router.push({path: "/login"}); //If user not logged in send to login page
+            }
+            else if (err.response.status === 406) {
+              this.$vs.notify({title:'User not found', text:'This user does not exist.', color:'danger'});
+              this.$router.push({path: "/home"}); //If user is logged in, but non-existent user
+            }
           }
           throw new Error(`Error trying to get user info from id: ${err}`);
       });
@@ -282,7 +286,7 @@ export default Users;
   z-index: 100;
 }
 
-#option-view-activity {
+#option-view-cards {
   padding-left: 0;
   padding-right: 0;
 }
