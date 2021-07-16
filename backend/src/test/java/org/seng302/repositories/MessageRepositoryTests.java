@@ -34,9 +34,6 @@ class MessageRepositoryTests {
 
     private Message testMessage1;
     private Message testMessage2;
-    private Card testCard1;
-    private Card testCard2;
-    private String keywords;
 
     @BeforeEach
     void setUp() throws NoSuchAlgorithmException, ValidationException {
@@ -57,24 +54,24 @@ class MessageRepositoryTests {
         User testSender2 = new User("Morticia", "YEP", "Addams","Mort", "Mother","motherofmych1ldren@addamsfam.com","1927-05-06","+86 123 456 7890",a2, "HGD0nAJNjSD");
         User testReceiver1 = new User("Pugsley", "YEP", "Addams","Pugs", "Son","littled3mon@addamsfam.com","1969-08-10","+86 123 456 7890",a3, "zWkb3AeLn3ld");
         User testReceiver2 = new User("Wednesday", "YEP", "Addams","Wed", "Daughter","crossb0w@addamsfam.com","1959-06-05","+86 123 456 7890",a4, "HGD0nAJNjSC");
-
         userRepository.save(testSender1);
         userRepository.save(testSender2);
         userRepository.save(testReceiver1);
         userRepository.save(testReceiver2);
 
-        keywords = "card, test, asdf";
+        String keywords = "card, test, asdf";
         NewCardRequest newCardRequest1 = new NewCardRequest(1, "Card title 1", "Card description 1", keywords, MarketplaceSection.FORSALE);
         NewCardRequest newCardRequest2 = new NewCardRequest(2, "Card title 2", "Card description 2", keywords, MarketplaceSection.FORSALE);
-        testCard1 = new Card(newCardRequest1, testReceiver1);
+        Card testCard1 = new Card(newCardRequest1, testReceiver1);
+        Card testCard2 = new Card(newCardRequest2, testReceiver2);
         cardRepository.save(testCard1);
-        testCard2 = new Card(newCardRequest2, testReceiver2);
         cardRepository.save(testCard2);
 
         Date date = new Date();
-
         testMessage1 = new Message(testSender1, testReceiver1, testCard1, "Message description 1", date);
         testMessage2 = new Message(testSender2, testReceiver2, testCard2, "Message description 2", date);
+        messageRepository.save(testMessage1);
+        messageRepository.save(testMessage2);
     }
 
     /**
