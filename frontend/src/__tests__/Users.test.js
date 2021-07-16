@@ -102,7 +102,7 @@ beforeEach(() => {
         localVue,
         router,
         propsData: {},
-        mocks: {$route, store, $vs},
+        mocks: {store, $vs},
         stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         

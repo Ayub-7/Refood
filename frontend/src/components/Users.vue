@@ -240,8 +240,8 @@ const Users = {
           }
           this.user = response.data;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-          this.showOptionsMenu();
-        }).catch((err) => {
+        })
+        .catch((err) => {
           if (err.response) {
             if (err.response.status === 401) {
               this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
