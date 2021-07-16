@@ -134,6 +134,19 @@ class CardRepositoryTests {
     }
 
     /**
+     * test deleteCardId Expects that
+     * the previously saved testCard is
+     *
+     * deleted by deleteCardById(testCard.id)
+     */
+    @Test
+    public void deleteCardByIdExpectsEmptyList() {
+        cardRepository.deleteCardById(testCard1.getId());
+        Card card1 = cardRepository.findCardById(testCard1.getId());
+        assertThat(card1).isEqualTo(null);
+    }
+
+    /**
      * Test that expects the card repository method findAllByDisplayPeriodEndBefore(Date)
      * returns all the expired cards.
      */
