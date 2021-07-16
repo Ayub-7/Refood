@@ -28,7 +28,6 @@ public class ListingController {
 
     @Autowired private BusinessRepository businessRepository;
 
-
     @Autowired
     private ListingRepository listingRepository;
 
