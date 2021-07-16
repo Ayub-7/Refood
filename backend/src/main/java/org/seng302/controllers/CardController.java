@@ -36,7 +36,7 @@ public class CardController {
     private static final Logger logger = LogManager.getLogger(CardController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private UserRepository userRepository;
+    @Autowired
     private CardRepository cardRepository;
 
     @Autowired
