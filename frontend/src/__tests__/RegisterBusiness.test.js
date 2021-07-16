@@ -9,11 +9,11 @@ const localVue = createLocalVue();
 localVue.use(Vuesax);
 
 api.createBusiness = jest.fn(() => {
-    return Promise.resolve({message:"test", data: mockBusiness, status: 200});
+    return Promise.resolve({data: mockBusiness, status: 200}).catch({message: "Error", status: 400});
 });
 
 api.actAsBusiness = jest.fn(() => {
-    return Promise.resolve({status: 200});
+    return Promise.resolve({status: 200}).reject({message: "Error", status: 400});
 });
 
 api.getUserFromID = jest.fn(() => {
@@ -187,10 +187,10 @@ describe('Creating business', () => {
        expect(wrapper.vm.$router.push).toBeCalled();
    });
 
-   // test("Unsuccessful", async () => {
-   //     await wrapper.vm.createBusinessInfo();
-   //     expect(wrapper.vm.$log.debug).toBeCalled();
-   // });
+   test("Unsuccessful", async () => {
+       await wrapper.vm.createBusinessInfo();
+       expect(wrapper.vm.$log.debug).toBeCalled();
+   });
 });
 
 describe("Get user info", () => {
