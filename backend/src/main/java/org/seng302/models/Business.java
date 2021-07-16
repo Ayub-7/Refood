@@ -9,6 +9,7 @@ import org.seng302.utilities.serializers.PrimaryAdministratorSerializer;
 
 import javax.persistence.*;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name") // Forces any nested business objects to only use name to prevent recursion.
 @JsonPropertyOrder({"id", "administrators", "name", "primaryAdministratorId"}) // force json property order to match api.
-public class Business {
+public class Business implements Serializable {
 
     public static final String BUSINESS_SESSION_ATTRIBUTE = "business";
 
