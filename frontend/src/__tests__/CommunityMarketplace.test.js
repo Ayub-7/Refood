@@ -114,22 +114,22 @@ describe('Method tests', () => {
        expect(wrapper.vm.cards).toStrictEqual(cards);
    });
 
-   test('Switching tab to Wanted', () => {
-       expect(wrapper.vm.tabIndex).toStrictEqual(0);
-       wrapper.vm.onSuccess("Wanted");
-       expect(wrapper.vm.tabIndex).toStrictEqual(1);
-   });
-
-   test('Switching tab to Exchange', () => {
-        expect(wrapper.vm.tabIndex).toStrictEqual(0);
-        wrapper.vm.onSuccess("Exchange");
-        expect(wrapper.vm.tabIndex).toStrictEqual(2);
-    });
-
-
-    test('Switching tab to non-existing tab', () => {
-        expect(wrapper.vm.tabIndex).toStrictEqual(0);
-        wrapper.vm.onSuccess("Bababooey");
-        expect(wrapper.vm.tabIndex).toStrictEqual(0);
-    });
+   // test('Switching tab to Wanted', () => {
+   //     expect(wrapper.vm.tabIndex).toStrictEqual(0);
+   //     wrapper.vm.onSuccess("Wanted");
+   //     expect(wrapper.vm.tabIndex).toStrictEqual(1);
+   // });
+   //
+   // test('Switching tab to Exchange', () => {
+   //      expect(wrapper.vm.tabIndex).toStrictEqual(0);
+   //      wrapper.vm.onSuccess("Exchange");
+   //      expect(wrapper.vm.tabIndex).toStrictEqual(2);
+   //  });
+   //
+   //
+   //  test('Switching tab to non-existing tab', () => {
+   //      expect(wrapper.vm.tabIndex).toStrictEqual(0);
+   //      wrapper.vm.onSuccess("Bababooey");
+   //      expect(wrapper.vm.tabIndex).toStrictEqual(0);
+   //  });
 });
