@@ -80,9 +80,13 @@ let mockBusinessAddress = {
     country: "New Zealand",
     postcode: 6969,
 };
+
+jest.mock("../Api.js", () => jest.fn);
+
 api.actAsBusiness = jest.fn(() => {
     return Promise.resolve({status: 200});
 });
+
 api.getUserFromID = jest.fn(() => {
     return Promise.resolve({data: mockUser, status: 200});
 });
