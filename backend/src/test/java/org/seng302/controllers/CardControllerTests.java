@@ -4,6 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.With;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -295,14 +297,14 @@ class CardControllerTests {
     }
 
     @Test
-   void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
+    public void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
         mvc.perform(delete("/cards/{cardId}", card.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-   void testDeleteCard_wrongCreatorId_returnForbidden() throws Exception {
+    public void testDeleteCard_wrongCreatorId_returnForbidden() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(delete("/cards/{cardId}", card.getId())
@@ -312,23 +314,11 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-   void testDeleteCard_asCreator() throws Exception {
+    public void testDeleteCard_asCreator() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(delete("/cards/{cardId}", card.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser
-   void testDeleteCard_asDGAA() throws Exception {
-        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
-
-        anotherUser.setRole(Role.DGAA);
-
-        mvc.perform(delete("/cards/{cardId}", card.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
                 .andExpect(status().isOk());
     }
 
@@ -343,7 +333,7 @@ class CardControllerTests {
     }
 
     @Test
-   void testExtendCard_noAuth_returnUnauthorized() throws Exception {
+    public void testExtendCard_noAuth_returnUnauthorized() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId()))
@@ -353,7 +343,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-   void testExtendCard_isGAA_returnOk() throws Exception {
+    public void testExtendCard_isGAA_returnOk() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
@@ -365,7 +355,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-   void testExtendCard_isCreator_returnOk() throws Exception {
+    public void testExtendCard_isCreator_returnOk() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId())
@@ -375,7 +365,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-   void testExtendCard_notCreatorOrGAA_returnForbidden() throws Exception {
+    public void testExtendCard_notCreatorOrGAA_returnForbidden() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId())
@@ -385,7 +375,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-   void testExtendCard_IdNotExist_returnUnacceptable() throws Exception {
+    public void testExtendCard_IdNotExist_returnUnacceptable() throws Exception {
         //If no card found repository will give null
         Mockito.when(cardRepository.findCardById(999)).thenReturn(null);
 

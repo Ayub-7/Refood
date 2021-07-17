@@ -60,17 +60,4 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      */
     @Transactional
     long deleteCardById(long id);
-
-
-
-    /**
-     * Gets all cards from a specific user
-     *
-     * @param user User that we want to retrieve cards from
-     * @return List<Card> a list of cards created by user
-     */
-    List<Card> findCardsByUser(User user);
-
-
-
 }
