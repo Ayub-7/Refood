@@ -16,7 +16,6 @@
       </div>
       <vs-divider></vs-divider>
 
-
       <div class="title-container">
 
         <div class="title-left" >
@@ -189,12 +188,12 @@ export default {
 
   mounted() {
     api.checkSession()
-        .then(() => {
-          this.getSectionCards("ForSale");
-        })
-        .catch((error) => {
-          this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
-        });
+      .then(() => {
+        this.getSectionCards("ForSale");
+      })
+      .catch((error) => {
+        this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+      });
   }
 
 }

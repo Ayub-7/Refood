@@ -4,8 +4,6 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-        <!-- Add to inventory modal -->
-        <AddToInventory @submitted="onSuccess"></AddToInventory>
       </div>
     </div>
 
@@ -124,12 +122,11 @@
 import axios from "axios";
 import api from "../Api";
 import {store} from "../store";
-import AddToInventory from "./AddToInventory";
 import ModifyInventory from "./ModifyInventory";
 
 export default {
   name: "BusinessInventory",
-  components: {AddToInventory, ModifyInventory},
+  components: {ModifyInventory},
   data: function() {
     return {
       errors: [],
@@ -189,6 +186,9 @@ export default {
       this.getBusinessInventory();
     },
 
+    /**
+     * Checks if the current web environment is in development mode.
+     */
     isDevelopment() {
       return (process.env.NODE_ENV === 'development')
     },
@@ -197,6 +197,7 @@ export default {
       let filteredInventory = this.inventory.filter(item => (item.quantity>0));
       return filteredInventory;
     },
+
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
@@ -339,21 +340,23 @@ export default {
       api.getBusinessInventory(this.$route.params.id)
       .then((response) => {
         this.inventory = response.data;
-        console.log(this.inventory)
+
         for(let inventoryItem of this.inventory) {
           //Issue with sorting using object properties, so pulled required properties into inventory object
           inventoryItem['productName'] = inventoryItem.product.name;
           inventoryItem['productId'] = inventoryItem.product.id;
         }
-
         //Default ordering is product name, so all similar products will be next to each other
         this.inventory = this.inventory.sort((productOne, productTwo) => (productOne.name < productTwo.name) ? 1 : -1)
 
-      }).catch((err) => {
-        if(err.response.status == 401) {
-          this.$router.push({path: '/login'})
-        }
       })
+      .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 401) {
+            this.$router.push({path: '/login'})
+          }
+        }
+      });
     }
   }
 }
@@ -501,6 +504,10 @@ export default {
     white-space: nowrap;
   }
 
+  #table >>> .vs-con-tbody {
+    min-height: 640px;
+  }
+
   #productIdCol {
     font-size: 10px;
   }
@@ -535,7 +542,7 @@ export default {
 
 
   /* ===== INVENTORY ADDING MODAL ===== */
-  #firstColModal {
+  #first-col-modal {
     margin-right: 160px;
     margin-left: 5px;
   }
