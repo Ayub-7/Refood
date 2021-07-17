@@ -3,22 +3,23 @@
         <div>
           <vs-row id="marketRow">
             <!-- Change vs-lg to 2 if you want 6 per row or 3 if you want 4 per row -->
-            <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cardData" :key="card.id">
+            <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cards" :key="card.id">
               <div style="margin: 10px; width: 90%;" @click="openCardModal(card)">
                 <!-- Marketplace Card -->
                 <vs-card>
-                  <div slot="media" id="cardHeader">
-                    <!-- Default image for now -->
-                    <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
-                  </div>
                   <div>
+                    <div id="cardCreationDate">{{card.created}}</div>
+                    <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
+                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{MarketpalceCommon.getGeneralAddress(card.user.homeAddress)}}</div>
+
+
                     <div id="cardTitle">{{card.title}}</div>
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
                     <!-- Keyword display -->
-                      <div id="keywordWrapper">
-                        <div id="cardKeywords"  v-for="keyword in card.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
-                      </div>
+                    <div v-if="card.keywords" id="keywordWrapper">
+                      <div id="cardKeywords"  v-for="keyword in MarketpalceCommon.getKeywords(card.keywords)" :key="keyword.id" >#{{keyword.name}}</div>
+                    </div>
                   </div>
                 </vs-card>
               </div>
@@ -31,17 +32,25 @@
 
 <script>
 import CardModal from './CardModal.vue'
+import MarketpalceCommon from "./MarketpalceCommon.js";
 
 export default {
-  data: function() {
+  props: ['cardData'],
+  data: function () {
     return {
+      cards: this.cardData,
       selectedCard: null,
+      MarketpalceCommon
     }
   },
   components: {
     CardModal
   },
-  props: ['cardData'],
+  watch: {
+    "cardData": function(val) {
+      this.cards = MarketpalceCommon.checkCardList(val);
+    }
+  },
   methods: {
     /**
      * Method for opening card modal, calls method in child component to open modal
@@ -49,8 +58,8 @@ export default {
     openCardModal: function(card) {
       this.selectedCard = card;
       this.$refs.cardModal.openModal();
-    }
-  }
+    },
+  },
 }
 
 
@@ -65,6 +74,22 @@ export default {
   height: auto;
 }
 
+#cardCreationDate {
+  font-weight: lighter;
+  font-size: 10px;
+  height: 20px;
+}
+
+#cardUserName {
+  font-size: 10px;
+  height: 15px;
+}
+
+#cardUserAddress {
+  font-size: 10px;
+  height: 40px;
+}
+
 #cardTitle {
   font-weight: bold;
   font-size: 17px;
@@ -75,7 +100,6 @@ export default {
   margin-top: 10px;
   height: 120px;
   overflow-y: auto;
-
 }
 
 #cardKeywords {

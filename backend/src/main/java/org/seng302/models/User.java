@@ -7,6 +7,7 @@ import org.seng302.models.requests.NewUserRequest;
 import org.seng302.utilities.Encrypter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id") // Forces any nested user objects to only use id to prevent recursion.
-public class User {
+public class User implements Serializable {
 
     public static final String USER_SESSION_ATTRIBUTE = "user";
 

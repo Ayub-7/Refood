@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "33da9456-73c4-40c5-bec4-6861f837ba43",
+		"_postman_id": "35200976-f8fc-462a-8a73-ea2b20c0746d",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -523,6 +523,63 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Cards",
+			"item": [
+				{
+					"name": "Get Expired Cards",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/cards/notifications",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"cards",
+								"notifications"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Expired Cards (invalid)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/cards/notifications",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"cards",
+								"notifications"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -547,12 +604,10 @@
 	],
 	"variable": [
 		{
-			"id": "1cf6c4b4-84d8-41fa-a19d-a5067d1f9041",
 			"key": "URL",
 			"value": "localhost:9499"
 		},
 		{
-			"id": "63463b7c-45f2-402e-a1b9-30c81ed1d55d",
 			"key": "userId",
 			"value": ""
 		}

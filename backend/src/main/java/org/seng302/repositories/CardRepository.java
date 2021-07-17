@@ -4,9 +4,11 @@ import org.seng302.models.Card;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.transaction.annotation.Transactional;
+
+import javax.transaction.Transactional;
 import org.seng302.models.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,6 +43,15 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      */
     List<Card> findAllBySection(MarketplaceSection section);
 
+    List<Card> findAllByDisplayPeriodEndBefore(Date date);
+
+    /**
+     * Gets all cards from a specific user
+     *
+     * @param user User that we want to retrieve cards from
+     * @return List<Card> a list of cards created by user
+     */
+    List<Card> findCardsByUser(User user);
     /**
      * Delete a Card by it's ID
      *

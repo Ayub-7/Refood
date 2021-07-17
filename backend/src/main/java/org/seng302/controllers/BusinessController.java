@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.finders.BusinessFinder;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RestController
 public class BusinessController {
@@ -33,6 +35,9 @@ public class BusinessController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BusinessFinder businessFinder;
 
     /**
      * Get request mapping for getting business by id
@@ -181,11 +186,43 @@ public class BusinessController {
     @GetMapping("/checkbusinesssession")
     public ResponseEntity<Business> checkBusinessSession(HttpSession session) {
         Business business = (Business) session.getAttribute("business");
-        if(business != null){
+        if (business != null) {
             return ResponseEntity.status(HttpStatus.OK).body(business);
         } else {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(business);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+        }
+    }
+
+    /**
+     * Searches for businesses, with credintials
+     * @param query A string with the search's query
+     * @return Http status code and list of businesses with name/names matching request.
+     */
+    @GetMapping("/businesses/search")
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
+        logger.debug("Searching for businesses...");
+        List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query));
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
+    }
+
+
+    /**
+     * Sets businesses administered to null for each admin, there is an issue with how our backend serializes business objects and if it encountered
+     * a business object inside there it would replace every other instance of that object with the business name
+     * @param businesses List of businesses that needs businessesAdministered removed
+     * @return List of businesses with businessesAdministered field set to null
+     */
+    private List<Business> removeBusinessesAdministered(List<Business> businesses) {
+        logger.debug("Removing businessesAdministered...");
+        for(Business business: businesses) {
+            List<User> admins = business.getAdministrators();
+            for(User admin: admins) {
+                admin.setBusinessesAdministered(null);
+            }
         }
 
+        logger.debug("businessesAdministered removed");
+        return businesses;
     }
 }

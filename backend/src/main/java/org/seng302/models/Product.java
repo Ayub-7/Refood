@@ -91,6 +91,7 @@ public class Product {
                 break;
             }
         }
+        assert removeImage != null;
         String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("business_"));
         if ((primaryPath.equals(this.primaryImagePath.replace("/", "\\")) && System.getProperty("os.name").startsWith("Windows")) || primaryPath.equals(this.primaryImagePath)) {
             if (this.images.size() > 0) {
