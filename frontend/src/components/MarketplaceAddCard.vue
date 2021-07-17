@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import api from "../Api";
+
 export default {
 
 
@@ -60,6 +62,8 @@ export default {
                 {key:'Wanted', value:'Wanted'},
                 {key:'Exchange', value: 'Exchange'}
             ],
+            userSession: null,
+            id: null,
             section: null,
             title: '',
             description: '',
@@ -71,73 +75,117 @@ export default {
 
 
     methods: {
-        remove(item) {
-          this.keywordList.splice(this.keywordList.indexOf(item), 1)
-        },
+      remove(item) {
+        this.keywordList.splice(this.keywordList.indexOf(item), 1)
+      },
+      /**
+       * Preconditions: User clicks add to inventory button
+       * Postconditions:
+       **/
+      checkForm(){
+        this.keywords= '';
+        for(let i = 0; i < this.keywordList.length; i++){
+          this.keywords += this.keywordList[i] + " ";
+        }
+        this.errors = [];
+
+        if (this.section === null) {
+          this.errors.push('no-section');
+        }
+
+        if (this.title.length <= 2) {
+          this.errors.push('no-title');
+        }
+
+
+        if (this.title.length > 50){
+          this.errors.push('long-title');
+        }
+
+        if (this.errors.includes('no-section')) {
+          this.$vs.notify({
+            title: 'Failed to add card',
+            text: 'Section is Required.',
+            color: 'danger'
+          });
+        }
+        if (this.errors.includes('no-title')) {
+          this.$vs.notify({
+            title: 'Failed to add card',
+            text: 'Title is required or is too short',
+            color: 'danger'
+          });
+        }
+
+        if (this.errors.includes('long-title')) {
+          this.$vs.notify({
+            title: 'Failed to add card',
+            text: 'Title exceeds max length',
+            color: 'danger'
+          });
+        }
+        if (this.errors.length > 0) {
+          return false;
+        }
+        return true;
+      },
+
+      /**
+       * Creates a new card. of type:
+       * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+       *
+       * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+       * 400 if there are errors with data, 201 otherwise
+
+       */
+      addToMarketplace() {
+        if (this.checkForm()) {
+          api.createCard(this.id, this.title, this.description, this.keywords, this.section)
+              .then((res) => {
+                this.$vs.notify({title: 'Success', text: `created new card: ${res.data.cardId}`, color: 'success'});
+                this.$emit('submitted', this.section);
+
+              })
+              .catch((error) => {
+                let errormsg = "ERROR creating new card: ";
+                if (error) {
+                  if (error.response) {
+                    if (error.response.status === 401 || error.response.status === 403) {
+                      this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                    }
+
+                    if (error.response.status === 400) {
+                      this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                    }
+                  } else {
+                    this.$vs.notify({
+                      title: 'Error',
+                      text: 'ERROR trying to obtain user info from session:',
+                      color: 'danger'
+                    });
+                  }
+                }
+              });
+          this.closeModal();
+        }
+      },
+
+      /**
+       * obtains the user's account details to create a new card.
+       */
+      getSession() {
+        api.checkSession()
+            .then((response) => {
+              this.userSession = response.data;
+              this.id = response.data.id;
+            })
+            .catch((error) => {
+              this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+              this.$log.error("Error checking sessions: " + error);
+            });
+      },
+
         /**
-         * Preconditions: User clicks add to inventory button
-         * Postconditions:
-         **/
-        checkForm(){
-          this.keywords= '';
-          for(let i = 0; i < this.keywordList.length; i++){
-            this.keywords += this.keywordList[i] + " ";
-          }
-          this.errors = [];
-
-          if (this.section === null) {
-            this.errors.push('no-section');
-          }
-
-          if (this.title === '') {
-            this.errors.push('no-title');
-          }
-
-
-          if (this.title.length > 50){
-            this.errors.push('long-title');
-          }
-
-          if (this.errors.includes('no-section')) {
-            this.$vs.notify({
-              title: 'Failed to add card',
-              text: 'Section is Required.',
-              color: 'danger'
-            });
-          }
-          if (this.errors.includes('no-title')) {
-            this.$vs.notify({
-              title: 'Failed to add card',
-              text: 'Title is required',
-              color: 'danger'
-            });
-          }
-
-          if (this.errors.includes('long-title')) {
-            this.$vs.notify({
-              title: 'Failed to add card',
-              text: 'Title exceeds max length',
-              color: 'danger'
-            });
-          }
-          if (this.errors.length > 0) {
-            return false;
-          }
-          return true;
-        },
-
-
-        /** 
-        * Template for POST request method
-        */
-        addToMarketplace() {
-          if (this.checkForm()) {
-            console.log(this.section, this.title, this.description, this.keywords);
-            this.closeModal();
-          }
-        },
-
-        /** 
         * Closes modal by setting showing to false (which is linked to Card :active-sync)
         */
         closeModal() {
@@ -148,8 +196,10 @@ export default {
         * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
         */
         openModal() {
-            this.resetData();
-            this.showing = true;
+          this.resetData();
+          this.getSession();
+
+          this.showing = true;
         },
 
         /**
@@ -161,6 +211,7 @@ export default {
             this.title = '';
             this.description = '';
             this.keywords = '';
+            this.keywordList = [];
         }
     }
 }

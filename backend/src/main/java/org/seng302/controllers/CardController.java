@@ -4,21 +4,28 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.models.Card;
-import org.seng302.models.MarketplaceSection;
-import org.seng302.models.Role;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
+import java.text.MessageFormat;
+import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
 
 /**
  * Controller class that handles the endpoints of community marketplace cards.
@@ -31,6 +38,18 @@ public class CardController {
 
     @Autowired
     private CardRepository cardRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    public CardController(UserRepository userRepository, CardRepository cardRepository) {
+        this.userRepository = userRepository;
+        this.cardRepository = cardRepository;
+    }
 
 
     /**
@@ -107,6 +126,68 @@ public class CardController {
     }
 
     /**
+     * GET endpoint, retrieves all the expired cards of a user and
+     * sends expired card notifications to the frontend to be displayed on the users home page feed.
+     * @param userId
+     * @return A list of notifications and code 200, 401 or 403.
+     * @throws JsonProcessingException
+     */
+    @GetMapping("/users/{userId}/cards/notifications")
+    public ResponseEntity<String> getExpiredCards (@PathVariable Long userId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (currentUser.getId() != userId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<Notification> notifications = notificationRepository.findNotificationsByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
+    }
+
+    /**
+     * Checks for expired cards and creates notification objects for each expired card without a current notification.
+     * Function is run every 10 minutes.
+     */
+    @Scheduled(fixedDelay = 600000, initialDelay = 0)
+    private void updateExpiredCards() {
+        logger.info("Checking for expired cards");
+        Date date = new Date();
+        List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
+        for (Card card: expiredCards) {
+            Notification exists = notificationRepository.findNotificationByCardId(card.getId());
+            if (exists == null) {
+                Long userId = card.getUser().getId();
+                Long cardId = card.getId();
+                String title = card.getTitle();
+                Date displayPeriodEnd = card.getDisplayPeriodEnd();
+                Notification notification = new Notification(userId, cardId, title, displayPeriodEnd);
+                notificationRepository.save(notification);
+            }
+        }
+        int repositorySize = notificationRepository.findAll().size();
+        String message = MessageFormat.format("Number of expired cards: {0}", repositorySize);
+        logger.info(message);
+    }
+
+    /**
+     * GET endpoint, returns detailed information about a cards belonging to a specific User
+     *
+     * Preconditions: User ID given is for a user that exists
+     * Postconditions: All cards belonging to the user are returned
+     *
+     * @param userId ID of user whose cards we want to retrieve
+     * @return 200 if valid user, 400 if bad formatted ID, 401 if unauthorized, 406 if user doesn't exist
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @GetMapping("/users/{userId}/cards")
+    public ResponseEntity<String> getUserCards (@PathVariable Long userId) throws JsonProcessingException {
+        User user = userRepository.findUserById(userId);
+        if (user == null) return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+
+        List<Card> cards = cardRepository.findCardsByUser(user);
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(cards));
+    }
+
+    /**
      * PUT endpoint, extends cards display period by two weeks
      *
      * Preconditions: User must be logged in, User must be the creator of the card, the card must exist
@@ -166,6 +247,5 @@ public class CardController {
         cardRepository.deleteCardById(cardId);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
-
 
 }
