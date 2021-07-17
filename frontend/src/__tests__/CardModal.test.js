@@ -132,4 +132,25 @@ describe('Card modal UI', () => {
         expect(wrapper.find("#card-modal-message")).toBeTruthy();
     });
 
+    test('User is not the owner - successfully shows message button', () => {
+        api.checkSession = jest.fn(() => {
+           return Promise.resolve({status: 200, data: {id: 2}});
+        });
+
+        wrapper.vm.getCurrentUserId();
+
+        expect(wrapper.find(".card-modal-message-button")).toBeTruthy();
+    });
+
+    test('User is card owner - successfully shows edit button', () => {
+        api.checkSession = jest.fn(() => {
+            return Promise.resolve({status: 200, data: {id: 1}});
+        });
+
+        wrapper.vm.getCurrentUserId();
+
+        expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
+
+    });
+
 });
