@@ -145,9 +145,9 @@ public class CardController {
      * Checks for expired cards and creates notification objects for each expired card without a current notification.
      * Function is run every 10 minutes.
      *
-     * 600000
+     *
      */
-    @Scheduled(fixedDelay = 5000, initialDelay = 0)
+    @Scheduled(fixedDelay = 600000, initialDelay = 0)
     private void updateExpiredCards() {
         logger.info("Checking for expired cards");
         Date date = new Date();
