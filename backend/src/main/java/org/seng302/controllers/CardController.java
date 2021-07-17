@@ -11,7 +11,6 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,6 @@ import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
 
 /**
  * Controller class that handles the endpoints of community marketplace cards.

@@ -88,7 +88,7 @@ public class ProductController {
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList<Object> checkProduct = isValidProduct(req, business, true);
+                ArrayList<Object> checkProduct = isValidProduct(req, business);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if (isValid) {
@@ -127,7 +127,7 @@ public class ProductController {
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList<Object> checkProduct = isValidProductPut(req, business, false);
+                ArrayList<Object> checkProduct = isValidProductPut(req);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
@@ -144,11 +144,9 @@ public class ProductController {
      * Checks the product request body to ensure all fields are valid
      * @param product The product to be created, includes id, name, description and price
      * @param business The business that is creating the product
-     * @param isPosting Since PUT request checking is being run through this function,
-     *                  it shouldn't check the PUT request for duplicate IDs
      * @return True if all fields are valid, otherwise false
      */
-    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business, Boolean isPosting) {
+    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business) {
         boolean isValid = true;
         String errorMessage = null;
 
@@ -172,7 +170,12 @@ public class ProductController {
         return returnObjects;
     }
 
-    private ArrayList<Object> isValidProductPut(NewProductRequest product, Business business, Boolean isPosting) {
+    /**
+     * Checks the product update request body to ensure all fields are valid.
+     * @param product the updated product details
+     * @return an array with the first element indicating if it it's valid, and a second element with an error message (if any).
+     */
+    private ArrayList<Object> isValidProductPut(NewProductRequest product) {
             boolean isValid = true;
             String errorMessage = null;
 

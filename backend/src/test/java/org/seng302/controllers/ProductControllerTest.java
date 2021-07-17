@@ -204,7 +204,18 @@ class ProductControllerTest {
 
     }
 
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostProductNonExistentBusiness() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
 
+        mvc.perform(post("/businesses/{id}/products", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(product1)))
+                .andExpect(status().isNotAcceptable());
+
+    }
 
     @Test
     @WithMockUser(roles="USER")

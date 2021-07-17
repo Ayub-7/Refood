@@ -51,8 +51,6 @@ class CardControllerTests {
     private User testUser;
     private User anotherUser;
     private NewCardRequest cardRequest;
-    private Card card1;
-    private Card card2;
     private Card card;
     private Address addr;
     private Notification notification;
@@ -384,7 +382,6 @@ class CardControllerTests {
                 .andExpect(status().isNotAcceptable());
     }
 
-
     @Test
     @WithMockUser
     public void testDeleteCard_asDGAA() throws Exception {
@@ -395,5 +392,87 @@ class CardControllerTests {
         mvc.perform(delete("/cards/{cardId}", card.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
                 .andExpect(status().isOk());
+    }
+
+    //
+    // PUT /cards/{id}
+    //
+    @Test
+    public void testEditCard_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(put("/cards/{id}", card.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_validEdit_returnOk() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser()
+    public void testEditCard_asGlobalAdmin_returnOk() throws Exception {
+        testUser.setRole(Role.GAA);
+        card.setUser(anotherUser);
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_noTitle_returnBadRequest() throws Exception {
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), null, card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_noSection_returnBadRequest() throws Exception {
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", null);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_notCardOwner_returnForbidden() throws Exception {
+        card.setUser(anotherUser);
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_noCardWithId_returnNotAcceptable() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
     }
 }
