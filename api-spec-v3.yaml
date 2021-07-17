@@ -985,7 +985,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Card'
+              type: object
+              required:
+                - title
+                - section
+                - keywords
+              properties:
+                section:
+                  type: string
+                  enum:
+                    - ForSale
+                    - Wanted
+                    - Exchange
+                title:
+                  type: string
+                  example: "1982 Lada Samara"
+                description:
+                  type: string
+                  example: "Beige, suitable for a hen house. Fair condition. Some rust. As is, where is. Will swap for budgerigar."
+                keywords:
+                  type: string
+                  example: "Used, Beige"
       responses:
         '200':
           description: Card updated successfully
