@@ -11,7 +11,6 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,6 @@ import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
 
 /**
  * Controller class that handles the endpoints of community marketplace cards.
@@ -246,6 +242,42 @@ public class CardController {
         }
         cardRepository.deleteCardById(cardId);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
+    }
+
+    /**
+     * PUT card endpoint; updates/modifies an existing card with new information.
+     *
+     * @param cardId ID of card to modify
+     * @param cardInfo the edited information of the card to save
+     * @param session the current user session
+     * @return 401 if not logged in (handled by spring sec), 403 if card owner ID, session user ID do not match or if not a D/GAA,
+     * 406 if the card ID does not exist, 400 if there are errors with the supplied information, 200 otherwise.
+     */
+    @PutMapping("/cards/{cardId}")
+    public ResponseEntity<String> editCardById(@PathVariable long cardId, @RequestBody NewCardRequest cardInfo, HttpSession session) {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        Card editedCard;
+        try { // Attempt to create a card entity with the given info.
+            editedCard = new Card(cardInfo, currentUser);
+        }
+        catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        }
+
+        Card existingCard = cardRepository.findCardById(cardId);
+        if (existingCard == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        if (existingCard.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        editedCard.setId(cardId);
+        cardRepository.save(editedCard);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }
