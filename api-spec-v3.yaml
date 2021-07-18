@@ -42,6 +42,7 @@ tags:
   - name: 'UCM6: Keyword management'
   - name: 'UCM7: Keyword search'
   - name: 'UCM8: Contacting other marketplace users'
+  - name: 'UCM9: Edit card'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -962,6 +963,60 @@ paths:
           description: 'Forbidden: Returned when a user tries to delete a card that they are not the creator of AND the user is not a GAA'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+    put:
+      tags:
+        - 'UCM9: Edit card'
+        - 'Cards / community marketplace'
+      summary: Modify an existing community marketplace card
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - name: id
+          in: path
+          description: The id of the card to get.
+          required: true
+          schema:
+            type: integer
+            example: 500
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - section
+                - keywords
+              properties:
+                section:
+                  type: string
+                  enum:
+                    - ForSale
+                    - Wanted
+                    - Exchange
+                title:
+                  type: string
+                  example: "1982 Lada Samara"
+                description:
+                  type: string
+                  example: "Beige, suitable for a hen house. Fair condition. Some rust. As is, where is. Will swap for budgerigar."
+                keywords:
+                  type: string
+                  example: "Used, Beige"
+      responses:
+        '200':
+          description: Card updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to update a card they do not own AND the user is not a global application admin'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
   '/cards/{id}/extenddisplayperiod':
     put:
@@ -1226,6 +1281,7 @@ paths:
           description: "Forbidden: Returned when a user tries to delete a message that they are not the receiver of AND the user is not a D/GAA"
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+
 
 components:
   securitySchemes:

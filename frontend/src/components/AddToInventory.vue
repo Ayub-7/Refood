@@ -1,30 +1,38 @@
 <template>
-  <div id="form-outer">
-    <vs-button @click="addNewInv=true" class="header-button">New Inventory Item</vs-button>
-    <vs-popup classContent="popup-example"  title="Add new inventory item" :active.sync="addNewInv">
-      <div class="form-group required vs-col" vs-order="1" id="firstColModal" >
-        <div class="row">
-          <label for="prodId">Product *</label>
-          <vs-select id="prodId" class="selectExample" v-model="invenForm.prodId" v-on:change="autofill">
-            <vs-select-item :value="product.id" :text="product.name" v-for="product in products" v-bind:href="product.id" :key="product.id"/>
-          </vs-select>
+  <div id="form-outer" v-if="product != null">
+    <vs-popup title="Add New Inventory Entry" :active.sync="addNewInv">
+      <!-- Product Image -->
+      <div id="header-row">
+        <div style="margin: auto;">
+          <img v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
+          <img v-if="product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
+          <img v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
+          <img v-if="!isDevelopment() && !product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
         </div>
+        <div id="product-name">
+          <div class="sub-header">Product</div>
+          <div style="font-size: 18px; text-align: center; font-weight: bold">{{ product.name }}</div>
+          <div>{{ product.id }}</div>
+        </div>
+      </div>
+      <vs-divider/>
+
+      <div class="vs-col" vs-order="1" id="first-col-modal" >
         <div class="row">
           <label for="pricePerItem">Price per item *</label>
           <vs-input
+              type="number"
               :danger="(errors.includes('pricePerItem'))"
               danger-text="Price per item must be greater than zero and numeric."
-              class="inputx"
               id="pricePerItem"
-              v-model="invenForm.pricePerItem"
-              v-on:change="updateTotalPrice"/>
+              v-model="invenForm.pricePerItem"/>
         </div>
         <div class="row">
           <label for="totalPrice">Total price *</label>
           <vs-input
+              type="number"
               :danger="(errors.includes(invenForm.totalPrice))"
               danger-text="Total price must be greater than zero and numeric."
-              class="inputx"
               id="totalPrice"
               v-model="invenForm.totalPrice"/>
         </div>
@@ -33,57 +41,52 @@
           <vs-input-number
               :danger="(errors.includes(invenForm.quantity))"
               danger-text="Quantity must be greater than zero."
-              min="0"
+              :min="1"
               :step="1"
               id="quantity"
-              v-model="invenForm.quantity"
-              v-on:change="updateTotalPrice"/>
+              v-model="invenForm.quantity"/>
         </div>
       </div>
-      <div class="form-group required vs-col" vs-order="2" id="secondColModal">
+      <div class="vs-col" vs-order="2" id="second-col-modal">
         <div class="row">
-          <label for="bestBefore">Best before</label>
+          <label for="bestBefore">Best Before</label>
           <vs-input
               :danger="(errors.includes('past-best'))"
               danger-text="Date cannot be in past"
               type="date"
               id="bestBefore"
-              class="inputx"
               v-model="invenForm.bestBefore"/>
         </div>
         <div class="row">
-          <label for="listingExpiry">Listing expiry *</label>
+          <label for="expiryDate">Expiry Date *</label>
           <vs-input
               :danger="(errors.includes('past-expiry'))"
               danger-text="Expiry date is required and cannot be in past"
               type="date"
-              id="listingExpiry"
-              class="inputx"
+              id="expiryDate"
               v-model="invenForm.listExpiry"/>
         </div>
         <div class="row">
-          <label for="manufactureDate">Manufacture date</label>
+          <label for="manufactureDate">Manufacture Date</label>
           <vs-input
               :danger="(errors.includes('future-manu'))"
               danger-text="Date cannot be in the future"
               type="date"
               id="manufactureDate"
-              class="inputx"
               v-model="invenForm.manufactureDate"/>
         </div>
         <div class="row">
-          <label for="sellBy">Sell by</label>
+          <label for="sellBy">Sell By</label>
           <vs-input
               :danger="(errors.includes('past-sell'))"
               danger-text="Date cannot be in past"
               type="date"
               id="sellBy"
-              class="inputx"
               v-model="invenForm.sellBy"/>
         </div>
       </div>
-      <div class="form-group required vs-col" align="center" id="addButton" @click="addInventory()">
-        <vs-button>Add product</vs-button>
+      <div class="required vs-col" align="center" id="addButton">
+        <vs-button @click="addInventory">Add To Inventory</vs-button>
       </div>
     </vs-popup>
   </div>
@@ -97,23 +100,75 @@ export default {
   name: "AddToInventory",
   data() {
     return {
+      product: null,
       invenForm: {
         prodId: '',
         pricePerItem: 0.0,
         totalPrice: 0.0,
-        quantity: 0,
+        quantity: 1,
         bestBefore: '',
         listExpiry: '',
         manufactureDate: '',
         sellBy: '',
       },
+
       addNewInv: false,
-      item: null,
-      products: [],
       errors: [],
     }
+
   },
   methods: {
+    /**
+     * Opens the modal, prefills any inputs that need to prefilled, and clears any other already filled in inputs.
+     */
+    open: function(product) {
+      this.errors = [];
+      this.invenForm.sellBy = '';
+      this.invenForm.bestBefore = '';
+      this.invenForm.manufactureDate = '';
+      this.invenForm.listExpiry = '';
+      this.invenForm.quantity = 1;
+
+      this.product = product;
+      this.invenForm.pricePerItem = product.recommendedRetailPrice;
+      this.invenForm.prodId = product.id;
+      this.updateTotalPrice();
+
+      this.addNewInv = true;
+    },
+
+    /**
+     * Checks if the current web environment is in development mode.
+     */
+    isDevelopment() {
+      return (process.env.NODE_ENV === 'development')
+    },
+
+    /**
+     * Retrieves the image url link for the given product.
+     * @param product the product to retrieve the image for.
+     * @return a string link to the product image, or the default image if it doesn't have a product.
+     **/
+    getImgUrl(product) {
+      if (product === true && process.env.NODE_ENV !== 'staging') {
+        return '/prod/ProductShoot.jpg';
+      } else if (product === true) {
+        return '/test/ProductShoot.jpg';
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
+        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
+        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
+      } else if (product.primaryImagePath != null) {
+        return product.primaryImagePath.toString().replace("\\", "/")
+      } else {
+        return '../../public/ProductShoot.jpg'
+      }
+    },
+
+    /**
+     * Checks the form inputs, validating the inputted values.
+     * @return boolean true if no errors found, false otherwise.
+     */
     checkForm: function() {
       this.errors = [];
       var today = new Date();
@@ -154,9 +209,11 @@ export default {
       if (this.invenForm.prodId.length === 0 || this.errors.includes('invalid-chars')) {
         this.errors.push(this.invenForm.prodId);
       }
+
       if (this.invenForm.pricePerItem <= 0.0) {
         this.errors.push('pricePerItem');
       }
+
       if (this.invenForm.bestBefore !== '') {
         var timestamp = Date.parse(this.invenForm.bestBefore);
         var dateObject = new Date(timestamp)
@@ -165,6 +222,7 @@ export default {
           this.errors.push('past-best');
         }
       }
+
       if (this.invenForm.listExpiry !== '') {
         timestamp = Date.parse(this.invenForm.listExpiry);
         dateObject = new Date(timestamp)
@@ -173,6 +231,7 @@ export default {
           this.errors.push('past-expiry');
         }
       }
+
       if (this.invenForm.manufactureDate !== '') {
         timestamp = Date.parse(this.invenForm.manufactureDate);
         dateObject = new Date(timestamp)
@@ -181,6 +240,7 @@ export default {
           this.errors.push('future-manu');
         }
       }
+
       if (this.invenForm.sellBy !== '') {
         timestamp = Date.parse(this.invenForm.sellBy);
         dateObject = new Date(timestamp)
@@ -189,6 +249,7 @@ export default {
           this.errors.push('past-sell');
         }
       }
+
       if (this.invenForm.quantity <= 0) {
         this.errors.push(this.invenForm.quantity);
       }
@@ -200,6 +261,7 @@ export default {
           color: 'danger'
         });
       }
+
       if (this.errors.includes('past-date')) {
         this.$vs.notify({
           title: 'Failed to create inventory item',
@@ -215,6 +277,7 @@ export default {
           color: 'danger'
         });
       }
+
       if (this.errors.includes(this.quantity)) {
         this.$vs.notify({
           title: 'Failed to create inventory item',
@@ -222,31 +285,25 @@ export default {
           color: 'danger'
         });
       }
+
       if (this.errors.length > 0) {
         return false;
       }
       return true;
     },
+
+    /**
+     * Updates the total price value when either quantity or price per item changes.
+     */
     updateTotalPrice: function() {
-      console.log(this.invenForm.quantity);
-      this.invenForm.totalPrice = this.invenForm.quantity * this.invenForm.pricePerItem;
+      this.invenForm.totalPrice = (this.invenForm.quantity * this.invenForm.pricePerItem).toFixed(2);
     },
-    autofill: function() {
-      if (this.invenForm.prodId !== '') {
-        let prodInd = 0;
-        while (prodInd < this.products.length) {
-          if (this.products[prodInd]["id"] === this.invenForm.prodId) {
-            break;
-          }
-          prodInd++;
-        }
-        this.invenForm.pricePerItem = this.products[prodInd]["recommendedRetailPrice"];
-        this.updateTotalPrice();
-      }
-    },
+
+    /**
+     * Saves the inventory to the backend (if input fields are valid).
+     */
     addInventory: function() {
       if (this.checkForm()) {
-        console.log("DEBUG: adding to inventory...")
         api.createInventory(store.actingAsBusinessId, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
             .then((response) => {
               this.$log.debug("New catalogue item created:", response.data);
@@ -257,52 +314,40 @@ export default {
                 title: `Item successfully added to the business' inventory`,
                 color: 'success'
               });
-            }).catch((error) => {
-          if (error.response) {
-            console.log(error);
-            if (error.response.status === 400) {
-              if (this.getActingAsBusinessId() == null) {
+            })
+            .catch((error) => {
+              if (error.response) {
+                if (error.response.status === 400) {
+                  if (this.getActingAsBusinessId() == null) {
+                    this.$vs.notify({
+                      title: 'Failed to add an inventory item',
+                      text: 'User is not a business administrator',
+                      color: 'danger'
+                    });
+                  } else {
+                    this.$vs.notify({
+                      title: 'Failed to add an inventory item',
+                      text: 'Incomplete form, or the product does not exist.',
+                      color: 'danger'
+                    });
+                  }
+                } else if (error.response.status === 403) {
                 this.$vs.notify({
                   title: 'Failed to add an inventory item',
-                  text: 'User is not a business administrator',
+                  text: 'You do not have the rights to access this business',
                   color: 'danger'
                 });
-              } else {
-                this.$vs.notify({
-                  title: 'Failed to add an inventory item',
-                  text: 'Incomplete form, or the product does not exist.',
-                  color: 'danger'
-                });
-              }
-            } else if (error.response.status === 403) {
-            this.$vs.notify({
-              title: 'Failed to add an inventory item',
-              text: 'You do not have the rights to access this business',
-              color: 'danger'
+                } else if (error.response.status === 404) {
+                  this.$vs.notify({
+                    title: 'Failed to add an inventory item',
+                    text: 'There was a problem adding the inventory item to the database',
+                    color: 'danger'
+                  });
+                }
+            }
+            this.$log.debug("Error Status:", error);
             });
-          } else if (error.response.status === 404) {
-            this.$vs.notify({
-              title: 'Failed to add an inventory item',
-              text: 'There was a problem adding the inventory item to the database',
-              color: 'danger'
-            });
-          }
-          console.log(error.response.status);
-        }
-          this.$log.debug("Error Status:", error);
-        })
       }
-    },
-    getBusinessProducts() {
-      api.getBusinessProducts(store.actingAsBusinessId)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.products = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load products";
-          });
     },
 
     /**
@@ -311,16 +356,51 @@ export default {
     getActingAsBusinessId() {
       return store.actingAsBusinessId;
     },
+
   },
-  mounted(){
-    this.getBusinessProducts();
+
+  watch: {
+    "invenForm.quantity": function() {
+      this.updateTotalPrice();
+    },
+
+    "invenForm.pricePerItem": function() {
+      this.updateTotalPrice();
+    },
   }
 }
 </script>
 
 
 <style>
-#firstColModal {
+
+#header-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.image {
+  margin: auto;
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+#product-name {
+  grid-row: 1;
+  grid-column: 2;
+
+  text-align: center;
+  margin: auto;
+}
+
+.sub-header {
+  font-size: 12px;
+  color: gray;
+}
+
+#first-col-modal {
   margin-right: 160px;
   margin-left: 5px;
 }
@@ -335,25 +415,27 @@ export default {
   margin-bottom: 15px;
 }
 
-.addButton {
-  align-self: center;
-}
-
-.vs-popup--header {
-  background-color: #1F74FF;
-  color: #FFFFFF;
-}
-
-.vs-popup-primary >>> header {
-  background-color: #1F74FF;
-  color: #FFFFFF;
-}
-
 .textarea >>> textarea {
   resize: none;
   max-width: 200px;
   min-height: 100px;
   max-height: 100px;
+}
+
+@media screen and (max-width: 630px) {
+  .vs-popup--content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  div#first-col-modal {
+    margin: 0 auto;
+  }
+
+  #second-col-modal {
+    margin: 0 auto;
+  }
+
 }
 
 
