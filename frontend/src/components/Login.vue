@@ -64,8 +64,6 @@ const Login = {
         this.errors.password = "Password required.";
         this.errors.hasErrors = true;
       }
-
-      console.log(this.errors);
     },
 
     /**
@@ -80,7 +78,6 @@ const Login = {
             this.$router.push({path: `/home`});
           })
           .catch(err => {
-            console.log(err.response);
             if(err.response.status === 400) { // Catch 400 Bad Request
               this.email = this.password = "";
               this.errors.email = this.errors.password = "";

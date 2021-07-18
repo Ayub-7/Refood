@@ -239,7 +239,6 @@ export default {
           });
     },
     updateInventory: function() {
-      console.log(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry);
       if (this.errors.length === 0) {
         api.modifyInventory(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
             .then((response) => {
@@ -254,9 +253,7 @@ export default {
               });
             }).catch((error) => {
           if (error.response) {
-            console.log(error);
             if (error.response.status === 400) {
-              console.log(error.response);
               this.$vs.notify( {
                 title: 'Failed to add an inventory item',
                 text: 'Incomplete form, or the product does not exist.',
@@ -269,7 +266,6 @@ export default {
                 color: 'danger'
               });
             }
-            console.log(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         })
