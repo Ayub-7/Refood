@@ -10,7 +10,7 @@
 
     <div v-if="users.length" id="userTable">
       <vs-table :data="this.users" max-items="10" pagination stripe >
-        <template slot="thead" id="tableHeader">
+        <template slot="thead" id="usersTableHeader">
 
           <vs-th sort-key="firstName" style="border-radius: 4px 0 0 0;">
             First name
@@ -67,7 +67,69 @@
           </vs-tr>
         </template>
       </vs-table>
-      <div id="displaying">Showing {{userSearchIndexMin}} - {{userSearchIndexMax}} of {{users.length}} results</div>
+      <div id="displayingUsers">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{users.length}} results</div>
+    </div>
+    <div v-if="businesses.length" id="businessTable">
+      <vs-table :data="this.businesses" max-items="10" pagination stripe>
+        <template slot="thead" id="businessesTableHeader">
+
+          <vs-th sort-key="businessName" style="border-radius: 4px 0 0 0;">
+            Business name
+          </vs-th>
+          <vs-th sort-key="businessType">
+            Business type
+          </vs-th>
+          <vs-th sort-key="admin">
+            Admin
+          </vs-th>
+          <vs-th sort-key="city" v-if="mobileMode==false">
+            City
+          </vs-th>
+          <vs-th sort-key="country" v-if="mobileMode==false">
+            Country
+          </vs-th>
+
+          <!-- Extra header for go to profile button -->
+          <vs-th style="border-radius: 0 4px 0 0;">
+          </vs-th>
+
+          <vs-th v-if="isDGAA">Is Admin</vs-th>
+          <vs-th class="dgaaCheckbox" v-if="isDGAA">Toggle Admin</vs-th>
+
+
+
+        </template>
+
+        <template slot-scope="{data}">
+          <vs-tr :key="indextr" v-for="(tr, indextr) in data">
+
+
+            <vs-td :data="data[indextr].name">{{data[indextr].name}}</vs-td>
+
+            <vs-td :data="data[indextr].businessType">{{data[indextr].businessType}}</vs-td>
+
+            <vs-td :data="data[indextr].primaryAdministratorId">{{`${data[indextr].primaryAdministratorId}`}}</vs-td>
+
+            <vs-td :data="data[indextr].address.city" v-if="mobileMode==false">{{`${data[indextr].address.city}`}}</vs-td>
+
+            <vs-td :data="data[indextr].address.country" v-if="mobileMode==false">{{data[indextr].address.country}}</vs-td>
+
+            <vs-td>
+              <vs-button id="goToProfileButton" @click="goToProfemailile(data[indextr].id)">Go to profile</vs-button>
+            </vs-td>
+
+            <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
+
+            <vs-td v-if="isDGAA" class="dgaaCheckbox">
+              <input type="checkbox" @click="toggleAdmin(data[indextr])">
+            </vs-td>
+
+
+          </vs-tr>
+        </template>
+      </vs-table>
+
+      <div id="displayingBusinesses">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{users.length}} results</div>
     </div>
 
   </div>
@@ -87,8 +149,9 @@ const Search = {
       mobileMode: false,
       errors: [],
       users: [],
-      userSearchIndexMin: 1,
-      userSearchIndexMax: 10,
+      businesses: [],
+      searchIndexMin: 1,
+      searchIndexMax: 10,
       isDGAA: false
     };
   },
@@ -136,11 +199,11 @@ const Search = {
      */
 
     increaseSearchRange: function() {
-      this.userSearchIndexMin += 10;
-      if(this.userSearchIndexMax + 10 > this.users.length) {
-        this.userSearchIndexMax += this.users.length - this.userSearchIndexMax
+      this.searchIndexMin += 10;
+      if(this.searchIndexMax + 10 > this.users.length) {
+        this.searchIndexMax += this.users.length - this.searchIndexMax
       } else {
-        this.userSearchIndexMax += 10;
+        this.searchIndexMax += 10;
       }
     },
 
@@ -148,11 +211,11 @@ const Search = {
      * Increases search range to be shown on page
      */
     decreaseSearchRange: function() {
-      this.userSearchIndexMin -= 10;
-      if(this.userSearchIndexMax % 10 != 0){
-        this.userSearchIndexMax -= this.userSearchIndexMax % 10;
+      this.searchIndexMin -= 10;
+      if(this.searchIndexMax % 10 != 0){
+        this.searchIndexMax -= this.searchIndexMax % 10;
       } else {
-        this.userSearchIndexMax -= 10;
+        this.searchIndexMax -= 10;
       }
     },
 
@@ -186,14 +249,14 @@ const Search = {
           }
 
           if(this.users.length < 10) {
-            this.userSearchIndexMin = 1;
-            this.userSearchIndexMax = this.users.length;
+            this.searchIndexMin = 1;
+            this.searchIndexMax = this.users.length;
             if(this.users.length == 0){
-              this.userSearchIndexMin = 0;
+              this.searchIndexMin = 0;
             }
           } else {
-            this.userSearchIndexMin = 1;
-            this.userSearchIndexMax = 10;
+            this.searchIndexMin = 1;
+            this.searchIndexMax = 10;
           }
 
         })
@@ -238,9 +301,14 @@ export default Search;
 <style scoped>
 
 
-#displaying {
+#displayingUsers {
   text-align: right;
 }
+
+#displayingBusinesses {
+  text-align: right;
+}
+
 
 #search {
   font-weight: bold;
