@@ -101,7 +101,14 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+    /**
+     *  Query search that returns businesses based on the parameter query
+     * @param query to help narrow down the businesses
+     * @returns {*}
+     */
+    searchBusinessesQuery: (query) => instance.get(`/businesses/search?searchQuery="${query}"`, {withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.

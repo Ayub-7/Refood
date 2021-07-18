@@ -4,7 +4,7 @@
       <vs-input class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
       <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers">Search</vs-button>
       <vs-input class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearchBusiness" size="large" type="border">Search</vs-button>
+      <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness">Search</vs-button>
     </div>
 
 
@@ -237,7 +237,7 @@ const Search = {
     searchUsers: function () {
       if (this.searchbarUser === "") return;
       this.$vs.loading();
-      api.searchQuery(this.searchbarUser)
+      api.searchUsersQuery(this.searchbarUser)
         .then((response) => {
           this.users = response.data;
           this.users = this.users.filter(x => typeof(x) == "object")
@@ -276,6 +276,51 @@ const Search = {
             this.tableLoaded = true;
         }
       })
+    },
+    searchBusiness: function() {
+      if (this.users.length) {
+        this.users = [];
+      }
+      if (this.searchbarBusiness === "") return;
+      this.$vs.loading();
+      api.searchBusinessesQuery(this.searchbarBusiness)
+         .then((response) => {
+           this.businesses = response.data;
+           this.businesses = this.businesses.filter(x => typeof(x) == "object")
+
+           //Need to set properties of user object so they can be sorted by
+           for(let user of this.businesses) {
+             user.country = user.homeAddress.country;
+             user.city = user.homeAddress.city;
+           }
+
+           if(this.businesses.length < 10) {
+             this.searchIndexMin = 1;
+             this.searchIndexMax = this.businesses.length;
+             if(this.businesses.length == 0){
+               this.searchIndexMin = 0;
+             }
+           } else {
+             this.searchIndexMin = 1;
+             this.searchIndexMax = 10;
+           }
+         })
+         .catch((error) => {
+           this.$log.debug(error);
+           this.error = "Failed to load businesses";
+         })
+         .finally(() => {
+           this.$vs.loading.close();
+           if(!this.tableLoaded){
+             document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+
+             //Event listeners for vuesax buttons on table since they're generated afterwards
+             document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
+             document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
+
+             this.tableLoaded = true;
+           }
+         })
     },
 
     /**
