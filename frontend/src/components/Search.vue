@@ -274,7 +274,7 @@ const Search = {
           this.error = "Failed to load users";
         })
         .finally(() => {
-          this.$vs.loading.close();
+          // this.$vs.loading.close();
           if(!this.tableLoaded){
             document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
@@ -307,7 +307,7 @@ const Search = {
            this.error = "Failed to load businesses";
          })
          .finally(() => {
-           this.$vs.loading.close();
+           // this.$vs.loading.close();
            if(!this.tableLoaded){
              document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 

@@ -106,7 +106,6 @@ beforeEach(() => {
     api.searchBusinessesQuery = jest.fn(() => {
         return Promise.resolve({data: mockBusinessesFromSearch, status: 200}).finally();
     });
-    $vs.loading.close = jest.fn()
 });
 
 afterEach(() => {
