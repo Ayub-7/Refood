@@ -80,7 +80,6 @@ const mockBusinessesFromSearch = [
 
 let $vs = {
     loading: jest.fn(),
-    close: jest.fn(),
 }
 
 const localVue = createLocalVue();
@@ -107,6 +106,7 @@ beforeEach(() => {
     api.searchBusinessesQuery = jest.fn(() => {
         return Promise.resolve({data: mockBusinessesFromSearch, status: 200}).finally();
     });
+    $vs.loading.close = jest.fn()
 });
 
 afterEach(() => {
