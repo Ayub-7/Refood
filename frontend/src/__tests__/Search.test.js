@@ -82,6 +82,11 @@ let $vs = {
     loading: jest.fn(),
 }
 
+let $log = {
+    debug: jest.fn(),
+    error: jest.fn()
+}
+
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
@@ -89,7 +94,7 @@ beforeEach(() => {
     wrapper = shallowMount(Search, {
         localVue,
         propsData: {},
-        mocks: {$vs},
+        mocks: {$vs, $log},
         stubs: ['router-link', 'router-view'],
         methods: {},
         data () {
