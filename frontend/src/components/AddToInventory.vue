@@ -5,20 +5,18 @@
       <div id="header-row">
         <div style="margin: auto; cursor: pointer;">
           <vs-tooltip text="Click here for more product details">
-            <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
-            <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-            <img @click="showFullProduct = true" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
-            <img @click="showFullProduct = true" v-if="!isDevelopment() && !product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
+            <vs-tooltip :text="product.description" title="Description" position="bottom">
+              <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
+              <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
+              <img @click="showFullProduct = true" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
+              <img @click="showFullProduct = true" v-if="!isDevelopment() && !product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
+            </vs-tooltip>
           </vs-tooltip>
         </div>
         <div id="product-name">
-
-            <div class="sub-header">Product</div>
-            <div style="font-size: 18px; text-align: center; font-weight: bold">{{ product.name }}</div>
-            <div>{{ product.id }}</div>
-            <vs-tooltip :text="product.description" title="Description" position="bottom">
-              <vs-icon size="1rem" icon="info"></vs-icon>
-            </vs-tooltip>
+          <div class="sub-header">Product</div>
+          <div style="font-size: 18px; text-align: center; font-weight: bold">{{ product.name }}</div>
+          <div>{{ product.id }}</div>
         </div>
       </div>
       <vs-divider/>
@@ -91,7 +89,7 @@
               v-model="invenForm.sellBy"/>
         </div>
       </div>
-      <div class="required vs-col" align="center" id="addButton">
+      <div class="required vs-col" id="addButton">
         <vs-button @click="addInventory">Add To Inventory</vs-button>
       </div>
     </vs-popup>
@@ -117,7 +115,7 @@
           <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
         </div>
 
-        <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currency + " " +  product.recommendedRetailPrice }} </div>
+        <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currency + product.recommendedRetailPrice }} </div>
     </vs-popup>
 
   </div>
