@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.xml.bind.ValidationException;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -32,6 +33,8 @@ public class MessageController {
     private MessageRepository messageRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CardRepository cardRepository;
 
 
     /**
@@ -71,6 +74,7 @@ public class MessageController {
     public ResponseEntity<String> addUserMessage(@PathVariable long userId, @RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         User receiver = userRepository.findUserById(userId);
+        Card card = cardRepository.findCardById(newMessageRequest.getCardId());
 
         //403 Attempting to create a message without logging in
         //Note: the user cannot send a message as someone else.
@@ -82,10 +86,16 @@ public class MessageController {
         if (receiver == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
+        if (card == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Message must have an associated, valid, Card");
+        }
+
+
+
 
         Message newMessage;
         try { // Attempt to create a new card.
-            newMessage = new Message(newMessageRequest, currentUser, receiver);
+            newMessage = new Message(newMessageRequest, currentUser, receiver, card);
         }
         //400 data is not correct
         catch (ValidationException exception) {

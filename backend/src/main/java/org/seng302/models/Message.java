@@ -62,12 +62,12 @@ public class Message {
      * @param newMessageRequest see NewMessageRequest.java. Creates a new Message using minimum fields
      * @param user the user object that is creating the new Messaage.
      */
-    public Message(NewMessageRequest newMessageRequest, User sender, User receiver) throws ValidationException {
+    public Message(NewMessageRequest newMessageRequest, User sender, User receiver, Card card) throws ValidationException {
         try {
             if (validateNewMessage(newMessageRequest)) {
                 this.sender = sender;
                 this.receiver = receiver;
-                this.card = newMessageRequest.getCard();
+                this.card = card;
                 this.description = newMessageRequest.getDescription();
                 this.sent = new Date();
             }
@@ -84,12 +84,6 @@ public class Message {
      * @throws ValidationException if any of the Message information is invalid.
      */
     private boolean validateNewMessage(NewMessageRequest newMessageRequest) throws ValidationException {
-        //no card
-        if (newMessageRequest.getCard() == null) {
-            throw new ValidationException("Message must have an associated Card");
-        }
-
-        //TODO: check in case the supplied card id is invalid
         //Blank or null description
         if (newMessageRequest.getDescription() == null) {
             throw new ValidationException("Message must have a description");

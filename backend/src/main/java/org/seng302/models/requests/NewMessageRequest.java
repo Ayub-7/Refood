@@ -9,11 +9,11 @@ import lombok.Data;
  */
 @Data
 public class NewMessageRequest {
-    private Card card;
+    private long cardId;
     private String description;
 
-    public NewMessageRequest(Card card, String description) {
-        this.card = card;
+    public NewMessageRequest(long cardId, String description) {
+        this.cardId = cardId;
         this.description = description;
     }
 }
