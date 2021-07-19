@@ -41,19 +41,19 @@
 
           <!-- If search query returns more than 10 products then this should be active -->
           <div id="grid-pagination">
-            <div class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</div>
-            <div v-if="filteredproducts.length > 10" style="display: flex;">
+            <div class="displaying">Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of
+              {{ filteredProducts.length }}</div>
+            <div v-if="filteredProducts.length > 10" style="display: flex;">
               <vs-button type="border" class='prevNextSearchButton' @click="decreaseSearchRange()">Previous</vs-button>
               <vs-button type="border" class='prevNextSearchButton' @click="increaseSearchRange()">Next</vs-button>
             </div>
           </div>
         </div>
 
-
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
             <vs-card class="grid-item"
-                    v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
+                    v-for="product in filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)"
                     v-bind:href="product.id"
                     :key="product.id">
 
@@ -70,7 +70,7 @@
                   <p>{{ product.id }}</p>
                 </div>
                 <vs-divider></vs-divider>
-                <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
+                <div style="font-size: 16px; font-weight: bold; height: 24px;">{{ product.manufacturer }} </div>
                 <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
                 <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
               </div>
@@ -97,6 +97,9 @@
                         {{pImage.name}}
                       </vs-dropdown-item>
                     </vs-dropdown-group>
+                    <vs-dropdown-item divider @click="openAddNewInventoryModal(product)">
+                      Add Inventory Entry
+                    </vs-dropdown-item>
                   </vs-dropdown-menu>
                 </vs-dropdown>
               </div>
@@ -110,7 +113,7 @@
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" stripe>
+            <vs-table :data="filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" stripe>
                 <template slot="thead" style="background:blue">
                   <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
@@ -170,20 +173,23 @@
                                 {{pImage.name}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
-
+                          <vs-dropdown-item divider @click="openAddNewInventoryModal(product)">
+                            Add Inventory Entry
+                          </vs-dropdown-item>
                         </vs-dropdown-menu>
                       </vs-dropdown>
                     </td>
                   </vs-tr>
 
                   <!-- If search query returns more than 10 products then this should be active -->
-                  <tfoot v-if="filteredproducts.length > 1">
+                  <tfoot v-if="filteredProducts.length > 1">
                   <tr>
                     <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
+                    <td class="displaying">Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of
+                      {{ filteredProducts.length }}</td>
                     <td><vs-button class='prevNextSearchButton' type='border' @click="decreaseSearchRange()">Previous</vs-button></td>
                     <td><vs-button class='prevNextSearchButton' type='border' @click="increaseSearchRange()">Next</vs-button></td>
                   </tr>
@@ -197,6 +203,7 @@
       "Product shoot" by Aameerule is licensed under CC BY 2.0
     </footer>
     <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
+    <AddToInventory ref="addToInventoryModal" />
   </vs-card>
 </template>
 
@@ -204,10 +211,11 @@
 import api from "../Api";
 import {store} from "../store";
 import axios from "axios";
+import AddToInventory from "./AddToInventory";
 
 const Search = {
   name: "Search",
-
+  components: {AddToInventory},
   data: function() {
     return {
       products: [],
@@ -216,7 +224,7 @@ const Search = {
 
       errors: [],
       toggle: [1,1,1,1,1],
-      filteredproducts: [],
+      filteredProducts: [],
       enableTable: false,
       productSearchIndexMin: 0,
       productSearchIndexMax: 12,
@@ -245,7 +253,7 @@ const Search = {
             .then((innerResponse) => {
               this.$log.debug("Data loaded: ", innerResponse.data);
               this.products = innerResponse.data;
-              this.filteredproducts = innerResponse.data;
+              this.filteredProducts = innerResponse.data;
             })
             .catch((error) => {
               this.$log.debug(error);
@@ -258,8 +266,17 @@ const Search = {
   },
 
   methods: {
+
+    /**
+     * Opens the add new inventory modal by calling the open function inside the component.
+     * @param product the select product to add a new inventory entry for.
+     */
+    openAddNewInventoryModal(product) {
+      this.$refs.addToInventoryModal.open(product);
+    },
+
     isDevelopment() {
-      return (process.env.NODE_ENV === 'development')
+      return (process.env.NODE_ENV === 'development');
     },
 
     setPrimaryImage(product, image) {
@@ -344,10 +361,11 @@ const Search = {
     },
 
 
-    //modifies selected catalog item
-    goToModify (productId) {
-      console.log(productId)
-      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`})
+    /**
+     * Redirects page to the 'modify product' page with the given product ID.
+     */
+    goToModify: function(productId) {
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`});
     },
 
     /**
@@ -382,8 +400,8 @@ const Search = {
         }
       }
 
-      if (this.filteredproducts) {
-        this.filteredproducts.sort(function(a, b) {
+      if (this.filteredProducts) {
+        this.filteredProducts.sort(function(a, b) {
           var aField = a[JSONField];
           var bField = b[JSONField];
 
@@ -422,7 +440,7 @@ const Search = {
 
         if (index >= 0) {
           if (this.toggle[index]) {
-            this.filteredproducts.reverse();
+            this.filteredProducts.reverse();
             this.toggle[index]=0;
           } else {
             this.toggle[index]=1;
@@ -438,7 +456,7 @@ const Search = {
      */
     increaseSearchRange: function () {
       //Stop value from going over range
-      if(this.productSearchIndexMax < this.filteredproducts.length) {
+      if(this.productSearchIndexMax < this.filteredProducts.length) {
         //console.log(this.productSearchIndexMax, this.filteredproducts.length, this.productSearchIndexMin)
         let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
         this.productSearchIndexMin += minMaxDiff;
@@ -481,19 +499,18 @@ const Search = {
         api.postProductImage(this.businessId, this.selectedProduct.id, fd)
           .then(() => { //On success
             this.$vs.notify({title:`Image for ${this.selectedProduct.id} was uploaded`, color:'success'});
+            location.reload();
           })
           .catch((error) => { //On fail
             if (error.response.status === 400) {
-              this.$vs.notify({title:`Image failed to upload`, color:'danger'});
+              this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
             } else if (error.response.status === 500) {
-              this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
+              this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
             }
-            this.$log.debug("HERHEHRE");
           })
           .finally(() => {
             this.$vs.loading.close();
-            location.reload();
-        })
+        });
       }
     }
 
@@ -508,8 +525,8 @@ const Search = {
     searchRange: function () {
       let max = this.productSearchIndexMax;
 
-      if (max > this.filteredproducts.length) {
-        max = this.filteredproducts.length
+      if (max > this.filteredProducts.length) {
+        max = this.filteredProducts.length
       }
 
       return [this.productSearchIndexMin + 1, max]

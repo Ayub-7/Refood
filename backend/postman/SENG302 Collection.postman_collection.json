@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "33da9456-73c4-40c5-bec4-6861f837ba43",
+		"_postman_id": "82d1eea9-ac01-4c63-995a-d5a70da985fb",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -523,6 +523,116 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Cards",
+			"item": [
+				{
+					"name": "Get User's Cards",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/{{userId}}/cards",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"cards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Expired Cards",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/cards/notifications",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"cards",
+								"notifications"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Expired Cards (invalid)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/cards/notifications",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"cards",
+								"notifications"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Card (Owns)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"section\": \"ForSale\",\r\n  \"title\": \"1982 Lada Samara\",\r\n  \"description\": \"Oooga Boooga\",\r\n  \"keywords\": \"Legitimate, new\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/cards/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cards",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1291",
+									"description": "Wilma Sail's card"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -547,12 +657,10 @@
 	],
 	"variable": [
 		{
-			"id": "1cf6c4b4-84d8-41fa-a19d-a5067d1f9041",
 			"key": "URL",
 			"value": "localhost:9499"
 		},
 		{
-			"id": "63463b7c-45f2-402e-a1b9-30c81ed1d55d",
 			"key": "userId",
 			"value": ""
 		}
