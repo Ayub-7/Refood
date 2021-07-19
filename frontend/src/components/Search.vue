@@ -54,7 +54,7 @@
             <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
 
             <vs-td>
-              <vs-button id="goToProfileButton" @click="goToProfile(data[indextr].id)">Go to profile</vs-button>
+              <vs-button id="goToProfileButton" @click="goToUserProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
 
             <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
@@ -78,9 +78,6 @@
           </vs-th>
           <vs-th sort-key="businessType">
             Business type
-          </vs-th>
-          <vs-th sort-key="admin">
-            Admin
           </vs-th>
           <vs-th sort-key="city" v-if="mobileMode==false">
             City
@@ -108,14 +105,12 @@
 
             <vs-td :data="data[indextr].businessType">{{data[indextr].businessType}}</vs-td>
 
-            <vs-td :data="data[indextr].primaryAdministratorId">{{`${data[indextr].primaryAdministratorId}`}}</vs-td>
-
             <vs-td :data="data[indextr].address.city" v-if="mobileMode==false">{{`${data[indextr].address.city}`}}</vs-td>
 
             <vs-td :data="data[indextr].address.country" v-if="mobileMode==false">{{data[indextr].address.country}}</vs-td>
 
             <vs-td>
-              <vs-button id="goToProfileButton" @click="goToProfemailile(data[indextr].id)">Go to profile</vs-button>
+              <vs-button id="goToProfileButton" @click="goToBusinessProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
 
             <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
@@ -129,7 +124,7 @@
         </template>
       </vs-table>
 
-      <div id="displayingBusinesses">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{users.length}} results</div>
+      <div id="displayingBusinesses">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{businesses.length}} results</div>
     </div>
 
   </div>
@@ -227,8 +222,15 @@ const Search = {
      * Go to users profile
      * @param userId id of user that has been clicked
      */
-    goToProfile(userId) {
+    goToUserProfile(userId) {
       this.$router.push({path: `/users/${userId}`})
+    },
+    /**
+     * Go to business' profile
+     * @param bizId id of business that has been clicked
+     */
+    goToBusinessProfile(bizId) {
+      this.$router.push({path: `/businesses/${bizId}`})
     },
     /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
@@ -277,6 +279,10 @@ const Search = {
         }
       })
     },
+    /**
+     * Searches for the businesses in the database by calling the API function with an SQL query
+     * to find the businesses based on the input in the search box.
+     */
     searchBusiness: function() {
       if (this.users.length) {
         this.users = [];
