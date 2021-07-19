@@ -233,6 +233,27 @@ const Search = {
       this.$router.push({path: `/businesses/${bizId}`})
     },
     /**
+     *
+     */
+    paginator(data) {
+      //Need to set properties of user object so they can be sorted by
+      for(let user of data) {
+        user.country = user.homeAddress.country;
+        user.city = user.homeAddress.city;
+      }
+
+      if(data.length < 10) {
+        this.searchIndexMin = 1;
+        this.searchIndexMax = data.length;
+        if(data.length == 0){
+          this.searchIndexMin = 0;
+        }
+      } else {
+        this.searchIndexMin = 1;
+        this.searchIndexMax = 10;
+      }
+    },
+    /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
      */
@@ -243,24 +264,7 @@ const Search = {
         .then((response) => {
           this.users = response.data;
           this.users = this.users.filter(x => typeof(x) == "object")
-
-          //Need to set properties of user object so they can be sorted by
-          for(let user of this.users) {
-            user.country = user.homeAddress.country;
-            user.city = user.homeAddress.city;
-          }
-
-          if(this.users.length < 10) {
-            this.searchIndexMin = 1;
-            this.searchIndexMax = this.users.length;
-            if(this.users.length == 0){
-              this.searchIndexMin = 0;
-            }
-          } else {
-            this.searchIndexMin = 1;
-            this.searchIndexMax = 10;
-          }
-
+          this.paginator(this.users);
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -293,23 +297,7 @@ const Search = {
          .then((response) => {
            this.businesses = response.data;
            this.businesses = this.businesses.filter(x => typeof(x) == "object")
-
-           //Need to set properties of user object so they can be sorted by
-           for(let user of this.businesses) {
-             user.country = user.homeAddress.country;
-             user.city = user.homeAddress.city;
-           }
-
-           if(this.businesses.length < 10) {
-             this.searchIndexMin = 1;
-             this.searchIndexMax = this.businesses.length;
-             if(this.businesses.length == 0){
-               this.searchIndexMin = 0;
-             }
-           } else {
-             this.searchIndexMin = 1;
-             this.searchIndexMax = 10;
-           }
+           this.paginator(this.businesses);
          })
          .catch((error) => {
            this.$log.debug(error);
