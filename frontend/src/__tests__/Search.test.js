@@ -107,6 +107,7 @@ beforeEach(() => {
         }
     });
     expect(wrapper).toBeTruthy();
+    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {
