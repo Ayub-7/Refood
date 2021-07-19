@@ -11,14 +11,12 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import javax.xml.bind.ValidationException;
 import java.util.List;
 
 /**
@@ -27,15 +25,13 @@ import java.util.List;
 @RestController
 public class MessageController {
 
-    private static final Logger logger = LogManager.getLogger(CardController.class.getName());
+    private static final Logger logger = LogManager.getLogger(MessageController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private MessageRepository messageRepository;
     @Autowired
-    private CardRepository cardRepository;
+    private UserRepository userRepository;
 
 
     /**
@@ -43,15 +39,23 @@ public class MessageController {
      * Preconditions: Logged in and acting as a user
      * Postconditions: User's messages will be retrieved if any exist
      * @param userId ID of user that we are going to get messages from
-     * @return
+     * @return 200 if successful, 40
      * @throws JsonProcessingException
      */
     @GetMapping("/users/{userId}/messages")
-    public ResponseEntity<String> getUserMessages(@PathVariable long userId) throws JsonProcessingException {
+    public ResponseEntity<String> getUserMessages(@PathVariable long userId, HttpSession session) throws JsonProcessingException {
         User user = userRepository.findUserById(userId);
-        List<Card> userCards = cardRepository.findCardsByUser(user);
-        List<Message> messages = messageRepository.findByCardIn(userCards);
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
+        if(user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        if(userId != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<Message> messages = messageRepository.findMessageByReceiver(user);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(messages));
     }
 
