@@ -154,12 +154,14 @@ describe("Test searching with query", () => {
     test("Successful user search - with query", async () => {
         wrapper.vm.$vs.loading.close = jest.fn();
         wrapper.vm.searchbarUser = "Something";
+        wrapper.vm.tableLoaded = true;
         await wrapper.vm.searchUsers();
         expect(wrapper.vm.$vs.loading).toBeCalled();
     });
     test("Successful business search - with query", async () => {
         wrapper.vm.$vs.loading.close = jest.fn();
         wrapper.vm.searchbarBusiness = "Something";
+        wrapper.vm.tableLoaded = true;
         await wrapper.vm.searchBusiness();
         expect(wrapper.vm.$vs.loading).toBeCalled();
     });
