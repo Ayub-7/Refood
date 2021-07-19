@@ -2,6 +2,7 @@ package org.seng302.models;
 
 import lombok.Data;
 import org.seng302.models.requests.NewMessageRequest;
+import javax.xml.bind.ValidationException;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
 /**
  * Entity class for a user message.
  * Represents a single message sent from one user, to another user, regarding a community card.
+
  */
 @Data
 @Entity
@@ -54,17 +56,17 @@ public class Message {
     }
 
     /**
-     * New Card request uses the minimum attributes and a reference to the User who created the card for initialization
-     * This intializer converts a NewCardRequest to a Card entity
+     * New Message request uses the minimum attributes and a reference to the User who created the Message for initialization
+     * This intializer converts a newMessageRequest to a Message entity
      * The date created is set to the date this constructor is called.
-     * @param newCardRequest see NewCardRequest.java. Creates a new card using minimum fields
-     * @param user the user object that is creating the new community card.
+     * @param newMessageRequest see NewMessageRequest.java. Creates a new Message using minimum fields
+     * @param user the user object that is creating the new Messaage.
      */
-    public Message(NewMessageRequest newMessageRequest, User user) throws ValidationException {
+    public Message(NewMessageRequest newMessageRequest, User sender, User receiver) throws ValidationException {
         try {
-            if (validateNewCard(newCardRequest)) {
-                this.sender = user;
-                this.receiver = newMessageRequest.getReceiver();
+            if (validateNewMessage(newMessageRequest)) {
+                this.sender = sender;
+                this.receiver = receiver;
                 this.card = newMessageRequest.getCard();
                 this.description = newMessageRequest.getDescription();
                 this.sent = new Date();
@@ -82,27 +84,14 @@ public class Message {
      * @throws ValidationException if any of the Message information is invalid.
      */
     private boolean validateNewMessage(NewMessageRequest newMessageRequest) throws ValidationException {
-
-        //no receiver
-        if (newMessageRequest.getReceiver() == null) {
-            throw new ValidationException("Receiver cannot be null");
-        }
-
-        //in case they send to an invalid user.
-        User user = userRepository.findUserById(newMessageRequest.getReceiver().getId());
-
-        if (user == null) {
-            throw new ValidationException("Receiver does not exist");
-        }
-
         //no card
         if (newMessageRequest.getCard() == null) {
             throw new ValidationException("Message must have an associated Card");
         }
-        //todo: check in case the supplied card id is invalid
 
+        //TODO: check in case the supplied card id is invalid
         //Blank or null description
-        if (newMessageRequest.getDescription() == null || newMessageRequest.getDescription() == '') {
+        if (newMessageRequest.getDescription() == null) {
             throw new ValidationException("Message must have a description");
         }
         return true;

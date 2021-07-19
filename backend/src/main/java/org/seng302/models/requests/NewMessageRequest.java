@@ -9,12 +9,10 @@ import lombok.Data;
  */
 @Data
 public class NewMessageRequest {
-    private User receiver;
     private Card card;
     private String description;
 
-    public NewMessageRequest(User receiver, Card card, String description) {
-        this.receiver = receiver;
+    public NewMessageRequest(Card card, String description) {
         this.card = card;
         this.description = description;
     }

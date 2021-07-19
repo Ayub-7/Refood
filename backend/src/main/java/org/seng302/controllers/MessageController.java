@@ -68,20 +68,26 @@ public class MessageController {
      * @throws JsonProcessingException
      */
     @PostMapping("/users/{userId}/messages")
-    public ResponseEntity<String> addUserMessage(@RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<String> addUserMessage(@PathVariable long userId, @RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        User receiver = userRepository.findUserById(userId);
 
         //403 Attempting to create a message without logging in
         //Note: the user cannot send a message as someone else.
-        if (currentUser.getId() == null ) {
+        if (currentUser == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        //406 Attempting to send to an invalid user.
+        if (receiver == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 
         Message newMessage;
         try { // Attempt to create a new card.
-            newMessage = new Message(newMessageRequest, currentUser);
+            newMessage = new Message(newMessageRequest, currentUser, receiver);
         }
-        //
+        //400 data is not correct
         catch (ValidationException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
         }
