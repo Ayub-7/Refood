@@ -67,8 +67,8 @@ public class MessageController {
     public ResponseEntity<String> addUserMessage(@RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
-        // Attempting to create a message without logging in
-        // The user cannot send a message as someone else.
+        //403 Attempting to create a message without logging in
+        //Note: the user cannot send a message as someone else.
         if (currentUser.getId() == null ) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -83,7 +83,6 @@ public class MessageController {
         }
 
         messageRepository.save(newMessage);
-        //CardIdResponse cardIdResponse = new CardIdResponse(newCard.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -74,6 +74,8 @@ public class Message {
      * @throws ValidationException if any of the Message information is invalid.
      */
     private boolean validateNewMessage(NewMessageRequest newMessageRequest) throws ValidationException {
+
+        //no receiver
         if (newMessageRequest.getReceiver() == null) {
             throw new ValidationException("Receiver cannot be null");
         }
@@ -85,10 +87,11 @@ public class Message {
             throw new ValidationException("Receiver does not exist");
         }
 
+        //no card
         if (newMessageRequest.getCard() == null) {
             throw new ValidationException("Message must have an associated Card");
         }
-        //todo: in case the supplied card is invalid
+        //todo: check in case the supplied card id is invalid
 
         //Blank or null description
         if (newMessageRequest.getDescription() == null || newMessageRequest.getDescription() == '') {

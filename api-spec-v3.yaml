@@ -1228,10 +1228,6 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          description: Returned if a user who is not a GAA tries to send a message from somebody else.
-        '406':
-          $ref: '#/components/responses/NotAcceptableError'
   '/messages/{id}':
     delete:
       tags:
