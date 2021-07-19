@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
-import org.seng302.models.requests.NewCardRequest;
+import org.seng302.models.requests.NewMessageRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.MessageRepository;
@@ -55,33 +55,36 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(messages));
     }
 
-        /**
-         * Post user message, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
-         * Preconditions: Logged in and acting as a user
-         * Postconditions: User's messages will be retrieved if any exist
-         * @param userId ID of user that we are going to get messages from
-         * @return
-         * @throws JsonProcessingException
-         */
-        @PostMapping("/users/{userId}/messages")
-        public ResponseEntity<String> addUserMessage(@RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
-            User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+    /**
+     * Post user message, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
+     * Preconditions: Logged in and acting as a user
+     * Postconditions: User's messages will be retrieved if any exist
+     * @param userId ID of user that we are going to get messages from
+     * @return
+     * @throws JsonProcessingException
+     */
+    @PostMapping("/users/{userId}/messages")
+    public ResponseEntity<String> addUserMessage(@RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
-            // Attempting to create a card for somebody else.
-            if (newMessageRequest.getCreatorId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
+        // Attempting to create a card for somebody else.
+        // no-one else may send messages posing as another, even GAA or DGAA
+        if (newMessageRequest.getSender().getId() != currentUser.getId() ) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
-            Message newMessage;
-            try { // Attempt to create a new card.
-                newMessage = new Message(newMessageRequest, currentUser);
-            }
+        Message newMessage;
+        try { // Attempt to create a new card.
+            newMessage = new Message(newMessageRequest);
+        }
+        //
+        catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        }
 
-            catch (ValidationException exception) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-            }
+        messageRepository.save(newMessage);
+        //CardIdResponse cardIdResponse = new CardIdResponse(newCard.getId());
 
-            messageRepository.save(newMessage);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
