@@ -12,6 +12,8 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.CardRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

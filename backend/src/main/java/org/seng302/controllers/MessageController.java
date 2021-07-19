@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewMessageRequest;
-import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
@@ -29,13 +28,16 @@ public class MessageController {
     private static final Logger logger = LogManager.getLogger(MessageController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
     private MessageRepository messageRepository;
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
     private CardRepository cardRepository;
 
+    @Autowired
+    public MessageController(UserRepository userRepository, CardRepository cardRepository, MessageRepository messageRepository) {
+        this.userRepository = userRepository;
+        this.cardRepository = cardRepository;
+        this.messageRepository = messageRepository;
+    }
 
     /**
      * Gets user messages, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
@@ -89,8 +91,6 @@ public class MessageController {
         if (card == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Message must have an associated, valid, Card");
         }
-
-
 
 
         Message newMessage;
