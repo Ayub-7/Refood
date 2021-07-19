@@ -258,6 +258,9 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
+      if (this.businesses.length) {
+        this.businesses = [];
+      }
       if (this.searchbarUser === "") return;
       this.$vs.loading();
       api.searchUsersQuery(this.searchbarUser)

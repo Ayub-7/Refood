@@ -82,14 +82,6 @@ let $vs = {
     loading: jest.fn(),
 }
 
-api.searchUsersQuery = jest.fn(() => {
-    return Promise.resolve({data: mockUsersFromSearch, status: 200});
-});
-
-api.searchBusinessesQuery = jest.fn(() => {
-    return Promise.resolve({data: mockBusinessesFromSearch, status: 200});
-});
-
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
@@ -107,7 +99,14 @@ beforeEach(() => {
         }
     });
     expect(wrapper).toBeTruthy();
-    wrapper.vm.$vs.loading.close = jest.fn();
+    api.searchUsersQuery = jest.fn(() => {
+        return Promise.resolve({data: mockUsersFromSearch, status: 200}).finally();
+    });
+
+    api.searchBusinessesQuery = jest.fn(() => {
+        return Promise.resolve({data: mockBusinessesFromSearch, status: 200}).finally();
+    });
+    wrapper.vm.$vs.loading.close = jest.fn()
 });
 
 afterEach(() => {
@@ -154,11 +153,13 @@ describe("Test searching without query", () => {
 
 describe("Test searching with query", () => {
     test("Successful user search - with query", async () => {
+        wrapper.vm.$vs.loading.close = jest.fn();
         wrapper.vm.searchbarUser = "Something";
         await wrapper.vm.searchUsers();
         expect(wrapper.vm.$vs.loading).toBeCalled();
     });
     test("Successful business search - with query", async () => {
+        wrapper.vm.$vs.loading.close = jest.fn();
         wrapper.vm.searchbarBusiness = "Something";
         await wrapper.vm.searchBusiness();
         expect(wrapper.vm.$vs.loading).toBeCalled();
