@@ -57,7 +57,7 @@ public class MessageController {
 
     /**
      * Post user message, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
-     * Preconditions: Logged in and acting as a user
+     * Preconditions: Logged in and acting as a valid user. The receiver is also valid and the message is non null or blank
      * Postconditions: User's messages will be retrieved if any exist
      * @param userId ID of user that we are going to get messages from
      * @return
@@ -67,15 +67,15 @@ public class MessageController {
     public ResponseEntity<String> addUserMessage(@RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
-        // Attempting to create a card for somebody else.
-        // no-one else may send messages posing as another, even GAA or DGAA
-        if (newMessageRequest.getSender().getId() != currentUser.getId() ) {
+        // Attempting to create a message without logging in
+        // The user cannot send a message as someone else.
+        if (currentUser.getId() == null ) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Message newMessage;
         try { // Attempt to create a new card.
-            newMessage = new Message(newMessageRequest);
+            newMessage = new Message(newMessageRequest, currentUser);
         }
         //
         catch (ValidationException exception) {
