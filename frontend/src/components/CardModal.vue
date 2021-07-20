@@ -52,6 +52,9 @@ export default {
           return dateFull.toDateString();
         },
 
+        /**
+         * Obtain the current logged in user's ID
+         */
         getUserId: function() {
           api.checkSession()
               .then((response) => {
@@ -63,6 +66,11 @@ export default {
               });
         },
 
+        /**
+         * Preconditions: Must be logged in
+         * Postconditions: The card will be deleted
+         * Allows the user to delete a card
+         */
         deleteCard: function() {
           api.deleteCard(this.selectedCard.id)
           .then(() => {
