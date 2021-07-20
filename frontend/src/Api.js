@@ -304,6 +304,8 @@ export default {
      */
     deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
 
+    getUserCards: (userId) => instance.get(`/users/${userId}/cards`, {withCredentials: true}),
+
     /**
      * Creates a new card. of type:
      * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
