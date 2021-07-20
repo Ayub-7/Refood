@@ -25,7 +25,7 @@
             </vs-col>
           </vs-row>
         </div>
-      <CardModal id="cardModal" ref="cardModal" v-if="selectedCard != null" :selectedCard='selectedCard' />
+      <CardModal id="cardModal" ref="cardModal" v-if="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
     </div>
 </template>
 
@@ -49,6 +49,14 @@ export default {
     openCardModal: function(card) {
       this.selectedCard = card;
       this.$refs.cardModal.openModal();
+    },
+
+    /**
+     * Method for notifying the marketplace component that a card has been deleted
+     */
+    notifyOfDeletion: function() {
+      this.$emit('cardRemoved');
+      console.log("Removed Grid")
     }
   }
 
@@ -59,6 +67,10 @@ export default {
 </script>
 
 <style>
+
+#card-modal-message-button {
+  margin-left: 5px;
+}
 
 /* CARD STYLING */
 

@@ -18,22 +18,22 @@
       </div>
       <vs-divider></vs-divider>
       <vs-tabs alignment="center">
-        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
+        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale'); currentSection = 'ForSale'">
           <div>
-            <MarketplaceGrid v-if="displayType" :cardData="cards" />
-            <MarketplaceTable v-if="!displayType" :tableData="cards" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards" />
           </div>
         </vs-tab>
-        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
+        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted'); currentSection = 'Wanted'">
           <div>
-            <MarketplaceGrid v-if="displayType" :cardData="cards" />
-            <MarketplaceTable v-if="!displayType" :tableData="cards" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards" />
           </div>
         </vs-tab>
-        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
+        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange'); currentSection = 'Exchange'">
           <div>
-            <MarketplaceGrid v-if="displayType" :cardData="cards" />
-            <MarketplaceTable v-if="!displayType" :tableData="cards" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards" />
           </div>
 
         </vs-tab>
@@ -87,6 +87,12 @@ export default {
      */
     openAddModal: function() {
       this.$refs.marketplaceAddCard.openModal();
+    },
+    /**
+     * Method for reloading card data, after the owner of a card has deleted it
+     */
+    reloadCards: function() {
+      this.getSectionCards(this.currentSection);
     },
   },
 

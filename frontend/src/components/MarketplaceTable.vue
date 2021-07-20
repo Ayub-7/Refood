@@ -36,7 +36,7 @@
           </vs-table>
         </vs-row>
 <!--    <CardModal ref="cardModal" :key="item.id" v-for="item in tableData" :selectedCard="item" />-->
-    <CardModal ref="cardModal" v-if="selectedItem != null" :selectedCard="selectedItem" />
+    <CardModal ref="cardModal" v-if="selectedItem != null" @deleted="notifyOfDeletion" :selectedCard="selectedItem" />
   </div>
 </template>
 
@@ -62,6 +62,13 @@ export default {
       console.log(this.selectedItem);
       this.$refs.cardModal.openModal();
     },
+
+    /**
+     * Method for notifying the marketplace component that a card has been deleted
+     */
+    notifyOfDeletion: function() {
+      this.$emit('cardRemoved');
+    }
   }
 }
 </script>
