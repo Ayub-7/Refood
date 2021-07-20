@@ -139,13 +139,15 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
     }
 
+
+
     /**
      * Checks for expired cards and creates notification objects for each expired card without a current notification.
      * Function is run every 10 minutes.
      *
      *
      */
-    @Scheduled(fixedDelay = 600000, initialDelay = 0)
+    @Scheduled(fixedDelay = 60000, initialDelay = 0)
     private void updateExpiredCards() {
         logger.info("Checking for expired cards");
         Date date = new Date();
