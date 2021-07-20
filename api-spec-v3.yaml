@@ -1283,6 +1283,10 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: When a user tries to send a message to an invalid user. Works also for a null card if present in database'
+
+
   '/messages/{id}':
     delete:
       tags:
