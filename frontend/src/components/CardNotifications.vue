@@ -1,7 +1,7 @@
 <template>
   <div id="notifications">
     <div>
-      <vs-dropdown vs-trigger-click>
+      <vs-dropdown id="dropdownButton" vs-trigger-click>
         <div id="notificationContainer">
           <vs-avatar icon="notifications" size="30" name="avatar" />
           <span id="dropdownButtonName">{{ this.notifications.length}}</span>
@@ -31,8 +31,9 @@
                 </div>
             </div>
           </vs-dropdown-group>
-          <vs-dropdown-group vs-label="No notifications" v-else>
-          </vs-dropdown-group>
+          <!-- If no notifications -->
+          <vs-dropdown-group id="noCards" vs-label="No notifications" v-else />
+
         </vs-dropdown-menu>
       </vs-dropdown>
     </div>
@@ -56,27 +57,39 @@ export default {
     },
 
     methods: {
+      /**
+       * Calls api method to extend card display period
+       * @param cardId card that is going to extended
+       * @param title card title for notification
+       */
       extendCard(cardId, title) {
         api.extendCardDisplayPeriod(cardId)
         .then(() => {
           this.getNotifications();
           this.$vs.notify({title:'Card Extended', text:`Card ${title} was extended`, color:'success'});
-        }).catch((error) => {
-          console.log(error);
+        }).catch(() => {
+          this.$vs.notify({title:'Error', text:`Card ${title} could not be extended due to an error`, color:'danger'});
         })
       },
 
+      /**
+       * Calls api method to delete card
+       * @param cardId card that is going to deleted
+       * @param title card title for notification
+       */
       deleteCard(cardId, title) {
         api.deleteCard(cardId)
         .then(() => {
           this.getNotifications();
           this.$vs.notify({title:'Card Deleted', text:`Card ${title} was deleted`, color:'success'});
-        }).catch((error) => {
-          console.log(error);
+        }).catch(() => {
+          this.$vs.notify({title:'Error', text:`Card ${title} could not be deleted due to an error`, color:'danger'});
         })
       },
 
-
+      /**
+       * Calls api method to get notifications
+       */
       getNotifications() {
         api.getNotifications(store.loggedInUserId)
         .then((response) => {
@@ -86,8 +99,13 @@ export default {
     },
 
     computed: {
-        notifications() {
-            return store.notifications
+        notifications: {
+            get() {
+                return store.notifications
+            },
+            set(val) { //setter for testing purposes
+                mutations.setNotifications(val);
+            }
         }
     }
 
@@ -115,7 +133,7 @@ export default {
 }
 
 #text {
-    max-width: 65%;
+    max-width: 60%;
 }
 
 #dropdownButtonName {
@@ -138,6 +156,9 @@ export default {
     margin-right: 5px;
 }
 
+.notificationButtons {
+    margin-right: 5px;
+}
 
 .cardContainer {
   display: flex;
