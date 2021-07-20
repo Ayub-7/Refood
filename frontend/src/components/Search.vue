@@ -390,6 +390,18 @@ export default Search;
   padding: 1em;
 }
 
+#businessTable {
+  width: 65%;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  margin: auto;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  border-radius: 1.5em;
+  border-style: solid;
+  border-color: white;
+  padding: 1em;
+}
+
 #submitSearchUser {
   margin-left: 0.5em;
   margin-right: 0.5em;
@@ -421,6 +433,10 @@ th {
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 1300px) {
   #userTable {
+    width: 100%;
+  }
+
+  #businessTable {
     width: 100%;
   }
 
