@@ -13,7 +13,7 @@
     <!-- Card name -->
     <vs-row class="addCardField">
         <vs-col id="title" vs-w="2" vs-xs="12">
-            <div class="addCardHeader" >Title <span class="required">*</span> </div> 
+            <div class="addCardHeader" >Title <span class="required">*</span> </div>
         </vs-col> 
         <vs-col vs-w="9">
             <vs-textarea v-model="title" rows="1" class="addCardInput" :counter="50" :danger="(errors.includes('no-title'))"
