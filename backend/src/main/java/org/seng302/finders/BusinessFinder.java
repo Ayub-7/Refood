@@ -45,7 +45,7 @@ public class BusinessFinder {
      *               Otherwise, the query must exactly match the business name.
      * @return Predicate that will be used to query businesses
      */
-    private Predicate criteriaBuilder(String term, boolean isLike) {
+    private Predicate criteriaBuilder(String term, String type, boolean isLike) {
         //Obtains criteria
         if (!isLike) {
             String[] subTerms = term.split(" ");
@@ -65,7 +65,12 @@ public class BusinessFinder {
             return combinedCriteria;
         } else {
             term = term.strip().toLowerCase();
-            return criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
+            Predicate name = criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
+            if (type != null || type.length() > 0) {
+                Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), type);
+                return criteriaBuilder.and(name, businessType);
+            }
+            return name;
         }
     }
 
@@ -76,7 +81,7 @@ public class BusinessFinder {
      *               Otherwise, it will return results that exactly match the query
      * @return Return a list of businesses
      */
-    private List<Business> queryProcess(ArrayList<String> terms, boolean isLike) {
+    private List<Business> queryProcess(ArrayList<String> terms, String type, boolean isLike) {
         List<Predicate> criteriaList = new ArrayList<>();
         Logic logic = Logic.NONE;
         short consecutive = 0;
@@ -98,7 +103,7 @@ public class BusinessFinder {
                     consecutive++;
                 }
 
-                Predicate combinedCriteria = this.criteriaBuilder(term, isLike);
+                Predicate combinedCriteria = this.criteriaBuilder(term, type, isLike);
 
                 if (criteriaList.isEmpty()) {
                     logic = Logic.NONE;
@@ -131,14 +136,14 @@ public class BusinessFinder {
      * @param query The search query to be used to filter search results
      * @return Will return all businesses if query is blank, otherwise will filter according to what is in the query
      */
-    public List<Business> findBusinesses(String query) {
+    public List<Business> findBusinesses(String query, String type) {
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Business.class);
         businessRoot = criteriaQuery.from(Business.class);
         ArrayList<String> terms = this.searchQueryKeywords(query);
         if (terms.size() > 0) {
-            List<Business> businesses = this.queryProcess(terms, false);
-            List<Business> partialBusinesses = this.queryProcess(terms, true);
+            List<Business> businesses = this.queryProcess(terms, type, false);
+            List<Business> partialBusinesses = this.queryProcess(terms, type, true);
             partialBusinesses.removeAll(businesses);
             businesses.addAll(partialBusinesses);
             return businesses;
