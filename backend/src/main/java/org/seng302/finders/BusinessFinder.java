@@ -41,6 +41,7 @@ public class BusinessFinder {
     /**
      * Builds criteria to help with querying businesses
      * @param term query used for filtering businesses
+     * @param type Type of business
      * @param isLike If true, it will require that a business' name either matches the query or part of its name has the query in it.
      *               Otherwise, the query must exactly match the business name.
      * @return Predicate that will be used to query businesses
@@ -77,6 +78,7 @@ public class BusinessFinder {
     /**
      * This method is used twice in this class to filter the exact matching results and to filter similar results.
      * @param terms List of subqueries to be used for searching.
+     * @param type Type of business
      * @param isLike If true, it will return results with things that contains query as a whole word or a part of a word.
      *               Otherwise, it will return results that exactly match the query
      * @return Return a list of businesses
@@ -134,6 +136,7 @@ public class BusinessFinder {
     /**
      * The only publicly available method to access outside of this class to search for businesses.
      * @param query The search query to be used to filter search results
+     * @param type Type of business
      * @return Will return all businesses if query is blank, otherwise will filter according to what is in the query
      */
     public List<Business> findBusinesses(String query, String type) {

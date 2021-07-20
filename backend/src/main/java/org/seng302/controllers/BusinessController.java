@@ -197,6 +197,7 @@ public class BusinessController {
     /**
      * Searches for businesses, with credintials
      * @param query A string with the search's query
+     * @param type Type of business
      * @return Http status code and list of businesses with name/names matching request.
      */
     @GetMapping("/businesses/search")
