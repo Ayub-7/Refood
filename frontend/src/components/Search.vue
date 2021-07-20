@@ -5,6 +5,18 @@
       <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers">Search</vs-button>
       <vs-input class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
       <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness">Search</vs-button>
+
+      <vs-select
+          width="10%"
+          id="business-type"
+          class="form-control"
+          label="Business Type *"
+          v-model="businessType"
+          autocomplete >
+        <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
+      </vs-select>
+      <vs-button @click="businessType = null">Clear</vs-button>
+
     </div>
 
 
@@ -138,6 +150,8 @@ const Search = {
   name: "Search",
   data: function() {
     return {
+      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
+      businessType: null,
       tableLoaded: false,
       searchbarUser: "",
       searchbarBusiness: "",
@@ -296,6 +310,11 @@ const Search = {
       }
       if (this.searchbarBusiness === "") return;
       this.$vs.loading();
+      // if(this.businessType){
+      //
+      // } else {
+      //
+      // }
       api.searchBusinessesQuery(this.searchbarBusiness)
          .then((response) => {
            this.businesses = response.data;
