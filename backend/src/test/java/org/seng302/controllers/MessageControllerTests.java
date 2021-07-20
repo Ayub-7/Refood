@@ -7,9 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.seng302.controllers.MessageController;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
+import org.seng302.models.requests.NewMessageRequest;
+
 import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.CardRepository;
@@ -46,9 +51,16 @@ class MessageControllerTests {
     @MockBean
     private UserRepository userRepository;
 
+    @MockBean
+    private CardRepository cardRepository;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private User testUserA;
     private User testUserB;
+    private Card cardA;
+    private Card cardB;
 
 
 
@@ -61,13 +73,15 @@ class MessageControllerTests {
         testUserB = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ItqVNvM2JBA");
         testUserB.setId(2L);
 
-
-
         NewCardRequest cardRequest = new NewCardRequest(testUserA.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
-        Card card = new Card(cardRequest, testUserA);
+        cardA = new Card(cardRequest, testUserA);
+        cardB = new Card(cardRequest, testUserB);
 
-        Message message = new Message(testUserB, testUserA, card, "hello", new Date());
+        NewMessageRequest newMessageRequest = new NewMessageRequest(cardA.getId(), "desc");
+
+        Message message = new Message(testUserB, testUserA, cardA, "hello", new Date());
+        Message messageInvalid = new Message(testUserB, testUserA, cardA, "hello", new Date());
 
         messages = new ArrayList<Message>();
         messages.add(message);
@@ -124,6 +138,100 @@ class MessageControllerTests {
         mvc.perform(get("/users/{userId}/messages", 1)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
                 .andExpect(status().isNotAcceptable());
+    }
+
+
+    /**
+    * Post Messages
+    **/
+
+    @Test
+    @WithMockUser
+    void postMessages_validIdAndCorrectUser_returnOk() throws Exception {
+        NewMessageRequest newMessageRequest = new NewMessageRequest(cardA.getId(), "Simple description");
+        Mockito.when(userRepository.findUserById(testUserA.getId())).thenReturn(testUserA);
+        Mockito.when(cardRepository.findCardById(cardA.getId())).thenReturn(cardA);
+
+        mvc.perform(post("/users/{userId}/messages", 1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(newMessageRequest)))
+                .andExpect(status().isCreated());
+    }
+
+    //401: Invalid/unauthorized user
+    @Test
+    void postMessages_noAuth_returnUnauthorized() throws Exception {
+        NewMessageRequest newMessageRequest = new NewMessageRequest(cardA.getId(), "Simple description");
+        Mockito.when(userRepository.findUserById(testUserA.getId())).thenReturn(testUserA);
+        Mockito.when(cardRepository.findCardById(cardA.getId())).thenReturn(cardA);
+
+        mvc.perform(post("/users/{userId}/messages", 1)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(newMessageRequest)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    //400: invalid data
+    @Test
+    @WithMockUser
+    void postMessages_noMessageDescription_returnIsBadRequest() throws Exception {
+        NewMessageRequest newMessageRequest = new NewMessageRequest(cardA.getId(), null);
+        Mockito.when(userRepository.findUserById(testUserA.getId())).thenReturn(testUserA);
+        Mockito.when(cardRepository.findCardById(cardA.getId())).thenReturn(cardA);
+
+        mvc.perform(post("/users/{userId}/messages", 1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(newMessageRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void postMessages_badCardId_returnIsBadRequest() throws Exception {
+        String newMessageRequest = "{\n" +
+                "    \"cardId\": \"send it\"\n" +
+                "    \"description\": \"No wof reg, send it\"\n" +
+                "}";
+        Mockito.when(userRepository.findUserById(testUserA.getId())).thenReturn(testUserA);
+        Mockito.when(cardRepository.findCardById(cardA.getId())).thenReturn(cardA);
+
+        mvc.perform(post("/users/{userId}/messages", 1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB)
+                .contentType("application/json")
+                .content(newMessageRequest))
+                .andExpect(status().isBadRequest());
+    }
+
+    //card not found
+    @Test
+    @WithMockUser
+    void postMessages_cardDoesntExist_returnIsForbidden() throws Exception {
+        NewMessageRequest newMessageRequest = new NewMessageRequest(cardA.getId(), "Simple description");
+        Mockito.when(userRepository.findUserById(testUserA.getId())).thenReturn(testUserA);
+        Mockito.when(cardRepository.findCardById(cardA.getId())).thenReturn(cardA);
+
+        mvc.perform(post("/users/{userId}/messages", 80)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(newMessageRequest)))
+                .andExpect(status().isForbidden());
+    }
+
+    //user not found
+    @Test
+    @WithMockUser
+    void postMessages_receiverDoesntExist_returnIsForbidden() throws Exception {
+        NewMessageRequest newMessageRequest = new NewMessageRequest(cardA.getId(), "Simple description");
+        Mockito.when(userRepository.findUserById(testUserA.getId())).thenReturn(null);
+        Mockito.when(cardRepository.findCardById(cardA.getId())).thenReturn(cardA);
+
+        mvc.perform(post("/users/{userId}/messages", 1)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(newMessageRequest)))
+                .andExpect(status().isForbidden());
     }
 
 

@@ -6,9 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewMessageRequest;
-import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.CardRepository;
+import org.seng302.models.responses.MessageIdResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,16 +30,14 @@ public class MessageController {
     private static final Logger logger = LogManager.getLogger(MessageController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
     private MessageRepository messageRepository;
-    private UserRepository userRepository;
-    private CardRepository cardRepository;
 
     @Autowired
-    public MessageController(UserRepository userRepository, CardRepository cardRepository, MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.cardRepository = cardRepository;
-        this.messageRepository = messageRepository;
-    }
+    private UserRepository userRepository;
+
+    @Autowired
+    private CardRepository cardRepository;
 
     /**
      * Gets user messages, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
@@ -78,16 +78,17 @@ public class MessageController {
         User receiver = userRepository.findUserById(userId);
         Card card = cardRepository.findCardById(newMessageRequest.getCardId());
 
-        //403 Attempting to create a message without logging in
+        //401 Attempting to create a message without logging in
         //Note: the user cannot send a message as someone else.
         if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        //406 Attempting to send to an invalid user.
+        //403 Attempting to send to an invalid user.
         if (receiver == null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        //403 Attempting to send via an invalid card.
         if (card == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Message must have an associated, valid, Card");
         }
@@ -103,7 +104,9 @@ public class MessageController {
         }
 
         messageRepository.save(newMessage);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        MessageIdResponse messageIdResponse = new MessageIdResponse(newMessage.getId());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(mapper.writeValueAsString(messageIdResponse));
     }
 }
