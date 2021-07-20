@@ -315,7 +315,8 @@ const Search = {
       // } else {
       //
       // }
-      api.searchBusinessesQuery(this.searchbarBusiness)
+      //console.log(this.businessType);
+      api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType)
          .then((response) => {
            this.businesses = response.data;
            this.businesses = this.businesses.filter(x => typeof(x) == "object")

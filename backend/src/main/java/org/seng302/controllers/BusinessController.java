@@ -9,6 +9,7 @@ import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
 import org.seng302.models.Role;
 import org.seng302.models.User;
+import org.seng302.models.requests.BusinessTypeRequest;
 import org.seng302.models.responses.BusinessIdResponse;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
@@ -203,10 +204,27 @@ public class BusinessController {
     @GetMapping("/businesses/search")
     public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query, String type) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
+        System.out.println("Searching for businesses...");
         List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query, type));
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
     }
+//
+//    /**
+//     * Searches for businesses, with credintials
+//     * @param query A string with the search's query
+//     * @param type Type of business
+//     * @return Http status code and list of businesses with name/names matching request.
+//     */
+//    @GetMapping("/businesses/search")
+//    public ResponseEntity<String> findBusinesses(@RequestBody BusinessTypeRequest req) throws JsonProcessingException {
+//        logger.debug("Searching for businesses...");
+//        System.out.println("Searching for businesses...");
+//        System.out.println(req.getBusinessType().toString());
+//        List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(req.getQuery(), req.getBusinessType().toString()));
+//
+//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
+//    }
 
 
     /**

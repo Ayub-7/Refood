@@ -111,6 +111,13 @@ export default {
     searchBusinessesQuery: (query) => instance.get(`/businesses/search?searchQuery="${query}"`, {withCredentials: true}),
 
     /**
+     *  Query search that returns businesses based on the parameter query
+     * @param query to help narrow down the businesses
+     * @returns {*}
+     */
+    searchBusinessesWithTypeQuery: (query, type) => instance.get(`/businesses/search?searchQuery="${query}"`, {type}, {withCredentials: true}),
+
+    /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
      * @param id user id to be made admin.
      */
