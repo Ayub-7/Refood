@@ -100,6 +100,8 @@ export default {
         {text:'Title',value:'title'},
         {text:'Date Created',value:'created'},
         {text:'Keywords',value:'keywords'},
+        {text:'Country',value:'country'},
+        {text:'City',value:'city'},
       ],
       optionsItemsPerPage:[
         {text:'Showing 10 Per Page',value:'10'},
@@ -144,13 +146,18 @@ export default {
      * @field tabIndex must track this.tabIndex
      */
     onSuccess(sectionName) {
-      console.log(sectionName + this.tabIndex)
       switch (sectionName) {
         case "Wanted":
           this.tabIndex = 1;
           break;
         case "Exchange":
           this.tabIndex = 2;
+          break;
+        case "Country":
+          this.tabIndex = 3;
+          break;
+        case "City":
+          this.tabIndex = 4;
           break;
         default:
           this.tabIndex = 0;
@@ -180,7 +187,17 @@ export default {
      */
     sortData: function (field) {
       let direction = this.toggleDirection;
-      this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field].toUpperCase() < cardTwo[field].toUpperCase()) ? direction : -direction);
+      if (field.toLowerCase() === "city" || field.toLowerCase() === "country") {
+        this.cards = this.cards.sort((cardOne,cardTwo) => {
+          if (cardOne["user"]["homeAddress"] && cardTwo["user"]["homeAddress"]) {
+            if (cardOne["user"]["homeAddress"][field] && cardTwo["user"]["homeAddress"][field]) {
+              return (cardOne["user"]["homeAddress"][field].toUpperCase() < cardTwo["user"]["homeAddress"][field].toUpperCase()) ? direction : -direction;
+            }
+          }
+        });
+      } else {
+        this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field].toUpperCase() < cardTwo[field].toUpperCase()) ? direction : -direction);
+      }
       this.toggleDirection = this.toggleDirection*-1;
     }
 
