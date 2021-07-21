@@ -46,9 +46,13 @@
           </nav>
         </main>
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
-      <div class="container">
+      <div v-if="cards.length > 0" class="container">
         <MarketplaceGrid :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)"></MarketplaceGrid>
-        <vs-pagination :max="5" :total="Math.round(cards.length/4+1)" v-model="currentCardPage"></vs-pagination>
+        <vs-pagination :max="5" :total="Math.ceil(cards.length/4)" v-model="currentCardPage"></vs-pagination>
+      </div>
+      <!-- If the user has no active cards -->
+      <div v-else class="container">
+        This user has no active cards on the marketplace right now.
       </div>
     </vs-popup>
   </div>
@@ -57,7 +61,7 @@
 <script>
 import api from "../Api";
 import {mutations, store} from "../store"
-import MarketplaceGrid from "@/components/MarketplaceGrid";
+import MarketplaceGrid from "./MarketplaceGrid";
 
 const Homepage = {
   name: "Homepage",
@@ -257,7 +261,7 @@ export default Homepage;
   z-index: 100;
 }
 
-#option-view-activity {
+#cards-btn {
   padding-left: 0;
   padding-right: 0;
 }
