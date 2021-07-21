@@ -44,7 +44,7 @@
             </div>
           </nav>
 
-          <HomePageMessages></HomePageMessages>
+          <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
         </main>
   </div>
 </template>

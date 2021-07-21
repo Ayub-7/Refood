@@ -1,5 +1,6 @@
 package org.seng302.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -28,6 +29,7 @@ public class Message {
 
     private String description;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date sent;
 
     /**
