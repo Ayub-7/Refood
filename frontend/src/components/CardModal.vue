@@ -23,7 +23,7 @@
     <transition name="slide" v-if="showTransition">
     <div id="card-modal-message" v-if="messaging">
       <vs-textarea v-model="message" id="message-input"></vs-textarea>
-      <vs-button id="card-modal-message-send" @click="sendMessage(selectedCard.id, message)">Send Message</vs-button>
+      <vs-button id="card-modal-message-send" @click="sendMessage(selectedCard, message)">Send Message</vs-button>
     </div>
     </transition>
 
@@ -123,8 +123,41 @@ export default {
          * TODO: to be implemented
          * @param cardId ID of card whose owner the user is going to message
          */
-        sendMessage(cardId, message) {
-          console.log("Implement Me", cardId, message);
+        sendMessage(card, message) {
+          let recipient;
+
+          //Because the server may return either the full user object or just their id
+          if (card.user) {
+            recipient = card.user.id;
+          } else {
+            recipient = card.userId;
+          }
+
+          if (this.checkMessage(message)) {
+            api.postMessage(recipient, card.id, message)
+                .then((res) => {
+                  console.log(res.data.messageId);
+                  this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
+
+                })
+                .catch((error) => {
+                  this.$log.debug(error);
+                  this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
+                });
+          }
+
+        },
+
+        /**
+         * Check the message contents
+         * Simply check a blank message is not sent
+         */
+         checkMessage(message) {
+          if (message == null || message === "") {
+            this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
+            return false
+          }
+          return true;
         },
 
         /**

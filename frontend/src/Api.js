@@ -331,6 +331,20 @@ export default {
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
 
+    /**
+     *
+     * @param userId        The intended recipient of the message
+     * @param cardId        Id of the card the message relates to
+     * @param description   Message content
+     * @returns {Promise<messageId<any>>}   The ID of the created message
+     *
+     */
+
+    postMessage: async(userId, cardId, description) =>
+        instance.post(`/users/${userId}/messages`, {cardId, description}, {withCredentials: true}),
+
+
+
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
 
 
