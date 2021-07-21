@@ -158,7 +158,6 @@ export default {
     this.getSession();
     this.getBusinessInventory();
     this.getProducts(this.$route.params.id);
-
   },
 
   methods: {
@@ -168,7 +167,6 @@ export default {
      */
     openNewListingModal(inventory) {
       this.invItem = inventory;
-      console.log(this.invItem);
       this.price = this.invItem.pricePerItem;
       this.listingQuantityMax = this.invItem.quantity;
       this.closes = this.invItem.expires + 'T00:00';
@@ -179,7 +177,7 @@ export default {
      * Opens the modify inventory modal by calling the open function inside the component.
      */
     openModifyModal(inventory) {
-      this.$refs.modifyInventoryModal.open(inventory);
+      this.$refs.modifyInventoryModal.open(inventory, this.currency);
     },
 
     onSuccess() {

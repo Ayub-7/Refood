@@ -102,6 +102,8 @@ beforeEach(() => {
         "primaryImagePath": null
     };
 
+    wrapper.vm.currentProduct = mockProduct;
+
 });
 
 afterEach(() => {
@@ -135,10 +137,28 @@ describe('Component', () => {
         expect(wrapper.vm.errors.includes('past-expiry')).toBeTruthy();
     });
 
-    test('Bad price per item error', () => {
+    test('Negative price per item error', () => {
         wrapper.vm.invenForm.pricePerItem = -50;
         wrapper.vm.checkForm();
-        expect(wrapper.vm.invenForm.pricePerItem).toBeTruthy();
+        expect(wrapper.vm.errors).toContain("pricePerItem");
+    });
+
+    test('Null total price error', () => {
+        wrapper.vm.invenForm.totalPrice = null;
+        expect(wrapper.vm.checkForm());
+        expect(wrapper.vm.errors).toContain("totalPrice");
+    });
+
+    test('Negative total price error', () => {
+        wrapper.vm.invenForm.totalPrice = -50;
+        expect(wrapper.vm.checkForm());
+        expect(wrapper.vm.errors).toContain("totalPrice");
+    });
+
+    test('Negative quantity error', () => {
+        wrapper.vm.invenForm.quantity = -10;
+        expect(wrapper.vm.checkForm());
+        expect(wrapper.vm.errors).toContain(wrapper.vm.invenForm.quantity);
     });
 
     test('Past best before date error', () => {
@@ -171,6 +191,7 @@ describe('Component', () => {
     test('Successful check', () => {
         wrapper.vm.invenForm.prodId = 'W04GP5EC0B1798680';
         wrapper.vm.invenForm.pricePerItem = 5.5;
+        wrapper.vm.invenForm.totalPrice = 16.5;
         wrapper.vm.invenForm.manufactureDate = "2021-01-27";
         wrapper.vm.invenForm.bestBefore = "2022-01-27";
         wrapper.vm.invenForm.listExpiry = "2022-01-27";
@@ -202,6 +223,7 @@ describe("Get business products", () => {
 describe("Modify inventory tests", () => {
     test("Successful modify", async () => {
         wrapper.vm.item.id = 1;
+        wrapper.vm.currentProduct.id = 1;
         wrapper.vm.invenForm.prodId = 'W04GP5EC0B1798680';
         wrapper.vm.invenForm.pricePerItem = 5.5;
         wrapper.vm.invenForm.totalPrice = 12;

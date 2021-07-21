@@ -3,7 +3,7 @@
     <vs-popup id="inventory-modal" title="Add New Inventory Entry" :active.sync="addNewInv">
       <!-- Product Image -->
       <div id="header-row">
-        <div style="margin: auto; cursor: pointer;">
+        <div id="image-container">
           <vs-tooltip text="Click here for more product details">
             <vs-tooltip :text="product.description" title="Description" position="bottom">
               <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
@@ -28,6 +28,7 @@
               type="number"
               :danger="(errors.includes('pricePerItem'))"
               danger-text="Price per item must be greater than zero and numeric."
+              :min="0"
               id="pricePerItem"
               v-model="invenForm.pricePerItem"/>
         </div>
@@ -35,8 +36,9 @@
           <label for="totalPrice">Total price *</label>
           <vs-input
               type="number"
-              :danger="(errors.includes(invenForm.totalPrice))"
+              :danger="(errors.includes('totalPrice'))"
               danger-text="Total price must be greater than zero and numeric."
+              :min="0"
               id="totalPrice"
               v-model="invenForm.totalPrice"/>
         </div>
@@ -204,30 +206,26 @@ export default {
      */
     checkForm: function() {
       this.errors = [];
-      var today = new Date();
+      let today = new Date();
       const invalidChars = /^([a-zA-Z0-9\u0600-\u06FF\u0660-\u0669\u06F0-\u06F9 _.-]+)$/;
       if (!invalidChars.test(this.invenForm.prodId)) {
         this.errors.push("invalid-chars");
       }
 
-      if(isNaN(this.invenForm.pricePerItem)) {
+      if (isNaN(this.invenForm.pricePerItem)) {
         this.errors.push('pricePerItem');
       }
 
-      var dateInPast = function(firstDate, secondDate) {
-        if(firstDate.setHours(0,0,0,0) <= secondDate.setHours(0,0,0,0)) {
-          return true;
-        }
-
-        return false;
+      if (isNaN(this.invenForm.totalPrice)) {
+        this.errors.push('totalPrice');
       }
 
-      var dateInFuture = function(firstDate, secondDate) {
-        if(firstDate.setHours(0,0,0,0) >= secondDate.setHours(0,0,0,0)) {
-          return true;
-        }
+      const dateInPast = function(firstDate, secondDate) {
+        return firstDate.setHours(0, 0, 0, 0) <= secondDate.setHours(0, 0, 0, 0);
+      }
 
-        return false;
+      const dateInFuture = function(firstDate, secondDate) {
+        return firstDate.setHours(0, 0, 0, 0) >= secondDate.setHours(0, 0, 0, 0);
       }
 
       if (this.invenForm.bestBefore === '' && this.invenForm.sellBy === '' && this.invenForm.manufactureDate === ''
@@ -247,9 +245,15 @@ export default {
         this.errors.push('pricePerItem');
       }
 
+      if (this.invenForm.totalPrice <= 0.0) {
+        this.errors.push('totalPrice');
+      }
+
+      let timestamp;
+      let dateObject;
       if (this.invenForm.bestBefore !== '') {
-        var timestamp = Date.parse(this.invenForm.bestBefore);
-        var dateObject = new Date(timestamp)
+        timestamp = Date.parse(this.invenForm.bestBefore);
+        dateObject = new Date(timestamp)
         if (dateInPast(dateObject, today) === true) {
           this.errors.push('past-date');
           this.errors.push('past-best');
@@ -311,7 +315,7 @@ export default {
         });
       }
 
-      if (this.errors.includes(this.quantity)) {
+      if (this.errors.includes(this.invenForm.quantity)) {
         this.$vs.notify({
           title: 'Failed to create inventory item',
           text: 'Quantity must be greater than zero.',
@@ -457,6 +461,18 @@ export default {
   max-width: 200px;
   min-height: 100px;
   max-height: 100px;
+}
+
+#image-container {
+  margin: auto;
+  cursor: pointer;
+
+  transition: .5s ease;
+  backface-visibility: hidden;
+}
+
+#image-container:hover {
+  opacity: 0.5;
 }
 
 /* === FULL PRODUCT MODAL === */
