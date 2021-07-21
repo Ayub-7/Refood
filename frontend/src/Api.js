@@ -305,6 +305,13 @@ export default {
     deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
 
     /**
+     * Gets the user's cards
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
+     */
+    getUserCards: (userId) => instance.get(`/users/${userId}/cards`, {withCredentials: true}),
+
+    /**
      * Creates a new card. of type:
      * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
      *
@@ -322,5 +329,6 @@ export default {
 
     createCard: async(creatorId, title, description, keywords, section) =>
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
+
 
 }
