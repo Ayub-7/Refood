@@ -323,7 +323,7 @@ export default {
     createCard: async(creatorId, title, description, keywords, section) =>
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
-
+    
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
 
 }
