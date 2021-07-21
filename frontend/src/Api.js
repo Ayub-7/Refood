@@ -115,10 +115,10 @@ export default {
      * @param query to help narrow down the businesses
      * @returns {*}
      */
-    searchBusinessesWithTypeQuery: (query, type) => instance.get(`/businesses/search?searchQuery="${query}"`, {type}, {withCredentials: true}),
+    searchBusinessesWithTypeQuery: (query, type) => instance.get(`/businesses/search?searchQuery="${query}"`, type, {withCredentials: true}),
 
     /**
-     * Method (frontend) to let a DGAA user make a user an GAA admin user.
+     * Method (frontend) to let a DGAA user make a user an GAA admin user.s
      * @param id user id to be made admin.
      */
     makeUserAdmin: async(id) =>
