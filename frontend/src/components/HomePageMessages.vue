@@ -76,7 +76,8 @@ export default {
           }
 
           console.log(this.users);
-        }).catch(() => {
+        }).catch((error) => {
+          this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
 
         })
