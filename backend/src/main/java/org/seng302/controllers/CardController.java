@@ -16,12 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Controller class that handles the endpoints of community marketplace cards.
@@ -141,6 +142,8 @@ public class CardController {
     /**
      * Checks for expired cards and creates notification objects for each expired card without a current notification.
      * Function is run every 10 minutes.
+     *
+     *
      */
     @Scheduled(fixedDelay = 600000, initialDelay = 0)
     private void updateExpiredCards() {
@@ -155,13 +158,51 @@ public class CardController {
                 String title = card.getTitle();
                 Date displayPeriodEnd = card.getDisplayPeriodEnd();
                 Notification notification = new Notification(userId, cardId, title, displayPeriodEnd);
+
                 notificationRepository.save(notification);
+            } else {
+                if(checkCardIsPastNotificationPeriod(card.getDisplayPeriodEnd())) {
+                    deleteExpiredCard(card);
+                }
             }
         }
         int repositorySize = notificationRepository.findAll().size();
         String message = MessageFormat.format("Number of expired cards: {0}", repositorySize);
         logger.info(message);
     }
+
+
+    /**
+     * Deletes given card and sets notification status to deleted
+     * Preconditions: Card exists and has notification that is expired
+     * Postconditions: Card is removed from DB and Cards notification is updated to deleted
+     * @param card card that is going to be deleted
+     */
+    private void deleteExpiredCard(Card card) {
+        Notification cardNotification = notificationRepository.findNotificationByCardId(card.getId());
+        cardNotification.setDeleted();
+        notificationRepository.save(cardNotification);
+
+        cardRepository.delete(card);
+    }
+
+
+    /**
+     * Checks card's display period end to see if it has been 24 hours
+     * Preconditions: Card exists with valid display period
+     * Postconditions: Card will either be past notification period or not
+     * @param displayPeriodEnd cards display period end, which would be when the notification starts
+     * @return True if notification has existed for 24 hours or longer, False if existed for less
+     */
+    private boolean checkCardIsPastNotificationPeriod(Date displayPeriodEnd) {
+        Date now = new Date();
+
+        long timeDiffInMs = Math.abs(now.getTime() - displayPeriodEnd.getTime());
+        long timeDiff = TimeUnit.HOURS.convert(timeDiffInMs, TimeUnit.MILLISECONDS);
+
+        return timeDiff >= 24;
+    }
+
 
     /**
      * GET endpoint, returns detailed information about a cards belonging to a specific User
@@ -208,6 +249,11 @@ public class CardController {
         }
         // Creating a copy of the old card with extended date
         card.updateDisplayPeriodEndDate();
+
+        //Deletes cards notification (since display period is being extended)
+        Notification cardNotification = notificationRepository.findNotificationByCardId(cardId);
+        notificationRepository.delete(cardNotification);
+
         cardRepository.save(card);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -240,6 +286,11 @@ public class CardController {
         if(cardCreator.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
+        //Deletes cards notification (since display period is being extended)
+        Notification cardNotification = notificationRepository.findNotificationByCardId(cardId);
+        if(cardNotification != null) notificationRepository.delete(cardNotification);
+
         cardRepository.deleteCardById(cardId);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }

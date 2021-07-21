@@ -2,7 +2,6 @@ package org.seng302.repositories;
 
 import org.seng302.models.Message;
 import org.seng302.models.User;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

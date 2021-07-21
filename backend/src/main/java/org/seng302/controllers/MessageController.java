@@ -11,6 +11,8 @@ import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.CardRepository;
 import org.seng302.models.responses.MessageIdResponse;
 
+import org.seng302.repositories.MessageRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +40,7 @@ public class MessageController {
 
     @Autowired
     private CardRepository cardRepository;
+
 
     /**
      * Gets user messages, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
