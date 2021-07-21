@@ -1,7 +1,7 @@
 <template>
   <div id="form-outer">
     <vs-popup classContent="popup-example"  title="Modify Inventory Item" :active.sync="modifyInv">
-      <div class="form-group required vs-col" vs-order="1" id="firstColModal">
+      <div class="form-group vs-col" vs-order="1" id="first-col-modal">
         <div class="row">
           <label for="prodId">Product</label>
           <vs-select id="prodId" class="selectExample" v-model="invenForm.prodId" disabled>
@@ -29,7 +29,7 @@
               v-model="invenForm.quantity"/>
         </div>
       </div>
-      <div class="form-group required vs-col" vs-order="2" id="secondColModal">
+      <div class="form-group vs-col" vs-order="2" id="second-col-modal">
         <div class="row">
           <label for="bestBefore">Best before</label>
           <vs-input
@@ -239,7 +239,6 @@ export default {
           });
     },
     updateInventory: function() {
-      console.log(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry);
       if (this.errors.length === 0) {
         api.modifyInventory(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
             .then((response) => {
@@ -254,9 +253,7 @@ export default {
               });
             }).catch((error) => {
           if (error.response) {
-            console.log(error);
             if (error.response.status === 400) {
-              console.log(error.response);
               this.$vs.notify( {
                 title: 'Failed to add an inventory item',
                 text: 'Incomplete form, or the product does not exist.',
@@ -269,7 +266,6 @@ export default {
                 color: 'danger'
               });
             }
-            console.log(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         })
@@ -292,7 +288,7 @@ export default {
 
 
 <style>
-#firstColModal {
+#first-col-modal {
   margin-right: 160px;
   margin-left: 5px;
 }

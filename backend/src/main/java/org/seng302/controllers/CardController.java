@@ -11,20 +11,17 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.http.HttpSession;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -145,6 +142,8 @@ public class CardController {
     /**
      * Checks for expired cards and creates notification objects for each expired card without a current notification.
      * Function is run every 10 minutes.
+     *
+     *
      */
     @Scheduled(fixedDelay = 600000, initialDelay = 0)
     private void updateExpiredCards() {
@@ -159,13 +158,51 @@ public class CardController {
                 String title = card.getTitle();
                 Date displayPeriodEnd = card.getDisplayPeriodEnd();
                 Notification notification = new Notification(userId, cardId, title, displayPeriodEnd);
+
                 notificationRepository.save(notification);
+            } else {
+                if(checkCardIsPastNotificationPeriod(card.getDisplayPeriodEnd())) {
+                    deleteExpiredCard(card);
+                }
             }
         }
         int repositorySize = notificationRepository.findAll().size();
         String message = MessageFormat.format("Number of expired cards: {0}", repositorySize);
         logger.info(message);
     }
+
+
+    /**
+     * Deletes given card and sets notification status to deleted
+     * Preconditions: Card exists and has notification that is expired
+     * Postconditions: Card is removed from DB and Cards notification is updated to deleted
+     * @param card card that is going to be deleted
+     */
+    private void deleteExpiredCard(Card card) {
+        Notification cardNotification = notificationRepository.findNotificationByCardId(card.getId());
+        cardNotification.setDeleted();
+        notificationRepository.save(cardNotification);
+
+        cardRepository.delete(card);
+    }
+
+
+    /**
+     * Checks card's display period end to see if it has been 24 hours
+     * Preconditions: Card exists with valid display period
+     * Postconditions: Card will either be past notification period or not
+     * @param displayPeriodEnd cards display period end, which would be when the notification starts
+     * @return True if notification has existed for 24 hours or longer, False if existed for less
+     */
+    private boolean checkCardIsPastNotificationPeriod(Date displayPeriodEnd) {
+        Date now = new Date();
+
+        long timeDiffInMs = Math.abs(now.getTime() - displayPeriodEnd.getTime());
+        long timeDiff = TimeUnit.HOURS.convert(timeDiffInMs, TimeUnit.MILLISECONDS);
+
+        return timeDiff >= 24;
+    }
+
 
     /**
      * GET endpoint, returns detailed information about a cards belonging to a specific User
@@ -212,6 +249,11 @@ public class CardController {
         }
         // Creating a copy of the old card with extended date
         card.updateDisplayPeriodEndDate();
+
+        //Deletes cards notification (since display period is being extended)
+        Notification cardNotification = notificationRepository.findNotificationByCardId(cardId);
+        notificationRepository.delete(cardNotification);
+
         cardRepository.save(card);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -244,8 +286,49 @@ public class CardController {
         if(cardCreator.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
+        //Deletes cards notification (since display period is being extended)
+        Notification cardNotification = notificationRepository.findNotificationByCardId(cardId);
+        if(cardNotification != null) notificationRepository.delete(cardNotification);
+
         cardRepository.deleteCardById(cardId);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
+    }
+
+    /**
+     * PUT card endpoint; updates/modifies an existing card with new information.
+     *
+     * @param cardId ID of card to modify
+     * @param cardInfo the edited information of the card to save
+     * @param session the current user session
+     * @return 401 if not logged in (handled by spring sec), 403 if card owner ID, session user ID do not match or if not a D/GAA,
+     * 406 if the card ID does not exist, 400 if there are errors with the supplied information, 200 otherwise.
+     */
+    @PutMapping("/cards/{cardId}")
+    public ResponseEntity<String> editCardById(@PathVariable long cardId, @RequestBody NewCardRequest cardInfo, HttpSession session) {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        Card editedCard;
+        try { // Attempt to create a card entity with the given info.
+            editedCard = new Card(cardInfo, currentUser);
+        }
+        catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        }
+
+        Card existingCard = cardRepository.findCardById(cardId);
+        if (existingCard == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        if (existingCard.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        editedCard.setId(cardId);
+        cardRepository.save(editedCard);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

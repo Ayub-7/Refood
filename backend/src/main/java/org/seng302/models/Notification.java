@@ -38,4 +38,11 @@ public class Notification {
         this.displayPeriodEnd = displayPeriodEnd;
         this.status = NotificationStatus.EXPIRED;
     }
+
+    /***
+     * Sets notification status to deleted
+     */
+    public void setDeleted() {
+        status = NotificationStatus.DELETED;
+    }
 }

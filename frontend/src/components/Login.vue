@@ -6,19 +6,19 @@
         <vs-input class="form-control"
                   id="email" type="text"
                   v-model="email"
-                  label-placeholder="Enter Email"
+                  label="Enter Email"
                   :danger="this.errors.email != null"
                   :danger-text="this.errors.email"
                   required></vs-input>
         <vs-input class="form-control"
                   id="password" type="password"
                   v-model="password"
-                  label-placeholder="Enter password"
+                  label="Enter Password"
                   :danger="this.errors.password != null"
                   :danger-text="this.errors.password"
                   required></vs-input>
 
-        <button class="loginButton form-input" type="button"  @click="checkForm(); loginSubmit()">Sign in</button>
+        <vs-button class="loginButton" @click="checkForm(); loginSubmit()">Sign in</vs-button>
     </form>
 
   </div>
@@ -64,8 +64,6 @@ const Login = {
         this.errors.password = "Password required.";
         this.errors.hasErrors = true;
       }
-
-      console.log(this.errors);
     },
 
     /**
@@ -80,7 +78,6 @@ const Login = {
             this.$router.push({path: `/home`});
           })
           .catch(err => {
-            console.log(err.response);
             if(err.response.status === 400) { // Catch 400 Bad Request
               this.email = this.password = "";
               this.errors.email = this.errors.password = "";
@@ -166,15 +163,7 @@ form {
   grid-row: 3;
   grid-column: 1;
 
-  margin: 1em auto 2em auto;
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding: 10px 40px;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  margin: 0 0 2em 0;
 }
 
 

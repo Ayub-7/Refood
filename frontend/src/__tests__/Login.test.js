@@ -1,6 +1,7 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Login from '../components/Login';
 import Vuesax from 'vuesax';
+import api from '../Api';
 
 let wrapper;
 let store;
@@ -14,6 +15,14 @@ const $router = {
     push: jest.fn()
 }
 
+const $vs = {
+    notify: jest.fn()
+}
+
+api.login = jest.fn(() => {
+   return Promise.resolve({data: {userId: 1}, status: 200});
+});
+
 beforeEach(() => {
     actions = {
         someAction: jest.fn()
@@ -24,9 +33,9 @@ beforeEach(() => {
     state = {
         key: {}
     };
-    wrapper = shallowMount(Login, {
+    wrapper = mount(Login, {
         propsData: {},
-        mocks: {$router},
+        mocks: {$router, $vs},
         stubs: {},
         methods: {},
         store,
@@ -77,3 +86,19 @@ describe('Login error checking', () => {
   
 });
 
+describe("Logging in", () => {
+    test("Successful login", async () => {
+       wrapper.vm.email = "jeff@mail.com";
+       wrapper.vm.password = "123456!Skux";
+       await wrapper.vm.loginSubmit();
+       expect(wrapper.vm.$router.push).toBeCalled();
+    });
+    test("Unsuccessful login - Bad request", async () => {
+        api.login = jest.fn(() => {
+            return Promise.reject({response: {message: "Bad request", status: 400}});
+        });
+        await wrapper.vm.loginSubmit();
+        expect(wrapper.vm.email).toEqual("");
+        expect(wrapper.vm.password).toEqual("");
+    });
+})
