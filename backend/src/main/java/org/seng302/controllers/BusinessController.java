@@ -202,7 +202,7 @@ public class BusinessController {
      * @return Http status code and list of businesses with name/names matching request.
      */
     @GetMapping("/businesses/search")
-    public ResponseEntity<String> findBusinesses(@RequestParam(name="searchQuery") String query, String type) throws JsonProcessingException {
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
         System.out.println("Searching for businesses...");
         List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query, type));
