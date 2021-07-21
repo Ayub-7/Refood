@@ -12,10 +12,11 @@
                     <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
                   </div>
                   <div>
+                    <p>Hello</p>
                     <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
                     <div id="cardCreationDate">{{card.created}}</div>
                     <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
-                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{MarketpalceCommon.getGeneralAddress(card.user.homeAddress)}}</div>417
+                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{MarketplaceCommon.getGeneralAddress(card.user.homeAddress)}}</div>417
                     <div id="cardTitle">{{card.title}}</div>
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
@@ -35,11 +36,13 @@
 
 <script>
 import CardModal from './CardModal.vue'
+import MarketplaceCommon from "./MarketplaceCommon";
 
 export default {
   data: function() {
     return {
       selectedCard: null,
+      MarketplaceCommon
     }
   },
   components: {
@@ -56,7 +59,7 @@ export default {
   },
   watch: {
     "cardData": function (val) {
-      this.cards = MarketpalceCommon.checkCardList(val);
+      this.cards = MarketplaceCommon.checkCardList(val);
     }
   },
   methods: {
