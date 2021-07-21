@@ -165,8 +165,10 @@ describe('User profile page tests', () => {
 
     test('User cards is retrieved and set', async () => {
        expect(wrapper.vm.cards).toStrictEqual([]);
+       console.log(expect(wrapper.vm.cards).toStrictEqual([]));
        wrapper.vm.getUserCards();
        await wrapper.vm.$nextTick();
+        console.log(expect(wrapper.vm.cards).toStrictEqual([]));
        expect(wrapper.vm.cards).toStrictEqual([mockCard]);
     });
 });
