@@ -75,10 +75,14 @@ const $router = {
     push: jest.fn()
 };
 
+let $vs = {
+    loading: jest.fn(),
+}
+
 beforeEach(() => {
     wrapper = mount(Homepage, {
         propsData: {},
-        mocks: {$router},
+        mocks: {$router, $vs},
         stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         localVue,
@@ -86,7 +90,8 @@ beforeEach(() => {
             return {
                 userId: mockUser.id,
                 business: mockBusiness,
-                actingAsBusinessId: null
+                actingAsBusinessId: null,
+
             }
         }
     });
@@ -141,7 +146,7 @@ describe('Homepage user tests', () => {
         expect(wrapper.find('#market-card-modal')).toBeTruthy();
     });
 
-    test('User cards is retrieved and set', async () => {
+    test('User\'s cards are retrieved and set', async () => {
         expect(wrapper.vm.cards).toStrictEqual([]);
         wrapper.vm.getUserCards();
         await wrapper.vm.$nextTick();

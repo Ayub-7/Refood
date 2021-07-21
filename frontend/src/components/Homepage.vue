@@ -81,6 +81,29 @@ const Homepage = {
 
   methods: {
     /**
+     * Retrieves all the cards that the user has created.
+     */
+    getUserCards: function(id) {
+      this.$vs.loading({
+        container: ".vs-popup",
+      });
+      this.cards = [];
+      api.getUserCards(id)
+          .then((res) => {
+            this.cards = res.data;
+          })
+          .catch((error) => {
+            if (error.response) {
+              this.$vs.notify({title: "Error retrieving cards", color: "danger"});
+            }
+            this.$log.debug(error);
+          })
+          .finally(() => {
+            this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
+          });
+    },
+
+    /**
      * Gets user info from backend and sets userFirstname property (for welcome message)
      * Also sets the users details in store.js, so the users session can be maintained
      * as they navigate throughout the applications and 'act' as a business
@@ -105,30 +128,6 @@ const Homepage = {
         }
         this.$log.error(err);
       })
-    },
-
-
-    /**
-     * Retrieves all the cards that the user has created.
-     */
-    getUserCards: function(id) {
-      this.$vs.loading({
-        container: ".vs-popup",
-      });
-      this.cards = [];
-      api.getUserCards(id)
-          .then((res) => {
-            this.cards = res.data;
-          })
-          .catch((error) => {
-            if (error.response) {
-              this.$vs.notify({title: "Error retrieving cards", color: "danger"});
-            }
-            this.$log.debug(error);
-          })
-          .finally(() => {
-            this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
-          });
     },
 
     /**
