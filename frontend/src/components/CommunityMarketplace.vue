@@ -182,15 +182,16 @@ export default {
       let direction = this.toggleDirection;
       this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field].toUpperCase() < cardTwo[field].toUpperCase()) ? direction : -direction);
       this.toggleDirection = this.toggleDirection*-1;
-    }
-
-   },
+    },
     /**
      * Method for reloading card data, after the owner of a card has deleted it
      */
     reloadCards: function() {
       this.getSectionCards(this.currentSection);
     },
+
+   },
+
 
   mounted() {
     api.checkSession()

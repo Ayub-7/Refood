@@ -75,7 +75,6 @@ export default {
      */
     notifyOfDeletion: function() {
       this.$emit('cardRemoved');
-      console.log("Removed Grid")
     }
     },
 
