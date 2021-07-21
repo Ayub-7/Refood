@@ -1,3 +1,4 @@
+ALTER TABLE user AUTO_INCREMENT = 0;
 INSERT INTO product (id, name, description, manufacturer, recommended_retail_price, created, business_id) VALUES
     /* 20 products */
 ('WAUEH98E37A680027', 'Wine - White, Pinot Grigio', 'integer ac leo pellentesque ultrices mattis odio donec vitae nisi nam ultrices libero non mattis pulvinar', 'Bubbletube', 51.63, '2021-01-27 16:07:14', 2),

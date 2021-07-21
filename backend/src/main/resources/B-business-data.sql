@@ -1,3 +1,4 @@
+ALTER TABLE user AUTO_INCREMENT = 0;
 insert into address (street_number, street_name, city, region, country, postcode) values ('9', 'Morningstar', 'Miguel Hidalgo', 'Tamaulipas', 'Mexico', '87090');
 insert into address (street_number, street_name, city, region, country, postcode) values ('36650', 'Scott', 'Leiden', 'Provincie Zuid-Holland', 'Netherlands', '2334');
 insert into address (street_number, street_name, city, region, country, postcode) values ('75659', 'Coleman', 'Pancas', null, 'Brazil', '29750-000');

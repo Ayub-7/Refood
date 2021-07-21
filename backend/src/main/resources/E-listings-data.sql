@@ -1,3 +1,4 @@
+ALTER TABLE user AUTO_INCREMENT = 0;
 INSERT INTO listing (closes, created, more_info, price, quantity, inventory_item_id) VALUES
 ('2021-09-22 12:00:00', '2021-01-27 12:00:00', 'Not negotiable.', 10, 3, 1),
 ('2021-10-27 12:00:00', '2021-01-28 12:00:00', 'Could be negotiable.', 10, 5, 1),
