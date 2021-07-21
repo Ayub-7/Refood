@@ -152,5 +152,30 @@ describe('Card modal UI', () => {
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
 
     });
+});
+
+
+
+describe('Messaging', () => {
+    test('is a Vue instance', () => {
+        expect(wrapper.isVueInstance).toBeTruthy();
+    });
+
+    test('open message box', () => {
+        //Setup
+        wrapper.vm.showing = true;
+        wrapper.vm.messaging = true;
+
+        let button = wrapper.find(".card-modal-message-button")
+        button.trigger("click")
+
+        wrapper.vm.message = "message desc";
+        wrapper.vm.selectedCard.user.id = 1;
+        wrapper.vm.selectedCard.id = 1;
+
+        //Result
+        expect(wrapper.vm.messaging).toBeTruthy();
+        expect(wrapper.find("#card-modal-message")).toBeTruthy();
+    });
 
 });

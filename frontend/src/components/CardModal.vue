@@ -17,7 +17,7 @@
 
       <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
-      <vs-button class="card-modal-message-button"  @click="messaging=false; editing=false" v-else>Cancel</vs-button>
+      <vs-button class="card-modal-message-button"  @click="messaging=false; editing=false; message = ''" v-else>Cancel</vs-button>
     </div>
 
     <transition name="slide" v-if="showTransition">
@@ -138,6 +138,9 @@ export default {
                 .then((res) => {
                   console.log(res.data.messageId);
                   this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
+
+                  //reset the message after success
+                  this.message = ""
 
                 })
                 .catch((error) => {
