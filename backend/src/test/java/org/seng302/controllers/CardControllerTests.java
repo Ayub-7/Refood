@@ -15,6 +15,7 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,8 +25,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @WebMvcTest(controllers = CardController.class)
 @ContextConfiguration(classes = TestApplication.class)
@@ -39,6 +42,8 @@ class CardControllerTests {
     private CardRepository cardRepository;
     @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private NotificationRepository notificationRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -46,11 +51,10 @@ class CardControllerTests {
     private User testUser;
     private User anotherUser;
     private NewCardRequest cardRequest;
-    private Card card1;
-    private Card card2;
     private Card card;
     private Address addr;
-
+    private Notification notification;
+    private List<Notification> notifications;
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException, ValidationException {
@@ -62,6 +66,9 @@ class CardControllerTests {
         cardRequest = new NewCardRequest(testUser.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         card = new Card(cardRequest, testUser);
+        notification = new Notification(testUser.getId(), card.getId(), card.getTitle(), card.getDisplayPeriodEnd());
+        notifications = new ArrayList<Notification>();
+        notifications.add(notification);
     }
 
     @Test
@@ -109,7 +116,7 @@ class CardControllerTests {
     @Test
     @WithMockUser
     void testPostCard_titleTooLong_returnBadRequest() throws Exception {
-        cardRequest.setTitle("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        cardRequest.setTitle("ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZZ");
 
         mvc.perform(post("/cards")
                 .contentType("application/json")
@@ -231,7 +238,23 @@ class CardControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser
+    void testGetExpiredCards_Successful() throws Exception {
+        Mockito.when(notificationRepository.findNotificationsByUserId(testUser.getId())).thenReturn(notifications);
 
+        mvc.perform(get("/users/{userId}/cards/notifications", testUser.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetExpiredCards_Forbidden() throws Exception {
+        mvc.perform(get("/users/{userId}/cards/notifications", anotherUser.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isForbidden());
+    }
 
     //Get user cards endpoint
 
@@ -359,7 +382,6 @@ class CardControllerTests {
                 .andExpect(status().isNotAcceptable());
     }
 
-
     @Test
     @WithMockUser
     public void testDeleteCard_asDGAA() throws Exception {
@@ -372,4 +394,85 @@ class CardControllerTests {
                 .andExpect(status().isOk());
     }
 
+    //
+    // PUT /cards/{id}
+    //
+    @Test
+    public void testEditCard_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(put("/cards/{id}", card.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_validEdit_returnOk() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser()
+    public void testEditCard_asGlobalAdmin_returnOk() throws Exception {
+        testUser.setRole(Role.GAA);
+        card.setUser(anotherUser);
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_noTitle_returnBadRequest() throws Exception {
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), null, card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_noSection_returnBadRequest() throws Exception {
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", null);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_notCardOwner_returnForbidden() throws Exception {
+        card.setUser(anotherUser);
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    public void testEditCard_noCardWithId_returnNotAcceptable() throws Exception {
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
+        NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
+        mvc.perform(put("/cards/{id}", card.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(editedCardRequest))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isNotAcceptable());
+    }
 }

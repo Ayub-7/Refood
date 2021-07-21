@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
+import org.seng302.models.Message;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
+import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,7 @@ public class UserController {
 
 //    @Autowired
     private UserRepository userRepository;
+    private MessageRepository messageRepository;
 
 //    @Autowired
     private UserFinder userFinder;
@@ -257,6 +260,41 @@ public class UserController {
         userRepository.updateUserRole(id, Role.USER);
         return ResponseEntity.status(HttpStatus.OK).build();
 
+    }
+
+    /**
+     * Message DELETE endpoint, deletes a single message given an ID.
+     *
+     * Preconditions:
+     *  Given card ID is of type Long.
+     *  Message exists in database.
+     *  User is logged in and the receiver/DGAA.
+     * Postconditions:
+     *  Message is deleted from the database.
+     *
+     * @param messageId ID of message to be retrieved from DB.
+     * @param session the current user session.
+     *
+     * @return 401 if not logged in, 403 if creatorId & session user Id don't match OR if not D/GAA,
+     * 400 if there are errors with data, 200 if everything works.
+     * @throw JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @DeleteMapping("/messages/{id}")
+    public ResponseEntity<String> deleteMessageById (@PathVariable Long messageId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        Message message = messageRepository.findMessageById(messageId);
+        if (message == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User messageReceiver = message.getReceiver();
+        if (messageReceiver.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        messageRepository.deleteMessageById(messageId);
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(message));
     }
 
 

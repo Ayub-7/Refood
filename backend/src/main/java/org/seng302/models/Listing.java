@@ -80,17 +80,8 @@ public class Listing {
             return false;
         } else {
             int quantityOfInventory = inventoryItem.getQuantity();
-            if(req.getQuantity() < 1 || req.getPrice() < 0 ) {
-                return false;
-            } else if (req.getCloses() == null || req.getCloses().before(today)) {
-                return false;
-            } else if(req.getQuantity() > quantityOfInventory){
-                return false;
-            }
-            return true;
+            return !(req.getQuantity() < 1 || req.getPrice() < 0 || req.getQuantity() > quantityOfInventory || req.getCloses() == null || req.getCloses().before(today));
         }
 
     }
-
-
 }

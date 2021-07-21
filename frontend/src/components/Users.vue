@@ -3,9 +3,10 @@
     <div id="container" v-if="this.user != null">
 
       <!-- Far left side options menu-->
-      <div id="options-bar" v-if="showOptionsMenu()">
+      <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
-        <div class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </div>
+        <vs-button class="options-card" id="option-view-cards" @click="openMarketModal()">Marketplace Cards</vs-button>
+        <vs-button class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
       </div>
 
       <div id="name-container">
@@ -54,6 +55,7 @@
 
       <!-- Right Content Side -->
       <main>
+        <div class="sub-header" id="businesses-header">Businesses</div>
         <ul id="business-list">
           <li class="card" v-for="business in businesses" :key="business.id" v-bind:business="business" @click="goToBusinessPage(business)">
             <div class="card-name">{{ business.name }}</div>
@@ -63,6 +65,18 @@
         </ul>
       </main>
   </div>
+
+    <!-- show users marketplace activity modal -->
+    <vs-popup :active.sync="showMarketModal" title="Marketplace Activity" id="market-card-modal">
+      <div v-if="cards.length > 0" class="container">
+        <MarketplaceGrid :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
+        <vs-pagination :max="5" :total="Math.ceil(cards.length/4)" v-model="currentCardPage"></vs-pagination>
+      </div>
+      <!-- If the user has no active cards -->
+      <div v-else class="container">
+        This user has no active cards on the marketplace right now.
+      </div>
+    </vs-popup>
 
     <!-- Add user to business as admin modal -->
     <Modal v-if="showModal">
@@ -93,21 +107,31 @@
 <script>
 import Modal from "./Modal";
 import api from "../Api";
-const moment = require('moment');
 import {store} from "../store";
-
+import MarketplaceGrid from '../components/MarketplaceGrid';
+import CardModal from "../components/CardModal";
+const moment = require('moment');
 
 const Users = {
   name: "Profile",
-  components: {Modal},
+  components: {
+    Modal, MarketplaceGrid, CardModal
+  },
   data: function () {
     return {
+      // Pagination
+      currentCardPage: 1,
+
       user: null,
       businesses: [],
       userViewingBusinesses: [],
-
+      showMarketModal: false,
       showModal: false,
-      selectedBusiness: null
+      selectedBusiness: null,
+      displayType: true,
+      cards: [],
+
+      displayOptions: false,
     };
   },
 
@@ -118,6 +142,45 @@ const Users = {
      */
     openModal: function() {
       this.showModal = true;
+    },
+
+    /**
+     * Retrieves all the cards that the user has created.
+     */
+    getUserCards: function(id) {
+      this.$vs.loading({
+        container: ".vs-popup",
+      });
+      this.cards = [];
+      api.getUserCards(id)
+          .then((res) => {
+            this.cards = res.data;
+
+          })
+          .catch((error) => {
+            if (error.response) {
+              this.$vs.notify({title: "Error retrieving cards", color: "danger"});
+            }
+            this.$log.debug(error);
+          })
+          .finally(() => {
+            this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
+          });
+    },
+
+    /**
+     * Show the modal box (marketplace activity).
+     * Having a separate function to just open the modal is good for testing.
+     */
+    openMarketModal: function() {
+      this.showMarketModal = true;
+      api.checkSession()
+          .then(() => {
+            this.getUserCards(this.user.id);
+          })
+          .catch((error) => {
+            this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+          });
     },
 
     /**
@@ -139,11 +202,13 @@ const Users = {
           this.closeModal();
         })
         .catch((error) => {
-          if (error.response.status === 400) {
-            this.$vs.notify({title:`Failed to add user to ${this.selectedBusiness.name}`, text:`${this.user.firstName} is already an administrator.`, color:'danger'});
-          }
-          else {
-            throw new Error(`Error trying to add user to business: ${error.response.status}`);
+          if (error.response) {
+            if (error.response.status === 400) {
+              this.$vs.notify({title:`Failed to add user to ${this.selectedBusiness.name}`, text:`${this.user.firstName} is already an administrator.`, color:'danger'});
+            }
+            else {
+              throw new Error(`Error trying to add user to business: ${error.response.status}`);
+            }
           }
         });
     },
@@ -180,14 +245,17 @@ const Users = {
           }
           this.user = response.data;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-        }).catch((err) => {
-          if (err.response.status === 401) {
-            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-            this.$router.push({path: "/login"}); //If user not logged in send to login page
-          }
-          else if (err.response.status === 406) {
-            this.$vs.notify({title:'User not found', text:'This user does not exist.', color:'danger'});
-            this.$router.push({path: "/home"}); //If user is logged in, but non-existent user
+        })
+        .catch((err) => {
+          if (err.response) {
+            if (err.response.status === 401) {
+              this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+              this.$router.push({path: "/login"}); //If user not logged in send to login page
+            }
+            else if (err.response.status === 406) {
+              this.$vs.notify({title:'User not found', text:'This user does not exist.', color:'danger'});
+              this.$router.push({path: "/home"}); //If user is logged in, but non-existent user
+            }
           }
           throw new Error(`Error trying to get user info from id: ${err}`);
       });
@@ -199,18 +267,6 @@ const Users = {
      */
     goToBusinessPage: function(business) {
       this.$router.push({path: `/businesses/${business.id}`})
-    },
-
-    /**
-     * Checks if the left-side options menu should show by checking the number of businesses
-     * has primary administrator access to.
-     * @returns {boolean} if there is one or more businesses, return true, else false.
-     */
-    showOptionsMenu: function() {
-      if (this.userViewingBusinesses < 1) {
-        return false
-      }
-      return true
     },
 
   },
@@ -226,6 +282,19 @@ export default Users;
 </script>
 
 <style scoped>
+
+#market-card-modal >>> .vs-popup {
+  width: 1200px;
+}
+
+#market-card-modal {
+  z-index: 100;
+}
+
+#option-view-cards {
+  padding-left: 0;
+  padding-right: 0;
+}
 
 #container {
   display: grid;
@@ -246,31 +315,12 @@ export default Users;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
   margin: 1em 0 1em 0;
-
 }
-
 
 .options-card {
-  cursor: pointer;
-
-  text-align: center;
-  color: white;
-  font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 1px;
-  text-decoration: none;
-
-  padding: 10px 20px;
-  margin: 1em;
-  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
-  background-size: 500%;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-}
-
-.options-card:hover {
-  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
+  width: 100%;
+  padding: 12px 20px;
+  margin: 0.5em auto;
 }
 
 /* Name Header */
@@ -352,8 +402,12 @@ main {
 }
 
 /* Business Card Component Related */
+#businesses-header {
+  padding: 1em 3em 0 3em;
+}
+
 #business-list {
-  padding: 1em;
+  padding: 0 1em;
 }
 
 .card {
@@ -361,7 +415,7 @@ main {
   padding: 1em;
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
-  margin: 1em;
+  margin: 0 1em 1em 1em;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 
   display: grid;
@@ -398,6 +452,7 @@ main {
   font-size: 12px;
   padding: 0.5em 0 0.5em 0;
 }
+
 
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {

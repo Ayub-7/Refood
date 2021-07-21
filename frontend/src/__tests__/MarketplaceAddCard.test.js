@@ -12,17 +12,38 @@ let $route = {
     }
 }
 
+let $vs = {
+    notify: jest.fn()
+}
+let mockCard = {
+    "creatorId": 1,
+    "section": "ForSale",
+    "title": "1982 Lada Samara",
+    "description": "Beige, suitable for a hen house. Fair condition. Some rust. As is, where is. Will swap for budgerigar.",
+    "keywordIds": [
+        [
+            20,
+            15,
+            600
+        ]
+    ]
+}
 let $log = {
     debug: jest.fn(),
 }
 
+api.checkSession = jest.fn().mockResolvedValue({data: {id: 1}});
+api.createCard = jest.fn(() => {
+    return Promise.resolve({data: mockCard, status: 200});
+});
 beforeEach(() => {
     wrapper = mount(MarketplaceAddCard, {
-        mocks: {$route, $log},
+        mocks: {$vs, $route, $log},
         stubs: {},
         methods: {},
         localVue,
     })
+    wrapper.vm.$emit = jest.fn();
 });
 
 afterEach(() => {
@@ -76,8 +97,16 @@ describe('Component', () => {
     test('Close modal after successful submission', () => {
         wrapper.vm.section = "Wanted";
         wrapper.vm.title = "Volkswagen Golf GTi mk5";
+        wrapper.vm.id = 7;
         expect(wrapper.vm.checkForm()).toBeTruthy();
         wrapper.vm.addToMarketplace();
         expect(wrapper.vm.showing).toBeFalsy();
     });
+});
+
+describe("Card creation", () => {
+   test("Succesful creation", async () => {
+       await wrapper.vm.addToMarketplace();
+       expect(wrapper.vm.$vs.notify).toBeCalled();
+   });
 });

@@ -4,23 +4,25 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.models.Card;
-import org.seng302.models.MarketplaceSection;
-import org.seng302.models.Role;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
+import java.text.MessageFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Controller class that handles the endpoints of community marketplace cards.
@@ -31,14 +33,21 @@ public class CardController {
     private static final Logger logger = LogManager.getLogger(CardController.class.getName());
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private UserRepository userRepository;
+    @Autowired
     private CardRepository cardRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @Autowired
     public CardController(UserRepository userRepository, CardRepository cardRepository) {
         this.userRepository = userRepository;
         this.cardRepository = cardRepository;
     }
+
 
     /**
      * POST/Creates a new card to store in the database that will go onto the community marketplace.
@@ -113,6 +122,87 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
 
+    /**
+     * GET endpoint, retrieves all the expired cards of a user and
+     * sends expired card notifications to the frontend to be displayed on the users home page feed.
+     * @param userId
+     * @return A list of notifications and code 200, 401 or 403.
+     * @throws JsonProcessingException
+     */
+    @GetMapping("/users/{userId}/cards/notifications")
+    public ResponseEntity<String> getExpiredCards (@PathVariable Long userId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (currentUser.getId() != userId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<Notification> notifications = notificationRepository.findNotificationsByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
+    }
+
+    /**
+     * Checks for expired cards and creates notification objects for each expired card without a current notification.
+     * Function is run every 10 minutes.
+     *
+     *
+     */
+    @Scheduled(fixedDelay = 600000, initialDelay = 0)
+    private void updateExpiredCards() {
+        logger.info("Checking for expired cards");
+        Date date = new Date();
+        List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
+        for (Card card: expiredCards) {
+            Notification exists = notificationRepository.findNotificationByCardId(card.getId());
+            if (exists == null) {
+                Long userId = card.getUser().getId();
+                Long cardId = card.getId();
+                String title = card.getTitle();
+                Date displayPeriodEnd = card.getDisplayPeriodEnd();
+                Notification notification = new Notification(userId, cardId, title, displayPeriodEnd);
+
+                notificationRepository.save(notification);
+            } else {
+                if(checkCardIsPastNotificationPeriod(card.getDisplayPeriodEnd())) {
+                    deleteExpiredCard(card);
+                }
+            }
+        }
+        int repositorySize = notificationRepository.findAll().size();
+        String message = MessageFormat.format("Number of expired cards: {0}", repositorySize);
+        logger.info(message);
+    }
+
+
+    /**
+     * Deletes given card and sets notification status to deleted
+     * Preconditions: Card exists and has notification that is expired
+     * Postconditions: Card is removed from DB and Cards notification is updated to deleted
+     * @param card card that is going to be deleted
+     */
+    private void deleteExpiredCard(Card card) {
+        Notification cardNotification = notificationRepository.findNotificationByCardId(card.getId());
+        cardNotification.setDeleted();
+        notificationRepository.save(cardNotification);
+
+        cardRepository.delete(card);
+    }
+
+
+    /**
+     * Checks card's display period end to see if it has been 24 hours
+     * Preconditions: Card exists with valid display period
+     * Postconditions: Card will either be past notification period or not
+     * @param displayPeriodEnd cards display period end, which would be when the notification starts
+     * @return True if notification has existed for 24 hours or longer, False if existed for less
+     */
+    private boolean checkCardIsPastNotificationPeriod(Date displayPeriodEnd) {
+        Date now = new Date();
+
+        long timeDiffInMs = Math.abs(now.getTime() - displayPeriodEnd.getTime());
+        long timeDiff = TimeUnit.HOURS.convert(timeDiffInMs, TimeUnit.MILLISECONDS);
+
+        return timeDiff >= 24;
+    }
+
 
     /**
      * GET endpoint, returns detailed information about a cards belonging to a specific User
@@ -159,6 +249,11 @@ public class CardController {
         }
         // Creating a copy of the old card with extended date
         card.updateDisplayPeriodEndDate();
+
+        //Deletes cards notification (since display period is being extended)
+        Notification cardNotification = notificationRepository.findNotificationByCardId(cardId);
+        notificationRepository.delete(cardNotification);
+
         cardRepository.save(card);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -191,10 +286,49 @@ public class CardController {
         if(cardCreator.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
+        //Deletes cards notification (since display period is being extended)
+        Notification cardNotification = notificationRepository.findNotificationByCardId(cardId);
+        if(cardNotification != null) notificationRepository.delete(cardNotification);
+
         cardRepository.deleteCardById(cardId);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(card));
     }
 
+    /**
+     * PUT card endpoint; updates/modifies an existing card with new information.
+     *
+     * @param cardId ID of card to modify
+     * @param cardInfo the edited information of the card to save
+     * @param session the current user session
+     * @return 401 if not logged in (handled by spring sec), 403 if card owner ID, session user ID do not match or if not a D/GAA,
+     * 406 if the card ID does not exist, 400 if there are errors with the supplied information, 200 otherwise.
+     */
+    @PutMapping("/cards/{cardId}")
+    public ResponseEntity<String> editCardById(@PathVariable long cardId, @RequestBody NewCardRequest cardInfo, HttpSession session) {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
+        Card editedCard;
+        try { // Attempt to create a card entity with the given info.
+            editedCard = new Card(cardInfo, currentUser);
+        }
+        catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        }
+
+        Card existingCard = cardRepository.findCardById(cardId);
+        if (existingCard == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        if (existingCard.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        editedCard.setId(cardId);
+        cardRepository.save(editedCard);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 }

@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {createLocalVue, mount} from '@vue/test-utils';
 import Users from '../components/Users';
 import {store} from '../store';
 import Vuesax from 'vuesax';
@@ -56,7 +56,19 @@ const mockBusinesses = [
         "businessType": "Retail Trade",
         "created": "2021-04-07 01:09:35"
     }
-]
+];
+
+let mockCard = {
+    id: 1,
+    user: {},
+    title: "Beans - Green",
+    description: "Integer ac leo.",
+    created: "2021-06-01 18:32:38",
+    displayPeriodEnd: "2021-06-15 18:32:38",
+    keywords: "aliquam augue quam",
+    section: "Wanted"
+}
+
 
 api.makeUserBusinessAdmin = jest.fn(() => {
     return Promise.resolve({status: 200});
@@ -66,12 +78,19 @@ api.getUserFromID = jest.fn(() => {
     return Promise.resolve({data: mockUser, status: 200});
 });
 
+api.getUserCards = jest.fn(() => {
+   return Promise.resolve({data: [mockCard], status: 200});
+});
+
 const $route = {
     params: {
         id: 5
     }
 };
 
+let $vs = {
+    loading: jest.fn(),
+}
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
@@ -79,14 +98,12 @@ localVue.use(VueRouter);
 const router = new VueRouter();
 
 beforeEach(() => {
-
-
-    wrapper = shallowMount(Users, {
+    wrapper = mount(Users, {
         localVue,
         router,
         propsData: {},
-        mocks: {$route, store},
-        stubs: ['router-link', 'router-view'],
+        mocks: {store, $vs},
+        stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         
     });
@@ -96,7 +113,7 @@ beforeEach(() => {
     getUserMethod.mockResolvedValue(mockUser);
     wrapper.setData({businesses: mockBusinesses})
 
-
+    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {
@@ -114,13 +131,15 @@ describe('User profile page tests', () => {
     });
 
     test('addUserToBusiness function is called', async () => {
+        wrapper.vm.userViewingBusinesses = ["test"];
+
         wrapper.vm.addUserToBusiness = jest.fn();
-        const openModalMethod = jest.spyOn(Users.methods, 'openModal')
+        const openModalMethod = jest.spyOn(Users.methods, 'openModal');
         openModalMethod.mockImplementation(() => {
             wrapper.vm.showModal = true;
         });
 
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('#option-add-to-business').exists()).toBe(true);
         wrapper.find('#option-add-to-business').trigger('click');
 
@@ -130,10 +149,27 @@ describe('User profile page tests', () => {
         wrapper.find('#add-user').trigger('click');
 
         expect(wrapper.vm.addUserToBusiness).toBeCalled();
-    })
+    });
 
+    test('Card modal successfully opens', async () => {
+        expect(wrapper.vm.showMarketModal).toBeFalsy();
+
+        let button = wrapper.find("#option-view-cards");
+        expect(button).toBeTruthy();
+
+        button.trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.showMarketModal).toBeTruthy();
+        expect(wrapper.find('#market-card-modal')).toBeTruthy();
+    });
+
+    test('User cards is retrieved and set', async () => {
+       expect(wrapper.vm.cards).toStrictEqual([]);
+       wrapper.vm.getUserCards();
+       await wrapper.vm.$nextTick();
+       expect(wrapper.vm.cards).toStrictEqual([mockCard]);
+    });
 });
-
 
 describe('Business link tests with businesses', () =>  {
     beforeEach(() => {
@@ -148,7 +184,6 @@ describe('Business link tests with businesses', () =>  {
         wrapper.vm.goToBusinessPage = jest.fn();
         wrapper.find('.card').trigger('click');
         expect(wrapper.vm.goToBusinessPage).toBeCalled();
-
     })
 });
 
@@ -158,17 +193,18 @@ describe('Business link tests without businesses', () =>  {
     });
 });
 
-
 describe('User details tests', () =>  {
     beforeEach(() => {
         wrapper.setData({businesses: []});
         wrapper.setData({selectedBusiness: mockBusinesses});
     });
+
     test('Successful addition to business', async () => {
         expect(wrapper.vm.businesses.length).toEqual(0);
         await wrapper.vm.addUserToBusiness();
         expect(wrapper.vm.businesses.length).toEqual(1);
     });
+
     test('User already an admin', async () => {
         let testdata = await wrapper.vm.getUserInfo(5);
         expect(testdata).toEqual(mockUser);

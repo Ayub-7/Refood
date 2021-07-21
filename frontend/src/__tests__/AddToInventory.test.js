@@ -29,7 +29,7 @@ const mockInventory = [
     }
 ]
 
-const mockProducts = [{
+const mockProduct = {
     "id": "W04GP5EC0B1798680",
     "name": "Compound - Mocha",
     "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
@@ -38,15 +38,15 @@ const mockProducts = [{
     "created": "2021-01-11 20:54:46",
     "images": [],
     "primaryImagePath": null
-}];
+};
 
 api.createInventory = jest.fn(() => {
     return Promise.resolve({data: mockInventory, status: 200});
 });
 
-api.getBusinessProducts = jest.fn(() => {
-    return Promise.resolve({data: mockProducts, status: 200});
-});
+// api.getBusinessProducts = jest.fn(() => {
+//     return Promise.resolve({data: mockProducts, status: 200});
+// });
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
@@ -69,8 +69,8 @@ beforeEach(() => {
         stubs: {},
         methods: {},
         localVue,
-    })
-    wrapper.vm.products = mockProducts;
+    });
+    wrapper.setData({product: mockProduct});
 });
 
 afterEach(() => {
@@ -133,12 +133,6 @@ describe('Component', () => {
         expect(wrapper.vm.errors.includes('past-sell')).toBeTruthy();
     });
 
-    test('Autofill', () => {
-        wrapper.vm.invenForm.prodId = "W04GP5EC0B1798680";
-        wrapper.vm.autofill();
-        expect(wrapper.vm.invenForm.pricePerItem).toEqual(88.93);
-    });
-
     test('Successful inventory addition', async () => {
         wrapper.vm.invenForm.prodId = "W04GP5EC0B1798680";
         wrapper.vm.invenForm.quantity = 7;
@@ -153,11 +147,34 @@ describe('Component', () => {
         expect(wrapper.vm.addNewInv).toBeFalsy();
     });
 
-    test('Successful retrieval of products', async () => {
-        wrapper.setData({products: []});
-        expect(wrapper.vm.products.length).toEqual(0)
-        await wrapper.vm.getBusinessProducts();
-        expect(wrapper.vm.products.length).toEqual(1)
-        expect(wrapper.vm.products[0]).toEqual(mockProducts[0])
+    test('Modal opens and sets info correctly',  () => {
+        expect(wrapper.vm.addNewInv).toBeFalsy();
+
+        wrapper.vm.open(mockProduct);
+        expect(wrapper.vm.errors).toStrictEqual([]);
+        expect(wrapper.vm.product).toBe(mockProduct);
     });
+
+    test("Product image url is retrieved", () => {
+        let url = wrapper.vm.getImgUrl(wrapper.vm.product);
+        expect(url).toBeTruthy();
+    });
+
+    test("Default image product url is retrieved", () => {
+        let emptyProduct = {primaryImagePath: null};
+        let url = wrapper.vm.getImgUrl(emptyProduct);
+        expect(url).toBe('../../public/ProductShoot.jpg');
+    });
+
+    test("Full product info modal appears when clicking image", async () => {
+      let image = wrapper.find('.image');
+      expect(image).toBeTruthy();
+
+      await image.trigger('click');
+
+      expect(wrapper.vm.showFullProduct).toBeTruthy();
+      expect(wrapper.find('#full-product-modal'))
+
+    });
+
 });

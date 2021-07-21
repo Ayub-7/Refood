@@ -12,6 +12,10 @@
                     <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
                   </div>
                   <div>
+                    <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
+                    <div id="cardCreationDate">{{card.created}}</div>
+                    <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
+                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{MarketplaceCommon.getGeneralAddress(card.user.homeAddress)}}</div>417
                     <div id="cardTitle">{{card.title}}</div>
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
@@ -25,23 +29,38 @@
             </vs-col>
           </vs-row>
         </div>
-      <CardModal id="cardModal" ref="cardModal" v-if="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
+      <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
     </div>
 </template>
 
 <script>
 import CardModal from './CardModal.vue'
+import MarketplaceCommon from "./MarketplaceCommon";
 
 export default {
   data: function() {
     return {
       selectedCard: null,
+      MarketplaceCommon
     }
   },
   components: {
     CardModal
   },
-  props: ['cardData'],
+  props: {
+      cardData: {
+        type: Array,
+      },
+      showSection: {
+        default: false,
+        type: Boolean,
+      }
+  },
+  watch: {
+    "cardData": function (val) {
+      this.cards = MarketplaceCommon.checkCardList(val);
+    }
+  },
   methods: {
     /**
      * Method for opening card modal, calls method in child component to open modal
@@ -58,7 +77,16 @@ export default {
       this.$emit('cardRemoved');
       console.log("Removed Grid")
     }
-  }
+    },
+
+    /**
+     * Displays the section - checks if it is 'ForSale', if so, return the string with a space, return normally otherwise.
+     * @param section card section.
+     */
+    displaySection: function(section) {
+      if (section === "ForSale") return "For Sale";
+      return section;
+    },
 
 
 }
@@ -77,6 +105,27 @@ export default {
 #marketImage {
   width: 100%;
   height: auto;
+}
+
+.section {
+  font-size: 12px;
+  color: gray;
+}
+
+#cardCreationDate {
+  font-weight: lighter;
+  font-size: 10px;
+  height: 20px;
+}
+
+#cardUserName {
+  font-size: 10px;
+  height: 15px;
+}
+
+#cardUserAddress {
+  font-size: 10px;
+  height: 40px;
 }
 
 #cardTitle {
