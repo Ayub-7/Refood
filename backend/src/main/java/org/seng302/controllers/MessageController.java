@@ -140,6 +140,7 @@ public class MessageController {
         }
 
         User messageReceiver = message.getReceiver();
+
         if (messageReceiver.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
