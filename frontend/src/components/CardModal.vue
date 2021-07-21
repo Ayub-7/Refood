@@ -18,7 +18,7 @@
       <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
       <!-- Add delete button if user is card owner -->
       <div v-if="selectedCard.user.id == userId">
-        <vs-button id="card-modal-message-button" @click="deleteCard()">Delete</vs-button>
+        <vs-button id="card-modal-delete-button" @click="deleteCard()">Delete</vs-button>
       </div>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
       <vs-button class="card-modal-message-button"  @click="messaging=false; editing=false" v-else>Cancel</vs-button>

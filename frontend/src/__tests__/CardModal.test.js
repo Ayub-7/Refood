@@ -137,7 +137,7 @@ describe('Card modal UI', () => {
            return Promise.resolve({status: 200, data: {id: 2}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        wrapper.vm.getUserId();
 
         expect(wrapper.find(".card-modal-message-button")).toBeTruthy();
     });
@@ -147,9 +147,20 @@ describe('Card modal UI', () => {
             return Promise.resolve({status: 200, data: {id: 1}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        wrapper.vm.getUserId();
 
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
+
+    });
+
+    test('User is card owner - successfully shows delete button', () => {
+        api.checkSession = jest.fn(() => {
+            return Promise.resolve({status: 200, data: {id: 1}});
+        });
+
+        wrapper.vm.getUserId();
+
+        expect(wrapper.find(".card-modal-delete-button")).toBeTruthy();
 
     });
 
