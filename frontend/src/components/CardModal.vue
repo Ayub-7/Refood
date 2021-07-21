@@ -14,8 +14,10 @@
     <vs-divider></vs-divider>
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>
-      <vs-button class="card-modal-message-button" @click="messaging=true" v-if="messaging==false">Message</vs-button>
-      <vs-button class="card-modal-message-button" @click="messaging=false" v-else>Cancel</vs-button>
+
+      <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
+      <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
+      <vs-button class="card-modal-message-button"  @click="messaging=false; editing=false" v-else>Cancel</vs-button>
     </div>
 
     <transition name="slide" v-if="showTransition">
@@ -25,11 +27,42 @@
     </div>
     </transition>
 
+    <transition name="slide" v-if="showTransition">
+      <div id="card-modal-edit" v-if="editing">
+        <vs-row class="addCardField">
+          <vs-col id="title" vs-w="2" vs-xs="12">
+            <div class="addCardHeader" >Title <span class="required">*</span> </div>
+          </vs-col>
+          <vs-col vs-w="9">
+            <vs-textarea v-model="title" rows="1" class="addCardInput" :counter="50" ></vs-textarea>
+          </vs-col>
+        </vs-row>
+        <vs-row class="addCardField">
+          <div class="addCardHeader">Description</div>
+          <vs-textarea v-model="description" id="description"></vs-textarea>
+        </vs-row>
+        <vs-row class="addCardField">
+          <vs-col vs-w="2" vs-xs="12">
+            <div class="addCardHeader">Keywords</div>
+          </vs-col>
+          <vs-col vs-w="9">
+            <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordList">
+              <vs-chip v-for="keyword in keywordList" v-bind:key="keyword.value" @click="remove(keyword)"
+                       closable>{{keyword}}
+              </vs-chip>
+            </vs-chips>
+          </vs-col>
+        </vs-row>
+        <vs-button color="success" id="card-modal-edit-save" >Save</vs-button>
+      </div>
+    </transition>
 
   </vs-popup>
 </template>
 
 <script>
+import api from "../Api.js";
+
 export default {
   name: "CardModal",
   props: ['selectedCard'],
@@ -37,18 +70,46 @@ export default {
     return {
       showing: false,
       messaging: false,
-      message: ''
+      message: '',
+      editing: false,
+      title: '',
+      keywordList: [],
+      description: '',
+
+      userId: -1,
     }
   },
   methods:
       {
+        /**
+         * removes keyword
+         */
+        remove(item) {
+          this.keywordList.splice(this.keywordList.indexOf(item), 1)
+        },
+        /**
+         * sets prefilled entries for edit card modal
+         */
+        setPrefills: function() {
+          this.editing = true;
+          this.title = this.selectedCard.title;
+          this.description = this.selectedCard.description;
+          if (this.selectedCard.keywords === '') {
+            this.keywordList = [];
+          } else {
+            this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
+          }
+          console.log(this.keywordList);
+        },
         /**
          * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
          */
         openModal: function() {
           this.resetState();
           this.showing = true;
+          this.getCurrentUserId();
         },
+
         /**
          * Converts seconds to date
          */
@@ -66,12 +127,29 @@ export default {
           console.log("Implement Me", cardId, message);
         },
 
+        /**
+         * Retrieves and sets the userId to the current user.
+         * Used to determine if the owner of the card is the current user.
+         */
+        getCurrentUserId: function() {
+          api.checkSession()
+            .then((res) => {
+              this.userId = res.data.id;
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+            });
+        },
 
         /**
          * Resets state of messaging information
          */
         resetState() {
           this.message = '';
+          this.title = '';
+          this.keywords = [];
+          this.description = '';
+          this.editing = false;
           this.messaging = false;
         }
 
@@ -124,9 +202,10 @@ export default {
   top: 7px;
 }
 
-.card-modal-message-button {
+.card-modal-message-button, .card-modal-edit-button {
   flex: 0%;
 }
+
 
 #card-modal-message {
   margin-top: 10px;

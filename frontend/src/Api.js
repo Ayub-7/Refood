@@ -304,6 +304,31 @@ export default {
      */
     deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
 
+    /**
+     * Gets the user's cards
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
+     */
     getUserCards: (userId) => instance.get(`/users/${userId}/cards`, {withCredentials: true}),
+
+    /**
+     * Creates a new card. of type:
+     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+     *
+     * @param newCardRequest
+     * @param creatorId     user's id
+     * @param title         card title
+     * @param description   card description
+     * @param keywords      keywords to describe the card (functionality added later)
+     * @param section       marketplace section
+     *
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code:
+     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 201 otherwise
+     */
+
+    createCard: async(creatorId, title, description, keywords, section) =>
+        instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
+
 
 }

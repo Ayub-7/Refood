@@ -30,4 +30,25 @@ public class Message {
 
     private Date sent;
 
+    /**
+     * Constructor for a new message object
+     * @param sender User that sends the message
+     * @param receiver User that receives the messages
+     * @param card Card the message is sent from
+     * @param description Message's description
+     * @param sent Date the message was sent
+     */
+    public Message(User sender, User receiver, Card card, String description, Date sent) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.card = card;
+        this.description = description;
+        this.sent = sent;
+    }
+
+    /**
+     * Empty constructor for JPA use.
+     */
+    protected Message() {
+    }
 }

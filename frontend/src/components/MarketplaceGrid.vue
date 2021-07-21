@@ -13,6 +13,9 @@
                   </div>
                   <div>
                     <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
+                    <div id="cardCreationDate">{{card.created}}</div>
+                    <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
+                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{MarketpalceCommon.getGeneralAddress(card.user.homeAddress)}}</div>417
                     <div id="cardTitle">{{card.title}}</div>
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
@@ -51,6 +54,11 @@ export default {
         type: Boolean,
       }
   },
+  watch: {
+    "cardData": function (val) {
+      this.cards = MarketpalceCommon.checkCardList(val);
+    }
+  },
   methods: {
     /**
      * Method for opening card modal, calls method in child component to open modal
@@ -87,6 +95,22 @@ export default {
 .section {
   font-size: 12px;
   color: gray;
+}
+
+#cardCreationDate {
+  font-weight: lighter;
+  font-size: 10px;
+  height: 20px;
+}
+
+#cardUserName {
+  font-size: 10px;
+  height: 15px;
+}
+
+#cardUserAddress {
+  font-size: 10px;
+  height: 40px;
 }
 
 #cardTitle {
