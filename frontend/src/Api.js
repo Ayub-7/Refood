@@ -331,4 +331,11 @@ export default {
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
 
+
+
+    // Messages
+
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+
+
 }

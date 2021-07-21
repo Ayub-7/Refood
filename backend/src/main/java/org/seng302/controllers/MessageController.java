@@ -53,6 +53,10 @@ public class MessageController {
         }
 
         List<Message> messages = messageRepository.findMessageByReceiver(user);
+        for(Message message: messages) {
+            message.getSender().setBusinessesAdministered(null);
+            message.getReceiver().setBusinessesAdministered(null);
+        }
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(messages));
     }
 
