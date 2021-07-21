@@ -77,6 +77,7 @@ const $router = {
 
 let $vs = {
     loading: jest.fn(),
+    notify: jest.fn()
 }
 
 beforeEach(() => {
