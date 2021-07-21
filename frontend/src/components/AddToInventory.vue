@@ -1,13 +1,17 @@
 <template>
   <div id="form-outer" v-if="product != null">
-    <vs-popup title="Add New Inventory Entry" :active.sync="addNewInv">
+    <vs-popup id="inventory-modal" title="Add New Inventory Entry" :active.sync="addNewInv">
       <!-- Product Image -->
       <div id="header-row">
-        <div style="margin: auto;">
-          <img v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
-          <img v-if="product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-          <img v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
-          <img v-if="!isDevelopment() && !product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
+        <div style="margin: auto; cursor: pointer;">
+          <vs-tooltip text="Click here for more product details">
+            <vs-tooltip :text="product.description" title="Description" position="bottom">
+              <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
+              <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
+              <img @click="showFullProduct = true" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
+              <img @click="showFullProduct = true" v-if="!isDevelopment() && !product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
+            </vs-tooltip>
+          </vs-tooltip>
         </div>
         <div id="product-name">
           <div class="sub-header">Product</div>
@@ -85,10 +89,35 @@
               v-model="invenForm.sellBy"/>
         </div>
       </div>
-      <div class="required vs-col" align="center" id="addButton">
+      <div class="required vs-col" id="addButton">
         <vs-button @click="addInventory">Add To Inventory</vs-button>
       </div>
     </vs-popup>
+
+    <!-- SHOW FULL PRODUCT INFO MODAL -->
+    <!-- Accessed by pressing the image of the product. -->
+    <vs-popup id="full-product-modal" title="Full Product" :active.sync="showFullProduct">
+        <div>
+          <img v-if="product.primaryImagePath != null && isDevelopment()" class="full-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
+          <img v-if="product.primaryImagePath != null && !isDevelopment()" class="full-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
+          <img v-if="!product.primaryImagePath && isDevelopment()" class="full-image" src="ProductShoot.jpg" alt="Product image"/>
+          <img v-if="!isDevelopment() && !product.primaryImagePath" class="full-image" :src="getImgUrl(true)" alt="Product image"/>
+        </div>
+
+        <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
+          <div style="display: flex; flex-direction: column; justify-content: space-between">
+            <div style="font-size: 16px; font-weight: bold;  text-align: justify; word-break: break-all;">{{ product.name }} </div>
+            <p>{{ product.id }}</p>
+          </div>
+          <vs-divider></vs-divider>
+          <div style="font-size: 16px; font-weight: bold; height: 24px;">{{ product.manufacturer }} </div>
+          <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
+          <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
+        </div>
+
+        <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currency + product.recommendedRetailPrice }} </div>
+    </vs-popup>
+
   </div>
 </template>
 
@@ -101,6 +130,7 @@ export default {
   data() {
     return {
       product: null,
+      currency: "$",
       invenForm: {
         prodId: '',
         pricePerItem: 0.0,
@@ -114,6 +144,8 @@ export default {
 
       addNewInv: false,
       errors: [],
+
+      showFullProduct: false,
     }
 
   },
@@ -121,7 +153,7 @@ export default {
     /**
      * Opens the modal, prefills any inputs that need to prefilled, and clears any other already filled in inputs.
      */
-    open: function(product) {
+    open: function(product, currency) {
       this.errors = [];
       this.invenForm.sellBy = '';
       this.invenForm.bestBefore = '';
@@ -130,6 +162,7 @@ export default {
       this.invenForm.quantity = 1;
 
       this.product = product;
+      this.currency = currency;
       this.invenForm.pricePerItem = product.recommendedRetailPrice;
       this.invenForm.prodId = product.id;
       this.updateTotalPrice();
@@ -374,6 +407,10 @@ export default {
 
 <style>
 
+#inventory-modal {
+  z-index: 100;
+}
+
 #header-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -420,6 +457,19 @@ export default {
   max-width: 200px;
   min-height: 100px;
   max-height: 100px;
+}
+
+/* === FULL PRODUCT MODAL === */
+
+#full-product-modal > .vs-popup {
+  width: 350px;
+}
+
+.full-image {
+  height: 210px;
+  border-radius: 4px 4px 0 0;
+  object-fit: cover;
+  margin-left: 4px;
 }
 
 @media screen and (max-width: 630px) {

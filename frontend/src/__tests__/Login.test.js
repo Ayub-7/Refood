@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Login from '../components/Login';
 import Vuesax from 'vuesax';
 import api from '../Api';
@@ -33,7 +33,7 @@ beforeEach(() => {
     state = {
         key: {}
     };
-    wrapper = shallowMount(Login, {
+    wrapper = mount(Login, {
         propsData: {},
         mocks: {$router, $vs},
         stubs: {},
