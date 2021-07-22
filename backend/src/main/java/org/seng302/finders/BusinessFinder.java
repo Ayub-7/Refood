@@ -49,6 +49,23 @@ public class BusinessFinder {
      */
     private Predicate criteriaBuilder(String term, String type, boolean isLike) {
         //Obtains criteria
+        Predicate businessType = null;
+        if (type != null || type.length() > 0) {
+            switch (type.toUpperCase()) {
+                case "ACCOMMODATION AND FOOD SERVICES":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+                    break;
+                case "RETAIL TRADE":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.RETAIL_TRADE);
+                    break;
+                case "CHARITABLE ORGANISATION":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.CHARITABLE_ORGANISATION);
+                    break;
+                case "NON-PROFIT ORGANISATION":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.NON_PROFIT_ORGANISATION);
+                    break;
+            }
+        }
         if (!isLike) {
             String[] subTerms = term.split(" ");
             List<Predicate> subTermPredicates = new ArrayList<>();
@@ -63,25 +80,15 @@ public class BusinessFinder {
             for (int i = 1; i < subTerms.length; i++) {
                 combinedCriteria = criteriaBuilder.and(combinedCriteria, subTermPredicates.get(i));
             }
-
+            if (businessType != null) {
+                return criteriaBuilder.and(combinedCriteria, businessType);
+            }
             return combinedCriteria;
         } else {
             term = term.strip().toLowerCase();
             Predicate name = criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
-            if (type != null || type.length() > 0) {
-                if (type.toUpperCase() == "ACCOMMODATION AND FOOD SERVICES") {
-                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES.toString());
-                    return criteriaBuilder.and(name, businessType);
-                } else if (type.toUpperCase() == "RETAIL TRADE") {
-                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.RETAIL_TRADE.toString());
-                    return criteriaBuilder.and(name, businessType);
-                } else if (type.toUpperCase() == "CHARITABLE ORGANISATION") {
-                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.CHARITABLE_ORGANISATION.toString());
-                    return criteriaBuilder.and(name, businessType);
-                } else if (type.toUpperCase() == "NON PROFIT ORGANISATION") {
-                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.NON_PROFIT_ORGANISATION.toString());
-                    return criteriaBuilder.and(name, businessType);
-                }
+            if (businessType != null) {
+                return criteriaBuilder.and(name, businessType);
             }
             return name;
         }
