@@ -75,9 +75,7 @@ export default {
      */
     notifyOfDeletion: function() {
       this.$emit('cardRemoved');
-    }
     },
-
     /**
      * Displays the section - checks if it is 'ForSale', if so, return the string with a space, return normally otherwise.
      * @param section card section.
@@ -85,7 +83,10 @@ export default {
     displaySection: function(section) {
       if (section === "ForSale") return "For Sale";
       return section;
+    }
     },
+
+
 
 
 }
