@@ -209,6 +209,21 @@ public class BusinessController {
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
     }
+
+//    /**
+//     * Searches for businesses, with credintials
+//     * @param query A string with the search's query
+//     * @param type Type of business
+//     * @return Http status code and list of businesses with name/names matching request.
+//     */
+//    @GetMapping("/businesses/search")
+//    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query) throws JsonProcessingException {
+//        logger.debug("Searching for businesses...");
+//        System.out.println("Searching for businesses...");
+//        List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query, null));
+//
+//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
+//    }
 //
 //    /**
 //     * Searches for businesses, with credintials
