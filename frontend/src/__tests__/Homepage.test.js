@@ -1,6 +1,7 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import Homepage from '../components/Homepage.vue';
+import Homepage from '../components/Homepage';
 import Vuesax from 'vuesax';
+import api from "../Api";
 
 let wrapper;
 let localVue = createLocalVue();
@@ -45,32 +46,53 @@ const mockBusiness =
         "created": "2020-05-18 21:06:11"
     };
 
+let mockCard = {
+    id: 1,
+    user: {},
+    title: "Beans - Green",
+    description: "Integer ac leo.",
+    created: "2021-06-01 18:32:38",
+    displayPeriodEnd: "2021-06-15 18:32:38",
+    keywords: "aliquam augue quam",
+    section: "Wanted"
+}
+
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
 getUserName.mockImplementation(() =>  {
     return 'Rayna';
 });
 
-const getBussinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
+const getBusinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
 
 const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getLoggedInUserId');
 getLoggedInUserIdMethod.mockResolvedValue(mockUser.id);
+
+api.getUserCards = jest.fn(() => {
+    return Promise.resolve({data: [mockCard], status: 200});
+});
 
 const $router = {
     push: jest.fn()
 };
 
+let $vs = {
+    loading: jest.fn(),
+    notify: jest.fn()
+}
+
 beforeEach(() => {
     wrapper = mount(Homepage, {
         propsData: {},
-        mocks: {$router},
-        stubs: ['router-link', 'router-view'],
+        mocks: {$router, $vs},
+        stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         localVue,
         data () {
             return {
                 userId: mockUser.id,
                 business: mockBusiness,
-                actingAsBusinessId: null
+                actingAsBusinessId: null,
+
             }
         }
     });
@@ -86,6 +108,8 @@ beforeEach(() => {
     const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
     getUserMethod.mockResolvedValue(mockUser);
     expect(wrapper).toBeTruthy();
+
+    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {
@@ -110,13 +134,32 @@ describe('Homepage user tests', () => {
         const profileButton = wrapper.find("#marketplace-btn");
         expect(profileButton).toBeTruthy();
     });
+
+    test('Card modal successfully opens', async () => {
+        expect(wrapper.vm.showMarketModal).toBeFalsy();
+
+        let button = wrapper.find("#cards-btn");
+        expect(button).toBeTruthy();
+
+        button.trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.showMarketModal).toBeTruthy();
+        expect(wrapper.find('#market-card-modal')).toBeTruthy();
+    });
+
+    test('User\'s cards are retrieved and set', async () => {
+        expect(wrapper.vm.cards).toStrictEqual([]);
+        wrapper.vm.getUserCards();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.cards).toStrictEqual([mockCard]);
+    });
 });
 
 
 describe('Homepage business tests', () => {
     beforeEach(() => {
         wrapper.vm.actingAsBusinessId = 1;
-        getBussinessName.mockImplementation(() =>  {
+        getBusinessName.mockImplementation(() =>  {
             return 'Dabshots';
         });
         const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getBusinessId');
