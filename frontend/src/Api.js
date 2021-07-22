@@ -343,4 +343,11 @@ export default {
 
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
 
+
+
+    // Messages
+
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+
+
 }
