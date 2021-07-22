@@ -34,7 +34,7 @@
             <div class="addCardHeader" >Title <span class="required">*</span> </div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-textarea v-model="title" rows="1" class="addCardInput" :counter="50" ></vs-textarea>
+            <vs-textarea class="addCardInput title-input" v-model="title" rows="1"  :counter="50" ></vs-textarea>
           </vs-col>
         </vs-row>
         <vs-row class="addCardField">
@@ -77,6 +77,10 @@ export default {
       description: '',
 
       userId: -1,
+
+      editErrors: {
+
+      },
     }
   },
   methods:
@@ -99,7 +103,6 @@ export default {
           } else {
             this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
           }
-          console.log(this.keywordList);
         },
         /**
          * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
@@ -151,6 +154,15 @@ export default {
           this.description = '';
           this.editing = false;
           this.messaging = false;
+        },
+
+        saveEdit() {
+          this.validateCardEdit();
+          console.log("yep");
+        },
+
+        validateCardEdit() {
+
         }
 
       },
@@ -220,7 +232,10 @@ export default {
   float: right;
 }
 
-
+.title-input >>> textarea {
+  max-height: 33px;
+  min-height: 33px;
+}
 
 /* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
 .slide-enter-active {
