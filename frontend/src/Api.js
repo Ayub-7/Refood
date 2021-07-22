@@ -338,8 +338,9 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} A response with status code:
      *      * 401 if not logged in, 403 if the session user is not a D/GAA or the message recipient,
      * 400 if there are errors with data, 201 otherwise
-
      */
+    deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
+
 
     /**
      *
@@ -349,14 +350,8 @@ export default {
      * @returns {Promise<messageId<any>>}   The ID of the created message
      *
      */
-
     postMessage: async(userId, cardId, description) =>
         instance.post(`/users/${userId}/messages`, {cardId, description}, {withCredentials: true}),
-
-
-
-    deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
-
 
 
     // Messages
