@@ -11,6 +11,8 @@ import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.CardRepository;
 import org.seng302.models.responses.MessageIdResponse;
 
+import org.seng302.repositories.MessageRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +41,7 @@ public class MessageController {
     @Autowired
     private CardRepository cardRepository;
 
+
     /**
      * Gets user messages, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
      * Preconditions: Logged in and acting as a user
@@ -61,6 +64,10 @@ public class MessageController {
         }
 
         List<Message> messages = messageRepository.findMessageByReceiver(user);
+        for(Message message: messages) {
+            message.getSender().setBusinessesAdministered(null);
+            message.getReceiver().setBusinessesAdministered(null);
+        }
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(messages));
     }
 
@@ -108,5 +115,41 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(mapper.writeValueAsString(messageIdResponse));
+    }
+
+    /**
+     * Message DELETE endpoint, deletes a single message given an ID.
+     *
+     * Preconditions:
+     *  Given card ID is of type Long.
+     *  Message exists in database.
+     *  User is logged in and the receiver/DGAA.
+     * Postconditions:
+     *  Message is deleted from the database.
+     *
+     * @param messageId ID of message to be retrieved from DB.
+     * @param session the current user session.
+     *
+     * @return 401 if not logged in, 403 if creatorId & session user Id don't match OR if not D/GAA,
+     * 400 if there are errors with data, 200 if everything works.
+     * @throw JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @DeleteMapping("/messages/{messageId}")
+    public ResponseEntity<String> deleteMessageById (@PathVariable Long messageId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        Message message = messageRepository.findMessageById(messageId);
+        if (message == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User messageReceiver = message.getReceiver();
+
+        if (messageReceiver.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        messageRepository.deleteMessageById(messageId);
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(message));
     }
 }

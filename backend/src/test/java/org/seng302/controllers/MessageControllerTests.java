@@ -73,6 +73,13 @@ class MessageControllerTests {
         testUserB = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ItqVNvM2JBA");
         testUserB.setId(2L);
 
+
+
+        NewCardRequest cardRequest = new NewCardRequest(testUserA.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
+
+        Card card = new Card(cardRequest, testUserA);
+
+        Message message = new Message(testUserB, testUserA, card, "hello", new Date());
         NewCardRequest cardRequest = new NewCardRequest(testUserA.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         cardA = new Card(cardRequest, testUserA);
@@ -113,7 +120,7 @@ class MessageControllerTests {
         Mockito.when(messageRepository.findMessageByReceiver(testUserA)).thenReturn(messages);
 
         mvc.perform(get("/users/{userId}/messages", 1)
-        .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserA))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserA))
                 .andExpect(status().isOk());
     }
 

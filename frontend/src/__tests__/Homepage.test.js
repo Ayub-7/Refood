@@ -1,6 +1,9 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Homepage from '../components/Homepage.vue';
 import Vuesax from 'vuesax';
+import HomepageMessages from "../components/HomePageMessages.vue";
+
+import api from '../Api';
 
 let wrapper;
 let localVue = createLocalVue();
@@ -45,6 +48,25 @@ const mockBusiness =
         "created": "2020-05-18 21:06:11"
     };
 
+// jest.mock("../Api.js", () => jest.fn);
+// api.getUserFromID = jest.fn(() => {
+//   return Promise.resolve({data: mockUser, status: 200});
+// });
+
+// api.checkSession = jest.fn(() => {
+//   return Promise.resolve({status: 200});
+// });
+
+
+// api.getBusinessFromId = jest.fn(() => {
+//   return Promise.resolve({data: mockBusiness, status: 200})
+// })
+
+// api.getMessages = jest.fn(() => {
+//   return Promise.resolve({status: 200});
+// })
+
+
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
 getUserName.mockImplementation(() =>  {
     return 'Rayna';
@@ -60,7 +82,7 @@ const $router = {
 };
 
 beforeEach(() => {
-    wrapper = mount(Homepage, {
+    wrapper = shallowMount(Homepage, {
         propsData: {},
         mocks: {$router},
         stubs: ['router-link', 'router-view'],
@@ -81,7 +103,6 @@ beforeEach(() => {
         wrapper.vm.currencyCode = "NZD";
         wrapper.vm.currencySymbol = "$"
     });
-
 
     const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
     getUserMethod.mockResolvedValue(mockUser);
