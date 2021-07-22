@@ -1,6 +1,7 @@
 package org.seng302.finders;
 
 import org.seng302.models.Business;
+import org.seng302.models.BusinessType;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -68,8 +69,19 @@ public class BusinessFinder {
             term = term.strip().toLowerCase();
             Predicate name = criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
             if (type != null || type.length() > 0) {
-                Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), type);
-                return criteriaBuilder.and(name, businessType);
+                if (type.toUpperCase() == "ACCOMMODATION AND FOOD SERVICES") {
+                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES.toString());
+                    return criteriaBuilder.and(name, businessType);
+                } else if (type.toUpperCase() == "RETAIL TRADE") {
+                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.RETAIL_TRADE.toString());
+                    return criteriaBuilder.and(name, businessType);
+                } else if (type.toUpperCase() == "CHARITABLE ORGANISATION") {
+                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.CHARITABLE_ORGANISATION.toString());
+                    return criteriaBuilder.and(name, businessType);
+                } else if (type.toUpperCase() == "NON PROFIT ORGANISATION") {
+                    Predicate businessType = criteriaBuilder.equal(criteriaBuilder.lower(businessRoot.get("businessType")), BusinessType.NON_PROFIT_ORGANISATION.toString());
+                    return criteriaBuilder.and(name, businessType);
+                }
             }
             return name;
         }
