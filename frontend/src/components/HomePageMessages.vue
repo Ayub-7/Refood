@@ -16,16 +16,27 @@
           </div>
         </div>
 
-        <div class="message-detail-container">
-          <vs-icon icon="send"></vs-icon>
-          <div id="message-detail-sent">
-            {{currentMessage.sent}}
-          </div>
-        </div>
 
         <div id="message-detail-message">
           {{currentMessage.description}}
         </div>
+        <vs-divider></vs-divider>
+        <div id="card-modal-bottom">
+          <div class="message-detail-delivered">
+            <vs-icon icon="send"></vs-icon>
+            <div id="message-detail-sent">
+              {{currentMessage.sent}}
+            </div>
+          </div>
+        <vs-button class="card-modal-message-button" v-if="messaging===false" @click="messaging=true">Reply</vs-button>
+        <vs-button class="card-modal-message-button"  @click="messaging=false; message = ''" v-else>Cancel</vs-button>
+        </div>
+        <transition name="slide" v-if="showTransition">
+          <div id="card-modal-message" v-if="messaging">
+            <vs-textarea v-model="message" id="message-input"></vs-textarea>
+            <vs-button id="card-modal-message-send" @click="sendMessage(currentMessage, message)">Send Reply</vs-button>
+          </div>
+        </transition>
       </div>
 
     </vs-popup>
@@ -53,6 +64,9 @@ export default {
     data() {
         return {
           messages: [],
+          messaging: false,
+          showing: false,
+          message: '',
           users: {},
           detailedView: false,
           currentMessage: null,
@@ -107,24 +121,13 @@ export default {
        * TODO: to be implemented
        * @param cardId ID of card whose owner the user is going to message
        */
-      sendMessage(card, message) {
-        let recipient;
-
-        //Because the server may return either the full user object or just their id
-        if (card.user) {
-          recipient = card.user.id;
-        } else {
-          recipient = card.userId;
-        }
-
+      sendMessage(originalMessage, message) {
         if (this.checkMessage(message)) {
-          api.postMessage(recipient, card.id, message)
+          api.postMessage(originalMessage.sender.id, originalMessage.card.id, message)
               .then((res) => {
-                this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
-
+                this.$vs.notify({title: 'Reply Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
                 //reset the message after success
                 this.message = ""
-
               })
               .catch((error) => {
                 this.$log.debug(error);
@@ -149,8 +152,17 @@ export default {
       openDetailedModal: function(card) {
         this.currentMessage = card;
         this.detailedView = true;
+        this.showing = true;
       }
       
+    },
+    computed: {
+      /**
+       * Weird computed property to stop closing transition from happening when opening modal
+       */
+      showTransition: function() {
+        return this.showing || !this.messaging;
+      }
     }
 }
 </script>
@@ -198,5 +210,64 @@ export default {
   margin-left: 5px;
 }
 
+#card-modal-bottom {
+  display: flex;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+#card-modal-message-send {
+  float: right;
+}
+
+.message-detail-delivered {
+  position: relative;
+  flex: 50%;
+  font-size: large;
+  top: 7px;
+  display: flex;
+}
+
+#message-detail-sent {
+  font-size: large;
+}
+
+#message-detail-modal button {
+  padding: 10px 30px;
+}
+
+
+/* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
+.slide-enter-active {
+  -moz-transition-duration: 0.3s;
+  -webkit-transition-duration: 0.3s;
+  -o-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -moz-transition-timing-function: ease-in;
+  -webkit-transition-timing-function: ease-in;
+  -o-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+}
+
+.slide-leave-active {
+  -moz-transition-duration: 0.3s;
+  -webkit-transition-duration: 0.3s;
+  -o-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -moz-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+  -webkit-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+  -o-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+
+.slide-enter-to, .slide-leave {
+  max-height: 250px;
+  overflow: hidden;
+}
+
+.slide-enter, .slide-leave-to {
+  overflow: hidden;
+  max-height: 0;
+}
 
 </style>
