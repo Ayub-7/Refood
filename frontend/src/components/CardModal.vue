@@ -34,7 +34,8 @@
             <div class="addCardHeader" >Title <span class="required">*</span> </div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-textarea class="addCardInput title-input" v-model="title" rows="1"  :counter="50" ></vs-textarea>
+            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" ></vs-textarea>
+            <div v-show="editErrors.title.error" class="edit-error">{{editErrors.title.message}}</div>
           </vs-col>
         </vs-row>
         <vs-row class="addCardField">
@@ -53,7 +54,7 @@
             </vs-chips>
           </vs-col>
         </vs-row>
-        <vs-button color="success" id="card-modal-edit-save" >Save</vs-button>
+        <vs-button color="success" id="card-modal-edit-save" @click="saveCardEdit">Save</vs-button>
       </div>
     </transition>
 
@@ -79,7 +80,7 @@ export default {
       userId: -1,
 
       editErrors: {
-
+        title: {error: false, message: "There is a problem with the card title."},
       },
     }
   },
@@ -156,15 +157,23 @@ export default {
           this.messaging = false;
         },
 
-        saveEdit() {
+        saveCardEdit() {
           this.validateCardEdit();
           console.log("yep");
         },
 
         validateCardEdit() {
+          Object.values(this.editErrors).forEach(input => input.error = false);
 
+          if (this.title.length < 1) {
+            this.editErrors.title.error = true;
+            this.editErrors.title.message = "A card title is required.";
+          }
+          else if (this.title.length > 50) {
+            this.editErrors.title.error = true;
+            this.editErrors.title.message = "Card title is too long.";
+          }
         }
-
       },
 
   computed: {
@@ -174,7 +183,24 @@ export default {
     showTransition: function() {
       return this.showing || !this.messaging;
     }
+  },
+
+  watch: {
+    title: function() {
+      if (this.title.length < 1) {
+        this.editErrors.title.error = true;
+        this.editErrors.title.message = "A card title is required.";
+      }
+      else if (this.title.length > 50) {
+        this.editErrors.title.error = true;
+        this.editErrors.title.message = "Card title is too long.";
+      }
+      else {
+        this.editErrors.title.error = false;
+      }
+    }
   }
+
 }
 </script>
 
@@ -232,10 +258,6 @@ export default {
   float: right;
 }
 
-.title-input >>> textarea {
-  max-height: 33px;
-  min-height: 33px;
-}
 
 /* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
 .slide-enter-active {
@@ -269,4 +291,22 @@ export default {
    overflow: hidden;
    max-height: 0;
 }
+
+/* === EDIT CARD === */
+.title-input >>> textarea {
+  max-height: 33px;
+  min-height: 33px;
+}
+
+.title-input {
+  margin-bottom: 0;
+}
+
+.edit-error {
+  font-size: 10px;
+  position: absolute;
+  color: #FF4757;
+  margin-left: 8px;
+}
+
 </style>
