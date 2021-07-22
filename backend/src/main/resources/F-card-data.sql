@@ -1,4 +1,3 @@
-ALTER TABLE user AUTO_INCREMENT = 0;
 insert into card (user_id, section, created, display_period_end, title, description, keywords) values (3355, 'EXCHANGE', '2021-06-25 00:58:25', '2021-07-31 00:58:25', 'Soup Campbells - Tomato Bisque', 'Praesent blandit.', 'donec');
 insert into card (user_id, section, created, display_period_end, title, description, keywords) values (35, 'EXCHANGE', '2021-07-02 00:58:25', '2021-07-21 00:58:25', 'Soup - Campbells - Chicken Noodle', 'Sed vel enim sit amet nunc viverra dapibus.', 'nulla');
 insert into card (user_id, section, created, display_period_end, title, description, keywords) values (9368, 'EXCHANGE', '2021-07-09 00:58:25', '2021-08-04 00:58:25', 'Lotus Leaves', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', 'tincidunt');

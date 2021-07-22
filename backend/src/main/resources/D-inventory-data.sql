@@ -1,4 +1,3 @@
-ALTER TABLE user AUTO_INCREMENT = 0;
 INSERT INTO inventory (best_before, business_id, expires, manufactured, price_per_item, product_id, quantity, sell_by, total_price) VALUES
 ('2021-05-27 12:00:00', 1, '2021-05-27 12:00:00', '2021-01-27 12:00:00', 5.00, 'WAUVT64B54N722288', 10, '2021-05-25 12:00:00', 50.00),
 ('2021-08-27 12:00:00', 1, '2021-08-27 12:00:00', '2020-01-27 12:00:00', 3.00, 'W04GP5EC0B1798680', 7, null, 80.00),
