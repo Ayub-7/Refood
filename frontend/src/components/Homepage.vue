@@ -43,6 +43,8 @@
               News Feed
             </div>
           </nav>
+
+          <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
         </main>
   </div>
 </template>
@@ -50,9 +52,13 @@
 <script>
 import api from "../Api";
 import {mutations, store} from "../store"
+import HomePageMessages from "./HomePageMessages.vue";
 
 const Homepage = {
     name: "Homepage",
+    components: {
+      HomePageMessages
+    },
     data: function () {
         return {
             userId: null,
