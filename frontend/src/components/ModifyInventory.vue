@@ -404,7 +404,25 @@ export default {
         this.invenForm.totalPrice = item.totalPrice;
       }
     },
+
+    /**
+     * Updates the total price value when either quantity or price per item changes.
+     */
+    updateTotalPrice: function() {
+      this.invenForm.totalPrice = (this.invenForm.quantity * this.invenForm.pricePerItem).toFixed(2);
+    },
+
   },
+
+  watch: {
+    "invenForm.quantity": function() {
+      this.updateTotalPrice();
+    },
+
+    "invenForm.pricePerItem": function() {
+      this.updateTotalPrice();
+    },
+  }
 }
 </script>
 
