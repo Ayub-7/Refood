@@ -34,7 +34,7 @@
           <div id="message-notification-container">
             <div id="message-text">New message from {{users[message.sender.id || message.sender].firstName}} {{users[message.sender.id || message.sender].lastName}} about {{message.card.title}}</div>
             <vs-button class="message-button" @click="openDetailedModal(message)">Expand</vs-button>
-            <vs-button class="message-button">Delete</vs-button>
+            <vs-button class="message-button" @click="deleteMessage(message.id)">Delete</vs-button>
           </div>
       </vs-card>
     </div>
@@ -81,6 +81,25 @@ export default {
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
 
         })
+      },
+
+      deleteMessage: function(messageId) {
+        api.deleteMessage(messageId)
+            .then((response) => {
+              this.$vs.notify( {
+                title: `Message Deleted`,
+                text: response.data.sender.firstName +" "+response.data.sender.lastName+ ": "+ response.data.description,
+                color: 'success'
+              });
+              this.getMessages();
+            })
+            .catch((error) => {
+              this.$vs.notify({
+                title: 'Failed to delete the message',
+                color: 'danger'
+              });
+              this.$log.debug("Error Status:", error);
+            });
       },
 
 
