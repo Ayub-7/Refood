@@ -84,6 +84,7 @@ export default {
       messaging: false,
       message: '',
       editing: false,
+      keywords: '',
       title: '',
       keywordList: [],
       description: '',
@@ -184,7 +185,31 @@ export default {
          */
         saveCardEdit: function() {
           if (this.validateCardEdit()) {
-            this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+            api.modifyCard(this.selectedCard.id, this.title, this.description, this.keywordList, this.section)
+                .then(() => {
+                  this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+                  //this.$emit('submitted', this.section);
+                })
+                .catch((error) => {
+                  let errormsg = "ERROR creating new card: ";
+                  if (error) {
+                    if (error.response) {
+                      if (error.response.status === 401 || error.response.status === 403) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                      }
+
+                      if (error.response.status === 400) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                      }
+                    } else {
+                      this.$vs.notify({
+                        title: 'Error',
+                        text: 'ERROR trying to obtain user info from session:',
+                        color: 'danger'
+                      });
+                    }
+                  }
+                });
           }
           else {
             this.$vs.notify({title: "Error saving changes", text: "Please check the input fields and try again.", color: "danger"});
@@ -195,6 +220,9 @@ export default {
          * Validates the input fields of the user's card editing.
          */
         validateCardEdit: function() {
+          for(let i = 0; i < this.keywordList.length; i++){
+            this.keywords += this.keywordList[i] + " ";
+          }
           let valid = true;
 
           if (this.editErrors.title.error) {
