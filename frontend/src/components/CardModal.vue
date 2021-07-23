@@ -123,7 +123,11 @@ export default {
           if (this.selectedCard.keywords === '') {
             this.keywordList = [];
           } else {
-            this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
+            console.log(this.selectedCard.keywords);
+            this.keywordList = this.selectedCard.keywords.split(" ");
+            //this.keywordList = this.keywordList.filter(function(removeSpace) { return entry.trim() != ''; });
+            this.keywordList = this.keywordList.filter(e => String(e).trim());
+            //this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
           }
         },
 
@@ -184,8 +188,13 @@ export default {
          * todo: send info to backend.
          */
         saveCardEdit: function() {
+          //console.log(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords, this.section);
+          this.keywords = '';
+          for(let i = 0; i < this.keywordList.length; i++){
+                this.keywords += this.keywordList[i] + " ";
+          }
           if (this.validateCardEdit()) {
-            api.modifyCard(this.selectedCard.id, this.title, this.description, this.keywordList, this.section)
+            api.modifyCard(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords.trimEnd(), this.section)
                 .then(() => {
                   this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
                   //this.$emit('submitted', this.section);
@@ -200,6 +209,8 @@ export default {
 
                       if (error.response.status === 400) {
                         this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                      } else {
+                        console.log(error.response.message);
                       }
                     } else {
                       this.$vs.notify({
@@ -209,6 +220,7 @@ export default {
                       });
                     }
                   }
+                  this.keywords = '';
                 });
           }
           else {
@@ -220,9 +232,6 @@ export default {
          * Validates the input fields of the user's card editing.
          */
         validateCardEdit: function() {
-          for(let i = 0; i < this.keywordList.length; i++){
-            this.keywords += this.keywordList[i] + " ";
-          }
           let valid = true;
 
           if (this.editErrors.title.error) {

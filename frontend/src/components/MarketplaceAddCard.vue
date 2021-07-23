@@ -83,10 +83,6 @@ export default {
        * Postconditions:
        **/
       checkForm(){
-        this.keywords= '';
-        for(let i = 0; i < this.keywordList.length; i++){
-          this.keywords += this.keywordList[i] + " ";
-        }
         this.errors = [];
 
         if (this.section === null) {
@@ -139,8 +135,12 @@ export default {
 
        */
       addToMarketplace() {
+        this.keywords= '';
+        for(let i = 0; i < this.keywordList.length; i++){
+          this.keywords += this.keywordList[i] + " ";
+        }
         if (this.checkForm()) {
-          api.createCard(this.id, this.title, this.description, this.keywords, this.section)
+          api.createCard(this.id, this.title, this.description, this.keywords.trimRight(), this.section)
               .then((res) => {
                 this.$vs.notify({title: 'Success', text: `created new card: ${res.data.cardId}`, color: 'success'});
                 this.$emit('submitted', this.section);

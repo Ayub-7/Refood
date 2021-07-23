@@ -347,8 +347,8 @@ export default {
      * 400 if there are errors with data, 201 otherwise
      */
 
-    modifyCard: async(creatorId, title, description, keywords, section) =>
-        instance.put('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
+    modifyCard: async(cardId, creatorId, title, description, keywords, section) =>
+        instance.put(`/cards/${cardId}`, {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
 
 }
