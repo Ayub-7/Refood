@@ -147,17 +147,12 @@ describe('Homepage user tests', () => {
         expect(profileButton).toBeTruthy();
     });
 
-    // test('Card modal successfully opens', async () => {
-    //     expect(wrapper.vm.showMarketModal).toBeFalsy();
-    //
-    //     let button = wrapper.find("#cards-btn");
-    //     expect(button).toBeTruthy();
-    //
-    //     button.trigger('click');
-    //     await wrapper.vm.$nextTick();
-    //     expect(wrapper.vm.showMarketModal).toBeTruthy();
-    //     expect(wrapper.find('#market-card-modal')).toBeTruthy();
-    // });
+    test('Card modal successfully opens', async () => {
+        expect(wrapper.vm.showMarketModal).toBeFalsy();
+        await wrapper.vm.openMarketModal();
+        expect(wrapper.vm.showMarketModal).toBeTruthy();
+        expect(wrapper.find('#market-card-modal')).toBeTruthy();
+    });
 
     test('User\'s cards are retrieved and set', async () => {
         expect(wrapper.vm.cards).toStrictEqual([]);
