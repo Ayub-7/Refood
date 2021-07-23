@@ -8,14 +8,14 @@
 
       <vs-select
           width="10%"
-          id="business-type"
+          id="businessType"
           class="form-control"
           label="Business Type *"
           v-model="businessType"
           autocomplete >
         <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
       </vs-select>
-      <vs-button @click="businessType = null">Clear</vs-button>
+      <vs-button id="clearBizType" @click="businessType = null">Clear</vs-button>
 
     </div>
 
@@ -375,6 +375,16 @@ export default Search;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#clearBizType {
+  right: -20px;
+  top: 5px;
+}
+
+#businessType {
+  left: 10px;
+  bottom: 4px;
 }
 
 #search input {
