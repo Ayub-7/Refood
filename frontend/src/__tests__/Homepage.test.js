@@ -48,23 +48,23 @@ const mockBusiness =
         "created": "2020-05-18 21:06:11"
     };
 
-// jest.mock("../Api.js", () => jest.fn);
-// api.getUserFromID = jest.fn(() => {
-//   return Promise.resolve({data: mockUser, status: 200});
-// });
+jest.mock("../Api.js", () => jest.fn);
+api.getUserFromID = jest.fn(() => {
+  return Promise.resolve({data: mockUser, status: 200});
+});
 
-// api.checkSession = jest.fn(() => {
-//   return Promise.resolve({status: 200});
-// });
+api.checkSession = jest.fn(() => {
+  return Promise.resolve({status: 200});
+});
 
 
-// api.getBusinessFromId = jest.fn(() => {
-//   return Promise.resolve({data: mockBusiness, status: 200})
-// })
+api.getBusinessFromId = jest.fn(() => {
+  return Promise.resolve({data: mockBusiness, status: 200})
+})
 
-// api.getMessages = jest.fn(() => {
-//   return Promise.resolve({status: 200});
-// })
+api.getMessages = jest.fn(() => {
+  return Promise.resolve({status: 200});
+})
 
 
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
@@ -96,17 +96,6 @@ beforeEach(() => {
             }
         }
     });
-
-    const checkSessionMethod = jest.spyOn(Homepage.methods, 'checkUserSession');
-    checkSessionMethod.mockImplementation(() => {
-        wrapper.vm.user = mockUser;
-        wrapper.vm.currencyCode = "NZD";
-        wrapper.vm.currencySymbol = "$"
-    });
-
-    const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
-    getUserMethod.mockResolvedValue(mockUser);
-    expect(wrapper).toBeTruthy();
 });
 
 afterEach(() => {
@@ -169,3 +158,21 @@ describe('Homepage business tests', () => {
 
 });
 
+describe("Tests for functionality", ()=> {
+   test("Get user ID test successfully", async () => {
+       await wrapper.vm.getUserDetails(5);
+       expect(wrapper.vm.user).toEqual(mockUser);
+       expect(wrapper.vm.businesses).toEqual([2]);
+       expect(wrapper.vm.userLoggedIn).toBeTruthy();
+   });
+
+   test("Get user ID while logged out", async () => {
+       api.getUserFromID = jest.fn(() => {
+           return Promise.reject({response: {message: "You must be logged in!", status: 401}});
+       });
+       await wrapper.vm.getUserDetails(5);
+       expect(wrapper.vm.user).toEqual(undefined);
+       expect(wrapper.vm.businesses).toEqual([]);
+       expect(wrapper.vm.userLoggedIn).toBeFalsy();
+   });
+});
