@@ -310,15 +310,11 @@ const Search = {
       }
       if (this.searchbarBusiness === "") return;
       this.$vs.loading();
-      // if(this.businessType){
-      //
-      // } else {
-      //
-      // }
-      //console.log(this.businessType);
+      if (!this.businessType) {
+        this.businessType = "";
+      }
       api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType)
          .then((response) => {
-           console.log("Hello");
            this.businesses = response.data;
            this.businesses = this.businesses.filter(x => typeof(x) == "object")
            this.paginator(this.businesses);
