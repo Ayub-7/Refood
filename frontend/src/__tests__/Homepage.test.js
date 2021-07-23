@@ -62,7 +62,7 @@ let mockCard = {
 
 jest.mock("../Api.js", () => jest.fn);
 api.getUserFromID = jest.fn(() => {
-  return Promise.resolve({data: mockUser, status: 200}).catch();
+  return Promise.resolve({data: mockUser, status: 200});
 });
 
 api.checkSession = jest.fn(() => {
