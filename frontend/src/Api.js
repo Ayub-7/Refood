@@ -331,4 +331,24 @@ export default {
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
 
+    /**
+     * Modifies a selected card. of type:
+     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+     *
+     * @param newCardRequest (same details for modifying)
+     * @param creatorId     user's id
+     * @param title         card title
+     * @param description   card description
+     * @param keywords      keywords to describe the card (functionality added later)
+     * @param section       marketplace section
+     *
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code:
+     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 201 otherwise
+     */
+
+    modifyCard: async(creatorId, title, description, keywords, section) =>
+        instance.put('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
+
+
 }
