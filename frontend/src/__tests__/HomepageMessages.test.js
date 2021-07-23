@@ -16,7 +16,6 @@ let $log = {
     debug: jest.fn(),
 }
 
-
 let oneMessage = [{
     "id": 3,
     "sender": {
@@ -79,6 +78,12 @@ let oneMessage = [{
     "sent": "2021-07-23 13:09:52"
 }]
 
+
+api.getMessages = jest.fn().mockResolvedValue({data: oneMessage});
+
+api.deleteMessage = jest.fn(() => {
+    return Promise.resolve({data: oneMessage[0].id, status: 200});
+});
 
 beforeEach(() => {
     wrapper = mount(HomepageMessages, {
