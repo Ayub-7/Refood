@@ -161,9 +161,9 @@ describe('Homepage user tests', () => {
 
     test('User\'s cards are retrieved and set', async () => {
         expect(wrapper.vm.cards).toStrictEqual([]);
-        wrapper.vm.getUserCards();
+        await wrapper.vm.getUserCards();
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.cards).toStrictEqual([mockCard]);
+        expect(wrapper.vm.cards).toEqual([mockCard]);
     });
 });
 
