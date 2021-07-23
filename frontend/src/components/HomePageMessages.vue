@@ -44,8 +44,8 @@
       <vs-card id="message-notification-card">
           <div id="message-notification-container">
             <div id="message-text">New message from {{users[message.sender.id || message.sender].firstName}} {{users[message.sender.id || message.sender].lastName}} about {{message.card.title}}</div>
-            <vs-button class="message-button" @click="openDetailedModal(message)">Expand</vs-button>
-            <vs-button class="message-button" @click="deleteMessage(message.id)">Delete</vs-button>
+            <vs-button id="expand-btn" class="message-button" @click="openDetailedModal(message)">Expand</vs-button>
+            <vs-button id="delete-btn" class="message-button" @click="deleteMessage(message.id)">Delete</vs-button>
           </div>
       </vs-card>
     </div>
@@ -82,14 +82,9 @@ export default {
         api.getMessages(store.loggedInUserId)
         .then((response) => {
           this.messages = response.data;
-        
-
           for (let message of this.messages) {
-            console.log(message.sender, message)
             this.users[message.sender.id] = message.sender;
           }
-
-          console.log(this.users);
         }).catch((error) => {
           this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
@@ -149,8 +144,9 @@ export default {
       },
 
 
-      openDetailedModal: function(card) {
-        this.currentMessage = card;
+      openDetailedModal: function(message) {
+        console.log(message);
+        this.currentMessage = message;
         this.detailedView = true;
         this.showing = true;
       }
