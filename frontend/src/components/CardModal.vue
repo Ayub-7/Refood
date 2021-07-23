@@ -17,7 +17,7 @@
 
       <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
-      <vs-button class="card-modal-message-button"  @click="messaging=false; editing=false; message = ''" v-else>Cancel</vs-button>
+      <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; editing=false; message = ''" v-else>Cancel</vs-button>
     </div>
 
     <transition name="slide" v-if="showTransition">
@@ -120,7 +120,6 @@ export default {
 
         /**
          * Sends user message by calling POST messages
-         * TODO: to be implemented
          * @param cardId ID of card whose owner the user is going to message
          */
         sendMessage(card, message) {
@@ -133,33 +132,55 @@ export default {
             recipient = card.userId;
           }
 
-          if (this.checkMessage(message)) {
-            api.postMessage(recipient, card.id, message)
-                .then((res) => {
-                  console.log(res.data.messageId);
-                  this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
-
-                  //reset the message after success
-                  this.message = ""
-
-                })
-                .catch((error) => {
-                  this.$log.debug(error);
-                  this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
-                });
+          if (this.checkMessage(message, recipient)) {
+            this.sendPostMessage(recipient, card.id, message);
           }
 
         },
 
         /**
+         * Calls post message
+         * @param recipient Intended user to receive the message
+         * @param cardid    Id of the card
+         * @param message   Text to be sent
+         */
+
+        sendPostMessage(recipient, cardid, message) {
+          api.postMessage(recipient, cardid, message)
+              .then((res) => {
+                console.log(res.data.messageId);
+                this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
+
+                //reset the message after success
+                this.message = "";
+
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+                this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
+              });
+        },
+
+        /**
          * Check the message contents
          * Simply check a blank message is not sent
+         *
+         * @param message   Text to be sent
+         * @param recipient Intended receiver of the message
+         * @return boolean  False if null or blank, then notify the user.
+         *                  Otherwise return true.
          */
-         checkMessage(message) {
+         checkMessage(message, recipient) {
           if (message == null || message === "") {
             this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
-            return false
+            return false;
           }
+
+          if (isNaN(recipient)) {
+            this.$vs.notify({title:'Error sending message', text:`Receiver is invalid`, color:'danger'});
+            return false;
+          }
+
           return true;
         },
 
