@@ -80,14 +80,14 @@ class MessageControllerTests {
         Card card = new Card(cardRequest, testUserA);
 
         Message message = new Message(testUserB, testUserA, card, "hello", new Date());
-        NewCardRequest cardRequest = new NewCardRequest(testUserA.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
+        cardRequest = new NewCardRequest(testUserA.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         cardA = new Card(cardRequest, testUserA);
         cardB = new Card(cardRequest, testUserB);
 
         NewMessageRequest newMessageRequest = new NewMessageRequest(cardA.getId(), "desc");
 
-        Message message = new Message(testUserB, testUserA, cardA, "hello", new Date());
+        message = new Message(testUserB, testUserA, cardA, "hello", new Date());
         Message messageInvalid = new Message(testUserB, testUserA, cardA, "hello", new Date());
 
         messages = new ArrayList<Message>();
