@@ -98,13 +98,18 @@ const $router = {
 
 const $log = {
     error: jest.fn(),
-}
+};
+
+let $vs = {
+    loading: jest.fn(),
+    notify: jest.fn()
+};
 
 beforeEach(() => {
     wrapper = shallowMount(Homepage, {
         propsData: {},
-        mocks: {$router, $log},
-        stubs: ['router-link', 'router-view'],
+        mocks: {$router, $log, $vs},
+        stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         localVue,
         data () {
