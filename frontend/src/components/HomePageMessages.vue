@@ -28,7 +28,7 @@
               {{currentMessage.sent}}
             </div>
           </div>
-        <vs-button class="card-modal-message-button" v-if="messaging===false" @click="messaging=true">Reply</vs-button>
+        <vs-button id="reply-btn" class="card-modal-message-button" v-if="messaging===false" @click="messaging=true">Reply</vs-button>
         <vs-button class="card-modal-message-button"  @click="messaging=false; message = ''" v-else>Cancel</vs-button>
         </div>
         <transition name="slide" v-if="showTransition">
@@ -145,7 +145,6 @@ export default {
 
 
       openDetailedModal: function(message) {
-        console.log(message);
         this.currentMessage = message;
         this.detailedView = true;
         this.showing = true;
