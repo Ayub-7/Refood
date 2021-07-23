@@ -85,9 +85,10 @@ public class Message {
      */
     private boolean validateNewMessage(NewMessageRequest newMessageRequest) throws ValidationException {
         //Blank or null description
-        if (newMessageRequest.getDescription() == null) {
+        if (newMessageRequest.getDescription() == null || newMessageRequest.getDescription() == "") {
             throw new ValidationException("Message must have a description");
         }
+
         return true;
     }
 }
