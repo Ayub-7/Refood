@@ -87,10 +87,14 @@ getUserName.mockImplementation(() =>  {
     return 'Rayna';
 });
 
-const getBussinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
+const getBusinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
 
 const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getLoggedInUserId');
 getLoggedInUserIdMethod.mockResolvedValue(mockUser.id);
+
+api.getUserCards = jest.fn(() => {
+    return Promise.resolve({data: [mockCard], status: 200});
+});
 
 const $router = {
     push: jest.fn()
@@ -116,10 +120,25 @@ beforeEach(() => {
             return {
                 userId: mockUser.id,
                 business: mockBusiness,
-                actingAsBusinessId: null
+                actingAsBusinessId: null,
+
             }
         }
     });
+
+    const checkSessionMethod = jest.spyOn(Homepage.methods, 'checkUserSession');
+    checkSessionMethod.mockImplementation(() => {
+        wrapper.vm.user = mockUser;
+        wrapper.vm.currencyCode = "NZD";
+        wrapper.vm.currencySymbol = "$"
+    });
+
+
+    const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
+    getUserMethod.mockResolvedValue(mockUser);
+    expect(wrapper).toBeTruthy();
+
+    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {
@@ -144,13 +163,32 @@ describe('Homepage user tests', () => {
         const profileButton = wrapper.find("#marketplace-btn");
         expect(profileButton).toBeTruthy();
     });
+
+    test('Card modal successfully opens', async () => {
+        expect(wrapper.vm.showMarketModal).toBeFalsy();
+
+        let button = wrapper.find("#cards-btn");
+        expect(button).toBeTruthy();
+
+        button.trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.showMarketModal).toBeTruthy();
+        expect(wrapper.find('#market-card-modal')).toBeTruthy();
+    });
+
+    test('User\'s cards are retrieved and set', async () => {
+        expect(wrapper.vm.cards).toStrictEqual([]);
+        wrapper.vm.getUserCards();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.cards).toStrictEqual([mockCard]);
+    });
 });
 
 
 describe('Homepage business tests', () => {
     beforeEach(() => {
         wrapper.vm.actingAsBusinessId = 1;
-        getBussinessName.mockImplementation(() =>  {
+        getBusinessName.mockImplementation(() =>  {
             return 'Dabshots';
         });
         const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getBusinessId');
