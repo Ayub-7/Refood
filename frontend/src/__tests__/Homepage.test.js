@@ -64,10 +64,6 @@ api.getUserFromID = jest.fn(() => {
   return Promise.resolve({data: mockUser, status: 200});
 });
 
-api.getUserCards = jest.fn(() => {
-    return Promise.resolve({data: mockCard, status: 200}).catch({response: {message: "Bad request", status: 400}});
-});
-
 api.checkSession = jest.fn(() => {
   return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
 });
@@ -125,20 +121,6 @@ beforeEach(() => {
             }
         }
     });
-
-    const checkSessionMethod = jest.spyOn(Homepage.methods, 'checkUserSession');
-    checkSessionMethod.mockImplementation(() => {
-        wrapper.vm.user = mockUser;
-        wrapper.vm.currencyCode = "NZD";
-        wrapper.vm.currencySymbol = "$"
-    });
-
-
-    const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
-    getUserMethod.mockResolvedValue(mockUser);
-    expect(wrapper).toBeTruthy();
-
-    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {
@@ -164,17 +146,17 @@ describe('Homepage user tests', () => {
         expect(profileButton).toBeTruthy();
     });
 
-    test('Card modal successfully opens', async () => {
-        expect(wrapper.vm.showMarketModal).toBeFalsy();
-
-        let button = wrapper.find("#cards-btn");
-        expect(button).toBeTruthy();
-
-        button.trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.showMarketModal).toBeTruthy();
-        expect(wrapper.find('#market-card-modal')).toBeTruthy();
-    });
+    // test('Card modal successfully opens', async () => {
+    //     expect(wrapper.vm.showMarketModal).toBeFalsy();
+    //
+    //     let button = wrapper.find("#cards-btn");
+    //     expect(button).toBeTruthy();
+    //
+    //     button.trigger('click');
+    //     await wrapper.vm.$nextTick();
+    //     expect(wrapper.vm.showMarketModal).toBeTruthy();
+    //     expect(wrapper.find('#market-card-modal')).toBeTruthy();
+    // });
 
     test('User\'s cards are retrieved and set', async () => {
         expect(wrapper.vm.cards).toStrictEqual([]);
