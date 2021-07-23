@@ -53,7 +53,6 @@
 import api from "../Api";
 import {mutations, store} from "../store"
 import HomePageMessages from "./HomePageMessages.vue";
-import MarketplaceGrid from "./MarketplaceGrid";
 
 const Homepage = {
     name: "Homepage",
