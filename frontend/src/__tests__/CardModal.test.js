@@ -58,7 +58,11 @@ beforeEach(() => {
         stubs: {},
         methods: {},
         localVue,
-    })
+    });
+
+    wrapper.vm.title = "Valid Title";
+    wrapper.vm.section = "ForSale";
+
 });
 
 afterEach(() => {
@@ -162,8 +166,6 @@ describe('Card editing', () => {
    });
 
     test('Edited card title is too short', async () => {
-        wrapper.vm.title = "Valid";
-        await wrapper.vm.$nextTick();
         wrapper.vm.title = ""; // No longer valid.
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.editErrors.title.error).toBeTruthy();
@@ -176,8 +178,29 @@ describe('Card editing', () => {
         expect(wrapper.vm.editErrors.title.error).toBeFalsy();
     });
 
-    test('Card edit is invalid', async () => {
+    test('Edited card has missing section', async () => {
+        wrapper.vm.section = "";
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.editErrors.section.error).toBeTruthy();
+    });
+
+    test('Edited card has valid section', async () => {
+        wrapper.vm.section = "Wanted";
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.editErrors.section.error).toBeFalsy();
+    });
+
+    test('Card edit is invalid - bad title', async () => {
         wrapper.vm.title = "OverFiftyCharactersLong".repeat(4);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.validateCardEdit()).toBeFalsy();
+    });
+
+    test('Card edit is invalid - bad section', async () => {
+        wrapper.vm.section = ""
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.validateCardEdit()).toBeFalsy();
@@ -185,6 +208,7 @@ describe('Card editing', () => {
 
     test('Card edit is valid', async () => {
         wrapper.vm.title = "New Edited Title";
+        wrapper.vm.section = "Exchange";
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.validateCardEdit()).toBeTruthy();

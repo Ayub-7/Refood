@@ -27,8 +27,17 @@
     </div>
     </transition>
 
+    <!-- EDIT CARD -->
     <transition name="slide" v-if="showTransition">
       <div id="card-modal-edit" v-if="editing">
+        <vs-row class="addCardField">
+          <vs-col vs-w="2" vs-xs="12" class="addCardHeader">Section <span class="required">*</span></vs-col>
+          <vs-select vs-w="10" v-model="section" :danger="editErrors.section.error"
+                     :danger-text="editErrors.section.message">
+            <vs-select-item v-for="section in availableSections" :key="section.key" :text="section.key" :value="section.value"/>
+          </vs-select>
+        </vs-row>
+
         <vs-row class="addCardField">
           <vs-col id="title" vs-w="2" vs-xs="12">
             <div class="addCardHeader" >Title <span class="required">*</span> </div>
@@ -78,12 +87,19 @@ export default {
       title: '',
       keywordList: [],
       description: '',
+      section: '',
 
       userId: -1,
 
       editErrors: {
-        title: {error: false, message: "There is a problem with the card title."},
+        title: {error: false, message: "There is a problem with the card title"},
+        section: {error: false, message: "You must choose a section"},
       },
+      availableSections: [
+        {key:'For Sale', value:'ForSale'},
+        {key:'Wanted', value:'Wanted'},
+        {key:'Exchange', value: 'Exchange'}
+      ],
     }
   },
   methods:
@@ -102,6 +118,7 @@ export default {
           this.editing = true;
           this.title = this.selectedCard.title;
           this.description = this.selectedCard.description;
+          this.section = this.selectedCard.section;
           if (this.selectedCard.keywords === '') {
             this.keywordList = [];
           } else {
@@ -183,6 +200,11 @@ export default {
           if (this.editErrors.title.error) {
             valid = false;
           }
+
+          if (this.editErrors.section.error) {
+            valid = false;
+          }
+
           return valid;
         }
       },
@@ -212,6 +234,10 @@ export default {
       else {
         this.editErrors.title.error = false;
       }
+    },
+
+    section: function() {
+      this.editErrors.section.error = this.section == null || this.section === "";
     }
   }
 
