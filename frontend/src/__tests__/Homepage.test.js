@@ -159,12 +159,12 @@ describe('Homepage user tests', () => {
     //     expect(wrapper.find('#market-card-modal')).toBeTruthy();
     // });
 
-    // test('User\'s cards are retrieved and set', async () => {
-    //     expect(wrapper.vm.cards).toStrictEqual([]);
-    //     wrapper.vm.getUserCards();
-    //     await wrapper.vm.$nextTick();
-    //     expect(wrapper.vm.cards).toStrictEqual([mockCard]);
-    // });
+    test('User\'s cards are retrieved and set', async () => {
+        expect(wrapper.vm.cards).toStrictEqual([]);
+        wrapper.vm.getUserCards();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.cards).toStrictEqual([mockCard]);
+    });
 });
 
 
