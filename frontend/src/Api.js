@@ -106,6 +106,7 @@ export default {
     /**
      *  Query search that returns businesses based on the parameter query
      * @param query to help narrow down the businesses
+     * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
      * @returns {*}
      */
     searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
