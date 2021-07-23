@@ -121,9 +121,27 @@ const Homepage = {
           this.$log.error(err);
         })
       },
-
-
-        /**
+      /**
+       * Show the modal box (marketplace activity).
+       * Having a separate function to just open the modal is good for testing.
+       */
+      openMarketModal: function() {
+        this.showMarketModal = true;
+        api.checkSession()
+            .then(() => {
+              this.getUserCards(this.user.id);
+            })
+            .catch((error) => {
+              this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+            });
+      },
+      /**
+       * Close the pop-up box with no consequences.
+       */
+      closeModal: function() {
+        this.showModal = false;
+      },
+      /**
        * Sends an api request to get a business object from a business Id
        * Sets this components business variable to this object
        *
