@@ -53,6 +53,7 @@
 import api from "../Api";
 import {mutations, store} from "../store"
 import HomePageMessages from "./HomePageMessages.vue";
+import MarketplaceGrid from "./MarketplaceGrid";
 
 const Homepage = {
     name: "Homepage",
@@ -65,11 +66,35 @@ const Homepage = {
             businesses: [],
             actingAsBusinessId: null,
             business: null,
-
+            showMarketModal: false,
+            cards: [],
+            currentCardPage: 1,
         }
     },
 
     methods: {
+      /**
+       * Retrieves all the cards that the user has created.
+       */
+      getUserCards: function(id) {
+        this.$vs.loading({
+          container: ".vs-popup",
+        });
+        this.cards = [];
+        api.getUserCards(id)
+            .then((res) => {
+              this.cards = res.data;
+            })
+            .catch((error) => {
+              if (error.response) {
+                this.$vs.notify({title: "Error retrieving cards", color: "danger"});
+              }
+              this.$log.debug(error);
+            })
+            .finally(() => {
+              this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
+            });
+      },
       /**
        * Gets user info from backend and sets userFirstname property (for welcome message)
        * Also sets the users details in store.js, so the users session can be maintained

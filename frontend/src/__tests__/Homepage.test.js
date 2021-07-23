@@ -48,22 +48,34 @@ const mockBusiness =
         "created": "2020-05-18 21:06:11"
     };
 
+let mockCard = {
+    id: 1,
+    user: {},
+    title: "Beans - Green",
+    description: "Integer ac leo.",
+    created: "2021-06-01 18:32:38",
+    displayPeriodEnd: "2021-06-15 18:32:38",
+    keywords: "aliquam augue quam",
+    section: "Wanted"
+}
+
+
 jest.mock("../Api.js", () => jest.fn);
 api.getUserFromID = jest.fn(() => {
-  return Promise.resolve({data: mockUser, status: 200});
+  return Promise.resolve({data: mockUser, status: 200}).catch();
 });
 
 api.checkSession = jest.fn(() => {
-  return Promise.resolve({status: 200});
+  return Promise.resolve({status: 200}).catch();
 });
 
 
 api.getBusinessFromId = jest.fn(() => {
-  return Promise.resolve({data: mockBusiness, status: 200})
+  return Promise.resolve({data: mockBusiness, status: 200}).catch();
 })
 
 api.getMessages = jest.fn(() => {
-  return Promise.resolve({status: 200});
+  return Promise.resolve({status: 200}).catch();
 })
 
 
