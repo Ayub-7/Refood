@@ -330,5 +330,24 @@ export default {
     createCard: async(creatorId, title, description, keywords, section) =>
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
+    /**
+     * Deletes a message with ID
+     * If the user is not the recipient, they cannot delete it.
+     *
+     * @param messageId Id of message to be deleted
+     * @returns {Promise<AxiosResponse<any>>} A response with status code:
+     *      * 401 if not logged in, 403 if the session user is not a D/GAA or the message recipient,
+     * 400 if there are errors with data, 201 otherwise
+
+     */
+
+    deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
+
+
+
+    // Messages
+
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+
 
 }
