@@ -148,9 +148,45 @@ describe('Card modal UI', () => {
         });
 
         wrapper.vm.getCurrentUserId();
-
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
+    });
+});
 
+describe('Card editing', () => {
+   test('Edited card title is too long', async () => {
+      wrapper.vm.title = "OverFiftyCharactersLong".repeat(4);
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.vm.editErrors.title.error).toBeTruthy();
+      expect(wrapper.vm.editErrors.title.message).toBe("Card title is too long");
+   });
+
+    test('Edited card title is too short', async () => {
+        wrapper.vm.title = "Valid";
+        await wrapper.vm.$nextTick();
+        wrapper.vm.title = ""; // No longer valid.
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.editErrors.title.error).toBeTruthy();
+        expect(wrapper.vm.editErrors.title.message).toBe("A card title is required");
     });
 
+    test('Edited card title is of valid length', async () => {
+        wrapper.vm.title = "Valid";
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.editErrors.title.error).toBeFalsy();
+    });
+
+    test('Card edit is invalid', async () => {
+        wrapper.vm.title = "OverFiftyCharactersLong".repeat(4);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.validateCardEdit()).toBeFalsy();
+    });
+
+    test('Card edit is valid', async () => {
+        wrapper.vm.title = "New Edited Title";
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.validateCardEdit()).toBeTruthy();
+    });
 });

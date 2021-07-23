@@ -35,7 +35,9 @@
           </vs-col>
           <vs-col vs-w="9">
             <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" ></vs-textarea>
-            <div v-show="editErrors.title.error" class="edit-error">{{editErrors.title.message}}</div>
+            <transition name="fade">
+              <div v-show="editErrors.title.error" class="edit-error">{{editErrors.title.message}}</div>
+            </transition>
           </vs-col>
         </vs-row>
         <vs-row class="addCardField">
@@ -92,6 +94,7 @@ export default {
         remove(item) {
           this.keywordList.splice(this.keywordList.indexOf(item), 1)
         },
+
         /**
          * sets prefilled entries for edit card modal
          */
@@ -105,6 +108,7 @@ export default {
             this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
           }
         },
+
         /**
          * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
          */
@@ -148,7 +152,7 @@ export default {
         /**
          * Resets state of messaging information
          */
-        resetState() {
+        resetState: function() {
           this.message = '';
           this.title = '';
           this.keywords = [];
@@ -157,22 +161,29 @@ export default {
           this.messaging = false;
         },
 
-        saveCardEdit() {
-          this.validateCardEdit();
-          console.log("yep");
+        /**
+         * Saves the the changed input fields of an edited card - provided that the fields are valid.
+         * todo: send info to backend.
+         */
+        saveCardEdit: function() {
+          if (this.validateCardEdit()) {
+            this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+          }
+          else {
+            this.$vs.notify({title: "Error saving changes", text: "Please check the input fields and try again.", color: "danger"});
+          }
         },
 
-        validateCardEdit() {
-          Object.values(this.editErrors).forEach(input => input.error = false);
+        /**
+         * Validates the input fields of the user's card editing.
+         */
+        validateCardEdit: function() {
+          let valid = true;
 
-          if (this.title.length < 1) {
-            this.editErrors.title.error = true;
-            this.editErrors.title.message = "A card title is required.";
+          if (this.editErrors.title.error) {
+            valid = false;
           }
-          else if (this.title.length > 50) {
-            this.editErrors.title.error = true;
-            this.editErrors.title.message = "Card title is too long.";
-          }
+          return valid;
         }
       },
 
@@ -186,14 +197,17 @@ export default {
   },
 
   watch: {
+    /**
+     * Watches the title value for any changes, and checks validity of it.
+     */
     title: function() {
       if (this.title.length < 1) {
         this.editErrors.title.error = true;
-        this.editErrors.title.message = "A card title is required.";
+        this.editErrors.title.message = "A card title is required";
       }
       else if (this.title.length > 50) {
         this.editErrors.title.error = true;
-        this.editErrors.title.message = "Card title is too long.";
+        this.editErrors.title.message = "Card title is too long";
       }
       else {
         this.editErrors.title.error = false;
@@ -244,7 +258,6 @@ export default {
   flex: 0%;
 }
 
-
 #card-modal-message {
   margin-top: 10px;
 }
@@ -293,12 +306,16 @@ export default {
 }
 
 /* === EDIT CARD === */
+#card-modal-edit {
+  margin-top: 8px;
+}
+
 .title-input >>> textarea {
   max-height: 33px;
   min-height: 33px;
 }
 
-.title-input {
+.title-input { /* Is being used. */
   margin-bottom: 0;
 }
 
