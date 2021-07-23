@@ -59,23 +59,26 @@ let mockCard = {
     section: "Wanted"
 }
 
-
 jest.mock("../Api.js", () => jest.fn);
 api.getUserFromID = jest.fn(() => {
   return Promise.resolve({data: mockUser, status: 200});
 });
 
+api.getUserCards = jest.fn(() => {
+    return Promise.resolve({data: mockCard, status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
+
 api.checkSession = jest.fn(() => {
-  return Promise.resolve({status: 200}).catch();
+  return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
 });
 
 
 api.getBusinessFromId = jest.fn(() => {
-  return Promise.resolve({data: mockBusiness, status: 200}).catch();
+  return Promise.resolve({data: mockBusiness, status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
 api.getMessages = jest.fn(() => {
-  return Promise.resolve({status: 200}).catch();
+  return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
 
@@ -93,10 +96,14 @@ const $router = {
     push: jest.fn()
 };
 
+const $log = {
+    error: jest.fn(),
+}
+
 beforeEach(() => {
     wrapper = shallowMount(Homepage, {
         propsData: {},
-        mocks: {$router},
+        mocks: {$router, $log},
         stubs: ['router-link', 'router-view'],
         methods: {},
         localVue,
