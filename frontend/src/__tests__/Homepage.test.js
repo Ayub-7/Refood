@@ -89,7 +89,7 @@ const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getLoggedInUserId'
 getLoggedInUserIdMethod.mockResolvedValue(mockUser.id);
 
 api.getUserCards = jest.fn(() => {
-    return Promise.resolve({data: [mockCard], status: 200});
+    return Promise.resolve({data: [mockCard], status: 200}).catch({response: {message: "Bad request", status: 400}});
 });
 
 const $router = {
@@ -121,6 +121,7 @@ beforeEach(() => {
             }
         }
     });
+    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {
