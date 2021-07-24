@@ -78,17 +78,6 @@ const mockBusinessesFromSearch = [
     }
 ]
 
-let mockStorage = {};
-
-beforeAll(() => {
-    localVue.sessionStorage.setItem = jest.fn((key, value) => {
-        mockStorage[key] = JSON.stringify(value);
-    })
-
-    localVue.sessionStorage.getItem = jest.fn((key) => mockStorage[key]);
-
-})
-
 let $vs = {
     loading: jest.fn(),
 }
@@ -105,7 +94,7 @@ beforeEach(() => {
     wrapper = shallowMount(Search, {
         localVue,
         propsData: {},
-        mocks: {$vs, $log, mockStorage},
+        mocks: {$vs, $log},
         stubs: ['router-link', 'router-view'],
         methods: {},
         data () {
@@ -115,7 +104,6 @@ beforeEach(() => {
         }
     });
     expect(wrapper).toBeTruthy();
-    mockStorage = {};
     api.searchUsersQuery = jest.fn(() => {
         return Promise.resolve({data: mockUsersFromSearch, status: 200}).finally();
     });
@@ -126,8 +114,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    localVue.sessionStorage.setItem.mockReset();
-    localVue.sessionStorage.getItem.mockReset();
     wrapper.destroy();
 });
 
