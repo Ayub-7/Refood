@@ -132,7 +132,7 @@
 
 <script>
 import api from "../Api";
-import {store} from "../store"
+import {store} from "../store";
 
 const Search = {
   name: "Search",
@@ -161,6 +161,10 @@ const Search = {
    * remove when test back end works well...
    */
   mounted() {
+    if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+      this.businesses = JSON.parse(sessionStorage.getItem('businessesCache'));
+      this.paginator(this.businesses)
+    }
     if ( this.getUserRole() === 'DGAA') {
       this.isDGAA = true;
     }
@@ -230,6 +234,7 @@ const Search = {
      * @param bizId id of business that has been clicked
      */
     goToBusinessProfile(bizId) {
+      sessionStorage.setItem("businessesCache", JSON.stringify(this.businesses))
       this.$router.push({path: `/businesses/${bizId}`})
     },
     /**
@@ -258,8 +263,10 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-      if (this.businesses.length) {
+      if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+        sessionStorage.setItem("businessesCache", [])
         this.businesses = [];
+
       }
       if (this.searchbarUser === "") return;
       this.$vs.loading();
