@@ -118,10 +118,6 @@ afterEach(() => {
 });
 
 describe('Search page tests', () => {
-    test('Sanity check DELETE LATER', () => {
-        sessionStorage.setItem("a", 1);
-    })
-
     test('Table exists when valid data is in response', () => {
         expect(wrapper.find('#userTable').exists()).toBe(true);        
     })

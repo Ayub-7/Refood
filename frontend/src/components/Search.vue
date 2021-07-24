@@ -161,9 +161,11 @@ const Search = {
    * remove when test back end works well...
    */
   mounted() {
-    if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
-      this.businesses = JSON.parse(sessionStorage.getItem('businessesCache'));
-      this.paginator(this.businesses)
+    if (sessionStorage.getItem('businessesCache') !== null) {
+      if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+        this.businesses = JSON.parse(sessionStorage.getItem('businessesCache'));
+        this.paginator(this.businesses)
+      }
     }
     if ( this.getUserRole() === 'DGAA') {
       this.isDGAA = true;
@@ -263,10 +265,12 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-      if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
-        sessionStorage.setItem("businessesCache", [])
-        this.businesses = [];
 
+      if (sessionStorage.getItem('businessesCache') !== null) {
+        if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+          sessionStorage.setItem("businessesCache", [])
+          this.businesses = [];
+        }
       }
       if (this.searchbarUser === "") return;
       this.$vs.loading();
