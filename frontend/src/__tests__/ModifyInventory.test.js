@@ -169,7 +169,7 @@ describe('Component', () => {
     });
 
     test('Past list expiry date error', () => {
-        wrapper.vm.invenForm.listExpiry = '01-01-2000';
+        wrapper.vm.invenForm.expiryDate = '01-01-2000';
         wrapper.vm.checkForm();
         expect(wrapper.vm.errors.includes('past-date')).toBeTruthy();
         expect(wrapper.vm.errors.includes('past-expiry')).toBeTruthy();
@@ -188,13 +188,27 @@ describe('Component', () => {
         expect(wrapper.vm.errors.includes('past-sell')).toBeTruthy();
     });
 
+    test('Best Before date is after expiry date error', () => {
+        wrapper.vm.invenForm.bestBefore = '2021-12-12';
+        wrapper.vm.invenForm.expiryDate = '2021-12-10';
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('best-before-expiry')).toBeTruthy();
+    });
+
+    test('Best Before date is before expiry date success', () => {
+        wrapper.vm.invenForm.bestBefore = '2021-12-10';
+        wrapper.vm.invenForm.expiryDate = '2021-12-12';
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('best-before-expiry')).toBeFalsy();
+    });
+
     test('Successful check', () => {
         wrapper.vm.invenForm.prodId = 'W04GP5EC0B1798680';
         wrapper.vm.invenForm.pricePerItem = 5.5;
         wrapper.vm.invenForm.totalPrice = 16.5;
         wrapper.vm.invenForm.manufactureDate = "2021-01-27";
         wrapper.vm.invenForm.bestBefore = "2022-01-27";
-        wrapper.vm.invenForm.listExpiry = "2022-01-27";
+        wrapper.vm.invenForm.expiryDate = "2022-01-27";
         wrapper.vm.invenForm.sellBy = "2022-01-27";
         wrapper.vm.invenForm.quantity = 3;
         wrapper.vm.checkForm();
@@ -229,7 +243,7 @@ describe("Modify inventory tests", () => {
         wrapper.vm.invenForm.totalPrice = 12;
         wrapper.vm.invenForm.manufactureDate = "2021-01-27";
         wrapper.vm.invenForm.bestBefore = "2022-01-27";
-        wrapper.vm.invenForm.listExpiry = "2022-01-27";
+        wrapper.vm.invenForm.expiryDate = "2022-01-27";
         wrapper.vm.invenForm.sellBy = "2022-01-27";
         wrapper.vm.invenForm.quantity = 3;
         wrapper.vm.addNewInv = true;
@@ -271,7 +285,7 @@ describe("Autofill", () => {
         expect(wrapper.vm.invenForm.manufactureDate).toEqual('')
         expect(wrapper.vm.invenForm.sellBy).toEqual('')
         expect(wrapper.vm.invenForm.bestBefore).toEqual('')
-        expect(wrapper.vm.invenForm.listExpiry).toEqual('')
+        expect(wrapper.vm.invenForm.expiryDate).toEqual('')
         expect(wrapper.vm.invenForm.quantity).toEqual(0)
         expect(wrapper.vm.invenForm.pricePerItem).toEqual(0)
         wrapper.vm.setCurrentItem(mockModifiedItem);
@@ -279,7 +293,7 @@ describe("Autofill", () => {
         expect(wrapper.vm.invenForm.manufactureDate).toEqual('2021-01-27')
         expect(wrapper.vm.invenForm.sellBy).toEqual('2022-01-27')
         expect(wrapper.vm.invenForm.bestBefore).toEqual('2022-01-27')
-        expect(wrapper.vm.invenForm.listExpiry).toEqual('2022-01-27')
+        expect(wrapper.vm.invenForm.expiryDate).toEqual('2022-01-27')
         expect(wrapper.vm.invenForm.quantity).toEqual(3)
         expect(wrapper.vm.invenForm.pricePerItem).toEqual(5.5)
     })

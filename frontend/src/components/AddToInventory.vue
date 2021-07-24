@@ -291,6 +291,10 @@ export default {
         this.errors.push(this.invenForm.quantity);
       }
 
+      if (this.invenForm.bestBefore > this.invenForm.listExpiry) {
+        this.errors.push("best-before-expiry");
+      }
+
       if (this.errors.includes('no-dates')) {
         this.$vs.notify({
           title: 'Failed to create inventory item',
@@ -319,6 +323,14 @@ export default {
         this.$vs.notify({
           title: 'Failed to create inventory item',
           text: 'Quantity must be greater than zero.',
+          color: 'danger'
+        });
+      }
+
+      if (this.errors.includes("best-before-expiry")) {
+        this.$vs.notify({
+          title: 'Failed to create inventory item',
+          text: 'Best before date cannot be after the expiry date.',
           color: 'danger'
         });
       }

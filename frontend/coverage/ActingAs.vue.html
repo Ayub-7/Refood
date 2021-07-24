@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.94% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>13/31</span>
+                <span class='fraction'>0/31</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/15</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.94% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>13/31</span>
+                <span class='fraction'>0/31</span>
             </div>
         
             
@@ -237,15 +237,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -254,19 +252,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,8 +301,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -380,13 +380,13 @@
 &lt;/template&gt;
 &nbsp;
 &lt;script&gt;
-import {store, mutations} from "../store";
-import api from "../Api";
+<span class="cstat-no" title="statement not covered" >import {store, mutations} from "../store";</span>
+<span class="cstat-no" title="statement not covered" >import api from "../Api";</span>
 &nbsp;
-const actingAs =  {
+<span class="cstat-no" title="statement not covered" >const actingAs =  {</span>
   name: "actingAs",
-  data: function () {
-    return {
+<span class="fstat-no" title="function not covered" >  data: function () {</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
       loggedInUserId: null,
       userName: null,
       role: null,
@@ -396,20 +396,20 @@ const actingAs =  {
     }
   },
   methods: {
-    getUserName() {
-      this.userName = store.userName;
-      this.loggedInUserId = store.loggedInUserId;
-      return this.userName;
+<span class="fstat-no" title="function not covered" >    getUserName() {</span>
+<span class="cstat-no" title="statement not covered" >      this.userName = store.userName;</span>
+<span class="cstat-no" title="statement not covered" >      this.loggedInUserId = store.loggedInUserId;</span>
+<span class="cstat-no" title="statement not covered" >      return this.userName;</span>
     },
 &nbsp;
-    getUserRole() {
-      this.role = store.role;
-      return this.role;
+<span class="fstat-no" title="function not covered" >    getUserRole() {</span>
+<span class="cstat-no" title="statement not covered" >      this.role = store.role;</span>
+<span class="cstat-no" title="statement not covered" >      return this.role;</span>
     },
 &nbsp;
-    getBusinesses(){
-      this.userBusinesses = store.userBusinesses;
-      return store.userBusinesses;
+<span class="fstat-no" title="function not covered" >    getBusinesses(){</span>
+<span class="cstat-no" title="statement not covered" >      this.userBusinesses = store.userBusinesses;</span>
+<span class="cstat-no" title="statement not covered" >      return store.userBusinesses;</span>
     },
 &nbsp;
 <span class="fstat-no" title="function not covered" >    setActingAsBusinessId(businessId, businessName){</span>
@@ -443,9 +443,9 @@ const actingAs =  {
       });
     },
 &nbsp;
-    getActingAsBusinessName() {
-      this.actingAsBusinessName = store.actingAsBusinessName
-      return this.actingAsBusinessName;
+<span class="fstat-no" title="function not covered" >    getActingAsBusinessName() {</span>
+<span class="cstat-no" title="statement not covered" >      this.actingAsBusinessName = store.actingAsBusinessName</span>
+<span class="cstat-no" title="statement not covered" >      return this.actingAsBusinessName;</span>
     },
 &nbsp;
 <span class="fstat-no" title="function not covered" >    showUserBusinesses: function() {</span>
@@ -493,7 +493,7 @@ span.user {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Jun 09 2021 14:42:02 GMT+1200 (New Zealand Standard Time)
+                at Sat Jul 24 2021 14:34:24 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

@@ -23,7 +23,7 @@
 
       <div class="vs-col" vs-order="1" id="first-col-modal">
         <div class="row">
-          <label for="pricePerItem">Price per item</label>
+          <label for="pricePerItem">Price Per Item *</label>
           <vs-input
               type="number"
               :danger="(errors.includes('pricePerItem'))"
@@ -33,7 +33,7 @@
               v-model="invenForm.pricePerItem"/>
         </div>
         <div class="row">
-          <label for="total-price">Total Price</label>
+          <label for="total-price">Total Price *</label>
           <vs-input
               type="number"
               :danger="(errors.includes('totalPrice'))"
@@ -43,11 +43,11 @@
               v-model="invenForm.totalPrice"/>
         </div>
         <div class="row">
-          <label for="quantity">Quantity</label>
+          <label for="quantity">Quantity *</label>
           <vs-input-number
               :danger="(errors.includes(invenForm.quantity))"
               danger-text="Quantity must be greater than zero."
-              min="0"
+              min="1"
               :step="1"
               id="quantity"
               v-model="invenForm.quantity"/>
@@ -58,19 +58,19 @@
           <label for="bestBefore">Best before</label>
           <vs-input
               :danger="(errors.includes('past-best'))"
-              danger-text="Date cannot be in past"
+              danger-text="Date cannot be in the past"
               type="date"
               id="bestBefore"
               v-model="invenForm.bestBefore"/>
         </div>
         <div class="row">
-          <label for="listingExpiry">Listing expiry</label>
+          <label for="listingExpiry">Expiry Date *</label>
           <vs-input
               :danger="(errors.includes('past-expiry'))"
-              danger-text="Expiry date is required and cannot be in past"
+              danger-text="Expiry date is required and cannot be in the past"
               type="date"
               id="listingExpiry"
-              v-model="invenForm.listExpiry"/>
+              v-model="invenForm.expiryDate"/>
         </div>
         <div class="row">
           <label for="manufactureDate">Manufacture date</label>
@@ -85,7 +85,7 @@
           <label for="sellBy">Sell by</label>
           <vs-input
               :danger="(errors.includes('past-sell'))"
-              danger-text="Date cannot be in past"
+              danger-text="Date cannot be in the past"
               type="date"
               id="sellBy"
               v-model="invenForm.sellBy"/>
@@ -142,7 +142,7 @@ export default {
         totalPrice: 0.0,
         quantity: 0,
         bestBefore: '',
-        listExpiry: '',
+        expiryDate: '',
         manufactureDate: '',
         sellBy: ''
       },
@@ -224,15 +224,15 @@ export default {
       }
 
       let dateInFuture = function(firstDate, secondDate) {
-        return firstDate.setHours(0, 0, 0, 0) >= secondDate.setHours(0, 0, 0, 0);
+        return firstDate.setHours(0, 0, 0, 0) > secondDate.setHours(0, 0, 0, 0);
       }
 
       if (this.invenForm.bestBefore === '' && this.invenForm.sellBy === '' && this.invenForm.manufactureDate === ''
-          && this.invenForm.listExpiry === '') {
+          && this.invenForm.expiryDate === '') {
         this.errors.push('no-dates');
       }
 
-      if (this.invenForm.listExpiry === '') {
+      if (this.invenForm.expiryDate === '') {
         this.errors.push('past-expiry');
       }
 
@@ -259,8 +259,8 @@ export default {
         }
       }
 
-      if (this.invenForm.listExpiry !== '') {
-        timestamp = Date.parse(this.invenForm.listExpiry);
+      if (this.invenForm.expiryDate !== '') {
+        timestamp = Date.parse(this.invenForm.expiryDate);
         dateObject = new Date(timestamp)
         if (dateInPast(dateObject, today) === true) {
           this.errors.push('past-date');
@@ -288,6 +288,10 @@ export default {
 
       if (this.invenForm.quantity <= 0) {
         this.errors.push(this.invenForm.quantity);
+      }
+
+      if (this.invenForm.bestBefore > this.invenForm.expiryDate) {
+        this.errors.push("best-before-expiry");
       }
 
       if (this.errors.includes('no-dates')) {
@@ -318,6 +322,14 @@ export default {
         this.$vs.notify({
           title: 'Failed to create inventory item',
           text: 'Quantity must be greater than zero.',
+          color: 'danger'
+        });
+      }
+
+      if (this.errors.includes("best-before-expiry")) {
+        this.$vs.notify({
+          title: 'Failed to create inventory item',
+          text: 'Best before date cannot be after the expiry date.',
           color: 'danger'
         });
       }
@@ -355,10 +367,9 @@ export default {
       this.invenForm.prodId = this.currentProduct.id;
       this.checkForm();
       if (this.errors.length === 0) {
-        api.modifyInventory(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.listExpiry)
+        api.modifyInventory(store.actingAsBusinessId, this.item.id, this.invenForm.prodId, this.invenForm.quantity, this.invenForm.pricePerItem, this.invenForm.totalPrice, this.invenForm.manufactureDate, this.invenForm.sellBy, this.invenForm.bestBefore, this.invenForm.expiryDate)
             .then((response) => {
               this.$log.debug("Inventory item updated:", response.data);
-              //this.inventory.push(response.data);
               this.addNewInv = false;
               this.modifyInv = false;
               this.$emit('submitted');
@@ -398,7 +409,7 @@ export default {
         this.invenForm.manufactureDate = item.manufactured;
         this.invenForm.sellBy = item.sellBy;
         this.invenForm.bestBefore = item.bestBefore;
-        this.invenForm.listExpiry = item.expires;
+        this.invenForm.expiryDate = item.expires;
         this.invenForm.quantity = item.quantity;
         this.invenForm.pricePerItem = item.pricePerItem;
         this.invenForm.totalPrice = item.totalPrice;
@@ -444,6 +455,7 @@ export default {
 
 .row {
   margin-bottom: 15px;
+
 }
 
 .vs-popup--header {

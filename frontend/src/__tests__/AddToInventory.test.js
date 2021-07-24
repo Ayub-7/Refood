@@ -151,6 +151,20 @@ describe('Component', () => {
         expect(wrapper.vm.errors.includes('past-sell')).toBeTruthy();
     });
 
+    test('Best Before date is after expiry date error', () => {
+        wrapper.vm.invenForm.bestBefore = '2021-12-12';
+        wrapper.vm.invenForm.listExpiry = '2021-12-10';
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('best-before-expiry')).toBeTruthy();
+    });
+
+    test('Best Before date is before expiry date success', () => {
+        wrapper.vm.invenForm.bestBefore = '2021-12-10';
+        wrapper.vm.invenForm.listExpiry = '2021-12-12';
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('best-before-expiry')).toBeFalsy();
+    });
+
     test('Successful inventory addition', async () => {
         wrapper.vm.invenForm.prodId = "W04GP5EC0B1798680";
         wrapper.vm.invenForm.quantity = 7;
