@@ -87,7 +87,10 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ],
-    "testResultsProcessor": "jest-sonar-reporter"
+    "testResultsProcessor": "jest-sonar-reporter",
+    "setupFilesAfterEnv": [
+      "./SessionStorageMock.js"
+    ]
   },
   "jestSonar": {
     "reportPath": "coverage",
