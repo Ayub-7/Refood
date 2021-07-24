@@ -1,6 +1,7 @@
 package org.seng302.finders;
 
 import org.seng302.models.Business;
+import org.seng302.models.BusinessType;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -41,12 +42,30 @@ public class BusinessFinder {
     /**
      * Builds criteria to help with querying businesses
      * @param term query used for filtering businesses
+     * @param type Type of business
      * @param isLike If true, it will require that a business' name either matches the query or part of its name has the query in it.
      *               Otherwise, the query must exactly match the business name.
      * @return Predicate that will be used to query businesses
      */
-    private Predicate criteriaBuilder(String term, boolean isLike) {
+    private Predicate criteriaBuilder(String term, String type, boolean isLike) {
         //Obtains criteria
+        Predicate businessType = null;
+        if (type != null || type.length() > 0) {
+            switch (type.toUpperCase()) {
+                case "ACCOMMODATION AND FOOD SERVICES":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+                    break;
+                case "RETAIL TRADE":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.RETAIL_TRADE);
+                    break;
+                case "CHARITABLE ORGANISATION":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.CHARITABLE_ORGANISATION);
+                    break;
+                case "NON-PROFIT ORGANISATION":
+                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.NON_PROFIT_ORGANISATION);
+                    break;
+            }
+        }
         if (!isLike) {
             String[] subTerms = term.split(" ");
             List<Predicate> subTermPredicates = new ArrayList<>();
@@ -61,22 +80,29 @@ public class BusinessFinder {
             for (int i = 1; i < subTerms.length; i++) {
                 combinedCriteria = criteriaBuilder.and(combinedCriteria, subTermPredicates.get(i));
             }
-
+            if (businessType != null) {
+                return criteriaBuilder.and(combinedCriteria, businessType);
+            }
             return combinedCriteria;
         } else {
             term = term.strip().toLowerCase();
-            return criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
+            Predicate name = criteriaBuilder.like(criteriaBuilder.lower(businessRoot.get("name")), "%" + term + "%");
+            if (businessType != null) {
+                return criteriaBuilder.and(name, businessType);
+            }
+            return name;
         }
     }
 
     /**
      * This method is used twice in this class to filter the exact matching results and to filter similar results.
      * @param terms List of subqueries to be used for searching.
+     * @param type Type of business
      * @param isLike If true, it will return results with things that contains query as a whole word or a part of a word.
      *               Otherwise, it will return results that exactly match the query
      * @return Return a list of businesses
      */
-    private List<Business> queryProcess(ArrayList<String> terms, boolean isLike) {
+    private List<Business> queryProcess(ArrayList<String> terms, String type, boolean isLike) {
         List<Predicate> criteriaList = new ArrayList<>();
         Logic logic = Logic.NONE;
         short consecutive = 0;
@@ -98,7 +124,7 @@ public class BusinessFinder {
                     consecutive++;
                 }
 
-                Predicate combinedCriteria = this.criteriaBuilder(term, isLike);
+                Predicate combinedCriteria = this.criteriaBuilder(term, type, isLike);
 
                 if (criteriaList.isEmpty()) {
                     logic = Logic.NONE;
@@ -129,16 +155,17 @@ public class BusinessFinder {
     /**
      * The only publicly available method to access outside of this class to search for businesses.
      * @param query The search query to be used to filter search results
+     * @param type Type of business
      * @return Will return all businesses if query is blank, otherwise will filter according to what is in the query
      */
-    public List<Business> findBusinesses(String query) {
+    public List<Business> findBusinesses(String query, String type) {
         criteriaBuilder = entityManager.getCriteriaBuilder();
         criteriaQuery = criteriaBuilder.createQuery(Business.class);
         businessRoot = criteriaQuery.from(Business.class);
         ArrayList<String> terms = this.searchQueryKeywords(query);
         if (terms.size() > 0) {
-            List<Business> businesses = this.queryProcess(terms, false);
-            List<Business> partialBusinesses = this.queryProcess(terms, true);
+            List<Business> businesses = this.queryProcess(terms, type, false);
+            List<Business> partialBusinesses = this.queryProcess(terms, type, true);
             partialBusinesses.removeAll(businesses);
             businesses.addAll(partialBusinesses);
             return businesses;
