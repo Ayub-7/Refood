@@ -43,7 +43,7 @@
             <div class="addCardHeader" >Title <span class="required">*</span> </div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" ></vs-textarea>
+            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" @keydown.enter.prevent></vs-textarea>
             <transition name="fade">
               <div v-show="editErrors.title.error" class="edit-error">{{editErrors.title.message}}</div>
             </transition>
@@ -184,6 +184,7 @@ export default {
          */
         saveCardEdit: function() {
           if (this.validateCardEdit()) {
+            this.title = this.title.trim(); // Removing any whitespace before and after.
             this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
           }
           else {
@@ -225,7 +226,11 @@ export default {
     title: function() {
       if (this.title.length < 1) {
         this.editErrors.title.error = true;
-        this.editErrors.title.message = "A card title is required";
+        this.editErrors.title.message = "A valid card title is required";
+      }
+      else if (this.title.trim().length === 0) {
+        this.editErrors.title.error = true;
+        this.editErrors.title.message = "A valid card title is required";
       }
       else if (this.title.length > 50) {
         this.editErrors.title.error = true;
@@ -236,6 +241,9 @@ export default {
       }
     },
 
+    /**
+     * Makes sure the section doesn't somehow become null.
+     */
     section: function() {
       this.editErrors.section.error = this.section == null || this.section === "";
     }

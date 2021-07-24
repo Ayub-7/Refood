@@ -169,7 +169,14 @@ describe('Card editing', () => {
         wrapper.vm.title = ""; // No longer valid.
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.editErrors.title.error).toBeTruthy();
-        expect(wrapper.vm.editErrors.title.message).toBe("A card title is required");
+        expect(wrapper.vm.editErrors.title.message).toBe("A valid card title is required");
+    });
+
+    test('Edited card title is invalid', async () => {
+        wrapper.vm.title = "  ";
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.editErrors.title.error).toBeTruthy();
+        expect(wrapper.vm.editErrors.title.message).toBe("A valid card title is required");
     });
 
     test('Edited card title is of valid length', async () => {
