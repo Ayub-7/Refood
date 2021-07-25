@@ -144,7 +144,6 @@ export default {
      * @field tabIndex must track this.tabIndex
      */
     onSuccess(sectionName) {
-      console.log(sectionName + this.tabIndex)
       switch (sectionName) {
         case "Wanted":
           this.tabIndex = 1;
