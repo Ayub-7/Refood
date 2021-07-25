@@ -156,12 +156,8 @@ describe('Card modal UI', () => {
             return Promise.resolve({status: 200, data: {id: 1}});
         });
 
-
-        wrapper.vm.getCurrentUserId();
-
         await wrapper.vm.getUserId();
 
-        frontend/src/__tests__/CardModal.test.js
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
     });
 });
