@@ -113,12 +113,20 @@ export default {
 
       /**
        * Sends user message by calling POST messages
-       * TODO: to be implemented
        * @param cardId ID of card whose owner the user is going to message
        */
       sendMessage(originalMessage, message) {
         if (this.checkMessage(message)) {
-          api.postMessage(originalMessage.sender.id, originalMessage.card.id, message)
+          //the server can return either the sender object or it's id
+          //we resolve which it is so we are always posting to the correct user
+          let senderId=null;
+          if (originalMessage.sender.id) {
+            senderId=originalMessage.sender.id;
+          } else {
+            senderId=originalMessage.sender;
+          }
+
+          api.postMessage(senderId, originalMessage.card.id, message)
               .then((res) => {
                 this.$vs.notify({title: 'Reply Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
                 //reset the message after success
