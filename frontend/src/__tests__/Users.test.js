@@ -92,6 +92,11 @@ let $vs = {
     loading: jest.fn(),
 }
 
+let $log = {
+    error: jest.fn(),
+    debug: jest.fn(),
+}
+
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 localVue.use(VueRouter);
@@ -102,7 +107,7 @@ beforeEach(() => {
         localVue,
         router,
         propsData: {},
-        mocks: {store, $vs},
+        mocks: {store, $vs, $log},
         stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         
