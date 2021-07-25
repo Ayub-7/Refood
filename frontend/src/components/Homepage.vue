@@ -49,7 +49,7 @@
         </main>
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
-        <MarketplaceGrid :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)"></MarketplaceGrid>
+        <MarketplaceGrid :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
         <vs-pagination :max="5" :total="Math.ceil(cards.length/4)" v-model="currentCardPage"></vs-pagination>
       </div>
       <!-- If the user has no active cards -->

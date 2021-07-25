@@ -69,11 +69,17 @@ describe('Component', () => {
         expect(wrapper.vm.errors.includes('no-title')).toBeTruthy();
     });
 
-    test('To long title error', () => {
+    test('Too long title error', () => {
         wrapper.vm.section = "Wanted";
         wrapper.vm.title = "The quick brown fox jumped over the lazy orange dog";
         wrapper.vm.checkForm();
         expect(wrapper.vm.errors.includes('long-title')).toBeTruthy();
+    });
+
+    test('Card title is only spaces error',  () => {
+        wrapper.vm.title = "   ";
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.titleError).toBeTruthy();
     });
 
     test('Valid card', () => {
