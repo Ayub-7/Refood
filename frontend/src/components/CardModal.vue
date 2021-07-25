@@ -93,7 +93,6 @@ export default {
       description: '',
       section: '',
 
-      userId: -1,
 
       editErrors: {
         title: {error: false, message: "There is a problem with the card title"},
