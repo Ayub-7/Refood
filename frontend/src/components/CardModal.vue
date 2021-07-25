@@ -17,13 +17,17 @@
 
       <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
-      <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; editing=false; message = ''" v-else>Cancel</vs-button>
+      <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; errors=[]; editing=false; message = ''" v-else>Cancel</vs-button>
     </div>
 
     <transition name="slide" v-if="showTransition">
     <div id="card-modal-message" v-if="messaging">
-      <vs-textarea v-model="message" id="message-input"></vs-textarea>
-      <vs-button id="card-modal-message-send" @click="sendMessage(selectedCard, message)">Send Message</vs-button>
+      <vs-textarea style="margin-bottom: 50px" v-model="message" id="message-input"
+                    :counter="250"
+      />
+      <div v-if="(errors.includes('bad-content'))" style="color: red">Message cannot be blank or too long</div>
+      <div v-if="(errors.includes('invalid-card'))" style="color: red">There was something wrong with the card</div>
+      <vs-button id="card-modal-message-send" @click="sendMessage()">Send Message</vs-button>
     </div>
     </transition>
 
@@ -75,7 +79,8 @@ export default {
       title: '',
       keywordList: [],
       description: '',
-
+      recipient: null,
+      errors: [],
       userId: -1,
     }
   },
@@ -122,37 +127,29 @@ export default {
          * Sends user message by calling POST messages
          * @param cardId ID of card whose owner the user is going to message
          */
-        sendMessage(card, message) {
-          let recipient;
-
+        sendMessage() {
           //Because the server may return either the full user object or just their id
-          if (card.user) {
-            recipient = card.user.id;
-          } else {
-            recipient = card.userId;
-          }
 
-          if (this.checkMessage(message, recipient)) {
-            this.sendPostMessage(recipient, card.id, message);
+          if (this.checkMessage()) {
+            this.sendPostMessage();
           }
 
         },
 
         /**
-         * Calls post message
-         * @param recipient Intended user to receive the message
-         * @param cardid    Id of the card
-         * @param message   Text to be sent
+         * Sends post message to back end. Notifies user if the send was a success or an error
          */
 
-        sendPostMessage(recipient, cardid, message) {
-          api.postMessage(recipient, cardid, message)
+        sendPostMessage() {
+
+          api.postMessage(this.recipient, this.selectedCard.id, this.message)
               .then((res) => {
                 console.log(res.data.messageId);
                 this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
 
                 //reset the message after success
                 this.message = "";
+                this.errors=[];
 
               })
               .catch((error) => {
@@ -165,21 +162,47 @@ export default {
          * Check the message contents
          * Simply check a blank message is not sent
          *
-         * @param message   Text to be sent
-         * @param recipient Intended receiver of the message
          * @return boolean  False if null or blank, then notify the user.
          *                  Otherwise return true.
          */
-         checkMessage(message, recipient) {
-          if (message == null || message === "") {
+         checkMessage() {
+
+          if (this.message == null || this.message === "") {
+            this.errors.push('bad-content');
+
             this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
             return false;
           }
 
-          if (isNaN(recipient)) {
+          if (this.message.length > 250) {
+            this.errors.push('bad-content');
+
+            this.$vs.notify({title:'Error sending message', text:`Message is too long. Consider sending it in parts.`, color:'danger'});
+            return false;
+          }
+
+          //the recipient can be stored as the userId or user.id depending on what the backend returns
+          //we check if it is a valid user Id at the end.
+          if (this.selectedCard.user) {
+            this.recipient = this.selectedCard.user.id;
+          } else {
+            this.recipient = this.selectedCard.userId;
+          }
+
+          if (isNaN(this.recipient)) {
+            this.errors.push('invalid-card');
+
             this.$vs.notify({title:'Error sending message', text:`Receiver is invalid`, color:'danger'});
             return false;
           }
+
+          if (isNaN(this.selectedCard.id)) {
+            this.errors.push('invalid-card');
+
+            this.$vs.notify({title:'Error sending message', text:`Card is invalid`, color:'danger'});
+            return false;
+          }
+
 
           return true;
         },
