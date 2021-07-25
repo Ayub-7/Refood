@@ -1,5 +1,5 @@
 <template>
-  <vs-popup id="card-modal" :title="selectedCard.title" :active.sync="showing">
+  <vs-popup id="card-modal" v-if="selectedCard" :title="selectedCard.title" :active.sync="showing">
     <div id="card-modal-name"><vs-icon icon="face" class="inline"></vs-icon>
       <p class="inline text">{{selectedCard.user.firstName}} {{selectedCard.user.lastName}}</p>
     </div>
@@ -189,14 +189,14 @@ export default {
             this.recipient = this.selectedCard.userId;
           }
 
-          if (isNaN(this.recipient)) {
+          if (isNaN(this.recipient) || this.recipient) {
             this.errors.push('invalid-card');
 
             this.$vs.notify({title:'Error sending message', text:`Receiver is invalid`, color:'danger'});
             return false;
           }
 
-          if (isNaN(this.selectedCard.id)) {
+          if (isNaN(this.selectedCard.id) || this.selectedCard.id) {
             this.errors.push('invalid-card');
 
             this.$vs.notify({title:'Error sending message', text:`Card is invalid`, color:'danger'});
