@@ -33,22 +33,22 @@
       <vs-divider></vs-divider>
 
       <vs-tabs alignment="center" v-model="tabIndex">
-        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')">
+        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale'); currentSection = 'ForSale'">
           <div>
-            <MarketplaceGrid  v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid  v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')">
+        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted'); currentSection = 'Wanted'">
           <div>
-            <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')">
+        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange'); currentSection = 'Exchange'">
           <div>
-            <MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
-            <MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
           </div>
 
         </vs-tab>
@@ -144,7 +144,6 @@ export default {
      * @field tabIndex must track this.tabIndex
      */
     onSuccess(sectionName) {
-      console.log(sectionName + this.tabIndex)
       switch (sectionName) {
         case "Wanted":
           this.tabIndex = 1;
@@ -182,9 +181,16 @@ export default {
       let direction = this.toggleDirection;
       this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field].toUpperCase() < cardTwo[field].toUpperCase()) ? direction : -direction);
       this.toggleDirection = this.toggleDirection*-1;
-    }
+    },
+    /**
+     * Method for reloading card data, after the owner of a card has deleted it
+     */
+    reloadCards: function() {
+      this.getSectionCards(this.currentSection);
+    },
 
    },
+
 
   mounted() {
     api.checkSession()

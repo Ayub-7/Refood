@@ -7,15 +7,15 @@
                   id="email" type="text"
                   v-model="email"
                   label="Enter Email"
-                  :danger="this.errors.email != null"
-                  :danger-text="this.errors.email"
+                  :danger="this.errors.message != null"
+                  :danger-text="this.errors.message"
                   required></vs-input>
         <vs-input class="form-control"
                   id="password" type="password"
                   v-model="password"
                   label="Enter Password"
-                  :danger="this.errors.password != null"
-                  :danger-text="this.errors.password"
+                  :danger="this.errors.message != null"
+                  :danger-text="this.errors.message"
                   required></vs-input>
 
         <vs-button class="loginButton" @click="checkForm(); loginSubmit()">Sign in</vs-button>
@@ -48,20 +48,19 @@ const Login = {
     checkForm: function() {
       this.errors = {
         hasErrors: false,
-        email: null,
-        password: null,
+        message: null
       };
 
       if (this.email.length === 0) {
-        this.errors.email = "Email required.";
+        this.errors.message = "Email required.";
         this.errors.hasErrors = true;
       }
       else if (!this.validEmail(this.email)) {
-        this.errors.email = "Invalid email.";
+        this.errors.message = "Incorrect email/password";
         this.errors.hasErrors = true;
       }
       if (this.password.length === 0) {
-        this.errors.password = "Password required.";
+        this.errors.message = "Incorrect email/password";
         this.errors.hasErrors = true;
       }
     },
@@ -80,7 +79,7 @@ const Login = {
           .catch(err => {
             if(err.response.status === 400) { // Catch 400 Bad Request
               this.email = this.password = "";
-              this.errors.email = this.errors.password = "";
+              this.errors.message = "";
               this.$vs.notify({title:'Login Failed', text:'Email or password is incorrect.', color:'danger'});
 
             }

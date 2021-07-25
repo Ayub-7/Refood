@@ -44,6 +44,8 @@
               News Feed
             </div>
           </nav>
+
+          <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
         </main>
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
@@ -61,11 +63,12 @@
 <script>
 import api from "../Api";
 import {mutations, store} from "../store"
+import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
 
 const Homepage = {
   name: "Homepage",
-  components: {MarketplaceGrid},
+  components: {HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       userId: null,
