@@ -41,6 +41,7 @@ class CardModelUnitTests {
 
     }
 
+    @Test
     void testCardCreation_nullTitle_throwsException() throws ValidationException {
         String title = null;
         String desc = "Desc";

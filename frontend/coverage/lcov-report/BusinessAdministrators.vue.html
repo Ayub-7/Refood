@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.86% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -55,7 +55,7 @@
             Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
         </p>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -193,19 +193,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -241,7 +241,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -249,7 +249,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -315,10 +315,10 @@
 &lt;/template&gt;
 &nbsp;
 &lt;script&gt;
-import api from "../Api";
-import {store} from "../store"
+<span class="cstat-no" title="statement not covered" >import api from "../Api";</span>
+<span class="cstat-no" title="statement not covered" >import {store} from "../store"</span>
 &nbsp;
-const BusinessAdministrators = {
+<span class="cstat-no" title="statement not covered" >const BusinessAdministrators = {</span>
   name: "BusinessAdministrators",
 &nbsp;
   props: {
@@ -326,8 +326,8 @@ const BusinessAdministrators = {
     pAdminId: Number,
   },
 &nbsp;
-  data: function() {
-    return {
+<span class="fstat-no" title="function not covered" >  data: function() {</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
       primaryAdminId: this.pAdminId,
     }
   },
@@ -362,16 +362,16 @@ const BusinessAdministrators = {
     /**
      * Navigate page to the user that was clicked on.
      */
-    navigateToUser: function (id) {
-      this.$router.push({path: `/users/${id}`})
+<span class="fstat-no" title="function not covered" >    navigateToUser: function (id) {</span>
+<span class="cstat-no" title="statement not covered" >      this.$router.push({path: `/users/${id}`})</span>
     },
 &nbsp;
     /**
      * Checks if the current user is also the primary administrator of this business.
      * @returns {boolean} true if the user is the primary admin, else false.
      */
-    isPrimaryAdmin: function () {
-      return store.loggedInUserId === this.primaryAdminId;
+<span class="fstat-no" title="function not covered" >    isPrimaryAdmin: function () {</span>
+<span class="cstat-no" title="statement not covered" >      return store.loggedInUserId === this.primaryAdminId;</span>
     },
   },
 }
@@ -430,7 +430,7 @@ export default BusinessAdministrators;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Sun Jul 18 2021 14:13:23 GMT+1200 (New Zealand Standard Time)
+                at Sat Jul 24 2021 14:34:24 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>

@@ -84,26 +84,44 @@ describe('Component', () => {
 
     test('Invalid ID error', () => {
         wrapper.vm.invenForm.prodId = '#@!%##@$%';
-        wrapper.vm.checkForm();
+        expect(wrapper.vm.checkForm()).toBeFalsy();
         expect(wrapper.vm.errors.includes('invalid-chars')).toBeTruthy();
     });
 
     test('Invalid PricePerItem error', () => {
         wrapper.vm.invenForm.pricePerItem = 'B';
-        wrapper.vm.checkForm();
+        expect(wrapper.vm.checkForm()).toBeFalsy();
         expect(wrapper.vm.errors.includes('pricePerItem')).toBeTruthy();
     });
 
     test('No date error', () => {
-        wrapper.vm.checkForm();
+        expect(wrapper.vm.checkForm()).toBeFalsy();
         expect(wrapper.vm.errors.includes('no-dates')).toBeTruthy();
         expect(wrapper.vm.errors.includes('past-expiry')).toBeTruthy();
     });
 
     test('Bad price per item error', () => {
         wrapper.vm.invenForm.pricePerItem = -50;
-        wrapper.vm.checkForm();
-        expect(wrapper.vm.invenForm.pricePerItem).toBeTruthy();
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("pricePerItem");
+    });
+
+    test('Total price is negative', () => {
+        wrapper.vm.invenForm.totalPrice = -50;
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("totalPrice");
+    });
+
+    test('Total price is null', () => {
+        wrapper.vm.invenForm.totalPrice = null;
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("totalPrice");
+    });
+
+    test('Invalid quantity error', () => {
+        wrapper.vm.invenForm.quantity = -50;
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain(wrapper.vm.invenForm.quantity);
     });
 
     test('Past best before date error', () => {
@@ -131,6 +149,20 @@ describe('Component', () => {
         wrapper.vm.checkForm();
         expect(wrapper.vm.errors.includes('past-date')).toBeTruthy();
         expect(wrapper.vm.errors.includes('past-sell')).toBeTruthy();
+    });
+
+    test('Best Before date is after expiry date error', () => {
+        wrapper.vm.invenForm.bestBefore = '2021-12-12';
+        wrapper.vm.invenForm.listExpiry = '2021-12-10';
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('best-before-expiry')).toBeTruthy();
+    });
+
+    test('Best Before date is before expiry date success', () => {
+        wrapper.vm.invenForm.bestBefore = '2021-12-10';
+        wrapper.vm.invenForm.listExpiry = '2021-12-12';
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('best-before-expiry')).toBeFalsy();
     });
 
     test('Successful inventory addition', async () => {

@@ -65,8 +65,6 @@ class InventoryControllerTests {
         adminUser.setId(3L);
 
 
-
-
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         business = new Business("Business1", "Test Business 1", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
         business.setId(1L);
@@ -280,6 +278,48 @@ class InventoryControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(inventory1)))
                 .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPost_BestBeforeAfterExpiry_returnBadRequest() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.FEBRUARY, 5);
+        Date before = calendar.getTime();
+        inventory1.setBestBefore(before);
+
+        calendar.set(2022, Calendar.FEBRUARY, 1);
+        inventory1.setExpires(calendar.getTime());
+
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+        mvc.perform(post("/businesses/{id}/inventory", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPost_BestBeforeBeforeExpiry_returnCreated() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2022, Calendar.FEBRUARY, 5);
+        Date expires = calendar.getTime();
+        inventory1.setExpires(expires);
+
+        calendar.set(2022, Calendar.FEBRUARY, 1);
+        inventory1.setBestBefore(calendar.getTime());
+
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+        mvc.perform(post("/businesses/{id}/inventory", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(inventory1)))
+                .andExpect(status().isCreated());
 
     }
 
