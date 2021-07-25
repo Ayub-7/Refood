@@ -14,6 +14,11 @@ let $route = {
 
 let $log = {
     debug: jest.fn(),
+    error: jest.fn(),
+}
+
+let $vs = {
+    notify: jest.fn(),
 }
 
 let cardDetails = {
@@ -54,7 +59,7 @@ beforeEach(() => {
         propsData: {
             selectedCard: cardDetails
         },
-        mocks: {$route, $log},
+        mocks: {$route, $log, $vs},
         stubs: {},
         methods: {},
         localVue,
@@ -74,7 +79,7 @@ describe('Card modal functionality', () => {
         //Setup
         wrapper.vm.message = "Hello"
         wrapper.vm.messaging = true;
-        
+
         expect(wrapper.vm.message).toBe("Hello")
         expect(wrapper.vm.messaging).toBe(true);
 
@@ -86,19 +91,19 @@ describe('Card modal functionality', () => {
         expect(wrapper.vm.messaging).toBe(false);
     });
 
-    test('Open modal correctly updates showing value', () => {
+    test('Open modal correctly updates showing value', async () => {
         //Setup
         wrapper.vm.showing = false;
         expect(wrapper.vm.showing).toBe(false);
-        
+
         //Execution
-        wrapper.vm.openModal()
+        await wrapper.vm.openModal()
 
         //Result
         expect(wrapper.vm.showing).toBe(true);
     })
 
-    test('Open modal calls resetState', () => {
+    test('Open modal calls resetState', async () => {
 
 
         //Setup
@@ -107,7 +112,7 @@ describe('Card modal functionality', () => {
         expect(wrapper.vm.showing).toBe(false);
 
         //Execution
-        wrapper.vm.openModal();
+        await wrapper.vm.openModal()
 
         expect(wrapper.vm.resetState).toBeCalled()
     })
@@ -132,24 +137,35 @@ describe('Card modal UI', () => {
         expect(wrapper.find("#card-modal-message")).toBeTruthy();
     });
 
-    test('User is not the owner - successfully shows message button', () => {
+    test('User is not the owner - successfully shows message button', async () => {
         api.checkSession = jest.fn(() => {
            return Promise.resolve({status: 200, data: {id: 2}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        await wrapper.vm.getUserId();
 
         expect(wrapper.find(".card-modal-message-button")).toBeTruthy();
     });
 
-    test('User is card owner - successfully shows edit button', () => {
+    test('User is card owner - successfully shows edit button', async () => {
         api.checkSession = jest.fn(() => {
             return Promise.resolve({status: 200, data: {id: 1}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        await wrapper.vm.getUserId();
 
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
+
+    });
+
+    test('User is card owner - successfully shows delete button', async () => {
+        api.checkSession = jest.fn(() => {
+            return Promise.resolve({status: 200, data: {id: 1}});
+        });
+
+        await wrapper.vm.getUserId();
+
+        expect(wrapper.find(".card-modal-delete-button")).toBeTruthy();
 
     });
 

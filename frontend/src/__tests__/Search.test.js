@@ -1,6 +1,7 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Search from '../components/Search.vue';
 import Vuesax from 'vuesax';
+import api from "../Api";
 
 let wrapper;
 
@@ -32,6 +33,60 @@ const mockUsersFromSearch = [
     }
 ]
 
+const mockBusinessesFromSearch = [
+    {
+        "name": "Dabshots",
+        "id": 1,
+        "administrators": [
+            {
+                "id": 1,
+                "firstName": "Wilma",
+                "middleName": "Janet",
+                "lastName": "Sails",
+                "nickname": "Open-architected",
+                "bio": "Profit-focused scalable moratorium",
+                "email": "jsails0@go.com",
+                "dateOfBirth": "1989-02-28",
+                "phoneNumber": "+57 242 190 0153",
+                "homeAddress": {
+                    "streetNumber": "44",
+                    "streetName": "Menomonie Way",
+                    "suburb": null,
+                    "city": "Zhashkiv",
+                    "region": null,
+                    "country": "Ukraine",
+                    "postcode": null
+                },
+                "created": "2020-08-06 23:35:52",
+                "role": "USER",
+                "businessesAdministered": null
+            }
+        ],
+        "primaryAdministratorId": 1,
+        "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+        "address": {
+            "streetNumber": "0",
+            "streetName": "Vernon Place",
+            "suburb": null,
+            "city": "Sarpang",
+            "region": null,
+            "country": "Bhutan",
+            "postcode": null
+        },
+        "businessType": "Charitable organisation",
+        "created": "2020-05-18 09:06:11"
+    }
+]
+
+let $vs = {
+    loading: jest.fn(),
+}
+
+let $log = {
+    debug: jest.fn(),
+    error: jest.fn()
+}
+
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
@@ -39,7 +94,7 @@ beforeEach(() => {
     wrapper = shallowMount(Search, {
         localVue,
         propsData: {},
-        mocks: {},
+        mocks: {$vs, $log},
         stubs: ['router-link', 'router-view'],
         methods: {},
         data () {
@@ -49,6 +104,13 @@ beforeEach(() => {
         }
     });
     expect(wrapper).toBeTruthy();
+    api.searchUsersQuery = jest.fn(() => {
+        return Promise.resolve({data: mockUsersFromSearch, status: 200}).finally();
+    });
+
+    api.searchBusinessesQuery = jest.fn(() => {
+        return Promise.resolve({data: mockBusinessesFromSearch, status: 200}).finally();
+    });
 });
 
 afterEach(() => {
@@ -76,3 +138,36 @@ describe('Search page tests', () => {
     })
 });
 
+describe("Test searching without query", () => {
+   test("Successful search - No query", async () => {
+      wrapper.vm.searchbarUser = "";
+      await wrapper.vm.searchUsers();
+      expect(wrapper.vm.$vs.loading).not.toBeCalled();
+   });
+
+
+    test("Successful search - No query", async () => {
+        wrapper.vm.searchbarBusiness = "";
+        await wrapper.vm.searchBusiness();
+        expect(wrapper.vm.$vs.loading).not.toBeCalled();
+    });
+
+});
+
+
+describe("Test searching with query", () => {
+    test("Successful user search - with query", async () => {
+        wrapper.vm.$vs.loading.close = jest.fn();
+        wrapper.vm.searchbarUser = "Something";
+        wrapper.vm.tableLoaded = true;
+        await wrapper.vm.searchUsers();
+        expect(wrapper.vm.$vs.loading).toBeCalled();
+    });
+    test("Successful business search - with query", async () => {
+        wrapper.vm.$vs.loading.close = jest.fn();
+        wrapper.vm.searchbarBusiness = "Something";
+        wrapper.vm.tableLoaded = true;
+        await wrapper.vm.searchBusiness();
+        expect(wrapper.vm.$vs.loading).toBeCalled();
+    });
+});
