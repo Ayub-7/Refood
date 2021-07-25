@@ -1,215 +1,211 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testExecutions version="1">
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/ModifyInventory.test.js">
-        <testCase name="Component is a Vue instance" duration="50"/>
-        <testCase name="Component Invalid ID error" duration="48"/>
-        <testCase name="Component Invalid PricePerItem error" duration="25"/>
-        <testCase name="Component No date error" duration="23"/>
-        <testCase name="Component Bad price per item error" duration="52"/>
-        <testCase name="Component Past best before date error" duration="30"/>
-        <testCase name="Component Past list expiry date error" duration="43"/>
-        <testCase name="Component Future manufacture date error" duration="27"/>
-        <testCase name="Component Past sell by date error" duration="26"/>
-        <testCase name="Component Successful check" duration="35"/>
-        <testCase name="Get business products Success" duration="18"/>
-        <testCase name="Get business products Failure" duration="39"/>
-        <testCase name="Modify inventory tests Successful modify" duration="34"/>
-        <testCase name="Modify inventory tests Unsuccessful with bad response" duration="21"/>
-        <testCase name="Modify inventory tests Unsuccessful with forbidden response" duration="40"/>
-        <testCase name="Autofill Autofill" duration="27"/>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Homepage.test.js">
+        <testCase name="Homepage user tests User&apos;s first name is shown" duration="55"/>
+        <testCase name="Homepage user tests Go to profile gets called when clicked" duration="36"/>
+        <testCase name="Homepage user tests Go to marketplace is present" duration="31"/>
+        <testCase name="Homepage user tests Card modal successfully opens" duration="19"/>
+        <testCase name="Homepage user tests User&apos;s cards are retrieved and set" duration="23"/>
+        <testCase name="Homepage business tests is a Vue instance" duration="12"/>
+        <testCase name="Homepage business tests Business&apos;s name is shown" duration="25"/>
+        <testCase name="Homepage business tests Go to business profile gets called when clicked" duration="13"/>
+        <testCase name="Homepage business tests Go to business catalogue gets called when clicked" duration="14"/>
+        <testCase name="Tests for functionality Get user ID test successfully" duration="13"/>
+        <testCase name="Tests for functionality Get user ID while logged out" duration="12"/>
     </file>
     <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/BusinessListings.test.js">
         <testCase name="Component is a Vue instance" duration="108"/>
-        <testCase name="Component Listings data is not empty." duration="102"/>
-        <testCase name="UI tests Table/grid view switch changes successfully" duration="140"/>
-        <testCase name="UI tests Grid sort order switches successfully" duration="72"/>
-        <testCase name="Functionality tests Sort direction switches successfully" duration="66"/>
-        <testCase name="Functionality tests Currency is set properly" duration="60"/>
-        <testCase name="Functionality tests Sort direction successfully changes" duration="78"/>
-        <testCase name="Functionality tests Product image url is retrieved" duration="115"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/AddToInventory.test.js">
-        <testCase name="Component is a Vue instance" duration="76"/>
-        <testCase name="Component Invalid ID error" duration="50"/>
-        <testCase name="Component Invalid PricePerItem error" duration="45"/>
-        <testCase name="Component No date error" duration="73"/>
-        <testCase name="Component Bad price per item error" duration="56"/>
-        <testCase name="Component Past best before date error" duration="35"/>
-        <testCase name="Component Past list expiry date error" duration="46"/>
-        <testCase name="Component Future manufacture date error" duration="44"/>
-        <testCase name="Component Past sell by date error" duration="51"/>
-        <testCase name="Component Successful inventory addition" duration="51"/>
-        <testCase name="Component Modal opens and sets info correctly" duration="91"/>
-        <testCase name="Component Product image url is retrieved" duration="31"/>
-        <testCase name="Component Default image product url is retrieved" duration="25"/>
-        <testCase name="Component Full product info modal appears when clicking image" duration="46"/>
+        <testCase name="Component Listings data is not empty." duration="79"/>
+        <testCase name="UI tests Table/grid view switch changes successfully" duration="139"/>
+        <testCase name="UI tests Grid sort order switches successfully" duration="88"/>
+        <testCase name="Functionality tests Sort direction switches successfully" duration="85"/>
+        <testCase name="Functionality tests Currency is set properly" duration="75"/>
+        <testCase name="Functionality tests Sort direction successfully changes" duration="110"/>
+        <testCase name="Functionality tests Product image url is retrieved" duration="116"/>
     </file>
     <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/ProductCatalogue.test.js">
-        <testCase name="Component is a Vue instance" duration="294"/>
-        <testCase name="UI tests Correct number of grid cards is displayed" duration="122"/>
-        <testCase name="UI tests uploadImage is called when new file uploaded" duration="130"/>
-        <testCase name="Functionality tests Data is initialized and set properly." duration="131"/>
-        <testCase name="Functionality tests Currency is set properly" duration="126"/>
-        <testCase name="Functionality tests Product item image url is retrieved" duration="123"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Users.test.js">
-        <testCase name="User profile page tests Check calculateDuration is called" duration="82"/>
-        <testCase name="User profile page tests User info loads successfully" duration="58"/>
-        <testCase name="User profile page tests addUserToBusiness function is called" duration="81"/>
-        <testCase name="User profile page tests Card modal successfully opens" duration="147"/>
-        <testCase name="User profile page tests User cards is retrieved and set" duration="157"/>
-        <testCase name="Business link tests with businesses Business names load successfully" duration="42"/>
-        <testCase name="Business link tests with businesses goToBusinessPage function gets called" duration="25"/>
-        <testCase name="Business link tests without businesses Business names don&apos;t appear" duration="33"/>
-        <testCase name="User details tests Successful addition to business" duration="47"/>
-        <testCase name="User details tests User already an admin" duration="27"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/MarketplaceAddCard.test.js">
-        <testCase name="Component is a Vue instance" duration="113"/>
-        <testCase name="Component No section error" duration="101"/>
-        <testCase name="Component No title error" duration="96"/>
-        <testCase name="Component To long title error" duration="80"/>
-        <testCase name="Component Valid card" duration="66"/>
-        <testCase name="Component Open modal" duration="80"/>
-        <testCase name="Component Reset values" duration="67"/>
-        <testCase name="Component Close modal after successful submission" duration="110"/>
-        <testCase name="Card creation Succesful creation" duration="80"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/BusinessAdministrators.test.js">
-        <testCase name="Component is a Vue instance" duration="7"/>
-        <testCase name="Component Props data loads correctly." duration="5"/>
-        <testCase name="UI components render successfully Correct number of admin cards generate" duration="30"/>
-        <testCase name="Checking method functions Router pushes" duration="7"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Login.test.js">
-        <testCase name="Login error checking Handles empty login" duration="41"/>
-        <testCase name="Login error checking Handles only email" duration="29"/>
-        <testCase name="Login error checking Handles only password" duration="40"/>
-        <testCase name="Login error checking Handles bad email" duration="24"/>
-        <testCase name="Logging in Successful login" duration="27"/>
-        <testCase name="Logging in Unsuccessful login - Bad request" duration="16"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/AddToCatalogue.test.js">
-        <testCase name="Component is a Vue instance" duration="94"/>
-        <testCase name="Add To Catalogue form error checking Handles empty Register" duration="28"/>
-        <testCase name="Add To Catalogue form error checking Handles no product name" duration="18"/>
-        <testCase name="Add To Catalogue form error checking Handles no product id" duration="30"/>
-        <testCase name="Add To Catalogue form error checking Handles no rrp" duration="19"/>
-        <testCase name="Add To Catalogue form error checking Handles negative rrp" duration="17"/>
-        <testCase name="Add To Catalogue form error checking Handles no manufacturer" duration="17"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Homepage.test.js">
-        <testCase name="Homepage user tests User&apos;s first name is shown" duration="40"/>
-        <testCase name="Homepage user tests Go to profile gets called when clicked" duration="14"/>
-        <testCase name="Homepage user tests Go to marketplace is present" duration="14"/>
-        <testCase name="Homepage business tests is a Vue instance" duration="7"/>
-        <testCase name="Homepage business tests Business&apos;s name is shown" duration="10"/>
-        <testCase name="Homepage business tests Go to business profile gets called when clicked" duration="15"/>
-        <testCase name="Homepage business tests Go to business catalogue gets called when clicked" duration="11"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/CardModal.test.js">
-        <testCase name="Card modal functionality is a Vue instance" duration="59"/>
-        <testCase name="Card modal functionality Reset state correctly resets values" duration="29"/>
-        <testCase name="Card modal functionality Open modal correctly updates showing value" duration="124"/>
-        <testCase name="Card modal functionality Open modal calls resetState" duration="34"/>
-        <testCase name="Card modal UI is a Vue instance" duration="38"/>
-        <testCase name="Card modal UI Message button opens message box" duration="55"/>
-        <testCase name="Card modal UI User is not the owner - successfully shows message button" duration="33"/>
-        <testCase name="Card modal UI User is card owner - successfully shows edit button" duration="34"/>
-        <testCase name="Messaging is a Vue instance" duration="22"/>
-        <testCase name="Messaging Message box shows with input" duration="40"/>
-        <testCase name="Messaging Message is checked after send" duration="66"/>
-        <testCase name="Messaging After sent success, Message clears and user is notified" duration="18"/>
-        <testCase name="Messaging On null recipient, User is notified and message is not cleared" duration="19"/>
-        <testCase name="Messaging On blank message, User is notified" duration="36"/>
-        <testCase name="Messaging On cancel message, message is cleared" duration="35">
-            <failure message="Error: [vue-test-utils]: find did not return #card-modal-message-cancel, cannot call trigger() on empty Wrapper"><![CDATA[Error: [vue-test-utils]: find did not return #card-modal-message-cancel, cannot call trigger() on empty Wrapper
-    at throwError (/home/sam/Documents/seng302/team-900/frontend/node_modules/@vue/test-utils/dist/vue-test-utils.js:1700:9)
-    at ErrorWrapper.trigger (/home/sam/Documents/seng302/team-900/frontend/node_modules/@vue/test-utils/dist/vue-test-utils.js:8962:3)
-    at Object.test (/home/sam/Documents/seng302/team-900/frontend/src/__tests__/CardModal.test.js:244:16)
-    at Object.asyncJestTest (/home/sam/Documents/seng302/team-900/frontend/node_modules/jest-jasmine2/build/jasmineAsyncInstall.js:106:37)
-    at resolve (/home/sam/Documents/seng302/team-900/frontend/node_modules/jest-jasmine2/build/queueRunner.js:45:12)
-    at new Promise (<anonymous>)
-    at mapper (/home/sam/Documents/seng302/team-900/frontend/node_modules/jest-jasmine2/build/queueRunner.js:28:19)
-    at promise.then (/home/sam/Documents/seng302/team-900/frontend/node_modules/jest-jasmine2/build/queueRunner.js:75:41)
-    at process._tickCallback (internal/process/next_tick.js:68:7)]]></failure>
-        </testCase>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/ModifyCatalog.test.js">
-        <testCase name="Component is a Vue instance" duration="93"/>
-        <testCase name="Modify Catalogue form error checking Handles no product name modification" duration="29"/>
-        <testCase name="Modify Catalogue form error checking Handles no product id modification" duration="20"/>
-        <testCase name="Modify Catalogue form error checking Handles no manufacturer modification" duration="18"/>
-        <testCase name="Modify Catalogue form error checking Handles no rrp modification" duration="33"/>
-        <testCase name="Modify Catalogue form error checking Handles negative rrp modification" duration="120"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Business.test.js">
-        <testCase name="Business tests is a Vue instance" duration="213"/>
-        <testCase name="Business tests has business" duration="51"/>
-        <testCase name="Successful login business page loads successfully" duration="61"/>
-        <testCase name="Functionality tests Check session is called" duration="89"/>
-        <testCase name="Functionality tests Check GET user info is called and sets data" duration="57"/>
-        <testCase name="Functionality tests Check GET business is being called and sets data" duration="45"/>
+        <testCase name="Component is a Vue instance" duration="320"/>
+        <testCase name="UI tests Correct number of grid cards is displayed" duration="152"/>
+        <testCase name="UI tests uploadImage is called when new file uploaded" duration="144"/>
+        <testCase name="Functionality tests Data is initialized and set properly." duration="226"/>
+        <testCase name="Functionality tests Currency is set properly" duration="169"/>
+        <testCase name="Functionality tests Product item image url is retrieved" duration="164"/>
     </file>
     <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Search.test.js">
-        <testCase name="Search page tests Table exists when valid data is in response" duration="46"/>
-        <testCase name="Search page tests Mobile mode not on when window is normal size" duration="38"/>
-        <testCase name="Search page tests Mobile mode active when window size is reduced" duration="59"/>
+        <testCase name="Search page tests Table exists when valid data is in response" duration="73"/>
+        <testCase name="Search page tests Mobile mode not on when window is normal size" duration="60"/>
+        <testCase name="Search page tests Mobile mode active when window size is reduced" duration="30"/>
+        <testCase name="Test searching without query Successful search - No query" duration="35"/>
+        <testCase name="Test searching without query Successful search - No query" duration="36"/>
+        <testCase name="Test searching with query Successful user search - with query" duration="39"/>
+        <testCase name="Test searching with query Successful business search - with query" duration="162"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/ModifyInventory.test.js">
+        <testCase name="Component is a Vue instance" duration="55"/>
+        <testCase name="Component Invalid ID error" duration="66"/>
+        <testCase name="Component Invalid PricePerItem error" duration="28"/>
+        <testCase name="Component No date error" duration="31"/>
+        <testCase name="Component Bad price per item error" duration="34"/>
+        <testCase name="Component Past best before date error" duration="38"/>
+        <testCase name="Component Past list expiry date error" duration="79"/>
+        <testCase name="Component Future manufacture date error" duration="45"/>
+        <testCase name="Component Past sell by date error" duration="96"/>
+        <testCase name="Component Successful check" duration="56"/>
+        <testCase name="Get business products Success" duration="36"/>
+        <testCase name="Get business products Failure" duration="61"/>
+        <testCase name="Modify inventory tests Successful modify" duration="60"/>
+        <testCase name="Modify inventory tests Unsuccessful with bad response" duration="51"/>
+        <testCase name="Modify inventory tests Unsuccessful with forbidden response" duration="48"/>
+        <testCase name="Autofill Autofill" duration="52"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Users.test.js">
+        <testCase name="User profile page tests Check calculateDuration is called" duration="93"/>
+        <testCase name="User profile page tests User info loads successfully" duration="60"/>
+        <testCase name="User profile page tests addUserToBusiness function is called" duration="82"/>
+        <testCase name="User profile page tests Card modal successfully opens" duration="166"/>
+        <testCase name="User profile page tests User cards is retrieved and set" duration="88"/>
+        <testCase name="Business link tests with businesses Business names load successfully" duration="42"/>
+        <testCase name="Business link tests with businesses goToBusinessPage function gets called" duration="28"/>
+        <testCase name="Business link tests without businesses Business names don&apos;t appear" duration="43"/>
+        <testCase name="User details tests Successful addition to business" duration="47"/>
+        <testCase name="User details tests User already an admin" duration="25"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/CardModal.test.js">
+        <testCase name="Card modal functionality is a Vue instance" duration="77"/>
+        <testCase name="Card modal functionality Reset state correctly resets values" duration="52"/>
+        <testCase name="Card modal functionality Open modal correctly updates showing value" duration="160"/>
+        <testCase name="Card modal functionality Open modal calls resetState" duration="57"/>
+        <testCase name="Card modal UI is a Vue instance" duration="53"/>
+        <testCase name="Card modal UI Message button opens message box" duration="61"/>
+        <testCase name="Card modal UI User is not the owner - successfully shows message button" duration="35"/>
+        <testCase name="Card modal UI User is card owner - successfully shows edit button" duration="40"/>
+        <testCase name="Messaging is a Vue instance" duration="32"/>
+        <testCase name="Messaging Message box shows with input" duration="49"/>
+        <testCase name="Messaging Message is checked after send" duration="70"/>
+        <testCase name="Messaging After sent success, Message clears and user is notified" duration="32"/>
+        <testCase name="Messaging On null recipient, User is notified and message is not cleared" duration="20"/>
+        <testCase name="Messaging On blank message, User is notified" duration="43"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/AddToInventory.test.js">
+        <testCase name="Component is a Vue instance" duration="106"/>
+        <testCase name="Component Invalid ID error" duration="70"/>
+        <testCase name="Component Invalid PricePerItem error" duration="55"/>
+        <testCase name="Component No date error" duration="73"/>
+        <testCase name="Component Bad price per item error" duration="56"/>
+        <testCase name="Component Past best before date error" duration="58"/>
+        <testCase name="Component Past list expiry date error" duration="39"/>
+        <testCase name="Component Future manufacture date error" duration="68"/>
+        <testCase name="Component Past sell by date error" duration="94"/>
+        <testCase name="Component Successful inventory addition" duration="66"/>
+        <testCase name="Component Modal opens and sets info correctly" duration="92"/>
+        <testCase name="Component Product image url is retrieved" duration="43"/>
+        <testCase name="Component Default image product url is retrieved" duration="46"/>
+        <testCase name="Component Full product info modal appears when clicking image" duration="165"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/ModifyCatalog.test.js">
+        <testCase name="Component is a Vue instance" duration="34"/>
+        <testCase name="Modify Catalogue form error checking Handles no product name modification" duration="40"/>
+        <testCase name="Modify Catalogue form error checking Handles no product id modification" duration="24"/>
+        <testCase name="Modify Catalogue form error checking Handles no manufacturer modification" duration="21"/>
+        <testCase name="Modify Catalogue form error checking Handles no rrp modification" duration="20"/>
+        <testCase name="Modify Catalogue form error checking Handles negative rrp modification" duration="45"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/MarketplaceAddCard.test.js">
+        <testCase name="Component is a Vue instance" duration="96"/>
+        <testCase name="Component No section error" duration="97"/>
+        <testCase name="Component No title error" duration="84"/>
+        <testCase name="Component To long title error" duration="81"/>
+        <testCase name="Component Valid card" duration="83"/>
+        <testCase name="Component Open modal" duration="81"/>
+        <testCase name="Component Reset values" duration="225"/>
+        <testCase name="Component Close modal after successful submission" duration="101"/>
+        <testCase name="Card creation Succesful creation" duration="64"/>
     </file>
     <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/ActingAs.test.js">
-        <testCase name="User acting as tests is a Vue instance" duration="7"/>
-        <testCase name="User acting as tests Check username is shown" duration="8"/>
-        <testCase name="User acting as tests Check username is displaying the correct username and role" duration="5"/>
-        <testCase name="User acting as tests Check user primary businesses list is rendered" duration="6"/>
-        <testCase name="User acting as tests Check selecting business in dropdown calls setActingAsBusinessId method" duration="6"/>
-        <testCase name="User acting as tests Check selecting user calls setActingAsUser method" duration="5"/>
+        <testCase name="User acting as tests is a Vue instance" duration="12"/>
+        <testCase name="User acting as tests Check username is shown" duration="10"/>
+        <testCase name="User acting as tests Check username is displaying the correct username and role" duration="8"/>
+        <testCase name="User acting as tests Check user primary businesses list is rendered" duration="8"/>
+        <testCase name="User acting as tests Check selecting business in dropdown calls setActingAsBusinessId method" duration="9"/>
+        <testCase name="User acting as tests Check selecting user calls setActingAsUser method" duration="9"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/BusinessAdministrators.test.js">
+        <testCase name="Component is a Vue instance" duration="8"/>
+        <testCase name="Component Props data loads correctly." duration="5"/>
+        <testCase name="UI components render successfully Correct number of admin cards generate" duration="4"/>
+        <testCase name="Checking method functions Router pushes" duration="5"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Business.test.js">
+        <testCase name="Business tests is a Vue instance" duration="225"/>
+        <testCase name="Business tests has business" duration="127"/>
+        <testCase name="Successful login business page loads successfully" duration="206"/>
+        <testCase name="Functionality tests Check session is called" duration="96"/>
+        <testCase name="Functionality tests Check GET user info is called and sets data" duration="66"/>
+        <testCase name="Functionality tests Check GET business is being called and sets data" duration="67"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/AddToCatalogue.test.js">
+        <testCase name="Component is a Vue instance" duration="119"/>
+        <testCase name="Add To Catalogue form error checking Handles empty Register" duration="43"/>
+        <testCase name="Add To Catalogue form error checking Handles no product name" duration="23"/>
+        <testCase name="Add To Catalogue form error checking Handles no product id" duration="28"/>
+        <testCase name="Add To Catalogue form error checking Handles no rrp" duration="22"/>
+        <testCase name="Add To Catalogue form error checking Handles negative rrp" duration="20"/>
+        <testCase name="Add To Catalogue form error checking Handles no manufacturer" duration="18"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Login.test.js">
+        <testCase name="Login error checking Handles empty login" duration="45"/>
+        <testCase name="Login error checking Handles only email" duration="24"/>
+        <testCase name="Login error checking Handles only password" duration="29"/>
+        <testCase name="Login error checking Handles bad email" duration="31"/>
+        <testCase name="Logging in Successful login" duration="16"/>
+        <testCase name="Logging in Unsuccessful login - Bad request" duration="17"/>
     </file>
     <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/BusinessInventory.test.js">
-        <testCase name="Component is a Vue instance" duration="412"/>
-        <testCase name="New sale listing modal tests No changes to input fields - reject form" duration="244"/>
-        <testCase name="New sale listing modal tests Invalid form with negative price" duration="252"/>
-        <testCase name="New sale listing modal tests Invalid form with bad date" duration="214"/>
-        <testCase name="New sale listing modal tests Successfully creates a new form" duration="185"/>
-        <testCase name="New sale listing modal tests New Listing closes on button click" duration="165"/>
-        <testCase name="New sale listing modal tests Form autocomplete calculates product attribute fields" duration="127"/>
+        <testCase name="Component is a Vue instance" duration="404"/>
+        <testCase name="New sale listing modal tests No changes to input fields - reject form" duration="228"/>
+        <testCase name="New sale listing modal tests Invalid form with negative price" duration="246"/>
+        <testCase name="New sale listing modal tests Invalid form with bad date" duration="398"/>
+        <testCase name="New sale listing modal tests Successfully creates a new form" duration="209"/>
+        <testCase name="New sale listing modal tests New Listing closes on button click" duration="226"/>
+        <testCase name="New sale listing modal tests Form autocomplete calculates product attribute fields" duration="171"/>
     </file>
     <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/Register.test.js">
-        <testCase name="Register error checking Handles empty register" duration="270"/>
-        <testCase name="Register error checking Handles only email" duration="192"/>
-        <testCase name="Register error checking Handles only password" duration="172"/>
-        <testCase name="Register error checking Handles bad email" duration="194"/>
-        <testCase name="Register error checking Handles large bio too large" duration="152"/>
-        <testCase name="Method Checking Country is successfully set" duration="122"/>
-        <testCase name="Method Checking City is successfully set" duration="132"/>
-        <testCase name="Checking age validity Test empty date of birth" duration="108"/>
-        <testCase name="Checking age validity Test successful age older than 13" duration="77"/>
-        <testCase name="Checking age validity Test unsuccessful age younger than 13" duration="65"/>
-        <testCase name="Checking age validity Test date of birth of now to be invalid" duration="63"/>
-    </file>
-    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/CommunityMarketplace.test.js">
-        <testCase name="Component is a Vue instance" duration="284"/>
-        <testCase name="CommunityMarketplace toggle tests Grid view is shown at first" duration="199"/>
-        <testCase name="CommunityMarketplace toggle tests Table view is shown when slider toggled" duration="277"/>
-        <testCase name="Method tests Cards is successfully set." duration="218"/>
-        <testCase name="Method tests Switching tab to Wanted" duration="229"/>
-        <testCase name="Method tests Switching tab to Exchange" duration="193"/>
-        <testCase name="Method tests Switching tab to non-existing tab" duration="110"/>
+        <testCase name="Register error checking Handles empty register" duration="309"/>
+        <testCase name="Register error checking Handles only email" duration="202"/>
+        <testCase name="Register error checking Handles only password" duration="174"/>
+        <testCase name="Register error checking Handles bad email" duration="195"/>
+        <testCase name="Register error checking Handles large bio too large" duration="324"/>
+        <testCase name="Method Checking Country is successfully set" duration="130"/>
+        <testCase name="Method Checking City is successfully set" duration="95"/>
+        <testCase name="Checking age validity Test empty date of birth" duration="76"/>
+        <testCase name="Checking age validity Test successful age older than 13" duration="74"/>
+        <testCase name="Checking age validity Test unsuccessful age younger than 13" duration="68"/>
+        <testCase name="Checking age validity Test date of birth of now to be invalid" duration="52"/>
     </file>
     <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/RegisterBusiness.test.js">
-        <testCase name="Business Register error checking Handles empty Register" duration="281"/>
-        <testCase name="Business Register error checking Handles only name" duration="110"/>
-        <testCase name="Business Register error checking Handles only a type" duration="163"/>
-        <testCase name="Business Register error checking Handles old enough user" duration="108"/>
-        <testCase name="Business Register user age checking Handles to young user" duration="176"/>
-        <testCase name="Business registration method checking Country is successfully set" duration="98"/>
-        <testCase name="Business registration method checking City is successfully set" duration="86"/>
-        <testCase name="Checking valid age to register a business Test empty date of birth" duration="81"/>
-        <testCase name="Checking valid age to register a business Test successful age older than 16" duration="81"/>
-        <testCase name="Checking valid age to register a business Test unsuccessful age younger than 16" duration="74"/>
-        <testCase name="Checking valid age to register a business Test date of birth of now to be invalid" duration="107"/>
-        <testCase name="Check user sessions Not logged in (no userId in store)" duration="66"/>
-        <testCase name="Creating business Successful" duration="57"/>
-        <testCase name="Creating business Unsuccessful" duration="50"/>
-        <testCase name="Get user info Successful" duration="38"/>
+        <testCase name="Business Register error checking Handles empty Register" duration="332"/>
+        <testCase name="Business Register error checking Handles only name" duration="143"/>
+        <testCase name="Business Register error checking Handles only a type" duration="137"/>
+        <testCase name="Business Register error checking Handles old enough user" duration="194"/>
+        <testCase name="Business Register user age checking Handles to young user" duration="183"/>
+        <testCase name="Business registration method checking Country is successfully set" duration="253"/>
+        <testCase name="Business registration method checking City is successfully set" duration="107"/>
+        <testCase name="Checking valid age to register a business Test empty date of birth" duration="101"/>
+        <testCase name="Checking valid age to register a business Test successful age older than 16" duration="99"/>
+        <testCase name="Checking valid age to register a business Test unsuccessful age younger than 16" duration="101"/>
+        <testCase name="Checking valid age to register a business Test date of birth of now to be invalid" duration="66"/>
+        <testCase name="Check user sessions Not logged in (no userId in store)" duration="73"/>
+        <testCase name="Creating business Successful" duration="53"/>
+        <testCase name="Creating business Unsuccessful" duration="39"/>
+        <testCase name="Get user info Successful" duration="30"/>
+    </file>
+    <file path="/home/sam/Documents/seng302/team-900/frontend/src/__tests__/CommunityMarketplace.test.js">
+        <testCase name="Component is a Vue instance" duration="377"/>
+        <testCase name="CommunityMarketplace toggle tests Grid view is shown at first" duration="215"/>
+        <testCase name="CommunityMarketplace toggle tests Table view is shown when slider toggled" duration="325"/>
+        <testCase name="Method tests Cards is successfully set." duration="238"/>
+        <testCase name="Method tests Switching tab to Wanted" duration="273"/>
+        <testCase name="Method tests Switching tab to Exchange" duration="134"/>
+        <testCase name="Method tests Switching tab to non-existing tab" duration="84"/>
     </file>
 </testExecutions>
