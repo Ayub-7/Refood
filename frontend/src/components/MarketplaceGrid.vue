@@ -29,7 +29,7 @@
             </vs-col>
           </vs-row>
         </div>
-      <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" :selectedCard='selectedCard' />
+      <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
     </div>
 </template>
 
@@ -71,14 +71,23 @@ export default {
     },
 
     /**
+     * Method for notifying the marketplace component that a card has been deleted
+     */
+    notifyOfDeletion: function() {
+      this.$emit('cardRemoved');
+    },
+    /**
      * Displays the section - checks if it is 'ForSale', if so, return the string with a space, return normally otherwise.
      * @param section card section.
      */
     displaySection: function(section) {
       if (section === "ForSale") return "For Sale";
       return section;
+    }
     },
-  }
+
+
+
 
 }
 
@@ -86,6 +95,10 @@ export default {
 </script>
 
 <style>
+
+#card-modal-message-button {
+  margin-left: 5px;
+}
 
 /* CARD STYLING */
 

@@ -15,7 +15,9 @@
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>
 
-      <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
+      <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && (userId === selectedCard.user.id || userRole === 'DGAA')">Edit Card</vs-button>
+      <!-- Add delete button if user is card owner -->
+      <vs-button id="card-modal-delete-button" @click="deleteCard()" v-if="selectedCard.user.id == userId || userRole === 'DGAA'" style="margin-left: 10px;">Delete</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
       <vs-button class="card-modal-message-button"  @click="messaging=false; editing=false" v-else>Cancel</vs-button>
     </div>
@@ -61,7 +63,7 @@
 </template>
 
 <script>
-import api from "../Api.js";
+import api from "../Api";
 
 export default {
   name: "CardModal",
@@ -69,14 +71,14 @@ export default {
   data: function() {
     return {
       showing: false,
+      userId: null,
+      userRole: null,
       messaging: false,
       message: '',
       editing: false,
       title: '',
       keywordList: [],
       description: '',
-
-      userId: -1,
     }
   },
   methods:
@@ -107,9 +109,8 @@ export default {
         openModal: function() {
           this.resetState();
           this.showing = true;
-          this.getCurrentUserId();
+          this.getUserId();
         },
-
         /**
          * Converts seconds to date
          */
@@ -119,26 +120,44 @@ export default {
         },
 
         /**
+         * Obtain the current logged in user's ID
+         */
+        getUserId: function() {
+          api.checkSession()
+              .then((response) => {
+                this.userId = response.data.id;
+                this.userRole = response.data.role;
+              })
+              .catch((error) => {
+                this.$log.error("Error checking sessions: " + error);
+                this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+              });
+        },
+
+        /**
+         * Preconditions: Must be logged in
+         * Postconditions: The card will be deleted
+         * Allows the user to delete a card
+         */
+        deleteCard: function() {
+          api.deleteCard(this.selectedCard.id)
+          .then(() => {
+            this.$emit('deleted');
+            this.showing = false;
+            this.$vs.notify({title:'Success', text:'Card deleted', color:'success'});
+          }).catch((error) => {
+            this.$log.error("Error deleting card: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR deleting card', color:'danger'});
+          });
+        },
+
+        /**
          * Sends user message by calling POST messages
          * TODO: to be implemented
          * @param cardId ID of card whose owner the user is going to message
          */
         sendMessage(cardId, message) {
           console.log("Implement Me", cardId, message);
-        },
-
-        /**
-         * Retrieves and sets the userId to the current user.
-         * Used to determine if the owner of the card is the current user.
-         */
-        getCurrentUserId: function() {
-          api.checkSession()
-            .then((res) => {
-              this.userId = res.data.id;
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-            });
         },
 
         /**
@@ -192,6 +211,7 @@ export default {
 
 #card-modal-bottom {
   display: flex;
+  margin-left: 20px;
   flex-wrap: wrap;
 }
 
