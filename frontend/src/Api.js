@@ -101,15 +101,7 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
-
-    /**
-     *  Query search that returns businesses based on the parameter query
-     * @param query to help narrow down the businesses
-     * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
-     * @returns {*}
-     */
-    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.s
@@ -349,6 +341,20 @@ export default {
 
      */
 
+    /**
+     *
+     * @param userId        The intended recipient of the message
+     * @param cardId        Id of the card the message relates to
+     * @param description   Message content
+     * @returns {Promise<messageId<any>>}   The ID of the created message
+     *
+     */
+
+    postMessage: async(userId, cardId, description) =>
+        instance.post(`/users/${userId}/messages`, {cardId, description}, {withCredentials: true}),
+
+
+
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
 
 
@@ -356,6 +362,7 @@ export default {
     // Messages
 
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+
 
 
 }
