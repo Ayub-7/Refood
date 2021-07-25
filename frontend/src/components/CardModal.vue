@@ -15,11 +15,9 @@
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>
 
-      <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
+      <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && (userId === selectedCard.user.id || userRole === 'DGAA')">Edit Card</vs-button>
       <!-- Add delete button if user is card owner -->
-      <div v-if="selectedCard.user.id == userId">
-        <vs-button id="card-modal-delete-button" @click="deleteCard()">Delete</vs-button>
-      </div>
+      <vs-button id="card-modal-delete-button" @click="deleteCard()" v-if="selectedCard.user.id == userId || userRole === 'DGAA'" style="margin-left: 10px;">Delete</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
       <vs-button class="card-modal-message-button"  @click="messaging=false; editing=false" v-else>Cancel</vs-button>
     </div>
@@ -74,6 +72,7 @@ export default {
     return {
       showing: false,
       userId: null,
+      userRole: null,
       messaging: false,
       message: '',
       editing: false,
@@ -127,6 +126,7 @@ export default {
           api.checkSession()
               .then((response) => {
                 this.userId = response.data.id;
+                this.userRole = response.data.role;
               })
               .catch((error) => {
                 this.$log.error("Error checking sessions: " + error);
