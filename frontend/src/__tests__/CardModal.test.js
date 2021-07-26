@@ -160,6 +160,15 @@ describe('Card modal UI', () => {
 
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
     });
+
+    test('Prefills are set', async () => {
+        wrapper.vm.setPrefills();
+
+        //cardDetails
+        expect(wrapper.vm.title).toBe(cardDetails.title);
+        expect(wrapper.vm.description).toBe(cardDetails.description);
+        expect(wrapper.vm.section).toBe(cardDetails.section);
+    });
 });
 
 describe('Card editing', () => {

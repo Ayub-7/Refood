@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.63% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>29/32</span>
+                <span class='fraction'>28/32</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">69.23% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>9/12</span>
+                <span class='fraction'>9/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.63% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>29/32</span>
+                <span class='fraction'>28/32</span>
             </div>
         
             
@@ -395,7 +395,13 @@
 <a name='L336'></a><a href='#L336'>336</a>
 <a name='L337'></a><a href='#L337'>337</a>
 <a name='L338'></a><a href='#L338'>338</a>
-<a name='L339'></a><a href='#L339'>339</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -542,7 +548,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -579,6 +584,13 @@
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -768,22 +780,22 @@
       &lt;vs-divider&gt;&lt;/vs-divider&gt;
 &nbsp;
       &lt;vs-tabs alignment="center" v-model="tabIndex"&gt;
-        &lt;vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale')"&gt;
+        &lt;vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale'); currentSection = 'ForSale'"&gt;
           &lt;div&gt;
-            &lt;MarketplaceGrid  v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
-            &lt;MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
+            &lt;MarketplaceGrid  v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
+            &lt;MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
           &lt;/div&gt;
         &lt;/vs-tab&gt;
-        &lt;vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted')"&gt;
+        &lt;vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted'); currentSection = 'Wanted'"&gt;
           &lt;div&gt;
-            &lt;MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
-            &lt;MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
+            &lt;MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
+            &lt;MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " /&gt;
           &lt;/div&gt;
         &lt;/vs-tab&gt;
-        &lt;vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange')"&gt;
+        &lt;vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange'); currentSection = 'Exchange'"&gt;
           &lt;div&gt;
-            &lt;MarketplaceGrid v-if="displayType" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" /&gt;
-            &lt;MarketplaceTable v-if="!displayType" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" /&gt;
+            &lt;MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" /&gt;
+            &lt;MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" /&gt;
           &lt;/div&gt;
 &nbsp;
         &lt;/vs-tab&gt;
@@ -879,7 +891,6 @@ export default {
      * @field tabIndex must track this.tabIndex
      */
     onSuccess(sectionName) {
-      console.log(sectionName + this.tabIndex)
       switch (sectionName) {
         case "Wanted":
           this.tabIndex = 1;
@@ -917,9 +928,16 @@ export default {
       let direction = this.toggleDirection;
       this.cards = this.cards.sort((cardOne,cardTwo) =&gt; (cardOne[field].toUpperCase() &lt; cardTwo[field].toUpperCase()) ? direction : -direction);
       this.toggleDirection = this.toggleDirection*-1;
-    }
+    },
+    /**
+     * Method for reloading card data, after the owner of a card has deleted it
+     */
+<span class="fstat-no" title="function not covered" >    reloadCards: function() {</span>
+<span class="cstat-no" title="statement not covered" >      this.getSectionCards(this.currentSection);</span>
+    },
 &nbsp;
    },
+&nbsp;
 &nbsp;
   mounted() {
     api.checkSession()
@@ -1078,7 +1096,7 @@ input:checked + .slider:before {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Fri Jul 23 2021 09:24:24 GMT+1200 (New Zealand Standard Time)
+                at Mon Jul 26 2021 16:59:54 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
