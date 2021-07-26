@@ -110,7 +110,6 @@ export default {
       ],
       recipient: null,
       errors: [],
-      userId: -1,
     }
   },
   methods:
