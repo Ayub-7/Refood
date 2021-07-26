@@ -277,12 +277,6 @@ export default Homepage;
   padding: 0 2em;
 }
 
-#container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 4fr 1fr;
-  grid-template-rows: auto auto;
-  grid-column-gap: 1em;
-}
 
 /* Top Name Container */
 #name-container {

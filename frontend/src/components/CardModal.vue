@@ -301,11 +301,7 @@ export default {
      * Watches the title value for any changes, and checks validity of it.
      */
     title: function() {
-      if (this.title.length < 1) {
-        this.editErrors.title.error = true;
-        this.editErrors.title.message = "A valid card title is required";
-      }
-      else if (this.title.trim().length === 0) {
+      if (this.title.length < 1 || this.title.trim().length === 0) {
         this.editErrors.title.error = true;
         this.editErrors.title.message = "A valid card title is required";
       }

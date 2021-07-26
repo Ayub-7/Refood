@@ -186,9 +186,12 @@ export default app;
   color: rgb(255,255,255);
 }
 
+.userDetail {
+  cursor: pointer;
+}
+
 .userDetail:hover {
   background: #E0E0E0;
-  /*color: #f5f5f5;*/
 }
 
 .navbar-group {
