@@ -141,32 +141,3 @@ describe('Homepage Messages functionality', () => {
         expect(wrapper.vm.deleteMessage).toBeCalled;
     });
 });
-
-
-describe('Detailed message UI', () => {
-
-    test('Message button opens message box', () => {
-        //Setup
-        //wrapper.vm.showing = true;
-        // wrapper.vm.currentMessage = wrapper.vm.messages[0];
-        // wrapper.vm.detailedView = true;
-        // wrapper.vm.showing = true;
-
-        let button = wrapper.find("#expand-btn")
-        button.trigger("click")
-
-        expect(wrapper.find("#message-detail-modal")).toBeTruthy();
-        expect(wrapper.find("#reply-btn")).toBeTruthy();
-        expect(wrapper.vm.messaging).toBe(false);
-
-        //Execution
-        let button2 = wrapper.find("#reply-btn")
-        // button2.trigger("click")
-        // //
-        // // //Result
-        // expect(wrapper.vm.messaging).toBeTruthy();
-        // expect(wrapper.find("#card-modal-message")).toBeTruthy();
-    });
-
-
-});
