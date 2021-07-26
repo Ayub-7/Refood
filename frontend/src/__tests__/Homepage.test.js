@@ -48,23 +48,34 @@ const mockBusiness =
         "created": "2020-05-18 21:06:11"
     };
 
-// jest.mock("../Api.js", () => jest.fn);
-// api.getUserFromID = jest.fn(() => {
-//   return Promise.resolve({data: mockUser, status: 200});
-// });
+let mockCard = {
+    id: 1,
+    user: {},
+    title: "Beans - Green",
+    description: "Integer ac leo.",
+    created: "2021-06-01 18:32:38",
+    displayPeriodEnd: "2021-06-15 18:32:38",
+    keywords: "aliquam augue quam",
+    section: "Wanted"
+}
 
-// api.checkSession = jest.fn(() => {
-//   return Promise.resolve({status: 200});
-// });
+jest.mock("../Api.js", () => jest.fn);
+api.getUserFromID = jest.fn(() => {
+  return Promise.resolve({data: mockUser, status: 200});
+});
+
+api.checkSession = jest.fn(() => {
+  return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
 
 
-// api.getBusinessFromId = jest.fn(() => {
-//   return Promise.resolve({data: mockBusiness, status: 200})
-// })
+api.getBusinessFromId = jest.fn(() => {
+  return Promise.resolve({data: mockBusiness, status: 200}).catch({response: {message: "Bad request", status: 400}});
+})
 
-// api.getMessages = jest.fn(() => {
-//   return Promise.resolve({status: 200});
-// })
+api.getMessages = jest.fn(() => {
+  return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
+})
 
 
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
@@ -72,41 +83,45 @@ getUserName.mockImplementation(() =>  {
     return 'Rayna';
 });
 
-const getBussinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
+const getBusinessName = jest.spyOn(Homepage.methods, 'getBusinessName');
 
 const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getLoggedInUserId');
 getLoggedInUserIdMethod.mockResolvedValue(mockUser.id);
+
+api.getUserCards = jest.fn(() => {
+    return Promise.resolve({data: [mockCard], status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
 
 const $router = {
     push: jest.fn()
 };
 
+const $log = {
+    error: jest.fn(),
+};
+
+let $vs = {
+    loading: jest.fn(),
+    notify: jest.fn()
+};
+
 beforeEach(() => {
     wrapper = shallowMount(Homepage, {
         propsData: {},
-        mocks: {$router},
-        stubs: ['router-link', 'router-view'],
+        mocks: {$router, $log, $vs},
+        stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         localVue,
         data () {
             return {
                 userId: mockUser.id,
                 business: mockBusiness,
-                actingAsBusinessId: null
+                actingAsBusinessId: null,
+
             }
         }
     });
-
-    const checkSessionMethod = jest.spyOn(Homepage.methods, 'checkUserSession');
-    checkSessionMethod.mockImplementation(() => {
-        wrapper.vm.user = mockUser;
-        wrapper.vm.currencyCode = "NZD";
-        wrapper.vm.currencySymbol = "$"
-    });
-
-    const getUserMethod = jest.spyOn(Homepage.methods, 'getUserDetails');
-    getUserMethod.mockResolvedValue(mockUser);
-    expect(wrapper).toBeTruthy();
+    wrapper.vm.$vs.loading.close = jest.fn();
 });
 
 afterEach(() => {
@@ -131,13 +146,27 @@ describe('Homepage user tests', () => {
         const profileButton = wrapper.find("#marketplace-btn");
         expect(profileButton).toBeTruthy();
     });
+
+    test('Card modal successfully opens', async () => {
+        expect(wrapper.vm.showMarketModal).toBeFalsy();
+        await wrapper.vm.openMarketModal();
+        expect(wrapper.vm.showMarketModal).toBeTruthy();
+        expect(wrapper.find('#market-card-modal')).toBeTruthy();
+    });
+
+    test('User\'s cards are retrieved and set', async () => {
+        expect(wrapper.vm.cards).toStrictEqual([]);
+        await wrapper.vm.getUserCards();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.cards).toEqual([mockCard]);
+    });
 });
 
 
 describe('Homepage business tests', () => {
     beforeEach(() => {
         wrapper.vm.actingAsBusinessId = 1;
-        getBussinessName.mockImplementation(() =>  {
+        getBusinessName.mockImplementation(() =>  {
             return 'Dabshots';
         });
         const getLoggedInUserIdMethod = jest.spyOn(Homepage.methods, 'getBusinessId');
@@ -169,3 +198,21 @@ describe('Homepage business tests', () => {
 
 });
 
+describe("Tests for functionality", ()=> {
+   test("Get user ID test successfully", async () => {
+       await wrapper.vm.getUserDetails(5);
+       expect(wrapper.vm.user).toEqual(mockUser);
+       expect(wrapper.vm.businesses).toEqual([2]);
+       expect(wrapper.vm.userLoggedIn).toBeTruthy();
+   });
+
+   test("Get user ID while logged out", async () => {
+       api.getUserFromID = jest.fn(() => {
+           return Promise.reject({response: {message: "You must be logged in!", status: 401}});
+       });
+       await wrapper.vm.getUserDetails(5);
+       expect(wrapper.vm.user).toEqual(undefined);
+       expect(wrapper.vm.businesses).toEqual([]);
+       expect(wrapper.vm.userLoggedIn).toBeFalsy();
+   });
+});

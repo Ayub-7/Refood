@@ -103,8 +103,23 @@ export default {
      */
     searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
+
     /**
-     * Method (frontend) to let a DGAA user make a user an GAA admin user.
+     * Query search results that uses searchQuery function
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+    /**
+     *  Query search that returns businesses based on the parameter query
+     * @param query to help narrow down the businesses
+     * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
+     * @returns {*}
+     */
+    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
+
+    /**
+     * Method (frontend) to let a DGAA user make a user an GAA admin user.s
      * @param id user id to be made admin.
      */
     makeUserAdmin: async(id) =>
@@ -340,6 +355,7 @@ export default {
      * 400 if there are errors with data, 201 otherwise
      */
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
+
 
 
     /**

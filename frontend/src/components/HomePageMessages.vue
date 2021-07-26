@@ -16,10 +16,13 @@
           </div>
         </div>
 
-
+        <div class="message-detail-container-left">
+        <vs-icon icon="question_answer" class="msg-icon"></vs-icon>
         <div id="message-detail-message">
           {{currentMessage.description}}
         </div>
+        </div>
+
         <vs-divider></vs-divider>
         <div id="card-modal-bottom">
           <div class="message-detail-delivered">
@@ -29,12 +32,17 @@
             </div>
           </div>
         <vs-button id="reply-btn" class="card-modal-message-button" v-if="messaging===false" @click="messaging=true">Reply</vs-button>
-        <vs-button class="card-modal-message-button"  @click="messaging=false; message = ''" v-else>Cancel</vs-button>
+        <vs-button class="card-modal-message-button"  @click="messaging=false; message = ''; errors=[];" v-else>Cancel</vs-button>
         </div>
         <transition name="slide" v-if="showTransition">
           <div id="card-modal-message" v-if="messaging">
-            <vs-textarea v-model="message" id="message-input"></vs-textarea>
+            <vs-textarea style="margin-bottom: 50px" v-model="message" id="message-input"
+                         :counter="250"
+            />
+            <div v-if="(errors.includes('bad-content'))" style="color: red">Message cannot be blank or too long</div>
+            <div v-if="(errors.includes('invalid-card'))" style="color: red">There was something wrong with the card</div>
             <vs-button id="card-modal-message-send" @click="sendMessage(currentMessage, message)">Send Reply</vs-button>
+
           </div>
         </transition>
       </div>
@@ -67,6 +75,7 @@ export default {
           messaging: false,
           showing: false,
           message: '',
+          errors: [],
           users: {},
           detailedView: false,
           currentMessage: null,
@@ -117,6 +126,7 @@ export default {
        */
       sendMessage(originalMessage, message) {
         if (this.checkMessage(message)) {
+          console.log("sup");
           //the server can return either the sender object or it's id
           //we resolve which it is so we are always posting to the correct user
           let senderId=null;
@@ -130,7 +140,8 @@ export default {
               .then((res) => {
                 this.$vs.notify({title: 'Reply Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
                 //reset the message after success
-                this.message = ""
+                this.message = "";
+                this.errors=[];
               })
               .catch((error) => {
                 this.$log.debug(error);
@@ -143,11 +154,22 @@ export default {
        * Check the message contents
        * Simply check a blank message is not sent
        */
-      checkMessage(message) {
-        if (message == null || message === "") {
+      checkMessage() {
+
+        if (this.message == null || this.message === "") {
+          this.errors.push('bad-content');
+
           this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
-          return false
+          return false;
         }
+
+        if (this.message.length > 250) {
+          this.errors.push('bad-content');
+
+          this.$vs.notify({title:'Error sending message', text:`Message is too long. Consider sending it in parts.`, color:'danger'});
+          return false;
+        }
+
         return true;
       },
 
@@ -201,6 +223,9 @@ export default {
   text-align: center;
   margin-top: 20px;
   font-size: 15px;
+  word-wrap: break-word;
+  width: 92%;
+  float: right;
 }
 
 #message-detail-sent {
@@ -273,4 +298,7 @@ export default {
   max-height: 0;
 }
 
+.msg-icon {
+  margin-top: 6%;
+}
 </style>

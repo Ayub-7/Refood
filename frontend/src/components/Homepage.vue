@@ -27,6 +27,7 @@
             <div id="userinfo-content">
               <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()'>Profile</vs-button>
               <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
+              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()">My Cards</vs-button>
             </div>
           </div>
         </div>
@@ -46,6 +47,16 @@
 
           <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
         </main>
+    <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
+      <div v-if="cards.length > 0" class="container">
+        <MarketplaceGrid :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)"></MarketplaceGrid>
+        <vs-pagination :max="5" :total="Math.ceil(cards.length/4)" v-model="currentCardPage"></vs-pagination>
+      </div>
+      <!-- If the user has no active cards -->
+      <div v-else class="container">
+        This user has no active cards on the marketplace right now.
+      </div>
+    </vs-popup>
   </div>
 </template>
 
@@ -53,134 +64,180 @@
 import api from "../Api";
 import {mutations, store} from "../store"
 import HomePageMessages from "./HomePageMessages.vue";
+import MarketplaceGrid from "./MarketplaceGrid";
 
 const Homepage = {
-    name: "Homepage",
-    components: {
-      HomePageMessages
+  name: "Homepage",
+  components: {HomePageMessages, MarketplaceGrid},
+  data: function () {
+    return {
+      userId: null,
+      businesses: [],
+      actingAsBusinessId: null,
+      business: null,
+      showMarketModal: false,
+      cards: [],
+      currentCardPage: 1,
+
+    }
+  },
+
+  methods: {
+    /**
+     * Retrieves all the cards that the user has created.
+     */
+    getUserCards: function(id) {
+      this.$vs.loading({
+        container: ".vs-popup",
+      });
+      this.cards = [];
+      api.getUserCards(id)
+          .then((res) => {
+            this.cards = res.data;
+          })
+          .catch((error) => {
+            if (error.response) {
+              this.$vs.notify({title: "Error retrieving cards", color: "danger"});
+            }
+            this.$log.debug(error);
+          })
+          .finally(() => {
+            this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
+          });
     },
-    data: function () {
-        return {
-            userId: null,
-            businesses: [],
-            actingAsBusinessId: null,
-            business: null,
 
+    /**
+     * Gets user info from backend and sets userFirstname property (for welcome message)
+     * Also sets the users details in store.js, so the users session can be maintained
+     * as they navigate throughout the applications and 'act' as a business
+     *
+     * @param userId ID of user who is currently viewing page.
+     */
+    getUserDetails: function(userId) {
+      api.getUserFromID(userId)
+          .then((response) => {
+            this.user = response.data;
+            this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
+            this.userLoggedIn = true;
+            /* Sets user details in store.js */
+            mutations.setUserDateOfBirth(response.data.dateOfBirth);
+            mutations.setUserName(response.data.firstName + " " + response.data.lastName);
+            mutations.setUserCountry(response.data.homeAddress.country);
+            mutations.setUserBusinesses(this.businesses);
+          }).catch((err) => {
+        if (err.response.status === 401) {
+          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
+          this.$router.push({name: 'LoginPage'});
         }
+        this.$log.error(err);
+      })
     },
 
-    methods: {
-      /**
-       * Gets user info from backend and sets userFirstname property (for welcome message)
-       * Also sets the users details in store.js, so the users session can be maintained
-       * as they navigate throughout the applications and 'act' as a business
-       *
-       * @param userId ID of user who is currently viewing page.
-       */
-      getUserDetails: function(userId) {
-        api.getUserFromID(userId)
-            .then((response) => {
-              this.user = response.data;
-              this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
-              this.userLoggedIn = true;
-              /* Sets user details in store.js */
-              mutations.setUserDateOfBirth(response.data.dateOfBirth);
-              mutations.setUserName(response.data.firstName + " " + response.data.lastName);
-              mutations.setUserCountry(response.data.homeAddress.country);
-              mutations.setUserBusinesses(this.businesses);
-            }).catch((err) => {
-          if (err.response.status === 401) {
-            this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-            this.$router.push({name: 'LoginPage'});
-          }
-          this.$log.error(err);
-        })
-      },
+    /**
+     * Show the modal box (marketplace activity).
+     * Having a separate function to just open the modal is good for testing.
+     */
+    openMarketModal: function() {
+      this.showMarketModal = true;
+      api.checkSession()
+          .then(() => {
+            this.getUserCards(this.user.id);
+          })
+          .catch((error) => {
+            this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+          });
+    },
 
+    /**
+     * Close the pop-up box with no consequences.
+     */
+    closeModal: function() {
+      this.showModal = false;
+    },
 
-        /**
-       * Sends an api request to get a business object from a business Id
-       * Sets this components business variable to this object
-       *
-       * @param id business id
-       */
-      getBusiness: function(id) {
-        api.getBusinessFromId(id)
-            .then((res) => {
-              this.business = res.data;
-            })
-            .catch((error) => {
-              this.$log.error(error);
-            })
-      },
+    /**
+     * Sends an api request to get a business object from a business Id
+     * Sets this components business variable to this object
+     *
+     * @param id business id
+     */
+    getBusiness: function(id) {
+      api.getBusinessFromId(id)
+          .then((res) => {
+            this.business = res.data;
+          })
+          .catch((error) => {
+            this.$log.error(error);
+          })
+    },
 
-      /**
-       * Gets the business id from the store, for the business the user is acting as
-       *
-       * @return busId the business id
-       */
-      getBusinessId: function() {
-        let busId = store.actingAsBusinessId;
-        this.actingAsBusinessId = busId;
-        if(busId){
-          this.getBusiness(busId);
-        }
-        return busId;
-      },
+    /**
+     * Gets the business id from the store, for the business the user is acting as
+     *
+     * @return busId the business id
+     */
+    getBusinessId: function() {
+      let busId = store.actingAsBusinessId;
+      this.actingAsBusinessId = busId;
+      if(busId){
+        this.getBusiness(busId);
+      }
+      return busId;
+    },
 
-      /**
-       * Gets the name of the business the user is acting as from the store
-       */
-      getBusinessName: function() {
-        return store.actingAsBusinessName;
-      },
+    /**
+     * Gets the name of the business the user is acting as from the store
+     */
+    getBusinessName: function() {
+      return store.actingAsBusinessName;
+    },
 
-      /**
-       * Gets the username of the logged in user from the store
-       */
-      getUserName: function() {
-        return store.userName;
-      },
+    /**
+     * Gets the username of the logged in user from the store
+     */
+    getUserName: function() {
+      return store.userName;
+    },
 
-      /**
-       * Gets the logged in users id from the store, and assigns this components
-       * userId variable equal to it.
-       */
-      getLoggedInUserId: function() {
-        this.userId = store.loggedInUserId;
-        return this.userId;
-      },
+    /**
+     * Gets the logged in users id from the store, and assigns this components
+     * userId variable equal to it.
+     */
+    getLoggedInUserId: function() {
+      this.userId = store.loggedInUserId;
+      return this.userId;
+    },
 
-      /**
-       * Redirects the user to either the business profile page, if acting as a business,
-       * or the user profile page, if acting as an individual
-       */
-      goToProfile: function() {
-        if(this.getBusinessId() != null){
-          this.$router.push({path: `/businesses/${this.getBusinessId() }`});
-        } else {
-          this.$router.push({path: `/users/${this.getLoggedInUserId()}`});
-        }
-      },
-
-      /**
-       * Redirects the user to the product catalogue page, if acting as a business
-       */
-      goToProductCatalogue: function() {
-        this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
-      },
-
-      checkUserSession: function() {
-        api.checkSession()
-            .then((response) => {
-              this.getUserDetails(response.data.id);
-            })
-            .catch((error) => {
-              this.$log.error("Error checking sessions: " + error);
-              this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-            });
+    /**
+     * Redirects the user to either the business profile page, if acting as a business,
+     * or the user profile page, if acting as an individual
+     */
+    goToProfile: function() {
+      if(this.getBusinessId() != null){
+        this.$router.push({path: `/businesses/${this.getBusinessId() }`});
+      } else {
+        this.$router.push({path: `/users/${this.getLoggedInUserId()}`});
       }
     },
+
+    /**
+     * Redirects the user to the product catalogue page, if acting as a business
+     */
+    goToProductCatalogue: function() {
+      this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
+    },
+
+    checkUserSession: function() {
+      api.checkSession()
+          .then((response) => {
+            this.getUserDetails(response.data.id);
+          })
+          .catch((error) => {
+            this.$log.error("Error checking sessions: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+          });
+    }
+  },
 
   /**
    * Sets the userId variable equal to the userId from the store when the component
@@ -197,6 +254,29 @@ export default Homepage;
 </script>
 
 <style scoped>
+
+#market-card-modal >>> .vs-popup {
+  width: 1200px;
+}
+
+#market-card-modal {
+  z-index: 100;
+}
+
+#cards-btn {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 4fr 1fr;
+  grid-template-rows: 1fr auto;
+  grid-column-gap: 1em;
+  margin: auto;
+  padding: 0 2em;
+}
+
 #container {
   display: grid;
   grid-template-columns: 1fr 1fr 4fr 1fr;
