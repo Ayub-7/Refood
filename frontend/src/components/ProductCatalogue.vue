@@ -213,8 +213,8 @@ import {store} from "../store";
 import axios from "axios";
 import AddToInventory from "./AddToInventory";
 
-const Search = {
-  name: "Search",
+const ProductCatalogue = {
+  name: "ProductCatalogue",
   components: {AddToInventory},
   data: function() {
     return {
@@ -535,7 +535,7 @@ const Search = {
   }
 }
 
-export default Search;
+export default ProductCatalogue;
 </script>
 
 <style scoped>

@@ -72,13 +72,18 @@ public class MessageController {
     }
 
     /**
-     * Post user message, does this by grabbing user from their id, then finding the cards that the user has, then finding the messages that are related to those cards
-     * Preconditions: Logged in and acting as a valid user. The receiver is also valid and the message is non null or blank
-     * Postconditions: User's messages will be retrieved if any exist
-     * @param userId ID of user that we are going to get messages from
-     * @return
+     * Posts a user's message. We get the recipient from {userId}, the sender from the user's session. The request contains
+     * the card id the message is about and the message contents which we use to create a new message. Null or incorrect
+     * data returns appropriate
+
+     * Preconditions: Logged in and acting as a valid user. The receiver and card are valid and the message is non null or blank
+     * Postconditions: The message will be saved to the database and the ID is returned
+
+     * @param userId ID of user that we are sending the messages to
+     * @return MessageIdResponse and 201 if successful
      * @throws JsonProcessingException
      */
+
     @PostMapping("/users/{userId}/messages")
     public ResponseEntity<String> addUserMessage(@PathVariable long userId, @RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
@@ -112,6 +117,7 @@ public class MessageController {
 
         messageRepository.save(newMessage);
         MessageIdResponse messageIdResponse = new MessageIdResponse(newMessage.getId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(mapper.writeValueAsString(messageIdResponse));
