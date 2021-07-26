@@ -129,7 +129,6 @@ export default {
          */
         sendMessage() {
           //Because the server may return either the full user object or just their id
-
           if (this.checkMessage()) {
             this.sendPostMessage();
           }
@@ -141,6 +140,7 @@ export default {
          */
 
         sendPostMessage() {
+          console.log(this.recipient+ " " + this.selectedCard.id+ " " +this.message)
 
           api.postMessage(this.recipient, this.selectedCard.id, this.message)
               .then((res) => {
@@ -166,6 +166,13 @@ export default {
          *                  Otherwise return true.
          */
          checkMessage() {
+          //the recipient can be stored as the userId or user.id depending on what the backend returns
+          //we check if it is a valid user Id at the end.
+          if (this.selectedCard.user) {
+            this.recipient = this.selectedCard.user.id;
+          } else {
+            this.recipient = this.selectedCard.userId;
+          }
 
           if (this.message == null || this.message === "") {
             this.errors.push('bad-content');
@@ -181,22 +188,16 @@ export default {
             return false;
           }
 
-          //the recipient can be stored as the userId or user.id depending on what the backend returns
-          //we check if it is a valid user Id at the end.
-          if (this.selectedCard.user) {
-            this.recipient = this.selectedCard.user.id;
-          } else {
-            this.recipient = this.selectedCard.userId;
-          }
-
-          if (isNaN(this.recipient) || this.recipient) {
+          console.log(this.recipient)
+          if (isNaN(this.recipient)) {
             this.errors.push('invalid-card');
 
             this.$vs.notify({title:'Error sending message', text:`Receiver is invalid`, color:'danger'});
             return false;
           }
 
-          if (isNaN(this.selectedCard.id) || this.selectedCard.id) {
+          console.log(this.selectedCard.id)
+          if (isNaN(this.selectedCard.id)) {
             this.errors.push('invalid-card');
 
             this.$vs.notify({title:'Error sending message', text:`Card is invalid`, color:'danger'});
