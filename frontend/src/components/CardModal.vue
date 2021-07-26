@@ -1,5 +1,5 @@
 <template>
-  <vs-popup id="card-modal" :title="selectedCard.title" :active.sync="showing">
+  <vs-popup id="card-modal" v-if="selectedCard" :title="selectedCard.title" :active.sync="showing">
     <div id="card-modal-name"><vs-icon icon="face" class="inline"></vs-icon>
       <p class="inline text">{{selectedCard.user.firstName}} {{selectedCard.user.lastName}}</p>
     </div>
@@ -19,13 +19,17 @@
       <!-- Add delete button if user is card owner -->
       <vs-button id="card-modal-delete-button" @click="deleteCard()" v-if="selectedCard.user.id == userId || userRole === 'DGAA'" style="margin-left: 10px;">Delete</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
-      <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; editing=false; message = ''" v-else>Cancel</vs-button>
+      <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; errors=[]; editing=false; message = ''" v-else>Cancel</vs-button>
     </div>
 
     <transition name="slide" v-if="showTransition">
     <div id="card-modal-message" v-if="messaging">
-      <vs-textarea v-model="message" id="message-input"></vs-textarea>
-      <vs-button id="card-modal-message-send" @click="sendMessage(selectedCard, message)">Send Message</vs-button>
+      <vs-textarea style="margin-bottom: 50px" v-model="message" id="message-input"
+                    :counter="250"
+      />
+      <div v-if="(errors.includes('bad-content'))" style="color: red">Message cannot be blank or too long</div>
+      <div v-if="(errors.includes('invalid-card'))" style="color: red">There was something wrong with the card</div>
+      <vs-button id="card-modal-message-send" @click="sendMessage()">Send Message</vs-button>
     </div>
     </transition>
 
@@ -104,6 +108,8 @@ export default {
         {key:'Wanted', value:'Wanted'},
         {key:'Exchange', value: 'Exchange'}
       ],
+      recipient: null,
+      errors: [],
     }
   },
   methods:
@@ -114,7 +120,6 @@ export default {
         remove(item) {
           this.keywordList.splice(this.keywordList.indexOf(item), 1)
         },
-
         /**
          * sets prefilled entries for edit card modal
          */
@@ -133,7 +138,6 @@ export default {
             //this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
           }
         },
-
         /**
          * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
          */
@@ -186,37 +190,29 @@ export default {
          * Sends user message by calling POST messages
          * @param cardId ID of card whose owner the user is going to message
          */
-        sendMessage(card, message) {
-          let recipient;
-
+        sendMessage() {
           //Because the server may return either the full user object or just their id
-          if (card.user) {
-            recipient = card.user.id;
-          } else {
-            recipient = card.userId;
-          }
-
-          if (this.checkMessage(message, recipient)) {
-            this.sendPostMessage(recipient, card.id, message);
+          if (this.checkMessage()) {
+            this.sendPostMessage();
           }
 
         },
 
         /**
-         * Calls post message
-         * @param recipient Intended user to receive the message
-         * @param cardid    Id of the card
-         * @param message   Text to be sent
+         * Sends post message to back end. Notifies user if the send was a success or an error
          */
 
-        sendPostMessage(recipient, cardid, message) {
-          api.postMessage(recipient, cardid, message)
+        sendPostMessage() {
+          console.log(this.recipient+ " " + this.selectedCard.id+ " " +this.message)
+
+          api.postMessage(this.recipient, this.selectedCard.id, this.message)
               .then((res) => {
                 console.log(res.data.messageId);
                 this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
 
                 //reset the message after success
                 this.message = "";
+                this.errors=[];
 
               })
               .catch((error) => {
@@ -234,16 +230,45 @@ export default {
          * @return boolean  False if null or blank, then notify the user.
          *                  Otherwise return true.
          */
-         checkMessage(message, recipient) {
-          if (message == null || message === "") {
+         checkMessage() {
+          //the recipient can be stored as the userId or user.id depending on what the backend returns
+          //we check if it is a valid user Id at the end.
+          if (this.selectedCard.user) {
+            this.recipient = this.selectedCard.user.id;
+          } else {
+            this.recipient = this.selectedCard.userId;
+          }
+
+          if (this.message == null || this.message === "") {
+            this.errors.push('bad-content');
+
             this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
             return false;
           }
 
-          if (isNaN(recipient)) {
+          if (this.message.length > 250) {
+            this.errors.push('bad-content');
+
+            this.$vs.notify({title:'Error sending message', text:`Message is too long. Consider sending it in parts.`, color:'danger'});
+            return false;
+          }
+
+          console.log(this.recipient)
+          if (isNaN(this.recipient)) {
+            this.errors.push('invalid-card');
+
             this.$vs.notify({title:'Error sending message', text:`Receiver is invalid`, color:'danger'});
             return false;
           }
+
+          console.log(this.selectedCard.id)
+          if (isNaN(this.selectedCard.id)) {
+            this.errors.push('invalid-card');
+
+            this.$vs.notify({title:'Error sending message', text:`Card is invalid`, color:'danger'});
+            return false;
+          }
+
 
           return true;
         },
@@ -251,7 +276,7 @@ export default {
         /**
          * Resets state of messaging information
          */
-        resetState: function() {
+        resetState() {
           this.message = '';
           this.title = '';
           this.keywords = [];
@@ -360,7 +385,6 @@ export default {
       this.editErrors.section.error = this.section == null || this.section === "";
     }
   }
-
 }
 </script>
 

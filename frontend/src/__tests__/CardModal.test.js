@@ -295,9 +295,11 @@ describe('Messaging', () => {
 
     test('On null recipient, User is notified and message is not cleared', () => {
         wrapper.vm.message = "message";
-        let recipient = null;
+        wrapper.vm.recipient = null;
+        wrapper.vm.selectedCard.user.id = null;
+        wrapper.vm.selectedCard.userId = null;
 
-        wrapper.vm.checkMessage(wrapper.vm.message, recipient);
+        wrapper.vm.checkMessage();
 
         expect(wrapper.vm.message).toBe("message");
         expect(wrapper.vm.$vs.notify).toBeCalled();
@@ -305,10 +307,44 @@ describe('Messaging', () => {
 
     test('On blank message, User is notified', () => {
         wrapper.vm.message = "";
-        let recipient = 7;
+        wrapper.vm.recipient = 7;
 
-        wrapper.vm.checkMessage(wrapper.vm.message, recipient);
-
+        wrapper.vm.checkMessage();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
         expect(wrapper.vm.$vs.notify).toBeCalled();
     });
+
+    test('On Long message, User is notified', () => {
+        wrapper.vm.message = " Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis " +
+            "egestas. Pellentesque sed tortor id lacus finibus aliquet at vitae nulla. Duis leo tortor, hendrerit at " +
+            "auctor non, convallis et enim. Ut aliquam consequat diam. Cras leo metus, tempus et dignissim ac, tempus " +
+            "quis purus. Etiam ornare, quam ac porttitor laoreet, arcu odio ullamcorper tellus, sit amet aliquam nisi " +
+            "enim ut nibh. Nulla vitae feugiat arcu, sit amet semper nisl. Vestibulum ac faucibus dolor, quis cursus " +
+            "dolor. Aliquam sagittis risus orci, eu aliquam orci feugiat in. Aliquam nec orci tortor. Duis id rutrum felis. " +
+            "Sed eget lacus porta, malesuada orci a, porttitor nisl. In turpis nisi, sagittis eu pulvinar vitae, finibus ac mi. ";
+        wrapper.vm.recipient = 7;
+
+        wrapper.vm.checkMessage();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On null card, User is notified', () => {
+        wrapper.vm.message = "";
+        wrapper.vm.errors = [];
+
+        wrapper.vm.recipient = null;
+        wrapper.vm.selectedCard.id = null;
+        wrapper.vm.selectedCard.user.id = null;
+        wrapper.vm.selectedCard.userId = null;
+
+        wrapper.vm.checkMessage();
+
+        expect(wrapper.vm.errors);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
+
+
 });
