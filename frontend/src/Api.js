@@ -101,7 +101,15 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+    /**
+     *  Query search that returns businesses based on the parameter query
+     * @param query to help narrow down the businesses
+     * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
+     * @returns {*}
+     */
+    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
@@ -330,6 +338,16 @@ export default {
     createCard: async(creatorId, title, description, keywords, section) =>
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
+    /**
+     * Deletes a message with ID
+     * If the user is not the recipient, they cannot delete it.
+     *
+     * @param messageId Id of message to be deleted
+     * @returns {Promise<AxiosResponse<any>>} A response with status code:
+     *      * 401 if not logged in, 403 if the session user is not a D/GAA or the message recipient,
+     * 400 if there are errors with data, 201 otherwise
+     */
+    deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
 
     /**
      * Modifies a selected card. of type:
@@ -351,4 +369,21 @@ export default {
         instance.put(`/cards/${cardId}`, {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
 
+    /**
+     *
+     * @param userId        The intended recipient of the message
+     * @param cardId        Id of the card the message relates to
+     * @param description   Message content
+     * @returns {Promise<messageId<any>>}   The ID of the created message
+     *
+     */
+    postMessage: async(userId, cardId, description) =>
+        instance.post(`/users/${userId}/messages`, {cardId, description}, {withCredentials: true}),
+
+    /**
+     * Get router endpoint for retrieving a users messages
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>} Messages of the user
+     */
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
 }

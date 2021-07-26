@@ -13,11 +13,13 @@
     <!-- Card name -->
     <vs-row class="addCardField">
         <vs-col id="title" vs-w="2" vs-xs="12">
-            <div class="addCardHeader" >Title <span class="required">*</span> </div>
+          <div class="addCardHeader" >Title <span class="required">*</span> </div>
         </vs-col> 
         <vs-col vs-w="9">
-            <vs-textarea v-model="title" rows="1" class="addCardInput" :counter="50" :danger="(errors.includes('no-title'))"
-                         danger-text="You must write a title"></vs-textarea>
+          <vs-textarea v-model="title" rows="1" :class="[{'textarea-danger': titleError}, 'addCardInput', 'title-input']" :counter="50" @keydown.enter.prevent></vs-textarea>
+          <transition name="fade">
+            <div v-show="titleError" class="create-error">{{titleErrorMessage}}</div> <!-- vs-textarea doesn't have a message system, so this is a homebrew solution -->
+          </transition>
         </vs-col>
     </vs-row>
 
@@ -52,25 +54,26 @@
 import api from "../Api";
 
 export default {
-
-
     data: function() {
-        return {
-            showing: false,
-            avaliableSections: [
-                {key:'For Sale', value:'ForSale'},
-                {key:'Wanted', value:'Wanted'},
-                {key:'Exchange', value: 'Exchange'}
-            ],
-            userSession: null,
-            id: null,
-            section: null,
-            title: '',
-            description: '',
-            keywordList: [],
-            keywords: '',
-            errors: [],
-        }
+      return {
+        showing: false,
+        avaliableSections: [
+            {key:'For Sale', value:'ForSale'},
+            {key:'Wanted', value:'Wanted'},
+            {key:'Exchange', value: 'Exchange'}
+        ],
+        userSession: null,
+        id: null,
+        section: null,
+        title: '',
+        description: '',
+        keywordList: [],
+        keywords: '',
+
+        errors: [],
+        titleError: false,
+        titleErrorMessage: "Card title is invalid",
+      }
     },
 
 
@@ -83,19 +86,27 @@ export default {
        * Postconditions:
        **/
       checkForm(){
+        this.keywords= '';
+        for(let i = 0; i < this.keywordList.length; i++){
+          this.keywords += this.keywordList[i] + " ";
+        }
+
         this.errors = [];
+        this.titleError = true;
 
         if (this.section === null) {
           this.errors.push('no-section');
+          this.titleError = true;
         }
 
         if (this.title.length <= 2) {
           this.errors.push('no-title');
+          this.titleError = true;
         }
-
 
         if (this.title.length > 50){
           this.errors.push('long-title');
+          this.titleError = true;
         }
 
         if (this.errors.includes('no-section')) {
@@ -105,12 +116,14 @@ export default {
             color: 'danger'
           });
         }
+
         if (this.errors.includes('no-title')) {
           this.$vs.notify({
             title: 'Failed to add card',
-            text: 'Title is required or is too short',
+            text: 'Please check your card title',
             color: 'danger'
           });
+          this.titleErrorMessage = "Title is required or is too short";
         }
 
         if (this.errors.includes('long-title')) {
@@ -119,7 +132,15 @@ export default {
             text: 'Title exceeds max length',
             color: 'danger'
           });
+          this.titleErrorMessage = "Title exceeds max length";
         }
+
+        if (this.title.trim().length === 0) {
+          this.errors.push("invalid-title");
+          this.titleError = true;
+          this.titleErrorMessage = "Card title is invalid";
+        }
+
         if (this.errors.length > 0) {
           return false;
         }
@@ -213,46 +234,61 @@ export default {
             this.keywords = '';
             this.keywordList = [];
         }
-    }
+    },
 }
 </script>
 
 <style>
 
 .addCardField {
-    margin-bottom: 25px;
-    margin-top: 5px;
+  margin-bottom: 25px;
+  margin-top: 5px;
 }
 
 .addCardHeader {
-    font-size: 17px;
+  font-size: 17px;
 }
 
 .addCardInput {
-    width: 80%;
-    font-size: 20px;
+  width: 80%;
+  font-size: 20px;
 }
 
 
 .addCardButton {
-    margin: 5px;
-    width: 150px;
+  margin: 5px;
+  width: 150px;
 }
 
 .required {
-    color: red;
+  color: red;
 }
 
 #buttons {
-    text-align: center;
+  text-align: center;
 }
 
 
 #description {
-    height: 150px;
-    max-height: 150px;
-    min-height: 150px;
+  height: 150px;
+  max-height: 150px;
+  min-height: 150px;
 }
 
+.create-error {
+  font-size: 10px;
+  position: absolute;
+  color: #FF4757;
+  margin-left: 8px;
+}
+
+.title-input > textarea {
+  max-height: 33px;
+  min-height: 33px;
+}
+
+.title-input { /* Is being used. */
+  margin-bottom: 0;
+}
 
 </style>

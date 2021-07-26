@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="main" >
+  <div id="app" class="main">
 
     <vs-navbar
         class="vs-navbar"
@@ -148,6 +148,8 @@ const app = {
   },
 
   beforeMount() {
+    //Set title to ReFood, shows up in tab display
+    document.title = "ReFood"
     api.checkSession()
         .then((response) => {
           if(response.data.id != null){

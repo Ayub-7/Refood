@@ -12,12 +12,15 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     /**
-     * Get Message by it's ID
+     * Get Message by it's Receiver
      *
-     * @param receiver receiver of messages we want to grab
-     * @return list of users messages
+     * @param receiver The user getting the message
+     * @return List<Message> All the user's messages
      */
     List<Message> findMessageByReceiver(User receiver);
+
+    // I'm not actually sure if this works.
+    List<Message> getAllByCardUserId(long id);
 
     /**
      * Get Message by it's ID

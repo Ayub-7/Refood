@@ -12,8 +12,13 @@ let $route = {
     }
 }
 
+let $vs = {
+    notify: jest.fn()
+}
+
 let $log = {
     debug: jest.fn(),
+    error: jest.fn(),
 }
 
 let cardDetails = {
@@ -54,7 +59,7 @@ beforeEach(() => {
         propsData: {
             selectedCard: cardDetails
         },
-        mocks: {$route, $log},
+        mocks: {$route, $log, $vs},
         stubs: {},
         methods: {},
         localVue,
@@ -78,7 +83,7 @@ describe('Card modal functionality', () => {
         //Setup
         wrapper.vm.message = "Hello"
         wrapper.vm.messaging = true;
-        
+
         expect(wrapper.vm.message).toBe("Hello")
         expect(wrapper.vm.messaging).toBe(true);
 
@@ -90,19 +95,19 @@ describe('Card modal functionality', () => {
         expect(wrapper.vm.messaging).toBe(false);
     });
 
-    test('Open modal correctly updates showing value', () => {
+    test('Open modal correctly updates showing value', async () => {
         //Setup
         wrapper.vm.showing = false;
         expect(wrapper.vm.showing).toBe(false);
-        
+
         //Execution
-        wrapper.vm.openModal()
+        await wrapper.vm.openModal()
 
         //Result
         expect(wrapper.vm.showing).toBe(true);
     })
 
-    test('Open modal calls resetState', () => {
+    test('Open modal calls resetState', async () => {
 
 
         //Setup
@@ -111,7 +116,7 @@ describe('Card modal functionality', () => {
         expect(wrapper.vm.showing).toBe(false);
 
         //Execution
-        wrapper.vm.openModal();
+        await wrapper.vm.openModal()
 
         expect(wrapper.vm.resetState).toBeCalled()
     })
@@ -136,22 +141,23 @@ describe('Card modal UI', () => {
         expect(wrapper.find("#card-modal-message")).toBeTruthy();
     });
 
-    test('User is not the owner - successfully shows message button', () => {
+    test('User is not the owner - successfully shows message button', async () => {
         api.checkSession = jest.fn(() => {
            return Promise.resolve({status: 200, data: {id: 2}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        await wrapper.vm.getUserId();
 
         expect(wrapper.find(".card-modal-message-button")).toBeTruthy();
     });
 
-    test('User is card owner - successfully shows edit button', () => {
+    test('User is card owner - successfully shows edit button', async () => {
         api.checkSession = jest.fn(() => {
             return Promise.resolve({status: 200, data: {id: 1}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        await wrapper.vm.getUserId();
+
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
     });
 });
@@ -169,8 +175,16 @@ describe('Card editing', () => {
         wrapper.vm.title = ""; // No longer valid.
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.editErrors.title.error).toBeTruthy();
-        expect(wrapper.vm.editErrors.title.message).toBe("A card title is required");
+        expect(wrapper.vm.editErrors.title.message).toBe("A valid card title is required");
     });
+
+    test('Edited card title is invalid', async () => {
+        wrapper.vm.title = "  ";
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.editErrors.title.error).toBeTruthy();
+        expect(wrapper.vm.editErrors.title.message).toBe("A valid card title is required");
+    });
+
 
     test('Edited card title is of valid length', async () => {
         wrapper.vm.title = "Valid";
@@ -212,5 +226,89 @@ describe('Card editing', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.validateCardEdit()).toBeTruthy();
+    });
+});
+
+
+
+describe('Messaging', () => {
+    test('is a Vue instance', () => {
+        expect(wrapper.isVueInstance).toBeTruthy();
+    });
+
+    test('Message box shows with input', () => {
+        //Setup
+        wrapper.vm.showing = true;
+        wrapper.vm.messaging = true;
+
+        let button = wrapper.find(".card-modal-message-button")
+        button.trigger("click")
+
+        //Result
+        expect(wrapper.vm.messaging).toBeTruthy();
+        expect(wrapper.find("#card-modal-message")).toBeTruthy();
+        expect(wrapper.find("#message-input")).toBeTruthy();
+        expect(wrapper.find("#card-modal-message-send")).toBeTruthy();
+    });
+
+
+    test('Message is checked after send', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {id: 1}});
+        });
+
+        wrapper.vm.checkMessage = jest.fn(() => {
+            return true;
+        });
+
+        wrapper.vm.message = "message desc";
+        wrapper.vm.selectedCard.user.id = 1;
+        wrapper.vm.selectedCard.id = 1;
+
+        wrapper.vm.sendMessage(wrapper.vm.selectedCard, wrapper.vm.message);
+
+        expect(wrapper.vm.checkMessage).toBeCalled();
+    });
+
+    test('User is card owner - successfully shows delete button', async () => {
+        api.checkSession = jest.fn(() => {
+            return Promise.resolve({status: 200, data: {id: 1}});
+        });
+
+        await wrapper.vm.getUserId();
+
+        expect(wrapper.find(".card-modal-delete-button")).toBeTruthy();
+
+    });
+
+    test('After sent success, Message clears and user is notified', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+
+        wrapper.vm.sendPostMessage(7, 12, "message");
+
+        expect(wrapper.vm.message).toBe("");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
+    test('On null recipient, User is notified and message is not cleared', () => {
+        wrapper.vm.message = "message";
+        let recipient = null;
+
+        wrapper.vm.checkMessage(wrapper.vm.message, recipient);
+
+        expect(wrapper.vm.message).toBe("message");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On blank message, User is notified', () => {
+        wrapper.vm.message = "";
+        let recipient = 7;
+
+        wrapper.vm.checkMessage(wrapper.vm.message, recipient);
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
     });
 });
