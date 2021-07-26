@@ -236,6 +236,35 @@ describe('Card editing', () => {
 
         expect(wrapper.vm.validateCardEdit()).toBeTruthy();
     });
+
+    test('Card edit success saves, then user is notified', async () => {
+
+        wrapper.vm.title = "New Edited Title";
+        wrapper.vm.section = "Exchange";
+
+        //wrapper.vm.validateCardEdit();
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.validateCardEdit()).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('Card edit success fails, then user is notified', async () => {
+        wrapper.vm.validateCardEdit = jest.fn(() => {
+            return false;
+        });
+
+        wrapper.vm.title = "New Edited Title";
+        wrapper.vm.section = "Exchange";
+
+        //wrapper.vm.validateCardEdit();
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.validateCardEdit()).toBeFalsy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+
+    });
+
 });
 
 
