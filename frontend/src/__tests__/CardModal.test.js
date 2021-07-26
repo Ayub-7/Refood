@@ -12,13 +12,13 @@ let $route = {
     }
 }
 
+let $vs = {
+    notify: jest.fn()
+}
+
 let $log = {
     debug: jest.fn(),
     error: jest.fn(),
-}
-
-let $vs = {
-    notify: jest.fn(),
 }
 
 let cardDetails = {
@@ -227,6 +227,48 @@ describe('Card editing', () => {
 
         expect(wrapper.vm.validateCardEdit()).toBeTruthy();
     });
+});
+
+
+
+describe('Messaging', () => {
+    test('is a Vue instance', () => {
+        expect(wrapper.isVueInstance).toBeTruthy();
+    });
+
+    test('Message box shows with input', () => {
+        //Setup
+        wrapper.vm.showing = true;
+        wrapper.vm.messaging = true;
+
+        let button = wrapper.find(".card-modal-message-button")
+        button.trigger("click")
+
+        //Result
+        expect(wrapper.vm.messaging).toBeTruthy();
+        expect(wrapper.find("#card-modal-message")).toBeTruthy();
+        expect(wrapper.find("#message-input")).toBeTruthy();
+        expect(wrapper.find("#card-modal-message-send")).toBeTruthy();
+    });
+
+
+    test('Message is checked after send', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {id: 1}});
+        });
+
+        wrapper.vm.checkMessage = jest.fn(() => {
+            return true;
+        });
+
+        wrapper.vm.message = "message desc";
+        wrapper.vm.selectedCard.user.id = 1;
+        wrapper.vm.selectedCard.id = 1;
+
+        wrapper.vm.sendMessage(wrapper.vm.selectedCard, wrapper.vm.message);
+
+        expect(wrapper.vm.checkMessage).toBeCalled();
+    });
 
     test('User is card owner - successfully shows delete button', async () => {
         api.checkSession = jest.fn(() => {
@@ -239,4 +281,34 @@ describe('Card editing', () => {
 
     });
 
+    test('After sent success, Message clears and user is notified', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+
+        wrapper.vm.sendPostMessage(7, 12, "message");
+
+        expect(wrapper.vm.message).toBe("");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
+    test('On null recipient, User is notified and message is not cleared', () => {
+        wrapper.vm.message = "message";
+        let recipient = null;
+
+        wrapper.vm.checkMessage(wrapper.vm.message, recipient);
+
+        expect(wrapper.vm.message).toBe("message");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On blank message, User is notified', () => {
+        wrapper.vm.message = "";
+        let recipient = 7;
+
+        wrapper.vm.checkMessage(wrapper.vm.message, recipient);
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
 });

@@ -15,6 +15,7 @@ let $route = {
 let $vs = {
     notify: jest.fn()
 }
+
 let mockCard = {
     "creatorId": 1,
     "section": "ForSale",
