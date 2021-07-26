@@ -12,9 +12,16 @@ let $route = {
     }
 }
 
+let $vs = {
+    notify: jest.fn()
+}
+
 let $log = {
     debug: jest.fn(),
 }
+
+
+
 
 let cardDetails = {
     id: 1,
@@ -54,7 +61,7 @@ beforeEach(() => {
         propsData: {
             selectedCard: cardDetails
         },
-        mocks: {$route, $log},
+        mocks: {$route, $log, $vs},
         stubs: {},
         methods: {},
         localVue,
@@ -152,5 +159,114 @@ describe('Card modal UI', () => {
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
 
     });
+});
+
+
+
+describe('Messaging', () => {
+    test('is a Vue instance', () => {
+        expect(wrapper.isVueInstance).toBeTruthy();
+    });
+
+    test('Message box shows with input', () => {
+        //Setup
+        wrapper.vm.showing = true;
+        wrapper.vm.messaging = true;
+
+        let button = wrapper.find(".card-modal-message-button")
+        button.trigger("click")
+
+        //Result
+        expect(wrapper.vm.messaging).toBeTruthy();
+        expect(wrapper.find("#card-modal-message")).toBeTruthy();
+        expect(wrapper.find("#message-input")).toBeTruthy();
+        expect(wrapper.find("#card-modal-message-send")).toBeTruthy();
+    });
+
+
+    test('Message is checked after send', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {id: 1}});
+        });
+
+        wrapper.vm.checkMessage = jest.fn(() => {
+            return true;
+        });
+
+        wrapper.vm.message = "message desc";
+        wrapper.vm.selectedCard.user.id = 1;
+        wrapper.vm.selectedCard.id = 1;
+
+        wrapper.vm.sendMessage(wrapper.vm.selectedCard, wrapper.vm.message);
+
+        expect(wrapper.vm.checkMessage).toBeCalled();
+    });
+
+
+    test('After sent success, Message clears and user is notified', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+
+        wrapper.vm.sendPostMessage(7, 12, "message");
+
+        expect(wrapper.vm.message).toBe("");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
+    test('On null recipient, User is notified and message is not cleared', () => {
+        wrapper.vm.message = "message";
+        wrapper.vm.recipient = null;
+        wrapper.vm.selectedCard.user.id = null;
+        wrapper.vm.selectedCard.userId = null;
+
+        wrapper.vm.checkMessage();
+
+        expect(wrapper.vm.message).toBe("message");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On blank message, User is notified', () => {
+        wrapper.vm.message = "";
+        wrapper.vm.recipient = 7;
+
+        wrapper.vm.checkMessage();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On Long message, User is notified', () => {
+        wrapper.vm.message = " Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis " +
+            "egestas. Pellentesque sed tortor id lacus finibus aliquet at vitae nulla. Duis leo tortor, hendrerit at " +
+            "auctor non, convallis et enim. Ut aliquam consequat diam. Cras leo metus, tempus et dignissim ac, tempus " +
+            "quis purus. Etiam ornare, quam ac porttitor laoreet, arcu odio ullamcorper tellus, sit amet aliquam nisi " +
+            "enim ut nibh. Nulla vitae feugiat arcu, sit amet semper nisl. Vestibulum ac faucibus dolor, quis cursus " +
+            "dolor. Aliquam sagittis risus orci, eu aliquam orci feugiat in. Aliquam nec orci tortor. Duis id rutrum felis. " +
+            "Sed eget lacus porta, malesuada orci a, porttitor nisl. In turpis nisi, sagittis eu pulvinar vitae, finibus ac mi. ";
+        wrapper.vm.recipient = 7;
+
+        wrapper.vm.checkMessage();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On null card, User is notified', () => {
+        wrapper.vm.message = "";
+        wrapper.vm.errors = [];
+
+        wrapper.vm.recipient = null;
+        wrapper.vm.selectedCard.id = null;
+        wrapper.vm.selectedCard.user.id = null;
+        wrapper.vm.selectedCard.userId = null;
+
+        wrapper.vm.checkMessage();
+
+        expect(wrapper.vm.errors);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
+
 
 });

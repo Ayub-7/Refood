@@ -101,6 +101,13 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+
+    /**
+     * Query search results that uses searchQuery function
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
     /**
@@ -349,6 +356,20 @@ export default {
 
      */
 
+    /**
+     *
+     * @param userId        The intended recipient of the message
+     * @param cardId        Id of the card the message relates to
+     * @param description   Message content
+     * @returns {Promise<messageId<any>>}   The ID of the created message
+     *
+     */
+
+    postMessage: async(userId, cardId, description) =>
+        instance.post(`/users/${userId}/messages`, {cardId, description}, {withCredentials: true}),
+
+
+
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
 
 
@@ -356,6 +377,7 @@ export default {
     // Messages
 
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+
 
 
 }
