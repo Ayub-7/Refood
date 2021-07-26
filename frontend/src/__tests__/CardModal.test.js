@@ -21,13 +21,6 @@ let $log = {
     error: jest.fn(),
 }
 
-let $vs = {
-    notify: jest.fn(),
-}
-
-
-
-
 let cardDetails = {
     id: 1,
     user: {

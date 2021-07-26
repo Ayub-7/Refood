@@ -357,18 +357,13 @@ export default {
      * @returns {Promise<messageId<any>>}   The ID of the created message
      *
      */
-
     postMessage: async(userId, cardId, description) =>
         instance.post(`/users/${userId}/messages`, {cardId, description}, {withCredentials: true}),
 
-
-
-
-
-
-    // Messages
-
+    /**
+     * Get router endpoint for retrieving a users messages
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>} Messages of the user
+     */
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
-
-
 }
