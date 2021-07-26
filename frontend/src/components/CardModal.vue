@@ -272,10 +272,11 @@ export default {
           }
           if (this.validateCardEdit()) {
             this.title = this.title.trim(); // Removing any whitespace before and after.
-            this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
             api.modifyCard(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords.trimEnd(), this.section)
                 .then(() => {
+                  this.$emit('deleted');
                   this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+                  this.showing = false;
                   //this.$emit('submitted', this.section);
                 })
                 .catch((error) => {
