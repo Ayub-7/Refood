@@ -112,7 +112,7 @@ export default {
     searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
 
     /**
-     * Method (frontend) to let a DGAA user make a user an GAA admin user.s
+     * Method (frontend) to let a DGAA user make a user an GAA admin user.
      * @param id user id to be made admin.
      */
     makeUserAdmin: async(id) =>
@@ -348,6 +348,26 @@ export default {
      * 400 if there are errors with data, 201 otherwise
      */
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
+
+    /**
+     * Modifies a selected card. of type:
+     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+     *
+     * @param newCardRequest (same details for modifying)
+     * @param creatorId     user's id
+     * @param title         card title
+     * @param description   card description
+     * @param keywords      keywords to describe the card (functionality added later)
+     * @param section       marketplace section
+     *
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code:
+     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 201 otherwise
+     */
+
+    modifyCard: async(cardId, creatorId, title, description, keywords, section) =>
+        instance.put(`/cards/${cardId}`, {creatorId, title, description, keywords, section}, {withCredentials: true}),
+
 
     /**
      *

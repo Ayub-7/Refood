@@ -88,6 +88,7 @@ export default {
       messaging: false,
       message: '',
       editing: false,
+      keywords: '',
       title: '',
       keywordList: [],
       description: '',
@@ -125,7 +126,11 @@ export default {
           if (this.selectedCard.keywords === '') {
             this.keywordList = [];
           } else {
-            this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
+            console.log(this.selectedCard.keywords);
+            this.keywordList = this.selectedCard.keywords.split(" ");
+            //this.keywordList = this.keywordList.filter(function(removeSpace) { return entry.trim() != ''; });
+            this.keywordList = this.keywordList.filter(e => String(e).trim());
+            //this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
           }
         },
 
@@ -260,9 +265,43 @@ export default {
          * todo: send info to backend.
          */
         saveCardEdit: function() {
+          //console.log(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords, this.section);
+          this.keywords = '';
+          for(let i = 0; i < this.keywordList.length; i++){
+                this.keywords += this.keywordList[i] + " ";
+          }
           if (this.validateCardEdit()) {
             this.title = this.title.trim(); // Removing any whitespace before and after.
-            this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+            api.modifyCard(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords.trimEnd(), this.section)
+                .then(() => {
+                  this.$emit('deleted');
+                  this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+                  this.showing = false;
+                  //this.$emit('submitted', this.section);
+                })
+                .catch((error) => {
+                  let errormsg = "ERROR creating new card: ";
+                  if (error) {
+                    if (error.response) {
+                      if (error.response.status === 401 || error.response.status === 403) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                      }
+
+                      if (error.response.status === 400) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                      } else {
+                        console.log(error.response.message);
+                      }
+                    } else {
+                      this.$vs.notify({
+                        title: 'Error',
+                        text: 'ERROR trying to obtain user info from session:',
+                        color: 'danger'
+                      });
+                    }
+                  }
+                  this.keywords = '';
+                });
           }
           else {
             this.$vs.notify({title: "Error saving changes", text: "Please check the input fields and try again.", color: "danger"});
