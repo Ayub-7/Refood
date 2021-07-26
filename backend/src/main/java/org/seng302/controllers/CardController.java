@@ -139,7 +139,9 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
     }
 
-
+    public static Date getDate() {
+        return new Date();
+    }
 
     /**
      * Checks for expired cards and creates notification objects for each expired card without a current notification.
@@ -148,10 +150,12 @@ public class CardController {
      *
      */
     @Scheduled(fixedDelay = 60000, initialDelay = 0)
-    private void updateExpiredCards() {
+    public void updateExpiredCards() {
         logger.info("Checking for expired cards");
         Date date = new Date();
         List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
+        //temp
+        System.out.println(expiredCards);
         for (Card card: expiredCards) {
             Notification exists = notificationRepository.findNotificationByCardId(card.getId());
             if (exists == null) {

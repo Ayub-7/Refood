@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
@@ -22,6 +23,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.junit.Assert.*;
+
 
 import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
@@ -54,6 +57,7 @@ class CardControllerTests {
     private Card card;
     private Address addr;
     private Notification notification;
+    private List<Card> fakeExpiredCards;
     private List<Notification> notifications;
 
     @BeforeEach
@@ -67,8 +71,13 @@ class CardControllerTests {
 
         card = new Card(cardRequest, testUser);
         notification = new Notification(testUser.getId(), card.getId(), card.getTitle(), card.getDisplayPeriodEnd());
-        notifications = new ArrayList<Notification>();
+        notifications = new ArrayList<>();
         notifications.add(notification);
+
+        //temporary for test
+        fakeExpiredCards = new ArrayList<>();
+        fakeExpiredCards.add(card);
+        cardController = new CardController(userRepository, cardRepository);
     }
 
     @Test
@@ -474,5 +483,19 @@ class CardControllerTests {
                 .content(mapper.writeValueAsString(editedCardRequest))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    public void testCardExpiryUpdatesCreatesNewNotification() throws Exception {
+        Date date = new Date();
+        final Date mockDate = Mockito.mock(Date.class);
+        Mockito.when(mockDate.getTime()).thenReturn(30L);
+
+        Mockito.when(cardRepository.findAllByDisplayPeriodEndBefore(mockDate)).thenReturn(fakeExpiredCards);
+        long l = 0;
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(null);
+        int size = notificationRepository.findAll().size();
+        cardController.updateExpiredCards();
+        assertEquals(size+1, notificationRepository.findAll().size());
     }
 }
