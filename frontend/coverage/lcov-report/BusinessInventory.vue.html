@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.91% </span>
+                <span class="strong">46.25% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>38/81</span>
+                <span class='fraction'>37/80</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.71% </span>
+                <span class="strong">30.23% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>13/41</span>
+                <span class='fraction'>13/43</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.91% </span>
+                <span class="strong">46.25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>38/81</span>
+                <span class='fraction'>37/80</span>
             </div>
         
             
@@ -684,7 +684,14 @@
 <a name='L625'></a><a href='#L625'>625</a>
 <a name='L626'></a><a href='#L626'>626</a>
 <a name='L627'></a><a href='#L627'>627</a>
-<a name='L628'></a><a href='#L628'>628</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L628'></a><a href='#L628'>628</a>
+<a name='L629'></a><a href='#L629'>629</a>
+<a name='L630'></a><a href='#L630'>630</a>
+<a name='L631'></a><a href='#L631'>631</a>
+<a name='L632'></a><a href='#L632'>632</a>
+<a name='L633'></a><a href='#L633'>633</a>
+<a name='L634'></a><a href='#L634'>634</a>
+<a name='L635'></a><a href='#L635'>635</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -805,9 +812,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -873,6 +877,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -882,6 +889,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1025,19 +1033,25 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1317,8 +1331,6 @@
       &lt;div id="title"&gt; Inventory &lt;/div&gt;
       &lt;div id="header-buttongroup"&gt;
         &lt;vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)"&gt;Product Catalogue&lt;/vs-button&gt;
-        &lt;!-- Add to inventory modal --&gt;
-        &lt;AddToInventory @submitted="onSuccess"&gt;&lt;/AddToInventory&gt;
       &lt;/div&gt;
     &lt;/div&gt;
 &nbsp;
@@ -1437,12 +1449,11 @@
 import axios from "axios";
 import api from "../Api";
 import {store} from "../store";
-import AddToInventory from "./AddToInventory";
 import ModifyInventory from "./ModifyInventory";
 &nbsp;
 export default {
   name: "BusinessInventory",
-  components: {AddToInventory, ModifyInventory},
+  components: {ModifyInventory},
   data: function() {
     return {
       errors: [],
@@ -1502,6 +1513,9 @@ export default {
 <span class="cstat-no" title="statement not covered" >      this.getBusinessInventory();</span>
     },
 &nbsp;
+    /**
+     * Checks if the current web environment is in development mode.
+     */
     isDevelopment() {
       return (process.env.NODE_ENV === 'development')
     },
@@ -1510,6 +1524,7 @@ export default {
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >      let filteredInventory = this.inventory.filter(item =&gt; (item.quantity&gt;0));</span></span>
 <span class="cstat-no" title="statement not covered" >      return filteredInventory;</span>
     },
+&nbsp;
     getProducts(businessId) {
 <span class="fstat-no" title="function not covered" >      api.getBusinessProducts(businessId)</span>
         .then((response) =&gt; {
@@ -1652,21 +1667,23 @@ export default {
 <span class="fstat-no" title="function not covered" >      api.getBusinessInventory(this.$route.params.id)</span>
       .then((response) =&gt; {
 <span class="cstat-no" title="statement not covered" >        this.inventory = response.data;</span>
-<span class="cstat-no" title="statement not covered" >        console.log(this.inventory)</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >        for(let inventoryItem of this.inventory) {</span>
           //Issue with sorting using object properties, so pulled required properties into inventory object
 <span class="cstat-no" title="statement not covered" >          inventoryItem['productName'] = inventoryItem.product.name;</span>
 <span class="cstat-no" title="statement not covered" >          inventoryItem['productId'] = inventoryItem.product.id;</span>
         }
-&nbsp;
         //Default ordering is product name, so all similar products will be next to each other
 <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >        this.inventory = this.inventory.sort((productOne, productTwo) =&gt; (productOne.name &lt; productTwo.name) ? 1 : -1)</span></span>
 &nbsp;
-<span class="fstat-no" title="function not covered" >      }).catch((err) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if(err.response.status == 401) {</span>
-<span class="cstat-no" title="statement not covered" >          this.$router.push({path: '/login'})</span>
+<span class="fstat-no" title="function not covered" >      })</span>
+      .catch((err) =&gt; {
+<span class="cstat-no" title="statement not covered" >        if (err.response) {</span>
+<span class="cstat-no" title="statement not covered" >          if (err.response.status === 401) {</span>
+<span class="cstat-no" title="statement not covered" >            this.$router.push({path: '/login'})</span>
+          }
         }
-      })
+      });
     }
   }
 }
@@ -1814,6 +1831,10 @@ export default {
     white-space: nowrap;
   }
 &nbsp;
+  #table &gt;&gt;&gt; .vs-con-tbody {
+    min-height: 640px;
+  }
+&nbsp;
   #productIdCol {
     font-size: 10px;
   }
@@ -1848,7 +1869,7 @@ export default {
 &nbsp;
 &nbsp;
   /* ===== INVENTORY ADDING MODAL ===== */
-  #firstColModal {
+  #first-col-modal {
     margin-right: 160px;
     margin-left: 5px;
   }
@@ -1945,7 +1966,7 @@ export default {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Sun Jul 18 2021 14:13:23 GMT+1200 (New Zealand Standard Time)
+                at Fri Jul 23 2021 09:24:24 GMT+1200 (New Zealand Standard Time)
             </div>
         </div>
         <script src="prettify.js"></script>
