@@ -43,9 +43,10 @@ public class CardController {
     private NotificationRepository notificationRepository;
 
     @Autowired
-    public CardController(UserRepository userRepository, CardRepository cardRepository) {
+    public CardController(UserRepository userRepository, CardRepository cardRepository, NotificationRepository notificationRepository) {
         this.userRepository = userRepository;
         this.cardRepository = cardRepository;
+        this.notificationRepository = notificationRepository;
     }
 
 
@@ -154,8 +155,6 @@ public class CardController {
         logger.info("Checking for expired cards");
         Date date = new Date();
         List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
-        //temp
-        System.out.println(expiredCards);
         for (Card card: expiredCards) {
             Notification exists = notificationRepository.findNotificationByCardId(card.getId());
             if (exists == null) {
@@ -184,7 +183,7 @@ public class CardController {
      * Postconditions: Card is removed from DB and Cards notification is updated to deleted
      * @param card card that is going to be deleted
      */
-    private void deleteExpiredCard(Card card) {
+    public void deleteExpiredCard(Card card) {
         Notification cardNotification = notificationRepository.findNotificationByCardId(card.getId());
         cardNotification.setDeleted();
         notificationRepository.save(cardNotification);
@@ -200,7 +199,7 @@ public class CardController {
      * @param displayPeriodEnd cards display period end, which would be when the notification starts
      * @return True if notification has existed for 24 hours or longer, False if existed for less
      */
-    private boolean checkCardIsPastNotificationPeriod(Date displayPeriodEnd) {
+    public boolean checkCardIsPastNotificationPeriod(Date displayPeriodEnd) {
         Date now = new Date();
 
         long timeDiffInMs = Math.abs(now.getTime() - displayPeriodEnd.getTime());
