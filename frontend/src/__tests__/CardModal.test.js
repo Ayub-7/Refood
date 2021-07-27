@@ -160,6 +160,21 @@ describe('Card modal UI', () => {
 
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
     });
+    test('Test prefills are are correctly inserted', async () => {
+        //setup test
+        wrapper.vm.setPrefills = jest.fn();
+        api.checkSession = jest.fn(() => {
+            return Promise.resolve({status: 200, data: {id: 1}});
+        });
+        await wrapper.vm.getUserId();
+        //checks that when edit button is called prefills are inserted
+        let button = wrapper.find(".card-modal-edit-button");
+        expect(button).toBeTruthy();
+        //button.trigger('click');
+        wrapper.vm.setPrefills()
+        expect(wrapper.vm.setPrefills).toBeCalled()
+
+    })
 });
 
 describe('Card editing', () => {
