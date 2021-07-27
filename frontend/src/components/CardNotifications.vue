@@ -7,7 +7,7 @@
           <span id="dropdownButtonName">{{ this.notifications.length}}</span>
         </div>
         <vs-dropdown-menu>
-            
+
           <vs-dropdown-group vs-label="Notifications" id="cardList" v-if="notifications.length > 0">
             <div class="dropdown-item" v-for="notification in notifications" :key="notification.cardId">
                 <div class="dropdown-item-name">
@@ -17,8 +17,8 @@
                         <div id="text">
                         {{notification.title}} has expired
                         </div>
-                        <div id="buttons"> 
-                            <vs-button class="notificationButtons" @click="extendCard(notification.cardId, notification.title)">Extend</vs-button> 
+                        <div id="buttons">
+                            <vs-button class="notificationButtons" @click="extendCard(notification.cardId, notification.title)">Extend</vs-button>
                             <vs-button class="notificationButtons" @click="deleteCard(notification.cardId, notification.title)">Delete card</vs-button>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
                     <div class="cardContainer" v-else-if="notification.status == deleted">
                         {{notification.title}} has been removed
                     </div>
-                
+
                 </div>
             </div>
           </vs-dropdown-group>
@@ -49,7 +49,7 @@ export default {
 
     data: function() {
         return {
-          
+
           expired: 'Expired',
           deleted: 'Deleted',
 
@@ -114,16 +114,23 @@ export default {
 
 <style>
 
+#dropdownButton {
+  cursor: pointer;
+}
+
+#dropdownButton:hover {
+  filter: brightness(75%);
+}
+
 .dropdown-item >>> a {
   display: flex;
   text-align: center;
 }
 
 .dropdown-item-name {
-  margin: auto;
   min-width: 100px;
   font-size: 12px;
-  margin-top: 5px;
+  margin: 5px auto auto;
 }
 
 #cardList {
@@ -138,12 +145,16 @@ export default {
 }
 
 #dropdownButtonName {
-  font-size: 16px;
   text-align: right;
   position: absolute;
   bottom: 0;
   left: 70%;
-  color: white;
+  font-size: 14px;
+
+  border-radius: 4px;
+  padding: 0 4px;
+  color: #fff;
+  background-color: rgba(var(--vs-danger),1);
 }
 
 #notificationContainer {

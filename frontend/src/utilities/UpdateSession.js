@@ -10,10 +10,10 @@ function updateSessionOnRouterChange(router) {
         api.checkSession()
         .then((response) => {
             console.log(to, response)
-          if(response.data.id != null && (to.path != '/' && to.path != '/login' && to.name != 'catchAll')){ //If logged in 
+          if(response.data.id != null && (to.path != '/' && to.path != '/register' && to.name != 'catchAll')){ //If logged in
                 getBusinessSession();
                 getNotifications(response.data.id)
-            } else if (response.data.id != null && (to.path == '/' || to.path == '/login' || to.name == 'catchAll')) { //If logged in and attempting to access login or register
+            } else if (response.data.id != null && (to.path == '/' || to.path == '/register' || to.name == 'catchAll')) { //If logged in and attempting to access login or register
                 sendToHome(to, next)
                 getBusinessSession();
                 getNotifications(response.data.id)
@@ -71,8 +71,8 @@ function getBusinessSession() {
  * @param next method to go to next component in router
  */
 function sendToLogin(to, next) {
-    if(to.path !== '/login' && to.path !== '/') {
-        next({path: '/login'})
+    if(to.path !== '/' && to.path !== '/register') {
+        next({path: '/'})
     } else {
         next();
     }

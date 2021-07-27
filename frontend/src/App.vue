@@ -20,10 +20,10 @@
       <!-- Not Logged In -->
       <div v-if="getLoggedInUser() == null" class="navbar-group">
         <vs-navbar-item index="0-0">
-          <router-link to="/">Register</router-link>
+          <router-link to="/register">Register</router-link>
         </vs-navbar-item>
         <vs-navbar-item index="0-1">
-          <router-link to="/login">Login</router-link>
+          <router-link to="/">Login</router-link>
         </vs-navbar-item>
       </div>
 
@@ -60,19 +60,15 @@
             <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
           </vs-navbar-item>
         </div>
-
-        <div>
-          <CardNotifications></CardNotifications>
-        </div>
-
         <div class="userDetail" v-if="getLoggedInUser() != null">
+          <CardNotifications></CardNotifications>
           <ActingAs/>
         </div>
 
 
         <div id="logout-nav" @click="logoutUser()">
           <vs-navbar-item index="8">
-            <router-link :to="{path: '/login'}">
+            <router-link :to="{path: '/'}">
               <span>Logout</span>
             </router-link>
           </vs-navbar-item>
@@ -82,7 +78,13 @@
     </vs-navbar>
 
     <div id="view">
-      <router-view></router-view>
+      <transition
+          name="fade"
+          mode="out-in"
+          :duration="100"
+          appear>
+        <router-view></router-view>
+      </transition>
     </div>
 
     <footer class="info">
@@ -202,10 +204,10 @@ export default app;
 }
 
 .userDetail {
+  display: flex;
   margin-left: 2px;
   cursor: pointer;
 }
-
 
 .userDetail:hover {
   background: #E0E0E0;
