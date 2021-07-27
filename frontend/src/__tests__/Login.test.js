@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Login from '../components/Login';
 import Vuesax from 'vuesax';
 import api from '../Api';
@@ -33,7 +33,7 @@ beforeEach(() => {
     state = {
         key: {}
     };
-    wrapper = shallowMount(Login, {
+    wrapper = mount(Login, {
         propsData: {},
         mocks: {$router, $vs},
         stubs: {},
@@ -52,8 +52,7 @@ describe('Login error checking', () => {
     test('Handles empty login', () => {
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.email).toBeTruthy();
-        expect(wrapper.vm.errors.password).toBeTruthy();
+        expect(wrapper.vm.errors.message).toBeTruthy();
         expect(wrapper.vm.errors.hasErrors).toBe(true);
     });
     
@@ -61,16 +60,14 @@ describe('Login error checking', () => {
         wrapper.vm.email = 'test@email.com';
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.email).toBeFalsy();
-        expect(wrapper.vm.errors.password).toBeTruthy();
+        expect(wrapper.vm.errors.message).toBeTruthy();
         expect(wrapper.vm.errors.hasErrors).toBe(true);
     })
     test('Handles only password', () => {
         wrapper.vm.password = 'test';
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.email).toBeTruthy();
-        expect(wrapper.vm.errors.password).toBeFalsy();
+        expect(wrapper.vm.errors.message).toBeTruthy();
         expect(wrapper.vm.errors.hasErrors).toBe(true);
     })
 
@@ -79,8 +76,7 @@ describe('Login error checking', () => {
         wrapper.vm.email = 'thisisnotaemail.com'
         const loginBtn = wrapper.find('.loginButton')
         loginBtn.trigger('click');
-        expect(wrapper.vm.errors.email).toBeTruthy();
-        expect(wrapper.vm.errors.password).toBeFalsy();
+        expect(wrapper.vm.errors.message).toBeTruthy();
         expect(wrapper.vm.errors.hasErrors).toBe(true);
     })
   

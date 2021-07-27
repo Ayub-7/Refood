@@ -362,7 +362,7 @@ class BusinessControllerTests {
     @Test
     void noSessionBusinessSearch() throws Exception {
         MvcResult results = mvc.perform(get("/businesses/search")
-                .param("searchQuery", "Pizza"))
+                .param("query", "Pizza"))
                 .andReturn();
         assert results.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
     }
@@ -371,7 +371,8 @@ class BusinessControllerTests {
     @WithMockUser
     void loggedInBusinessSearch() throws Exception {
         MvcResult results = mvc.perform(get("/businesses/search")
-                .param("searchQuery", "Pizza"))
+                .param("query", "Pizza")
+                .param("type", "Retail Trade"))
                 .andReturn();
         assert results.getResponse().getStatus() == HttpStatus.OK.value();
     }

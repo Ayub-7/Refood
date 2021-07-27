@@ -84,6 +84,8 @@ public class Inventory {
             this.bestBefore = newInventoryRequest.getBestBefore();
             this.manufactured = newInventoryRequest.getManufactured();
             this.expires = newInventoryRequest.getExpires();
+
+
         } else {
             throw new ValidationException("Inventory request item is not valid");
         }
@@ -101,9 +103,11 @@ public class Inventory {
             return false;
         } else if (req.getManufactured() != null && req.getManufactured().after(today)) {
             return false;
-        } else if(req.getSellBy() != null && req.getSellBy().before(today)) {
+        } else if (req.getSellBy() != null && req.getSellBy().before(today)) {
             return false;
-        } else if(req.getBestBefore() != null && req.getBestBefore().before(today)) {
+        } else if (req.getBestBefore() != null && req.getBestBefore().before(today)) {
+            return false;
+        } else if (req.getBestBefore() != null && req.getBestBefore().after(req.getExpires())) {
             return false;
         }
 

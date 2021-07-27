@@ -103,6 +103,21 @@ export default {
      */
     searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
+
+    /**
+     * Query search results that uses searchQuery function
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+    /**
+     *  Query search that returns businesses based on the parameter query
+     * @param query to help narrow down the businesses
+     * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
+     * @returns {*}
+     */
+    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
+
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
      * @param id user id to be made admin.
@@ -305,6 +320,13 @@ export default {
     deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
 
     /**
+     * Gets the user's cards
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
+     */
+    getUserCards: (userId) => instance.get(`/users/${userId}/cards`, {withCredentials: true}),
+
+    /**
      * Creates a new card. of type:
      * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
      *
@@ -322,6 +344,7 @@ export default {
 
     createCard: async(creatorId, title, description, keywords, section) =>
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
+
 
 
     /**
@@ -342,6 +365,55 @@ export default {
      */
      
 
-    getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true})
+    getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
+
+
+    /**
+     * Deletes a message with ID
+     * If the user is not the recipient, they cannot delete it.
+     *
+     * @param messageId Id of message to be deleted
+     * @returns {Promise<AxiosResponse<any>>} A response with status code:
+     *      * 401 if not logged in, 403 if the session user is not a D/GAA or the message recipient,
+     * 400 if there are errors with data, 201 otherwise
+     */
+    deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
+
+    /**
+     * Modifies a selected card. of type:
+     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+     *
+     * @param newCardRequest (same details for modifying)
+     * @param creatorId     user's id
+     * @param title         card title
+     * @param description   card description
+     * @param keywords      keywords to describe the card (functionality added later)
+     * @param section       marketplace section
+     *
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code:
+     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 201 otherwise
+     */
+    modifyCard: async(cardId, creatorId, title, description, keywords, section) =>
+        instance.put(`/cards/${cardId}`, {creatorId, title, description, keywords, section}, {withCredentials: true}),
+
+
+    /**
+     *
+     * @param userId        The intended recipient of the message
+     * @param cardId        Id of the card the message relates to
+     * @param description   Message content
+     * @returns {Promise<messageId<any>>}   The ID of the created message
+     *
+     */
+    postMessage: async(userId, cardId, description) =>
+        instance.post(`/users/${userId}/messages`, {cardId, description}, {withCredentials: true}),
+
+    /**
+     * Get router endpoint for retrieving a users messages
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>} Messages of the user
+     */
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
 
 }

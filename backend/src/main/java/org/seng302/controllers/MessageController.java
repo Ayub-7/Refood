@@ -5,6 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
+import org.seng302.models.requests.NewMessageRequest;
+import org.seng302.repositories.MessageRepository;
+import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.CardRepository;
+import org.seng302.models.responses.MessageIdResponse;
+
 import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.xml.bind.ValidationException;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -27,8 +34,12 @@ public class MessageController {
 
     @Autowired
     private MessageRepository messageRepository;
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CardRepository cardRepository;
 
 
     /**
@@ -53,7 +64,98 @@ public class MessageController {
         }
 
         List<Message> messages = messageRepository.findMessageByReceiver(user);
+        for(Message message: messages) {
+            message.getSender().setBusinessesAdministered(null);
+            message.getReceiver().setBusinessesAdministered(null);
+        }
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(messages));
     }
 
+    /**
+     * Posts a user's message. We get the recipient from {userId}, the sender from the user's session. The request contains
+     * the card id the message is about and the message contents which we use to create a new message. Null or incorrect
+     * data returns appropriate
+
+     * Preconditions: Logged in and acting as a valid user. The receiver and card are valid and the message is non null or blank
+     * Postconditions: The message will be saved to the database and the ID is returned
+
+     * @param userId ID of user that we are sending the messages to
+     * @return MessageIdResponse and 201 if successful
+     * @throws JsonProcessingException
+     */
+
+    @PostMapping("/users/{userId}/messages")
+    public ResponseEntity<String> addUserMessage(@PathVariable long userId, @RequestBody NewMessageRequest newMessageRequest, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        User receiver = userRepository.findUserById(userId);
+        Card card = cardRepository.findCardById(newMessageRequest.getCardId());
+
+        //401 Attempting to create a message without logging in
+        //Note: the user cannot send a message as someone else.
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        //403 Attempting to send to an invalid user.
+        if (receiver == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        //403 Attempting to send via an invalid card.
+        if (card == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Message must have an associated, valid, Card");
+        }
+
+
+        Message newMessage;
+        try { // Attempt to create a new card.
+            newMessage = new Message(newMessageRequest, currentUser, receiver, card);
+        }
+        //400 data is not correct
+        catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        }
+
+        messageRepository.save(newMessage);
+        MessageIdResponse messageIdResponse = new MessageIdResponse(newMessage.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(mapper.writeValueAsString(messageIdResponse));
+    }
+
+    /**
+     * Message DELETE endpoint, deletes a single message given an ID.
+     *
+     * Preconditions:
+     *  Given card ID is of type Long.
+     *  Message exists in database.
+     *  User is logged in and the receiver/DGAA.
+     * Postconditions:
+     *  Message is deleted from the database.
+     *
+     * @param messageId ID of message to be retrieved from DB.
+     * @param session the current user session.
+     *
+     * @return 401 if not logged in, 403 if creatorId & session user Id don't match OR if not D/GAA,
+     * 400 if there are errors with data, 200 if everything works.
+     * @throw JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @DeleteMapping("/messages/{messageId}")
+    public ResponseEntity<String> deleteMessageById (@PathVariable Long messageId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        Message message = messageRepository.findMessageById(messageId);
+        if (message == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User messageReceiver = message.getReceiver();
+
+        if (messageReceiver.getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        messageRepository.deleteMessageById(messageId);
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(message));
+    }
 }

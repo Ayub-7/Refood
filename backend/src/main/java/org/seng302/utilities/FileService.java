@@ -30,13 +30,16 @@ public class FileService {
      */
     public void uploadImage(File file, byte[] bytes) throws IOException {
         logger.info("Uploading Image at " + file);
-        file.createNewFile();
-        BufferedOutputStream stream = null;
-        try {
-            stream = new BufferedOutputStream(new FileOutputStream((file)));
-            stream.write(bytes);
-        } finally {
-            Objects.requireNonNull(stream).close();
+        if (file.createNewFile()) {
+            BufferedOutputStream stream = null;
+            try {
+                stream = new BufferedOutputStream(new FileOutputStream((file)));
+                stream.write(bytes);
+            } finally {
+                Objects.requireNonNull(stream).close();
+            }
+        } else {
+            logger.info("Failed to upload image from " + file);
         }
     }
 

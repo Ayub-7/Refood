@@ -35,32 +35,32 @@
                 <vs-td id="cardCreationDate">{{card.created}}</vs-td>
 
                 <vs-td id="cardUserName">{{card.user.firstName+" "+card.user.lastName}}</vs-td>
-                <vs-td id="cardUserAddress" v-if="card.user.homeAddress">{{MarketpalceCommon.getGeneralAddress(card.user.homeAddress)}}</vs-td>
+                <vs-td id="cardUserAddress" v-if="card.user.homeAddress">{{MarketplaceCommon.getGeneralAddress(card.user.homeAddress)}}</vs-td>
                 <vs-td id="cardUserNoAddress" v-if="!card.user.homeAddress"></vs-td>
 
                 <vs-td>{{ card.title }} </vs-td>
                 <vs-td style="min-width: 500px;" >{{ card.description }} </vs-td>
 
                 <vs-td v-if="card.keywords" id="keywordWrapper">
-                  <div id="cardKeywords"  v-for="keyword in MarketpalceCommon.getKeywords(card.keywords)" :key="keyword.id" >#{{keyword.name}}</div>
+                  <div id="cardKeywords"  v-for="keyword in MarketplaceCommon.getKeywords(card.keywords)" :key="keyword.id" >#{{keyword.name}}</div>
                 </vs-td>
               </vs-tr>
             </template>
           </vs-table>
         </vs-row>
-    <CardModal ref="cardModal" v-if="selectedItem != null" :selectedCard="selectedItem" />
+    <CardModal ref="cardModal" v-if="selectedItem != null" @deleted="notifyOfDeletion" :selectedCard="selectedItem" />
   </div>
 </template>
 
 <script>
 import CardModal from './CardModal.vue'
-import MarketpalceCommon from "./MarketpalceCommon.js";
+import MarketplaceCommon from "./MarketplaceCommon.js";
 
 export default {
   data: function() {
     return {
       selectedItem: null,
-      MarketpalceCommon
+      MarketplaceCommon
     }
   },
   components: {
@@ -75,6 +75,13 @@ export default {
       this.selectedItem = item;
       this.$refs.cardModal.openModal();
     },
+
+    /**
+     * Method for notifying the marketplace component that a card has been deleted
+     */
+    notifyOfDeletion: function() {
+      this.$emit('cardRemoved');
+    }
   }
 }
 </script>

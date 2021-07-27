@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="main" >
+  <div id="app" class="main">
 
     <vs-navbar
         class="vs-navbar"
@@ -155,6 +155,8 @@ const app = {
   },
 
   beforeMount() {
+    //Set title to ReFood, shows up in tab display
+    document.title = "ReFood"
     api.checkSession()
         .then((response) => {
           if(response.data.id != null){
@@ -193,12 +195,16 @@ export default app;
 
 .userDetail {
   margin-left: 2px;
+  cursor: pointer;
+}
+
+
+
 }
 
 
 .userDetail:hover {
   background: #E0E0E0;
-  /*color: #f5f5f5;*/
 }
 
 .navbar-group {
