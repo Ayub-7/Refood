@@ -122,7 +122,7 @@ describe('Homepage Messages functionality', () => {
 
     test('Clicking expand button opens detailed modal', () => {
         //Setup
-        let button = wrapper.find("#expand-btn")
+        let button = wrapper.find("#message-notification-container")
         button.trigger("click")
 
         //Execution

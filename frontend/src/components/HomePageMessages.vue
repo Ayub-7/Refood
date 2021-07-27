@@ -16,7 +16,7 @@
           </div>
         </div>
 
-        <div class="message-detail-container-left">
+        <div class="message-detail-container message">
         <vs-icon icon="question_answer" class="msg-icon"></vs-icon>
         <div id="message-detail-message">
           {{currentMessage.description}}
@@ -49,11 +49,10 @@
 
     </vs-popup>
     <div v-for="message in messages" :key="message.id">
-      <vs-card id="message-notification-card">
-          <div id="message-notification-container">
+      <vs-card id="message-notification-card" actionable>
+          <div id="message-notification-container"  @click="openDetailedModal(message)">
             <div id="message-text">New message from {{users[message.sender.id || message.sender].firstName}} {{users[message.sender.id || message.sender].lastName}} about {{message.card.title}}</div>
-            <vs-button id="expand-btn" class="message-button" @click="openDetailedModal(message)">Expand</vs-button>
-            <vs-button id="delete-btn" class="message-button" @click="deleteMessage(message.id)">Delete</vs-button>
+            <vs-button color="danger" id="delete-btn" class="message-button" @click.stop.prevent="deleteMessage(message.id)">X</vs-button>
           </div>
       </vs-card>
     </div>
@@ -91,9 +90,11 @@ export default {
         api.getMessages(store.loggedInUserId)
         .then((response) => {
           this.messages = response.data;
+          console.log(this.messages)
           for (let message of this.messages) {
             this.users[message.sender.id] = message.sender;
           }
+          console.log(this.users)
         }).catch((error) => {
           this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
@@ -196,15 +197,25 @@ export default {
 
 #message-notification-container {
   display: flex;
-  justify-content: space-between;
   margin-right: 10px;
 }
 
+
+
 #message-text {
-  width: 80%;
+
+
+  width: 100%;
   font-size: 14px;
-  height: 30px;
+  /* height: 100%; */
+  /* margin-bottom: 15px; */
   line-height: 30px;
+}
+
+#delete-btn {
+  padding: 0.5em;
+  font-size: 14px;
+  width: 35px;
 }
 
 
@@ -220,12 +231,12 @@ export default {
 }
 
 #message-detail-message {
-  text-align: center;
-  margin-top: 20px;
+
   font-size: 15px;
   word-wrap: break-word;
   width: 92%;
   float: right;
+  margin-left: 5px;
 }
 
 #message-detail-sent {
@@ -260,11 +271,38 @@ export default {
   font-size: large;
 }
 
+.message {
+  margin-top: 25px;
+}
+
 #message-detail-modal button {
   padding: 10px 30px;
 }
 
+@media only screen and (max-width: 1250px){
+  #message-notification-container {
+    display: grid;
+  }
 
+  #message-notification-card {
+    height: 100%;
+  }
+
+  #message-text {
+    margin-bottom: 10px;
+    text-align: center;
+    height: 100%;
+  }
+
+  #delete-btn{
+    margin: auto;
+    width: 25px;
+    font-size: 12px;
+  }
+}
+
+
+This is a card I am selllThis is a card I am selll
 /* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
 .slide-enter-active {
   -moz-transition-duration: 0.3s;
@@ -298,7 +336,7 @@ export default {
   max-height: 0;
 }
 
-.msg-icon {
+/* .msg-icon {
   margin-top: 6%;
-}
+} */
 </style>
