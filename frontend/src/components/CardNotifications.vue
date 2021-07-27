@@ -143,7 +143,6 @@ export default {
   position: absolute;
   bottom: 0;
   left: 70%;
-  font-size: 14px;
   color: white;
 }
 

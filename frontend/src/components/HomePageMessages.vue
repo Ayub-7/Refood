@@ -239,7 +239,6 @@ export default {
 #message-detail-sent {
   font-size: 14px;
   margin-left: 5px;
-  font-size: large;
 }
 
 .message-detail-header {

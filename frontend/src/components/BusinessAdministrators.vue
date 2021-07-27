@@ -5,7 +5,7 @@
       <vs-chip class="admin-chip" color="primary" :closable="isPrimaryAdmin()" @click="removeUserAsAdmin(user)">
         <div @click="navigateToUser(user.id)" class="admin-label">
           <vs-tooltip text="Go to profile">
-            <b v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </b>
+            <strong v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </strong>
             <div v-else> {{user.firstName}} {{user.middleName}} {{user.lastName}} </div>
           </vs-tooltip>
         </div>
