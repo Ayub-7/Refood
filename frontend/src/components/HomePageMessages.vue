@@ -202,8 +202,6 @@ export default {
 
 
 #message-text {
-
-
   width: 100%;
   font-size: 14px;
   /* height: 100%; */
@@ -241,6 +239,7 @@ export default {
 #message-detail-sent {
   font-size: 14px;
   margin-left: 5px;
+  font-size: large;
 }
 
 .message-detail-header {
@@ -264,10 +263,6 @@ export default {
   font-size: large;
   top: 7px;
   display: flex;
-}
-
-#message-detail-sent {
-  font-size: large;
 }
 
 .message {
