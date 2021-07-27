@@ -13,7 +13,7 @@ public enum BusinessType {
 
     private final String label;
 
-    BusinessType (String label) {
+    BusinessType(String label) {
         this.label = label;
     }
 

@@ -12,8 +12,13 @@ let $route = {
     }
 }
 
+let $vs = {
+    notify: jest.fn()
+}
+
 let $log = {
     debug: jest.fn(),
+    error: jest.fn(),
 }
 
 let cardDetails = {
@@ -54,11 +59,15 @@ beforeEach(() => {
         propsData: {
             selectedCard: cardDetails
         },
-        mocks: {$route, $log},
+        mocks: {$route, $log, $vs},
         stubs: {},
         methods: {},
         localVue,
-    })
+    });
+
+    wrapper.vm.title = "Valid Title";
+    wrapper.vm.section = "ForSale";
+
 });
 
 afterEach(() => {
@@ -74,7 +83,7 @@ describe('Card modal functionality', () => {
         //Setup
         wrapper.vm.message = "Hello"
         wrapper.vm.messaging = true;
-        
+
         expect(wrapper.vm.message).toBe("Hello")
         expect(wrapper.vm.messaging).toBe(true);
 
@@ -86,19 +95,19 @@ describe('Card modal functionality', () => {
         expect(wrapper.vm.messaging).toBe(false);
     });
 
-    test('Open modal correctly updates showing value', () => {
+    test('Open modal correctly updates showing value', async () => {
         //Setup
         wrapper.vm.showing = false;
         expect(wrapper.vm.showing).toBe(false);
-        
+
         //Execution
-        wrapper.vm.openModal()
+        await wrapper.vm.openModal()
 
         //Result
         expect(wrapper.vm.showing).toBe(true);
     })
 
-    test('Open modal calls resetState', () => {
+    test('Open modal calls resetState', async () => {
 
 
         //Setup
@@ -107,7 +116,7 @@ describe('Card modal functionality', () => {
         expect(wrapper.vm.showing).toBe(false);
 
         //Execution
-        wrapper.vm.openModal();
+        await wrapper.vm.openModal()
 
         expect(wrapper.vm.resetState).toBeCalled()
     })
@@ -132,25 +141,225 @@ describe('Card modal UI', () => {
         expect(wrapper.find("#card-modal-message")).toBeTruthy();
     });
 
-    test('User is not the owner - successfully shows message button', () => {
+    test('User is not the owner - successfully shows message button', async () => {
         api.checkSession = jest.fn(() => {
            return Promise.resolve({status: 200, data: {id: 2}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        await wrapper.vm.getUserId();
 
         expect(wrapper.find(".card-modal-message-button")).toBeTruthy();
     });
 
-    test('User is card owner - successfully shows edit button', () => {
+    test('User is card owner - successfully shows edit button', async () => {
         api.checkSession = jest.fn(() => {
             return Promise.resolve({status: 200, data: {id: 1}});
         });
 
-        wrapper.vm.getCurrentUserId();
+        await wrapper.vm.getUserId();
 
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
+    });
+    test('Test prefills are are correctly inserted', async () => {
+        //setup test
+        wrapper.vm.setPrefills = jest.fn();
+        api.checkSession = jest.fn(() => {
+            return Promise.resolve({status: 200, data: {id: 1}});
+        });
+        await wrapper.vm.getUserId();
+        //checks that when edit button is called prefills are inserted
+        let button = wrapper.find(".card-modal-edit-button");
+        expect(button).toBeTruthy();
+        //button.trigger('click');
+        wrapper.vm.setPrefills()
+        expect(wrapper.vm.setPrefills).toBeCalled()
+
+    })
+});
+
+describe('Card editing', () => {
+   test('Edited card title is too long', async () => {
+      wrapper.vm.title = "OverFiftyCharactersLong".repeat(4);
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.vm.editErrors.title.error).toBeTruthy();
+      expect(wrapper.vm.editErrors.title.message).toBe("Card title is too long");
+   });
+
+    test('Edited card title is too short', async () => {
+        wrapper.vm.title = ""; // No longer valid.
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.editErrors.title.error).toBeTruthy();
+        expect(wrapper.vm.editErrors.title.message).toBe("A valid card title is required");
+    });
+
+    test('Edited card title is invalid', async () => {
+        wrapper.vm.title = "  ";
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.editErrors.title.error).toBeTruthy();
+        expect(wrapper.vm.editErrors.title.message).toBe("A valid card title is required");
+    });
+
+
+    test('Edited card title is of valid length', async () => {
+        wrapper.vm.title = "Valid";
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.editErrors.title.error).toBeFalsy();
+    });
+
+    test('Edited card has missing section', async () => {
+        wrapper.vm.section = "";
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.editErrors.section.error).toBeTruthy();
+    });
+
+    test('Edited card has valid section', async () => {
+        wrapper.vm.section = "Wanted";
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.editErrors.section.error).toBeFalsy();
+    });
+
+    test('Card edit is invalid - bad title', async () => {
+        wrapper.vm.title = "OverFiftyCharactersLong".repeat(4);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.validateCardEdit()).toBeFalsy();
+    });
+
+    test('Card edit is invalid - bad section', async () => {
+        wrapper.vm.section = ""
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.validateCardEdit()).toBeFalsy();
+    });
+
+    test('Card edit is valid', async () => {
+        wrapper.vm.title = "New Edited Title";
+        wrapper.vm.section = "Exchange";
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.validateCardEdit()).toBeTruthy();
+    });
+});
+
+
+
+describe('Messaging', () => {
+    test('is a Vue instance', () => {
+        expect(wrapper.isVueInstance).toBeTruthy();
+    });
+
+    test('Message box shows with input', () => {
+        //Setup
+        wrapper.vm.showing = true;
+        wrapper.vm.messaging = true;
+
+        let button = wrapper.find(".card-modal-message-button")
+        button.trigger("click")
+
+        //Result
+        expect(wrapper.vm.messaging).toBeTruthy();
+        expect(wrapper.find("#card-modal-message")).toBeTruthy();
+        expect(wrapper.find("#message-input")).toBeTruthy();
+        expect(wrapper.find("#card-modal-message-send")).toBeTruthy();
+    });
+
+
+    test('Message is checked after send', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {id: 1}});
+        });
+
+        wrapper.vm.checkMessage = jest.fn(() => {
+            return true;
+        });
+
+        wrapper.vm.message = "message desc";
+        wrapper.vm.selectedCard.user.id = 1;
+        wrapper.vm.selectedCard.id = 1;
+
+        wrapper.vm.sendMessage(wrapper.vm.selectedCard, wrapper.vm.message);
+
+        expect(wrapper.vm.checkMessage).toBeCalled();
+    });
+
+    test('User is card owner - successfully shows delete button', async () => {
+        api.checkSession = jest.fn(() => {
+            return Promise.resolve({status: 200, data: {id: 1}});
+        });
+
+        await wrapper.vm.getUserId();
+
+        expect(wrapper.find(".card-modal-delete-button")).toBeTruthy();
 
     });
+
+    test('After sent success, Message clears and user is notified', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+
+        wrapper.vm.sendPostMessage(7, 12, "message");
+
+        expect(wrapper.vm.message).toBe("");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
+    test('On null recipient, User is notified and message is not cleared', () => {
+        wrapper.vm.message = "message";
+        wrapper.vm.recipient = null;
+        wrapper.vm.selectedCard.user.id = null;
+        wrapper.vm.selectedCard.userId = null;
+
+        wrapper.vm.checkMessage();
+
+        expect(wrapper.vm.message).toBe("message");
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On blank message, User is notified', () => {
+        wrapper.vm.message = "";
+        wrapper.vm.recipient = 7;
+
+        wrapper.vm.checkMessage();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On Long message, User is notified', () => {
+        wrapper.vm.message = " Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis " +
+            "egestas. Pellentesque sed tortor id lacus finibus aliquet at vitae nulla. Duis leo tortor, hendrerit at " +
+            "auctor non, convallis et enim. Ut aliquam consequat diam. Cras leo metus, tempus et dignissim ac, tempus " +
+            "quis purus. Etiam ornare, quam ac porttitor laoreet, arcu odio ullamcorper tellus, sit amet aliquam nisi " +
+            "enim ut nibh. Nulla vitae feugiat arcu, sit amet semper nisl. Vestibulum ac faucibus dolor, quis cursus " +
+            "dolor. Aliquam sagittis risus orci, eu aliquam orci feugiat in. Aliquam nec orci tortor. Duis id rutrum felis. " +
+            "Sed eget lacus porta, malesuada orci a, porttitor nisl. In turpis nisi, sagittis eu pulvinar vitae, finibus ac mi. ";
+        wrapper.vm.recipient = 7;
+
+        wrapper.vm.checkMessage();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('On null card, User is notified', () => {
+        wrapper.vm.message = "";
+        wrapper.vm.errors = [];
+
+        wrapper.vm.recipient = null;
+        wrapper.vm.selectedCard.id = null;
+        wrapper.vm.selectedCard.user.id = null;
+        wrapper.vm.selectedCard.userId = null;
+
+        wrapper.vm.checkMessage();
+
+        expect(wrapper.vm.errors);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
+
 
 });

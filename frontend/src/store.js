@@ -15,6 +15,7 @@ export const store = Vue.observable({
     productToAlterDescription: null,
     productToAlterRRP: null,
     productToAlterManufacturer: null,
+    notifications: [],
 
 });
 
@@ -99,5 +100,8 @@ export const mutations = {
         store.actingAsBusinessId = null;
         store.actingAsBusinessName = null;
     },
-
+    
+    setNotifications(notifications) {
+        store.notifications = notifications
+    }
 }

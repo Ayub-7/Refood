@@ -8,7 +8,9 @@ import lombok.With;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
@@ -17,14 +19,20 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.junit.Assert.*;
+
 
 import javax.xml.bind.ValidationException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,6 +50,7 @@ class CardControllerTests {
     private CardRepository cardRepository;
     @MockBean
     private UserRepository userRepository;
+
     @MockBean
     private NotificationRepository notificationRepository;
 
@@ -54,6 +63,7 @@ class CardControllerTests {
     private Card card;
     private Address addr;
     private Notification notification;
+    private List<Card> fakeExpiredCards;
     private List<Notification> notifications;
 
     @BeforeEach
@@ -67,8 +77,13 @@ class CardControllerTests {
 
         card = new Card(cardRequest, testUser);
         notification = new Notification(testUser.getId(), card.getId(), card.getTitle(), card.getDisplayPeriodEnd());
-        notifications = new ArrayList<Notification>();
+        notifications = new ArrayList<>();
         notifications.add(notification);
+
+        //temporary for test
+        fakeExpiredCards = new ArrayList<>();
+        fakeExpiredCards.add(card);
+        cardController = new CardController(userRepository, cardRepository, notificationRepository);
     }
 
     @Test
@@ -295,14 +310,14 @@ class CardControllerTests {
     }
 
     @Test
-    public void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
+    void testDeleteCardById_noAuth_returnUnauthorized() throws Exception {
         mvc.perform(delete("/cards/{cardId}", card.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-    public void testDeleteCard_wrongCreatorId_returnForbidden() throws Exception {
+    void testDeleteCard_wrongCreatorId_returnForbidden() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(delete("/cards/{cardId}", card.getId())
@@ -312,7 +327,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testDeleteCard_asCreator() throws Exception {
+    void testDeleteCard_asCreator() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(delete("/cards/{cardId}", card.getId())
@@ -322,7 +337,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testDeleteCard_badId_returnNotAcceptable() throws Exception {
+    void testDeleteCard_badId_returnNotAcceptable() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
 
         mvc.perform(delete("/cards/{cardId}", card.getId())
@@ -331,7 +346,7 @@ class CardControllerTests {
     }
 
     @Test
-    public void testExtendCard_noAuth_returnUnauthorized() throws Exception {
+    void testExtendCard_noAuth_returnUnauthorized() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId()))
@@ -341,7 +356,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testExtendCard_isGAA_returnOk() throws Exception {
+    void testExtendCard_isGAA_returnOk() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
@@ -353,7 +368,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testExtendCard_isCreator_returnOk() throws Exception {
+    void testExtendCard_isCreator_returnOk() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId())
@@ -363,7 +378,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testExtendCard_notCreatorOrGAA_returnForbidden() throws Exception {
+    void testExtendCard_notCreatorOrGAA_returnForbidden() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         mvc.perform(put("/cards/{id}/extenddisplayperiod", card.getId())
@@ -373,7 +388,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testExtendCard_IdNotExist_returnUnacceptable() throws Exception {
+    void testExtendCard_IdNotExist_returnUnacceptable() throws Exception {
         //If no card found repository will give null
         Mockito.when(cardRepository.findCardById(999)).thenReturn(null);
 
@@ -398,14 +413,14 @@ class CardControllerTests {
     // PUT /cards/{id}
     //
     @Test
-    public void testEditCard_noAuth_returnUnauthorized() throws Exception {
+    void testEditCard_noAuth_returnUnauthorized() throws Exception {
         mvc.perform(put("/cards/{id}", card.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-    public void testEditCard_validEdit_returnOk() throws Exception {
+    void testEditCard_validEdit_returnOk() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
         NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
         mvc.perform(put("/cards/{id}", card.getId())
@@ -417,7 +432,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser()
-    public void testEditCard_asGlobalAdmin_returnOk() throws Exception {
+    void testEditCard_asGlobalAdmin_returnOk() throws Exception {
         testUser.setRole(Role.GAA);
         card.setUser(anotherUser);
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
@@ -431,7 +446,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testEditCard_noTitle_returnBadRequest() throws Exception {
+    void testEditCard_noTitle_returnBadRequest() throws Exception {
         NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), null, card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
         mvc.perform(put("/cards/{id}", card.getId())
                 .contentType("application/json")
@@ -442,7 +457,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testEditCard_noSection_returnBadRequest() throws Exception {
+    void testEditCard_noSection_returnBadRequest() throws Exception {
         NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", null);
         mvc.perform(put("/cards/{id}", card.getId())
                 .contentType("application/json")
@@ -453,7 +468,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testEditCard_notCardOwner_returnForbidden() throws Exception {
+    void testEditCard_notCardOwner_returnForbidden() throws Exception {
         card.setUser(anotherUser);
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
         NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
@@ -466,7 +481,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testEditCard_noCardWithId_returnNotAcceptable() throws Exception {
+    void testEditCard_noCardWithId_returnNotAcceptable() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
         NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
         mvc.perform(put("/cards/{id}", card.getId())
@@ -475,4 +490,42 @@ class CardControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isNotAcceptable());
     }
+
+    @Test
+    void testCardExpiryUpdatesCreatesNewNotification() throws Exception {
+        Mockito.when(cardRepository.findAllByDisplayPeriodEndBefore(Mockito.any(Date.class))).thenReturn(fakeExpiredCards);
+        Mockito.when(notificationRepository.findNotificationByCardId(Mockito.anyLong())).thenReturn(null);
+
+        //Check method saves a notification object if there is no existing notification
+        cardController.updateExpiredCards();
+
+        Mockito.verify(notificationRepository).save(Mockito.any(Notification.class));
+    }
+
+    @Test
+    void testCardPastExpiryGetsDeleted() throws Exception {
+        Mockito.when(cardRepository.findAllByDisplayPeriodEndBefore(Mockito.any(Date.class))).thenReturn(fakeExpiredCards);
+        Mockito.when(notificationRepository.findNotificationByCardId(Mockito.anyLong())).thenReturn(notification);
+        Instant now = Instant.now();
+        Date yesterday = Date.from(now.minus(1, ChronoUnit.DAYS));
+        card.setDisplayPeriodEnd(yesterday);
+        //Check method deletes card if date is 24 hours in the past
+        cardController.updateExpiredCards();
+
+        Mockito.verify(cardRepository).delete(Mockito.any(Card.class));
+    }
+
+    @Test
+    void testNotificationExistsButNotExpired() throws Exception {
+        Mockito.when(cardRepository.findAllByDisplayPeriodEndBefore(Mockito.any(Date.class))).thenReturn(fakeExpiredCards);
+        Mockito.when(notificationRepository.findNotificationByCardId(Mockito.anyLong())).thenReturn(notification);
+        Date today = new Date();
+        card.setDisplayPeriodEnd(today);
+        //Check method does not delete card if date isn't 24 hours in the past
+        cardController.updateExpiredCards();
+
+        Mockito.verify(cardRepository, Mockito.never()).delete(Mockito.any(Card.class));
+    }
+
+
 }

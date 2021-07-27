@@ -97,7 +97,7 @@
                         {{pImage.name}}
                       </vs-dropdown-item>
                     </vs-dropdown-group>
-                    <vs-dropdown-item divider @click="openAddNewInventoryModal(product)">
+                    <vs-dropdown-item divider @click="openAddNewInventoryModal(product, currencySymbol)">
                       Add Inventory Entry
                     </vs-dropdown-item>
                   </vs-dropdown-menu>
@@ -173,7 +173,7 @@
                                 {{pImage.name}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
-                          <vs-dropdown-item divider @click="openAddNewInventoryModal(product)">
+                          <vs-dropdown-item divider @click="openAddNewInventoryModal(product, currencySymbol)">
                             Add Inventory Entry
                           </vs-dropdown-item>
                         </vs-dropdown-menu>
@@ -213,8 +213,8 @@ import {store} from "../store";
 import axios from "axios";
 import AddToInventory from "./AddToInventory";
 
-const Search = {
-  name: "Search",
+const ProductCatalogue = {
+  name: "ProductCatalogue",
   components: {AddToInventory},
   data: function() {
     return {
@@ -270,9 +270,10 @@ const Search = {
     /**
      * Opens the add new inventory modal by calling the open function inside the component.
      * @param product the select product to add a new inventory entry for.
+     * @param currency the currently viewable currency symbol being used.
      */
-    openAddNewInventoryModal(product) {
-      this.$refs.addToInventoryModal.open(product);
+    openAddNewInventoryModal(product, currency) {
+      this.$refs.addToInventoryModal.open(product, currency);
     },
 
     isDevelopment() {
@@ -534,7 +535,7 @@ const Search = {
   }
 }
 
-export default Search;
+export default ProductCatalogue;
 </script>
 
 <style scoped>

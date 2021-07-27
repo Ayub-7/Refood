@@ -49,6 +49,7 @@ import BusinessInventory from "@/components/BusinessInventory";
 
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
+import { updateSessionOnRouterChange } from './utilities/UpdateSession';
 
 
 Vue.config.productionTip = false;
@@ -95,6 +96,10 @@ const router = new VueRouter({
 
   
 });
+
+updateSessionOnRouterChange(router);
+
+
 
 /* eslint-disable no-new */
 new Vue({
