@@ -38,20 +38,20 @@
       <vs-tabs alignment="center" v-model="tabIndex">
         <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale'); currentSection = 'ForSale'">
           <div>
-            <MarketplaceGrid  v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid  v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
         <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted'); currentSection = 'Wanted'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
         <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange'); currentSection = 'Exchange'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
           </div>
 
         </vs-tab>
@@ -95,7 +95,7 @@ export default {
       currentPage: 1,
       itemPerPage: 10,
       tabIndex: 0,
-      ascending: true,
+      ascending: false,
 
       currentSection: "ForSale",
       cards: [],
@@ -130,7 +130,14 @@ export default {
       this.cards = [];
       api.getCardsBySection(section, sortBy, ascending)
           .then((res) => {
+            
             this.cards = res.data;
+
+            //Fixes issue with changing to section with less cards than what you already have
+            if(this.currentPage >= Math.round(this.cards.length/this.itemPerPage +0.4)) {
+              this.currentPage = Math.round(this.cards.length/this.itemPerPage +0.4)
+            }
+
           })
           .catch((error) => {
             console.log(error);
@@ -168,7 +175,7 @@ export default {
 
       this.getSectionCards(sectionName);
       this.selectSortBy = 'created';
-      this.toggleDirection = -1;
+      this.ascending = false;
     },
 
     /**
@@ -183,7 +190,7 @@ export default {
   mounted() {
     api.checkSession()
       .then(() => {
-        this.getSectionCards("ForSale", "created", "descending");
+        this.getSectionCards("ForSale", "created", false);
       })
       .catch((error) => {
         this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
