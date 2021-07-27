@@ -22,7 +22,10 @@
           <vs-select class="selectExample" v-model="selectSortBy">
             <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy"/>
           </vs-select>
-          <vs-button @click="sortData(selectSortBy);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+          <vs-select id="AscendingOrDescendingDropbox" class="selectAscOrDesc" v-model="ascending">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsAscending"/>
+          </vs-select>
+          <vs-button @click="getSectionCards(currentSection, selectSortBy, ascending);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
 
         </div>
         <div class="title-right">
@@ -33,22 +36,22 @@
       <vs-divider></vs-divider>
 
       <vs-tabs alignment="center" v-model="tabIndex">
-        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale'); currentSection = 'ForSale'">
+        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale', selectSortBy, ascending); currentSection = 'ForSale'">
           <div>
-            <MarketplaceGrid  v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid  v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted'); currentSection = 'Wanted'">
+        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted', selectSortBy, ascending); currentSection = 'Wanted'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
           </div>
         </vs-tab>
-        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange'); currentSection = 'Exchange'">
+        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange', selectSortBy, ascending); currentSection = 'Exchange'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="reloadCards" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="reloadCards" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
           </div>
 
         </vs-tab>
@@ -92,6 +95,7 @@ export default {
       currentPage: 1,
       itemPerPage: 10,
       tabIndex: 0,
+      ascending: false,
 
       currentSection: "ForSale",
       cards: [],
@@ -100,6 +104,11 @@ export default {
         {text:'Title',value:'title'},
         {text:'Date Created',value:'created'},
         {text:'Keywords',value:'keywords'},
+        {text:'Country',value:'country'},
+      ],
+      optionsAscending:[
+        {text: "Ascending", value:true},
+        {text: "Descending", value:false},
       ],
       optionsItemsPerPage:[
         {text:'Showing 10 Per Page',value:'10'},
@@ -114,17 +123,21 @@ export default {
   },
 
   methods: {
-    getSectionCards: function(section) {
+    getSectionCards: function(section, sortBy, ascending) {
       this.$vs.loading({
         container: ".vs-tabs",
       });
       this.cards = [];
-      api.getCardsBySection(section)
+      api.getCardsBySection(section, sortBy, ascending)
           .then((res) => {
+            
             this.cards = res.data;
 
-            //Sort by creation date
-            this.sortData('created');
+            //Fixes issue with changing to section with less cards than what you already have
+            if(this.currentPage >= Math.round(this.cards.length/this.itemPerPage +0.4)) {
+              this.currentPage = Math.round(this.cards.length/this.itemPerPage +0.4)
+            }
+
           })
           .catch((error) => {
             console.log(error);
@@ -151,6 +164,9 @@ export default {
         case "Exchange":
           this.tabIndex = 2;
           break;
+        case "Country":
+          this.tabIndex = 3;
+          break;
         default:
           this.tabIndex = 0;
           sectionName = "ForSale";
@@ -159,8 +175,7 @@ export default {
 
       this.getSectionCards(sectionName);
       this.selectSortBy = 'created';
-      this.toggleDirection = -1;
-      this.sortData(this.selectSortBy);
+      this.ascending = false;
     },
 
     /**
@@ -169,33 +184,13 @@ export default {
     openModal: function() {
       this.$refs.marketplaceAddCard.openModal();
     },
-
-    /**
-     * Sort the cards by the [field] input.
-     * Assumes the [field] can be sorted via a simple comparison
-     * if the field is anything other than 'created', it will attempt to convert to uppercase before sorting
-     *
-     * @param field
-     */
-    sortData: function (field) {
-      let direction = this.toggleDirection;
-      this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field].toUpperCase() < cardTwo[field].toUpperCase()) ? direction : -direction);
-      this.toggleDirection = this.toggleDirection*-1;
-    },
-    /**
-     * Method for reloading card data, after the owner of a card has deleted it
-     */
-    reloadCards: function() {
-      this.getSectionCards(this.currentSection);
-    },
-
    },
 
 
   mounted() {
     api.checkSession()
       .then(() => {
-        this.getSectionCards("ForSale");
+        this.getSectionCards("ForSale", "created", false);
       })
       .catch((error) => {
         this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
@@ -218,6 +213,10 @@ export default {
 
 #exchangeTab {
   color: #1F74FF;
+}
+
+#AscendingOrDescendingDropbox {
+  margin-left: 5px;
 }
 
 /* REMOVE AUTO SCROLL HIDING, SO USER KNOWS IF PARAGRAPH IS LONGER THAN CARD SIZE */
