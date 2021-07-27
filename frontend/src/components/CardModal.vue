@@ -64,11 +64,12 @@
             <div class="addCardHeader">Keywords</div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordList">
+            <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordListInput">
               <vs-chip v-for="keyword in keywordList" v-bind:key="keyword.value" @click="remove(keyword)"
                        closable>{{keyword}}
               </vs-chip>
             </vs-chips>
+             <div id="keyword-count">{{keywordList.length}} / 10</div>
           </vs-col>
         </vs-row>
         <vs-button color="success" id="card-modal-edit-save" @click="saveCardEdit">Save</vs-button>
@@ -95,6 +96,7 @@ export default {
       keywords: '',
       title: '',
       keywordList: [],
+      keywordListInput: [],
       description: '',
       section: '',
 
@@ -131,11 +133,12 @@ export default {
           if (this.selectedCard.keywords === '') {
             this.keywordList = [];
           } else {
-            console.log(this.selectedCard.keywords);
             this.keywordList = this.selectedCard.keywords.split(" ");
-            //this.keywordList = this.keywordList.filter(function(removeSpace) { return entry.trim() != ''; });
+
             this.keywordList = this.keywordList.filter(e => String(e).trim());
-            //this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
+
+            this.keywordListInput = this.keywordList
+    
           }
         },
         /**
@@ -230,7 +233,7 @@ export default {
          * @return boolean  False if null or blank, then notify the user.
          *                  Otherwise return true.
          */
-         checkMessage() {
+        checkMessage() {
           //the recipient can be stored as the userId or user.id depending on what the backend returns
           //we check if it is a valid user Id at the end.
           if (this.selectedCard.user) {
@@ -382,7 +385,57 @@ export default {
      */
     section: function() {
       this.editErrors.section.error = this.section == null || this.section === "";
+    },
+
+    /**
+     * Watches the keyword input for any changes, and checks validity of it.
+     */
+    keywordListInput: function() {
+      if(this.keywordListInput.filter(x => x.length > 20).length > 0) {
+        this.$vs.notify({
+          title: 'Bad keyword',
+          text: 'Keyword exceeds max character limit of 20',
+          color: 'danger'
+        });
+        this.$nextTick(() => {
+          this.keywordListInput.pop();
+        })
+      } else if (this.keywordListInput.length > 10) {
+          this.$vs.notify({
+            title: 'Too many keywords',
+            text: 'You cannot have more than 10 keywords',
+            color: 'danger'
+          });
+
+          this.$nextTick(() => {
+            this.keywordListInput.pop();
+          })
+      } else if (/\s/.test(this.keywordListInput[this.keywordListInput.length - 1])) {
+          this.$vs.notify({
+            title: 'Bad keyword',
+            text: 'Keyword cannot have spaces',
+            color: 'danger'
+          });
+
+          this.$nextTick(() => {
+            this.keywordListInput.pop();
+          })
+        } else if (this.keywordListInput[this.keywordListInput.length - 1] == ''){
+          this.$vs.notify({
+            title: 'Bad keyword',
+            text: 'Keyword cannot be empty',
+            color: 'danger'
+          });
+
+          this.$nextTick(() => {
+            this.keywordListInput.pop();
+          })
+
+        } else {
+          this.keywordList = this.keywordListInput
+        }
     }
+
   }
 }
 </script>
