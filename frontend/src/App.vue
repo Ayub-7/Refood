@@ -154,8 +154,10 @@ const app = {
           })
     },
     refreshCachedItems() {
-      if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
-        sessionStorage.setItem("businessesCache", []);
+      if (sessionStorage.getItem('businessesCache') !== null) {
+        if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+          sessionStorage.setItem("businessesCache", []);
+        }
       }
     }
   },
