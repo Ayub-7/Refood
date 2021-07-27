@@ -58,10 +58,7 @@
                     :key="product.id">
 
               <div slot="media">
-                <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
-                <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-                <img v-if="!product.primaryImagePath && isDevelopment()" class="grid-image" src="ProductShoot.jpg" alt="Product image"/>
-                <img v-if="!isDevelopment() && !product.primaryImagePath" class="grid-image" :src="getImgUrl(true)" alt="Product image"/>
+                <ReImage :imagePath="product.primaryImagePath" class="grid-image"/>
               </div>
 
               <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
@@ -78,7 +75,7 @@
               <div slot="footer" class="grid-item-footer">
                 <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </div>
                 <vs-dropdown vs-trigger-click class="actionButton">
-                  <vs-button style="width: fit-content;" type="flat">Actions</vs-button>
+                  <vs-button style="width: fit-content;" type="flat" icon="settings"></vs-button>
                   <vs-dropdown-menu>
                     <vs-dropdown-item @click="goToModify(product.id);">
                       Modify product
@@ -113,7 +110,7 @@
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <vs-table :data="filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" stripe>
+            <vs-table :data="filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0 20px; margin: 1em" stripe>
                 <template slot="thead" style="background:blue">
                   <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
@@ -141,10 +138,7 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a style="color: rgb(0,0,238);">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
-                        <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)" alt="Product image"/>
-                        <img v-if="!product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg" alt="Product image"/>
-                        <img v-if="!isDevelopment() && !product.primaryImagePath" class="table-image" :src="getImgUrl(true)" alt="Product image"/>
+                        <ReImage :imagePath="product.primaryImagePath" class="table-image"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -212,10 +206,11 @@ import api from "../Api";
 import {store} from "../store";
 import axios from "axios";
 import AddToInventory from "./AddToInventory";
+import ReImage from "./ReImage";
 
-const Search = {
-  name: "Search",
-  components: {AddToInventory},
+const ProductCatalogue = {
+  name: "ProductCatalogue",
+  components: {AddToInventory, ReImage},
   data: function() {
     return {
       products: [],
@@ -276,10 +271,6 @@ const Search = {
       this.$refs.addToInventoryModal.open(product, currency);
     },
 
-    isDevelopment() {
-      return (process.env.NODE_ENV === 'development');
-    },
-
     setPrimaryImage(product, image) {
       this.imageId = image.id;
       this.productId = product.id;
@@ -302,27 +293,6 @@ const Search = {
           }).catch((err) => {
             console.log(err);
       });
-    },
-
-    /**
-     * Retrieves the image url link for the given product.
-     * @param product the product to retrieve the image for.
-     * @return a string link to the product image, or the default image if it doesn't have a product.
-     **/
-    getImgUrl(product) {
-      if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
-      } else if (product === true) {
-        return '/test/ProductShoot.jpg';
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
-      } else {
-        return '../../public/ProductShoot.jpg'
-      }
     },
 
     getUserInfo: function(userId) {
@@ -374,11 +344,11 @@ const Search = {
      * if they are already, revoke privledges...
      */
     toggleAdmin: function (currentproduct) {
-      if (currentproduct.role == 'product') {
+      if (currentproduct.role === 'product') {
         //currentproduct.id = true;
         api.makeproductAdmin(currentproduct.id);
         currentproduct.role = 'GAA'
-      } else if (currentproduct.role == 'GAA') {
+      } else if (currentproduct.role === 'GAA') {
         api.revokeproductAdmin(currentproduct.id);
         currentproduct.role = 'product'
       }
@@ -386,8 +356,8 @@ const Search = {
 
     /**
      * Filters the displayed products alphabetically by
+     * @param event
      * @param JSONField is the name of the field to sort by (as string)
-     * @param index references the toggle state list in the data object (int)
      */
     sortByName: function (event, JSONField) {
 
@@ -535,7 +505,7 @@ const Search = {
   }
 }
 
-export default Search;
+export default ProductCatalogue;
 </script>
 
 <style scoped>
@@ -703,7 +673,7 @@ th {
   color: white;
 }
 
-.table-image {
+.table-image >>> img {
   width: 100%;
   height: 100px;
   border-radius: 4px 4px 0 0;

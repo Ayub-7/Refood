@@ -1,5 +1,5 @@
 <template>
-  <vs-popup id="card-modal" :title="selectedCard.title" :active.sync="showing">
+  <vs-popup id="card-modal" v-if="selectedCard" :title="selectedCard.title" :active.sync="showing">
     <div id="card-modal-name"><vs-icon icon="face" class="inline"></vs-icon>
       <p class="inline text">{{selectedCard.user.firstName}} {{selectedCard.user.lastName}}</p>
     </div>
@@ -10,7 +10,7 @@
       <p class="inline text">Closes on {{toStringDate(selectedCard.displayPeriodEnd)}}</p>
     </div>
     <div id="card-modal-description">{{selectedCard.description}}</div>
-    <div id="card-modal-keywords" v-for="keyword in selectedCard.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
+    <div id="card-modal-keywords" v-for="keyword in selectedCard.keywords.split(' ').filter(e => String(e).trim())" :key="keyword" >#{{keyword}}</div>
     <vs-divider></vs-divider>
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>
@@ -19,13 +19,17 @@
       <!-- Add delete button if user is card owner -->
       <vs-button id="card-modal-delete-button" @click="deleteCard()" v-if="selectedCard.user.id == userId || userRole === 'DGAA'" style="margin-left: 10px;">Delete</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
-      <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; editing=false; message = ''" v-else>Cancel</vs-button>
+      <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; errors=[]; editing=false; message = ''" v-else>Cancel</vs-button>
     </div>
 
     <transition name="slide" v-if="showTransition">
     <div id="card-modal-message" v-if="messaging">
-      <vs-textarea v-model="message" id="message-input"></vs-textarea>
-      <vs-button id="card-modal-message-send" @click="sendMessage(selectedCard, message)">Send Message</vs-button>
+      <vs-textarea style="margin-bottom: 50px" v-model="message" id="message-input"
+                    :counter="250"
+      />
+      <div v-if="(errors.includes('bad-content'))" style="color: red">Message cannot be blank or too long</div>
+      <div v-if="(errors.includes('invalid-card'))" style="color: red">There was something wrong with the card</div>
+      <vs-button id="card-modal-message-send" @click="sendMessage()">Send Message</vs-button>
     </div>
     </transition>
 
@@ -45,7 +49,7 @@
             <div class="addCardHeader" >Title <span class="required">*</span> </div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" @keydown.enter.prevent></vs-textarea>
+            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" @keydown.enter.prevent=""></vs-textarea>
             <transition name="fade">
               <div v-show="editErrors.title.error" class="edit-error">{{editErrors.title.message}}</div>
             </transition>
@@ -60,11 +64,12 @@
             <div class="addCardHeader">Keywords</div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordList">
+            <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordListInput">
               <vs-chip v-for="keyword in keywordList" v-bind:key="keyword.value" @click="remove(keyword)"
                        closable>{{keyword}}
               </vs-chip>
             </vs-chips>
+             <div id="keyword-count">{{keywordList.length}} / 10</div>
           </vs-col>
         </vs-row>
         <vs-button color="success" id="card-modal-edit-save" @click="saveCardEdit">Save</vs-button>
@@ -88,8 +93,10 @@ export default {
       messaging: false,
       message: '',
       editing: false,
+      keywords: '',
       title: '',
       keywordList: [],
+      keywordListInput: [],
       description: '',
       section: '',
 
@@ -103,6 +110,8 @@ export default {
         {key:'Wanted', value:'Wanted'},
         {key:'Exchange', value: 'Exchange'}
       ],
+      recipient: null,
+      errors: [],
     }
   },
   methods:
@@ -113,7 +122,6 @@ export default {
         remove(item) {
           this.keywordList.splice(this.keywordList.indexOf(item), 1)
         },
-
         /**
          * sets prefilled entries for edit card modal
          */
@@ -125,10 +133,14 @@ export default {
           if (this.selectedCard.keywords === '') {
             this.keywordList = [];
           } else {
-            this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
+            this.keywordList = this.selectedCard.keywords.split(" ");
+
+            this.keywordList = this.keywordList.filter(e => String(e).trim());
+
+            this.keywordListInput = this.keywordList
+    
           }
         },
-
         /**
          * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
          */
@@ -181,37 +193,29 @@ export default {
          * Sends user message by calling POST messages
          * @param cardId ID of card whose owner the user is going to message
          */
-        sendMessage(card, message) {
-          let recipient;
-
+        sendMessage() {
           //Because the server may return either the full user object or just their id
-          if (card.user) {
-            recipient = card.user.id;
-          } else {
-            recipient = card.userId;
-          }
-
-          if (this.checkMessage(message, recipient)) {
-            this.sendPostMessage(recipient, card.id, message);
+          if (this.checkMessage()) {
+            this.sendPostMessage();
           }
 
         },
 
         /**
-         * Calls post message
-         * @param recipient Intended user to receive the message
-         * @param cardid    Id of the card
-         * @param message   Text to be sent
+         * Sends post message to back end. Notifies user if the send was a success or an error
          */
 
-        sendPostMessage(recipient, cardid, message) {
-          api.postMessage(recipient, cardid, message)
+        sendPostMessage() {
+          console.log(this.recipient+ " " + this.selectedCard.id+ " " +this.message)
+
+          api.postMessage(this.recipient, this.selectedCard.id, this.message)
               .then((res) => {
                 console.log(res.data.messageId);
                 this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
 
                 //reset the message after success
                 this.message = "";
+                this.errors=[];
 
               })
               .catch((error) => {
@@ -229,16 +233,44 @@ export default {
          * @return boolean  False if null or blank, then notify the user.
          *                  Otherwise return true.
          */
-         checkMessage(message, recipient) {
-          if (message == null || message === "") {
+        checkMessage() {
+          //the recipient can be stored as the userId or user.id depending on what the backend returns
+          //we check if it is a valid user Id at the end.
+          if (this.selectedCard.user) {
+            this.recipient = this.selectedCard.user.id;
+          } else {
+            this.recipient = this.selectedCard.userId;
+          }
+
+          if (this.message == null || this.message === "") {
+            this.errors.push('bad-content');
+
             this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
             return false;
           }
 
-          if (isNaN(recipient)) {
+          if (this.message.length > 250) {
+            this.errors.push('bad-content');
+
+            this.$vs.notify({title:'Error sending message', text:`Message is too long. Consider sending it in parts.`, color:'danger'});
+            return false;
+          }
+
+          if (isNaN(this.recipient)) {
+            this.errors.push('invalid-card');
+
             this.$vs.notify({title:'Error sending message', text:`Receiver is invalid`, color:'danger'});
             return false;
           }
+
+          console.log(this.selectedCard.id)
+          if (isNaN(this.selectedCard.id)) {
+            this.errors.push('invalid-card');
+
+            this.$vs.notify({title:'Error sending message', text:`Card is invalid`, color:'danger'});
+            return false;
+          }
+
 
           return true;
         },
@@ -246,7 +278,7 @@ export default {
         /**
          * Resets state of messaging information
          */
-        resetState: function() {
+        resetState() {
           this.message = '';
           this.title = '';
           this.keywords = [];
@@ -260,9 +292,43 @@ export default {
          * todo: send info to backend.
          */
         saveCardEdit: function() {
+          //console.log(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords, this.section);
+          this.keywords = '';
+          for(let i = 0; i < this.keywordList.length; i++){
+                this.keywords += this.keywordList[i] + " ";
+          }
           if (this.validateCardEdit()) {
             this.title = this.title.trim(); // Removing any whitespace before and after.
-            this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+            api.modifyCard(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords.trimEnd(), this.section)
+                .then(() => {
+                  this.$emit('deleted');
+                  this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+                  this.showing = false;
+                  //this.$emit('submitted', this.section);
+                })
+                .catch((error) => {
+                  let errormsg = "ERROR creating new card: ";
+                  if (error) {
+                    if (error.response) {
+                      if (error.response.status === 401 || error.response.status === 403) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                      }
+
+                      if (error.response.status === 400) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                      } else {
+                        console.log(error.response.message);
+                      }
+                    } else {
+                      this.$vs.notify({
+                        title: 'Error',
+                        text: 'ERROR trying to obtain user info from session:',
+                        color: 'danger'
+                      });
+                    }
+                  }
+                  this.keywords = '';
+                });
           }
           else {
             this.$vs.notify({title: "Error saving changes", text: "Please check the input fields and try again.", color: "danger"});
@@ -301,11 +367,7 @@ export default {
      * Watches the title value for any changes, and checks validity of it.
      */
     title: function() {
-      if (this.title.length < 1) {
-        this.editErrors.title.error = true;
-        this.editErrors.title.message = "A valid card title is required";
-      }
-      else if (this.title.trim().length === 0) {
+      if (this.title.length < 1 || this.title.trim().length === 0) {
         this.editErrors.title.error = true;
         this.editErrors.title.message = "A valid card title is required";
       }
@@ -323,9 +385,58 @@ export default {
      */
     section: function() {
       this.editErrors.section.error = this.section == null || this.section === "";
-    }
-  }
+    },
 
+    /**
+     * Watches the keyword input for any changes, and checks validity of it.
+     */
+    keywordListInput: function() {
+      if(this.keywordListInput.filter(x => x.length > 20).length > 0) {
+        this.$vs.notify({
+          title: 'Bad keyword',
+          text: 'Keyword exceeds max character limit of 20',
+          color: 'danger'
+        });
+        this.$nextTick(() => {
+          this.keywordListInput.pop();
+        })
+      } else if (this.keywordListInput.length > 10) {
+          this.$vs.notify({
+            title: 'Too many keywords',
+            text: 'You cannot have more than 10 keywords',
+            color: 'danger'
+          });
+
+          this.$nextTick(() => {
+            this.keywordListInput.pop();
+          })
+      } else if (/\s/.test(this.keywordListInput[this.keywordListInput.length - 1])) {
+          this.$vs.notify({
+            title: 'Bad keyword',
+            text: 'Keyword cannot have spaces',
+            color: 'danger'
+          });
+
+          this.$nextTick(() => {
+            this.keywordListInput.pop();
+          })
+        } else if (this.keywordListInput[this.keywordListInput.length - 1] == ''){
+          this.$vs.notify({
+            title: 'Bad keyword',
+            text: 'Keyword cannot be empty',
+            color: 'danger'
+          });
+
+          this.$nextTick(() => {
+            this.keywordListInput.pop();
+          })
+
+        } else {
+          this.keywordList = this.keywordListInput
+        }
+    }
+
+  }
 }
 </script>
 

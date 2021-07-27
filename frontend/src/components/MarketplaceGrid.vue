@@ -7,10 +7,6 @@
               <div style="margin: 10px; width: 90%;" @click="openCardModal(card)">
                 <!-- Marketplace Card -->
                 <vs-card>
-                  <div slot="media" id="cardHeader">
-                    <!-- Default image for now -->
-                    <img id="marketImage" src="../../public/ProductShoot.jpg" alt="Product image"/>
-                  </div>
                   <div>
                     <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
                     <div id="cardCreationDate">{{card.created}}</div>
@@ -20,9 +16,12 @@
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
                     <!-- Keyword display -->
-                      <div id="keywordWrapper">
-                        <div id="cardKeywords"  v-for="keyword in card.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
+                      <div id="keywordWrapper" v-if="card.keywords">
+                        <div id="cardKeywords" v-for="keyword in card.keywords.split(' ')" :key="keyword" >
+                          #{{keyword}}
+                        </div>
                       </div>
+                      <div v-else id="keywordWrapper"></div>
                   </div>
                 </vs-card>
               </div>
@@ -136,6 +135,7 @@ export default {
   font-weight: bold;
   font-size: 17px;
   height: 50px;
+  word-wrap: break-word;
 }
 
 #cardDescription {

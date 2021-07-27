@@ -350,6 +350,12 @@ public class ProductController {
         String imageExtension = "";
         Business business = businessRepository.findBusinessById(businessId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        //checks if business exists
+        if (business == null)  {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
         //checks if user us logged in and authorized
         if (auth.getPrincipal() == "anonymousUser") {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -360,10 +366,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        //checks if business exists
-        if (business == null)  {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
         //checks if product exists
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
         if (product == null) {

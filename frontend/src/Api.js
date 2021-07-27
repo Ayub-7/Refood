@@ -101,6 +101,13 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
+    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+
+
+    /**
+     * Query search results that uses searchQuery function
+     * @returns {Promise<AxiosResponse<any>>}
+     */
     searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
     /**
@@ -112,7 +119,7 @@ export default {
     searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
 
     /**
-     * Method (frontend) to let a DGAA user make a user an GAA admin user.s
+     * Method (frontend) to let a DGAA user make a user an GAA admin user.
      * @param id user id to be made admin.
      */
     makeUserAdmin: async(id) =>
@@ -301,9 +308,15 @@ export default {
     /**
      * Retrieves community marketplace cards from a given section.
      * @param section the name of the section to retrieve the cards from.
+     * @param sortBy The expected values are CREATED, TITLE, COUNTRY, and KEYWORDS.
+     *               Where the cards will be sorted by one of the four attributes, and the default is by CREATED.
+     * @param ascending Not always passed but the default is ascending order; however, if false is passed, the list will
+     *                  be sorted in descending order.
      * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
      */
-    getCardsBySection: (section) => instance.get(`/cards`, {params: {section: section}, withCredentials: true}),
+    getCardsBySection: (section, sortBy, ascending) => instance.get(`/cards`, {params: {section: section,
+                                                                     sortBy: sortBy,
+                                                                     ascending: ascending}, withCredentials: true}),
 
     /**
      * Deletes a community marketplace card.
@@ -338,6 +351,29 @@ export default {
     createCard: async(creatorId, title, description, keywords, section) =>
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
+
+
+    /**
+     * Extends card display period by 24 hours (from current time)
+     * @param cardId card that is going to be extended
+     * @returns {Promise<AxiosResponse<any>>}:
+     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful 
+     */
+    extendCardDisplayPeriod: (cardId) => instance.put(`/cards/${cardId}/extenddisplayperiod`, {}, {withCredentials: true}),
+
+
+
+    /**
+     * Gets users notifications, which can contain a deleted or expiring notification
+     * @param userId ID of user we want notifications for
+     * @returns {Promise<AxiosResponse<any>>}:
+     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful 
+     */
+     
+
+    getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
+
+
     /**
      * Deletes a message with ID
      * If the user is not the recipient, they cannot delete it.
@@ -348,6 +384,25 @@ export default {
      * 400 if there are errors with data, 201 otherwise
      */
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
+
+    /**
+     * Modifies a selected card. of type:
+     * (long creatorId, String title, String description, String keywords, MarketplaceSection section)
+     *
+     * @param newCardRequest (same details for modifying)
+     * @param creatorId     user's id
+     * @param title         card title
+     * @param description   card description
+     * @param keywords      keywords to describe the card (functionality added later)
+     * @param section       marketplace section
+     *
+     * @returns {Promise<AxiosResponse<any>>} A response with appropriate status code:
+     * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
+     * 400 if there are errors with data, 201 otherwise
+     */
+    modifyCard: async(cardId, creatorId, title, description, keywords, section) =>
+        instance.put(`/cards/${cardId}`, {creatorId, title, description, keywords, section}, {withCredentials: true}),
+
 
     /**
      *
@@ -366,4 +421,5 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} Messages of the user
      */
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+
 }

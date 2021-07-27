@@ -49,7 +49,7 @@
         </main>
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
-        <MarketplaceGrid :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
+        <MarketplaceGrid @cardRemoved="getUserCards(userId)" :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
         <vs-pagination :max="5" :total="Math.ceil(cards.length/4)" v-model="currentCardPage"></vs-pagination>
       </div>
       <!-- If the user has no active cards -->
@@ -78,7 +78,7 @@ const Homepage = {
       showMarketModal: false,
       cards: [],
       currentCardPage: 1,
-
+      user: null,
     }
   },
 
@@ -94,6 +94,11 @@ const Homepage = {
       api.getUserCards(id)
           .then((res) => {
             this.cards = res.data;
+            for(let i = 0; i < this.cards.length; i++){
+              if(!this.cards[i].user.homeAddress){
+                this.cards[i].user = this.user;
+              }
+            }
           })
           .catch((error) => {
             if (error.response) {
@@ -277,12 +282,6 @@ export default Homepage;
   padding: 0 2em;
 }
 
-#container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 4fr 1fr;
-  grid-template-rows: auto auto;
-  grid-column-gap: 1em;
-}
 
 /* Top Name Container */
 #name-container {

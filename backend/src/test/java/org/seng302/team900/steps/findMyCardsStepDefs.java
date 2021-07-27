@@ -16,6 +16,7 @@ import org.seng302.controllers.UserController;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.repositories.CardRepository;
+import org.seng302.repositories.NotificationRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -45,6 +46,9 @@ public class findMyCardsStepDefs {
     @MockBean
     private UserRepository userRepository;
 
+    @MockBean
+    private NotificationRepository notificationRepository;
+
 
     User user;
     ResponseEntity<String> result;
@@ -59,7 +63,7 @@ public class findMyCardsStepDefs {
         cardRepository = Mockito.mock(CardRepository.class);
         userRepository = Mockito.mock(UserRepository.class);
 
-        cardController = new CardController(userRepository, cardRepository);
+        cardController = new CardController(userRepository, cardRepository, notificationRepository);
 
         NewCardRequest card = new NewCardRequest(this.user.getId(), "card", "description", "keyword", MarketplaceSection.FORSALE);
         Card card1 = new Card(card, user);

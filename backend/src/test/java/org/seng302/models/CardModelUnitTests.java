@@ -74,7 +74,7 @@ class CardModelUnitTests {
 
     @Test
     void testCardCreation_longTitle_throwsException() throws ValidationException {
-        String title = "dsaddsajdsajdklasdjklsajdl";
+        String title = "dsaddsajdsajdklasdjklsajdlasdsdsadadadasdasdsaasdaa";
         String desc = "Desc";
         String keywords = "Test, Two";
         MarketplaceSection section = MarketplaceSection.FORSALE;

@@ -34,14 +34,17 @@
             <div class="addCardHeader">Keywords</div>
         </vs-col> 
         <vs-col vs-w="9">
-          <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" v-model="keywordList">
-            <vs-chip v-for="keyword in keywordList" v-bind:key="keyword.value" @click="remove(keyword)"
-                     closable>{{keyword}}
-            </vs-chip>
-          </vs-chips>
+          <div>
+            <vs-chips color="rgb(145, 32, 159)" placeholder="New Keyword" :counter="50" v-model="keywordListInput" :class="[{'textarea-danger': keywordError}]" @keydown.enter.prevent>
+              <vs-chip v-for="keyword in keywordList" v-bind:key="keyword.value" @click="remove(keyword)"
+                      closable>{{keyword}}
+              </vs-chip>
+            </vs-chips>
+            <div id="keyword-count">{{keywordList.length}} / 10</div>
+          </div>
         </vs-col>
     </vs-row>
-
+    
     <div id="buttons">
         <vs-button class="addCardButton" @click="addToMarketplace()">Add To Marketplace</vs-button>
         <vs-button class="addCardButton" @click="closeModal()">Cancel</vs-button>
@@ -67,19 +70,73 @@ export default {
         section: null,
         title: '',
         description: '',
-        keywordList: [],
+        keywordListInput: [],
         keywords: '',
-
+        keywordError: false,
+        keywordList: [],
         errors: [],
         titleError: false,
         titleErrorMessage: "Card title is invalid",
       }
     },
 
+    watch: {
+      /**
+       * Watches the keyword input for any changes, and checks validity of it.
+       */
+      keywordListInput: function() {
+        if(this.keywordListInput.filter(x => x.length > 20).length > 0) {
+          this.$vs.notify({
+            title: 'Bad keyword',
+            text: 'Keyword exceeds max character limit of 20',
+            color: 'danger'
+          });
+          this.$nextTick(() => {
+            this.keywordListInput.pop();
+          })
+        } else if (this.keywordListInput.length > 10) {
+            this.$vs.notify({
+              title: 'Too many keywords',
+              text: 'You cannot have more than 10 keywords',
+              color: 'danger'
+            });
+
+            this.$nextTick(() => {
+              this.keywordListInput.pop();
+            })
+        } else if (/\s/.test(this.keywordListInput[this.keywordListInput.length - 1])) {
+            this.$vs.notify({
+              title: 'Bad keyword',
+              text: 'Keyword cannot have spaces',
+              color: 'danger'
+            });
+
+            this.$nextTick(() => {
+              this.keywordListInput.pop();
+            })
+          } else if (this.keywordListInput[this.keywordListInput.length - 1] == ''){
+            this.$vs.notify({
+              title: 'Bad keyword',
+              text: 'Keyword cannot be empty',
+              color: 'danger'
+            });
+
+            this.$nextTick(() => {
+              this.keywordListInput.pop();
+            })
+
+          } else {
+            this.keywordList = this.keywordListInput
+          }
+          
+     
+      }
+    },
+
 
     methods: {
       remove(item) {
-        this.keywordList.splice(this.keywordList.indexOf(item), 1)
+        this.keywordListInput.splice(this.keywordListInput.indexOf(item), 1)
       },
       /**
        * Preconditions: User clicks add to inventory button
@@ -88,15 +145,15 @@ export default {
       checkForm(){
         this.keywords= '';
         for(let i = 0; i < this.keywordList.length; i++){
+          if(this.keywordList[i] )
           this.keywords += this.keywordList[i] + " ";
         }
 
         this.errors = [];
-        this.titleError = true;
+
 
         if (this.section === null) {
           this.errors.push('no-section');
-          this.titleError = true;
         }
 
         if (this.title.length <= 2) {
@@ -156,8 +213,12 @@ export default {
 
        */
       addToMarketplace() {
+        this.keywords= '';
+        for(let i = 0; i < this.keywordList.length; i++){
+          this.keywords += this.keywordList[i] + " ";
+        }
         if (this.checkForm()) {
-          api.createCard(this.id, this.title, this.description, this.keywords, this.section)
+          api.createCard(this.id, this.title, this.description, this.keywords.trimRight(), this.section)
               .then((res) => {
                 this.$vs.notify({title: 'Success', text: `created new card: ${res.data.cardId}`, color: 'success'});
                 this.$emit('submitted', this.section);
@@ -229,6 +290,10 @@ export default {
             this.description = '';
             this.keywords = '';
             this.keywordList = [];
+            this.keywordListInput = [];
+            this.titleError = false;
+            this.keywordError = false;
+            this.errors = [];
         }
     },
 }
@@ -271,6 +336,10 @@ export default {
   min-height: 150px;
 }
 
+#keyword-count {
+  text-align: center;
+}
+
 .create-error {
   font-size: 10px;
   position: absolute;
@@ -285,6 +354,10 @@ export default {
 
 .title-input { /* Is being used. */
   margin-bottom: 0;
+}
+
+.con-chips {
+  justify-content: flex-start;
 }
 
 </style>

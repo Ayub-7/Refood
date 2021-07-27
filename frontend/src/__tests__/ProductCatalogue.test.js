@@ -188,13 +188,4 @@ describe('Functionality tests', () => {
         await wrapper.vm.setCurrency("France");
         expect(wrapper.vm.currencySymbol).toBe("€");
     });
-
-    test("Product item image url is retrieved", () => {
-        let url = wrapper.vm.getImgUrl(wrapper.vm.products[0]);
-        expect(url).toBeTruthy();
-
-        let emptyProduct = {primaryImagePath: null};
-        url = wrapper.vm.getImgUrl(emptyProduct);
-        expect(url).toBe('../../public/ProductShoot.jpg');
-    });
 });

@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,9 +45,10 @@ public class CardController {
     private NotificationRepository notificationRepository;
 
     @Autowired
-    public CardController(UserRepository userRepository, CardRepository cardRepository) {
+    public CardController(UserRepository userRepository, CardRepository cardRepository, NotificationRepository notificationRepository) {
         this.userRepository = userRepository;
         this.cardRepository = cardRepository;
+        this.notificationRepository = notificationRepository;
     }
 
 
@@ -82,11 +85,17 @@ public class CardController {
     /**
      * Retrieves all cards from a given section parameter.
      * @param section the string section name.
+     * @param sortBy The expected values are CREATED, TITLE, COUNTRY, and KEYWORDS.
+     *               Where the cards will be sorted by one of the four attributes, and the default is by CREATED.
+     * @param ascending Not always passed but the default is ascending order; however, if false is passed, the list will
+     *                  be sorted in descending order.
      * @return 401 (if no auth), 400 if section does not exist, 200 otherwise, along with the list of cards in that section.
      * @throws JsonProcessingException if converting the list of cards into a JSON string fails.
      */
     @GetMapping("/cards")
-    public ResponseEntity<String> getCardsFromSection(@RequestParam(name="section") String section) throws JsonProcessingException {
+    public ResponseEntity<String> getCardsFromSection(@RequestParam(name="section") String section,
+                                                      @RequestParam(required = false) String sortBy,
+                                                      @RequestParam(required = false) boolean ascending) throws JsonProcessingException {
         MarketplaceSection marketplaceSection = null;
 
         // Attempt to get the section enum (string is made uppercase to get correct value).
@@ -96,8 +105,28 @@ public class CardController {
             logger.error("Bad section parameter input.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Section does not exist.");
         }
-
         List<Card> cards = cardRepository.findAllBySection(marketplaceSection);
+        if (sortBy != null && sortBy.length() > 0) {
+            switch (sortBy.toUpperCase()) {
+                case "TITLE":
+                    cards.sort(Comparator.comparing(Card::getTitle));
+                    break;
+                case "CREATED":
+                    cards.sort(Comparator.comparing(Card::getCreated));
+                    break;
+                case "KEYWORDS":
+                    cards.sort(Comparator.comparing(Card::getKeywords));
+                    break;
+                case "COUNTRY":
+                    cards.sort(Comparator.comparing(c -> c.getUser().getHomeAddress().getCountry()));
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + sortBy.toUpperCase());
+            }
+        }
+        if (!ascending) {
+            Collections.reverse(cards);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }
 
@@ -139,14 +168,18 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
     }
 
+    public static Date getDate() {
+        return new Date();
+    }
+
     /**
      * Checks for expired cards and creates notification objects for each expired card without a current notification.
      * Function is run every 10 minutes.
      *
      *
      */
-    @Scheduled(fixedDelay = 600000, initialDelay = 0)
-    private void updateExpiredCards() {
+    @Scheduled(fixedDelay = 60000, initialDelay = 0)
+    public void updateExpiredCards() {
         logger.info("Checking for expired cards");
         Date date = new Date();
         List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
@@ -178,7 +211,7 @@ public class CardController {
      * Postconditions: Card is removed from DB and Cards notification is updated to deleted
      * @param card card that is going to be deleted
      */
-    private void deleteExpiredCard(Card card) {
+    public void deleteExpiredCard(Card card) {
         Notification cardNotification = notificationRepository.findNotificationByCardId(card.getId());
         cardNotification.setDeleted();
         notificationRepository.save(cardNotification);
@@ -194,7 +227,7 @@ public class CardController {
      * @param displayPeriodEnd cards display period end, which would be when the notification starts
      * @return True if notification has existed for 24 hours or longer, False if existed for less
      */
-    private boolean checkCardIsPastNotificationPeriod(Date displayPeriodEnd) {
+    public boolean checkCardIsPastNotificationPeriod(Date displayPeriodEnd) {
         Date now = new Date();
 
         long timeDiffInMs = Math.abs(now.getTime() - displayPeriodEnd.getTime());
