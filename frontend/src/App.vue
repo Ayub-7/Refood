@@ -61,16 +61,21 @@
           </vs-navbar-item>
         </div>
 
+        <div>
+          <CardNotifications></CardNotifications>
+        </div>
+
+        <div class="userDetail" v-if="getLoggedInUser() != null">
+          <ActingAs/>
+        </div>
+
+
         <div id="logout-nav" @click="logoutUser()">
           <vs-navbar-item index="8">
             <router-link :to="{path: '/login'}">
               <span>Logout</span>
             </router-link>
           </vs-navbar-item>
-        </div>
-
-        <div class="userDetail" v-if="getLoggedInUser() != null">
-          <ActingAs/>
         </div>
       </div>
 
@@ -93,6 +98,7 @@ import Login from "./components/Login";
 import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
 import AddToCatalogue from "@/components/AddToCatalogue";
+import CardNotifications from "./components/CardNotifications";
 import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
@@ -107,7 +113,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue,
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue, CardNotifications
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
@@ -143,6 +149,7 @@ const app = {
       api.logout()
           .then(() => {
             mutations.userLogout();
+            this.$router.push({path: '/login'})
           })
     },
   },
@@ -187,8 +194,10 @@ export default app;
 }
 
 .userDetail {
+  margin-left: 2px;
   cursor: pointer;
 }
+
 
 .userDetail:hover {
   background: #E0E0E0;

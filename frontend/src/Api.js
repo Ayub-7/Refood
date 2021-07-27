@@ -345,6 +345,29 @@ export default {
     createCard: async(creatorId, title, description, keywords, section) =>
         instance.post('/cards', {creatorId, title, description, keywords, section}, {withCredentials: true}),
 
+
+
+    /**
+     * Extends card display period by 24 hours (from current time)
+     * @param cardId card that is going to be extended
+     * @returns {Promise<AxiosResponse<any>>}:
+     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful 
+     */
+    extendCardDisplayPeriod: (cardId) => instance.put(`/cards/${cardId}/extenddisplayperiod`, {}, {withCredentials: true}),
+
+
+
+    /**
+     * Gets users notifications, which can contain a deleted or expiring notification
+     * @param userId ID of user we want notifications for
+     * @returns {Promise<AxiosResponse<any>>}:
+     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful 
+     */
+     
+
+    getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
+
+
     /**
      * Deletes a message with ID
      * If the user is not the recipient, they cannot delete it.
@@ -392,4 +415,5 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} Messages of the user
      */
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+
 }
