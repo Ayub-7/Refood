@@ -75,7 +75,7 @@
               <div slot="footer" class="grid-item-footer">
                 <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </div>
                 <vs-dropdown vs-trigger-click class="actionButton">
-                  <vs-button style="width: fit-content;" type="flat">Actions</vs-button>
+                  <vs-button style="width: fit-content;" type="flat" icon="settings"></vs-button>
                   <vs-dropdown-menu>
                     <vs-dropdown-item @click="goToModify(product.id);">
                       Modify product
@@ -110,7 +110,7 @@
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <vs-table :data="filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" stripe>
+            <vs-table :data="filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0 20px; margin: 1em" stripe>
                 <template slot="thead" style="background:blue">
                   <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
@@ -344,11 +344,11 @@ const ProductCatalogue = {
      * if they are already, revoke privledges...
      */
     toggleAdmin: function (currentproduct) {
-      if (currentproduct.role == 'product') {
+      if (currentproduct.role === 'product') {
         //currentproduct.id = true;
         api.makeproductAdmin(currentproduct.id);
         currentproduct.role = 'GAA'
-      } else if (currentproduct.role == 'GAA') {
+      } else if (currentproduct.role === 'GAA') {
         api.revokeproductAdmin(currentproduct.id);
         currentproduct.role = 'product'
       }
@@ -356,8 +356,8 @@ const ProductCatalogue = {
 
     /**
      * Filters the displayed products alphabetically by
+     * @param event
      * @param JSONField is the name of the field to sort by (as string)
-     * @param index references the toggle state list in the data object (int)
      */
     sortByName: function (event, JSONField) {
 
