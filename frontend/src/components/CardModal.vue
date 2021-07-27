@@ -10,7 +10,7 @@
       <p class="inline text">Closes on {{toStringDate(selectedCard.displayPeriodEnd)}}</p>
     </div>
     <div id="card-modal-description">{{selectedCard.description}}</div>
-    <div id="card-modal-keywords" v-for="keyword in selectedCard.keywords.split(' ')" :key="keyword" >#{{keyword}}</div>
+    <div id="card-modal-keywords" v-for="keyword in selectedCard.keywords.split(' ').filter(e => String(e).trim())" :key="keyword" >#{{keyword}}</div>
     <vs-divider></vs-divider>
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>

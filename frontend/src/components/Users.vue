@@ -69,7 +69,7 @@
     <!-- show users marketplace activity modal -->
     <vs-popup :active.sync="showMarketModal" title="Marketplace Activity" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
-        <MarketplaceGrid @cardRemoved="getUserCards(user.id)" :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
+        <MarketplaceGrid @cardRemoved="getUserCards(user.id)" :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" :showSection="false"></MarketplaceGrid>
         <vs-pagination :max="5" :total="Math.ceil(cards.length/4)" v-model="currentCardPage"></vs-pagination>
       </div>
       <!-- If the user has no active cards -->
@@ -155,7 +155,11 @@ const Users = {
       api.getUserCards(id)
           .then((res) => {
             this.cards = res.data;
-
+            for(let i = 0; i < this.cards.length; i++){
+              if(!this.cards[i].user.homeAddress){
+                this.cards[i].user = this.user;
+              }
+            }
           })
           .catch((error) => {
             if (error.response) {
@@ -174,13 +178,7 @@ const Users = {
      */
     openMarketModal: function() {
       this.showMarketModal = true;
-      api.checkSession()
-          .then(() => {
-            this.getUserCards(this.user.id);
-          })
-          .catch((error) => {
-            this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
-          });
+      this.getUserCards(this.user.id);
     },
 
     /**

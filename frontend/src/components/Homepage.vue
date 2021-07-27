@@ -78,7 +78,7 @@ const Homepage = {
       showMarketModal: false,
       cards: [],
       currentCardPage: 1,
-
+      user: null,
     }
   },
 
@@ -94,6 +94,11 @@ const Homepage = {
       api.getUserCards(id)
           .then((res) => {
             this.cards = res.data;
+            for(let i = 0; i < this.cards.length; i++){
+              if(!this.cards[i].user.homeAddress){
+                this.cards[i].user = this.user;
+              }
+            }
           })
           .catch((error) => {
             if (error.response) {

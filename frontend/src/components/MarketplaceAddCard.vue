@@ -72,6 +72,7 @@ export default {
         description: '',
         keywordListInput: [],
         keywords: '',
+        keywordError: false,
         keywordList: [],
         errors: [],
         titleError: false,
