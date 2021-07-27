@@ -92,11 +92,10 @@ export default {
         }
 
         this.errors = [];
-        this.titleError = true;
+
 
         if (this.section === null) {
           this.errors.push('no-section');
-          this.titleError = true;
         }
 
         if (this.title.length <= 2) {
@@ -233,6 +232,8 @@ export default {
             this.description = '';
             this.keywords = '';
             this.keywordList = [];
+            this.titleError = false;
+            this.errors = [];
         }
     },
 }

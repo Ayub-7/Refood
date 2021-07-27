@@ -133,7 +133,8 @@ export default {
 }
 
 #text {
-    max-width: 60%;
+  max-width: 60%;
+  word-wrap: break-word;
 }
 
 #dropdownButtonName {
@@ -153,11 +154,11 @@ export default {
 }
 
 #notifications {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
 .notificationButtons {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
 .cardContainer {
