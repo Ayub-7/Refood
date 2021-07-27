@@ -144,7 +144,7 @@
 
 <script>
 import api from "../Api";
-import {store} from "../store"
+import {store} from "../store";
 
 const Search = {
   name: "Search",
@@ -175,6 +175,12 @@ const Search = {
    * remove when test back end works well...
    */
   mounted() {
+    if (sessionStorage.getItem('businessesCache') !== null) {
+      if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+        this.businesses = JSON.parse(sessionStorage.getItem('businessesCache'));
+        this.paginator(this.businesses)
+      }
+    }
     if ( this.getUserRole() === 'DGAA') {
       this.isDGAA = true;
     }
@@ -244,6 +250,7 @@ const Search = {
      * @param bizId id of business that has been clicked
      */
     goToBusinessProfile(bizId) {
+      sessionStorage.setItem("businessesCache", JSON.stringify(this.businesses))
       this.$router.push({path: `/businesses/${bizId}`})
     },
     /**
@@ -272,8 +279,12 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-      if (this.businesses.length) {
-        this.businesses = [];
+
+      if (sessionStorage.getItem('businessesCache') !== null) {
+        if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+          sessionStorage.setItem("businessesCache", [])
+          this.businesses = [];
+        }
       }
       if (this.searchbarUser === "") return;
       this.$vs.loading();
@@ -417,6 +428,18 @@ export default Search;
   padding: 1em;
 }
 
+#businessTable {
+  width: 65%;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  margin: auto;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  border-radius: 1.5em;
+  border-style: solid;
+  border-color: white;
+  padding: 1em;
+}
+
 #submitSearchUser {
   margin-left: 0.5em;
   margin-right: 0.5em;
@@ -448,6 +471,10 @@ th {
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 1300px) {
   #userTable {
+    width: 100%;
+  }
+
+  #businessTable {
     width: 100%;
   }
 
