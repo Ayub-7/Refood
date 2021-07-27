@@ -22,7 +22,7 @@
           <vs-select class="selectExample" v-model="selectSortBy">
             <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy"/>
           </vs-select>
-          <vs-button @click="sortData(selectSortBy);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+          <vs-button @click="getSectionCards(currentSection, selectSortBy, true);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
 
         </div>
         <div class="title-right">
@@ -101,7 +101,6 @@ export default {
         {text:'Date Created',value:'created'},
         {text:'Keywords',value:'keywords'},
         {text:'Country',value:'country'},
-        {text:'City',value:'city'},
       ],
       optionsItemsPerPage:[
         {text:'Showing 10 Per Page',value:'10'},
@@ -116,17 +115,14 @@ export default {
   },
 
   methods: {
-    getSectionCards: function(section) {
+    getSectionCards: function(section, sortBy, ascending) {
       this.$vs.loading({
         container: ".vs-tabs",
       });
       this.cards = [];
-      api.getCardsBySection(section)
+      api.getCardsBySection(section, sortBy, ascending)
           .then((res) => {
             this.cards = res.data;
-
-            //Sort by creation date
-            this.sortData('created');
           })
           .catch((error) => {
             console.log(error);
@@ -156,9 +152,6 @@ export default {
         case "Country":
           this.tabIndex = 3;
           break;
-        case "City":
-          this.tabIndex = 4;
-          break;
         default:
           this.tabIndex = 0;
           sectionName = "ForSale";
@@ -168,7 +161,6 @@ export default {
       this.getSectionCards(sectionName);
       this.selectSortBy = 'created';
       this.toggleDirection = -1;
-      this.sortData(this.selectSortBy);
     },
 
     /**
@@ -177,30 +169,6 @@ export default {
     openModal: function() {
       this.$refs.marketplaceAddCard.openModal();
     },
-
-    /**
-     * Sort the cards by the [field] input.
-     * Assumes the [field] can be sorted via a simple comparison
-     * if the field is anything other than 'created', it will attempt to convert to uppercase before sorting
-     *
-     * @param field
-     */
-    sortData: function (field) {
-      let direction = this.toggleDirection;
-      if (field.toLowerCase() === "city" || field.toLowerCase() === "country") {
-        this.cards = this.cards.sort((cardOne,cardTwo) => {
-          if (cardOne["user"]["homeAddress"] && cardTwo["user"]["homeAddress"]) {
-            if (cardOne["user"]["homeAddress"][field] && cardTwo["user"]["homeAddress"][field]) {
-              return (cardOne["user"]["homeAddress"][field].toUpperCase() < cardTwo["user"]["homeAddress"][field].toUpperCase()) ? direction : -direction;
-            }
-          }
-        });
-      } else {
-        this.cards = this.cards.sort((cardOne,cardTwo) => (cardOne[field].toUpperCase() < cardTwo[field].toUpperCase()) ? direction : -direction);
-      }
-      this.toggleDirection = this.toggleDirection*-1;
-    }
-
    },
 
   mounted() {

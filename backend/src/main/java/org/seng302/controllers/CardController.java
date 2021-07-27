@@ -103,19 +103,16 @@ public class CardController {
         if (sortBy != null && sortBy.length() > 0) {
             switch (sortBy.toUpperCase()) {
                 case "TITLE":
-                    cards.sort((c1, c2) -> c1.getTitle().compareTo(c2.getTitle()));
+                    cards.sort(Comparator.comparing(Card::getTitle));
                     break;
                 case "CREATED":
-                    cards.sort((c1, c2) -> c1.getCreated().compareTo(c2.getCreated()));
+                    cards.sort(Comparator.comparing(Card::getCreated));
                     break;
                 case "KEYWORDS":
-                    cards.sort((c1, c2) -> c1.getKeywords().compareTo(c2.getKeywords()));
-                    break;
-                case "CITY":
-                    cards.sort((c1, c2) -> c1.getUser().getHomeAddress().getCity().compareTo(c2.getUser().getHomeAddress().getCity()));
+                    cards.sort(Comparator.comparing(Card::getKeywords));
                     break;
                 case "COUNTRY":
-                    cards.sort((c1, c2) -> c1.getUser().getHomeAddress().getCountry().compareTo(c2.getUser().getHomeAddress().getCountry()));
+                    cards.sort(Comparator.comparing(c -> c.getUser().getHomeAddress().getCountry()));
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + sortBy.toUpperCase());

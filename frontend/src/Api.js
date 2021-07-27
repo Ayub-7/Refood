@@ -295,7 +295,9 @@ export default {
      * @param section the name of the section to retrieve the cards from.
      * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
      */
-    getCardsBySection: (section) => instance.get(`/cards`, {params: {section: section}, withCredentials: true}),
+    getCardsBySection: (section, sortBy, ascending) => instance.get(`/cards`, {params: {section: section,
+                                                                     sortBy: sortBy,
+                                                                     ascending: ascending}, withCredentials: true}),
 
     /**
      * Deletes a community marketplace card.
