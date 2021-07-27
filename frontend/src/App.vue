@@ -199,10 +199,6 @@ export default app;
 }
 
 
-
-}
-
-
 .userDetail:hover {
   background: #E0E0E0;
 }
