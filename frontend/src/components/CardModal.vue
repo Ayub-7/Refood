@@ -49,7 +49,7 @@
             <div class="addCardHeader" >Title <span class="required">*</span> </div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" @keydown.enter.prevent></vs-textarea>
+            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" @keydown.enter.prevent=""></vs-textarea>
             <transition name="fade">
               <div v-show="editErrors.title.error" class="edit-error">{{editErrors.title.message}}</div>
             </transition>

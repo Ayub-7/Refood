@@ -1,14 +1,17 @@
 <template>
-  <ul id="administrators-list">
+  <div id="administrators-list">
     <!-- Admin Card -->
-    <li class="card" v-for="user in admins" :key="user.id" v-bind:user="user" @click="navigateToUser(user.id)">
-      <div class="admin-name">
-        <strong v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </strong>
-        <div v-else> {{user.firstName}} {{user.middleName}} {{user.lastName}} </div>
-      </div>
-      <vs-icon icon="close" class="removeAdminButton" v-if="isPrimaryAdmin()" v-on:click.stop="removeUserAsAdmin(user)"></vs-icon>
-    </li>
-  </ul>
+    <div v-for="user in admins" :key="user.id" v-bind:user="user">
+      <vs-chip class="admin-chip" color="primary" :closable="isPrimaryAdmin()" @click="removeUserAsAdmin(user)">
+        <div @click="navigateToUser(user.id)" class="admin-label">
+          <vs-tooltip text="Go to profile">
+            <b v-if="primaryAdminId === user.id"> {{user.firstName}} {{user.middleName}} {{user.lastName}} </b>
+            <div v-else> {{user.firstName}} {{user.middleName}} {{user.lastName}} </div>
+          </vs-tooltip>
+        </div>
+      </vs-chip>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -71,6 +74,7 @@ const BusinessAdministrators = {
       return store.loggedInUserId === this.primaryAdminId;
     },
   },
+
 }
 
 export default BusinessAdministrators;
@@ -82,42 +86,17 @@ export default BusinessAdministrators;
   padding: 1em;
   display: flex;
   flex-wrap: wrap;
-
 }
 
-/* Card CSS */
-.card {
-  min-width: 150px;
-
-  display: inline-flex;
-  flex-direction: row;
-  cursor: pointer;
-
-  background-color: transparent;
-  padding: 10px 20px;
-  border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
+.admin-chip {
+  height: 40px;
+  font-size: 14px;
   margin: 0.5em 1em;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+  border-radius: 4px;
 }
 
-.card:hover {
-  box-shadow: 0 0.5em 1em rgba(0,1,1,.25);
-}
-
-.admin-name {
-  align-content: center;
-  padding: 0 0.5em;
-}
-
-.removeAdminButton {
-  margin: auto;
-  opacity: 0.3;
-  padding: 0 4px;
-}
-
-.removeAdminButton:hover {
-  opacity: 1;
+.admin-label {
+  cursor: pointer;
 }
 
 </style>
