@@ -70,15 +70,13 @@ public class InventoryController {
     public ResponseEntity<List<Product>> postInventory(@PathVariable Long id, @RequestBody NewInventoryRequest request, HttpSession session) {
         Business business = businessRepository.findBusinessById(id);
 
-        Product product = productRepository.findProductByIdAndBusinessId(request.getProductId(), business.getId());
-
-        if(product == null) { //Product doesn't exist in business
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
         if(business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
+            Product product = productRepository.findProductByIdAndBusinessId(request.getProductId(), business.getId());
+            if (product == null) { //Product doesn't exist in business
+                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList<Long>::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
