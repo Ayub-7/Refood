@@ -26,7 +26,12 @@
     <!-- Card description -->
     <vs-row class="addCardField">
         <div class="addCardHeader">Description</div>
-        <vs-textarea v-model="description" id="description"></vs-textarea>
+        <vs-textarea v-model="description" id="description" :class="[{'textarea-danger': descriptionError}]" :counter="250" @keydown.enter.prevent></vs-textarea>
+        <vs-col>
+        <transition name="fade">
+            <div v-show="descriptionError" class="create-error">{{descriptionErrorMessage}}</div> <!-- vs-textarea doesn't have a message system, so this is a homebrew solution -->
+        </transition>
+        </vs-col>
     </vs-row>
     <!-- Card keywords -->
     <vs-row class="addCardField">
@@ -77,6 +82,8 @@ export default {
         errors: [],
         titleError: false,
         titleErrorMessage: "Card title is invalid",
+        descriptionError: false,
+        descriptionErrorMessage: "Description is too long"
       }
     },
 
@@ -144,9 +151,10 @@ export default {
        **/
       checkForm(){
         this.keywords= '';
-        for(let i = 0; i < this.keywordList.length; i++){
-          if(this.keywordList[i] )
-          this.keywords += this.keywordList[i] + " ";
+        for (let i = 0; i < this.keywordList.length; i++) {
+          if (this.keywordList[i]) {
+              this.keywords += this.keywordList[i] + " ";
+          }
         }
 
         this.errors = [];
@@ -164,6 +172,12 @@ export default {
         if (this.title.length > 50){
           this.errors.push('long-title');
           this.titleError = true;
+        }
+        if (this.description.length > 250) {
+          this.errors.push("invalid-description");
+          this.descriptionError = true;
+        } else {
+            this.descriptionError = false;
         }
 
         if (this.errors.includes('no-section')) {
@@ -190,6 +204,14 @@ export default {
             color: 'danger'
           });
           this.titleErrorMessage = "Title exceeds max length";
+        }
+
+        if (this.errors.includes('invalid-description')) {
+            this.$vs.notify({
+              title: 'Failed to add card',
+              text: this.descriptionErrorMessage,
+              color: 'danger'
+          });
         }
 
         if (this.title.trim().length === 0) {
