@@ -180,6 +180,7 @@ export default Business;
 
 #description {
   grid-row: 2;
+  font-size: 14px;
 }
 
 #info-container {

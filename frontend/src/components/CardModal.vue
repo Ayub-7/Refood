@@ -204,11 +204,10 @@ export default {
         /**
          * Sends post message to back end. Notifies user if the send was a success or an error
          */
-
         sendPostMessage() {
           api.postMessage(this.recipient, this.selectedCard.id, this.message)
               .then(() => {
-                this.$vs.notify({title: 'Message Sent!', text: `Text: ${this.message}`, color: 'success'});
+                this.$vs.notify({title: 'Message Sent!', color: 'success'});
 
                 //reset the message after success
                 this.message = "";
