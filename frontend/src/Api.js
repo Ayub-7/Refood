@@ -371,7 +371,6 @@ export default {
      * 401 if not logged in, 403 if creatorId, session user Id do not match or if not a D/GAA,
      * 400 if there are errors with data, 201 otherwise
      */
-
     modifyCard: async(cardId, creatorId, title, description, keywords, section) =>
         instance.put(`/cards/${cardId}`, {creatorId, title, description, keywords, section}, {withCredentials: true}),
 

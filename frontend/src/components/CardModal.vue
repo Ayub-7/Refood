@@ -253,7 +253,6 @@ export default {
             return false;
           }
 
-          console.log(this.recipient)
           if (isNaN(this.recipient)) {
             this.errors.push('invalid-card');
 
