@@ -204,14 +204,10 @@ export default {
         /**
          * Sends post message to back end. Notifies user if the send was a success or an error
          */
-
         sendPostMessage() {
-          console.log(this.recipient+ " " + this.selectedCard.id+ " " +this.message)
-
           api.postMessage(this.recipient, this.selectedCard.id, this.message)
-              .then((res) => {
-                console.log(res.data.messageId);
-                this.$vs.notify({title: 'Message Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
+              .then(() => {
+                this.$vs.notify({title: 'Message Sent!', color: 'success'});
 
                 //reset the message after success
                 this.message = "";
@@ -289,10 +285,9 @@ export default {
 
         /**
          * Saves the the changed input fields of an edited card - provided that the fields are valid.
-         * todo: send info to backend.
+         * Sends request to backend to successfully edit card.
          */
         saveCardEdit: function() {
-          //console.log(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords, this.section);
           this.keywords = '';
           for(let i = 0; i < this.keywordList.length; i++){
                 this.keywords += this.keywordList[i] + " ";
@@ -304,7 +299,6 @@ export default {
                   this.$emit('deleted');
                   this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
                   this.showing = false;
-                  //this.$emit('submitted', this.section);
                 })
                 .catch((error) => {
                   let errormsg = "ERROR creating new card: ";

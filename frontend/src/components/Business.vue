@@ -51,7 +51,6 @@
 import api from "../Api";
 import BusinessAdministrators from "./BusinessAdministrators";
 import BusinessListings from "./BusinessListings";
-//import {store} from "../store";
 
 const Business = {
   name: "Business",
@@ -171,6 +170,7 @@ export default Business;
   border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   background-color: #F5F5F5;
+  overflow: auto;
 }
 
 .sub-header {
@@ -180,6 +180,7 @@ export default Business;
 
 #description {
   grid-row: 2;
+  font-size: 14px;
 }
 
 #info-container {
