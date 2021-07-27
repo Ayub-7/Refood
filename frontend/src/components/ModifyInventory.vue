@@ -5,10 +5,7 @@
         <div id="image-container">
           <vs-tooltip text="Click here for more product details">
             <vs-tooltip :text="currentProduct.description" title="Description" position="bottom">
-              <img @click="showFullProduct = true" v-if="currentProduct.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(currentProduct))" alt="Product image"/>
-              <img @click="showFullProduct = true" v-if="currentProduct.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(currentProduct)"/>
-              <img @click="showFullProduct = true" v-if="!currentProduct.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
-              <img @click="showFullProduct = true" v-if="!isDevelopment() && !currentProduct.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
+              <ReImage :image-path="currentProduct.primaryImagePath" class="image" @click.native="showFullProduct = true"/>
             </vs-tooltip>
           </vs-tooltip>
         </div>
@@ -103,10 +100,7 @@
     <!-- Accessed by pressing the image of the product. -->
     <vs-popup id="full-product-modal" title="Full Product" :active.sync="showFullProduct" >
       <div>
-        <img v-if="currentProduct.primaryImagePath != null && isDevelopment()" class="full-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(currentProduct))" alt="Product image"/>
-        <img v-if="currentProduct.primaryImagePath != null && !isDevelopment()" class="full-image" alt="Product Image" v-bind:src="getImgUrl(currentProduct)"/>
-        <img v-if="!currentProduct.primaryImagePath && isDevelopment()" class="full-image" src="ProductShoot.jpg" alt="Product image"/>
-        <img v-if="!isDevelopment() && !currentProduct.primaryImagePath" class="full-image" :src="getImgUrl(true)" alt="Product image"/>
+        <ReImage :image-path="currentProduct.primaryImagePath" class="full-image"/>
       </div>
 
       <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
@@ -128,9 +122,12 @@
 <script>
 import api from "../Api";
 import {store} from "../store";
+import ReImage from "./ReImage";
 
 export default {
   name: "ModifyInventory",
+
+  components: {ReImage},
 
   data() {
     return {
@@ -168,34 +165,6 @@ export default {
       this.currency = currency;
       this.getBusinessProducts();
       this.setCurrentItem(this.item);
-    },
-
-    /**
-     * Checks if the current web environment is in development mode.
-     */
-    isDevelopment() {
-      return (process.env.NODE_ENV === 'development');
-    },
-
-    /**
-     * Retrieves the image url link for the given product.
-     * @param product the product to retrieve the image for.
-     * @return a string link to the product image, or the default image if it doesn't have a product.
-     **/
-    getImgUrl(product) {
-      if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
-      } else if (product === true) {
-        return '/test/ProductShoot.jpg';
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
-      } else {
-        return '../../public/ProductShoot.jpg'
-      }
     },
 
     /**
@@ -438,7 +407,17 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
+
+.vs-popup-primary >>> header {
+  background-color: #1F74FF;
+  color: #FFFFFF;
+}
+
+.vs-popup--header {
+  background-color: #1F74FF;
+  color: #FFFFFF;
+}
 
 #modify-modal {
   z-index: 100;
@@ -455,7 +434,24 @@ export default {
 
 .row {
   margin-bottom: 15px;
+}
 
+.full-image >>> img {
+  height: 210px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.full-image {
+  margin-bottom: 1em;
+}
+
+.image >>> img {
+  margin: auto;
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
 .vs-popup--header {
@@ -463,10 +459,6 @@ export default {
   color: #FFFFFF;
 }
 
-.vs-popup-primary >>> header {
-  background-color: #1F74FF;
-  color: #FFFFFF;
-}
 
 #cancel-button {
   margin-left: 4px;

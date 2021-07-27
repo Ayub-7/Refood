@@ -12,11 +12,7 @@
               title="Create a new listing">
       <div class="new-listing-modal">
         <div class="row" v-if="invItem != null">
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(invItem.product))" alt="Product image"/>
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(invItem.product)"/>
-          <img v-if="invItem != null && !invItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
-          <img v-if="invItem != null && !isDevelopment() && !invItem.product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
-
+          <ReImage :image-path="invItem.product.primaryImagePath" class="image"/>
         </div>
         <div id="listing-product-name">
           <div class="sub-header">Inventory Item Name</div>
@@ -70,9 +66,8 @@
               :maxItems="5"
               stripe>
       <template class="table-head" slot="thead" >
-        <vs-th sort-key="id" style="border-radius: 8px 0 0 0; width: 40px;"> ID</vs-th>
-        <vs-th sort-key="productId" > Image </vs-th>
-        <vs-th sort-key="productName"> Product </vs-th>
+        <vs-th sort-key="productId" style="border-radius: 4px 0 0 0;" > Image </vs-th>
+        <vs-th class="product-column" sort-key="productName"> Product </vs-th>
         <vs-th class="dateInTable" sort-key="manufactured"> Manufactured </vs-th>
         <vs-th class="dateInTable" sort-key="sellBy"> Sell By </vs-th>
         <vs-th class="dateInTable" sort-key="bestBefore"> Best Before </vs-th>
@@ -80,23 +75,20 @@
         <vs-th sort-key="quantity"> Qty </vs-th>
         <vs-th id="pricePerItemCol"  sort-key="pricePerItem"> Price Per Item </vs-th>
         <vs-th sort-key="totalPrice"> Total Price </vs-th>
-        <vs-th style="border-radius: 0 8px 0 0"> <!-- Action Button Column --> </vs-th>
+        <vs-th style="border-radius: 0 4px 0 0;"> <!-- Action Button Column --> </vs-th>
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="inventory in data" :key="inventory.id">
-          <vs-td :data="inventory.id" style=" text-align: center; font-weight: bold; font-size: 10pt"> ({{inventory.id}}) </vs-td>
           <vs-td id="productIdCol" :data="inventory.productId">
           {{inventory.productId}}
           <div style="height: 80px">
-            <img v-if="inventory.product.primaryImagePath != null && isDevelopment()" style=" height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(inventory.product))" alt="Business' inventory"/>
-            <img v-if="inventory.product.primaryImagePath != null && !isDevelopment()" style="height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(inventory.product)" alt="Business' inventory"/>
-            <img v-if="!inventory.product.primaryImagePath" style="height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')" alt="Business' inventory"/>
+            <ReImage :imagePath="inventory.product.primaryImagePath" class="inventory-image"/>
           </div>
             </vs-td>
-          <vs-td :data="inventory.productName"> {{inventory.productName}} </vs-td>
+          <vs-td :data="inventory.productName" class="product-cell"> {{inventory.productName}} </vs-td>
           <vs-td :data="inventory.manufactured"> {{inventory.manufactured}} </vs-td>
           <vs-td :data="inventory.sellBy"> {{inventory.sellBy}} </vs-td>
-          <vs-td :data="inventory.bestBefore">{{inventory.bestBefore}} </vs-td>
+          <vs-td :data="inventory.bestBefore" >{{inventory.bestBefore}} </vs-td>
           <vs-td :data="inventory.expires">{{inventory.expires}} </vs-td>
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
           <vs-td :data="inventory.pricePerItem">{{currency}} {{inventory.pricePerItem}} </vs-td>
@@ -123,10 +115,11 @@ import axios from "axios";
 import api from "../Api";
 import {store} from "../store";
 import ModifyInventory from "./ModifyInventory";
+import ReImage from "./ReImage";
 
 export default {
   name: "BusinessInventory",
-  components: {ModifyInventory},
+  components: {ModifyInventory, ReImage},
   data: function() {
     return {
       errors: [],
@@ -184,13 +177,6 @@ export default {
       this.getBusinessInventory();
     },
 
-    /**
-     * Checks if the current web environment is in development mode.
-     */
-    isDevelopment() {
-      return (process.env.NODE_ENV === 'development')
-    },
-
     getInventory() {
       let filteredInventory = this.inventory.filter(item => (item.quantity>0));
       return filteredInventory;
@@ -236,28 +222,6 @@ export default {
 
       return isValid;
     },
-
-    /**
-     * Retrieves the image url link for the given product.
-     * @param product the product to retrieve the image for.
-     * @return a string link to the product image, or the default image if it doesn't have a product.
-     **/
-    getImgUrl(product) {
-      if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
-      } else if (product === true) {
-        return '/test/ProductShoot.jpg';
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
-      } else {
-        return '../../public/ProductShoot.jpg'
-      }
-    },
-
 
     /**
      * Checks if the new list form is valid, then creates a new listing to be sent to backend if true.
@@ -388,10 +352,6 @@ export default {
   .header-button {
     margin: 0 1em;
   }
-  .header-button1 {
-    margin: 0 1em;
-    margin-top: 40px;
-  }
 
   /* ===== NEW LISTING DIALOG/PROMPT ====== */
 
@@ -516,21 +476,16 @@ export default {
 
   td {
     font-size: 12px;
-    min-width: 80px
+    white-space: normal;
   }
 
-  .dateInTable{
-    width: 130px;
-  }
-
-  .table-image {
-    width: 150px;
-    height: 100px;
-    object-fit: cover;
+  .inventory-image >>> img {
+    width: 100px;
     border-radius: 4px;
+    object-fit: cover;
   }
 
-  .image {
+  .image >>> img {
     margin: auto;
     width: 150px;
     height: 100px;
@@ -538,25 +493,14 @@ export default {
     border-radius: 4px;
   }
 
-
-  /* ===== INVENTORY ADDING MODAL ===== */
-  #first-col-modal {
-    margin-right: 160px;
-    margin-left: 5px;
-  }
-
-  .description-textarea >>> textarea {
-    resize: none;
-    min-height: 50px;
-    max-height: 50px;
+  .product-column {
+    min-width: 150px;
   }
 
   .row {
     margin: auto;
   }
-  .addButton {
-    align-self: center;
-  }
+
 
   @media screen and (max-width: 850px) {
     #header-container {

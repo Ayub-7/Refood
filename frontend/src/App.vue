@@ -9,7 +9,7 @@
         text-color="rgba(255,255,255,.6)"
         active-text-color="#FFFFFF">
       <div slot="title">
-        <router-link :to="{path: '/home'}">
+        <router-link @click.native="refreshCachedItems" :to="{path: '/home'}">
           <vs-navbar-title style="color: white">
             ReFood
           </vs-navbar-title>
@@ -30,7 +30,7 @@
       <!-- Logged In -->
       <div v-else class="navbar-group">
         <vs-navbar-item index="1-0">
-          <router-link :to="{path: '/home'}">Home</router-link>
+          <router-link @click.native="refreshCachedItems" :to="{path: '/home'}">Home</router-link>
         </vs-navbar-item>
         <vs-navbar-item index="1-2">
           <router-link to="/search">Search</router-link>
@@ -38,12 +38,12 @@
         <!-- Acting As User -->
         <div v-if="getActingAsUserId() == null" class="sub-navbar-group">
           <vs-navbar-item index="2-0">
-            <router-link to="/marketplace">Marketplace</router-link>
+            <router-link @click.native="refreshCachedItems" to="/marketplace">Marketplace</router-link>
           </vs-navbar-item>
           <vs-navbar-item index="2-1">
-            <router-link to="/businesses">Register a Business</router-link>
+            <router-link @click.native="refreshCachedItems" to="/businesses">Register a Business</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="2-2">
+          <vs-navbar-item index="2-2" @click="refreshCachedItems">
             <router-link :to="{path: `/users/${getLoggedInUser()}`}">Profile</router-link>
           </vs-navbar-item>
         </div>
@@ -51,13 +51,13 @@
         <!-- Acting As Business -->
         <div v-else class="sub-navbar-group">
           <vs-navbar-item index="3-0">
-            <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
+            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
           </vs-navbar-item>
           <vs-navbar-item index="3-1">
-            <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
+            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
           </vs-navbar-item>
           <vs-navbar-item index="3-2">
-            <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
+            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
           </vs-navbar-item>
         </div>
 
@@ -146,12 +146,18 @@ const app = {
      * Calls the logout function which removes loggedInUserId
      */
     logoutUser() {
+      this.refreshCachedItems();
       api.logout()
           .then(() => {
             mutations.userLogout();
             this.$router.push({path: '/login'})
           })
     },
+    refreshCachedItems() {
+      if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
+        sessionStorage.setItem("businessesCache", []);
+      }
+    }
   },
 
   beforeMount() {

@@ -64,16 +64,16 @@ describe('Component', () => {
 
 describe('UI components render successfully', () => {
     test('Correct number of admin cards generate', () => {
-        expect(wrapper.findAll(".card").length).toBe(adminList.length);
+        expect(wrapper.findAll(".admin-chip").length).toBe(adminList.length);
     });
 });
 
 describe('Checking method functions', () => {
     test('Router pushes', async () => {
-        let adminCard = wrapper.find(".card");
-        expect(adminCard).toBeTruthy();
+        let admin = wrapper.find(".admin-label");
+        expect(admin).toBeTruthy();
 
-        await adminCard.trigger('click');
+        await admin.trigger('click');
         expect(wrapper.vm.$router.push).toBeCalled();
     });
 });

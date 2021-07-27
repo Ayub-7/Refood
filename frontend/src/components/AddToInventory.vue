@@ -6,10 +6,7 @@
         <div id="image-container">
           <vs-tooltip text="Click here for more product details">
             <vs-tooltip :text="product.description" title="Description" position="bottom">
-              <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
-              <img @click="showFullProduct = true" v-if="product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-              <img @click="showFullProduct = true" v-if="!product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg" alt="Product image"/>
-              <img @click="showFullProduct = true" v-if="!isDevelopment() && !product.primaryImagePath" class="image" :src="getImgUrl(true)" alt="Product image"/>
+              <ReImage :image-path="product.primaryImagePath" class="image" @click.native="showFullProduct = true"/>
             </vs-tooltip>
           </vs-tooltip>
         </div>
@@ -100,10 +97,7 @@
     <!-- Accessed by pressing the image of the product. -->
     <vs-popup id="full-product-modal" title="Full Product" :active.sync="showFullProduct">
         <div>
-          <img v-if="product.primaryImagePath != null && isDevelopment()" class="full-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))" alt="Product image"/>
-          <img v-if="product.primaryImagePath != null && !isDevelopment()" class="full-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-          <img v-if="!product.primaryImagePath && isDevelopment()" class="full-image" src="ProductShoot.jpg" alt="Product image"/>
-          <img v-if="!isDevelopment() && !product.primaryImagePath" class="full-image" :src="getImgUrl(true)" alt="Product image"/>
+          <ReImage :image-path="product.primaryImagePath" class="full-image"/>
         </div>
 
         <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
@@ -126,9 +120,13 @@
 <script>
 import api from "../Api.js";
 import {store} from "../store.js";
+import ReImage from "./ReImage";
 
 export default {
   name: "AddToInventory",
+
+  components: {ReImage},
+
   data() {
     return {
       product: null,
@@ -170,34 +168,6 @@ export default {
       this.updateTotalPrice();
 
       this.addNewInv = true;
-    },
-
-    /**
-     * Checks if the current web environment is in development mode.
-     */
-    isDevelopment() {
-      return (process.env.NODE_ENV === 'development')
-    },
-
-    /**
-     * Retrieves the image url link for the given product.
-     * @param product the product to retrieve the image for.
-     * @return a string link to the product image, or the default image if it doesn't have a product.
-     **/
-    getImgUrl(product) {
-      if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
-      } else if (product === true) {
-        return '/test/ProductShoot.jpg';
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
-      } else {
-        return '../../public/ProductShoot.jpg'
-      }
     },
 
     /**
@@ -432,7 +402,13 @@ export default {
   grid-template-columns: 1fr 1fr;
 }
 
-.image {
+.full-image > img {
+  height: 210px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.image > img {
   margin: auto;
   width: 150px;
   height: 100px;
@@ -485,6 +461,11 @@ export default {
 
 #image-container:hover {
   opacity: 0.5;
+}
+
+.vs-popup-primary .vs-popup--header {
+  background-color: #1F74FF;
+  color: #FFFFFF;
 }
 
 /* === FULL PRODUCT MODAL === */

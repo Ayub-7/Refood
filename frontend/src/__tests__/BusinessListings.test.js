@@ -147,13 +147,4 @@ describe("Functionality tests", () => {
         expect(wrapper.vm.sortDirection).toBe("asc");
     });
 
-    test("Product image url is retrieved", () => {
-        let url = wrapper.vm.getImgUrl(wrapper.vm.listings[0].inventoryItem.product);
-        expect(url).toBeTruthy();
-
-        let emptyProduct = {primaryImagePath: null};
-        url = wrapper.vm.getImgUrl(emptyProduct);
-        expect(url).toBe('../../public/ProductShoot.jpg');
-    });
-
 });
