@@ -119,9 +119,14 @@ export default actingAs;
 
 <style scoped>
 
+.userInfo >>> .vs-con-dropdown {
+  cursor: pointer;
+}
+
 .acting-display {
   display: flex;
   min-width: 150px;
+  cursor: pointer;
 }
 
 span.user {

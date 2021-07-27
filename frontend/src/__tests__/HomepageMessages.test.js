@@ -16,6 +16,10 @@ let $log = {
     debug: jest.fn(),
 }
 
+let $vs = {
+    notify: jest.fn()
+}
+
 let oneMessage = [{
     "id": 3,
     "sender": {
@@ -87,7 +91,7 @@ api.deleteMessage = jest.fn(() => {
 
 beforeEach(() => {
     wrapper = mount(HomepageMessages, {
-        mocks: {$route, $log},
+        mocks: {$route, $log, $vs},
         stubs: {},
         methods: {},
         localVue,
@@ -111,33 +115,40 @@ describe('Homepage Messages functionality', () => {
     test('Open modal correctly updates showing value', () => {
         //Setup
         wrapper.vm.showing = false;
-        expect(wrapper.vm.showing).toBe(false);
+        expect(wrapper.vm.detailedView).toBe(false);
 
         //Execution
         wrapper.vm.openDetailedModal(oneMessage[0])
 
         //Result
-        expect(wrapper.vm.showing).toBe(true);
+        expect(wrapper.vm.detailedView).toBe(true);
     })
 
-    test('Clicking expand button opens detailed modal', () => {
-        //Setup
-        let button = wrapper.find("#message-notification-container")
-        button.trigger("click")
-
-        //Execution
-        expect(wrapper.vm.openDetailedModal).toBeCalled
-
-        //Result
-        expect(wrapper.find("#message-detail-modal")).toBeTruthy();
-    })
-
-    test('Delete message, actually deletes it', () => {
-        //Setup
-        let button = wrapper.find("#delete-btn")
-
-        button.trigger("click")
-
-        expect(wrapper.vm.deleteMessage).toBeCalled;
-    });
+    // test('Delete message, actually deletes it', async () => {
+    //     await wrapper.vm.deleteMessage(3);
+    //     expect(wrapper.vm.$vs.notify()).toBeCalled();
+    // });
 });
+
+
+// describe('Detailed message UI', () => {
+//
+//     test('Message button opens message box', () => {
+//         //Setup
+//         //wrapper.vm.showing = true;
+//         wrapper.vm.currentMessage = oneMessage[0];
+//         wrapper.vm.detailedView = true;
+//         wrapper.vm.showing = true;
+//
+//         let button2 = wrapper.find(".card-modal-message-button")
+//
+//         //Execution
+//         button2.trigger("click")
+//
+//         //Result
+//         expect(wrapper.vm.messaging).toBeTruthy();
+//         expect(wrapper.find("#card-modal-message")).toBeTruthy();
+//     });
+//
+//
+// });

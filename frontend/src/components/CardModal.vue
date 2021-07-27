@@ -15,7 +15,9 @@
     <div id="card-modal-bottom">
       <div id="card-modal-listed">Listed: {{toStringDate(selectedCard.created)}}</div>
 
-      <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && userId === selectedCard.user.id">Edit Card</vs-button>
+      <vs-button class="card-modal-edit-button" @click="setPrefills()" v-if="editing===false && (userId === selectedCard.user.id || userRole === 'DGAA')">Edit Card</vs-button>
+      <!-- Add delete button if user is card owner -->
+      <vs-button id="card-modal-delete-button" @click="deleteCard()" v-if="selectedCard.user.id == userId || userRole === 'DGAA'" style="margin-left: 10px;">Delete</vs-button>
       <vs-button class="card-modal-message-button" @click="messaging=true" v-else-if="messaging===false && userId !== selectedCard.user.id">Message</vs-button>
       <vs-button id="card-modal-message-cancel" class="card-modal-message-button"  @click="messaging=false; errors=[]; editing=false; message = ''" v-else>Cancel</vs-button>
     </div>
@@ -31,14 +33,26 @@
     </div>
     </transition>
 
+    <!-- EDIT CARD -->
     <transition name="slide" v-if="showTransition">
       <div id="card-modal-edit" v-if="editing">
+        <vs-row class="addCardField">
+          <vs-col vs-w="2" vs-xs="12" class="addCardHeader">Section <span class="required">*</span></vs-col>
+          <vs-select vs-w="10" v-model="section" :danger="editErrors.section.error"
+                     :danger-text="editErrors.section.message">
+            <vs-select-item v-for="section in availableSections" :key="section.key" :text="section.key" :value="section.value"/>
+          </vs-select>
+        </vs-row>
+
         <vs-row class="addCardField">
           <vs-col id="title" vs-w="2" vs-xs="12">
             <div class="addCardHeader" >Title <span class="required">*</span> </div>
           </vs-col>
           <vs-col vs-w="9">
-            <vs-textarea v-model="title" rows="1" class="addCardInput" :counter="50" ></vs-textarea>
+            <vs-textarea :class="[{'textarea-danger': editErrors.title.error}, 'addCardInput', 'title-input']" v-model="title" rows="1" :counter="50" @keydown.enter.prevent></vs-textarea>
+            <transition name="fade">
+              <div v-show="editErrors.title.error" class="edit-error">{{editErrors.title.message}}</div>
+            </transition>
           </vs-col>
         </vs-row>
         <vs-row class="addCardField">
@@ -57,7 +71,7 @@
             </vs-chips>
           </vs-col>
         </vs-row>
-        <vs-button color="success" id="card-modal-edit-save" >Save</vs-button>
+        <vs-button color="success" id="card-modal-edit-save" @click="saveCardEdit">Save</vs-button>
       </div>
     </transition>
 
@@ -65,7 +79,7 @@
 </template>
 
 <script>
-import api from "../Api.js";
+import api from "../Api";
 
 export default {
   name: "CardModal",
@@ -73,15 +87,29 @@ export default {
   data: function() {
     return {
       showing: false,
+      userId: null,
+      userRole: null,
       messaging: false,
       message: '',
       editing: false,
+      keywords: '',
       title: '',
       keywordList: [],
       description: '',
+      section: '',
+
+
+      editErrors: {
+        title: {error: false, message: "There is a problem with the card title"},
+        section: {error: false, message: "You must choose a section"},
+      },
+      availableSections: [
+        {key:'For Sale', value:'ForSale'},
+        {key:'Wanted', value:'Wanted'},
+        {key:'Exchange', value: 'Exchange'}
+      ],
       recipient: null,
       errors: [],
-      userId: -1,
     }
   },
   methods:
@@ -99,12 +127,16 @@ export default {
           this.editing = true;
           this.title = this.selectedCard.title;
           this.description = this.selectedCard.description;
+          this.section = this.selectedCard.section;
           if (this.selectedCard.keywords === '') {
             this.keywordList = [];
           } else {
-            this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
+            console.log(this.selectedCard.keywords);
+            this.keywordList = this.selectedCard.keywords.split(" ");
+            //this.keywordList = this.keywordList.filter(function(removeSpace) { return entry.trim() != ''; });
+            this.keywordList = this.keywordList.filter(e => String(e).trim());
+            //this.keywordList = this.selectedCard.keywords.match(/.*?[\s]+?/g);
           }
-          console.log(this.keywordList);
         },
         /**
          * Opens modal by setting showing to true (linked to :active-sync), also resets form data before opening
@@ -112,15 +144,46 @@ export default {
         openModal: function() {
           this.resetState();
           this.showing = true;
-          this.getCurrentUserId();
+          this.getUserId();
         },
-
         /**
          * Converts seconds to date
          */
         toStringDate: function (timestamp) {
           const dateFull = new Date(timestamp);
           return dateFull.toDateString();
+        },
+
+        /**
+         * Obtain the current logged in user's ID
+         */
+        getUserId: function() {
+          api.checkSession()
+              .then((response) => {
+                this.userId = response.data.id;
+                this.userRole = response.data.role;
+              })
+              .catch((error) => {
+                this.$log.error("Error checking sessions: " + error);
+                this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+              });
+        },
+
+        /**
+         * Preconditions: Must be logged in
+         * Postconditions: The card will be deleted
+         * Allows the user to delete a card
+         */
+        deleteCard: function() {
+          api.deleteCard(this.selectedCard.id)
+          .then(() => {
+            this.$emit('deleted');
+            this.showing = false;
+            this.$vs.notify({title:'Success', text:'Card deleted', color:'success'});
+          }).catch((error) => {
+            this.$log.error("Error deleting card: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR deleting card', color:'danger'});
+          });
         },
 
         /**
@@ -162,6 +225,8 @@ export default {
          * Check the message contents
          * Simply check a blank message is not sent
          *
+         * @param message   Text to be sent
+         * @param recipient Intended receiver of the message
          * @return boolean  False if null or blank, then notify the user.
          *                  Otherwise return true.
          */
@@ -208,20 +273,6 @@ export default {
         },
 
         /**
-         * Retrieves and sets the userId to the current user.
-         * Used to determine if the owner of the card is the current user.
-         */
-        getCurrentUserId: function() {
-          api.checkSession()
-            .then((res) => {
-              this.userId = res.data.id;
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-            });
-        },
-
-        /**
          * Resets state of messaging information
          */
         resetState() {
@@ -231,8 +282,72 @@ export default {
           this.description = '';
           this.editing = false;
           this.messaging = false;
-        }
+        },
 
+        /**
+         * Saves the the changed input fields of an edited card - provided that the fields are valid.
+         * todo: send info to backend.
+         */
+        saveCardEdit: function() {
+          //console.log(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords, this.section);
+          this.keywords = '';
+          for(let i = 0; i < this.keywordList.length; i++){
+                this.keywords += this.keywordList[i] + " ";
+          }
+          if (this.validateCardEdit()) {
+            this.title = this.title.trim(); // Removing any whitespace before and after.
+            api.modifyCard(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords.trimEnd(), this.section)
+                .then(() => {
+                  this.$emit('deleted');
+                  this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
+                  this.showing = false;
+                  //this.$emit('submitted', this.section);
+                })
+                .catch((error) => {
+                  let errormsg = "ERROR creating new card: ";
+                  if (error) {
+                    if (error.response) {
+                      if (error.response.status === 401 || error.response.status === 403) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'user account error', color: 'danger'});
+                      }
+
+                      if (error.response.status === 400) {
+                        this.$vs.notify({title: 'Error', text: errormsg + 'invalid data', color: 'danger'});
+                      } else {
+                        console.log(error.response.message);
+                      }
+                    } else {
+                      this.$vs.notify({
+                        title: 'Error',
+                        text: 'ERROR trying to obtain user info from session:',
+                        color: 'danger'
+                      });
+                    }
+                  }
+                  this.keywords = '';
+                });
+          }
+          else {
+            this.$vs.notify({title: "Error saving changes", text: "Please check the input fields and try again.", color: "danger"});
+          }
+        },
+
+        /**
+         * Validates the input fields of the user's card editing.
+         */
+        validateCardEdit: function() {
+          let valid = true;
+
+          if (this.editErrors.title.error) {
+            valid = false;
+          }
+
+          if (this.editErrors.section.error) {
+            valid = false;
+          }
+
+          return valid;
+        }
       },
 
   computed: {
@@ -241,6 +356,32 @@ export default {
      */
     showTransition: function() {
       return this.showing || !this.messaging;
+    }
+  },
+
+  watch: {
+    /**
+     * Watches the title value for any changes, and checks validity of it.
+     */
+    title: function() {
+      if (this.title.length < 1 || this.title.trim().length === 0) {
+        this.editErrors.title.error = true;
+        this.editErrors.title.message = "A valid card title is required";
+      }
+      else if (this.title.length > 50) {
+        this.editErrors.title.error = true;
+        this.editErrors.title.message = "Card title is too long";
+      }
+      else {
+        this.editErrors.title.error = false;
+      }
+    },
+
+    /**
+     * Makes sure the section doesn't somehow become null.
+     */
+    section: function() {
+      this.editErrors.section.error = this.section == null || this.section === "";
     }
   }
 }
@@ -272,6 +413,7 @@ export default {
 
 #card-modal-bottom {
   display: flex;
+  margin-left: 20px;
   flex-wrap: wrap;
 }
 
@@ -286,7 +428,6 @@ export default {
   flex: 0%;
 }
 
-
 #card-modal-message {
   margin-top: 10px;
 }
@@ -299,7 +440,6 @@ export default {
 #card-modal-message-send {
   float: right;
 }
-
 
 
 /* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
@@ -334,4 +474,26 @@ export default {
    overflow: hidden;
    max-height: 0;
 }
+
+/* === EDIT CARD === */
+#card-modal-edit {
+  margin-top: 8px;
+}
+
+.title-input >>> textarea {
+  max-height: 33px;
+  min-height: 33px;
+}
+
+.title-input { /* Is being used. */
+  margin-bottom: 0;
+}
+
+.edit-error {
+  font-size: 10px;
+  position: absolute;
+  color: #FF4757;
+  margin-left: 8px;
+}
+
 </style>

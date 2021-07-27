@@ -94,7 +94,6 @@ export default {
           for (let message of this.messages) {
             this.users[message.sender.id] = message.sender;
           }
-          console.log(this.users)
         }).catch((error) => {
           this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});

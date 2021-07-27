@@ -15,7 +15,7 @@
                     <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
                     <div id="cardCreationDate">{{card.created}}</div>
                     <div id="cardUserName" v-if="card.user.firstName">{{card.user.firstName+" "+card.user.lastName}}</div>
-                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{MarketplaceCommon.getGeneralAddress(card.user.homeAddress)}}</div>417
+                    <div id="cardUserAddress" v-if="card.user.homeAddress">{{MarketplaceCommon.getGeneralAddress(card.user.homeAddress)}}</div>
                     <div id="cardTitle">{{card.title}}</div>
                     <!-- Need to add limit or something to description -->
                     <div id="cardDescription">{{card.description}}</div>
@@ -29,7 +29,7 @@
             </vs-col>
           </vs-row>
         </div>
-      <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" :selectedCard='selectedCard' />
+      <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
     </div>
 </template>
 
@@ -71,14 +71,23 @@ export default {
     },
 
     /**
+     * Method for notifying the marketplace component that a card has been deleted
+     */
+    notifyOfDeletion: function() {
+      this.$emit('cardRemoved');
+    },
+    /**
      * Displays the section - checks if it is 'ForSale', if so, return the string with a space, return normally otherwise.
      * @param section card section.
      */
     displaySection: function(section) {
       if (section === "ForSale") return "For Sale";
       return section;
+    }
     },
-  }
+
+
+
 
 }
 
@@ -87,7 +96,15 @@ export default {
 
 <style>
 
+#card-modal-message-button {
+  margin-left: 5px;
+}
+
 /* CARD STYLING */
+
+#marketCard {
+  cursor: pointer;
+}
 
 #marketImage {
   width: 100%;

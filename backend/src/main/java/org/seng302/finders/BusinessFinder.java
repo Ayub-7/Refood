@@ -50,20 +50,22 @@ public class BusinessFinder {
     private Predicate criteriaBuilder(String term, String type, boolean isLike) {
         //Obtains criteria
         Predicate businessType = null;
-        if (type != null || type.length() > 0) {
-            switch (type.toUpperCase()) {
-                case "ACCOMMODATION AND FOOD SERVICES":
-                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-                    break;
-                case "RETAIL TRADE":
-                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.RETAIL_TRADE);
-                    break;
-                case "CHARITABLE ORGANISATION":
-                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.CHARITABLE_ORGANISATION);
-                    break;
-                case "NON-PROFIT ORGANISATION":
-                    businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.NON_PROFIT_ORGANISATION);
-                    break;
+        if (type != null) {
+            if (type.length() > 0) {
+                switch (type.toUpperCase()) {
+                    case "ACCOMMODATION AND FOOD SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+                        break;
+                    case "RETAIL TRADE":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.RETAIL_TRADE);
+                        break;
+                    case "CHARITABLE ORGANISATION":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.CHARITABLE_ORGANISATION);
+                        break;
+                    case "NON-PROFIT ORGANISATION":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.NON_PROFIT_ORGANISATION);
+                        break;
+                }
             }
         }
         if (!isLike) {

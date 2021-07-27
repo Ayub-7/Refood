@@ -1270,15 +1270,33 @@ paths:
             type: integer
           required: true
           example: 5
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cardId:
+                  type: string
+                  description: The ID of the card associated with the message
+                  example: "42"
+                description:
+                  type: string
+                  description: The message content
+                  example: "Is this available, no wait nevermind of course it is available..."
       responses:
         '201':
           description: Post successful, message has been sent to the user
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message'
+                type: object
+                properties:
+                  messageId:
+                    type: string
+                    description: The ID of the message that has just been created
+                    example: "42"
         '400':
           $ref: '#/components/responses/BadRequestError'
         '401':

@@ -92,6 +92,11 @@ let $vs = {
     loading: jest.fn(),
 }
 
+let $log = {
+    error: jest.fn(),
+    debug: jest.fn(),
+}
+
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 localVue.use(VueRouter);
@@ -102,7 +107,7 @@ beforeEach(() => {
         localVue,
         router,
         propsData: {},
-        mocks: {store, $vs},
+        mocks: {store, $vs, $log},
         stubs: ['router-link', 'router-view', 'CardModal'],
         methods: {},
         
@@ -165,7 +170,7 @@ describe('User profile page tests', () => {
 
     test('User cards is retrieved and set', async () => {
        expect(wrapper.vm.cards).toStrictEqual([]);
-       wrapper.vm.getUserCards();
+       await wrapper.vm.getUserCards();
        await wrapper.vm.$nextTick();
        expect(wrapper.vm.cards).toStrictEqual([mockCard]);
     });
