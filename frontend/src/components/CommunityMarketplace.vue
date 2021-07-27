@@ -22,7 +22,10 @@
           <vs-select class="selectExample" v-model="selectSortBy">
             <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy"/>
           </vs-select>
-          <vs-button @click="getSectionCards(currentSection, selectSortBy, true);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+          <vs-select id="AscendingOrDescendingDropbox" class="selectAscOrDesc" v-model="ascending">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsAscending"/>
+          </vs-select>
+          <vs-button @click="getSectionCards(currentSection, selectSortBy, ascending);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
 
         </div>
         <div class="title-right">
@@ -92,6 +95,7 @@ export default {
       currentPage: 1,
       itemPerPage: 10,
       tabIndex: 0,
+      ascending: true,
 
       currentSection: "ForSale",
       cards: [],
@@ -101,6 +105,10 @@ export default {
         {text:'Date Created',value:'created'},
         {text:'Keywords',value:'keywords'},
         {text:'Country',value:'country'},
+      ],
+      optionsAscending:[
+        {text: "Ascending", value:true},
+        {text: "Descending", value:false},
       ],
       optionsItemsPerPage:[
         {text:'Showing 10 Per Page',value:'10'},
@@ -197,6 +205,10 @@ export default {
 
 #exchangeTab {
   color: #1F74FF;
+}
+
+#AscendingOrDescendingDropbox {
+  margin-left: 5px;
 }
 
 /* REMOVE AUTO SCROLL HIDING, SO USER KNOWS IF PARAGRAPH IS LONGER THAN CARD SIZE */

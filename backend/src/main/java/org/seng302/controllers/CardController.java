@@ -118,6 +118,9 @@ public class CardController {
                     throw new IllegalStateException("Unexpected value: " + sortBy.toUpperCase());
             }
         }
+        if (!ascending) {
+            Collections.reverse(cards);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }
 
