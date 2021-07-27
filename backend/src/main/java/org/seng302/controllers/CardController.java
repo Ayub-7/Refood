@@ -83,6 +83,10 @@ public class CardController {
     /**
      * Retrieves all cards from a given section parameter.
      * @param section the string section name.
+     * @param sortBy The expected values are CREATED, TITLE, COUNTRY, and KEYWORDS.
+     *               Where the cards will be sorted by one of the four attributes, and the default is by CREATED.
+     * @param ascending Not always passed but the default is ascending order; however, if false is passed, the list will
+     *                  be sorted in descending order.
      * @return 401 (if no auth), 400 if section does not exist, 200 otherwise, along with the list of cards in that section.
      * @throws JsonProcessingException if converting the list of cards into a JSON string fails.
      */

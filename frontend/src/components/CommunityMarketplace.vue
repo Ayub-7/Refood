@@ -182,7 +182,7 @@ export default {
   mounted() {
     api.checkSession()
       .then(() => {
-        this.getSectionCards("ForSale");
+        this.getSectionCards("ForSale", "created", "descending");
       })
       .catch((error) => {
         this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
