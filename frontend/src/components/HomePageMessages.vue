@@ -69,16 +69,16 @@ import { store } from '../store';
 
 export default {
     data() {
-        return {
-          messages: [],
-          messaging: false,
-          showing: false,
-          message: '',
-          errors: [],
-          users: {},
-          detailedView: false,
-          currentMessage: null,
-        }
+      return {
+        messages: [],
+        messaging: false,
+        showing: false,
+        message: '',
+        errors: [],
+        users: {},
+        detailedView: false,
+        currentMessage: null,
+      }
     },
 
     mounted() {
@@ -301,8 +301,6 @@ export default {
   }
 }
 
-
-This is a card I am selllThis is a card I am selll
 /* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
 .slide-enter-active {
   -moz-transition-duration: 0.3s;
