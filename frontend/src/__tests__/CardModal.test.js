@@ -285,6 +285,22 @@ describe('Messaging', () => {
         expect(wrapper.vm.checkMessage).toBeCalled();
     });
 
+    test('When user inputs failed data, Message is checked and user is notified', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {id: 1}});
+        });
+
+        wrapper.vm.message = "message desc";
+        wrapper.vm.errors = [];
+        wrapper.vm.selectedCard.userId = "asdf"; //server returns the user's id instead of the object
+        wrapper.vm.selectedCard.id = "asdf";
+
+        wrapper.vm.checkMessage();
+
+        expect(wrapper.vm.errors.includes('invalid-card')).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
     test('User is card owner - successfully shows delete button', async () => {
         api.checkSession = jest.fn(() => {
             return Promise.resolve({status: 200, data: {id: 1}});
@@ -358,8 +374,72 @@ describe('Messaging', () => {
         expect(wrapper.vm.errors);
         expect(wrapper.vm.$vs.notify).toBeCalled();
     });
+});
+
+describe('Messaging returns', () => {
+    test('When a modified card is saved, User is notified, card closes and delete event', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+        wrapper.vm.validateCardEdit = jest.fn(() => {
+            return true;
+        });
+        wrapper.vm.keywordList = ["key1", "key2"]
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.showing).toBeFalsy();
+        expect(wrapper.vm.keywords).toBe('key1 key2 ');
+    });
+
+    test('When a modified card is not saved (400), User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.reject({response: { status: 400}});
+        });
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.keywords).toBe('');
+    });
 
 
+    test('When a modified card is not saved (401/403), User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.reject({response: {message: "Bad request", status: 403}});
+        });
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.keywords).toBe('');
+    });
+
+    test('When a modified card is not saved with an unspecified error (500), User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.reject({response: {status: 500}});
+        });
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
 
 
+    test('When a modified card includes errors, User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+        wrapper.vm.validateCardEdit = jest.fn(() => {
+            return false;
+        });
+
+        wrapper.vm.showing = true;
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.showing).toBeTruthy();
+    });
 });

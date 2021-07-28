@@ -292,7 +292,6 @@ export default {
          * todo: send info to backend.
          */
         saveCardEdit: function() {
-          //console.log(this.selectedCard.id, this.selectedCard.user.id, this.title, this.description, this.keywords, this.section);
           this.keywords = '';
           for(let i = 0; i < this.keywordList.length; i++){
                 this.keywords += this.keywordList[i] + " ";
@@ -304,7 +303,6 @@ export default {
                   this.$emit('deleted');
                   this.$vs.notify({title: "Success", text: "Card successfully edited.", color:"success"});
                   this.showing = false;
-                  //this.$emit('submitted', this.section);
                 })
                 .catch((error) => {
                   let errormsg = "ERROR creating new card: ";
