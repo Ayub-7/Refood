@@ -311,7 +311,6 @@ const Search = {
       if (this.users.length) {
         this.users = [];
       }
-      if (this.searchbarBusiness === "") return;
       this.$vs.loading();
       if (!this.businessType) {
         this.businessType = "";
