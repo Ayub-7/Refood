@@ -315,6 +315,7 @@ export default {
             this.keywordListInput = [];
             this.titleError = false;
             this.keywordError = false;
+            this.descriptionError = false;
             this.errors = [];
         }
     },
