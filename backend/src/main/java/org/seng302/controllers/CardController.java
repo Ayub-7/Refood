@@ -340,10 +340,12 @@ public class CardController {
     @PutMapping("/cards/{cardId}")
     public ResponseEntity<String> editCardById(@PathVariable long cardId, @RequestBody NewCardRequest cardInfo, HttpSession session) {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-
+        long cardCreatorId = cardInfo.getCreatorId();
+        User cardCreator = userRepository.findUserById(cardCreatorId);
+        
         Card editedCard;
         try { // Attempt to create a card entity with the given info.
-            editedCard = new Card(cardInfo, currentUser);
+            editedCard = new Card(cardInfo, cardCreator);
         }
         catch (ValidationException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
