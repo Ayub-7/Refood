@@ -70,6 +70,7 @@ const actingAs =  {
     setActingAsBusinessId(businessId, businessName){
       api.actAsBusiness(businessId)
           .then(() => {
+            this.refreshCachedItems();
             mutations.setActingAsBusiness(businessId, businessName)
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
           }).catch((error) => {
@@ -87,6 +88,7 @@ const actingAs =  {
     setActingAsUser(){
       api.actAsBusiness(0)
           .then(() => {
+            this.refreshCachedItems();
             mutations.setActingAsUser();
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
           }).catch((error) => {
@@ -96,6 +98,12 @@ const actingAs =  {
         }
         this.$log.debug("Error Status:", error)
       });
+    },
+
+    refreshCachedItems() {
+      if (sessionStorage.getItem('businessesCache') !== null) {
+        sessionStorage.removeItem("businessesCache");
+      }
     },
 
     getActingAsBusinessName() {

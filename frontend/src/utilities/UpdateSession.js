@@ -9,7 +9,6 @@ function updateSessionOnRouterChange(router) {
     router.beforeEach((to, from, next) => {
         api.checkSession()
         .then((response) => {
-            console.log(to, response)
           if(response.data.id != null && (to.path != '/' && to.path != '/register' && to.name != 'catchAll')){ //If logged in
                 getBusinessSession();
                 getNotifications(response.data.id)
@@ -20,7 +19,6 @@ function updateSessionOnRouterChange(router) {
             } else {
                 sendToLogin(to, next);
             }
-
             setStoreValues(response);
             next();
 

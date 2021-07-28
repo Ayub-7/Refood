@@ -90,7 +90,6 @@ export default {
         api.getMessages(store.loggedInUserId)
         .then((response) => {
           this.messages = response.data;
-          console.log(this.messages)
           for (let message of this.messages) {
             this.users[message.sender.id] = message.sender;
           }
@@ -126,7 +125,6 @@ export default {
        */
       sendMessage(originalMessage, message) {
         if (this.checkMessage(message)) {
-          console.log("sup");
           //the server can return either the sender object or it's id
           //we resolve which it is so we are always posting to the correct user
           let senderId=null;

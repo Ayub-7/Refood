@@ -33,7 +33,7 @@ public class AdminUtils {
     public void checkForDefaultGlobalAdmin(UserRepository userRepository) throws NoSuchAlgorithmException {
         List<User> dgaaUsers = userRepository.findAllByRole(Role.DGAA);
 
-        if (dgaaUsers.size() < 1) {
+        if (dgaaUsers.isEmpty()) {
             Address dgaaAddr = new Address(null, null, null, null, null, "New Zealand", "8041");
             User dgaa = new User("Default", "Global Admin", dgaaAddr, DGAA_EMAIL, DGAA_PASSWORD, Role.DGAA);
             userRepository.save(dgaa);

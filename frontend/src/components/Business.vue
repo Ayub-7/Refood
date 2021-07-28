@@ -1,5 +1,9 @@
 <template>
   <div>
+
+    <div v-if="fromSearch" class="return-button">
+      <vs-button @click="returnToSearch()" title="Go Back">Return To Search</vs-button>
+    </div>
     <div id="container" v-if="this.business != null">
       <!-- Left Side Business Information Panel -->
       <div id="business-name-container">
@@ -59,6 +63,7 @@ const Business = {
   // App's initial state.
   data: function () {
     return {
+      fromSearch: sessionStorage.getItem("businessesCache"),
       business: null,
       adminList: null,
       user: null
@@ -96,6 +101,12 @@ const Business = {
           }
           this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);
       });
+
+    },
+
+    returnToSearch: function() {
+      console.log(88);
+      this.$router.push({path: '/search'})
     },
 
     checkUserSession: function() {
@@ -176,6 +187,10 @@ export default Business;
 .sub-header {
   font-size: 12px;
   color: gray;
+}
+
+.return-button {
+  margin: 10px;
 }
 
 #description {
