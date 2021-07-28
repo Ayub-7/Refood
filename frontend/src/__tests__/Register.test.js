@@ -1,83 +1,29 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import Register from '../components/Register';
 import Vuesax from 'vuesax';
+import api from "../Api";
 
 let wrapper;
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
-// Mocking registered users
-const mockUsers = {
-    "id": 1,
-    "users" : [
-        {
-            "firstName": "Helene",
-            "lastName": "Newton",
-            "middleName": "Angeline",
-            "nickname": "non",
-            "bio": "cillum nisi ullamco labore",
-            "email": "angelinenewton@digitalus.com",
-            "dateOfBirth": "1995-08-21",
-            "phoneNumber": "(868) 442-3726",
-            "homeAddress": "Albemarle Terrace",
-            "password": "proident",
-            "registerDate": "3/14/2021",
-            "id": 1
-        },
-        {
-            "firstName": "Sheri",
-            "lastName": "Christian",
-            "middleName": "Griffith",
-            "nickname": "velit",
-            "bio": "nulla quis elit ullamco",
-            "email": "griffithchristian@digitalus.com",
-            "dateOfBirth": "1995-08-21",
-            "phoneNumber": "(983) 576-3532",
-            "homeAddress": "Village Road",
-            "password": "id",
-            "registerDate": "3/14/2021",
-            "id": 2
-        },
-        {
-            "firstName": "Irwin",
-            "lastName": "Lara",
-            "middleName": "Fuentes",
-            "nickname": "adipisicing",
-            "bio": "irure reprehenderit laboris aute",
-            "email": "fuenteslara@digitalus.com",
-            "dateOfBirth": "1995-08-21",
-            "phoneNumber": "(917) 580-3281",
-            "homeAddress": "Fiske Place",
-            "password": "culpa",
-            "registerDate": "3/14/2021",
-            "id": 3
-        },
-        {
-            "firstName": "Eloise",
-            "lastName": "Hewitt",
-            "middleName": "Stella",
-            "nickname": "exercitation",
-            "bio": "irure ex laborum ipsum",
-            "email": "stellahewitt@digitalus.com",
-            "dateOfBirth": "1995-08-21",
-            "phoneNumber": "(833) 599-2927",
-            "homeAddress": "Java Street",
-            "password": "ea",
-            "registerDate": "3/14/2021",
-            "id": 4
-        }
-    ]
-}
+api.createUser = jest.fn(() => {
+    return Promise.resolve({status: 201});
+});
+
+api.login = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
 
 // Mocking $route
 const $route = {
     params: {
         id: 1
-    }
+    },
 };
 
-let api = {
-    createUser: jest.fn(),
+const $router = {
+    push: jest.fn(),
 }
 
 let $log = {
@@ -87,7 +33,7 @@ let $log = {
 beforeEach(() => {
     wrapper = mount(Register, {
         propsData: {},
-        mocks: {$route, api, $log},
+        mocks: {$route, $log, $router},
         stubs: ['router-link', 'router-view'],
         methods: {},
 
@@ -101,8 +47,6 @@ afterEach(() => {
 
 //TESTS TO CHECK LOGIN ERROR HANDLING
 describe('Register error checking', () => {
-    const getRegisterMethod = jest.spyOn(Register.methods, 'createUserInfo');
-    getRegisterMethod.mockResolvedValue(mockUsers);
     test('Handles empty register', () => {
         wrapper.vm.firstname = '';
         wrapper.vm.lastname = '';
@@ -188,6 +132,24 @@ describe('Register error checking', () => {
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors).toStrictEqual([wrapper.vm.bio])
+    })
+
+    test('Handles large bio too large', async () => {
+        wrapper.vm.password = 'Potato123!';
+        wrapper.vm.confirm_password = 'Potato123!';
+        wrapper.vm.firstname = 'bob';
+        wrapper.vm.lastname = 'steve';
+        wrapper.vm.dateofbirth = '2000-01-01';
+        wrapper.vm.country = 'New Zealand';
+        wrapper.vm.email = 'thisis@email.com'
+        wrapper.vm.middlename = '';
+        wrapper.vm.nickname = '';
+        let info = "some info";
+        wrapper.vm.phonenumber = '027254871';
+        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
+        await wrapper.vm.createUserInfo();
+        expect(wrapper.vm.$log.debug).toBeCalled();
+        expect(wrapper.vm.errors.length).toBe(0);
     })
 });
 
