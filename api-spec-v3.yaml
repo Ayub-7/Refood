@@ -277,11 +277,17 @@ paths:
             - defaultGlobalApplicationAdmin
       parameters:
         - in: query
-          name: searchQuery
+          name: query
           schema:
             type: string
           required: true
           description: 'Criteria to search businesses for, all partial and complete matches are returned'
+        - in: query
+          name: type
+          schema:
+            type: string
+          required: true
+          description: 'Criteria to search for businesses by business type'
       responses:
         '200':
           description: Request successful, a (possibly empty) list of businesses is returned
