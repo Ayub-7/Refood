@@ -342,18 +342,21 @@ public class CardController {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         long cardCreatorId = cardInfo.getCreatorId();
         User cardCreator = userRepository.findUserById(cardCreatorId);
-        
+
+        Card existingCard = cardRepository.findCardById(cardId);
+
         Card editedCard;
+        if (existingCard == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
         try { // Attempt to create a card entity with the given info.
             editedCard = new Card(cardInfo, cardCreator);
+            editedCard.setCreated(existingCard.getCreated());
+            editedCard.setDisplayPeriodEnd(existingCard.getDisplayPeriodEnd());
         }
         catch (ValidationException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-        }
-
-        Card existingCard = cardRepository.findCardById(cardId);
-        if (existingCard == null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 
         if (existingCard.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
