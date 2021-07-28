@@ -4,25 +4,22 @@
         <div id="header-container">
           <div id="page-title">Product Catalogue</div>
           <div id="header-menu">
-            <vs-button class="header-button" :to="{path: `/addtocatalogue`}">Add Product</vs-button>
-            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button" style="margin-right: 0;">Inventory</vs-button>
+           <div style="display: flex;">
+              <vs-tooltip text="Grid View">
+                <vs-button icon="grid_view" type="border" @click="displaytype = true" style="border: none; padding: 12px;"></vs-button>
+              </vs-tooltip>
+              <vs-tooltip text="List View">
+                <vs-button icon="view_list" type="border" @click="displaytype = false" style="border: none;"></vs-button>
+              </vs-tooltip>
+            </div>
           </div>
         </div>
 
-        <vs-divider></vs-divider>
+        <vs-divider style="padding: 4px;"></vs-divider>
 
         <div id="catalogue-options">
-          <div class="switch-container">
-            <div class="title" style="margin-top: 5px; margin-right: 10px">
-              <p v-if="displaytype">Grid</p>
-              <p v-if="!displaytype">List</p>
-            </div>
-
-            <label class="switch">
-              <input v-model="displaytype" type="checkbox" checked>
-              <span class="slider round"></span>
-            </label>
-          </div>
+          <vs-button class="header-button" :to="{path: `/addtocatalogue`}">Add Product</vs-button>
+          <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button" style="margin-right: 8px;">Inventory</vs-button>
 
           <div id="sort-container">
             <div v-show="displaytype" style="display: flex;">
@@ -49,6 +46,8 @@
             </div>
           </div>
         </div>
+
+        <vs-divider style="padding: 4px;"></vs-divider>
 
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
@@ -608,66 +607,6 @@ export default ProductCatalogue;
   display: flex;
 }
 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
 th {
   background: #1F74FF;
   color: white;
@@ -694,6 +633,10 @@ th {
     margin: 1em auto 0 0;
   }
 
+  .header-button {
+    margin: 8px;
+  }
+
 }
 
 @media screen and (max-width: 625px) {
@@ -715,18 +658,10 @@ th {
     justify-content: space-evenly;
   }
 
-  .header-button {
-    min-width: 0;
-    margin: 0 4px;
-  }
-
   #sort-container {
     flex-direction: column;
   }
 
-  .switch-container {
-    margin: 1em auto;
-  }
 }
 
 </style>

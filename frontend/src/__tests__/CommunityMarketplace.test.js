@@ -99,7 +99,7 @@ describe('CommunityMarketplace toggle tests', () => {
     });
 
     test('Table view is shown when slider toggled', async () => {
-        const displayTypeButton = wrapper.find("#display-type-button");
+        const displayTypeButton = wrapper.find("#list-button");
         displayTypeButton.trigger("click");
         await wrapper.vm.$nextTick();
 

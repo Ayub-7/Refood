@@ -199,6 +199,7 @@ export default app;
 .vs-navbar {
   padding: 5px;
   color: rgb(255,255,255);
+  box-shadow: 0 1px 10px #999;
 }
 
 .userDetail {

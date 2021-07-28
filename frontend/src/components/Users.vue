@@ -311,7 +311,7 @@ export default Users;
   padding: 2em;
   border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+  background-color: #FFFFFF;
   margin: 1em 0 1em 0;
 }
 
@@ -327,7 +327,7 @@ export default Users;
 
   text-align: center;
 
-  background-color: transparent;
+  background-color: #FFFFFF;
   padding: 0.5em 0 0.5em 0;
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
@@ -366,7 +366,7 @@ export default Users;
   padding: 2em;
   border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+  background-color: #FFFFFF;
 }
 
 #bio {
@@ -396,7 +396,7 @@ main {
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
   margin: 1em 0 1em 0;
   padding: 0;
-  background-color: #F5F5F5;
+  background-color: #FFFFFF;
 }
 
 /* Business Card Component Related */

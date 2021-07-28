@@ -16,11 +16,12 @@
       </div>
       <!-- ====== LISTINGS OPTIONS MENU ===== -->
       <div id="view-switch">
-        <div style="padding: 0 1em; font-size: 14px;"> View </div>
-        <vs-switch id="table-switch" v-model="tableView" style="margin: auto 0; width: 50px">
-          <span slot="on">Table</span>
-          <span slot="off">Grid</span>
-        </vs-switch>
+        <vs-tooltip text="Grid View">
+          <vs-button icon="grid_view" type="border" @click="displaytype = true" style="border: none; padding: 12px;"></vs-button>
+        </vs-tooltip>
+        <vs-tooltip text="List View">
+          <vs-button icon="view_list" type="border" @click="displaytype = false" style="border: none;"></vs-button>
+        </vs-tooltip>
       </div>
     </div>
     <vs-divider></vs-divider>
@@ -196,7 +197,7 @@ export default {
 
   #view-switch {
     display: flex;
-    margin: auto 0 0.5em 0;
+    margin: auto 0 0 0;
   }
 
   #sort-button {
