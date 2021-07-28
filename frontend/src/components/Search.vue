@@ -1,29 +1,28 @@
 <template>
   <div class="main" id="body">
     <div id="search">
-      <vs-input class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-input v-on:keyup.enter="searchUsers()"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
       <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers">Search</vs-button>
-      <vs-input class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-input v-on:keyup.enter="searchBusiness()" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
       <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness">Search</vs-button>
 
       <vs-select
           width="10%"
-          id="businessType"
+          id="business-type"
           class="form-control"
-          label="Business Type *"
+          label="Business Type"
           v-model="businessType"
-          autocomplete >
+          @autocomplete="'off'">
         <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
       </vs-select>
-      <vs-button id="clearBizType" @click="businessType = null">Clear</vs-button>
-
+      <vs-button id="clear-business-type" @click="businessType = null">Clear</vs-button>
     </div>
 
+    <vs-divider style="padding: 0 1em 1em"></vs-divider>
 
-    <div v-if="users.length" id="userTable">
-      <vs-table :data="this.users" max-items="10" pagination stripe >
+    <div v-if="users.length" class="data-table">
+      <vs-table :data="this.users" max-items="10" pagination stripe>
         <template slot="thead" id="usersTableHeader">
-
           <vs-th sort-key="firstName" style="border-radius: 4px 0 0 0;">
             First name
           </vs-th>
@@ -33,10 +32,10 @@
           <vs-th sort-key="city">
             City
           </vs-th>
-          <vs-th sort-key="country" v-if="mobileMode==false">
+          <vs-th sort-key="country" v-if="mobileMode===false">
             Country
           </vs-th>
-          <vs-th sort-key="email" v-if="mobileMode==false">
+          <vs-th sort-key="email" v-if="mobileMode===false">
             Email
           </vs-th>
 
@@ -46,46 +45,33 @@
 
           <vs-th v-if="isDGAA">Is Admin</vs-th>
           <vs-th class="dgaaCheckbox" v-if="isDGAA">Toggle Admin</vs-th>
-
-
-
         </template>
 
         <template slot-scope="{data}">
-          <vs-tr :key="indextr" v-for="(tr, indextr) in data">
-
-
+          <vs-tr :key="indextr" v-for="(tr, indextr) in data" class="data-row">
             <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
-
             <vs-td :data="data[indextr].lastName">{{data[indextr].lastName}}</vs-td>
-
             <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
-
             <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].country}`}}</vs-td>
-
             <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
-
             <vs-td>
               <vs-button id="goToProfileButton" @click="goToUserProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
-
             <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
-
             <vs-td v-if="isDGAA" class="dgaaCheckbox">
               <input type="checkbox" @click="toggleAdmin(data[indextr])">
             </vs-td>
-
-
           </vs-tr>
         </template>
       </vs-table>
-      <div id="displayingUsers">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{users.length}} results</div>
+      <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{users.length}} results</div>
     </div>
-    <div v-if="businesses.length" id="businessTable">
-      <vs-table :data="this.businesses" max-items="10" pagination stripe>
-        <template slot="thead" id="businessesTableHeader">
 
-          <vs-th sort-key="businessName" style="border-radius: 4px 0 0 0;">
+    <!-- === BUSINESS TABLE === -->
+    <div v-if="businesses.length" class="data-table">
+      <vs-table :data="this.businesses" max-items="10" pagination stripe >
+        <template slot="thead" id="businessesTableHeader">
+          <vs-th sort-key="name" style="border-radius: 4px 0 0 0;">
             Business name
           </vs-th>
           <vs-th sort-key="businessType">
@@ -97,46 +83,25 @@
           <vs-th sort-key="country" v-if="mobileMode==false">
             Country
           </vs-th>
-
           <!-- Extra header for go to profile button -->
           <vs-th style="border-radius: 0 4px 0 0;">
           </vs-th>
-
-          <vs-th v-if="isDGAA">Is Admin</vs-th>
-          <vs-th class="dgaaCheckbox" v-if="isDGAA">Toggle Admin</vs-th>
-
-
-
         </template>
 
         <template slot-scope="{data}">
-          <vs-tr :key="indextr" v-for="(tr, indextr) in data">
-
-
+          <vs-tr :key="indextr" v-for="(tr, indextr) in data" class="data-row">
             <vs-td :data="data[indextr].name">{{data[indextr].name}}</vs-td>
-
             <vs-td :data="data[indextr].businessType">{{data[indextr].businessType}}</vs-td>
-
-            <vs-td :data="data[indextr].address.city" v-if="mobileMode==false">{{`${data[indextr].address.city}`}}</vs-td>
-
+            <vs-td :data="data[indextr].address.city" v-if="mobileMode==false">{{data[indextr].address.city}}</vs-td>
             <vs-td :data="data[indextr].address.country" v-if="mobileMode==false">{{data[indextr].address.country}}</vs-td>
-
             <vs-td>
               <vs-button id="goToProfileButton" @click="goToBusinessProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
-
-            <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
-
-            <vs-td v-if="isDGAA" class="dgaaCheckbox">
-              <input type="checkbox" @click="toggleAdmin(data[indextr])">
-            </vs-td>
-
-
           </vs-tr>
         </template>
       </vs-table>
 
-      <div id="displayingBusinesses">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{businesses.length}} results</div>
+      <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{businesses.length}} results</div>
     </div>
 
   </div>
@@ -159,8 +124,10 @@ const Search = {
       errors: [],
       users: [],
       businesses: [],
+
       searchIndexMin: 1,
       searchIndexMax: 10,
+
       isDGAA: false
     };
   },
@@ -191,8 +158,7 @@ const Search = {
     window.addEventListener(
         'resize',
         this.setMobileMode
-    )
-
+    );
   },
 
 
@@ -212,7 +178,6 @@ const Search = {
     /**
      * Increases search range to be shown on page
      */
-
     increaseSearchRange: function() {
       this.searchIndexMin += 10;
       if(this.searchIndexMax + 10 > this.users.length) {
@@ -225,9 +190,33 @@ const Search = {
     /**
      * Increases search range to be shown on page
      */
+    increaseSearchRangeForBusiness: function() {
+      this.searchIndexMin += 10;
+      if(this.searchIndexMax + 10 > this.businesses.length) {
+        this.searchIndexMax = this.businesses.length;
+      } else {
+        this.searchIndexMax += 10;
+      }
+    },
+
+    /**
+     * Increases search range to be shown on page
+     */
     decreaseSearchRange: function() {
       this.searchIndexMin -= 10;
-      if(this.searchIndexMax % 10 != 0){
+      if(this.searchIndexMax % 10 !== 0){
+        this.searchIndexMax -= this.searchIndexMax % 10;
+      } else {
+        this.searchIndexMax -= 10;
+      }
+    },
+
+    /**
+     * Increases search range to be shown on page
+     */
+    decreaseSearchRangeForBusiness: function() {
+      this.searchIndexMin -= 10;
+      if(this.searchIndexMax % 10 !== 0){
         this.searchIndexMax -= this.searchIndexMax % 10;
       } else {
         this.searchIndexMax -= 10;
@@ -245,14 +234,16 @@ const Search = {
     goToUserProfile(userId) {
       this.$router.push({path: `/users/${userId}`})
     },
+
     /**
      * Go to business' profile
      * @param bizId id of business that has been clicked
      */
     goToBusinessProfile(bizId) {
-      sessionStorage.setItem("businessesCache", JSON.stringify(this.businesses))
-      this.$router.push({path: `/businesses/${bizId}`})
+      sessionStorage.setItem("businessesCache", JSON.stringify(this.businesses));
+      this.$router.push({path: `/businesses/${bizId}`});
     },
+
     /**
      *
      */
@@ -266,7 +257,7 @@ const Search = {
       if(data.length < 10) {
         this.searchIndexMin = 1;
         this.searchIndexMax = data.length;
-        if(data.length == 0){
+        if(data.length === 0){
           this.searchIndexMin = 0;
         }
       } else {
@@ -282,7 +273,7 @@ const Search = {
 
       if (sessionStorage.getItem('businessesCache') !== null) {
         if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
-          sessionStorage.setItem("businessesCache", [])
+          sessionStorage.setItem("businessesCache", []);
           this.businesses = [];
         }
       }
@@ -301,7 +292,7 @@ const Search = {
         .finally(() => {
           this.$vs.loading.close();
           if(!this.tableLoaded){
-            document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+            // document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
             //Event listeners for vuesax buttons on table since they're generated afterwards
             document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
@@ -311,6 +302,7 @@ const Search = {
         }
       })
     },
+
     /**
      * Searches for the businesses in the database by calling the API function with an SQL query
      * to find the businesses based on the input in the search box.
@@ -327,8 +319,8 @@ const Search = {
       api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType)
          .then((response) => {
            this.businesses = response.data;
-           this.businesses = this.businesses.filter(x => typeof(x) == "object")
-           this.paginator(this.businesses);
+           this.businesses = this.businesses.filter(x => typeof(x) == "object");
+           // this.paginator(this.businesses);
          })
          .catch((error) => {
            this.$log.debug(error);
@@ -340,8 +332,8 @@ const Search = {
              document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
              //Event listeners for vuesax buttons on table since they're generated afterwards
-             document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
-             document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
+             document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRangeForBusiness);
+             document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRangeForBusiness);
 
              this.tableLoaded = true;
            }
@@ -349,15 +341,14 @@ const Search = {
     },
 
     /**
-     * makes the checkuser an administrator
-     * if they are already, revoke privledges...
+     * Checks if the user is an administrator
+     * if they are already, revoke priveleges...
      */
-
     toggleAdmin: function (currentUser) {
-      if (currentUser.role == 'USER') {
+      if (currentUser.role === 'USER') {
         api.makeUserAdmin(currentUser.id);
         currentUser.role = 'GAA'
-      } else if (currentUser.role == 'GAA') {
+      } else if (currentUser.role === 'GAA') {
         api.revokeUserAdmin(currentUser.id);
         currentUser.role = 'USER'
       }
@@ -370,30 +361,23 @@ export default Search;
 
 <style scoped>
 
-
-#displayingUsers {
+.displaying-results {
   text-align: right;
 }
-
-#displayingBusinesses {
-  text-align: right;
-}
-
 
 #search {
-  font-weight: bold;
-  height: 10em;
+  padding-top: 2em;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#clearBizType {
+#clear-business-type {
   right: -20px;
   top: 5px;
 }
 
-#businessType {
+#business-type {
   left: 10px;
   bottom: 4px;
 }
@@ -416,30 +400,6 @@ export default Search;
   height: 35px;
 }
 
-#userTable {
-  width: 65%;
-  font-family: 'Ubuntu', sans-serif;
-  font-weight: bold;
-  margin: auto;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  border-radius: 1.5em;
-  border-style: solid;
-  border-color: white;
-  padding: 1em;
-}
-
-#businessTable {
-  width: 65%;
-  font-family: 'Ubuntu', sans-serif;
-  font-weight: bold;
-  margin: auto;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  border-radius: 1.5em;
-  border-style: solid;
-  border-color: white;
-  padding: 1em;
-}
-
 #submitSearchUser {
   margin-left: 0.5em;
   margin-right: 0.5em;
@@ -451,36 +411,39 @@ export default Search;
   height: 3em;
 }
 
-tr {
-  font-size: 15px
+.data-table {
+  width: 90%;
+  margin: auto;
 }
 
-th {
-  background: #1F74FF;
-  color: white;
+.data-table >>> .data-row {
+  font-size: 15px;
+  height: 75px;
 }
 
 .main {
+  width: 90%;
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  border-radius: 4px;
+  border-style: solid;
+  border-color: white;
   background-color: white;
-  top: 1px;
   padding-bottom: 4em;
+  margin: 1em auto auto;
+
+  font-weight: bold;
 }
 
 
 
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 1300px) {
-  #userTable {
-    width: 100%;
-  }
-
-  #businessTable {
+  .data-table {
     width: 100%;
   }
 
   tr {
     font-size: 10px;
-
   }
 
   th {
