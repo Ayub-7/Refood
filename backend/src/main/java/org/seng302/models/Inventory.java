@@ -7,10 +7,8 @@ import org.seng302.models.requests.NewInventoryRequest;
 
 import javax.persistence.*;
 import javax.xml.bind.ValidationException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Entity class that holds the information of a businesss product inventory.
@@ -86,6 +84,8 @@ public class Inventory {
             this.bestBefore = newInventoryRequest.getBestBefore();
             this.manufactured = newInventoryRequest.getManufactured();
             this.expires = newInventoryRequest.getExpires();
+
+
         } else {
             throw new ValidationException("Inventory request item is not valid");
         }
@@ -103,9 +103,11 @@ public class Inventory {
             return false;
         } else if (req.getManufactured() != null && req.getManufactured().after(today)) {
             return false;
-        } else if(req.getSellBy() != null && req.getSellBy().before(today)) {
+        } else if (req.getSellBy() != null && req.getSellBy().before(today)) {
             return false;
-        } else if(req.getBestBefore() != null && req.getBestBefore().before(today)) {
+        } else if (req.getBestBefore() != null && req.getBestBefore().before(today)) {
+            return false;
+        } else if (req.getBestBefore() != null && req.getBestBefore().after(req.getExpires())) {
             return false;
         }
 

@@ -1,5 +1,9 @@
 <template>
   <div>
+
+    <div v-if="fromSearch" class="return-button">
+      <vs-button @click="returnToSearch()" title="Go Back">Return To Search</vs-button>
+    </div>
     <div id="container" v-if="this.business != null">
       <!-- Left Side Business Information Panel -->
       <div id="business-name-container">
@@ -32,7 +36,7 @@
 
       <main>
         <!-- Sub Navigation Bar -->
-        <vs-tabs id="business-navbar"> <!-- id="business-navbar" -->
+        <vs-tabs id="business-navbar">
           <vs-tab class="business-nav-item" label="Listings">
             <BusinessListings :business-id="business.id" :country="user.homeAddress.country"/>
           </vs-tab>
@@ -51,7 +55,6 @@
 import api from "../Api";
 import BusinessAdministrators from "./BusinessAdministrators";
 import BusinessListings from "./BusinessListings";
-//import {store} from "../store";
 
 const Business = {
   name: "Business",
@@ -60,6 +63,7 @@ const Business = {
   // App's initial state.
   data: function () {
     return {
+      fromSearch: sessionStorage.getItem("businessesCache"),
       business: null,
       adminList: null,
       user: null
@@ -97,6 +101,11 @@ const Business = {
           }
           this.$log.error(`ERROR trying to obtain user info from Id: ${err}`);
       });
+
+    },
+
+    returnToSearch: function() {
+      this.$router.push({path: '/search'})
     },
 
     checkUserSession: function() {
@@ -115,6 +124,12 @@ const Business = {
 
   mounted() {
     this.checkUserSession();
+  },
+
+  watch: {
+    $route() {
+      this.checkUserSession();
+    }
   }
 }
 
@@ -170,7 +185,8 @@ export default Business;
   padding: 2em;
   border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+  background-color: #FFFFFF;
+  overflow: auto;
 }
 
 .sub-header {
@@ -178,8 +194,13 @@ export default Business;
   color: gray;
 }
 
+.return-button {
+  margin: 10px;
+}
+
 #description {
   grid-row: 2;
+  font-size: 14px;
 }
 
 #info-container {
@@ -210,7 +231,7 @@ main {
   margin: 1em 0 1em 0;
   border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+  background-color: #FFFFFF;
 }
 
 #business-navbar {

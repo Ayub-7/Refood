@@ -1,6 +1,5 @@
 package org.seng302.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +26,7 @@ import java.nio.file.Paths;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -45,8 +45,6 @@ public class ProductController {
 
     @Value("${media.image.business.directory}")
     String rootImageDir;
-
-//    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Retrieves all of the products in the business' product catalogue.
@@ -69,7 +67,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
-
     /**
      * Creates a new product and adds it to the product catalogue of the current acting business
      * Authentication is required, user must be a business admin or a default global admin
@@ -77,7 +74,6 @@ public class ProductController {
      * @param req the request body for the new product object
      * @param session http session which holds the authenticated user
      * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
-     * @throws JsonProcessingException
      */
     @PostMapping("/businesses/{id}/products")
     public ResponseEntity<String> createProduct(@PathVariable long id, @RequestBody NewProductRequest req, HttpSession session) {
@@ -86,13 +82,13 @@ public class ProductController {
         if (business == null) { // Business does not exist
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProduct(req, business, true);
+                ArrayList<Object> checkProduct = isValidProduct(req, business);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if (isValid) {
@@ -125,13 +121,13 @@ public class ProductController {
         if (business == null || product == null) { // Business or product does not exist
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             } else { // User is authorized
-                ArrayList checkProduct = isValidProductPut(req, business, false);
+                ArrayList<Object> checkProduct = isValidProductPut(req);
                 boolean isValid = (Boolean) checkProduct.get(0);
                 String errorMessage = (String) checkProduct.get(1);
                 if(isValid) {
@@ -148,21 +144,19 @@ public class ProductController {
      * Checks the product request body to ensure all fields are valid
      * @param product The product to be created, includes id, name, description and price
      * @param business The business that is creating the product
-     * @param isPosting Since PUT request checking is being run through this function,
-     *                  it shouldn't check the PUT request for duplicate IDs
      * @return True if all fields are valid, otherwise false
      */
-    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business, Boolean isPosting) {
+    private ArrayList<Object> isValidProduct(NewProductRequest product, Business business) {
         boolean isValid = true;
         String errorMessage = null;
 
         if (productRepository.findProductByIdAndBusinessId(product.getId(), business.getId()) != null) {
             errorMessage = "A product already exists with this ID";
             isValid = false;
-        } else if (product.getId() == null || product.getId() == "") {
+        } else if (product.getId() == null || product.getId().equals("")) {
             errorMessage = "Product id can not be empty";
             isValid = false;
-        } else if (product.getName() == null || product.getName() == "") {
+        } else if (product.getName() == null || product.getName().equals("")) {
             errorMessage = "Product name can not be empty";
             isValid = false;
         } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
@@ -170,31 +164,36 @@ public class ProductController {
             isValid = false;
         }
 
-        ArrayList returnObjects = new ArrayList();
+        ArrayList<Object> returnObjects = new ArrayList<>();
         returnObjects.add(isValid);
         returnObjects.add(errorMessage);
         return returnObjects;
     }
 
-    private ArrayList<Object> isValidProductPut(NewProductRequest product, Business business, Boolean isPosting) {
+    /**
+     * Checks the product update request body to ensure all fields are valid.
+     * @param product the updated product details
+     * @return an array with the first element indicating if it it's valid, and a second element with an error message (if any).
+     */
+    private ArrayList<Object> isValidProductPut(NewProductRequest product) {
             boolean isValid = true;
             String errorMessage = null;
 
-            if (product.getId() == null || product.getId() == "") {
+            if (product.getId() == null || product.getId().equals("")) {
                 errorMessage = "Product id can not be empty";
                 isValid = false;
-            } else if (product.getName() == null || product.getName() == "") {
+            } else if (product.getName() == null || product.getName().equals("")) {
                 errorMessage = "Product name can not be empty";
                 isValid = false;
             } else if (product.getRecommendedRetailPrice() == null || product.getRecommendedRetailPrice() < 0) {
                 errorMessage = "Product recommended retail price must be at least 0";
                 isValid = false;
-            } else if (product.getDescription() == null || product.getDescription() == "") {
+            } else if (product.getDescription() == null || product.getDescription().equals("")) {
                 errorMessage = "Product must have description";
                 isValid = false;
             }
 
-            ArrayList returnObjects = new ArrayList();
+            ArrayList<Object> returnObjects = new ArrayList<>();
             returnObjects.add(isValid);
             returnObjects.add(errorMessage);
             return returnObjects;
@@ -207,7 +206,7 @@ public class ProductController {
      * @param businessId unique identifier of the business that the image is relating to.
      * @param productId product identifier that the image is relating to.
      * @param image a multipart image of the file
-     * @return ResponseEntity with the appriate status codes - 201, 400, 403, 406.
+     * @return ResponseEntity with the appropriate status codes - 201, 400, 403, 406.
      * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
@@ -232,7 +231,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
         }
         try { // Throw error if the file is not an image.
-            imageExtension = Image.getContentTypeExtension(image.getContentType());
+            imageExtension = Image.getContentTypeExtension(Objects.requireNonNull(image.getContentType()));
         }
         catch (InvalidImageExtensionException exception) {
             throw new InvalidImageExtensionException(exception.getMessage());
@@ -285,10 +284,10 @@ public class ProductController {
 
     /**
      * Sets the primary image for a product from a previously saved image.
-     * @param businessId
-     * @param productId
-     * @param imageId
-     * @return
+     * @param businessId unique identifier of the business that the image is relating to.
+     * @param productId product identifier that the image is relating to.
+     * @param imageId a multipart image of the file
+     * @return ResponseEntity with the appropriate status codes - 200, 401, 403, 406.
      */
     @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
     public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) throws IOException {
@@ -303,15 +302,16 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Boolean validImage = false;
+        boolean validImage = false;
         if (product != null) {
             for (Image image: product.getImages()) {
                 if (imageId.equals(image.getId())) {
                     validImage = true;
+                    break;
                 }
             }
         }
-        if (product == null || validImage == false) {
+        if (product == null || !validImage) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         String imageDir = rootImageDir + "/business_" + businessId + "/" + imageId;
@@ -350,6 +350,12 @@ public class ProductController {
         String imageExtension = "";
         Business business = businessRepository.findBusinessById(businessId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        //checks if business exists
+        if (business == null)  {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
         //checks if user us logged in and authorized
         if (auth.getPrincipal() == "anonymousUser") {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -360,10 +366,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        //checks if business exists
-        if (business == null)  {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
         //checks if product exists
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
         if (product == null) {
@@ -388,17 +390,14 @@ public class ProductController {
         }
         File businessDir = new File(rootImageDir + "business_" + businessId);
         File checkFile = new File(businessDir + "/" + imageId + imageExtension);
-        File thumbnailFile = new File(businessDir + "/" + imageId + "_thumbnail" + imageExtension);
-        if (pathExists == true) {
+        if (pathExists) {
             product.deleteProductImage(imageId);
             productRepository.save(product);
-            checkFile.delete();
-            thumbnailFile.delete();
+            Files.delete(Paths.get(businessDir + "/" + imageId + imageExtension));
+            Files.delete(Paths.get(businessDir + "/" + imageId + "_thumbnail" + imageExtension));
             System.out.println("File "
             + checkFile.toString()
             + " successfully removed");
-                freeImage = true;
-
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
         }

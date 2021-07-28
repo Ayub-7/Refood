@@ -176,7 +176,7 @@ describe('Functionality tests', () => {
     test("Data is initialized and set properly.",  () => {
         expect(wrapper.vm.userId).toBe(7);
         expect(wrapper.vm.products).toBe(mockProducts);
-        expect(wrapper.vm.filteredproducts).toBe(mockProducts);
+        expect(wrapper.vm.filteredProducts).toBe(mockProducts);
         expect(api.checkSession).toBeCalled();
         expect(api.getBusinessProducts).toBeCalled();
 
@@ -187,14 +187,5 @@ describe('Functionality tests', () => {
     test("Currency is set properly", async () => {
         await wrapper.vm.setCurrency("France");
         expect(wrapper.vm.currencySymbol).toBe("€");
-    });
-
-    test("Product item image url is retrieved", () => {
-        let url = wrapper.vm.getImgUrl(wrapper.vm.products[0]);
-        expect(url).toBeTruthy();
-
-        let emptyProduct = {primaryImagePath: null};
-        url = wrapper.vm.getImgUrl(emptyProduct);
-        expect(url).toBe('../../public/ProductShoot.jpg');
     });
 });

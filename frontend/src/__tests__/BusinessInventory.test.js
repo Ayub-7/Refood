@@ -26,8 +26,7 @@ const mockInventory = [
         "productName": "Compound - Mocha",
         "productId": "W04GP5EC0B1798680"
     }
-]
-
+];
 
 const localVue = createLocalVue();
 localVue.use(Vuesax);
@@ -46,7 +45,7 @@ let $route = {
 beforeEach(() => {
    wrapper = mount(BusinessInventory, {
        mocks: {$log, $route},
-       stubs: {},
+       stubs: ["ModifyInventory"],
        methods: {},
        localVue,
    });

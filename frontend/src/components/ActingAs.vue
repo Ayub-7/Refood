@@ -70,12 +70,13 @@ const actingAs =  {
     setActingAsBusinessId(businessId, businessName){
       api.actAsBusiness(businessId)
           .then(() => {
+            this.refreshCachedItems();
             mutations.setActingAsBusiness(businessId, businessName)
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
           }).catch((error) => {
         if(error.response) {
-          console.log(error.response.status);
-          console.log(error.response.message);
+          this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
+
         }
         this.$log.debug("Error Status:", error)
       });
@@ -87,15 +88,21 @@ const actingAs =  {
     setActingAsUser(){
       api.actAsBusiness(0)
           .then(() => {
+            this.refreshCachedItems();
             mutations.setActingAsUser();
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
           }).catch((error) => {
         if(error.response) {
-          console.log(error.response.status);
-          console.log(error.response.message);
+          this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
         }
         this.$log.debug("Error Status:", error)
       });
+    },
+
+    refreshCachedItems() {
+      if (sessionStorage.getItem('businessesCache') !== null) {
+        sessionStorage.removeItem("businessesCache");
+      }
     },
 
     getActingAsBusinessName() {
@@ -119,9 +126,14 @@ export default actingAs;
 
 <style scoped>
 
+.userInfo >>> .vs-con-dropdown {
+  cursor: pointer;
+}
+
 .acting-display {
   display: flex;
   min-width: 150px;
+  cursor: pointer;
 }
 
 span.user {

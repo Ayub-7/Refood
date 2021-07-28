@@ -1,126 +1,229 @@
 <template>
   <vs-card class="main">
-    <div class="profile-text-inner">
-      <div style="display: flex; margin: auto; padding-bottom: 1em;">
-        <div id="title" style="font-size: 30px; margin: auto 8px;">Community Marketplace</div>
-        <div style="margin-right: 0; margin-left: auto; display: flex">
-          <div class="title" style="margin-top: 5px; margin-right: 10px">
-            <p v-if="displaytype">Grid</p>
-            <p v-if="!displaytype">List</p>
+    <div class="container">
+      <div class="title-container">
+        <vs-icon icon="local_offer"/>
+        <h1 id="title" class="title-left title" >Community Marketplace</h1>
+        <div class="title-right">
+          <div style="display: flex;">
+            <vs-tooltip text="Grid View">
+              <vs-button id="grid-button" icon="grid_view" type="border" @click="displayType = true" style="border: none; padding: 12px;"></vs-button>
+            </vs-tooltip>
+            <vs-tooltip text="List View">
+              <vs-button id="list-button" icon="view_list" type="border" @click="displayType = false" style="border: none;"></vs-button>
+            </vs-tooltip>
           </div>
-          <label class="switch" >
-            <input v-model="displaytype" type="checkbox" checked>
-            <span class="slider round"></span>
-          </label>
         </div>
       </div>
       <vs-divider></vs-divider>
-    <vs-tabs alignment="center">
-      <vs-tab label="For Sale">
-        <div>
-          <MarketplaceGrid v-if="displaytype" :cardData="testData" />
-          <MarketplaceTable v-if="!displaytype" :tableData="testData" />
+
+      <div class="title-container">
+
+        <div class="title-left" >
+          <vs-select class="selectExample" v-model="selectSortBy">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy"/>
+          </vs-select>
+          <vs-select id="AscendingOrDescendingDropbox" class="selectAscOrDesc" v-model="ascending">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsAscending"/>
+          </vs-select>
+          <vs-button @click="getSectionCards(currentSection, selectSortBy, ascending);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+
         </div>
-      </vs-tab>
-      <vs-tab label="Wanted">
-        <div>
-          <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1, 4)" />
-          <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1, 4)" />
+        <div class="title-right">
+          <vs-button icon="add" @click="openModal" >Add a New Item</vs-button>
         </div>
-      </vs-tab>
-      <vs-tab label="Exchange">
-        <div>
-          <MarketplaceGrid v-if="displaytype" :cardData="testData.slice(1,2)" />
-          <MarketplaceTable v-if="!displaytype" :tableData="testData.slice(1,2)" />
+      </div>
+
+      <vs-divider></vs-divider>
+
+      <vs-tabs alignment="fixed" v-model="tabIndex">
+        <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale', selectSortBy, ascending); currentSection = 'ForSale'">
+          <div>
+            <MarketplaceGrid  v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+          </div>
+        </vs-tab>
+        <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted', selectSortBy, ascending); currentSection = 'Wanted'">
+          <div>
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+          </div>
+        </vs-tab>
+        <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange', selectSortBy, ascending); currentSection = 'Exchange'">
+          <div>
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+          </div>
+
+        </vs-tab>
+      </vs-tabs>
+
+      <div class="title-container">
+        <div class="title-centre">
+          <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.4)"/>
         </div>
-      </vs-tab>
-    </vs-tabs>
+
+        <div class="title-right">
+          <vs-select class="selectExample" v-model="itemPerPage" @click="currentPage=1;">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsItemsPerPage" />
+          </vs-select>
+        </div>
+      </div>
     </div>
+
+  <MarketplaceAddCard ref="marketplaceAddCard" @submitted="onSuccess"/>
   </vs-card>
+
+
+
 </template>
 
 <script>
 import MarketplaceGrid from './MarketplaceGrid.vue'
-import MarketplaceTable from './MarketplaceTable.vue';
+import MarketplaceTable from './MarketplaceTable.vue'
+import MarketplaceAddCard from './MarketplaceAddCard.vue'
+import api from "../Api";
+import { store } from "../store"
+
 export default {
   name: "CommunityMarketplace",
   components: {
-    MarketplaceGrid, MarketplaceTable
+    MarketplaceGrid, MarketplaceTable, MarketplaceAddCard
   },
+
   data: () => {
     return {
-      displaytype: true,
-      // TEST DATA FOR NOW, ONCE PROPER IMPLEMATION OF CARDS IS MADE THIS CAN BE REMOVED
-      testData: [
-        {
-          id: 1,
-          title: 'Beans',
-          description: 'I need to get rid of these beans someone please buy them $1000 ono' ,
-          keywords: [
-            {
-              id: 1,
-              name: 'beans'
-              }
-          ]
-        },
-        {
-          id: 2,
-          title: 'Waste Food',
-          description: 'We have a lot of waste food that needs to be sold ',
-          keywords: [
-            {
-              id: 2,
-              name: 'waste'
-              }
-          ]
-        },
-        {
-          id: 3,
-          title: 'Silvia s14 SR20DET',
-          description: '21k flat no cheaper first in first serve S14 Facelift •SR20DET (TURBO) •Body has done 199xxxkm •Engine had a rebuild done at 197xxxkm •New reconditioned TURBO  •Has current WOF REG AND CERT  •Lowered on adjustable suspension •On mags Any questions please ask',
-          keywords: [
-            {
-              id: 3,
-              name: 'carr'
-              },
-                     {
-              id: 4,
-              name: 'vroom'
-              }
-          ]
-        },
+      displayType: true,
+      currentPage: 1,
+      itemPerPage: 12,
+      tabIndex: 0,
+      ascending: false,
 
-        {
-          id: 4,
-          title: 'Bad Rats: the Rats\' Revenge Steam Key',
-          description: 'Bad Rats: The Rats\' Revenge is a 2009 puzzle video game developed by Invent4 Entertainment. Over a string of levels, the player places a set of rats and static objects to guide a ball towards a trap that kills a cat',
-          keywords: [
-            {
-              id: 3,
-              name: 'rats'
-              },
-                     {
-              id: 4,
-              name: 'game'
-              },
-              {
-              id: 5,
-              name: 'steam'
-              }           
-          ]
-        },
-        
-      ]
+      currentSection: "ForSale",
+      cards: [],
+
+      optionsSortBy:[
+        {text:'Title',value:'title'},
+        {text:'Date Created',value:'created'},
+        {text:'Keywords',value:'keywords'},
+        {text:'Country',value:'country'},
+      ],
+      optionsAscending:[
+        {text: "Ascending", value:true},
+        {text: "Descending", value:false},
+      ],
+      optionsItemsPerPage:[
+        {text:'Showing 12 Per Page',value:'12'},
+        {text:'Showing 24 Per Page',value:'24'},
+        {text:'Showing 48 Per Page',value:'48'},
+        {text:'Showing 96 Per Page',value:'96'},
+      ],
+      selectSortBy: 'created',
+      selectSortByPrevious: '',
+      toggleDirection: 1,
     }
+  },
+
+  methods: {
+    getSectionCards: function(section, sortBy, ascending) {
+      this.$vs.loading({
+        container: ".vs-tabs",
+      });
+      this.cards = [];
+      api.getCardsBySection(section, sortBy, ascending)
+          .then((res) => {
+            
+            this.cards = res.data;
+
+            //Fixes issue with changing to section with less cards than what you already have
+            if(this.currentPage >= Math.round(this.cards.length/this.itemPerPage +0.4)) {
+              this.currentPage = Math.round(this.cards.length/this.itemPerPage +0.4)
+            }
+
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            this.$vs.loading.close(`.vs-tabs > .con-vs-loading`);
+          });
+
+    },
+
+    /**
+     * Reloads the data upon sucessful add card.
+     * ForSale, Wanted, Exchange
+     * Orders the cards by newly created first
+     * Tab changes to the new card's section
+     *
+     * @field tabIndex must track this.tabIndex
+     */
+    onSuccess(sectionName) {
+      switch (sectionName) {
+        case "Wanted":
+          this.tabIndex = 1;
+          break;
+        case "Exchange":
+          this.tabIndex = 2;
+          break;
+        case "Country":
+          this.tabIndex = 3;
+          break;
+        default:
+          this.tabIndex = 0;
+          sectionName = "ForSale";
+          break;
+      }
+
+      this.getSectionCards(sectionName);
+      this.selectSortBy = 'created';
+      this.ascending = false;
+    },
+
+    /**
+    * Method for opening modal, calls method in child component to open modal
+    */
+    openModal: function() {
+      this.$refs.marketplaceAddCard.openModal();
+    },
+   },
+
+
+  mounted() {
+  
+    api.checkSession()
+      .then(() => {
+        console.log(store.actingAsBusinessId)
+        if(store.actingAsBusinessId != null) {
+          this.$router.push({path: "/home"})
+        }
+        this.getSectionCards("ForSale", "created", false);
+      })
+      .catch((error) => {
+        this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+      });
   }
+
 }
 
 </script>
 
 <style scoped>
 
-vs-tab {
+#saleTab {
   color: #1F74FF;
+}
+
+#wantedTab {
+  color: #1F74FF;
+}
+
+#exchangeTab {
+  color: #1F74FF;
+}
+
+#AscendingOrDescendingDropbox {
+  margin-left: 5px;
 }
 
 /* REMOVE AUTO SCROLL HIDING, SO USER KNOWS IF PARAGRAPH IS LONGER THAN CARD SIZE */
@@ -136,7 +239,7 @@ vs-tab {
   box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
-.profile-text-inner {
+.container {
   margin: 1em;
 }
 
@@ -146,83 +249,48 @@ vs-tab {
   margin: 1em auto;
 }
 
-.vs-divider {
-  margin-bottom: 0px;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-#header-container {
+.title-container {
   display: flex;
-  justify-content: space-between;
-  padding-top: 4px;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 0.5em;
+}
+.title-left {
+  margin-right: auto;
+  margin-left: 4px;
+  display: flex;
 }
 
-#header-buttongroup {
-  display: inline-flex;
-  justify-content: space-around;
+.title-centre {
+  margin-right: auto;
+  margin-left: auto;
+  display: flex;
+}
+
+.title-right{
+  margin-right: 0;
+  margin-left: auto;
+  display: flex;
 }
 
 
+.menu-title {
+  margin: auto;
+  padding-right: 4px;
+  font-size: 20px;
+}
 
+.title {
+  font-size: 30px;
+}
+
+.con-select {
+  margin: auto;
+}
+
+.vs-button {
+  height: 35px;
+}
 
 
 </style>

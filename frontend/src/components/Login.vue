@@ -1,5 +1,4 @@
 <template>
-  <!-- <h1> Basic Login Form</h1> -->
   <div id="main">
 
     <p id="sign">Sign In</p>
@@ -7,19 +6,19 @@
         <vs-input class="form-control"
                   id="email" type="text"
                   v-model="email"
-                  label-placeholder="Enter Email"
-                  :danger="this.errors.email != null"
-                  :danger-text="this.errors.email"
+                  label="Enter Email"
+                  :danger="this.errors.message != null"
+                  :danger-text="this.errors.message"
                   required></vs-input>
         <vs-input class="form-control"
                   id="password" type="password"
                   v-model="password"
-                  label-placeholder="Enter password"
-                  :danger="this.errors.password != null"
-                  :danger-text="this.errors.password"
+                  label="Enter Password"
+                  :danger="this.errors.message != null"
+                  :danger-text="this.errors.message"
                   required></vs-input>
 
-        <button class="loginButton form-input" type="button"  @click="checkForm(); loginSubmit()">Sign in</button>
+        <vs-button class="loginButton" @click="checkForm(); loginSubmit()">Sign in</vs-button>
     </form>
 
   </div>
@@ -49,24 +48,21 @@ const Login = {
     checkForm: function() {
       this.errors = {
         hasErrors: false,
-        email: null,
-        password: null,
+        message: null
       };
 
       if (this.email.length === 0) {
-        this.errors.email = "Email required.";
+        this.errors.message = "Email required.";
         this.errors.hasErrors = true;
       }
       else if (!this.validEmail(this.email)) {
-        this.errors.email = "Invalid email.";
+        this.errors.message = "Incorrect email/password";
         this.errors.hasErrors = true;
       }
       if (this.password.length === 0) {
-        this.errors.password = "Password required.";
+        this.errors.message = "Incorrect email/password";
         this.errors.hasErrors = true;
       }
-
-      console.log(this.errors);
     },
 
     /**
@@ -81,10 +77,9 @@ const Login = {
             this.$router.push({path: `/home`});
           })
           .catch(err => {
-            console.log(err.response);
             if(err.response.status === 400) { // Catch 400 Bad Request
               this.email = this.password = "";
-              this.errors.email = this.errors.password = "";
+              this.errors.message = "";
               this.$vs.notify({title:'Login Failed', text:'Email or password is incorrect.', color:'danger'});
 
             }
@@ -167,15 +162,7 @@ form {
   grid-row: 3;
   grid-column: 1;
 
-  margin: 1em auto 2em auto;
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  padding: 10px 40px;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  margin: 0 0 2em 0;
 }
 
 

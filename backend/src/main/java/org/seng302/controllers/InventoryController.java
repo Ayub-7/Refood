@@ -1,11 +1,8 @@
 package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewInventoryRequest;
-
-import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ProductRepository;
@@ -22,8 +19,6 @@ import java.util.stream.Collectors;
 
 @RestController
 public class InventoryController {
-
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private BusinessRepository businessRepository;
@@ -53,7 +48,7 @@ public class InventoryController {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 
-        ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList<Long>::new));
 
         if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -75,16 +70,14 @@ public class InventoryController {
     public ResponseEntity<List<Product>> postInventory(@PathVariable Long id, @RequestBody NewInventoryRequest request, HttpSession session) {
         Business business = businessRepository.findBusinessById(id);
 
-        Product product = productRepository.findProductByIdAndBusinessId(request.getProductId(), business.getId());
-
-        if(product == null) { //Product doesn't exist in business
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
         if(business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            Product product = productRepository.findProductByIdAndBusinessId(request.getProductId(), business.getId());
+            if (product == null) { //Product doesn't exist in business
+                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList<Long>::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) {
@@ -113,7 +106,7 @@ public class InventoryController {
         if (business == null || inventoryItem == null || product == null) { // Business or product does not exist
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList<Long>::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products

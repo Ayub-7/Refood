@@ -49,6 +49,7 @@ import BusinessInventory from "@/components/BusinessInventory";
 
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
+import { updateSessionOnRouterChange } from './utilities/UpdateSession';
 
 
 Vue.config.productionTip = false;
@@ -70,10 +71,10 @@ Vue.use(Vuesax);
 
 const routes = [
   {path: '/home', component: Homepage},
-  {path: '/login', component: Login},
+  {path: '/', component: Login},
   {path: '/businesses', component: BusinessRegister},
-  {name: 'LoginPage', path: '/login', component: Login},
-  {path: '/', component: Register},
+  {name: 'LoginPage', path: '/', component: Login},
+  {path: '/register', component: Register},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
   {name: 'BusinessInventory', path: '/businesses/:id/inventory', component: BusinessInventory},
@@ -85,7 +86,7 @@ const routes = [
   {
     path: '*',
     name: 'catchAll',
-    component: Register
+    component: Login
  }
 
 ];
@@ -95,6 +96,10 @@ const router = new VueRouter({
 
   
 });
+
+updateSessionOnRouterChange(router);
+
+
 
 /* eslint-disable no-new */
 new Vue({

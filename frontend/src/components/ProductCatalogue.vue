@@ -4,25 +4,22 @@
         <div id="header-container">
           <div id="page-title">Product Catalogue</div>
           <div id="header-menu">
-            <vs-button class="header-button" :to="{path: `/addtocatalogue`}">Add Product</vs-button>
-            <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button" style="margin-right: 0;">Inventory</vs-button>
+           <div style="display: flex;">
+              <vs-tooltip text="Grid View">
+                <vs-button icon="grid_view" type="border" @click="displaytype = true" style="border: none; padding: 12px;"></vs-button>
+              </vs-tooltip>
+              <vs-tooltip text="List View">
+                <vs-button icon="view_list" type="border" @click="displaytype = false" style="border: none;"></vs-button>
+              </vs-tooltip>
+            </div>
           </div>
         </div>
 
-        <vs-divider></vs-divider>
+        <vs-divider style="padding: 4px;"></vs-divider>
 
         <div id="catalogue-options">
-          <div class="switch-container">
-            <div class="title" style="margin-top: 5px; margin-right: 10px">
-              <p v-if="displaytype">Grid</p>
-              <p v-if="!displaytype">List</p>
-            </div>
-
-            <label class="switch">
-              <input v-model="displaytype" type="checkbox" checked>
-              <span class="slider round"></span>
-            </label>
-          </div>
+          <vs-button class="header-button" :to="{path: `/addtocatalogue`}">Add Product</vs-button>
+          <vs-button @click="$router.push(`/businesses/${$route.params.id}/inventory`)" class="header-button" style="margin-right: 8px;">Inventory</vs-button>
 
           <div id="sort-container">
             <div v-show="displaytype" style="display: flex;">
@@ -41,27 +38,26 @@
 
           <!-- If search query returns more than 10 products then this should be active -->
           <div id="grid-pagination">
-            <div class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</div>
-            <div v-if="filteredproducts.length > 10" style="display: flex;">
+            <div class="displaying">Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of
+              {{ filteredProducts.length }}</div>
+            <div v-if="filteredProducts.length > 10" style="display: flex;">
               <vs-button type="border" class='prevNextSearchButton' @click="decreaseSearchRange()">Previous</vs-button>
               <vs-button type="border" class='prevNextSearchButton' @click="increaseSearchRange()">Next</vs-button>
             </div>
           </div>
         </div>
 
+        <vs-divider style="padding: 4px;"></vs-divider>
 
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
             <vs-card class="grid-item"
-                    v-for="product in filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)"
+                    v-for="product in filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)"
                     v-bind:href="product.id"
                     :key="product.id">
 
               <div slot="media">
-                <img v-if="product.primaryImagePath != null && isDevelopment()" class="grid-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                <img v-if="product.primaryImagePath != null && !isDevelopment()" class="grid-image" alt="Product Image" v-bind:src="getImgUrl(product)"/>
-                <img v-if="!product.primaryImagePath && isDevelopment()" class="grid-image" src="ProductShoot.jpg"/>
-                <img v-if="!isDevelopment() && !product.primaryImagePath" class="grid-image" :src="getImgUrl(true)"/>
+                <ReImage :imagePath="product.primaryImagePath" class="grid-image"/>
               </div>
 
               <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
@@ -70,7 +66,7 @@
                   <p>{{ product.id }}</p>
                 </div>
                 <vs-divider></vs-divider>
-                <div style="font-size: 16px; font-weight: bold">{{ product.manufacturer }} </div>
+                <div style="font-size: 16px; font-weight: bold; height: 24px;">{{ product.manufacturer }} </div>
                 <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
                 <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
               </div>
@@ -78,7 +74,7 @@
               <div slot="footer" class="grid-item-footer">
                 <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currencySymbol + " " +  product.recommendedRetailPrice }} </div>
                 <vs-dropdown vs-trigger-click class="actionButton">
-                  <vs-button style="width: fit-content;" type="flat">Actions</vs-button>
+                  <vs-button style="width: fit-content;" type="flat" icon="settings"></vs-button>
                   <vs-dropdown-menu>
                     <vs-dropdown-item @click="goToModify(product.id);">
                       Modify product
@@ -97,6 +93,9 @@
                         {{pImage.name}}
                       </vs-dropdown-item>
                     </vs-dropdown-group>
+                    <vs-dropdown-item divider @click="openAddNewInventoryModal(product, currencySymbol)">
+                      Add Inventory Entry
+                    </vs-dropdown-item>
                   </vs-dropdown-menu>
                 </vs-dropdown>
               </div>
@@ -110,7 +109,7 @@
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <vs-table :data="filteredproducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0px 20px; margin: 1em" stripe>
+            <vs-table :data="filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0 20px; margin: 1em" stripe>
                 <template slot="thead" style="background:blue">
                   <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
@@ -138,10 +137,7 @@
                     <vs-td style="width: 20px; padding-right: 10px">
                       <a style="color: rgb(0,0,238);">{{ product.id }}</a>
                       <div>
-                        <img v-if="product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(product))"/>
-                        <img v-if="product.primaryImagePath != null && !isDevelopment()" class="table-image"  v-bind:src="getImgUrl(product)"/>
-                        <img v-if="!product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg"/>
-                        <img v-if="!isDevelopment() && !product.primaryImagePath" class="table-image" :src="getImgUrl(true)"/>
+                        <ReImage :imagePath="product.primaryImagePath" class="table-image"/>
                       </div>
                     </vs-td>
                     <vs-td>{{ product.name }} </vs-td>
@@ -170,20 +166,23 @@
                                 {{pImage.name}}
                               </vs-dropdown-item>
                           </vs-dropdown-group>
-
+                          <vs-dropdown-item divider @click="openAddNewInventoryModal(product, currencySymbol)">
+                            Add Inventory Entry
+                          </vs-dropdown-item>
                         </vs-dropdown-menu>
                       </vs-dropdown>
                     </td>
                   </vs-tr>
 
                   <!-- If search query returns more than 10 products then this should be active -->
-                  <tfoot v-if="filteredproducts.length > 1">
+                  <tfoot v-if="filteredProducts.length > 1">
                   <tr>
                     <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td class="displaying">Displaying {{searchRange[0]}}-{{searchRange[1]}} of {{filteredproducts.length}}</td>
+                    <td class="displaying">Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of
+                      {{ filteredProducts.length }}</td>
                     <td><vs-button class='prevNextSearchButton' type='border' @click="decreaseSearchRange()">Previous</vs-button></td>
                     <td><vs-button class='prevNextSearchButton' type='border' @click="increaseSearchRange()">Next</vs-button></td>
                   </tr>
@@ -197,6 +196,7 @@
       "Product shoot" by Aameerule is licensed under CC BY 2.0
     </footer>
     <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
+    <AddToInventory ref="addToInventoryModal" />
   </vs-card>
 </template>
 
@@ -204,10 +204,12 @@
 import api from "../Api";
 import {store} from "../store";
 import axios from "axios";
+import AddToInventory from "./AddToInventory";
+import ReImage from "./ReImage";
 
-const Search = {
-  name: "Search",
-
+const ProductCatalogue = {
+  name: "ProductCatalogue",
+  components: {AddToInventory, ReImage},
   data: function() {
     return {
       products: [],
@@ -216,7 +218,7 @@ const Search = {
 
       errors: [],
       toggle: [1,1,1,1,1],
-      filteredproducts: [],
+      filteredProducts: [],
       enableTable: false,
       productSearchIndexMin: 0,
       productSearchIndexMax: 12,
@@ -242,10 +244,10 @@ const Search = {
         this.business = this.getBusinessName();
 
         api.getBusinessProducts(this.businessId)
-            .then((response) => {
-              this.$log.debug("Data loaded: ", response.data);
-              this.products = response.data;
-              this.filteredproducts = response.data;
+            .then((innerResponse) => {
+              this.$log.debug("Data loaded: ", innerResponse.data);
+              this.products = innerResponse.data;
+              this.filteredProducts = innerResponse.data;
             })
             .catch((error) => {
               this.$log.debug(error);
@@ -258,8 +260,14 @@ const Search = {
   },
 
   methods: {
-    isDevelopment() {
-      return (process.env.NODE_ENV === 'development')
+
+    /**
+     * Opens the add new inventory modal by calling the open function inside the component.
+     * @param product the select product to add a new inventory entry for.
+     * @param currency the currently viewable currency symbol being used.
+     */
+    openAddNewInventoryModal(product, currency) {
+      this.$refs.addToInventoryModal.open(product, currency);
     },
 
     setPrimaryImage(product, image) {
@@ -284,27 +292,6 @@ const Search = {
           }).catch((err) => {
             console.log(err);
       });
-    },
-
-    /**
-     * Retrieves the image url link for the given product.
-     * @param product the product to retrieve the image for.
-     * @return a string link to the product image, or the default image if it doesn't have a product.
-     **/
-    getImgUrl(product) {
-      if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
-      } else if (product === true) {
-        return '/test/ProductShoot.jpg';
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
-      } else {
-        return '../../public/ProductShoot.jpg'
-      }
     },
 
     getUserInfo: function(userId) {
@@ -344,10 +331,11 @@ const Search = {
     },
 
 
-    //modifies selected catalog item
-    goToModify (productId) {
-      console.log(productId)
-      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`})
+    /**
+     * Redirects page to the 'modify product' page with the given product ID.
+     */
+    goToModify: function(productId) {
+      this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products/${productId}/modify`});
     },
 
     /**
@@ -355,11 +343,11 @@ const Search = {
      * if they are already, revoke privledges...
      */
     toggleAdmin: function (currentproduct) {
-      if (currentproduct.role == 'product') {
+      if (currentproduct.role === 'product') {
         //currentproduct.id = true;
         api.makeproductAdmin(currentproduct.id);
         currentproduct.role = 'GAA'
-      } else if (currentproduct.role == 'GAA') {
+      } else if (currentproduct.role === 'GAA') {
         api.revokeproductAdmin(currentproduct.id);
         currentproduct.role = 'product'
       }
@@ -367,8 +355,8 @@ const Search = {
 
     /**
      * Filters the displayed products alphabetically by
+     * @param event
      * @param JSONField is the name of the field to sort by (as string)
-     * @param index references the toggle state list in the data object (int)
      */
     sortByName: function (event, JSONField) {
 
@@ -382,8 +370,8 @@ const Search = {
         }
       }
 
-      if (this.filteredproducts) {
-        this.filteredproducts.sort(function(a, b) {
+      if (this.filteredProducts) {
+        this.filteredProducts.sort(function(a, b) {
           var aField = a[JSONField];
           var bField = b[JSONField];
 
@@ -422,7 +410,7 @@ const Search = {
 
         if (index >= 0) {
           if (this.toggle[index]) {
-            this.filteredproducts.reverse();
+            this.filteredProducts.reverse();
             this.toggle[index]=0;
           } else {
             this.toggle[index]=1;
@@ -438,7 +426,7 @@ const Search = {
      */
     increaseSearchRange: function () {
       //Stop value from going over range
-      if(this.productSearchIndexMax < this.filteredproducts.length) {
+      if(this.productSearchIndexMax < this.filteredProducts.length) {
         //console.log(this.productSearchIndexMax, this.filteredproducts.length, this.productSearchIndexMin)
         let minMaxDiff = this.productSearchIndexMax - this.productSearchIndexMin;
         this.productSearchIndexMin += minMaxDiff;
@@ -481,19 +469,18 @@ const Search = {
         api.postProductImage(this.businessId, this.selectedProduct.id, fd)
           .then(() => { //On success
             this.$vs.notify({title:`Image for ${this.selectedProduct.id} was uploaded`, color:'success'});
+            location.reload();
           })
           .catch((error) => { //On fail
             if (error.response.status === 400) {
-              this.$vs.notify({title:`Image failed to upload`, color:'danger'});
+              this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
             } else if (error.response.status === 500) {
-              this.$vs.notify({title:`Image cannot be uploaded, there is problem with the server`, color:'danger'});
+              this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
             }
-            this.$log.debug("HERHEHRE");
           })
           .finally(() => {
             this.$vs.loading.close();
-            location.reload();
-        })
+        });
       }
     }
 
@@ -508,8 +495,8 @@ const Search = {
     searchRange: function () {
       let max = this.productSearchIndexMax;
 
-      if (max > this.filteredproducts.length) {
-        max = this.filteredproducts.length
+      if (max > this.filteredProducts.length) {
+        max = this.filteredProducts.length
       }
 
       return [this.productSearchIndexMin + 1, max]
@@ -517,7 +504,7 @@ const Search = {
   }
 }
 
-export default Search;
+export default ProductCatalogue;
 </script>
 
 <style scoped>
@@ -620,72 +607,12 @@ export default Search;
   display: flex;
 }
 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
 th {
   background: #1F74FF;
   color: white;
 }
 
-.table-image {
+.table-image >>> img {
   width: 100%;
   height: 100px;
   border-radius: 4px 4px 0 0;
@@ -704,6 +631,10 @@ th {
 
   #grid-pagination {
     margin: 1em auto 0 0;
+  }
+
+  .header-button {
+    margin: 8px;
   }
 
 }
@@ -727,18 +658,10 @@ th {
     justify-content: space-evenly;
   }
 
-  .header-button {
-    min-width: 0;
-    margin: 0 4px;
-  }
-
   #sort-container {
     flex-direction: column;
   }
 
-  .switch-container {
-    margin: 1em auto;
-  }
 }
 
 </style>

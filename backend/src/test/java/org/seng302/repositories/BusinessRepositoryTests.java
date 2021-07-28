@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
-public class BusinessRepositoryTests {
+class BusinessRepositoryTests {
 
     @Autowired
     private BusinessRepository businessRepository;

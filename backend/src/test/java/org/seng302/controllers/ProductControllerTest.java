@@ -39,7 +39,7 @@ import java.util.List;
 
 @WebMvcTest(controllers = ProductController.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class ProductControllerTest {
+class ProductControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -82,14 +82,14 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testNoAuthGetBusinessProductCatalogue() throws Exception {
+    void testNoAuthGetBusinessProductCatalogue() throws Exception {
         mvc.perform(get("/businesses/{id}/products", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulGetBusinessProductCatalogue() throws Exception {
+    void testSuccessfulGetBusinessProductCatalogue() throws Exception {
         List<Product> productList = new ArrayList<>();
         productList.add(product1);
         productList.add(product2);
@@ -114,7 +114,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testBadGetBusinessProductCatalogue() throws Exception {
+    void testBadGetBusinessProductCatalogue() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
         mvc.perform(get("/businesses/{id}/products", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
@@ -131,14 +131,14 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testNoAuthPostProduct() throws Exception {
+    void testNoAuthPostProduct() throws Exception {
         mvc.perform(post("/businesses/{id}/products", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenUserPostProduct() throws Exception {
+    void testForbiddenUserPostProduct() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -151,7 +151,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostProductAsGlobalAdmin() throws Exception {
+    void testPostProductAsGlobalAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
         User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
@@ -172,7 +172,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulPostProductAsBusinessAdmin() throws Exception {
+    void testSuccessfulPostProductAsBusinessAdmin() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         mvc.perform(post("/businesses/{id}/products", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
@@ -192,7 +192,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostProductDuplicateId() throws Exception {
+    void testPostProductDuplicateId() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
 
@@ -204,11 +204,22 @@ public class ProductControllerTest {
 
     }
 
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostProductNonExistentBusiness() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
 
+        mvc.perform(post("/businesses/{id}/products", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(product1)))
+                .andExpect(status().isNotAcceptable());
+
+    }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostProductEmptyId() throws Exception {
+    void testPostProductEmptyId() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         product1.setId(null);
@@ -230,7 +241,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostProductEmptyName() throws Exception {
+    void testPostProductEmptyName() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         product1.setName(null);
@@ -252,7 +263,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostProductEmptyDescription() throws Exception {
+    void testPostProductEmptyDescription() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         product1.setDescription(null);
@@ -274,7 +285,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPostProductNegativePrice() throws Exception {
+    void testPostProductNegativePrice() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         product1.setRecommendedRetailPrice(-0.01);
@@ -287,7 +298,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testNoAuthPutProduct() throws Exception {
+    void testNoAuthPutProduct() throws Exception {
         mvc.perform(put("/businesses/{businessId}/products/{productId}", business.getId(), product1.getId()))
                 .andExpect(status().isUnauthorized());
     }
@@ -295,7 +306,7 @@ public class ProductControllerTest {
     //PUT (Modify Catalogue Entries) tests, similar to POST tests since they're both very similar
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenUserPutProduct() throws Exception {
+    void testForbiddenUserPutProduct() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User forbiddenUser = new User("New", "User", addr, "email@email.com", "password", Role.USER);
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
@@ -310,7 +321,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutProductAsGlobalAdmin() throws Exception {
+    void testPutProductAsGlobalAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User DGAAUser = new User("New", "DGAA", addr, "email@email.com", "password", Role.DGAA);
         User GAAUser = new User("New", "GAA", addr, "email2@email.com", "password", Role.GAA);
@@ -333,7 +344,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulPutProductAsBusinessAdmin() throws Exception {
+    void testSuccessfulPutProductAsBusinessAdmin() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
 
@@ -356,7 +367,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutProductEmptyId() throws Exception {
+    void testPutProductEmptyId() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         productUpdate.setId(null);
@@ -378,7 +389,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutProductEmptyName() throws Exception {
+    void testPutProductEmptyName() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         productUpdate.setName(null);
@@ -400,7 +411,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutProductEmptyDescription() throws Exception {
+    void testPutProductEmptyDescription() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         productUpdate.setDescription(null);
@@ -422,7 +433,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testPutProductNegativePrice() throws Exception {
+    void testPutProductNegativePrice() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(null);
         productUpdate.setRecommendedRetailPrice(-0.01);
@@ -438,7 +449,7 @@ public class ProductControllerTest {
 
     // Adding Product Image Tests.
     @Test
-    public void testNoAuthAddProductImage() throws Exception {
+    void testNoAuthAddProductImage() throws Exception {
         File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
         assertThat(data).exists();
         byte[] bytes = FileCopyUtils.copyToByteArray(data);
@@ -451,7 +462,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulAddProductImage() throws Exception {
+    void testSuccessfulAddProductImage() throws Exception {
         File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
         assertThat(data).exists();
 
@@ -478,7 +489,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testBadPathForProductImages() throws Exception {
+    void testBadPathForProductImages() throws Exception {
         File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
         assertThat(data).exists();
         byte[] bytes = FileCopyUtils.copyToByteArray(data);
@@ -502,7 +513,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testUnsuccessfulAddProductImage() throws Exception {
+    void testUnsuccessfulAddProductImage() throws Exception {
         // No Image Supplied
         Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
         MockMultipartFile noImageFile = new MockMultipartFile("filename", null, null, (byte[]) null);
@@ -533,7 +544,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testBadSetProductImage() throws Exception {
+    void testBadSetProductImage() throws Exception {
         // Wrong image id
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);
@@ -566,7 +577,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void noAuthSetImage() throws Exception {
+    void noAuthSetImage() throws Exception {
         //no authentication
         mvc.perform(put("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary", business.getId(), product1.getId(), 1))
                 .andExpect(status().isUnauthorized());
@@ -575,7 +586,7 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSetProductImageSuccessful() throws Exception {
+    void testSetProductImageSuccessful() throws Exception {
         // Business owner
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(product1.getId(), business.getId())).thenReturn(product1);

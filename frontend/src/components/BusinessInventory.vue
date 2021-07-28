@@ -4,8 +4,6 @@
       <div id="title"> Inventory </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
-        <!-- Add to inventory modal -->
-        <AddToInventory @submitted="onSuccess"></AddToInventory>
       </div>
     </div>
 
@@ -14,11 +12,7 @@
               title="Create a new listing">
       <div class="new-listing-modal">
         <div class="row" v-if="invItem != null">
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(invItem.product))"/>
-          <img v-if="invItem != null && invItem.product.primaryImagePath != null && !isDevelopment()" class="image" alt="Product Image" v-bind:src="getImgUrl(invItem.product)"/>
-          <img v-if="invItem != null && !invItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
-          <img v-if="invItem != null && !isDevelopment() && !invItem.product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
-
+          <ReImage :image-path="invItem.product.primaryImagePath" class="image"/>
         </div>
         <div id="listing-product-name">
           <div class="sub-header">Inventory Item Name</div>
@@ -72,9 +66,8 @@
               :maxItems="5"
               stripe>
       <template class="table-head" slot="thead" >
-        <vs-th sort-key="id" style="border-radius: 8px 0 0 0; width: 40px;"> ID</vs-th>
-        <vs-th sort-key="productId" > Image </vs-th>
-        <vs-th sort-key="productName"> Product </vs-th>
+        <vs-th sort-key="productId" style="border-radius: 4px 0 0 0;" > Image </vs-th>
+        <vs-th class="product-column" sort-key="productName"> Product </vs-th>
         <vs-th class="dateInTable" sort-key="manufactured"> Manufactured </vs-th>
         <vs-th class="dateInTable" sort-key="sellBy"> Sell By </vs-th>
         <vs-th class="dateInTable" sort-key="bestBefore"> Best Before </vs-th>
@@ -82,23 +75,20 @@
         <vs-th sort-key="quantity"> Qty </vs-th>
         <vs-th id="pricePerItemCol"  sort-key="pricePerItem"> Price Per Item </vs-th>
         <vs-th sort-key="totalPrice"> Total Price </vs-th>
-        <vs-th style="border-radius: 0 8px 0 0"> <!-- Action Button Column --> </vs-th>
+        <vs-th style="border-radius: 0 4px 0 0;"> <!-- Action Button Column --> </vs-th>
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="inventory in data" :key="inventory.id">
-          <vs-td :data="inventory.id" style=" text-align: center; font-weight: bold; font-size: 10pt"> ({{inventory.id}}) </vs-td>
           <vs-td id="productIdCol" :data="inventory.productId">
           {{inventory.productId}}
           <div style="height: 80px">
-            <img v-if="inventory.product.primaryImagePath != null && isDevelopment()" style=" height: 100%;   border-radius: 1em;" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(inventory.product))"/>
-            <img v-if="inventory.product.primaryImagePath != null && !isDevelopment()" style="height: 100%;   border-radius: 1em;" v-bind:src="getImgUrl(inventory.product)"/>
-            <img v-if="!inventory.product.primaryImagePath" style="height: 100%;   border-radius: 1em;" v-bind:src="require('../../public/ProductShoot.jpg')"/>
+            <ReImage :imagePath="inventory.product.primaryImagePath" class="inventory-image"/>
           </div>
             </vs-td>
-          <vs-td :data="inventory.productName"> {{inventory.productName}} </vs-td>
+          <vs-td :data="inventory.productName" class="product-cell"> {{inventory.productName}} </vs-td>
           <vs-td :data="inventory.manufactured"> {{inventory.manufactured}} </vs-td>
           <vs-td :data="inventory.sellBy"> {{inventory.sellBy}} </vs-td>
-          <vs-td :data="inventory.bestBefore">{{inventory.bestBefore}} </vs-td>
+          <vs-td :data="inventory.bestBefore" >{{inventory.bestBefore}} </vs-td>
           <vs-td :data="inventory.expires">{{inventory.expires}} </vs-td>
           <vs-td :data="inventory.quantity">{{inventory.quantity}} </vs-td>
           <vs-td :data="inventory.pricePerItem">{{currency}} {{inventory.pricePerItem}} </vs-td>
@@ -124,12 +114,12 @@
 import axios from "axios";
 import api from "../Api";
 import {store} from "../store";
-import AddToInventory from "./AddToInventory";
 import ModifyInventory from "./ModifyInventory";
+import ReImage from "./ReImage";
 
 export default {
   name: "BusinessInventory",
-  components: {AddToInventory, ModifyInventory},
+  components: {ModifyInventory, ReImage},
   data: function() {
     return {
       errors: [],
@@ -161,7 +151,6 @@ export default {
     this.getSession();
     this.getBusinessInventory();
     this.getProducts(this.$route.params.id);
-
   },
 
   methods: {
@@ -171,7 +160,6 @@ export default {
      */
     openNewListingModal(inventory) {
       this.invItem = inventory;
-      console.log(this.invItem);
       this.price = this.invItem.pricePerItem;
       this.listingQuantityMax = this.invItem.quantity;
       this.closes = this.invItem.expires + 'T00:00';
@@ -182,21 +170,18 @@ export default {
      * Opens the modify inventory modal by calling the open function inside the component.
      */
     openModifyModal(inventory) {
-      this.$refs.modifyInventoryModal.open(inventory);
+      this.$refs.modifyInventoryModal.open(inventory, this.currency);
     },
 
     onSuccess() {
       this.getBusinessInventory();
     },
 
-    isDevelopment() {
-      return (process.env.NODE_ENV === 'development')
-    },
-
     getInventory() {
       let filteredInventory = this.inventory.filter(item => (item.quantity>0));
       return filteredInventory;
     },
+
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
@@ -237,28 +222,6 @@ export default {
 
       return isValid;
     },
-
-    /**
-     * Retrieves the image url link for the given product.
-     * @param product the product to retrieve the image for.
-     * @return a string link to the product image, or the default image if it doesn't have a product.
-     **/
-    getImgUrl(product) {
-      if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
-      } else if (product === true) {
-        return '/test/ProductShoot.jpg';
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
-      } else {
-        return '../../public/ProductShoot.jpg'
-      }
-    },
-
 
     /**
      * Checks if the new list form is valid, then creates a new listing to be sent to backend if true.
@@ -339,21 +302,23 @@ export default {
       api.getBusinessInventory(this.$route.params.id)
       .then((response) => {
         this.inventory = response.data;
-        console.log(this.inventory)
+
         for(let inventoryItem of this.inventory) {
           //Issue with sorting using object properties, so pulled required properties into inventory object
           inventoryItem['productName'] = inventoryItem.product.name;
           inventoryItem['productId'] = inventoryItem.product.id;
         }
-
         //Default ordering is product name, so all similar products will be next to each other
         this.inventory = this.inventory.sort((productOne, productTwo) => (productOne.name < productTwo.name) ? 1 : -1)
 
-      }).catch((err) => {
-        if(err.response.status == 401) {
-          this.$router.push({path: '/login'})
-        }
       })
+      .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 401) {
+            this.$router.push({path: '/login'})
+          }
+        }
+      });
     }
   }
 }
@@ -386,10 +351,6 @@ export default {
 
   .header-button {
     margin: 0 1em;
-  }
-  .header-button1 {
-    margin: 0 1em;
-    margin-top: 40px;
   }
 
   /* ===== NEW LISTING DIALOG/PROMPT ====== */
@@ -501,6 +462,10 @@ export default {
     white-space: nowrap;
   }
 
+  #table >>> .vs-con-tbody {
+    min-height: 640px;
+  }
+
   #productIdCol {
     font-size: 10px;
   }
@@ -511,21 +476,16 @@ export default {
 
   td {
     font-size: 12px;
-    min-width: 80px
+    white-space: normal;
   }
 
-  .dateInTable{
-    width: 130px;
-  }
-
-  .table-image {
-    width: 150px;
-    height: 100px;
-    object-fit: cover;
+  .inventory-image >>> img {
+    width: 100px;
     border-radius: 4px;
+    object-fit: cover;
   }
 
-  .image {
+  .image >>> img {
     margin: auto;
     width: 150px;
     height: 100px;
@@ -533,25 +493,14 @@ export default {
     border-radius: 4px;
   }
 
-
-  /* ===== INVENTORY ADDING MODAL ===== */
-  #firstColModal {
-    margin-right: 160px;
-    margin-left: 5px;
-  }
-
-  .description-textarea >>> textarea {
-    resize: none;
-    min-height: 50px;
-    max-height: 50px;
+  .product-column {
+    min-width: 150px;
   }
 
   .row {
     margin: auto;
   }
-  .addButton {
-    align-self: center;
-  }
+
 
   @media screen and (max-width: 850px) {
     #header-container {

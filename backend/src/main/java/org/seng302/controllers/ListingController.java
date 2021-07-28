@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
@@ -13,13 +12,11 @@ import org.seng302.repositories.BusinessRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -30,8 +27,6 @@ public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
     @Autowired private BusinessRepository businessRepository;
-
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private ListingRepository listingRepository;
@@ -53,7 +48,7 @@ public class ListingController {
         }
         List<Inventory> inventoryList = inventoryRepository.findInventoryByBusinessId(id);
 
-        List<Listing> listings = new ArrayList<Listing>();
+        List<Listing> listings = new ArrayList<>();
 
         //Iterate over reach inventory item to get the corresponding listing (if any)
         for (Inventory inventoryItem : inventoryList) {
@@ -69,7 +64,7 @@ public class ListingController {
      * Creates a new product and adds it to the product catalogue of the current acting business
      * Authentication is required, user must be a business admin or a default global admin
      * @param id unique identifier of the business
-     * @param req the request body for the new listing object
+     * @param request the request body for the new listing object
      * @param session http session which holds the authenticated user
      * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
      * @throws JsonProcessingException
@@ -80,13 +75,13 @@ public class ListingController {
         Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
 
         if(inventory == null){ //inventory item doesen't exist for business
-            System.out.println(request.getInventoryItemId());
+            logger.debug(request.getInventoryItemId());
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         if (business == null) { // Business does not exist
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } else {
-            ArrayList adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
             User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
             if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products

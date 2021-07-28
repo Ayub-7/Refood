@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="main" >
+  <div id="app" class="main">
 
     <vs-navbar
         class="vs-navbar"
@@ -9,7 +9,7 @@
         text-color="rgba(255,255,255,.6)"
         active-text-color="#FFFFFF">
       <div slot="title">
-        <router-link :to="{path: '/home'}">
+        <router-link @click.native="refreshCachedItems" :to="{path: '/home'}">
           <vs-navbar-title style="color: white">
             ReFood
           </vs-navbar-title>
@@ -20,17 +20,17 @@
       <!-- Not Logged In -->
       <div v-if="getLoggedInUser() == null" class="navbar-group">
         <vs-navbar-item index="0-0">
-          <router-link to="/">Register</router-link>
+          <router-link to="/register">Register</router-link>
         </vs-navbar-item>
         <vs-navbar-item index="0-1">
-          <router-link to="/login">Login</router-link>
+          <router-link to="/">Login</router-link>
         </vs-navbar-item>
       </div>
 
       <!-- Logged In -->
       <div v-else class="navbar-group">
         <vs-navbar-item index="1-0">
-          <router-link :to="{path: '/home'}">Home</router-link>
+          <router-link @click.native="refreshCachedItems" :to="{path: '/home'}">Home</router-link>
         </vs-navbar-item>
         <vs-navbar-item index="1-2">
           <router-link to="/search">Search</router-link>
@@ -38,12 +38,12 @@
         <!-- Acting As User -->
         <div v-if="getActingAsUserId() == null" class="sub-navbar-group">
           <vs-navbar-item index="2-0">
-            <router-link to="/marketplace">Marketplace</router-link>
+            <router-link @click.native="refreshCachedItems" to="/marketplace">Marketplace</router-link>
           </vs-navbar-item>
           <vs-navbar-item index="2-1">
-            <router-link to="/businesses">Register a Business</router-link>
+            <router-link @click.native="refreshCachedItems" to="/businesses">Register a Business</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="2-2">
+          <vs-navbar-item index="2-2" @click="refreshCachedItems">
             <router-link :to="{path: `/users/${getLoggedInUser()}`}">Profile</router-link>
           </vs-navbar-item>
         </div>
@@ -51,33 +51,40 @@
         <!-- Acting As Business -->
         <div v-else class="sub-navbar-group">
           <vs-navbar-item index="3-0">
-            <router-link :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
+            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}`}">Business Profile</router-link>
           </vs-navbar-item>
           <vs-navbar-item index="3-1">
-            <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
+            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
           </vs-navbar-item>
           <vs-navbar-item index="3-2">
-            <router-link :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
+            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
           </vs-navbar-item>
         </div>
+        <div class="userDetail" v-if="getLoggedInUser() != null">
+          <CardNotifications></CardNotifications>
+          <ActingAs/>
+        </div>
+
 
         <div id="logout-nav" @click="logoutUser()">
           <vs-navbar-item index="8">
-            <router-link :to="{path: '/login'}">
+            <router-link :to="{path: '/'}">
               <span>Logout</span>
             </router-link>
           </vs-navbar-item>
-        </div>
-
-        <div class="userDetail" v-if="getLoggedInUser() != null">
-          <ActingAs/>
         </div>
       </div>
 
     </vs-navbar>
 
     <div id="view">
-      <router-view></router-view>
+      <transition
+          name="fade"
+          mode="out-in"
+          :duration="100"
+          appear>
+        <router-view></router-view>
+      </transition>
     </div>
 
     <footer class="info">
@@ -93,11 +100,11 @@ import Login from "./components/Login";
 import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
 import AddToCatalogue from "@/components/AddToCatalogue";
+import CardNotifications from "./components/CardNotifications";
 import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
 import 'vuesax/dist/vuesax.css';
-
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
@@ -107,7 +114,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue,
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue, CardNotifications
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
@@ -140,14 +147,23 @@ const app = {
      * Calls the logout function which removes loggedInUserId
      */
     logoutUser() {
+      this.refreshCachedItems();
       api.logout()
           .then(() => {
             mutations.userLogout();
+            this.$router.push({path: '/login'})
           })
     },
+    refreshCachedItems() {
+      if (sessionStorage.getItem('businessesCache') !== null) {
+        sessionStorage.removeItem("businessesCache");
+      }
+    }
   },
 
   beforeMount() {
+    //Set title to ReFood, shows up in tab display
+    document.title = "ReFood"
     api.checkSession()
         .then((response) => {
           if(response.data.id != null){
@@ -182,11 +198,17 @@ export default app;
 .vs-navbar {
   padding: 5px;
   color: rgb(255,255,255);
+  box-shadow: 0 1px 10px #999;
+}
+
+.userDetail {
+  display: flex;
+  margin-left: 2px;
+  cursor: pointer;
 }
 
 .userDetail:hover {
   background: #E0E0E0;
-  /*color: #f5f5f5;*/
 }
 
 .navbar-group {

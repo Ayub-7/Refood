@@ -6,7 +6,7 @@ build/
 !**/src/test/**
 dist/
 node_modules/
-coverage/
+!**/coverage/**
 
 ### STS ###
 .apt_generated
@@ -35,3 +35,4 @@ out/
 .vscode/
 .settings/
 bin/
+/frontend/coverage/

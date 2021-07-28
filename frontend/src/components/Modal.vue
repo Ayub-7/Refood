@@ -69,7 +69,7 @@ export default {
   padding: 1em 2em;
   border-radius: 4px;
   box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
-  background-color: #F5F5F5;
+  background-color: #FFFFFF;
 }
 
 .modal-header {

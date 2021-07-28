@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
+import org.seng302.models.Message;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
+import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,7 @@ public class UserController {
 
 //    @Autowired
     private UserRepository userRepository;
+    private MessageRepository messageRepository;
 
 //    @Autowired
     private UserFinder userFinder;
@@ -258,7 +261,5 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
-
-
 
 }

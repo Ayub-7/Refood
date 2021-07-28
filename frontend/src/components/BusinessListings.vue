@@ -16,11 +16,12 @@
       </div>
       <!-- ====== LISTINGS OPTIONS MENU ===== -->
       <div id="view-switch">
-        <div style="padding: 0 1em; font-size: 14px;"> View </div>
-        <vs-switch id="table-switch" v-model="tableView" style="margin: auto 0; width: 50px">
-          <span slot="on">Table</span>
-          <span slot="off">Grid</span>
-        </vs-switch>
+        <vs-tooltip text="Grid View">
+          <vs-button icon="grid_view" type="border" @click="displaytype = true" style="border: none; padding: 12px;"></vs-button>
+        </vs-tooltip>
+        <vs-tooltip text="List View">
+          <vs-button icon="view_list" type="border" @click="displaytype = false" style="border: none;"></vs-button>
+        </vs-tooltip>
       </div>
     </div>
     <vs-divider></vs-divider>
@@ -30,10 +31,7 @@
       <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
 
         <div slot="media">
-          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
-          <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
-          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment()" class="image" src="ProductShoot.jpg"/>
-          <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment() != true" class="image" :src="getImgUrl(true)"/>
+          <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
         </div>
         <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.productName }}</div>
         <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
@@ -70,10 +68,7 @@
         <template slot-scope="{data}">
           <vs-tr v-for="listing in data" :key="listing.id">
             <vs-td>
-              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && isDevelopment()" class="table-image" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(listing.inventoryItem.product))"/>
-              <img alt="Product Image" v-if="listing.inventoryItem.product.primaryImagePath != null && !isDevelopment()" class="table-image" v-bind:src="getImgUrl(listing.inventoryItem.product)"/>
-              <img alt="Product Image" v-if="!listing.inventoryItem.product.primaryImagePath && isDevelopment()" class="table-image" src="ProductShoot.jpg"/>
-              <img alt="Product Image" v-if="isDevelopment() !== true && !listing.inventoryItem.product.primaryImagePath" class="image" :src="getImgUrl(true)"/>
+              <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath" class="table-image"/>
             </vs-td>
             <vs-td>{{ listing.productName }}</vs-td>
             <vs-td>{{ currencySymbol }}{{ listing.price }}</vs-td>
@@ -92,9 +87,12 @@
 <script>
 import api from "../Api";
 import axios from "axios";
+import ReImage from "./ReImage";
 
 export default {
   name: "BusinessListings",
+
+  components: {ReImage},
 
   props: {
     businessId: Number,
@@ -131,26 +129,6 @@ export default {
         .catch((error) => {
           this.$log.error(error);
         });
-    },
-
-    isDevelopment() {
-      return (process.env.NODE_ENV === 'development')
-    },
-
-    getImgUrl(product) {
-      if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
-      } else if (product === true) {
-        return '/test/ProductShoot.jpg';
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + product.primaryImagePath.toString().replace("\\", "/")
-      } else if (product.primaryImagePath != null) {
-        return product.primaryImagePath.toString().replace("\\", "/")
-      } else {
-        return '../../public/ProductShoot.jpg'
-      }
     },
 
     /**
@@ -219,7 +197,7 @@ export default {
 
   #view-switch {
     display: flex;
-    margin: auto 0 0.5em 0;
+    margin: auto 0 0 0;
   }
 
   #sort-button {

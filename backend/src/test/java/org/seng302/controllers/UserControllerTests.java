@@ -54,7 +54,7 @@ import java.security.NoSuchAlgorithmException;
 
 @ContextConfiguration(classes = TestApplication.class)
 @WebMvcTest(controllers = UserController.class)
-public class UserControllerTests {
+class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,14 +70,14 @@ public class UserControllerTests {
     User user;
 
     @BeforeEach
-    public void setup() throws NoSuchAlgorithmException {
+    void setup() throws NoSuchAlgorithmException {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         user = new User("John", "Smith", addr, "johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
 
     }
 
     @Test
-    public void testSuccessfulRegistration() throws Exception {
+    void testSuccessfulRegistration() throws Exception {
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         NewUserRequest newUserRequest = new NewUserRequest("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
@@ -99,7 +99,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testRegistrationWithInvalidAddress() throws Exception {
+    void testRegistrationWithInvalidAddress() throws Exception {
         NewUserRequest newUserRequest = new NewUserRequest("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
                 "1999-04-27", "+64 3 555 0129", null, "1337-H%nt3r2");
@@ -125,7 +125,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testRegistrationWithInvalidUserDetails() throws Exception {
+    void testRegistrationWithInvalidUserDetails() throws Exception {
         Address address = new Address(null, null, null, null, "Canada", null);
         NewUserRequest invalidEmailUser = new NewUserRequest("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", null,
@@ -176,7 +176,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testRegistrationWithExistingEmail() throws Exception {
+    void testRegistrationWithExistingEmail() throws Exception {
         Address minAddress = new Address(null, null, null, null, "Canada", null);
         NewUserRequest minUserRequest = new NewUserRequest("John", null, "Smith", null,
                 null, "johnsmith99@gmail.com", "1999-04-27", null, minAddress, "1337-H%nt3r2");
@@ -191,7 +191,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testGetExistingUser() throws Exception {
+    void testGetExistingUser() throws Exception {
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
@@ -205,21 +205,21 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testGettingNonExistingUser() throws Exception {
+    void testGettingNonExistingUser() throws Exception {
         MvcResult userNotFound = mockMvc.perform(get("/users/{id}", 0))
                 .andReturn();
         assert userNotFound.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
     }
 
     @Test
-    public void testUnauthorizedGettingUser() throws Exception {
+    void testUnauthorizedGettingUser() throws Exception {
         MvcResult userNotFound = mockMvc.perform(get("/users/{id}", 0))
                 .andReturn();
         assert userNotFound.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
     }
 
     @Test
-    public void testGoodLogin() throws Exception {
+    void testGoodLogin() throws Exception {
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
@@ -234,7 +234,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testBadPasswordLogin() throws Exception {
+    void testBadPasswordLogin() throws Exception {
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
@@ -249,7 +249,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testNonExistingUserLogin() throws Exception {
+    void testNonExistingUserLogin() throws Exception {
         LoginRequest loginReq = new LoginRequest("Bazinga", "BABABOOEY");
         MvcResult success = mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -260,7 +260,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testGoodUserSearch() throws Exception {
+    void testGoodUserSearch() throws Exception {
         List<User> users = new ArrayList<User>();
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user1 = new User("John", "Hector", "Smith", "Jonny",
@@ -285,7 +285,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testGoodUserAdmin() throws Exception {
+    void testGoodUserAdmin() throws Exception {
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
@@ -298,14 +298,14 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testBadIdUserAdmin() throws Exception {
+    void testBadIdUserAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/makeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
     }
 
     @Test
-    public void testNoTokenUserAdmin() throws Exception {
+    void testNoTokenUserAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/makeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
@@ -313,7 +313,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testNoAuthorityUserAdmin() throws Exception {
+    void testNoAuthorityUserAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/makeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.FORBIDDEN.value();
@@ -323,7 +323,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testGoodUserRevokeAdmin() throws Exception {
+    void testGoodUserRevokeAdmin() throws Exception {
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
@@ -337,14 +337,14 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testBadIdUserRevokeAdmin() throws Exception {
+    void testBadIdUserRevokeAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
     }
 
     @Test
-    public void testNoTokenUserRevokeAdmin() throws Exception {
+    void testNoTokenUserRevokeAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
@@ -352,21 +352,21 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testNoAuthorityUserRevokeAdmin() throws Exception {
+    void testNoAuthorityUserRevokeAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
         assert success.getResponse().getStatus() == HttpStatus.FORBIDDEN.value();
     }
 
     @Test
-    public void testNoAuthGetUser() throws Exception {
+    void testNoAuthGetUser() throws Exception {
         mockMvc.perform(get("/users/{id}", user.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testSuccessfulGetUser() throws Exception {
+    void testSuccessfulGetUser() throws Exception {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         MvcResult result = mockMvc.perform(get("/users/{id}", user.getId())).andReturn();
 
@@ -377,7 +377,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="USER")
-    public void testInvalidGetUser() throws Exception {
+    void testInvalidGetUser() throws Exception {
         Mockito.when(userRepository.findUserById(100)).thenReturn(null);
         MvcResult result = mockMvc.perform(get("/users/{id}", user.getId())).andReturn();
 
@@ -387,28 +387,28 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testUnauthorizedMakeAdmin() throws Exception {
+    void testUnauthorizedMakeAdmin() throws Exception {
         mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenMakeAdmin() throws Exception {
+    void testForbiddenMakeAdmin() throws Exception {
         mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(roles="GAA")
-    public void testForbiddenMakeAdminAsGAA() throws Exception {
+    void testForbiddenMakeAdminAsGAA() throws Exception {
         mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testNotAcceptableMakeAdmin() throws Exception {
+    void testNotAcceptableMakeAdmin() throws Exception {
         Mockito.when(userRepository.findUserById(1000)).thenReturn(null);
         mockMvc.perform(put("/users/{id}/makeAdmin", user.getId()))
                 .andExpect(status().isNotAcceptable());
@@ -416,7 +416,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testSuccessfulMakeAdmin() throws Exception {
+    void testSuccessfulMakeAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User adminUser = new User("New", "DGAA", addr, "dgaaEmail@email.com", "dgaa123", Role.DGAA);
         adminUser.setId(5);
@@ -428,28 +428,28 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testUnauthorizedRevokeAdmin() throws Exception {
+    void testUnauthorizedRevokeAdmin() throws Exception {
         mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles="USER")
-    public void testForbiddenRevokeAdmin() throws Exception {
+    void testForbiddenRevokeAdmin() throws Exception {
         mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(roles="GAA")
-    public void testForbiddenRevokeAdminAsGAA() throws Exception {
+    void testForbiddenRevokeAdminAsGAA() throws Exception {
         mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testNotAcceptableRevokeAdmin() throws Exception {
+    void testNotAcceptableRevokeAdmin() throws Exception {
         Mockito.when(userRepository.findUserById(1000)).thenReturn(null);
         mockMvc.perform(put("/users/{id}/revokeAdmin", user.getId()))
                 .andExpect(status().isNotAcceptable());
@@ -457,7 +457,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testConflictRevokeAdmin() throws Exception {
+    void testConflictRevokeAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User adminUser = new User("New", "DGAA", addr, "dgaaEmail@email.com", "dgaa123", Role.DGAA);
         adminUser.setId(5);
@@ -470,7 +470,7 @@ public class UserControllerTests {
 
     @Test
     @WithMockUser(roles="DGAA")
-    public void testSuccessfulRevokeAdmin() throws Exception {
+    void testSuccessfulRevokeAdmin() throws Exception {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User adminUser = new User("New", "DGAA", addr, "dgaaEmail@email.com", "dgaa123", Role.DGAA);
         adminUser.setId(5);
@@ -482,7 +482,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testBadRequestLogin() throws Exception {
+    void testBadRequestLogin() throws Exception {
         LoginRequest loginRequest = new LoginRequest(user.getEmail(), user.getPassword());
         Mockito.when(userRepository.findUserByEmail(loginRequest.getEmail())).thenReturn(null);
 
@@ -507,7 +507,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testSuccessfulLogin() throws Exception {
+    void testSuccessfulLogin() throws Exception {
         LoginRequest loginRequest = new LoginRequest(user.getEmail(), "1337-H%nt3r2");
         Mockito.when(userRepository.findUserByEmail(loginRequest.getEmail())).thenReturn(user);
 

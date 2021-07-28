@@ -1,13 +1,22 @@
 <template>
   <div id="tableContainer">
         <vs-row id="tableRow">
-          <vs-table :data="tableData" style="border-spacing: 0px 20px; margin: 1em" search>
+          <vs-table v-model="selectedItem" @selected="handleSelected" :data="tableData" style="border-spacing: 0 20px; margin: 1em" search>
             <template slot="thead" style="background:blue">
               <vs-th sort-key="id" style="text-align: center;">
                 <div>ID</div>
               </vs-th>
+              <vs-th sort-key="created">
+                <div>Date</div>
+              </vs-th >
+              <vs-th sort-key="user.firstName">
+                <div>Name</div>
+              </vs-th >
+              <vs-th sort-key="user.address">
+                <div>Address</div>
+              </vs-th >
               <vs-th sort-key="title">
-                <div>title</div>
+                <div>Title</div>
               </vs-th >
               <vs-th sort-key="description">
                 <div>Description</div>
@@ -19,32 +28,61 @@
             </template>
 
             <template slot-scope="{data}">
-              <vs-tr :key="item.id" v-for="item in data">
-                <vs-td style="width: 20px; min-width: 100px; padding-right: 10px; text-align: center;">
-                  <a href="#">{{ item.id }}</a>
-                  <div>
-                    <img id="marketImage" style="width: 100%; height: 100%; border-radius: 1em;" src="../../public/ProductShoot.jpg" />
-                  </div>
+              <vs-tr :key="card.id" v-for="card in data" :data="card">
+                <vs-td >
+                  <a href="#">{{ card.id }}</a>
                 </vs-td>
-                <vs-td>{{ item.title }} </vs-td>
-                <vs-td>{{ item.description }} </vs-td>
-                <vs-td>
-                    <div id="cardKeywords"  v-for="keyword in item.keywords" :key="keyword.id" >#{{keyword.name}}</div>
+                <vs-td id="cardCreationDate">{{card.created}}</vs-td>
+
+                <vs-td id="cardUserName">{{card.user.firstName+" "+card.user.lastName}}</vs-td>
+                <vs-td id="cardUserAddress" v-if="card.user.homeAddress">{{MarketplaceCommon.getGeneralAddress(card.user.homeAddress)}}</vs-td>
+                <vs-td id="cardUserNoAddress" v-if="!card.user.homeAddress"></vs-td>
+
+                <vs-td>{{ card.title }} </vs-td>
+                <vs-td style="min-width: 500px;" >{{ card.description }} </vs-td>
+
+                <vs-td v-if="card.keywords" id="keywordWrapper">
+                  <div id="cardKeywords"  v-for="keyword in MarketplaceCommon.getKeywords(card.keywords)" :key="keyword.id" >#{{keyword.name}}</div>
                 </vs-td>
-                <td>
-                  <!-- Effectively repeated above, should refactor at some point. -->
-                </td>
               </vs-tr>
             </template>
           </vs-table>
         </vs-row>
+    <CardModal ref="cardModal" v-if="selectedItem != null" @deleted="notifyOfDeletion" :selectedCard="selectedItem" />
   </div>
 </template>
 
 <script>
-export default {
-  props: ['tableData']
+import CardModal from './CardModal.vue'
+import MarketplaceCommon from "./MarketplaceCommon.js";
 
+export default {
+  data: function() {
+    return {
+      selectedItem: null,
+      MarketplaceCommon
+    }
+  },
+  components: {
+    CardModal
+  },
+  props: ['tableData'],
+  methods: {
+    /**
+     * Method for opening card modal, calls method in child component to open modal
+     */
+    handleSelected(item) {
+      this.selectedItem = item;
+      this.$refs.cardModal.openModal();
+    },
+
+    /**
+     * Method for notifying the marketplace component that a card has been deleted
+     */
+    notifyOfDeletion: function() {
+      this.$emit('cardRemoved');
+    }
+  }
 }
 </script>
 
@@ -81,22 +119,21 @@ th {
   color: white;
 }
 
-vs-table {
+td {
+  max-width: 100px;
+}
+table {
   width: 100%;
-}
-
-.vs-con-table {
-  background: none;
-}
-
-.vs-component.vs-con-table.vs-table-primary {
-  margin: 0px !important;
 }
 
 ::-webkit-scrollbar-thumb {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, .5);
   box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+td.td.vs-table--td {
+  overflow-y: auto;
 }
 
 

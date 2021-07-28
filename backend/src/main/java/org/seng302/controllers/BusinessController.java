@@ -2,6 +2,9 @@ package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.seng302.finders.BusinessFinder;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
@@ -18,10 +21,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 public class BusinessController {
+
+    private static final Logger logger = LogManager.getLogger(BusinessController.class.getName());
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -30,6 +35,9 @@ public class BusinessController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BusinessFinder businessFinder;
 
     /**
      * Get request mapping for getting business by id
@@ -48,9 +56,10 @@ public class BusinessController {
     }
 
     /**
-     * Post request mapping to create a new Business
-     * @param req Request body
-     * @return ResponseEntity
+     * Post request mapping to create a new business.
+     * @param req DTO containing the new request information.
+     * @param session the current user session.
+     * @return ResponseEntity 401 if no auth (handled by spring sec), 400 if there are errors in the request, 201 otherwise.
      */
     @PostMapping("/businesses")
     public ResponseEntity<String> createBusiness(@RequestBody NewBusinessRequest req, HttpSession session) throws JsonProcessingException {
@@ -62,11 +71,11 @@ public class BusinessController {
         if (isValidBusiness(business)) {
             businessRepository.save(business);
             BusinessIdResponse businessIdResponse = new BusinessIdResponse(business.getId(), business.getBusinessType());
-            System.out.println(businessIdResponse);
+
             String jsonString = mapper.writeValueAsString(businessIdResponse);
             return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
         } else {
-            System.out.println(owner.getId());
+            logger.debug(owner.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -113,6 +122,14 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).build(); // 200
     }
 
+    /**
+     * A PUT request that removes a user from being an administrator of a given business.
+     * @param userIdRequest DTO class that contains the user id to remove from the business.
+     * @param id the unique business id.
+     * @param session current user session.
+     * @return 406 if business doesn't exist, 403 if user making the request is not the primary admin, or DGAA,
+     * 400 if there is an error in user being removed, 200 otherwise.
+     */
     @PutMapping("/businesses/{id}/removeAdministrator")
     public ResponseEntity<String> removeUserBusinessAdministrator(@RequestBody UserIdRequest userIdRequest, @PathVariable long id, HttpSession session) {
         long userId = userIdRequest.getUserId();
@@ -139,7 +156,7 @@ public class BusinessController {
     }
 
     /**
-     *
+     * Retrieves the business information, and stores the information in the session for the user to act as.
      * @param businessIdRequest DTO containing the buinessId to make the user act as.
      * @param session current authenticated login session of the user.
      * @return a response entity with the appropriate status code.
@@ -162,19 +179,52 @@ public class BusinessController {
     }
 
     /**
-     *
-     * @param req http request
-     * @param session users current session
+     * Checks the current session of the currently controlled business.
+     * @param session business' current session
      * @return ResponseEntity containing the business object for the current session
      */
     @GetMapping("/checkbusinesssession")
-    public ResponseEntity<Business> checkbusinesssession(HttpServletRequest req, HttpSession session) {
+    public ResponseEntity<Business> checkBusinessSession(HttpSession session) {
         Business business = (Business) session.getAttribute("business");
-        if(business != null){
+        if (business != null) {
             return ResponseEntity.status(HttpStatus.OK).body(business);
         } else {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(business);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+        }
+    }
+
+    /**
+     * Searches for businesses, with credintials
+     * @param query A string with the search's query
+     * @param type Type of business
+     * @return Http status code and list of businesses with name/names matching request.
+     */
+    @GetMapping("/businesses/search")
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, HttpSession session) throws JsonProcessingException {
+        logger.debug("Searching for businesses...");
+        System.out.println("Searching for businesses...");
+        List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query, type));
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
+    }
+
+
+    /**
+     * Sets businesses administered to null for each admin, there is an issue with how our backend serializes business objects and if it encountered
+     * a business object inside there it would replace every other instance of that object with the business name
+     * @param businesses List of businesses that needs businessesAdministered removed
+     * @return List of businesses with businessesAdministered field set to null
+     */
+    private List<Business> removeBusinessesAdministered(List<Business> businesses) {
+        logger.debug("Removing businessesAdministered...");
+        for(Business business: businesses) {
+            List<User> admins = business.getAdministrators();
+            for(User admin: admins) {
+                admin.setBusinessesAdministered(null);
+            }
         }
 
+        logger.debug("businessesAdministered removed");
+        return businesses;
     }
 }
