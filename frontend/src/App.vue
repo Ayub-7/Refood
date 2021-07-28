@@ -158,7 +158,6 @@ const app = {
       if (sessionStorage.getItem('businessesCache') !== null) {
         sessionStorage.removeItem("businessesCache");
       }
-      console.log("sdsads");
       this.$router.replace({path: `/businesses/${this.getActingAsUserId()}`});
     }
   },
