@@ -125,6 +125,12 @@ const Business = {
 
   mounted() {
     this.checkUserSession();
+  },
+
+  watch: {
+    $route() {
+      this.checkUserSession();
+    }
   }
 }
 
