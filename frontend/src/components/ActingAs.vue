@@ -75,8 +75,8 @@ const actingAs =  {
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
           }).catch((error) => {
         if(error.response) {
-          console.log(error.response.status);
-          console.log(error.response.message);
+          this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
+
         }
         this.$log.debug("Error Status:", error)
       });
@@ -93,8 +93,7 @@ const actingAs =  {
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
           }).catch((error) => {
         if(error.response) {
-          console.log(error.response.status);
-          console.log(error.response.message);
+          this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
         }
         this.$log.debug("Error Status:", error)
       });

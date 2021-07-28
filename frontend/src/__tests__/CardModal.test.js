@@ -160,9 +160,10 @@ describe('Card modal UI', () => {
 
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
     });
-    test('Test prefills are are correctly inserted', async () => {
+    test('With blank keywords, Test prefills are are correctly called and keywordList array is empty', async () => {
         //setup test
         wrapper.vm.setPrefills = jest.fn();
+
         api.checkSession = jest.fn(() => {
             return Promise.resolve({status: 200, data: {id: 1}});
         });
@@ -170,7 +171,7 @@ describe('Card modal UI', () => {
         //checks that when edit button is called prefills are inserted
         let button = wrapper.find(".card-modal-edit-button");
         expect(button).toBeTruthy();
-        //button.trigger('click');
+
         wrapper.vm.setPrefills()
         expect(wrapper.vm.setPrefills).toBeCalled()
 
@@ -244,12 +245,21 @@ describe('Card editing', () => {
     });
 });
 
-
-
 describe('Messaging', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
     });
+
+    test('Check Prefills accurate', () => {
+        wrapper.vm.setPrefills();
+
+        expect(wrapper.vm.editing).toBeTruthy();
+        expect(wrapper.vm.title).toBe(wrapper.vm.selectedCard.title);
+        expect(wrapper.vm.description).toBe(wrapper.vm.selectedCard.description);
+        expect(wrapper.vm.section).toBe(wrapper.vm.selectedCard.section);
+        expect(wrapper.vm.keywordList).toStrictEqual(["aliquam", "augue", "quam"]);
+    });
+
 
     test('Message box shows with input', () => {
         //Setup
@@ -283,6 +293,22 @@ describe('Messaging', () => {
         wrapper.vm.sendMessage(wrapper.vm.selectedCard, wrapper.vm.message);
 
         expect(wrapper.vm.checkMessage).toBeCalled();
+    });
+
+    test('When user inputs failed data, Message is checked and user is notified', () => {
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {id: 1}});
+        });
+
+        wrapper.vm.message = "message desc";
+        wrapper.vm.errors = [];
+        wrapper.vm.selectedCard.userId = "asdf"; //server returns the user's id instead of the object
+        wrapper.vm.selectedCard.id = "asdf";
+
+        wrapper.vm.checkMessage();
+
+        expect(wrapper.vm.errors.includes('invalid-card')).toBeTruthy();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
     });
 
     test('User is card owner - successfully shows delete button', async () => {
@@ -358,8 +384,72 @@ describe('Messaging', () => {
         expect(wrapper.vm.errors);
         expect(wrapper.vm.$vs.notify).toBeCalled();
     });
+});
+
+describe('Messaging returns', () => {
+    test('When a modified card is saved, User is notified, card closes and delete event', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+        wrapper.vm.validateCardEdit = jest.fn(() => {
+            return true;
+        });
+        wrapper.vm.keywordList = ["key1", "key2"]
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.showing).toBeFalsy();
+        expect(wrapper.vm.keywords).toBe('key1 key2 ');
+    });
+
+    test('When a modified card is not saved (400), User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.reject({response: { status: 400}});
+        });
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.keywords).toBe('');
+    });
 
 
+    test('When a modified card is not saved (401/403), User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.reject({response: {message: "Bad request", status: 403}});
+        });
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.keywords).toBe('');
+    });
+
+    test('When a modified card is not saved with an unspecified error (500), User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.reject({response: {status: 500}});
+        });
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
 
 
+    test('When a modified card includes errors, User is notified', () => {
+        api.modifyCard = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {messageId: 1}});
+        });
+        wrapper.vm.validateCardEdit = jest.fn(() => {
+            return false;
+        });
+
+        wrapper.vm.showing = true;
+
+        wrapper.vm.saveCardEdit();
+
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.showing).toBeTruthy();
+    });
 });

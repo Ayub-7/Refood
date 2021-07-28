@@ -129,6 +129,37 @@ describe('Homepage Messages functionality', () => {
     //     expect(wrapper.vm.$vs.notify()).toBeCalled();
     // });
 });
+describe('Message validation', () => {
+    test('When message is valid, check passes', () => {
+        wrapper.vm.message = 'Simple correct message';
+
+        let res = wrapper.vm.checkMessage();
+
+        expect(res).toBeTruthy();
+        expect(wrapper.vm.errors).toStrictEqual([]);
+    });
+
+    test('When message is blank, check fails', () => {
+        wrapper.vm.message = '';
+
+        let res = wrapper.vm.checkMessage();
+
+        expect(res).toBeFalsy();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
+    });
+
+    test('When message is over character limit, check fails', () => {
+        wrapper.vm.message = ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris condimentum metus mauris, ut vehicula lacus sollicitudin vel. Etiam consectetur maximus vulputate. Etiam non laoreet velit, sed consequat lectus. Ut rhoncus suscipit urna sed maximus. Vestibulum volutpat iaculis lorem ac faucibus. Quisque ultrices nisi et augue consectetur, maximus fringilla neque aliquam. Cras et felis vitae justo iaculis egestas eu eu nisl. Integer pellentesque arcu eget erat finibus dapibus. Cras eleifend ante eget suscipit vestibulum. Sed nunc nisi, hendrerit id sodales nec, varius fermentum turpis. Suspendisse dictum mollis est, sit amet dignissim elit vehicula nec. Nullam eget dui ac augue laoreet ultrices. Cras laoreet rhoncus odio. ';
+
+        let res = wrapper.vm.checkMessage();
+
+        expect(res).toBeFalsy();
+        expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
+    });
+
+});
+
+
 
 
 // describe('Detailed message UI', () => {

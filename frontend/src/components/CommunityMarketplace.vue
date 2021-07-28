@@ -83,6 +83,7 @@ import MarketplaceGrid from './MarketplaceGrid.vue'
 import MarketplaceTable from './MarketplaceTable.vue'
 import MarketplaceAddCard from './MarketplaceAddCard.vue'
 import api from "../Api";
+import { store } from "../store"
 
 export default {
   name: "CommunityMarketplace",
@@ -189,8 +190,13 @@ export default {
 
 
   mounted() {
+  
     api.checkSession()
       .then(() => {
+        console.log(store.actingAsBusinessId)
+        if(store.actingAsBusinessId != null) {
+          this.$router.push({path: "/home"})
+        }
         this.getSectionCards("ForSale", "created", false);
       })
       .catch((error) => {
