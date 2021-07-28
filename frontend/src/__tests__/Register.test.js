@@ -12,7 +12,7 @@ api.createUser = jest.fn(() => {
 });
 
 api.login = jest.fn(() => {
-    return Promise.resolve({status: 200});
+    return Promise.resolve({status: 200}).reject({message: "Error", status: 400});
 });
 
 // Mocking $route
