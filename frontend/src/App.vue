@@ -51,7 +51,7 @@
         <!-- Acting As Business -->
         <div v-else class="sub-navbar-group">
           <vs-navbar-item index="3-0">
-            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsUserId()}`}">Business Profile</router-link>
+            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}`}">Business Profile</router-link>
           </vs-navbar-item>
           <vs-navbar-item index="3-1">
             <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/products`}">Product Catalogue</router-link>
@@ -105,7 +105,6 @@ import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
 import 'vuesax/dist/vuesax.css';
-
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
@@ -159,6 +158,7 @@ const app = {
       if (sessionStorage.getItem('businessesCache') !== null) {
         sessionStorage.removeItem("businessesCache");
       }
+      this.$router.replace({path: `/businesses/${this.getActingAsUserId()}`});
     }
   },
 

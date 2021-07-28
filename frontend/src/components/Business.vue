@@ -105,7 +105,6 @@ const Business = {
     },
 
     returnToSearch: function() {
-      console.log(88);
       this.$router.push({path: '/search'})
     },
 
@@ -125,6 +124,12 @@ const Business = {
 
   mounted() {
     this.checkUserSession();
+  },
+
+  watch: {
+    $route() {
+      this.checkUserSession();
+    }
   }
 }
 
