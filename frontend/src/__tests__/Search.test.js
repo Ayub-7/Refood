@@ -139,17 +139,17 @@ describe('Search page tests', () => {
 });
 
 describe("Test searching without query", () => {
-   test("Successful search - No query", async () => {
+   test("Successful search for users - No query", async () => {
       wrapper.vm.searchbarUser = "";
       await wrapper.vm.searchUsers();
       expect(wrapper.vm.$vs.loading).not.toBeCalled();
    });
 
 
-    test("Successful search - No query", async () => {
+    test("Successful search for businesses - No query", async () => {
         wrapper.vm.searchbarBusiness = "";
         await wrapper.vm.searchBusiness();
-        expect(wrapper.vm.$vs.loading).not.toBeCalled();
+        expect(wrapper.vm.$vs.loading).toBeCalled();
     });
 
 });
