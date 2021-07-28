@@ -139,9 +139,10 @@ export default {
 }
 
 #cardDescription {
-  margin-top: 10px;
+  margin-top: 15px;
   height: 120px;
   overflow-y: auto;
+  word-break: break-word;
 
 }
 

@@ -57,7 +57,12 @@
         </vs-row>
         <vs-row class="addCardField">
           <div class="addCardHeader">Description</div>
-          <vs-textarea v-model="description" id="description"></vs-textarea>
+          <vs-textarea v-model="description" id="description" :class="[{'textarea-danger': descriptionError}]" :counter="250" @keydown.enter.prevent></vs-textarea>
+          <vs-col>
+            <transition name="fade">
+              <div v-show="descriptionError" class="edit-error">{{descriptionErrorMessage}}</div> <!-- vs-textarea doesn't have a message system, so this is a homebrew solution -->
+            </transition>
+          </vs-col>
         </vs-row>
         <vs-row class="addCardField">
           <vs-col vs-w="2" vs-xs="12">
@@ -99,8 +104,8 @@ export default {
       keywordListInput: [],
       description: '',
       section: '',
-
-
+      descriptionError: false,
+      descriptionErrorMessage: "Description is too long",
       editErrors: {
         title: {error: false, message: "There is a problem with the card title"},
         section: {error: false, message: "You must choose a section"},
@@ -138,7 +143,7 @@ export default {
             this.keywordList = this.keywordList.filter(e => String(e).trim());
 
             this.keywordListInput = this.keywordList
-    
+
           }
         },
         /**
@@ -259,7 +264,6 @@ export default {
             return false;
           }
 
-          console.log(this.selectedCard.id)
           if (isNaN(this.selectedCard.id)) {
             this.errors.push('invalid-card');
 
@@ -343,6 +347,12 @@ export default {
             valid = false;
           }
 
+          if (this.description.length > 250) {
+            this.descriptionError = true;
+            valid = false;
+          } else {
+            this.descriptionError = false;
+          }
           return valid;
         }
       },
@@ -368,6 +378,10 @@ export default {
       else if (this.title.length > 50) {
         this.editErrors.title.error = true;
         this.editErrors.title.message = "Card title is too long";
+      }
+      else if (this.description.length > 250){
+        this.editErrors.description.error = true;
+        this
       }
       else {
         this.editErrors.title.error = false;
@@ -443,6 +457,10 @@ export default {
 .inline {
   display: inline-block;
   position: relative;
+}
+
+#card-modal-description {
+  word-break: break-word;
 }
 
 .text {
@@ -527,6 +545,13 @@ export default {
   margin-top: 8px;
 }
 
+.edit-error {
+  font-size: 10px;
+  position: absolute;
+  color: #FF4757;
+  margin-left: 8px;
+}
+
 .title-input >>> textarea {
   max-height: 33px;
   min-height: 33px;
@@ -538,7 +563,7 @@ export default {
 
 .edit-error {
   font-size: 10px;
-  position: absolute;
+  position: relative;
   color: #FF4757;
   margin-left: 8px;
 }
