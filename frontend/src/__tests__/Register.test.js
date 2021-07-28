@@ -7,14 +7,6 @@ let wrapper;
 const localVue = createLocalVue();
 localVue.use(Vuesax);
 
-api.createUser = jest.fn(() => {
-    return Promise.resolve({status: 201});
-});
-
-api.login = jest.fn(() => {
-    return Promise.resolve({status: 200}).reject({message: "Error", status: 400});
-});
-
 // Mocking $route
 const $route = {
     params: {
@@ -134,7 +126,7 @@ describe('Register error checking', () => {
         expect(wrapper.vm.errors).toStrictEqual([wrapper.vm.bio])
     })
 
-    test('Handles large bio too large', async () => {
+    test('Successful login', async () => {
         wrapper.vm.password = 'Potato123!';
         wrapper.vm.confirm_password = 'Potato123!';
         wrapper.vm.firstname = 'bob';
@@ -148,7 +140,6 @@ describe('Register error checking', () => {
         wrapper.vm.phonenumber = '027254871';
         wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
         await wrapper.vm.createUserInfo();
-        expect(wrapper.vm.$log.debug).toBeCalled();
         expect(wrapper.vm.errors.length).toBe(0);
     })
 });
