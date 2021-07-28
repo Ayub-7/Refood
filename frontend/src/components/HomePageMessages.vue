@@ -137,8 +137,8 @@ export default {
           }
 
           api.postMessage(senderId, originalMessage.card.id, message)
-              .then((res) => {
-                this.$vs.notify({title: 'Reply Sent!', text: `ID: ${res.data.messageId}`, color: 'success'});
+              .then(() => {
+                this.$vs.notify({title: 'Reply Sent!', color: 'success'});
                 //reset the message after success
                 this.message = "";
                 this.errors=[];
