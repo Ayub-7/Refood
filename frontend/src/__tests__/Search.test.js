@@ -119,7 +119,7 @@ afterEach(() => {
 
 describe('Search page tests', () => {
     test('Table exists when valid data is in response', () => {
-        expect(wrapper.find('#userTable').exists()).toBe(true);        
+        expect(wrapper.find('.data-table').exists()).toBe(true);
     })
 
     test('Mobile mode not on when window is normal size', () => {

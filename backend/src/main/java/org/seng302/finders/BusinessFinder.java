@@ -68,6 +68,11 @@ public class BusinessFinder {
                 }
             }
         }
+
+        if (term.length() == 0) {
+            return businessType;
+        }
+
         if (!isLike) {
             String[] subTerms = term.split(" ");
             List<Predicate> subTermPredicates = new ArrayList<>();
@@ -106,6 +111,11 @@ public class BusinessFinder {
      */
     private List<Business> queryProcess(ArrayList<String> terms, String type, boolean isLike) {
         List<Predicate> criteriaList = new ArrayList<>();
+        if (terms.isEmpty()) {
+            criteriaList.add(this.criteriaBuilder("", type, isLike));
+            criteriaQuery.where(criteriaList.get(0));
+            return entityManager.createQuery(criteriaQuery).getResultList();
+        }
         Logic logic = Logic.NONE;
         short consecutive = 0;
         for (String term : terms) {
@@ -170,6 +180,9 @@ public class BusinessFinder {
             List<Business> partialBusinesses = this.queryProcess(terms, type, true);
             partialBusinesses.removeAll(businesses);
             businesses.addAll(partialBusinesses);
+            return businesses;
+        } else if (type.length() > 0) {
+            List<Business> businesses = this.queryProcess(terms, type, false);
             return businesses;
         } else {
             return entityManager.createQuery(criteriaQuery).getResultList();
