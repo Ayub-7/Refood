@@ -160,9 +160,10 @@ describe('Card modal UI', () => {
 
         expect(wrapper.find(".card-modal-edit-button")).toBeTruthy();
     });
-    test('Test prefills are are correctly inserted', async () => {
+    test('With blank keywords, Test prefills are are correctly called and keywordList array is empty', async () => {
         //setup test
         wrapper.vm.setPrefills = jest.fn();
+
         api.checkSession = jest.fn(() => {
             return Promise.resolve({status: 200, data: {id: 1}});
         });
@@ -170,7 +171,7 @@ describe('Card modal UI', () => {
         //checks that when edit button is called prefills are inserted
         let button = wrapper.find(".card-modal-edit-button");
         expect(button).toBeTruthy();
-        //button.trigger('click');
+
         wrapper.vm.setPrefills()
         expect(wrapper.vm.setPrefills).toBeCalled()
 
@@ -244,12 +245,21 @@ describe('Card editing', () => {
     });
 });
 
-
-
 describe('Messaging', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
     });
+
+    test('Check Prefills accurate', () => {
+        wrapper.vm.setPrefills();
+
+        expect(wrapper.vm.editing).toBeTruthy();
+        expect(wrapper.vm.title).toBe(wrapper.vm.selectedCard.title);
+        expect(wrapper.vm.description).toBe(wrapper.vm.selectedCard.description);
+        expect(wrapper.vm.section).toBe(wrapper.vm.selectedCard.section);
+        expect(wrapper.vm.keywordList).toStrictEqual(["aliquam", "augue", "quam"]);
+    });
+
 
     test('Message box shows with input', () => {
         //Setup
