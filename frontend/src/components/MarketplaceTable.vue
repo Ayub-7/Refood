@@ -132,5 +132,9 @@ table {
   box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
+td.td.vs-table--td {
+  overflow-y: auto;
+}
+
 
 </style>
