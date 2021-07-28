@@ -447,6 +447,8 @@ class CardControllerTests {
     @Test
     @WithMockUser
     void testEditCard_noTitle_returnBadRequest() throws Exception {
+        card.setUser(testUser);
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
         NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), null, card.getDescription(), "Some keywords", MarketplaceSection.FORSALE);
         mvc.perform(put("/cards/{id}", card.getId())
                 .contentType("application/json")
@@ -458,6 +460,8 @@ class CardControllerTests {
     @Test
     @WithMockUser
     void testEditCard_noSection_returnBadRequest() throws Exception {
+        card.setUser(testUser);
+        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
         NewCardRequest editedCardRequest = new NewCardRequest(testUser.getId(), "Edited Title", card.getDescription(), "Some keywords", null);
         mvc.perform(put("/cards/{id}", card.getId())
                 .contentType("application/json")
