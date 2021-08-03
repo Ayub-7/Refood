@@ -1,13 +1,13 @@
 package org.seng302.repositories;
 
 import org.seng302.models.Card;
-
+import org.seng302.models.MarketplaceSection;
+import org.seng302.models.User;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.transaction.Transactional;
-import org.seng302.models.*;
-
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +42,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      * @return List<Card> a list of cards matching section
      */
     List<Card> findAllBySection(MarketplaceSection section);
+    List<Card> findAllBySection(MarketplaceSection section, PageRequest pageable);
 
     List<Card> findAllByDisplayPeriodEndBefore(Date date);
 

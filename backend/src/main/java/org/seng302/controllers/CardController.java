@@ -8,21 +8,24 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
-import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.NotificationRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -82,6 +85,24 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(cardIdResponse));
     }
 
+    private PageRequest sortAndPaginate(int numOfPage, int resultsPerPage, String orderBy, boolean reverse) {
+        Sort.Direction orderDirection = Sort.Direction.ASC;
+        if (reverse) {
+            orderDirection = Sort.Direction.DESC;
+        }
+        Set<String> sortAttributes = Set.of("title", "created", "keywords", "country");
+        if (!sortAttributes.contains(orderBy) || orderBy == null) {
+            orderBy = "created";
+        }
+        List<Sort.Order> order;
+        if (orderBy.equals("country")) {
+            order = List.of(new Sort.Order(orderDirection, "creator.address.country").ignoreCase())
+        } else {
+            order = List.of(new Sort.Order(orderDirection, orderBy).ignoreCase());
+        }
+        return PageRequest.of(numOfPage, resultsPerPage, Sort.by(order));
+    }
+
     /**
      * Retrieves all cards from a given section parameter.
      * @param section the string section name.
@@ -94,8 +115,10 @@ public class CardController {
      */
     @GetMapping("/cards")
     public ResponseEntity<String> getCardsFromSection(@RequestParam(name="section") String section,
+                                                      @RequestParam(required = true) int numOfPages,
+                                                      @RequestParam(required = true) int resultsPerPage,
                                                       @RequestParam(required = false) String sortBy,
-                                                      @RequestParam(required = false) boolean ascending) throws JsonProcessingException {
+                                                      @RequestParam(required = false) boolean reverse) throws JsonProcessingException {
         MarketplaceSection marketplaceSection = null;
 
         // Attempt to get the section enum (string is made uppercase to get correct value).
@@ -105,28 +128,8 @@ public class CardController {
             logger.error("Bad section parameter input.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Section does not exist.");
         }
-        List<Card> cards = cardRepository.findAllBySection(marketplaceSection);
-        if (sortBy != null && sortBy.length() > 0) {
-            switch (sortBy.toUpperCase()) {
-                case "TITLE":
-                    cards.sort(Comparator.comparing(Card::getTitle));
-                    break;
-                case "CREATED":
-                    cards.sort(Comparator.comparing(Card::getCreated));
-                    break;
-                case "KEYWORDS":
-                    cards.sort(Comparator.comparing(Card::getKeywords));
-                    break;
-                case "COUNTRY":
-                    cards.sort(Comparator.comparing(c -> c.getUser().getHomeAddress().getCountry()));
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + sortBy.toUpperCase());
-            }
-        }
-        if (!ascending) {
-            Collections.reverse(cards);
-        }
+        List<Card> cards = cardRepository.findAllBySection(marketplaceSection,
+                this.sortAndPaginate(numOfPages, resultsPerPage, sortBy, reverse));
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }
 
