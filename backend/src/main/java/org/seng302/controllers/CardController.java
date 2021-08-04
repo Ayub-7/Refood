@@ -96,7 +96,7 @@ public class CardController {
         }
         List<Sort.Order> order;
         if (orderBy.equals("country")) {
-            order = List.of(new Sort.Order(orderDirection, "creator.address.country").ignoreCase())
+            order = List.of(new Sort.Order(orderDirection, "user_id.address.country").ignoreCase());
         } else {
             order = List.of(new Sort.Order(orderDirection, orderBy).ignoreCase());
         }
@@ -115,8 +115,8 @@ public class CardController {
      */
     @GetMapping("/cards")
     public ResponseEntity<String> getCardsFromSection(@RequestParam(name="section") String section,
-                                                      @RequestParam(required = true) int numOfPages,
-                                                      @RequestParam(required = true) int resultsPerPage,
+                                                      @RequestParam int numOfPages,
+                                                      @RequestParam int resultsPerPage,
                                                       @RequestParam(required = false) String sortBy,
                                                       @RequestParam(required = false) boolean reverse) throws JsonProcessingException {
         MarketplaceSection marketplaceSection = null;
@@ -128,7 +128,7 @@ public class CardController {
             logger.error("Bad section parameter input.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Section does not exist.");
         }
-        List<Card> cards = cardRepository.findAllBySection(marketplaceSection,
+            List<Card> cards = cardRepository.findAllBySection(marketplaceSection,
                 this.sortAndPaginate(numOfPages, resultsPerPage, sortBy, reverse));
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }
