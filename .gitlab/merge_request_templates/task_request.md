@@ -7,8 +7,10 @@ Summarise what the major changes are, plus any other notable changes either with
 Short step-by-step guide on how to access/reproduce the new features/changes.
 
 ## Checklist
-* [ ] Manually/smoke tested
+* [ ] Manually (if GUI changes)/smoke tested
 * [ ] Cucumber tests (if applicable)
 * [ ] Unit tests
 * [ ] Pipeline passed
 * [ ] Code style is up to standard (Check Google's HTML/CSS, JavaScript code style guide if unsure).
+* [ ] All functions and code documented
+* [ ] If last task for story, DoDs checked
