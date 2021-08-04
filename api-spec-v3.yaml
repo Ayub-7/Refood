@@ -1349,20 +1349,20 @@ paths:
           name: count
           schema:
             type: number
-          description: 'How many results to return'
+          description: 'How many results per page to return'
         - in: query
           name: offset
           schema:
             type: number
-          description: 'How many listings to skip before returning the results'
+          description: 'How many pages to skip before returning the results'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BusinessListingsRequest'
+              $ref: '#/components/schemas/BusinessListingSearchRequest'
       responses:
         '200':
-          description: Retrieves a (potentially empty) list of listings.
+          description: Retrieves a (potentially empty) paginated list of listings.
           content:
             application/json:
               schema:
@@ -1846,22 +1846,26 @@ components:
           readOnly: true
           description: The time and date when the message was sent to the receiver
 
-    BusinessListingsRequest:
+    BusinessListingSearchRequest:
       type: object
       properties:
         businessQuery:
           type: string
           description: 'Search for all, or part of the name of a business'
+          example: 'Dabshot'
         productQuery:
           type: string
           description: 'Search for all, or part of the name of a seller'
+          example: 'Apples'
         addressQuery:
           type: string
           description: 'Search for all, or part of the sellers address'
+          example: 'Christchurch'
         sortBy:
           type: string
           description: 'Sort by a specific category'
-        businessType:
+          example: 'price'
+        businessTypes:
           type: array
           items:
             type: string
@@ -1875,15 +1879,19 @@ components:
           type: number
           format: double
           description: 'Limit the results by setting a minimum price range'
+          example: '5.00'
         maxPrice:
           type: number
           format: double
           description: 'Limit the results by setting a maximum price range'
+          example: '25.00'
         minClosingDate:
           type: string
           format: date
           description: 'Limit the results by setting a minimum closing date'
+          example: '2021-09-09 12:00:00'
         maxClosingDate:
           type: string
           format: date
           description: 'Limit the results by setting a maximum closing date'
+          example: '2021-09-12 12:00:00'
