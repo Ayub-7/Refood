@@ -65,6 +65,57 @@ public class BusinessFinder {
                     case "NON-PROFIT ORGANISATION":
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.NON_PROFIT_ORGANISATION);
                         break;
+                    case "ADMINISTRATIVE AND SUPPORT SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ADMINISTRATIVE_AND_SUPPORT_SERVICES);
+                        break;
+                    case "AGRICULTURE FORESTRY AND FISHING":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.AGRICULTURE_FORESTRY_AND_FISHING);
+                        break;
+                    case "ARTS AND RECREATION_SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ARTS_AND_RECREATION_SERVICES);
+                        break;
+                    case "CONSTRUCTION":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.CONSTRUCTION);
+                        break;
+                    case "EDUCATION AND TRAINING":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.EDUCATION_AND_TRAINING);
+                        break;
+                    case "ELECTRICITY GAS WATER AND WASTE SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES);
+                        break;
+                    case "FINANCIAL AND INSURANCE SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.FINANCIAL_AND_INSURANCE_SERVICES);
+                        break;
+                    case "HEALTH CAR AND SOCIAL ASSISTANCE":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.HEALTH_CAR_AND_SOCIAL_ASSISTANCE);
+                        break;
+                    case "INFORMATION MEDIA AND TELECOMMUNICATION":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.INFORMATION_MEDIA_AND_TELECOMMUNICATION);
+                        break;
+                    case "MANUFACTURING":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.MANUFACTURING);
+                        break;
+                    case "MINING":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.MINING);
+                        break;
+                    case "PROFESSIONAL SCIENTIFIC AND TECHNICAL SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_SERVICES);
+                        break;
+                    case "PUBLIC ADMINISTRATION AND SAFETY":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.PUBLIC_ADMINISTRATION_AND_SAFETY);
+                        break;
+                    case "RENTAL HIRING AND REAL ESTATE SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.RENTAL_HIRING_AND_REAL_ESTATE_SERVICES);
+                        break;
+                    case "TRANSPORT POSTAL AND WAREHOUSING":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.TRANSPORT_POSTAL_AND_WAREHOUSING);
+                        break;
+                    case "WHOLESALE TRADE":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.WHOLESALE_TRADE);
+                        break;
+                    case "OTHER SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.OTHER_SERVICES);
+                        break;
                 }
             }
         }
