@@ -43,6 +43,7 @@ tags:
   - name: 'UCM7: Keyword search'
   - name: 'UCM8: Contacting other marketplace users'
   - name: 'UCM9: Edit card'
+  - name: 'U29 : Browse/search sale listings'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -1339,6 +1340,67 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
+  '/business/types':
+    get:
+      tags:
+        - 'Business Accounts'
+        - 'U29 : Browse/search sale listings'
+      summary: Retrieve all of the business type enums and return them as the string values.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Retrieves all business types in array of strings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessTypesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  '/businesses/listings':
+    post:
+      tags:
+        - 'Business Accounts'
+        - 'U29 : Browse/search sale listings'
+      summary: Search across all business listings with (optional) given parameters.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: query
+          name: count
+          schema:
+            type: number
+          description: 'How many results per page to return'
+        - in: query
+          name: offset
+          schema:
+            type: number
+          description: 'How many pages to skip before returning the results'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessListingSearchRequest'
+      responses:
+        '200':
+          description: Retrieves a (potentially empty) paginated list of listings.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Listing'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
 components:
   securitySchemes:
@@ -1358,7 +1420,7 @@ components:
     AuthenticatedResponse:
       description: >
         Response returned to client when they have performed an action to gain authentication (registering or logging in).
-        This response includes a session token that the client can use in future API requests to authenticate itself. 
+        This response includes a session token that the client can use in future API requests to authenticate itself.
         This session token is set as a cookie with name 'JSESSIONID', and will need to be included in subsequent requests to the server.
       content:
         application/json:
@@ -1588,10 +1650,10 @@ components:
           type: string
           example: 'WATT-420-BEANS'
           description: >
-            Developers can choose whether or not to make this a required field (i.e user 
-            specified vs. auto-generated). In the case that the team automatically 
-            generates the IDs, they should still allow this field to be present when 
-            creating (POST) or modifying (PUT) a product, and then simply ignore its 
+            Developers can choose whether or not to make this a required field (i.e user
+            specified vs. auto-generated). In the case that the team automatically
+            generates the IDs, they should still allow this field to be present when
+            creating (POST) or modifying (PUT) a product, and then simply ignore its
             value (i.e do not return a 400 code if it is present but not needed). An
             ID only needs to be unique within its catalogue, not system-wide.
         name:
@@ -1811,3 +1873,68 @@ components:
           example: '2021-07-07 17:59:00'
           readOnly: true
           description: The time and date when the message was sent to the receiver
+
+    BusinessTypesResponse:
+      type: object
+      properties:
+        businessTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - Accommodation and Food Services
+              - Retail Trade
+              - Charitable organisation
+              - Non-profit organisation
+          example: ["Accommodation and Food Services", "Retail Trade", "Charitable organisation", "Non-profit organisation"]
+          description: "Get all business types"
+
+    BusinessListingSearchRequest:
+      type: object
+      properties:
+        businessQuery:
+          type: string
+          description: 'Search for all, or part of the name of a business'
+          example: 'Dabshot'
+        productQuery:
+          type: string
+          description: 'Search for all, or part of the name of a seller'
+          example: 'Apples'
+        addressQuery:
+          type: string
+          description: 'Search for all, or part of the sellers address'
+          example: 'Christchurch'
+        sortBy:
+          type: string
+          description: 'Sort by a specific category'
+          example: 'price'
+        businessTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - Accommodation and Food Services
+              - Retail Trade
+              - Charitable organisation
+              - Non-profit organisation
+          description: "Search for one or more business type(s)"
+        minPrice:
+          type: number
+          format: double
+          description: 'Limit the results by setting a minimum price range'
+          example: '5.00'
+        maxPrice:
+          type: number
+          format: double
+          description: 'Limit the results by setting a maximum price range'
+          example: '25.00'
+        minClosingDate:
+          type: string
+          format: date
+          description: 'Limit the results by setting a minimum closing date'
+          example: '2021-09-09 12:00:00'
+        maxClosingDate:
+          type: string
+          format: date
+          description: 'Limit the results by setting a maximum closing date'
+          example: '2021-09-12 12:00:00'
