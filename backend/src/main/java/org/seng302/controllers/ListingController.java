@@ -98,13 +98,22 @@ public class ListingController {
             sortBy.equalsIgnoreCase("closes")) {
             sort = Sort.by(request.getSortBy());
         }
-        else if (sortBy.equalsIgnoreCase("name")) {
-            sort = Sort.by("inventoryItem.product.name");
+        else if (sortBy.equalsIgnoreCase("name") || sortBy.equalsIgnoreCase("manufacturer")) {
+            sort = Sort.by("inventoryItem.product." + request.getSortBy());
         }
         else if (sortBy.equalsIgnoreCase("expires")) {
-            sort = Sort.by("inventoryItem.product.name");
+            sort = Sort.by("inventoryItem.expires");
+        }
+        else if (sortBy.equalsIgnoreCase("city") ||
+                sortBy.equalsIgnoreCase("country") ||
+                sortBy.equalsIgnoreCase("businessType")) {
+            sort = Sort.by("inventoryItem.product.business." + request.getSortBy());
+        }
+        else if (sortBy.equalsIgnoreCase("seller")) {
+            sort = Sort.by("inventoryItem.product.business.name");
         }
         else { // Sort By parameter is not what we were expecting.
+            logger.error("Unknown sort parameter: " + request.getSortBy());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected sort parameter.");
         }
 

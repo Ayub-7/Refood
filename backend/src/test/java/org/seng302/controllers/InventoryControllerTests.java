@@ -72,7 +72,7 @@ class InventoryControllerTests {
         business.getAdministrators().add(adminUser);
 
 
-        product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
+        product1 = new Product("07-4957066", business, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
 
         Calendar afterCalendar = Calendar.getInstance();
         afterCalendar.set(2022, 1, 1);

@@ -1,19 +1,16 @@
 package org.seng302.repositories;
 
-import org.junit.After;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class InventoryRepositoryTests {
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Autowired
     private InventoryRepository inventoryRepository;
@@ -33,9 +34,6 @@ class InventoryRepositoryTests {
 
     @Autowired
     private BusinessRepository businessRepository;
-
-    @Autowired
-    private EntityManager entityManager;
 
     private Business business1;
 
@@ -54,6 +52,7 @@ class InventoryRepositoryTests {
         productRepository.flush();
         inventoryRepository.deleteAll();
         inventoryRepository.flush();
+        entityManager.clear();
 
         Calendar afterCalendar = Calendar.getInstance();
         afterCalendar.set(2022, 1, 1);
@@ -67,11 +66,13 @@ class InventoryRepositoryTests {
         assertThat(businessRepository).isNotNull();
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         Business b1 = new Business("AnotherBusiness", "A business", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-        businessRepository.save(b1);
+
+        entityManager.persist(b1);
+        entityManager.flush();
 
 
         assertThat(productRepository).isNotNull();
-        testProd1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
+        testProd1 = new Product("07-4957066", b1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
         productRepository.save(testProd1);
 
         assertThat(inventoryRepository).isNotNull();

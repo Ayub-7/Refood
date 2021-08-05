@@ -31,6 +31,7 @@ public class ProductBusinessSerializer extends StdSerializer<Business> {
 
         Business newBusiness = new Business(business.getName(), business.getDescription(), business.getAddress(), business.getBusinessType());
         newBusiness.setCreated(business.getCreated());
+        newBusiness.setId(business.getId());
         generator.writeObject(newBusiness);
     }
 

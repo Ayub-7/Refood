@@ -46,9 +46,10 @@ public class Product {
 
     protected Product() { }
 
-    public Product(String id, long businessId, String name, String description, String manufacturer, double recommendedRetailPrice, Date created) {
+    public Product(String id, Business business, String name, String description, String manufacturer, double recommendedRetailPrice, Date created) {
         this.id = id;
-        this.businessId = businessId;
+        this.businessId = business.getId();
+        this.business = business;
         this.name = name;
         this.description = description;
         this.manufacturer = manufacturer;
