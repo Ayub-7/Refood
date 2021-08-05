@@ -96,11 +96,11 @@ public class CardController {
         }
         List<Sort.Order> order;
         if (orderBy.equals("country")) {
-            order = List.of(new Sort.Order(orderDirection, "user_id.address.country").ignoreCase());
+            order = List.of(new Sort.Order(orderDirection, "user.homeAddress.country").ignoreCase());
         } else {
             order = List.of(new Sort.Order(orderDirection, orderBy).ignoreCase());
         }
-        return PageRequest.of(numOfPage, resultsPerPage, Sort.by(order));
+        return PageRequest.of(numOfPage-1, resultsPerPage, Sort.by(order));
     }
 
     /**
