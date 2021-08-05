@@ -71,7 +71,7 @@ public class BusinessFinder {
                     case "AGRICULTURE FORESTRY AND FISHING":
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.AGRICULTURE_FORESTRY_AND_FISHING);
                         break;
-                    case "ARTS AND RECREATION_SERVICES":
+                    case "ARTS AND RECREATION SERVICES":
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ARTS_AND_RECREATION_SERVICES);
                         break;
                     case "CONSTRUCTION":
@@ -114,6 +114,9 @@ public class BusinessFinder {
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.WHOLESALE_TRADE);
                         break;
                     case "OTHER SERVICES":
+                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.OTHER_SERVICES);
+                        break;
+                    default:
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.OTHER_SERVICES);
                         break;
                 }
