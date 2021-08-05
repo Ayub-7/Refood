@@ -200,7 +200,7 @@ const Search = {
     },
 
     /**
-     * Increases search range to be shown on page
+     * Decreases search range to be shown on page
      */
     decreaseSearchRange: function() {
       this.searchIndexMin -= 10;
@@ -212,7 +212,7 @@ const Search = {
     },
 
     /**
-     * Increases search range to be shown on page
+     * Decrease search range to be shown on page for businesses
      */
     decreaseSearchRangeForBusiness: function() {
       this.searchIndexMin -= 10;
@@ -223,6 +223,9 @@ const Search = {
       }
     },
 
+    /**
+     * Retrieve the role of the user
+     */
     getUserRole: function () {
       return store.role;
     },
@@ -265,6 +268,7 @@ const Search = {
         this.searchIndexMax = 10;
       }
     },
+
     /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
@@ -282,7 +286,7 @@ const Search = {
       api.searchUsersQuery(this.searchbarUser)
         .then((response) => {
           this.users = response.data;
-          this.users = this.users.filter(x => typeof(x) == "object")
+          this.users = this.users.filter(x => typeof(x) == "object").slice(0,100)
           this.paginator(this.users);
         })
         .catch((error) => {
@@ -317,9 +321,9 @@ const Search = {
       }
       api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType)
          .then((response) => {
-           this.businesses = response.data;
+           this.businesses = response.data.slice(0,100);
            this.businesses = this.businesses.filter(x => typeof(x) == "object");
-           // this.paginator(this.businesses);
+           this.paginator(this.businesses);
          })
          .catch((error) => {
            this.$log.debug(error);
