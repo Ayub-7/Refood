@@ -178,8 +178,7 @@ export default {
     },
 
     getInventory() {
-      let filteredInventory = this.inventory.filter(item => (item.quantity>0));
-      return filteredInventory;
+      return this.inventory.filter(item => (item.quantity>0));
     },
 
     getProducts(businessId) {
@@ -194,7 +193,6 @@ export default {
         });
 
     },
-
 
     /**
      * Validates the fields for a new public listing.
