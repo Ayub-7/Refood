@@ -2,14 +2,11 @@ package org.seng302.finders;
 
 
 import org.seng302.models.Product;
+import org.seng302.repositories.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -18,12 +15,8 @@ import java.util.regex.Pattern;
 @Component
 public class ProductFinder {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    private CriteriaQuery<Product> criteriaQuery;
-    private CriteriaBuilder criteriaBuilder;
-    private Root<Product> productRoot;
+    @Autowired
+    ProductRepository productRepository;
 
 
     /**
@@ -40,112 +33,67 @@ public class ProductFinder {
         return terms;
     }
 
-
-    private Predicate criteriaBuilder(String term, boolean isLike) {
-        if (!isLike) {
-            String[] subTerms = term.split(" ");
-            List<Predicate> subTermPredicates = new ArrayList<>();
-
-            for (String subTerm : subTerms) {
-                subTerm = subTerm.strip().toLowerCase();
-                Predicate criteria = criteriaBuilder.equal(criteriaBuilder.lower(productRoot.get("name")), subTerm);
-                subTermPredicates.add(criteria);
-            }
-
-            Predicate combinedCriteria = subTermPredicates.get(0);
-            for (int i = 1; i < subTerms.length; i++) {
-                combinedCriteria = criteriaBuilder.and(combinedCriteria, subTermPredicates.get(i));
-            }
-
-            return combinedCriteria;
-        } else {
-            term = term.strip().toLowerCase();
-            Predicate name = criteriaBuilder.like(criteriaBuilder.lower(productRoot.get("name")), "%" + term + "%");
-
-            return name;
-
-        }
+    /**
+     * Gets specification objects if their name matches query
+     * @param name name of product, used to find all instances of
+     * @return Specification<Product> containing matches for name
+     */
+    private Specification<Product> nameContains(String name) {
+        return (root, query, criteriaBuilder)
+        -> criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%"+name.toLowerCase()+"%");
     }
 
 
     /**
-     * This method is used twice in this class to filter the exact matching results and to filter similar results.
-     * @param terms List of subqueries to be used for searching.
-     * @param isLike If true, it will return results with things that contains query as a whole word or a part of a word.
-     *               Otherwise, it will return results that exactly match the query
-     * @return Return a list of businesses
+     * Builds full specification object to be used in repository query
+     * @param query search query, will be split up into terms and processed
+     * @return Specification<Product> resulting specification that will contain all predicates
      */
-    private List<Product> queryProcess(ArrayList<String> terms, boolean isLike) {
-        List<Predicate> criteriaList = new ArrayList<>();
-
-        Logic logic = Logic.NONE;
-        short consecutive = 0;
+    private Specification<Product> buildProductSpec(String query) {
+        ArrayList<String> terms = searchQueryKeywords(query);
+        Specification<Product> specification = nameContains(terms.get(0).trim());
         for (String term : terms) {
-
-            if (term.strip().equals("AND")) {
-                logic = Logic.AND;
-                consecutive = 0;
-            }
-            else if (term.strip().equals("OR")) {
-                logic = Logic.OR;
-                consecutive = 0;
-            }
-            else { // Not a logic operator.
-                if (consecutive == 1) { // Automatically assume two terms next to each other is AND.
-                    consecutive = 0;
-                    logic = Logic.AND;
-                } else {
-                    consecutive++;
-                }
-
-                Predicate combinedCriteria = this.criteriaBuilder(term, isLike);
-
-                if (criteriaList.isEmpty()) {
-                    logic = Logic.NONE;
-                    criteriaList.add(combinedCriteria);
-                }
-                else if (logic == Logic.AND) {
-                    Predicate predicate = criteriaBuilder.and(criteriaList.get(0), combinedCriteria);
-                    criteriaList.remove(0);
-                    criteriaList.add(predicate);
-                    logic = Logic.NONE;
-
-                }
-                else if (logic == Logic.OR) {
-                    Predicate predicate = criteriaBuilder.or(criteriaList.get(0), combinedCriteria);
-                    criteriaList.remove(0);
-                    criteriaList.add(predicate);
-                    logic = Logic.NONE;
-                }
-                else {
-                    criteriaList.add(combinedCriteria);
-                }
-            }
+            specification = getNextSpecification(specification, term, terms);
         }
-        criteriaQuery.where(criteriaList.get(0));
-        return entityManager.createQuery(criteriaQuery).getResultList();
+
+        return specification;
     }
 
+    /**
+     * Gets next specification will perform AND or OR operation depending on current term and next term
+     * @param specification current specification
+     * @param term current term
+     * @param terms list of terms, used to get next term in sequence
+     * @return Specification<Product> current specification with AND or OR operation applied
+     */
+    private Specification<Product> getNextSpecification(Specification<Product> specification, String term, ArrayList<String> terms) {
+        if (terms.indexOf(term) != terms.size() - 1) {
+            String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
+
+            if (term.strip().equals("AND")) {
+                specification = specification.and(nameContains(nextTerm));
+            } else if (term.strip().equals("OR")) {
+                specification = specification.or(nameContains(nextTerm));
+            } else if(!nextTerm.equals("AND") && !nextTerm.equals("OR")) {
+                specification = specification.and(nameContains(nextTerm));
+            }
+        }
+
+        return specification;
+
+    }
 
     /**
      * The only publicly available method to access outside of this class to search for products
      * @param query The search query to be used to filter search results
-     * @return Will return all businesses if query is blank, otherwise will filter according to what is in the query
+     * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
     public List<Product> findProduct(String query) {
-        criteriaBuilder = entityManager.getCriteriaBuilder();
 
-        criteriaQuery = criteriaBuilder.createQuery(Product.class);
-        productRoot = criteriaQuery.from(Product.class);
-        ArrayList<String> terms = this.searchQueryKeywords(query);
-        if (terms.size() > 0) {
-            List<Product> products = this.queryProcess(terms, false);
-            List<Product> partialProducts = this.queryProcess(terms, true);
-            partialProducts.removeAll(products);
-            products.addAll(partialProducts);
-            return products;
-        } else {
-            return entityManager.createQuery(criteriaQuery).getResultList();
-        }
+        Specification<Product> matches = buildProductSpec(query);
+
+        return productRepository.findAll(matches);
+
+
     }
 }
