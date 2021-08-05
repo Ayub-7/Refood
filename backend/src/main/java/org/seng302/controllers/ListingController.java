@@ -83,10 +83,12 @@ public class ListingController {
     @PostMapping("/businesses/listings")
     public ResponseEntity<String> getAllListings(@RequestBody BusinessListingSearchRequest request,
                                                  @RequestParam("count") int count,
-                                                 @RequestParam("offset") int offset) throws JsonProcessingException {
+                                                 @RequestParam("offset") int offset,
+                                                 @RequestParam("sortDirection") String sortDirection) throws JsonProcessingException {
 
         Sort sort;
         String sortBy = request.getSortBy();
+        // Sort category
         if (sortBy == null) {
             sort = Sort.unsorted();
         }
@@ -105,6 +107,15 @@ public class ListingController {
         else { // Sort By parameter is not what we were expecting.
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected sort parameter.");
         }
+
+        // Sort direction
+        if (sortDirection.equalsIgnoreCase("desc")) {
+            sort = sort.descending();
+        }
+        else {
+            sort = sort.ascending();
+        }
+
 
         ListingSpecifications specifications = new ListingSpecifications(request);
         Pageable pageRange = PageRequest.of(offset, count, sort);
