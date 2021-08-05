@@ -1,4 +1,4 @@
-package org.seng302.team900.steps;
+package org.seng302.steps;
 
 
 import io.cucumber.java.Before;

@@ -208,7 +208,11 @@ class CardControllerTests {
     @WithMockUser
     void testGetCards_returnOk() throws Exception {
         mvc.perform(get("/cards")
-                .param("section", "ForSale"))
+                .param("section", "ForSale")
+                .param("numOfPages", String.valueOf(1))
+                .param("resultsPerPage", String.valueOf(1))
+                .param("sortBy", "created")
+                .param("reverse", String.valueOf(true)))
                 .andExpect(status().isOk());
     }
 
