@@ -1722,6 +1722,23 @@ components:
             - Retail Trade
             - Charitable organisation
             - Non-profit organisation
+            - Administrative and Support services
+            - Agriculture, Forestry and Fishing
+            - Arts and Recreation Services
+            - Construction
+            - Education and Training
+            - Electricity, Gas, Water and Waste Services
+            - Financial and Insurance Services
+            - Health Care and Social Assistance
+            - Information Media and Telecommunication
+            - Manufacturing
+            - Mining
+            - Professional, Scientific and Technical Services
+            - Public Administration and Safety
+            - Rental, Hiring and Real Estate Services
+            - Transport, Postal and Warehousing
+            - Wholesale Trade
+            - Other Services
         created:
           type: string
           format: date-time

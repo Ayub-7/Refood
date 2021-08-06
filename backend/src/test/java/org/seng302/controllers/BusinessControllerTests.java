@@ -377,9 +377,33 @@ class BusinessControllerTests {
         assert results.getResponse().getStatus() == HttpStatus.OK.value();
     }
 
+    @Test
+    @WithMockUser
+    void loggedInBusinessSearch_newBusinessType_returns200() throws Exception {
+        MvcResult results = mvc.perform(get("/businesses/search")
+                .param("query", "Pizza")
+                .param("type", "AGRICULTURE FORESTRY AND FISHING"))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+    }
 
+    @Test
+    @WithMockUser
+    void loggedInBusinessSearch_newBusinessType2_returns200() throws Exception {
+        MvcResult results = mvc.perform(get("/businesses/search")
+                .param("query", "Pizza")
+                .param("type", "INFORMATION MEDIA AND TELECOMMUNICATION"))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+    }
 
-
-
-
+    @Test
+    @WithMockUser
+    void loggedInBusinessSearch_InvalidBusinessType_returns200() throws Exception {
+        MvcResult results = mvc.perform(get("/businesses/search")
+                .param("query", "Pizza")
+                .param("type", ".,/.,1!#@@%^$^&*(())sauiul';';"))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+    }
 }
