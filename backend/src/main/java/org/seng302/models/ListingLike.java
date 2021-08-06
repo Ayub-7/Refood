@@ -1,5 +1,6 @@
 package org.seng302.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -15,9 +16,11 @@ import javax.persistence.*;
 public class ListingLike {
 
     @Id
+    @JsonIgnore
     private long userId;
 
     @Id
+    @JsonIgnore
     private long listingId;
 
     @OneToOne
