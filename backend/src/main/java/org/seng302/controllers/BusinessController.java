@@ -15,10 +15,15 @@ import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.awt.print.Pageable;
+
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -200,11 +205,13 @@ public class BusinessController {
      * @return Http status code and list of businesses with name/names matching request.
      */
     @GetMapping("/businesses/search")
-    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, @RequestParam(name="page") int page, HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
         System.out.println("Searching for businesses...");
-        List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query, type));
-
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        Specification<Business> matches = businessFinder.findBusinesses(query);
+        Page<Business> unfilteredBusinesses =  businessRepository.findAll(matches, pageRequest);
+        Page<Business> businesses = removeBusinessesAdministered(unfilteredBusinesses);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
     }
 
@@ -215,7 +222,7 @@ public class BusinessController {
      * @param businesses List of businesses that needs businessesAdministered removed
      * @return List of businesses with businessesAdministered field set to null
      */
-    private List<Business> removeBusinessesAdministered(List<Business> businesses) {
+    private Page<Business> removeBusinessesAdministered(Page<Business> businesses) {
         logger.debug("Removing businessesAdministered...");
         for(Business business: businesses) {
             List<User> admins = business.getAdministrators();
