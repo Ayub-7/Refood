@@ -11,6 +11,7 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.NotificationRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -136,7 +137,7 @@ public class CardController {
             logger.error("Bad section parameter input.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Section does not exist.");
         }
-        List<Card> cards = cardRepository.findAllBySection(marketplaceSection,
+        Page<Card> cards = cardRepository.findAllBySection(marketplaceSection,
                 this.sortAndPaginateCards(pageNum, resultsPerPage, sortBy, reverse));
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }

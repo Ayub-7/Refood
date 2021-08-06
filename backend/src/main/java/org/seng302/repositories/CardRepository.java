@@ -3,6 +3,7 @@ package org.seng302.repositories;
 import org.seng302.models.Card;
 import org.seng302.models.MarketplaceSection;
 import org.seng302.models.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -42,7 +43,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      * @param pageable helper Pageable object that is passed in the controller class.
      * @return List<Card> a list of cards matching section
      */
-    List<Card> findAllBySection(MarketplaceSection section, Pageable pageable);
+    Page<Card> findAllBySection(MarketplaceSection section, Pageable pageable);
 
     List<Card> findAllByDisplayPeriodEndBefore(Date date);
 
