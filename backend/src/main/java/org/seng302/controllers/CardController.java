@@ -99,7 +99,7 @@ public class CardController {
             orderDirection = Sort.Direction.ASC;
         }
         Set<String> sortAttributes = Set.of("title", "created", "keywords", "country");
-        if (!sortAttributes.contains(orderBy) || orderBy == null) {
+        if (orderBy == null || !sortAttributes.contains(orderBy)) {
             orderBy = "created";
         }
         List<Sort.Order> order;

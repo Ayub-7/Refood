@@ -216,8 +216,38 @@ class CardControllerTests {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @WithMockUser
+    void testGetCards_returnOk_not_reverse() throws Exception {
+        mvc.perform(get("/cards")
+                .param("section", "ForSale")
+                .param("pageNum", String.valueOf(1))
+                .param("resultsPerPage", String.valueOf(1))
+                .param("sortBy", "created"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetCards_returnOk_no_required_params() throws Exception {
+        mvc.perform(get("/cards")
+                .param("section", "ForSale")
+                .param("pageNum", String.valueOf(1))
+                .param("resultsPerPage", String.valueOf(1)))
+                .andExpect(status().isOk());
+    }
 
 
+    @Test
+    @WithMockUser
+    void testGetCards_returnOk_sort_by_country() throws Exception {
+        mvc.perform(get("/cards")
+                .param("section", "ForSale")
+                .param("pageNum", String.valueOf(1))
+                .param("resultsPerPage", String.valueOf(1))
+                .param("sortBy", "country"))
+                .andExpect(status().isOk());
+    }
 
     //GET by ID tests
 
