@@ -1551,6 +1551,11 @@ components:
           format: date-time
           example: '2021-07-21T23:59:00Z'
           description: Date and time when the listing closes (defaults to expiry date of related inventory item)
+        likes:
+          type: number
+          format: integer
+          example: 10
+          description: The number of likes the listing has received (defaults to 0)
 
     InventoryItem:
       type: object
