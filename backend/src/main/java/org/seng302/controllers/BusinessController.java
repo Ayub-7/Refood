@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.BusinessFinder;
+import org.seng302.finders.AddressFinder;
 import org.seng302.models.Business;
 import org.seng302.models.Role;
 import org.seng302.models.User;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -38,6 +40,10 @@ public class BusinessController {
 
     @Autowired
     private BusinessFinder businessFinder;
+
+    @Autowired
+    private AddressFinder addressFinder;
+
 
     /**
      * Get request mapping for getting business by id
@@ -207,6 +213,16 @@ public class BusinessController {
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
     }
+    @GetMapping("/businesses/location")
+        public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
+            logger.debug("Searching for businesses...");
+            System.out.println("Searching for businesses...");
+            Specification<Business> specification = addressFinder.findAddress(query);
+
+            List<Business> businesses = removeBusinessesAdministered(businessRepository.findAll(specification));
+
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
+        }
 
 
     /**
