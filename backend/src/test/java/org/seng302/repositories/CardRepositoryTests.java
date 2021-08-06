@@ -11,6 +11,9 @@ import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.MarketplaceSection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestConstructor;
 
@@ -117,7 +120,8 @@ class CardRepositoryTests {
      */
     @Test
     void findInventoryBySectionExpectsList() {
-        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.FORSALE);
+        Pageable mockPageable = PageRequest.of(0, 10, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "created").ignoreCase())));
+        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.FORSALE, mockPageable);
         assertThat(cardList.size()).isEqualTo(2);
     }
 
@@ -129,7 +133,8 @@ class CardRepositoryTests {
      */
     @Test
     void findInventoryBySectionExpectsEmptyList() {
-        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED);
+        Pageable mockPageable = PageRequest.of(1, 10, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "created").ignoreCase())));
+        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED, mockPageable);
         assertThat(cardList.size()).isEqualTo(0);
     }
 

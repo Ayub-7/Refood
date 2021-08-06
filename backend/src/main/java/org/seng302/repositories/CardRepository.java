@@ -39,9 +39,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
      * FORSALE, WANTED, EXCHANGE
      *
      * @param section enum of MarketplaceSection
+     * @param pageable helper Pageable object that is passed in the controller class.
      * @return List<Card> a list of cards matching section
      */
-    List<Card> findAllBySection(MarketplaceSection section);
     List<Card> findAllBySection(MarketplaceSection section, Pageable pageable);
 
     List<Card> findAllByDisplayPeriodEndBefore(Date date);

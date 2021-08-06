@@ -85,10 +85,18 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(cardIdResponse));
     }
 
-    private PageRequest sortAndPaginate(int numOfPage, int resultsPerPage, String orderBy, boolean reverse) {
-        Sort.Direction orderDirection = Sort.Direction.ASC;
-        if (reverse) {
-            orderDirection = Sort.Direction.DESC;
+    /**
+     * Helper function to sort and paginate cards. Only available in this class.
+     * @param pageNum
+     * @param resultsPerPage
+     * @param orderBy
+     * @param reverse
+     * @return
+     */
+    private PageRequest sortAndPaginateCards(int pageNum, int resultsPerPage, String orderBy, boolean reverse) {
+        Sort.Direction orderDirection = Sort.Direction.DESC;
+        if (!reverse) {
+            orderDirection = Sort.Direction.ASC;
         }
         Set<String> sortAttributes = Set.of("title", "created", "keywords", "country");
         if (!sortAttributes.contains(orderBy) || orderBy == null) {
@@ -100,26 +108,27 @@ public class CardController {
         } else {
             order = List.of(new Sort.Order(orderDirection, orderBy).ignoreCase());
         }
-        return PageRequest.of(numOfPage-1, resultsPerPage, Sort.by(order));
+        return PageRequest.of(pageNum-1, resultsPerPage, Sort.by(order));
     }
 
     /**
      * Retrieves all cards from a given section parameter.
      * @param section the string section name.
+     * @param pageNum Number of page, the bounds start from 1. Anything below 1 will return 500 HTTP Status error.
+     * @param resultsPerPage Number of results per page.
      * @param sortBy The expected values are CREATED, TITLE, COUNTRY, and KEYWORDS.
      *               Where the cards will be sorted by one of the four attributes, and the default is by CREATED.
-     * @param ascending Not always passed but the default is ascending order; however, if false is passed, the list will
-     *                  be sorted in descending order.
+     * @param reverse Default is true.
      * @return 401 (if no auth), 400 if section does not exist, 200 otherwise, along with the list of cards in that section.
      * @throws JsonProcessingException if converting the list of cards into a JSON string fails.
      */
     @GetMapping("/cards")
     public ResponseEntity<String> getCardsFromSection(@RequestParam(name="section") String section,
-                                                      @RequestParam int numOfPages,
+                                                      @RequestParam int pageNum,
                                                       @RequestParam int resultsPerPage,
                                                       @RequestParam(required = false) String sortBy,
                                                       @RequestParam(required = false) boolean reverse) throws JsonProcessingException {
-        MarketplaceSection marketplaceSection = null;
+        MarketplaceSection marketplaceSection;
 
         // Attempt to get the section enum (string is made uppercase to get correct value).
         try {
@@ -128,8 +137,8 @@ public class CardController {
             logger.error("Bad section parameter input.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Section does not exist.");
         }
-            List<Card> cards = cardRepository.findAllBySection(marketplaceSection,
-                this.sortAndPaginate(numOfPages, resultsPerPage, sortBy, reverse));
+        List<Card> cards = cardRepository.findAllBySection(marketplaceSection,
+                this.sortAndPaginateCards(pageNum, resultsPerPage, sortBy, reverse));
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }
 

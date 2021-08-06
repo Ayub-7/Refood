@@ -209,7 +209,7 @@ class CardControllerTests {
     void testGetCards_returnOk() throws Exception {
         mvc.perform(get("/cards")
                 .param("section", "ForSale")
-                .param("numOfPages", String.valueOf(1))
+                .param("pageNum", String.valueOf(1))
                 .param("resultsPerPage", String.valueOf(1))
                 .param("sortBy", "created")
                 .param("reverse", String.valueOf(true)))
