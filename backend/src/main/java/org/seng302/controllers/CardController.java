@@ -87,11 +87,11 @@ public class CardController {
 
     /**
      * Helper function to sort and paginate cards. Only available in this class.
-     * @param pageNum
-     * @param resultsPerPage
-     * @param orderBy
-     * @param reverse
-     * @return
+     * @param pageNum Page number
+     * @param resultsPerPage Results per page
+     * @param orderBy attribute to order with
+     * @param reverse If false, will be ascending order. Otherwise, descending.
+     * @return PageRequest to help with respository request.
      */
     private PageRequest sortAndPaginateCards(int pageNum, int resultsPerPage, String orderBy, boolean reverse) {
         Sort.Direction orderDirection = Sort.Direction.DESC;
