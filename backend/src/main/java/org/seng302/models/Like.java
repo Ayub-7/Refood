@@ -20,7 +20,7 @@ public class Like {
     private User user;
 
     @Id
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "listing_id", referencedColumnName = "id")
     private Listing listing;
 
