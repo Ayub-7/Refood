@@ -1340,28 +1340,6 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
-  '/business/types':
-    get:
-      tags:
-        - 'Business Accounts'
-        - 'U29 : Browse/search sale listings'
-      summary: Retrieve all of the business type enums and return them as the string values.
-      security:
-        - CookieAuth:
-            - globalApplicationAdmin
-            - defaultGlobalApplicationAdmin
-      responses:
-        '200':
-          description: Retrieves all business types in array of strings
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BusinessTypesResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-
   '/businesses/listings':
     post:
       tags:
@@ -1378,11 +1356,19 @@ paths:
           schema:
             type: number
           description: 'How many results per page to return'
+          example: '10'
         - in: query
           name: offset
           schema:
             type: number
           description: 'How many pages to skip before returning the results'
+          example: '2'
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+          description: 'Which direction to sort by: asc, desc. Invalid directions default to asc'
+          example: 'desc'
       requestBody:
         content:
           application/json:
@@ -1874,21 +1860,6 @@ components:
           readOnly: true
           description: The time and date when the message was sent to the receiver
 
-    BusinessTypesResponse:
-      type: object
-      properties:
-        businessTypes:
-          type: array
-          items:
-            type: string
-            enum:
-              - Accommodation and Food Services
-              - Retail Trade
-              - Charitable organisation
-              - Non-profit organisation
-          example: ["Accommodation and Food Services", "Retail Trade", "Charitable organisation", "Non-profit organisation"]
-          description: "Get all business types"
-
     BusinessListingSearchRequest:
       type: object
       properties:
@@ -1938,3 +1909,15 @@ components:
           format: date
           description: 'Limit the results by setting a maximum closing date'
           example: '2021-09-12 12:00:00'
+
+    Like:
+      type: object
+      description: An entity representing a user liking a sale listing
+      required:
+        - user
+        - listing
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        listing:
+          $ref: '#/components/schemas/Listing'
