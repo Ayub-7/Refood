@@ -50,12 +50,8 @@ import org.springframework.stereotype.Component;
 public class MainApplicationRunner implements ApplicationRunner {
 
   private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
-  private UserRepository userRepository;
-  private BusinessRepository businessRepository;
-  @Autowired private ProductRepository productRepository;
-  @Autowired private ListingRepository listingRepository;
-  @Autowired private InventoryRepository inventoryRepository;
 
+  @Autowired
   private SchedAdminCheck schedAdminCheck;
 
 
@@ -64,13 +60,10 @@ public class MainApplicationRunner implements ApplicationRunner {
    * annotation). Injected constructors can be supplied with instances of other
    * classes (i.e. dependency injection)
    *
-   * @param userRepository the user repository.
    */
   @Autowired
-  public MainApplicationRunner(UserRepository userRepository, BusinessRepository businessRepository, SchedAdminCheck schedAdminCheck) {
-    this.userRepository = userRepository;
-    this.businessRepository = businessRepository;
-    this.schedAdminCheck = schedAdminCheck;
+  public MainApplicationRunner() {
+
   }
 
   /**
