@@ -1,0 +1,7 @@
+package org.seng302.repositories;
+
+import org.seng302.models.ListingLike;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ListingLikeRepository extends JpaRepository<ListingLike, Long> {
+}
