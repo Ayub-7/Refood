@@ -4,13 +4,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.With;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
@@ -19,14 +15,11 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.junit.Assert.*;
 
 
 import javax.xml.bind.ValidationException;
@@ -34,7 +27,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -234,6 +226,17 @@ class CardControllerTests {
                 .param("section", "ForSale")
                 .param("pageNum", String.valueOf(1))
                 .param("resultsPerPage", String.valueOf(1)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetCards_returnOk_with_bad_sortBy() throws Exception {
+        mvc.perform(get("/cards")
+                .param("section", "ForSale")
+                .param("pageNum", String.valueOf(1))
+                .param("resultsPerPage", String.valueOf(1))
+                .param("sortBy", "bababooey"))
                 .andExpect(status().isOk());
     }
 
