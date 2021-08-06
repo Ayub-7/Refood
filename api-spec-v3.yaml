@@ -891,6 +891,40 @@ paths:
               - ForSale
               - Wanted
               - Exchange
+
+        - name: pageNum
+          in: query
+          description: On frontend, 1 will be passed to start from first page.
+          required: true
+          schema:
+            type: integer
+        - name: resultsPerPage
+          in: query
+          description: Number of cards per page.
+          required: true
+          schema:
+            type: integer
+
+        - name: sortBy
+          in: query
+          description: Can sort by the following attributes; CREATED, TITLE, COUNTRY, and KEYWORDS.
+            If the parameter is not passed, the default sorting is CREATED.
+          required: false
+          schema:
+            type: string
+            enum:
+              - CREATED
+              - TITLE
+              - COUNTRY
+              - KEYWORDS
+
+
+        - name: reverse
+          in: query
+          description: False by default, but if true, the list will be sorted in descending order.
+          required: false
+          schema:
+            type: boolean
       security:
         - CookieAuth:
             - user
