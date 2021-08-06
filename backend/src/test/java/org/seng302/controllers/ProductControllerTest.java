@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -51,6 +52,8 @@ class ProductControllerTest {
     private ProductRepository productRepository;
     @MockBean
     private FileService fileService;
+    @MockBean
+    private ProductFinder productFinder;
     @Autowired
     private ObjectMapper mapper;
 

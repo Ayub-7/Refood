@@ -88,12 +88,10 @@ public class ProductFinder {
      * @param query The search query to be used to filter search results
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
-    public List<Product> findProduct(String query) {
-
+    public Specification<Product> findProduct(String query) {
         Specification<Product> matches = buildProductSpec(query);
 
-        return productRepository.findAll(matches);
-
+        return matches;
 
     }
 }

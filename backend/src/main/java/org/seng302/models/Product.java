@@ -39,7 +39,7 @@ public class Product {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
-    @OneToMany(cascade = CascadeType.ALL) // Creates a table PRODUCT_IMAGES.
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Creates a table PRODUCT_IMAGES.
     private List<Image> images;
 
     private String primaryImagePath;
@@ -91,7 +91,6 @@ public class Product {
 
     public void deleteProductImage(String imageId) {
         Image removeImage = null;
-        System.out.println(this.images);
         for (Image image: this.images) {
             if (image.getId().equals(imageId)) {
                 this.images.remove(image);
