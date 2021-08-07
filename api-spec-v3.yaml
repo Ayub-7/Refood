@@ -1340,32 +1340,10 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
-  '/business/types':
-    get:
-      tags:
-        - 'Business Accounts'
-        - 'U29 : Browse/search sale listings'
-      summary: Retrieve all of the business type enums and return them as the string values.
-      security:
-        - CookieAuth:
-            - globalApplicationAdmin
-            - defaultGlobalApplicationAdmin
-      responses:
-        '200':
-          description: Retrieves all business types in array of strings
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BusinessTypesResponse'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-
   '/businesses/listings':
     post:
       tags:
-        - 'Business Accounts'
+        - 'Listing / sales'
         - 'U29 : Browse/search sale listings'
       summary: Search across all business listings with (optional) given parameters.
       security:
@@ -1409,6 +1387,38 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+
+  '/businesses/{businessId}/listing/{listingId}/like':
+      post:
+        tags:
+          - 'Listing / sales'
+          - 'U29 : Browse/search sale listings'
+        summary:
+          Add a user like to a sale listing
+        security:
+          - CookieAuth:
+              - globalApplicationAdmin
+              - defaultGlobalApplicationAdmin
+        parameters:
+          - in: path
+            name: businessId
+            description: Id of the business that the listing is owned by
+            required: true
+            example: 3
+          - in: path
+            name: listingId
+            description: Id of the listing
+            required: true
+            example: 50
+        responses:
+          '201':
+            description: The listing was successfully liked
+          '400':
+            $ref: '#/components/responses/BadRequestError'
+          '401':
+            $ref: '#/components/responses/UnauthorizedError'
+          '406':
+            $ref: '#/components/responses/NotAcceptableError'
 
 components:
   securitySchemes:
@@ -1573,6 +1583,11 @@ components:
           format: date-time
           example: '2021-07-21T23:59:00Z'
           description: Date and time when the listing closes (defaults to expiry date of related inventory item)
+        likes:
+          type: number
+          format: integer
+          example: 10
+          description: The number of likes the listing has received (defaults to 0)
 
     InventoryItem:
       type: object
@@ -1730,23 +1745,6 @@ components:
             - Retail Trade
             - Charitable organisation
             - Non-profit organisation
-            - Administrative and Support services
-            - Agriculture, Forestry and Fishing
-            - Arts and Recreation Services
-            - Construction
-            - Education and Training
-            - Electricity, Gas, Water and Waste Services
-            - Financial and Insurance Services
-            - Health Care and Social Assistance
-            - Information Media and Telecommunication
-            - Manufacturing
-            - Mining
-            - Professional, Scientific and Technical Services
-            - Public Administration and Safety
-            - Rental, Hiring and Real Estate Services
-            - Transport, Postal and Warehousing
-            - Wholesale Trade
-            - Other Services
         created:
           type: string
           format: date-time
@@ -1899,21 +1897,6 @@ components:
           readOnly: true
           description: The time and date when the message was sent to the receiver
 
-    BusinessTypesResponse:
-      type: object
-      properties:
-        businessTypes:
-          type: array
-          items:
-            type: string
-            enum:
-              - Accommodation and Food Services
-              - Retail Trade
-              - Charitable organisation
-              - Non-profit organisation
-          example: ["Accommodation and Food Services", "Retail Trade", "Charitable organisation", "Non-profit organisation"]
-          description: "Get all business types"
-
     BusinessListingSearchRequest:
       type: object
       properties:
@@ -1963,3 +1946,15 @@ components:
           format: date
           description: 'Limit the results by setting a maximum closing date'
           example: '2021-09-12 12:00:00'
+
+    Like:
+      type: object
+      description: An entity representing a user liking a sale listing
+      required:
+        - user
+        - listing
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        listing:
+          $ref: '#/components/schemas/Listing'
