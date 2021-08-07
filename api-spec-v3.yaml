@@ -1389,36 +1389,60 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
 
   '/businesses/{businessId}/listing/{listingId}/like':
-      post:
-        tags:
-          - 'Listing / sales'
-          - 'U29 : Browse/search sale listings'
-        summary:
-          Add a user like to a sale listing
-        security:
-          - CookieAuth:
-              - globalApplicationAdmin
-              - defaultGlobalApplicationAdmin
-        parameters:
-          - in: path
-            name: businessId
-            description: Id of the business that the listing is owned by
-            required: true
-            example: 3
-          - in: path
-            name: listingId
-            description: Id of the listing
-            required: true
-            example: 50
-        responses:
-          '201':
-            description: The listing was successfully liked
-          '400':
-            $ref: '#/components/responses/BadRequestError'
-          '401':
-            $ref: '#/components/responses/UnauthorizedError'
-          '406':
-            $ref: '#/components/responses/NotAcceptableError'
+    post:
+      tags:
+        - 'Listings / sales'
+        - 'U29 : Browse/search sale listings'
+      summary: Add a user like to a sale listing
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: businessId
+          description: Id of the business that the listing is owned by
+          required: true
+          example: 3
+        - in: path
+          name: listingId
+          description: Id of the listing
+          required: true
+          example: 50
+      responses:
+        '201':
+          description: The listing was successfully liked
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+    delete:
+      tags:
+        - 'Listings / sales'
+        - 'U29 : Browse/search sale listings'
+      summary: Delete a user like on a listing
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: businessId
+          description: Id of the business that the listing is owned by
+          required: true
+          example: 3
+        - in: path
+          name: listingId
+          description: Id of the listing
+          required: true
+          example: 50
+      responses:
+        '200':
+          description: The listing like was successfully removed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
 components:
   securitySchemes:
