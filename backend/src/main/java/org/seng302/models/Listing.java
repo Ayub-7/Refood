@@ -74,6 +74,12 @@ public class Listing {
         }
     }
 
+    /**
+     * Checks if the new listing details are valid.
+     * @param inventoryItem the inventory item the listing is associated with.
+     * @param req the dto class that holds the details to be checked.
+     * @return true if all details are valid, false otherwise.
+     */
     private boolean validListingRequest(Inventory inventoryItem, NewListingRequest req) {
         Date today = Calendar.getInstance().getTime();
         if(inventoryItem == null){

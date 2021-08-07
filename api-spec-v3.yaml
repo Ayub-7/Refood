@@ -1378,11 +1378,19 @@ paths:
           schema:
             type: number
           description: 'How many results per page to return'
+          example: '10'
         - in: query
           name: offset
           schema:
             type: number
           description: 'How many pages to skip before returning the results'
+          example: '2'
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+          description: 'Which direction to sort by: asc, desc. Invalid directions default to asc'
+          example: 'desc'
       requestBody:
         content:
           application/json:

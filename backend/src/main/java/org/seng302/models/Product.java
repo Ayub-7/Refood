@@ -2,8 +2,10 @@ package org.seng302.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import org.seng302.models.requests.NewProductRequest;
+import org.seng302.utilities.serializers.ProductBusinessSerializer;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,6 +27,11 @@ public class Product {
     @JsonIgnore
     private long businessId;
 
+    @ManyToOne
+    @JsonSerialize(using = ProductBusinessSerializer.class)
+    @JoinColumn(name = "businessId", insertable = false, updatable = false)
+    private Business business;
+
     private String name;
     private String description;
     private String manufacturer;
@@ -39,9 +46,10 @@ public class Product {
 
     protected Product() { }
 
-    public Product(String id, long businessId, String name, String description, String manufacturer, double recommendedRetailPrice, Date created) {
+    public Product(String id, Business business, String name, String description, String manufacturer, double recommendedRetailPrice, Date created) {
         this.id = id;
-        this.businessId = businessId;
+        this.businessId = business.getId();
+        this.business = business;
         this.name = name;
         this.description = description;
         this.manufacturer = manufacturer;

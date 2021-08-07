@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7c0383c0-664d-43f9-b5e6-8f84302c8dbc",
+		"_postman_id": "d2e410c5-22ef-4e10-9a93-b65144ed84fe",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -251,7 +251,9 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": ""
+						}
 					},
 					"response": []
 				}
@@ -387,6 +389,71 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Inventory Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/1/inventory",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"1",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listings",
+			"item": [
+				{
+					"name": "Retrieve Sale Listings",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sortBy\": \"businessType\",\r\n    \"minPrice\": 10.00,\r\n    \"maxPrice\": 20.00,\r\n    \"minClosingDate\": \"2021-09-01 06:00:00\",\r\n    \"maxClosingDate\": \"2021-09-30 23:59:59\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/listings?count=10&offset=0&sortDirection=asc",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings"
+							],
+							"query": [
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "sortDirection",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -399,13 +466,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/:id",
+							"raw": "{{URL}}/businesses/:id/products",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
 								"businesses",
-								":id"
+								":id",
+								"products"
 							],
 							"variable": [
 								{
@@ -577,7 +645,9 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": ""
+						}
 					},
 					"response": []
 				}

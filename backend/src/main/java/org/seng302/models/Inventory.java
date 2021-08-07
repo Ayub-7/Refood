@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Entity class that holds the information of a businesss product inventory.
+ * Entity class that holds the information of a business product inventory.
  */
 @Data
 @Entity

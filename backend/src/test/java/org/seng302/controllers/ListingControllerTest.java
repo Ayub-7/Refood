@@ -5,9 +5,13 @@ import io.cucumber.java.ca.Cal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.ListingSpecifications;
 import org.seng302.models.*;
+import org.seng302.models.requests.BusinessListingSearchRequest;
+import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -22,7 +26,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.LinkedMultiValueMap;
 
+import java.awt.print.Pageable;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -66,6 +72,7 @@ class ListingControllerTest {
     private Product product1;
     private Inventory inventory1;
     private Listing listing1;
+    private Listing listing2;
     private NewListingRequest newListingRequest;
 
     @BeforeEach
@@ -83,7 +90,7 @@ class ListingControllerTest {
         business.createBusiness(ownerUser);
         business.getAdministrators().add(adminUser);
 
-        product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
+        product1 = new Product("07-4957066", business, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
 
         Calendar afterCalendar = Calendar.getInstance();
         afterCalendar.set(2022, 1, 1);
@@ -97,6 +104,12 @@ class ListingControllerTest {
         newListingRequest = new NewListingRequest(inventory1.getId(), 2, 2.99, "more info", laterDate);
         listing1 = new Listing(inventory1, 5, 2.0, "Seller may be interested in offers", new Date(), laterDate);
         listingRepository.save(listing1);
+
+        afterCalendar.set(2022, 2, 2);
+        Date anotherLaterDate = afterCalendar.getTime();
+        listing2 = new Listing(inventory1, 10, 10.0, "Seller may be interested in offers", new Date(), anotherLaterDate);
+        listingRepository.save(listing2);
+
         assertThat(business.getAdministrators().size()).isEqualTo(2);
     }
 
@@ -312,6 +325,139 @@ class ListingControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(listing1)))
                 .andExpect(status().isBadRequest());
+    }
+
+    //
+    // POST get all listings
+    //
+
+    @Test
+    void testPostAllListings_noAuth_returnUnauthorized() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content("{}")) // No filter/sort parameters
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostAllListings_invalidSortOption_returnBadRequest() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+
+        BusinessListingSearchRequest request = new BusinessListingSearchRequest();
+        request.setSortBy("invalidSort");
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content(mapper.writeValueAsString(request))) // No filter/sort parameters
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostAllListings_validRequest_returnOk() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+        requestParams.add("sortDirection", "asc");
+
+        List<Listing> results = new ArrayList<>();
+        results.add(listing1);
+        results.add(listing2);
+
+        Mockito.when(listingRepository.findAll()).thenReturn(results);
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content("{}")) // No filter/sort parameters
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostAllListings_sortByProductName_returnOk() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+        requestParams.add("sortDirection", "asc");
+
+        BusinessListingSearchRequest request = new BusinessListingSearchRequest();
+        request.setSortBy("name");
+
+        List<Listing> results = new ArrayList<>();
+        results.add(listing1);
+        results.add(listing2);
+
+        Mockito.when(listingRepository.findAll()).thenReturn(results);
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostAllListings_sortByExpiry_returnOk() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+        requestParams.add("sortDirection", "asc");
+
+        BusinessListingSearchRequest request = new BusinessListingSearchRequest();
+        request.setSortBy("expires");
+
+        List<Listing> results = new ArrayList<>();
+        results.add(listing1);
+        results.add(listing2);
+
+        Mockito.when(listingRepository.findAll()).thenReturn(results);
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostAllListings_sortByCloseDate_returnOk() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+        requestParams.add("sortDirection", "asc");
+
+        BusinessListingSearchRequest request = new BusinessListingSearchRequest();
+        request.setSortBy("closes");
+
+        List<Listing> results = new ArrayList<>();
+        results.add(listing1);
+        results.add(listing2);
+
+        Mockito.when(listingRepository.findAll()).thenReturn(results);
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
     }
 
 }
