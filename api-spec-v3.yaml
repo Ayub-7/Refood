@@ -1444,6 +1444,38 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
+  '/users/{id}/likes':
+    get:
+      tags:
+        - 'Users'
+        - 'U29 : Browse/search sale listings'
+      summary: Retrieved all liked listings for a specific user
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Id of the user to obtain likes from
+          required: true
+          example: 3
+      responses:
+        '200':
+          description: A (potentially empty) list of liked listings was retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Like'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
 components:
   securitySchemes:
     CookieAuth:
