@@ -47,6 +47,15 @@ public class ListingController {
     private ObjectMapper mapper;
 
     /**
+     * Constructor used for cucumber testing.
+     * @param listingRepository repository for listings
+     */
+    public ListingController(ListingRepository listingRepository, ObjectMapper mapper) {
+        this.listingRepository = listingRepository;
+        this.mapper = mapper;
+    }
+
+    /**
      * Get request mapping for getting Listing by id
      * @param id the businesses' id
      * @return ResponseEntity - 401 when unauthorized (handled by spring sec). 406 when Listing doesn't exist. 200 otherwise.

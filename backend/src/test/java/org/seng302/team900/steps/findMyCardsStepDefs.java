@@ -77,7 +77,8 @@ public class findMyCardsStepDefs {
 
 
     @Given("A user named {string} exists with {int} cards")
-    public void a_user_named_exists_with_cards(String userName, Integer numCards) throws ValidationException {        NewCardRequest card = new NewCardRequest(this.user.getId(), "card", "description", "keyword", MarketplaceSection.FORSALE);
+    public void a_user_named_exists_with_cards(String userName, Integer numCards) throws ValidationException {
+        NewCardRequest card = new NewCardRequest(this.user.getId(), "card", "description", "keyword", MarketplaceSection.FORSALE);
         assertThat(this.user.getFirstName()).isEqualTo(userName);
         assertThat(cardRepository.findCardsByUser(this.user).size()).isEqualTo(numCards);
     }
