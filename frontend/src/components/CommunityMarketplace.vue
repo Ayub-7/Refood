@@ -133,7 +133,7 @@ export default {
       api.getCardsBySection(section, sortBy, ascending)
           .then((res) => {
             
-            this.cards = res.data;
+            this.cards = res.data.slice(0,100);
 
             //Fixes issue with changing to section with less cards than what you already have
             if(this.currentPage >= Math.round(this.cards.length/this.itemPerPage +0.4)) {
