@@ -1388,7 +1388,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  '/businesses/{businessId}/listings/{listingId}/like':
+  '/businesses/listings/{id}/like':
     post:
       tags:
         - 'Listings / sales'
@@ -1400,12 +1400,7 @@ paths:
             - defaultGlobalApplicationAdmin
       parameters:
         - in: path
-          name: businessId
-          description: Id of the business that the listing is owned by
-          required: true
-          example: 3
-        - in: path
-          name: listingId
+          name: id
           description: Id of the listing
           required: true
           example: 50
@@ -1427,12 +1422,7 @@ paths:
             - defaultGlobalApplicationAdmin
       parameters:
         - in: path
-          name: businessId
-          description: Id of the business that the listing is owned by
-          required: true
-          example: 3
-        - in: path
-          name: listingId
+          name: id
           description: Id of the listing
           required: true
           example: 50
