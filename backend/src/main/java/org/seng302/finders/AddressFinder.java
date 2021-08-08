@@ -42,25 +42,26 @@ public class AddressFinder {
      * @return Specification<Product> containing matches for name
      */
     private Specification<Business> countryContains(String term) {
+        System.out.println(term);
         return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("address").get("country")), "%"+term.toLowerCase()+"%");
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%"+term.toLowerCase()+"%");
 
         };
     }
 
     private Specification<Business> suburbContains(String term) {
-      return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("suburb")), "%"+term.toLowerCase()+"%");
+        return (root, query, criteriaBuilder)
+                -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("suburb")), "%"+term.toLowerCase()+"%");
     }
 
     private Specification<Business> cityContains(String term) {
-      return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("city")), "%"+term.toLowerCase()+"%");
+        return (root, query, criteriaBuilder)
+                -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("city")), "%"+term.toLowerCase()+"%");
     }
 
     private Specification<Business> regionContains(String term) {
-      return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("region")), "%"+term.toLowerCase()+"%");
+        return (root, query, criteriaBuilder)
+                -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("region")), "%"+term.toLowerCase()+"%");
     }
 
 
@@ -79,7 +80,7 @@ public class AddressFinder {
         if(predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {
-             currentSpecification = currentSpecification.or(newSpec);
+            currentSpecification = currentSpecification.or(newSpec);
         }
 
 
@@ -96,7 +97,7 @@ public class AddressFinder {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
         Specification<Business> specification = buildQuery(terms.get(0))
-        ;
+                ;
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }
