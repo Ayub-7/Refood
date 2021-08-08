@@ -47,7 +47,7 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "administrators")
     private List<Business> businessesAdministered;
 
 
