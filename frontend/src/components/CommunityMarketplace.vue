@@ -60,14 +60,14 @@
 
       <div class="title-container">
         <div class="title-centre">
-          <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.4)"/>
+          <vs-pagination v-model="currentPage" :total="Math.round(numOfCards/itemPerPage +0.4)" @change="getSectionCards(currentSection, selectSortBy, ascending)"/>
         </div>
 
-        <div class="title-right">
-          <vs-select class="selectExample" v-model="itemPerPage" @click="currentPage=1;">
-            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsItemsPerPage" />
-          </vs-select>
-        </div>
+<!--        <div class="title-right">-->
+<!--          <vs-select class="selectExample" v-model="itemPerPage" @click="currentPage=1;">-->
+<!--            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsItemsPerPage" />-->
+<!--          </vs-select>-->
+<!--        </div>-->
       </div>
     </div>
 
@@ -98,6 +98,8 @@ export default {
       itemPerPage: 12,
       tabIndex: 0,
       ascending: false,
+      numOfCards: 0,
+      totalPages: 0,
 
       currentSection: "ForSale",
       cards: [],
@@ -112,12 +114,12 @@ export default {
         {text: "Ascending", value:true},
         {text: "Descending", value:false},
       ],
-      optionsItemsPerPage:[
-        {text:'Showing 12 Per Page',value:'12'},
-        {text:'Showing 24 Per Page',value:'24'},
-        {text:'Showing 48 Per Page',value:'48'},
-        {text:'Showing 96 Per Page',value:'96'},
-      ],
+      // optionsItemsPerPage:[
+      //   {text:'Showing 12 Per Page',value:'12'},
+      //   {text:'Showing 24 Per Page',value:'24'},
+      //   {text:'Showing 48 Per Page',value:'48'},
+      //   {text:'Showing 96 Per Page',value:'96'},
+      // ],
       selectSortBy: 'created',
       selectSortByPrevious: '',
       toggleDirection: 1,
@@ -130,14 +132,19 @@ export default {
         container: ".vs-tabs",
       });
       this.cards = [];
-      api.getCardsBySection(section, sortBy, ascending)
+      api.getCardsBySection(section, this.currentPage, this.itemPerPage, sortBy, ascending)
           .then((res) => {
-            
-            this.cards = res.data.slice(0,100);
+            this.cards = res.data.content;
+            this.numOfCards = res.data.totalElements;
+            this.totalPages = res.data.totalPages;
+            console.log(this.cards)
+            console.log(this.numOfCards)
+            console.log(this.totalPages)
+            console.log(this.currentPage)
 
             //Fixes issue with changing to section with less cards than what you already have
-            if(this.currentPage >= Math.round(this.cards.length/this.itemPerPage +0.4)) {
-              this.currentPage = Math.round(this.cards.length/this.itemPerPage +0.4)
+            if(this.currentPage >= Math.round(this.numOfCards/this.itemPerPage +0.4)) {
+              this.currentPage = Math.round(this.numOfCards/this.itemPerPage +0.4)
             }
 
           })
