@@ -39,7 +39,7 @@ public class Product {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Creates a table PRODUCT_IMAGES.
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Creates a table PRODUCT_IMAGES.
     private List<Image> images;
 
     private String primaryImagePath;

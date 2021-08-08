@@ -26,13 +26,13 @@ public class Business implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "BUSINESS_ADMINS",
                     joinColumns = @JoinColumn(name="BUSINESS_ID"),
                     inverseJoinColumns = @JoinColumn(name="USER_ID"))
     private List<User> administrators = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="USER_ID")
     @JsonSerialize(using = PrimaryAdministratorSerializer.class)
     @JsonProperty("primaryAdministratorId") // while the entity itself stores the user object, when we output to a JSON,
