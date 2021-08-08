@@ -36,6 +36,7 @@ public class AddressFinder {
         return terms;
     }
 
+
     /**
      * Gets specification objects if their name matches query
      * @param name name of product, used to find all instances of
