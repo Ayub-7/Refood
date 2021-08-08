@@ -16,8 +16,8 @@ import java.util.List;
 @RepositoryRestResource
 public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpecificationExecutor<Listing> {
 
+    Listing findListingById(long id);
+
     List<Listing> findListingsByInventoryItem(Inventory inventoryItem);
-
-
 
 }

@@ -24,11 +24,24 @@ public class ListingLike {
     private long listingId;
 
     @OneToOne
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "listing_id", insertable = false, updatable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "listing_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Listing listing;
 
+    /**
+     * Basic constructor to create a new like given a user and listing entity.
+     * @param user the entity that is liking the listing.
+     * @param listing the entity that is being liked by the user.
+     */
+    public ListingLike(User user, Listing listing) {
+        this.user = user;
+        this.listing = listing;
+        this.userId = user.getId();
+        this.listingId = listing.getId();
+    }
+
+    public ListingLike() {}
 }

@@ -454,6 +454,31 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET business listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:id/listings",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"listings"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -647,6 +672,77 @@
 						"header": [],
 						"url": {
 							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Cards by Section",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/cards?section=ForSale&pageNum=1&resultsPerPage=3&reverse=true",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cards"
+							],
+							"query": [
+								{
+									"key": "section",
+									"value": "ForSale"
+								},
+								{
+									"key": "pageNum",
+									"value": "1"
+								},
+								{
+									"key": "resultsPerPage",
+									"value": "3"
+								},
+								{
+									"key": "sortBy",
+									"value": "country",
+									"disabled": true
+								},
+								{
+									"key": "reverse",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Likes",
+			"item": [
+				{
+					"name": "Add New Like",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id/like",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
 						}
 					},
 					"response": []

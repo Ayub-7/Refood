@@ -158,7 +158,7 @@ public class ListingController {
         Business business = businessRepository.findBusinessById(id);
         Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
 
-        if(inventory == null){ //inventory item doesen't exist for business
+        if(inventory == null){ //inventory item doesn't exist for business
             logger.debug(request.getInventoryItemId());
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
