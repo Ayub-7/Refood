@@ -1388,7 +1388,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  '/businesses/{businessId}/listing/{listingId}/like':
+  '/businesses/{businessId}/listings/{listingId}/like':
     post:
       tags:
         - 'Listings / sales'
