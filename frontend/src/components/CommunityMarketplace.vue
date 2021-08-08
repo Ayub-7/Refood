@@ -39,20 +39,20 @@
       <vs-tabs alignment="fixed" v-model="tabIndex">
         <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale', selectSortBy, ascending); currentSection = 'ForSale'">
           <div>
-            <MarketplaceGrid  v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid  v-if="displayType" @cardRemoved="onSuccess" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards" />
           </div>
         </vs-tab>
         <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted', selectSortBy, ascending); currentSection = 'Wanted'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards" />
           </div>
         </vs-tab>
         <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange', selectSortBy, ascending); currentSection = 'Exchange'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards" />
           </div>
 
         </vs-tab>
