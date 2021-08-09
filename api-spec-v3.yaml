@@ -1374,10 +1374,32 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
+  '/business/types':
+    get:
+      tags:
+        - 'Business Accounts'
+        - 'U29 : Browse/search sale listings'
+      summary: Retrieve all of the business type enums and return them as the string values.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Retrieves all business types in array of strings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessTypesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
   '/businesses/listings':
     post:
       tags:
-        - 'Business Accounts'
+        - 'Listing / sales'
         - 'U29 : Browse/search sale listings'
       summary: Search across all business listings with (optional) given parameters.
       security:
@@ -1421,6 +1443,84 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+
+  '/businesses/listings/{id}/like':
+    post:
+      tags:
+        - 'Listings / sales'
+        - 'U29 : Browse/search sale listings'
+      summary: Add a user like to a sale listing
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Id of the listing
+          required: true
+          example: 50
+      responses:
+        '201':
+          description: The listing was successfully liked
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+    delete:
+      tags:
+        - 'Listings / sales'
+        - 'U29 : Browse/search sale listings'
+      summary: Delete a user like on a listing
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Id of the listing
+          required: true
+          example: 50
+      responses:
+        '200':
+          description: The listing like was successfully removed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
+  '/users/{id}/likes':
+    get:
+      tags:
+        - 'Users'
+        - 'U29 : Browse/search sale listings'
+      summary: Retrieved all liked listings for a specific user
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Id of the user to obtain likes from
+          required: true
+          example: 3
+      responses:
+        '200':
+          description: A (potentially empty) list of liked listings was retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Listing'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
 components:
   securitySchemes:
@@ -1915,6 +2015,21 @@ components:
           example: '2021-07-07 17:59:00'
           readOnly: true
           description: The time and date when the message was sent to the receiver
+
+    BusinessTypesResponse:
+      type: object
+      properties:
+        businessTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - Accommodation and Food Services
+              - Retail Trade
+              - Charitable organisation
+              - Non-profit organisation
+          example: ["Accommodation and Food Services", "Retail Trade", "Charitable organisation", "Non-profit organisation"]
+          description: "Get all business types"
 
     BusinessListingSearchRequest:
       type: object
