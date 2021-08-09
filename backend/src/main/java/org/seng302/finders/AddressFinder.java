@@ -3,6 +3,7 @@ package org.seng302.finders;
 import javax.persistence.criteria.Join;
 import org.seng302.models.Product;
 import org.seng302.models.Business;
+import org.seng302.models.Listing;
 import org.seng302.models.Address;
 import org.seng302.repositories.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,38 +37,34 @@ public class AddressFinder {
         return terms;
     }
 
-
     /**
      * Gets specification objects if their name matches query
      * @param name name of product, used to find all instances of
      * @return Specification<Product> containing matches for name
      */
-    private Specification<Business> countryContains(String term) {
-        System.out.println(term);
-        return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%"+term.toLowerCase()+"%");
-
-        };
-    }
-
-    private Specification<Business> suburbContains(String term) {
+    private Specification<Listing> countryContains(String term) {
         return (root, query, criteriaBuilder)
-                -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("suburb")), "%"+term.toLowerCase()+"%");
+        -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("country")), "%"+term.toLowerCase()+"%");
     }
 
-    private Specification<Business> cityContains(String term) {
-        return (root, query, criteriaBuilder)
-                -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("city")), "%"+term.toLowerCase()+"%");
+    private Specification<Listing> suburbContains(String term) {
+      return (root, query, criteriaBuilder)
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("suburb")), "%"+term.toLowerCase()+"%");
     }
 
-    private Specification<Business> regionContains(String term) {
-        return (root, query, criteriaBuilder)
-                -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("region")), "%"+term.toLowerCase()+"%");
+    private Specification<Listing> cityContains(String term) {
+      return (root, query, criteriaBuilder)
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("city")), "%"+term.toLowerCase()+"%");
+    }
+
+    private Specification<Listing> regionContains(String term) {
+      return (root, query, criteriaBuilder)
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("region")), "%"+term.toLowerCase()+"%");
     }
 
 
-    private Specification<Business> buildQuery(String term) {
-        Specification<Business> newSpec = countryContains(term);
+    private Specification<Listing> buildQuery(String term) {
+        Specification<Listing> newSpec = countryContains(term);
         newSpec = newSpec.or(suburbContains(term));
         newSpec = newSpec.or(cityContains(term));
         newSpec = newSpec.or(regionContains(term));
@@ -75,13 +72,13 @@ public class AddressFinder {
         return newSpec;
     }
 
-    private Specification<Business> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
-        Specification<Business> newSpec = buildQuery(nextTerm);
+    private Specification<Listing> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
+        Specification<Listing> newSpec = buildQuery(nextTerm);
 
         if(predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {
-            currentSpecification = currentSpecification.or(newSpec);
+             currentSpecification = currentSpecification.or(newSpec);
         }
 
 
@@ -94,11 +91,11 @@ public class AddressFinder {
      * @param query search query, will be split up into terms and processed
      * @return Specification<Product> resulting specification that will contain all predicates
      */
-    private Specification<Business> buildAddressSpec(String query) {
+    private Specification<Listing> buildAddressSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
-        Specification<Business> specification = buildQuery(terms.get(0))
-                ;
+        Specification<Listing> specification = buildQuery(terms.get(0))
+        ;
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }
@@ -113,7 +110,7 @@ public class AddressFinder {
      * @param terms list of terms, used to get next term in sequence
      * @return Specification<Product> current specification with AND or OR operation applied
      */
-    private Specification<Business> getNextSpecification(Specification<Business> specification, String term, ArrayList<String> terms) {
+    private Specification<Listing> getNextSpecification(Specification<Listing> specification, String term, ArrayList<String> terms) {
         if (terms.indexOf(term) != terms.size() - 1) {
             String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
 
@@ -135,9 +132,9 @@ public class AddressFinder {
      * @param query The search query to be used to filter search results
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
-    public Specification<Business> findAddress(String query) {
+    public Specification<Listing> findAddress(String query) {
 //         Specification<Business> matches = buildAddressSpec(query);
-        Specification<Business> matches = countryContains(query);
+        Specification<Listing> matches = countryContains(query);
         return matches;
 
     }
