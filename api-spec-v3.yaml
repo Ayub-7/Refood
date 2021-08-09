@@ -1458,7 +1458,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Like'
+                  $ref: '#/components/schemas/Listing'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
