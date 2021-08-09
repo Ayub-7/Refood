@@ -41,8 +41,6 @@ public class BusinessController {
     @Autowired
     private BusinessFinder businessFinder;
 
-    @Autowired
-    private AddressFinder addressFinder;
 
 
     /**
@@ -213,16 +211,6 @@ public class BusinessController {
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
     }
-    @GetMapping("/businesses/location")
-        public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
-            logger.debug("Searching for businesses...");
-            System.out.println("Searching for businesses... countrys");
-            Specification<Business> specification = addressFinder.findAddress(query);
-            System.out.println(specification);
-            List<Business> businesses = businessRepository.findAll(specification);
-            System.out.println(businesses);
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
-        }
 
 
     /**

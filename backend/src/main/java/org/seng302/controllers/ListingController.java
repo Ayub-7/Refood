@@ -2,11 +2,14 @@ package org.seng302.controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.MediaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
+import org.seng302.finders.AddressFinder;
 import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.BusinessRepository;
 
@@ -14,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.jpa.domain.Specification;
+
 
 import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
@@ -26,6 +31,8 @@ import java.util.stream.Collectors;
 public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Autowired private BusinessRepository businessRepository;
 
     @Autowired
@@ -33,6 +40,9 @@ public class ListingController {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private AddressFinder addressFinder;
 
     /**
      * Get request mapping for getting Listing by id
@@ -98,5 +108,16 @@ public class ListingController {
             }
         }
     }
+
+    @GetMapping("/businesses/location")
+            public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
+                logger.debug("Searching for businesses...");
+                System.out.println("Searching for businesses... address");
+                Specification<Listing> specification = addressFinder.findAddress(query);
+                System.out.println(specification);
+                List<Listing> businesses = listingRepository.findAll(specification);
+
+                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
+            }
 
 }
