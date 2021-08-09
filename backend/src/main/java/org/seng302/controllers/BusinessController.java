@@ -22,8 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.awt.print.Pageable;
-
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -207,9 +206,14 @@ public class BusinessController {
     @GetMapping("/businesses/search")
     public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, @RequestParam(name="page") int page, HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
-        System.out.println("Searching for businesses...");
         PageRequest pageRequest = PageRequest.of(page, 10);
-        Specification<Business> matches = businessFinder.findBusinesses(query);
+        Specification<Business> matches;
+        try {
+            matches = businessFinder.findBusinesses(query, type);
+        } catch (ResponseStatusException e) {
+            logger.error("{} error - invalid sort by parameter {}", e.getStatus(), type);
+            return ResponseEntity.status(e.getStatus()).body(e.getReason());
+        }
         Page<Business> unfilteredBusinesses =  businessRepository.findAll(matches, pageRequest);
         Page<Business> businesses = removeBusinessesAdministered(unfilteredBusinesses);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
