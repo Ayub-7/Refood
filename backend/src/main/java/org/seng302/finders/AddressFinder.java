@@ -49,17 +49,17 @@ public class AddressFinder {
 
     private Specification<Listing> suburbContains(String term) {
       return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("suburb")), "%"+term.toLowerCase()+"%");
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("suburb")), "%"+term.toLowerCase()+"%");
     }
 
     private Specification<Listing> cityContains(String term) {
       return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("city")), "%"+term.toLowerCase()+"%");
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("city")), "%"+term.toLowerCase()+"%");
     }
 
     private Specification<Listing> regionContains(String term) {
       return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("region")), "%"+term.toLowerCase()+"%");
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("region")), "%"+term.toLowerCase()+"%");
     }
 
 
@@ -133,8 +133,8 @@ public class AddressFinder {
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
     public Specification<Listing> findAddress(String query) {
-//         Specification<Business> matches = buildAddressSpec(query);
-        Specification<Listing> matches = countryContains(query);
+        Specification<Listing> matches = buildAddressSpec(query);
+        //Specification<Listing> matches = countryContains(query);
         return matches;
 
     }
