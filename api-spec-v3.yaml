@@ -1373,6 +1373,26 @@ paths:
           description: "Forbidden: Returned when a user tries to delete a message that they are not the receiver of AND the user is not a D/GAA"
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+          
+  '/businesses/types':
+    get:
+      tags:
+        - 'Business Accounts'
+        - 'U29 : Browse/search sale listings'
+      summary: Retrieve all of the business type enums and return them as the string values.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Retrieves all business types in array of strings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessTypesResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
   '/businesses/listings':
     post:
@@ -1915,6 +1935,21 @@ components:
           example: '2021-07-07 17:59:00'
           readOnly: true
           description: The time and date when the message was sent to the receiver
+          
+    BusinessTypesResponse:
+      type: array
+      items:
+        type: string
+        enum:
+          - Accommodation and Food Services
+          - Retail Trade
+          - Charitable organisation
+          - Non-profit organisation
+          - Administrative and Support services
+          - Agriculture, Forestry and Fishing
+      example: ["Accommodation and Food Services", "Retail Trade", "Charitable organisation", "Non-profit organisation",
+      "Administrative and Support services", "Agriculture, Forestry and Fishing"]
+      description: "Get all business types"
 
     BusinessListingSearchRequest:
       type: object

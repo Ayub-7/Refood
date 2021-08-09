@@ -50,9 +50,10 @@ public class BusinessFinder {
     private Predicate criteriaBuilder(String term, String type, boolean isLike) {
         //Obtains criteria
         Predicate businessType = null;
+
         if (type != null) {
             if (type.length() > 0) {
-                switch (type.toUpperCase()) {
+                switch (type.toUpperCase().replace(",", "")) {
                     case "ACCOMMODATION AND FOOD SERVICES":
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
                         break;
@@ -99,6 +100,7 @@ public class BusinessFinder {
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.MINING);
                         break;
                     case "PROFESSIONAL SCIENTIFIC AND TECHNICAL SERVICES":
+
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_SERVICES);
                         break;
                     case "PUBLIC ADMINISTRATION AND SAFETY":
@@ -112,9 +114,6 @@ public class BusinessFinder {
                         break;
                     case "WHOLESALE TRADE":
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.WHOLESALE_TRADE);
-                        break;
-                    case "OTHER SERVICES":
-                        businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.OTHER_SERVICES);
                         break;
                     default:
                         businessType = criteriaBuilder.equal(businessRoot.get("businessType"), BusinessType.OTHER_SERVICES);

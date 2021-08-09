@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "d2e410c5-22ef-4e10-9a93-b65144ed84fe",
-		"name": "SENG302 Collection",
+		"_postman_id": "7dd09606-600e-4d72-9255-14342d5df59f",
+		"name": "SENG302 Collection Copy 2",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -247,12 +247,152 @@
 					"response": []
 				},
 				{
-					"name": "Search businesses",
+					"name": "Search businesses with type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body does not contain other types\", function () {",
+									"    pm.expect(pm.response.text()).to.not.include(\"Accommodation and Food Services\");",
+									"    pm.expect(pm.response.text()).to.not.include(\"Charitable organisation\");",
+									"    pm.expect(pm.response.text()).to.not.include(\"Non-profit organisation\");  ",
+									"     ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{URL}}/businesses/search?query=&type=Retail Trade",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": ""
+								},
+								{
+									"key": "type",
+									"value": "Retail Trade"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search businesses with no type and query",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Dabshots\");",
+									"});",
+									"",
+									"var data = ",
+									"",
+									"",
+									"pm.test('Only one result is returned', function () {",
+									"    pm.expect(pm.response.json().length).to.equal(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/search?query=Dabshots&type=",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Dabshots"
+								},
+								{
+									"key": "type",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get business types",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Checks if correct status",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"//Checks if correct values are there",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Accommodation and Food Services\");",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Information Media and Telecommunication\");",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Electricity, Gas, Water and Waste Services\");",
+									"});",
+									"",
+									"pm.test(\"All business types are returned\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(21)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/types",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"types"
+							]
 						}
 					},
 					"response": []
