@@ -137,10 +137,6 @@ export default {
             this.cards = res.data.content;
             this.numOfCards = res.data.totalElements;
             this.totalPages = res.data.totalPages;
-            console.log(this.cards)
-            console.log(this.numOfCards)
-            console.log(this.totalPages)
-            console.log(this.currentPage)
 
             //Fixes issue with changing to section with less cards than what you already have
             if(this.currentPage >= Math.round(this.numOfCards/this.itemPerPage +0.4)) {
@@ -200,7 +196,6 @@ export default {
   
     api.checkSession()
       .then(() => {
-        console.log(store.actingAsBusinessId)
         if(store.actingAsBusinessId != null) {
           this.$router.push({path: "/home"})
         }
