@@ -130,12 +130,19 @@ public class BusinessFinder {
      */
     private Specification<Business> buildBusinessSpec(String query, String type) throws ResponseStatusException {
         ArrayList<String> terms = searchQueryKeywords(query);
-        Specification<Business> specification = nameContains(terms.get(0).trim());
-        for (String term : terms) {
-            specification = getNextSpecification(specification, term, terms);
-        }
-        if (type != null && type.length() > 0) {
-            specification = specification.and(typeFilter(type));
+        Specification<Business> specification;
+        if (!terms.isEmpty()) {
+            specification = nameContains(terms.get(0).trim());
+            for (String term : terms) {
+                specification = getNextSpecification(specification, term, terms);
+            }
+            if (type != null && type.length() > 0) {
+                specification = specification.and(typeFilter(type));
+            }
+        } else if (type != null && type.length() > 0) {
+            specification = typeFilter(type);
+        } else {
+            specification = nameContains("");
         }
         return specification;
     }
