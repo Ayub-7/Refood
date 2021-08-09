@@ -25,44 +25,32 @@ public class ListingFinder {
         return terms;
     }
 
+    /**
+     * Query criteria for business/seller name
+     * @param term part of query that helps find the desired business(es)
+     * @return Specification object that contains Listings.
+     */
     private Specification<Listing> sellerContains(String term) {
         return (root, query, criteriaBuilder)
-                -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("name")), "%"+term.toLowerCase()+"%");
+                -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product")
+                .get("business").get("name")), "%"+term.toLowerCase()+"%");
     }
 
-
-    private Specification<Listing> buildQuery(String term) {
-        return sellerContains(term);
-    }
-
+    /**
+     * Helper function that checks the fields if a predicate contains AND, OR, or any other term.
+     * @param currentSpecification Specification object to be checked
+     * @param nextTerm The upcoming term in the query
+     * @param predicate Predicate object
+     * @return Specification<Listing> object
+     */
     private Specification<Listing> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
-        Specification<Listing> newSpec = buildQuery(nextTerm);
-
-        if(predicate.equals(Logic.AND)) {
+        Specification<Listing> newSpec = sellerContains(nextTerm);
+        if (predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {
             currentSpecification = currentSpecification.or(newSpec);
         }
-
-
         return currentSpecification;
-    }
-
-
-    /**
-     * Builds full specification object to be used in repository query
-     * @param query search query, will be split up into terms and processed
-     * @return Specification<Product> resulting specification that will contain all predicates
-     */
-    private Specification<Listing> buildAddressSpec(String query) {
-        ArrayList<String> terms = searchQueryKeywords(query);
-        System.out.println(terms);
-        Specification<Listing> specification = buildQuery(terms.get(0));
-        for (String term : terms) {
-            specification = getNextSpecification(specification, term, terms);
-        }
-
-        return specification;
     }
 
     /**
@@ -70,12 +58,11 @@ public class ListingFinder {
      * @param specification current specification
      * @param term current term
      * @param terms list of terms, used to get next term in sequence
-     * @return Specification<Product> current specification with AND or OR operation applied
+     * @return Specification<Listing> current specification with AND or OR operation applied
      */
     private Specification<Listing> getNextSpecification(Specification<Listing> specification, String term, ArrayList<String> terms) {
         if (terms.indexOf(term) != terms.size() - 1) {
             String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
-
             if (term.strip().equals("AND")) {
                 specification = checkFields(specification, nextTerm, Logic.AND);
             } else if (term.strip().equals("OR")) {
@@ -84,20 +71,32 @@ public class ListingFinder {
                 specification = checkFields(specification, nextTerm, Logic.AND);
             }
         }
-
         return specification;
 
     }
 
     /**
-     * The only publicly available method to access outside of this class to search for products
+     * Builds full specification object to be used in repository query
+     * @param query search query, will be split up into terms and processed
+     * @return Specification<Listing> resulting specification that will contain all predicates
+     */
+    private Specification<Listing> buildAddressSpec(String query) {
+        ArrayList<String> terms = searchQueryKeywords(query);
+        System.out.println(terms);
+        Specification<Listing> specification = sellerContains(terms.get(0));
+        for (String term : terms) {
+            specification = getNextSpecification(specification, term, terms);
+        }
+        return specification;
+    }
+
+    /**
+     * The only publicly available method to access outside of this class to search for listings
      * @param query The search query to be used to filter search results
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
     public Specification<Listing> findListing(String query) {
         Specification<Listing> matches = buildAddressSpec(query);
-        //Specification<Listing> matches = countryContains(query);
         return matches;
-
     }
 }
