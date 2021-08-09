@@ -1,12 +1,11 @@
 package org.seng302.repositories;
 
-import org.seng302.models.Listing;
 import org.seng302.models.Inventory;
-
+import org.seng302.models.Listing;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-
 
 import java.util.List;
 
@@ -18,6 +17,7 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
 
     List<Listing> findListingsByInventoryItem(Inventory inventoryItem);
 
+    List<Listing> findAll(Specification<Listing> query);
 
 
 }
