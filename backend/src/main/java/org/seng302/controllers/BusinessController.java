@@ -230,6 +230,11 @@ public class BusinessController {
     }
 
 
+    /**
+     * Gets ALL business types from ENUM business type
+     * @return ResponseEntity<String> 401 if no auth, 200 if authenticated and requested correct endpoint
+     * @throws JsonProcessingException
+     */
     @GetMapping("/businesses/types")
     public ResponseEntity<String> getBusinessTypes() throws JsonProcessingException {
         List<BusinessType> businessTypes = getAllTypes();
@@ -237,6 +242,11 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businessTypes));
     }
 
+
+    /**
+     * Gets business types by calling values on BusinessType ENUM
+     * @return List<String> values from business type enum
+     */
     public List<BusinessType> getAllTypes() {
         logger.debug("Retrieving all business types...");
         return Arrays.asList(BusinessType.values());
