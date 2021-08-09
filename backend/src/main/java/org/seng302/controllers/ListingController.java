@@ -4,29 +4,29 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.seng302.finders.ListingFinder;
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
 import org.seng302.models.requests.NewListingRequest;
+import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.BusinessRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
-
-import java.util.List;
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -35,7 +35,9 @@ import static org.springframework.data.jpa.domain.Specification.where;
 public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
-    @Autowired private BusinessRepository businessRepository;
+    @Autowired
+    private BusinessRepository businessRepository;
+
 
     @Autowired
     private ListingRepository listingRepository;
@@ -45,6 +47,9 @@ public class ListingController {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private ListingFinder listingFinder;
 
     /**
      * Constructor used for cucumber testing.
@@ -144,6 +149,14 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }
 
+    @GetMapping("/businesses/listings")
+    public ResponseEntity<String> findListing(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
+        logger.debug("Searching for Listings...");
+        Specification<Listing> specification = listingFinder.findListing(query);
+        List<Listing> listings = listingRepository.findAll(specification);
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
+    }
 
     /**
      * Creates a new product and adds it to the product catalogue of the current acting business
