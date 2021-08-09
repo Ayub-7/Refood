@@ -849,6 +849,7 @@ th {
 
 div#filter-box {
   display: flex;
+  border-radius: 10px;
 }
 
 #search-parameter {
