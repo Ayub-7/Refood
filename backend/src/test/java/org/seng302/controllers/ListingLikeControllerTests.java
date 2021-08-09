@@ -5,11 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
-import org.seng302.models.Inventory;
-import org.seng302.models.Listing;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.repositories.ListingLikeRepository;
 import org.seng302.repositories.ListingRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,8 +17,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,9 +37,12 @@ public class ListingLikeControllerTests {
     private ListingRepository listingRepository;
     @MockBean
     private ListingLikeRepository listingLikeRepository;
+    @MockBean
+    private UserRepository userRepository;
 
     private User user;
     private Listing listing;
+    private List<ListingLike> likedList;
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException {
@@ -46,6 +51,11 @@ public class ListingLikeControllerTests {
 
         Inventory inventory = new Inventory("07-4957066", 1, 10, 2.0, 20.0, new Date(), new Date(), new Date(), new Date());
         listing = new Listing(inventory, 5, 2.0, "Seller may be interested in offers", new Date(), new Date());
+
+        ListingLike like = new ListingLike(user, listing);
+
+        likedList = new ArrayList<>();
+        likedList.add(like);
     }
 
     //
@@ -73,6 +83,63 @@ public class ListingLikeControllerTests {
         mvc.perform(post("/businesses/listings/{id}/like", 1)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isCreated());
+    }
+
+    //
+    // GET - User liked listings
+    //
+
+    @Test
+    void testGetUserLikedListings_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(get("/users/{id}/likes", user.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserLikedListings_noUser_returnBadRequest() throws Exception {
+        Mockito.when(userRepository.findUserById(100)).thenReturn(null);
+
+        mvc.perform(get("/users/{id}/likes", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserLikedListings_notTheUser_returnForbidden() throws Exception {
+        User differentUser = new User("First", "Last", null, "email@a.com", "123456", Role.USER);
+        differentUser.setId(2);
+        Mockito.when(userRepository.findUserById(2)).thenReturn(differentUser);
+
+        mvc.perform(get("/users/{id}/likes", 2)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserLikedListings_notTheUserIsDgaa_returnOk() throws Exception {
+        User differentUser = new User("First", "Last", null, "email@a.com", "123456", Role.USER);
+        differentUser.setId(2);
+        user.setRole(Role.DGAA);
+        Mockito.when(userRepository.findUserById(2)).thenReturn(differentUser);
+        Mockito.when(listingLikeRepository.findListingLikesByUserId(2)).thenReturn(likedList);
+
+        mvc.perform(get("/users/{id}/likes", 2)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserLikedListings_isUser_returnOk() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(listingLikeRepository.findListingLikesByUserId(user.getId())).thenReturn(likedList);
+
+        mvc.perform(get("/users/{id}/likes", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
     }
 
 }
