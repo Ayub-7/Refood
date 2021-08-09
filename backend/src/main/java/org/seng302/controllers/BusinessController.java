@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.BusinessFinder;
 import org.seng302.models.Business;
+import org.seng302.models.BusinessType;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.responses.BusinessIdResponse;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -202,7 +204,6 @@ public class BusinessController {
     @GetMapping("/businesses/search")
     public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
-        System.out.println("Searching for businesses...");
         List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query, type));
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
@@ -227,4 +228,18 @@ public class BusinessController {
         logger.debug("businessesAdministered removed");
         return businesses;
     }
+
+
+    @GetMapping("/businesses/types")
+    public ResponseEntity<String> getBusinessTypes() throws JsonProcessingException {
+        List<BusinessType> businessTypes = getAllTypes();
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businessTypes));
+    }
+
+    public List<BusinessType> getAllTypes() {
+        logger.debug("Retrieving all business types...");
+        return Arrays.asList(BusinessType.values());
+    }
+
 }
