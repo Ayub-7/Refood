@@ -7,13 +7,13 @@ Feature: U29 - Browse/search sale listings
 
 
   Scenario: U6 User can type all of a product name
-    Given there are products with name "Food" and "Ford"
-    When the user searches for a product with name "Food"
-    Then only the product with name "Food" is in the search result
+    Given there are listings with name "Food" and "Ford"
+    When the user searches for a listing with name "Food"
+    Then only the listing with name "Food" is in the search result
 
 
   Scenario: U6 User can type part of a product name
-    Given there are products with name "Food" and "Ford"
-    When the user searches for a product with name "Fo"
-    Then products with name "Food" and "Ford" is in the search result
+    Given there are listings with name "Food" and "Ford"
+    When the user searches for a listing with name "Fo"
+    Then listings with name "Food" and "Ford" is in the search result
 

@@ -9,15 +9,11 @@ import org.junit.jupiter.api.Assertions;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.controllers.ListingController;
-import org.seng302.controllers.ProductController;
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
-import org.seng302.repositories.BusinessRepository;
-import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.ProductRepository;
-import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -31,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 
+import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,11 +50,18 @@ public class searchSaleListingsDefs extends CucumberSpringConfiguration {
     @MockBean
     private ListingRepository listingRepository;
 
+    // Since listings is being mocked in other tests, need a repository to do spring tests on
+    @Autowired
+    private ListingRepository realListingRepository;
+
     @MockBean
     private ListingSpecifications listingSpecifications;
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
     @Autowired
     private BusinessRepository businessRepository;
@@ -77,7 +81,11 @@ public class searchSaleListingsDefs extends CucumberSpringConfiguration {
     private Business business;
     private Product product1;
     private Product product2;
-    private List<Product> products;
+    private Listing listing1;
+    private Listing listing2;
+    private Inventory inventory1;
+    private Inventory inventory2;
+    private List<Listing> listings;
 
     @Before
     public void setup() throws Exception {
@@ -149,44 +157,72 @@ public class searchSaleListingsDefs extends CucumberSpringConfiguration {
 
     //AC6
 
-    @Given("there are products with name {string} and {string}")
-    public void thereAreProductsWithNameAnd(String name1, String name2) {
+    @Given("there are listings with name {string} and {string}")
+    @Transactional
+    public void thereAreListingWithNameAnd(String name1, String name2) {
         product1 = new Product("07-4957067", business, name1, "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
         product2 = new Product("07-4957066", business, name2, "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
 
         productRepository.save(product1);
         productRepository.save(product2);
 
-        List<Product> products = productRepository.findAll();
+        Calendar afterCalendar = Calendar.getInstance();
+        afterCalendar.set(2022, 1, 1);
+        Date laterDate = afterCalendar.getTime();
 
-        boolean containsProduct1 = products.stream().anyMatch(o -> o.getName().equals(name1));
-        boolean containsProduct2 = products.stream().anyMatch(o -> o.getName().equals(name2));
+        Calendar beforeCalendar = Calendar.getInstance();
+        afterCalendar.set(2020, 1, 1);
+        Date beforeDate = beforeCalendar.getTime();
+
+        realListingRepository.deleteAll();
+        realListingRepository.flush();
+
+        inventory1 = new Inventory("07-4957067", 1, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
+        inventoryRepository.save(inventory1);
+
+        listing1 = new Listing(inventory1, 5, 2.0, "Seller may be interested in offers", new Date(), laterDate);
+        realListingRepository.save(listing1);
+
+        inventory2 = new Inventory("07-4957066", 1, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
+        inventoryRepository.save(inventory2);
+
+        listing2 = new Listing(inventory2, 10, 10.0, "Seller may be interested in offers", new Date(), laterDate);
+        realListingRepository.save(listing2);
+
+        List<Listing> products = realListingRepository.findAll();
+
+
+        boolean containsProduct1 = products.stream().anyMatch(o -> o.equals(listing1));
+        boolean containsProduct2 = products.stream().anyMatch(o -> o.equals(listing2));
         Assertions.assertTrue(containsProduct1 && containsProduct2);
         Assertions.assertEquals(2, products.size());
 
     }
 
-    @When("the user searches for a product with name {string}")
-    public void theUserSearchesForAProductWithName(String name1) {
-        Specification<Product> matches = productFinder.findProduct(name1);
+    @When("the user searches for a listing with name {string}")
+    @Transactional
+    public void theUserSearchesForAListingWithName(String name1) {
+        Specification<Listing> matches = productFinder.findProduct(name1);
 
-        products = productRepository.findAll(matches);
+        listings = realListingRepository.findAll(matches);
 
-        Assertions.assertFalse(products.isEmpty());
+        Assertions.assertFalse(listings.isEmpty());
     }
 
-    @Then("only the product with name {string} is in the search result")
-    public void onlyTheProductWithNameIsInTheSearchResult(String name1) {
-        boolean containsProduct1 = products.stream().anyMatch(o -> o.getName().equals(name1));
+    @Then("only the listing with name {string} is in the search result")
+    @Transactional
+    public void onlyTheListingWithNameIsInTheSearchResult(String name1) {
+        boolean containsProduct1 = listings.stream().anyMatch(o -> o.getInventoryItem().getProduct().getName().equals(name1));
         Assertions.assertTrue(containsProduct1);
-        Assertions.assertEquals(1, products.size());
+        Assertions.assertEquals(1, listings.size());
     }
 
-    @Then("products with name {string} and {string} is in the search result")
-    public void productsWithNameAndIsInTheSearchResult(String name1, String name2) {
-        boolean containsProduct1 = products.stream().anyMatch(o -> o.getName().equals(name1));
-        boolean containsProduct2 = products.stream().anyMatch(o -> o.getName().equals(name1));
+    @Then("listings with name {string} and {string} is in the search result")
+    @Transactional
+    public void listingsWithNameAndIsInTheSearchResult(String name1, String name2) {
+        boolean containsProduct1 = listings.stream().anyMatch(o -> o.getInventoryItem().getProduct().getName().equals(name1));
+        boolean containsProduct2 = listings.stream().anyMatch(o ->  o.getInventoryItem().getProduct().getName().equals(name1));
         Assertions.assertTrue(containsProduct1 && containsProduct2);
-        Assertions.assertEquals(2, products.size());
+        Assertions.assertEquals(2, listings.size());
     }
 }

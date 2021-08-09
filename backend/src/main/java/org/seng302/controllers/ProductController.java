@@ -407,13 +407,4 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-
-    @GetMapping("/businesses/{id}/productss")
-    public ResponseEntity<List<Product>> test(@PathVariable long id, HttpSession session) {
-        Specification<Product> specification = productFinder.findProduct("Cheese OR Chinese AND erat");
-        List<Product> products = productRepository.findAll(specification);
-
-        return ResponseEntity.status(HttpStatus.OK).body(products);
-    }
 }
