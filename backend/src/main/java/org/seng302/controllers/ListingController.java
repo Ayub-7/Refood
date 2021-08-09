@@ -149,6 +149,13 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }
 
+    /**
+     *
+     * @param query
+     * @param session
+     * @return
+     * @throws JsonProcessingException
+     */
     @GetMapping("/businesses/listings")
     public ResponseEntity<String> findListing(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for Listings...");
