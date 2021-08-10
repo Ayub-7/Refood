@@ -150,10 +150,10 @@ public class ListingController {
     }
 
     /**
-     *
-     * @param query
-     * @param session
-     * @return
+     * GET endpoint that retrieves businesses' listings by a search query.
+     * @param query A string with the search's query
+     * @param session current user session.
+     * @return Response with the JSONified list of the businesses' listings
      * @throws JsonProcessingException
      */
     @GetMapping("/businesses/listings")
