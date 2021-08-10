@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "771dce43-aab4-4d1f-9d08-bac549a08088",
+		"_postman_id": "ded2c9d0-3fbb-4562-9baf-8ab2aeefa2e6",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -736,6 +736,31 @@
 								"listings",
 								":id",
 								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Liked Listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/likes",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"likes"
 							],
 							"variable": [
 								{
