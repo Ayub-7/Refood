@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.exceptions.InvalidImageExtensionException;
-import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -12,7 +11,6 @@ import org.seng302.repositories.ProductRepository;
 import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -42,8 +40,6 @@ public class ProductController {
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
     @Autowired private FileService fileService;
-
-    @Autowired private ProductFinder productFinder;
 
     @Autowired private ObjectMapper mapper;
 
