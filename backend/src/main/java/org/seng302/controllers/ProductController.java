@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.exceptions.InvalidImageExtensionException;
+import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -11,6 +12,7 @@ import org.seng302.repositories.ProductRepository;
 import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -40,6 +42,8 @@ public class ProductController {
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
     @Autowired private FileService fileService;
+
+    @Autowired private ProductFinder productFinder;
 
     @Autowired private ObjectMapper mapper;
 
@@ -322,7 +326,6 @@ public class ProductController {
         extensions.add(".gif");
         for (String ext: extensions) {
             Path path = Paths.get(imageDir + ext);
-            System.out.println(path.toString());
             if (Files.exists(path)) {
                 extension = ext;
                 break;
@@ -342,7 +345,7 @@ public class ProductController {
          * @param businessId unique identifier of the business that the image is relating to.
          * @param productId product identifier that the image is relating to.
          * @param image a multipart image of the file
-         * @return
+         * @return ResponseEntity<String>
          * @throws IOException
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
