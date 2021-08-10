@@ -39,20 +39,20 @@
       <vs-tabs alignment="fixed" v-model="tabIndex">
         <vs-tab id="saleTab" label="For Sale" @click="getSectionCards('ForSale', selectSortBy, ascending); currentSection = 'ForSale'">
           <div>
-            <MarketplaceGrid  v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid  v-if="displayType" @cardRemoved="onSuccess" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards" />
           </div>
         </vs-tab>
         <vs-tab id="wantedTab" label="Wanted" @click="getSectionCards('Wanted', selectSortBy, ascending); currentSection = 'Wanted'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage) " />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards" />
           </div>
         </vs-tab>
         <vs-tab id="exchangeTab" label="Exchange" @click="getSectionCards('Exchange', selectSortBy, ascending); currentSection = 'Exchange'">
           <div>
-            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
-            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards.slice(itemPerPage*(currentPage-1),currentPage*itemPerPage)" />
+            <MarketplaceGrid v-if="displayType" @cardRemoved="onSuccess" :cardData="cards" />
+            <MarketplaceTable v-if="!displayType" @cardRemoved="onSuccess" :tableData="cards" />
           </div>
 
         </vs-tab>
@@ -60,13 +60,7 @@
 
       <div class="title-container">
         <div class="title-centre">
-          <vs-pagination v-model="currentPage" :total="Math.round(cards.length/itemPerPage +0.4)"/>
-        </div>
-
-        <div class="title-right">
-          <vs-select class="selectExample" v-model="itemPerPage" @click="currentPage=1;">
-            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsItemsPerPage" />
-          </vs-select>
+          <vs-pagination v-model="currentPage" :total="Math.round(numOfCards/itemPerPage +0.4)" @change="getSectionCards(currentSection, selectSortBy, ascending)"/>
         </div>
       </div>
     </div>
@@ -98,6 +92,8 @@ export default {
       itemPerPage: 12,
       tabIndex: 0,
       ascending: false,
+      numOfCards: 0,
+      totalPages: 0,
 
       currentSection: "ForSale",
       cards: [],
@@ -112,12 +108,12 @@ export default {
         {text: "Ascending", value:true},
         {text: "Descending", value:false},
       ],
-      optionsItemsPerPage:[
-        {text:'Showing 12 Per Page',value:'12'},
-        {text:'Showing 24 Per Page',value:'24'},
-        {text:'Showing 48 Per Page',value:'48'},
-        {text:'Showing 96 Per Page',value:'96'},
-      ],
+      // optionsItemsPerPage:[
+      //   {text:'Showing 12 Per Page',value:'12'},
+      //   {text:'Showing 24 Per Page',value:'24'},
+      //   {text:'Showing 48 Per Page',value:'48'},
+      //   {text:'Showing 96 Per Page',value:'96'},
+      // ],
       selectSortBy: 'created',
       selectSortByPrevious: '',
       toggleDirection: 1,
@@ -130,14 +126,15 @@ export default {
         container: ".vs-tabs",
       });
       this.cards = [];
-      api.getCardsBySection(section, sortBy, ascending)
+      api.getCardsBySection(section, this.currentPage, this.itemPerPage, sortBy, ascending)
           .then((res) => {
-            
-            this.cards = res.data.slice(0,100);
+            this.cards = res.data.content;
+            this.numOfCards = res.data.totalElements;
+            this.totalPages = res.data.totalPages;
 
             //Fixes issue with changing to section with less cards than what you already have
-            if(this.currentPage >= Math.round(this.cards.length/this.itemPerPage +0.4)) {
-              this.currentPage = Math.round(this.cards.length/this.itemPerPage +0.4)
+            if(this.currentPage >= Math.round(this.numOfCards/this.itemPerPage +0.4)) {
+              this.currentPage = Math.round(this.numOfCards/this.itemPerPage +0.4)
             }
 
           })
@@ -193,7 +190,6 @@ export default {
   
     api.checkSession()
       .then(() => {
-        console.log(store.actingAsBusinessId)
         if(store.actingAsBusinessId != null) {
           this.$router.push({path: "/home"})
         }
