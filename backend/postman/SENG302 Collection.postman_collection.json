@@ -454,6 +454,31 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET business listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:id/listings",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"listings"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -652,12 +677,12 @@
 					"response": []
 				},
 				{
-					"name": "GET Cards",
+					"name": "GET Cards by Section",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/cards?section&pageNum&resultsPerPage&sortBy&reverse",
+							"raw": "{{URL}}/cards?section=ForSale&pageNum=1&resultsPerPage=3&reverse=true",
 							"host": [
 								"{{URL}}"
 							],
@@ -667,27 +692,58 @@
 							"query": [
 								{
 									"key": "section",
-									"value": null
+									"value": "ForSale"
 								},
 								{
 									"key": "pageNum",
-									"value": null
+									"value": "1"
 								},
 								{
 									"key": "resultsPerPage",
-									"value": null
+									"value": "3"
 								},
 								{
 									"key": "sortBy",
-									"value": null
+									"value": "country",
+									"disabled": true
 								},
 								{
 									"key": "reverse",
-									"value": null
+									"value": "true"
 								}
 							]
-						},
-						"description": "Retrieves cards with sorting (By creation date, title, keywords, and country), pagination, and ascending/descending sorting."
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Likes",
+			"item": [
+				{
+					"name": "Add New Like",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id/like",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
 					},
 					"response": []
 				}
