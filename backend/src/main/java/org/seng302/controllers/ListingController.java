@@ -152,15 +152,21 @@ public class ListingController {
     /**
      * GET endpoint that retrieves businesses' listings by a search query.
      * @param query A string with the search's query
+     * @param count how many results will show per page.
+     * @param offset how many PAGES (not results) to skip before returning the results.
      * @param session current user session.
      * @return Response with the JSONified list of the businesses' listings
      * @throws JsonProcessingException
      */
     @GetMapping("/businesses/listings")
-    public ResponseEntity<String> findListing(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
+                                              @RequestParam("count") int count,
+                                              @RequestParam("offset") int offset,
+                                              HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for Listings...");
         Specification<Listing> specification = listingFinder.findListing(query);
-        List<Listing> listings = listingRepository.findAll(specification);
+        Pageable pageRange = PageRequest.of(offset, count);
+        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
     }
