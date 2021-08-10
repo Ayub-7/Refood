@@ -2217,3 +2217,29 @@ components:
           $ref: '#/components/schemas/User'
         listing:
           $ref: '#/components/schemas/Listing'
+
+    ListingNotification:
+      type: object
+      description: An entity representing a notification associated with a listing
+      required:
+        - id
+        - user
+        - listing
+        - status
+      properties:
+        id:
+          type: number
+          description: Unique id of the notification
+          example: 5
+        user:
+          $ref: '#/components/schemas/User'
+        listing:
+          $ref: '#/components/schemas/Listing'
+        status:
+          type: string
+          description: The status of the notification
+          enum:
+            - Expired
+            - Bought
+
+
