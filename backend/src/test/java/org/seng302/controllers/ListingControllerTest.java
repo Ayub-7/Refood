@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.ListingFinder;
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
@@ -64,6 +65,8 @@ class ListingControllerTest {
     private ListingRepository listingRepository;
     @Autowired
     private ObjectMapper mapper;
+    @MockBean
+    private ListingFinder listingFinder;
 
     private User ownerUser;
     private User adminUser;
