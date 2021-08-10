@@ -244,6 +244,32 @@ class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
+    void testPostWithBadInventory() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+
+        mvc.perform(post("/businesses/{id}/listings", business.getId())
+                        .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(newListingRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testPostWithBadBusiness() throws Exception {
+        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
+        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
+
+        mvc.perform(post("/businesses/{id}/listings", business.getId())
+                        .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(newListingRequest)))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
     void testPostWithQuantityLargerThanInventoryQuantity() throws Exception {
         //inventory quantity is 10
         inventory1.setQuantity(4);
@@ -463,4 +489,58 @@ class ListingControllerTest {
 
     }
 
+    @Test
+    @WithMockUser
+    void testFindListing_returnOk() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+
+        List<Listing> results = new ArrayList<>();
+        results.add(listing1);
+        results.add(listing2);
+
+        Mockito.when(listingRepository.findAll()).thenReturn(results);
+        mvc.perform(get("/businesses/listings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .params(requestParams))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testFindListing_noUserLoggedIn() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("count", "5");
+        requestParams.add("offset", "1");
+
+        List<Listing> results = new ArrayList<>();
+        results.add(listing1);
+        results.add(listing2);
+
+        Mockito.when(listingRepository.findAll()).thenReturn(results);
+        mvc.perform(get("/businesses/listings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .params(requestParams))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testFindListing_missingParams() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("count", "5");
+
+        List<Listing> results = new ArrayList<>();
+        results.add(listing1);
+        results.add(listing2);
+
+        Mockito.when(listingRepository.findAll()).thenReturn(results);
+        mvc.perform(get("/businesses/listings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .params(requestParams))
+                .andExpect(status().isBadRequest());
+    }
 }
