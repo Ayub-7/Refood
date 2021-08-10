@@ -118,7 +118,8 @@ public class CardController {
      * @param resultsPerPage Number of results per page.
      * @param sortBy The expected values are CREATED, TITLE, COUNTRY, and KEYWORDS.
      *               Where the cards will be sorted by one of the four attributes, and the default is by CREATED.
-     * @param reverse Default is true.
+     * @param reverse Default is false, which will return the order of cards in ascending order.
+                      Otherwise, will return them in descending order.
      * @return 401 (if no auth), 400 if section does not exist, 200 otherwise, along with the list of cards in that section.
      * @throws JsonProcessingException if converting the list of cards into a JSON string fails.
      */
