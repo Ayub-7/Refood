@@ -76,8 +76,6 @@ public class AddressFinder {
         } else if (predicate.equals(Logic.OR)) {
              currentSpecification = currentSpecification.or(newSpec);
         }
-
-
         return currentSpecification;
     }
 
@@ -90,8 +88,7 @@ public class AddressFinder {
     private Specification<Listing> buildAddressSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
-        Specification<Listing> specification = buildQuery(terms.get(0))
-        ;
+        Specification<Listing> specification = buildQuery(terms.get(0));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }
@@ -118,9 +115,7 @@ public class AddressFinder {
                 specification = checkFields(specification, nextTerm, Logic.AND);
             }
         }
-
         return specification;
-
     }
 
     /**
@@ -130,8 +125,6 @@ public class AddressFinder {
      */
     public Specification<Listing> findAddress(String query) {
         Specification<Listing> matches = buildAddressSpec(query);
-        //Specification<Listing> matches = countryContains(query);
         return matches;
-
     }
 }
