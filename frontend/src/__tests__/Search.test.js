@@ -123,14 +123,14 @@ describe('Search page tests', () => {
     })
 
     test('Mobile mode not on when window is normal size', () => {
-        global.innerWidth = 1300;
+        global.innerWidth = 500;
         global.dispatchEvent(new Event('resize'));
         expect(wrapper.vm.mobileMode).toBe(false)
     })
     
 
     test('Mobile mode active when window size is reduced', () => {
-        global.innerWidth = 1299;
+        global.innerWidth = 499;
         global.dispatchEvent(new Event('resize'));
 
         expect(wrapper.vm.mobileMode).toBe(true)
