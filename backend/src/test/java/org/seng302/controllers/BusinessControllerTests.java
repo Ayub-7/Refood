@@ -33,6 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.util.LinkedMultiValueMap;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
@@ -64,7 +65,6 @@ class BusinessControllerTests {
     User adminUser;
     User user;
     Business business;
-    List<Business> businessList;
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
@@ -81,9 +81,6 @@ class BusinessControllerTests {
         business.createBusiness(ownerUser);
         business.getAdministrators().add(adminUser);
         assertThat(business.getAdministrators().size()).isEqualTo(2);
-
-        businessList = new ArrayList<Business>();
-        businessList.add(business);
     }
 
     @Test
@@ -367,24 +364,28 @@ class BusinessControllerTests {
     }
 
     @Test
-    void noSessionBusinessSearch() throws Exception {
+    void testNoSessionBusinessSearch() throws Exception {
         MvcResult results = mvc.perform(get("/businesses/search")
                 .param("query", "Pizza"))
                 .andReturn();
         assert results.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
     }
 
-//    @Test
-//    @WithMockUser
-//    void loggedInBusinessSearch() throws Exception {
-//        Page<Business> businessPage = new PageImpl<>(businessList);
-//        Mockito.when(businessRepository.findAll()).thenReturn(businessList);
-//
-//        MvcResult results = mvc.perform(get("/businesses/search")
-//                .param("query", "Business1")
-//                .param("type", "")
-//                .param("page", String.valueOf(0)))
-//                .andReturn();
-//        assert results.getResponse().getStatus() == HttpStatus.OK.value();
-//    }
+    @Test
+    @WithMockUser
+    void testSuccessfulBusinessSearch() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("type", "");
+        requestParams.add("page", "0");
+
+        List<Business> businessList = new ArrayList<Business>();
+        businessList.add(business);
+        Mockito.when(businessRepository.findAll()).thenReturn(businessList);
+
+        MvcResult results = mvc.perform(get("/businesses/search")
+                .params(requestParams))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+    }
 }

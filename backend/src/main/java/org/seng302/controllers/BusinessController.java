@@ -228,15 +228,16 @@ public class BusinessController {
      */
     private Page<Business> removeBusinessesAdministered(Page<Business> businesses) {
         logger.debug("Removing businessesAdministered...");
-        System.out.println(businesses);
-        for(Business business: businesses) {
-            List<User> admins = business.getAdministrators();
-            for(User admin: admins) {
-                admin.setBusinessesAdministered(null);
+        if (businesses != null) {
+            for(Business business: businesses) {
+                List<User> admins = business.getAdministrators();
+                for(User admin: admins) {
+                    admin.setBusinessesAdministered(null);
+                }
             }
-        }
 
-        logger.debug("businessesAdministered removed");
+            logger.debug("businessesAdministered removed");
+        }
         return businesses;
     }
 }
