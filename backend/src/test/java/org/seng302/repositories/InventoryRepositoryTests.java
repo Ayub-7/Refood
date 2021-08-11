@@ -71,7 +71,7 @@ class InventoryRepositoryTests {
 
 
         assertThat(productRepository).isNotNull();
-        testProd1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
+        testProd1 = new Product("07-4957066", b1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
         productRepository.save(testProd1);
 
         assertThat(inventoryRepository).isNotNull();

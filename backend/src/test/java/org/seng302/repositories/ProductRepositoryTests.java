@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.seng302.TestApplication;
 import org.seng302.models.Product;
+import org.seng302.models.Business;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,12 +24,13 @@ class ProductRepositoryTests {
 
     private Product testProd1;
     private Product testProd2;
+    private Business business;
 
     @BeforeEach
     void setUp() {
         assertThat(productRepository).isNotNull();
-        testProd1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
-        testProd2 = new Product("07-4957066", 2, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
+        testProd1 = new Product("07-4957066", business, "Spoon", "Soup, Plastic", "Good Manufacturer",  14.69, new Date());
+        testProd2 = new Product("07-4957066", business, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
 
         productRepository.save(testProd1);
         productRepository.save(testProd2);
@@ -36,7 +38,7 @@ class ProductRepositoryTests {
 
     @Test
     void saveProduct() {
-        Product product = new Product("55-9986232", 1, "Lamb Leg", "Bone - In Nz", "Some Manufacturer", 43.66, new Date());
+        Product product = new Product("55-9986232", business, "Lamb Leg", "Bone - In Nz", "Some Manufacturer", 43.66, new Date());
         productRepository.save(product);
 
         // Test if insertion is properly inserting values.
@@ -47,7 +49,7 @@ class ProductRepositoryTests {
 
         List<Product> products = productRepository.findProductsByBusinessId(1);
         assertThat(products.size()).isEqualTo(2);
-        Product anotherProduct = new Product("12-5088639", 1, "Foam Cup", "6 Oz", "Legit Manufacturer", 55.2, new Date());
+        Product anotherProduct = new Product("12-5088639", business, "Foam Cup", "6 Oz", "Legit Manufacturer", 55.2, new Date());
         productRepository.save(anotherProduct);
 
         products = productRepository.findProductsByBusinessId(1);

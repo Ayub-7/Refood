@@ -42,7 +42,7 @@ class ListingRepositoryTests {
 
     @Autowired
     private ProductRepository productRepository;
-
+    private Business business;
 
     private Inventory testInven1;
     private Inventory testInven2;
@@ -65,8 +65,8 @@ class ListingRepositoryTests {
         assertThat(inventoryRepository).isNotNull();
         assertThat(inventoryRepository).isNotNull();
 
-        Product testProd1 = new Product("77-9986231", 2, "Seedlings", "Buckwheat, Organic", "Nestle", 1.26, new Date());
-        Product testProd2 = new Product("77-5088639", 2, "Foam Cup", "6 Oz", "Edible Objects Ltd.",55.2, new Date());
+        Product testProd1 = new Product("77-9986231", business, "Seedlings", "Buckwheat, Organic", "Nestle", 1.26, new Date());
+        Product testProd2 = new Product("77-5088639", business, "Foam Cup", "6 Oz", "Edible Objects Ltd.",55.2, new Date());
 
         productRepository.save(testProd1);
         productRepository.save(testProd2);
