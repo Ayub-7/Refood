@@ -111,12 +111,9 @@ public class ListingController {
 
     @GetMapping("/businesses/location")
             public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
-                logger.debug("Searching for businesses...");
-                System.out.println("Searching for businesses... address");
+                logger.debug("Searching for businesses...address");
                 Specification<Listing> specification = addressFinder.findAddress(query);
-                System.out.println(specification);
                 List<Listing> businesses = listingRepository.findAll(specification);
-
                 return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
             }
 
