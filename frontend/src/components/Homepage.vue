@@ -40,11 +40,14 @@
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
         <main>
           <nav id="newsfeed-navbar">
-            <div class="name" style="text-align: center;">
-              News Feed
+            <div class="newsfeed-title">
+              <span style="display: inline-block; vertical-align: middle;">
+                <vs-icon icon="feed" />
+              </span>
+               News Feed
             </div>
           </nav>
-
+          <vs-divider style="padding: 0 1em;"/>
           <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
         </main>
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
@@ -291,16 +294,22 @@ export default Homepage;
   background-color: white;
   padding: 15px 0 15px 0;
   border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
 
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1)
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
 }
 
 .name {
   font-size: 32px;
   padding: 0.5em 0;
   line-height: 1.2em;
+}
+
+.newsfeed-title {
+  font-size: 24px;
+  padding: 1em 0 0 1em;
+  line-height: 1.2em;
+
 }
 
 /* Side-bar panel on left side */
@@ -328,7 +337,6 @@ export default Homepage;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(1, auto) repeat(1, 1fr);
   grid-row-gap: 2em;
-  color: #FFFFFF;
 }
 
 #watchlist-container h3 {
@@ -351,9 +359,7 @@ main {
   grid-column: 2;
   grid-row: 1;
   font-size: 18px;
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
   border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
 }
 
 /* left navigation panel styling */
