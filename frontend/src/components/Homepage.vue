@@ -33,10 +33,16 @@
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container">
-          <h3>Watchlist:</h3>
+          <div>
+            <span style="display: inline-block; vertical-align: middle;">
+              <vs-icon icon="favorite_border"/>
+            </span>
+            <span class="watchlist-title">Watchlist</span>
+            <vs-divider style="margin-top: 8px;"/>
+          </div>
         </div>
-
       </div>
+
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
         <main>
           <nav id="newsfeed-navbar">
@@ -50,6 +56,7 @@
           <vs-divider style="padding: 0 1em;"/>
           <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
         </main>
+
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
         <MarketplaceGrid @cardRemoved="getUserCards(userId)" :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
@@ -309,7 +316,6 @@ export default Homepage;
   font-size: 24px;
   padding: 1em 0 0 1em;
   line-height: 1.2em;
-
 }
 
 /* Side-bar panel on left side */
@@ -339,11 +345,11 @@ export default Homepage;
   grid-row-gap: 2em;
 }
 
-#watchlist-container h3 {
-  font-weight: 400;
-  margin: 0 auto;
-  widows: 100%;
+.watchlist-title {
+  font-size: 18px;
+  margin-left: 4px;
 }
+
 /* News feed styles. */
 main {
   grid-column: 3;

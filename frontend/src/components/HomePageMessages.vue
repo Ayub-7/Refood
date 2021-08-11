@@ -62,7 +62,7 @@
          </div>
       </vs-card>
 
-    <!-- LISTING NOTIFICATIONS -->
+    <!-- PURCHASE LISTING NOTIFICATIONS -->
     <vs-card class="notification-card">
       <div class="pln-top-row">
         <p class="sub-header">PURCHASED LISTING - 2021-08-08</p>
@@ -87,7 +87,7 @@
       </div>
     </vs-card>
 
-
+    <!-- LIKED LISTING NOTIFICATIONS -->
     <vs-card class="liked-listing-notification notification-card">
       <p class="sub-header">LIKED LISTING - 2021-08-08</p>
       <div class="lln-description">
