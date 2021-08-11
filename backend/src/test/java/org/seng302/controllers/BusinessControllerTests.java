@@ -25,6 +25,8 @@ import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,6 +37,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests relating to the REST Business Controller.
@@ -60,6 +64,7 @@ class BusinessControllerTests {
     User adminUser;
     User user;
     Business business;
+    List<Business> businessList;
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
@@ -76,6 +81,9 @@ class BusinessControllerTests {
         business.createBusiness(ownerUser);
         business.getAdministrators().add(adminUser);
         assertThat(business.getAdministrators().size()).isEqualTo(2);
+
+        businessList = new ArrayList<Business>();
+        businessList.add(business);
     }
 
     @Test
@@ -369,9 +377,12 @@ class BusinessControllerTests {
 //    @Test
 //    @WithMockUser
 //    void loggedInBusinessSearch() throws Exception {
+//        Page<Business> businessPage = new PageImpl<>(businessList);
+//        Mockito.when(businessRepository.findAll()).thenReturn(businessList);
+//
 //        MvcResult results = mvc.perform(get("/businesses/search")
-//                .param("query", "Bu")
-//                .param("type", "Retail Trade")
+//                .param("query", "Business1")
+//                .param("type", "")
 //                .param("page", String.valueOf(0)))
 //                .andReturn();
 //        assert results.getResponse().getStatus() == HttpStatus.OK.value();

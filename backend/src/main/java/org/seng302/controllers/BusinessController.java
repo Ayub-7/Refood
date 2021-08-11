@@ -211,7 +211,7 @@ public class BusinessController {
         try {
             matches = businessFinder.findBusinesses(query, type);
         } catch (ResponseStatusException e) {
-            logger.error("{} error - invalid sort by parameter {}", e.getStatus(), type);
+            logger.error("{} error - invalid type parameter {}", e.getStatus(), type);
             return ResponseEntity.status(e.getStatus()).body(e.getReason());
         }
         Page<Business> unfilteredBusinesses =  businessRepository.findAll(matches, pageRequest);
@@ -228,6 +228,7 @@ public class BusinessController {
      */
     private Page<Business> removeBusinessesAdministered(Page<Business> businesses) {
         logger.debug("Removing businessesAdministered...");
+        System.out.println(businesses);
         for(Business business: businesses) {
             List<User> admins = business.getAdministrators();
             for(User admin: admins) {
