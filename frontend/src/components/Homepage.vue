@@ -275,7 +275,7 @@ export default Homepage;
 
 #container {
   display: grid;
-  grid-template-columns: 1fr 1fr 4fr 1fr;
+  grid-template-columns: 0.5fr 1fr 4fr 0.5fr;
   grid-template-rows: 1fr auto;
   grid-column-gap: 1em;
   margin: auto;
@@ -288,12 +288,13 @@ export default Homepage;
   grid-column: 2 / 4;
   grid-row: 1;
   text-align: center;
-  background-color: transparent;
+  background-color: white;
   padding: 15px 0 15px 0;
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1)
 }
 
 .name {
@@ -316,7 +317,7 @@ export default Homepage;
 .sub-container {
   padding: 2em;
   border-radius: 4px;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
   background-color: #FFFFFF;
 }
 
@@ -349,9 +350,7 @@ main {
   grid-column: 2;
   grid-row: 1;
   font-size: 18px;
-  padding-top: 1em;
-  padding-bottom: 1em;
-  box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
 }

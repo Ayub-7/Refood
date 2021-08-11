@@ -56,7 +56,42 @@
           </div>
       </vs-card>
     </div>
+    <!-- LISTING NOTIFICATIONS -->
+    <vs-card class="purchased-listing-notification">
+      <div class="pln-top-row">
+        <p class="sub-header">PURCHASED LISTING - 2021-08-08</p>
+        <div style="display: flex;">
+          <div></div>
+          <vs-button color="danger" icon="close" class="pln-delete-button"></vs-button>
+        </div>
+      </div>
+      <h2>Honda Civic</h2>
+      <h3>Company Name</h3>
+      <div class="pln-bottom-row">
+        <div style="display: flex; margin-top: auto;">
+          <h2>
+            $69.99
+          </h2>
+          <div style="padding-left: 1em">
+            Pickup: Ilam Road, Christchurch, New Zealand
+          </div>
+        </div>
+        <div>
+          <vs-button>View Listing</vs-button>
+        </div>
+      </div>
+    </vs-card>
+    <vs-card class="liked-listing-notification">
+      <p class="sub-header">LIKED LISTING - 2021-08-08</p>
+      <div class="lln-description">
+        <b>Honda Civic</b>, by Company Name was purchased by someone else, and is no longer available.
+      </div>
+      <div class="lln-button-group">
+        <vs-button>View Listing</vs-button>
+        <vs-button color="danger" icon="close" class="lln-delete-button"></vs-button>
+      </div>
 
+    </vs-card>
 
   </div>
 
@@ -197,8 +232,6 @@ export default {
   margin-right: 10px;
 }
 
-
-
 #message-text {
   width: 100%;
   font-size: 14px;
@@ -270,6 +303,71 @@ export default {
   padding: 10px 30px;
 }
 
+.sub-header {
+  font-size: 12px;
+  color: gray;
+}
+
+/* === PURCHASE LISTING NOTIFICATION === */
+
+.purchased-listing-notification {
+  margin: 1em;
+  width: auto;
+}
+
+.pln-top-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.pln-delete-button {
+  width: 25px!important;
+  height: 25px!important;
+  margin-left: 1em;
+}
+
+.pln-delete-button > i.material-icons {
+  font-size: 18px;
+}
+
+.pln-bottom-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.liked-listing-notification {
+  margin: 1em;
+  width: auto;
+}
+
+.liked-listing-notification > .vs-card--content {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: auto auto;
+}
+
+.lln-description {
+  grid-row: 2;
+}
+
+.lln-button-group {
+  grid-row: 1/3;
+  grid-column: 2;
+
+  margin: auto 0 auto auto;
+  display: flex;
+  flex-direction: row;
+}
+
+.lln-delete-button {
+  width: 25px!important;
+  height: 25px!important;
+  margin: auto 0 auto 1em;
+}
+
+
 @media only screen and (max-width: 1250px){
   #message-notification-container {
     display: grid;
@@ -291,6 +389,7 @@ export default {
     font-size: 12px;
   }
 }
+
 
 /* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
 .slide-enter-active {
