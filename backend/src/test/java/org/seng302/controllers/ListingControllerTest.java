@@ -419,7 +419,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByProductName_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -444,7 +444,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByExpiry_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -469,7 +469,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByCloseDate_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -495,7 +495,7 @@ class ListingControllerTest {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("query", "Business1");
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
 
         List<Listing> results = new ArrayList<>();
         results.add(listing1);
@@ -513,7 +513,7 @@ class ListingControllerTest {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("query", "Business1");
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
 
         List<Listing> results = new ArrayList<>();
         results.add(listing1);
