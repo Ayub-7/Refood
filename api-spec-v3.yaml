@@ -1685,6 +1685,37 @@ paths:
             not logged in.
         '400':
           description: Bad request
+    get:
+      tags:
+        - Users
+        - 'U31 : Purchases'
+      summary: User can retrieve all notifications they have received.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: Id of the user who is about to receive the notification
+          required: true
+          example: 111
+      responses:
+        '200':
+          description: Successful retrieval of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListOfNotifications'
+        '401':
+          description: Cannot send a notification to a user when the sender is
+            not logged in.
+        '400':
+          description: Bad request
 components:
   securitySchemes:
     CookieAuth:
@@ -2007,7 +2038,6 @@ components:
           description: List of images of a product (implemented in U16).
           items:
             $ref: '#/components/schemas/Image'
-
     BusinessPage:
       type: object
       description: Business search page
@@ -2123,8 +2153,6 @@ components:
         totalElements:
           type: integer
           example: 73
-
-
     Business:
       type: object
       description: Business account entity
@@ -2440,5 +2468,14 @@ components:
           enum:
             - Expired
             - Bought
+    ListOfNotifications:
+      example: [{"sender": 43,
+                 "listing": 43,
+                 "message": "Honda Civic 2007 has been sold!",
+                 "status": "Expired"},
+        {"sender": 44,
+         "listing": 69,
+         "message": "You have successfully bought Toyota Corolla 1998!",
+         "status": "Bought"}]
 
 
