@@ -137,7 +137,7 @@ public class searchSaleListingsDefs extends CucumberSpringConfiguration {
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
         requestParams.add("sortDirection", "asc");
 
         response = mockMvc.perform(post("/businesses/listings")
