@@ -328,6 +328,7 @@ export default Homepage;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(1, auto) repeat(1, 1fr);
   grid-row-gap: 2em;
+  color: #FFFFFF;
 }
 
 #watchlist-container h3 {

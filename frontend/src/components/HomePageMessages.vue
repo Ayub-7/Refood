@@ -48,32 +48,37 @@
       </div>
 
     </vs-popup>
-    <div v-for="message in messages" :key="message.id">
-      <vs-card id="message-notification-card" actionable>
-          <div id="message-notification-container"  @click="openDetailedModal(message)">
-            <div id="message-text">New message from {{users[message.sender.id || message.sender].firstName}} {{users[message.sender.id || message.sender].lastName}} about {{message.card.title}}</div>
-            <vs-button color="danger" id="delete-btn" class="message-button" @click.stop.prevent="deleteMessage(message.id)">X</vs-button>
-          </div>
+
+
+      <vs-card v-for="message in messages" :key="message.id" id="message-notification-card" class="notification-card" actionable>
+          <div @click="openDetailedModal(message)">
+            <div style="display: flex; justify-content: space-between">
+              <p class="sub-header">MARKETPLACE - {{message.sent}}</p>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(message.id)" icon="close"></vs-button>
+            </div>
+            <div id="message-notification-container">
+              <div id="message-text">New message from {{users[message.sender.id || message.sender].firstName}} {{users[message.sender.id || message.sender].lastName}} about {{message.card.title}}</div>
+            </div>
+         </div>
       </vs-card>
-    </div>
+
     <!-- LISTING NOTIFICATIONS -->
-    <vs-card class="purchased-listing-notification">
+    <vs-card class="notification-card">
       <div class="pln-top-row">
         <p class="sub-header">PURCHASED LISTING - 2021-08-08</p>
         <div style="display: flex;">
-          <div></div>
-          <vs-button color="danger" icon="close" class="pln-delete-button"></vs-button>
+          <vs-button color="danger" icon="close" class="pln-delete-button delete-button"></vs-button>
         </div>
       </div>
       <h2>Honda Civic</h2>
-      <h3>Company Name</h3>
+      <h5>Company Name</h5>
       <div class="pln-bottom-row">
         <div style="display: flex; margin-top: auto;">
           <h2>
             $69.99
           </h2>
           <div style="padding-left: 1em">
-            Pickup: Ilam Road, Christchurch, New Zealand
+            Collect at Ilam Road, Christchurch, New Zealand
           </div>
         </div>
         <div>
@@ -81,14 +86,16 @@
         </div>
       </div>
     </vs-card>
-    <vs-card class="liked-listing-notification">
+
+
+    <vs-card class="liked-listing-notification notification-card">
       <p class="sub-header">LIKED LISTING - 2021-08-08</p>
       <div class="lln-description">
         <b>Honda Civic</b>, by Company Name was purchased by someone else, and is no longer available.
       </div>
       <div class="lln-button-group">
         <vs-button>View Listing</vs-button>
-        <vs-button color="danger" icon="close" class="lln-delete-button"></vs-button>
+        <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
       </div>
 
     </vs-card>
@@ -212,7 +219,7 @@ export default {
         this.detailedView = true;
         this.showing = true;
       }
-      
+
     },
     computed: {
       /**
@@ -226,6 +233,19 @@ export default {
 </script>
 
 <style>
+.notification-card {
+  margin: 1em;
+  width: auto;
+}
+
+.delete-button {
+  width: 25px!important;
+  height: 25px!important;
+}
+
+.delete-button > i.material-icons {
+  font-size: 18px;
+}
 
 #message-notification-container {
   display: flex;
@@ -235,9 +255,6 @@ export default {
 #message-text {
   width: 100%;
   font-size: 14px;
-  /* height: 100%; */
-  /* margin-bottom: 15px; */
-  line-height: 30px;
 }
 
 #delete-btn {
@@ -246,20 +263,12 @@ export default {
   width: 35px;
 }
 
-
-#message-notification-card {
-  width: 95%;
-  margin: auto;
-  margin-top: 5px;
-}
-
 .message-detail-container {
   display: flex;
   margin-top: 5px;
 }
 
 #message-detail-message {
-
   font-size: 15px;
   word-wrap: break-word;
   width: 92%;
@@ -310,11 +319,6 @@ export default {
 
 /* === PURCHASE LISTING NOTIFICATION === */
 
-.purchased-listing-notification {
-  margin: 1em;
-  width: auto;
-}
-
 .pln-top-row {
   display: flex;
   flex-direction: row;
@@ -322,24 +326,13 @@ export default {
 }
 
 .pln-delete-button {
-  width: 25px!important;
-  height: 25px!important;
   margin-left: 1em;
-}
-
-.pln-delete-button > i.material-icons {
-  font-size: 18px;
 }
 
 .pln-bottom-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-.liked-listing-notification {
-  margin: 1em;
-  width: auto;
 }
 
 .liked-listing-notification > .vs-card--content {
@@ -362,8 +355,6 @@ export default {
 }
 
 .lln-delete-button {
-  width: 25px!important;
-  height: 25px!important;
   margin: auto 0 auto 1em;
 }
 
@@ -379,15 +370,22 @@ export default {
 
   #message-text {
     margin-bottom: 10px;
-    text-align: center;
     height: 100%;
   }
 
   #delete-btn{
-    margin: auto;
-    width: 25px;
-    font-size: 12px;
+
   }
+
+  .lln-button-group {
+    flex-direction: column-reverse;
+  }
+
+  .lln-delete-button {
+    margin-left: auto;
+    margin-bottom: 4px;
+  }
+
 }
 
 
