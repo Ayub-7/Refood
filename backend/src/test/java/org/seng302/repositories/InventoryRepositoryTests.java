@@ -1,19 +1,16 @@
 package org.seng302.repositories;
 
-import org.junit.After;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class InventoryRepositoryTests {
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Autowired
     private InventoryRepository inventoryRepository;
@@ -34,14 +35,11 @@ class InventoryRepositoryTests {
     @Autowired
     private BusinessRepository businessRepository;
 
-    @Autowired
-    private EntityManager entityManager;
-
     private Business business1;
 
     private Product testProd1;
 
-    private Inventory testInven1;
+    private Inventory testInvent1;
 
     private Date dateBefore;
     private Date dateAfter;
@@ -54,6 +52,7 @@ class InventoryRepositoryTests {
         productRepository.flush();
         inventoryRepository.deleteAll();
         inventoryRepository.flush();
+        entityManager.clear();
 
         Calendar afterCalendar = Calendar.getInstance();
         afterCalendar.set(2022, 1, 1);
@@ -67,7 +66,9 @@ class InventoryRepositoryTests {
         assertThat(businessRepository).isNotNull();
         Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Brazil","39960-000");
         Business b1 = new Business("AnotherBusiness", "A business", a1, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-        businessRepository.save(b1);
+
+        entityManager.persist(b1);
+        entityManager.flush();
 
 
         assertThat(productRepository).isNotNull();
@@ -75,19 +76,19 @@ class InventoryRepositoryTests {
         productRepository.save(testProd1);
 
         assertThat(inventoryRepository).isNotNull();
-        testInven1 = new Inventory("07-4957066", 1, 5, 2.0, 10.0, dateBefore, dateAfter, dateAfter, dateAfter);
-        inventoryRepository.save(testInven1);
+        testInvent1 = new Inventory("07-4957066", 1, 5, 2.0, 10.0, dateBefore, dateAfter, dateAfter, dateAfter);
+        inventoryRepository.save(testInvent1);
 
     }
 
 
     @Test
     void saveInventory() {
-        Inventory inventoryItem = inventoryRepository.findInventoryByIdAndBusinessId(testInven1.getId(), testInven1.getBusinessId());
+        Inventory inventoryItem = inventoryRepository.findInventoryByIdAndBusinessId(testInvent1.getId(), testInvent1.getBusinessId());
 
-        Assertions.assertEquals(testInven1.getId(), inventoryItem.getId());
-        assertThat(testInven1.getProductId()).isEqualTo(inventoryItem.getProductId());
-        assertThat(testInven1.getQuantity()).isEqualTo(inventoryItem.getQuantity());
+        Assertions.assertEquals(testInvent1.getId(), inventoryItem.getId());
+        assertThat(testInvent1.getProductId()).isEqualTo(inventoryItem.getProductId());
+        assertThat(testInvent1.getQuantity()).isEqualTo(inventoryItem.getQuantity());
 
         // Test if insertion is properly inserting values.
         List<Inventory> inventoryItems = inventoryRepository.findInventoryByProductIdAndBusinessId("07-4957066", 1);
