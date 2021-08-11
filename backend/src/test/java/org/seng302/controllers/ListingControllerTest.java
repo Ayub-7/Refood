@@ -485,7 +485,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByCountry_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -510,7 +510,7 @@ class ListingControllerTest {
     void testPostAllListings_sortBySeller_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
