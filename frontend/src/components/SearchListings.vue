@@ -41,7 +41,7 @@
               <div class="parameter" id="listings">
                 <div class="vert-row">
                 <h3 class="filter-label">
-                  Prouduct Name:
+                  Product Name:
                 </h3>
                 <vs-input class="filter-input" type="search" placeholder="Product name.." name="searchbarUser"  style="width: 400px; font-size: 24px" size="medium"/>
               </div>
