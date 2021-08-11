@@ -87,7 +87,6 @@ public class AddressFinder {
      */
     private Specification<Listing> buildAddressSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
-        System.out.println(terms);
         Specification<Listing> specification = buildQuery(terms.get(0));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
