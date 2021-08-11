@@ -2241,5 +2241,10 @@ components:
           enum:
             - Expired
             - Bought
+        created:
+          type: string
+          format: date
+          description: The date the notification was created
+          readOnly: true
 
 
