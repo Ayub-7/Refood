@@ -97,7 +97,7 @@ public class ListingController {
     @PostMapping("/businesses/listings")
     public ResponseEntity<String> getAllListings(@RequestBody BusinessListingSearchRequest request,
                                                  @RequestParam("count") int count,
-                                                 @RequestParam("offset") int offset,
+                                                 @RequestParam("page") int offset,
                                                  @RequestParam("sortDirection") String sortDirection) throws JsonProcessingException {
 
         Sort sort;
@@ -161,7 +161,7 @@ public class ListingController {
     @GetMapping("/businesses/listings")
     public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
                                               @RequestParam("count") int count,
-                                              @RequestParam("offset") int offset,
+                                              @RequestParam("page") int offset,
                                               HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for Listings...");
         Specification<Listing> specification = listingFinder.findListing(query);

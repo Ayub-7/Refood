@@ -1472,7 +1472,7 @@ paths:
           description: How many results per page to return
           example: '10'
         - in: query
-          name: offset
+          name: page
           schema:
             type: number
           description: How many pages to skip before returning the results
@@ -1507,7 +1507,7 @@ paths:
       tags:
         - Business Accounts
         - 'U29 : Browse/search sale listings'
-      summary: Search for listings by business/seller name
+      summary: Search for listings by business name
       security:
         - CookieAuth:
             - globalApplicationAdmin
@@ -1526,7 +1526,7 @@ paths:
           description: How many results per page to return
           example: '10'
         - in: query
-          name: offset
+          name: page
           schema:
             type: number
           description: How many pages to skip before returning the results
