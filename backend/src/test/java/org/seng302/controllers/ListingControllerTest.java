@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.AddressFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.models.requests.UserIdRequest;
@@ -58,6 +59,8 @@ class ListingControllerTest {
     private ListingRepository listingRepository;
     @Autowired
     private ObjectMapper mapper;
+    @MockBean
+    private AddressFinder addressFinder;
 
     private User ownerUser;
     private User adminUser;
