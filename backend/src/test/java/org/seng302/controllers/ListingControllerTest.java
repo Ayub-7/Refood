@@ -397,7 +397,7 @@ class ListingControllerTest {
     void testPostAllListings_validRequest_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("offset", "1");
+        requestParams.add("page", "1");
         requestParams.add("sortDirection", "asc");
 
         List<Listing> results = new ArrayList<>();
