@@ -1,18 +1,12 @@
 package org.seng302.finders;
 
-import javax.persistence.criteria.Join;
-import org.seng302.models.Product;
-import org.seng302.models.Business;
 import org.seng302.models.Listing;
-import org.seng302.models.Address;
 import org.seng302.repositories.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-import org.seng302.finders.Logic;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +26,9 @@ public class AddressFinder {
         ArrayList<String> terms = new ArrayList<>();
         Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
         while (matcher.find()) {
-            terms.add(matcher.group().replace("\"", ""));
+            var temp = matcher.group().replace("\"", "");
+            temp = temp.replace(" ", "");
+            terms.add(temp);
         }
         return terms;
     }
