@@ -116,7 +116,7 @@ export default {
      * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
      * @returns {*}
      */
-    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
+    searchBusinessesWithTypeQuery: (query, type, page) => instance.get('/businesses/search', {params: {query: query, type: type, page: page}, withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.

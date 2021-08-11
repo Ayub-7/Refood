@@ -3,8 +3,8 @@
     <div id="search">
       <vs-input v-on:keyup.enter="searchUsers()"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
       <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers">Search</vs-button>
-      <vs-input v-on:keyup.enter="searchBusiness()" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness">Search</vs-button>
+      <vs-input v-on:keyup.enter="searchBusiness(1)" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness(1)">Search</vs-button>
 
       <vs-select
           width="10%"
@@ -69,7 +69,7 @@
 
     <!-- === BUSINESS TABLE === -->
     <div v-if="businesses.length" class="data-table">
-      <vs-table :data="this.businesses" max-items="10" pagination stripe >
+      <vs-table :data="this.businesses">
         <template slot="thead" id="businessesTableHeader">
           <vs-th sort-key="name" style="border-radius: 4px 0 0 0;">
             Business name
@@ -100,8 +100,16 @@
           </vs-tr>
         </template>
       </vs-table>
-
-      <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{businesses.length}} results</div>
+      <div class="title-container">
+        <div class="title-centre">
+          <vs-pagination v-model="page" :total="totalPages" @change="searchBusiness(page)"/>
+        </div>
+      </div>
+      <div class="title-container">
+        <div class="title-centre">
+          <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{resultSize}} results</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -128,6 +136,9 @@ const Search = {
       searchIndexMin: 1,
       searchIndexMax: 10,
 
+      page: 1,
+      resultSize: 0,
+      totalPages: 0,
       isDGAA: false
     };
   },
@@ -145,7 +156,7 @@ const Search = {
     if (sessionStorage.getItem('businessesCache') !== null) {
       if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
         this.businesses = JSON.parse(sessionStorage.getItem('businessesCache'));
-        this.paginator(this.businesses)
+        //this.paginator(this.businesses)
       }
     }
     if ( this.getUserRole() === 'DGAA') {
@@ -168,7 +179,8 @@ const Search = {
      * If page reaches certain width set mobile mode on, this removes columns from the table to ensure it fits on the page
      */
     setMobileMode: function() {
-      if(window.innerWidth < 1300) {
+      if(window.innerWidth < 500) {
+        console.log(99);
         this.mobileMode = true
       } else {
         this.mobileMode = false;
@@ -190,31 +202,7 @@ const Search = {
     /**
      * Increases search range to be shown on page
      */
-    increaseSearchRangeForBusiness: function() {
-      this.searchIndexMin += 10;
-      if(this.searchIndexMax + 10 > this.businesses.length) {
-        this.searchIndexMax = this.businesses.length;
-      } else {
-        this.searchIndexMax += 10;
-      }
-    },
-
-    /**
-     * Increases search range to be shown on page
-     */
     decreaseSearchRange: function() {
-      this.searchIndexMin -= 10;
-      if(this.searchIndexMax % 10 !== 0){
-        this.searchIndexMax -= this.searchIndexMax % 10;
-      } else {
-        this.searchIndexMax -= 10;
-      }
-    },
-
-    /**
-     * Increases search range to be shown on page
-     */
-    decreaseSearchRangeForBusiness: function() {
       this.searchIndexMin -= 10;
       if(this.searchIndexMax % 10 !== 0){
         this.searchIndexMax -= this.searchIndexMax % 10;
@@ -250,8 +238,10 @@ const Search = {
     paginator(data) {
       //Need to set properties of user object so they can be sorted by
       for(let user of data) {
-        user.country = user.homeAddress.country;
-        user.city = user.homeAddress.city;
+        if (user.country) {
+          user.country = user.homeAddress.country;
+          user.city = user.homeAddress.city;
+        }
       }
 
       if(data.length < 10) {
@@ -270,7 +260,7 @@ const Search = {
      * users based on the input in the search box.
      */
     searchUsers: function () {
-
+      this.businesses = [];
       if (sessionStorage.getItem('businessesCache') !== null) {
         if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
           sessionStorage.setItem("businessesCache", []);
@@ -307,7 +297,7 @@ const Search = {
      * Searches for the businesses in the database by calling the API function with an SQL query
      * to find the businesses based on the input in the search box.
      */
-    searchBusiness: function() {
+    searchBusiness: function(page) {
       if (this.users.length) {
         this.users = [];
       }
@@ -315,11 +305,15 @@ const Search = {
       if (!this.businessType) {
         this.businessType = "";
       }
-      api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType)
+      api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType, page-1)
          .then((response) => {
-           this.businesses = response.data;
+           console.log(response.data);
+           this.resultSize = response.data.totalElements;
+           this.businesses = response.data.content;
+           this.totalPages = response.data.totalPages;
            this.businesses = this.businesses.filter(x => typeof(x) == "object");
-           // this.paginator(this.businesses);
+           this.searchIndexMin = response.data.number*10+1;
+           this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
          })
          .catch((error) => {
            this.$log.debug(error);
@@ -331,8 +325,8 @@ const Search = {
              document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
              //Event listeners for vuesax buttons on table since they're generated afterwards
-             document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRangeForBusiness);
-             document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRangeForBusiness);
+             // document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRangeForBusiness);
+             // document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRangeForBusiness);
 
              this.tableLoaded = true;
            }
@@ -362,6 +356,19 @@ export default Search;
 
 .displaying-results {
   text-align: right;
+}
+
+.title-centre {
+  margin-right: auto;
+  margin-left: auto;
+  display: flex;
+}
+
+.title-container {
+  display: flex;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 0.5em;
 }
 
 #search {
