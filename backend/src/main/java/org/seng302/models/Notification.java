@@ -1,6 +1,7 @@
 package org.seng302.models;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -25,6 +26,9 @@ public class Notification {
     @Column(name = "status")
     private NotificationStatus status;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date created;
+
     /**
      * Empty constructor for JPA use.
      */
@@ -37,6 +41,7 @@ public class Notification {
         this.title = title;
         this.displayPeriodEnd = displayPeriodEnd;
         this.status = NotificationStatus.EXPIRED;
+        this.created = new Date();
     }
 
     /***
