@@ -1,12 +1,18 @@
 package org.seng302.finders;
 
+import javax.persistence.criteria.Join;
+import org.seng302.models.Product;
+import org.seng302.models.Business;
 import org.seng302.models.Listing;
+import org.seng302.models.Address;
 import org.seng302.repositories.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.seng302.finders.Logic;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,9 +32,7 @@ public class AddressFinder {
         ArrayList<String> terms = new ArrayList<>();
         Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
         while (matcher.find()) {
-            var temp = matcher.group().replace("\"", "");
-            temp = temp.replace(" ", "");
-            terms.add(temp);
+            terms.add(matcher.group().replace("\"", ""));
         }
         return terms;
     }
@@ -45,17 +49,17 @@ public class AddressFinder {
 
     private Specification<Listing> suburbContains(String term) {
       return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("suburb")), "%"+term.toLowerCase()+"%");
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("suburb")), "%"+term.toLowerCase()+"%");
     }
 
     private Specification<Listing> cityContains(String term) {
       return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("city")), "%"+term.toLowerCase()+"%");
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("city")), "%"+term.toLowerCase()+"%");
     }
 
     private Specification<Listing> regionContains(String term) {
       return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.join("address").get("region")), "%"+term.toLowerCase()+"%");
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("region")), "%"+term.toLowerCase()+"%");
     }
 
 
@@ -76,8 +80,6 @@ public class AddressFinder {
         } else if (predicate.equals(Logic.OR)) {
              currentSpecification = currentSpecification.or(newSpec);
         }
-
-
         return currentSpecification;
     }
 
@@ -90,8 +92,7 @@ public class AddressFinder {
     private Specification<Listing> buildAddressSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
-        Specification<Listing> specification = buildQuery(terms.get(0))
-        ;
+        Specification<Listing> specification = buildQuery(terms.get(0));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }
@@ -118,9 +119,7 @@ public class AddressFinder {
                 specification = checkFields(specification, nextTerm, Logic.AND);
             }
         }
-
         return specification;
-
     }
 
     /**
@@ -129,9 +128,7 @@ public class AddressFinder {
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
     public Specification<Listing> findAddress(String query) {
-//         Specification<Business> matches = buildAddressSpec(query);
-        Specification<Listing> matches = countryContains(query);
+        Specification<Listing> matches = buildAddressSpec(query);
         return matches;
-
     }
 }
