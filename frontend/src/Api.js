@@ -97,11 +97,11 @@ export default {
      */
     //searchQuery: async(input) => instance.post('users/search', input),
 
-    /**
-     * Query search results that uses searchQuery function
-     * @returns {Promise<AxiosResponse<any>>}
-     */
-    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    // /**
+    //  * Query search results that uses searchQuery function
+    //  * @returns {Promise<AxiosResponse<any>>}
+    //  */
+    // searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
 
     /**
