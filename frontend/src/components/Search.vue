@@ -280,28 +280,28 @@ const Search = {
       }
       if (this.searchbarUser === "") return;
       this.$vs.loading();
-      api.searchUsersQuery(this.searchbarUser, page-1, this.sortString)
-        .then((response) => {
-          this.users = response.data.content;
-          this.users = this.users.filter(x => typeof(x) == "object")
-          this.resultSize = response.data.totalElements;
-          this.totalPages = response.data.totalPages;
-          this.searchIndexMin = response.data.number*10+1;
-          this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load users";
-        })
-        .finally(() => {
-          this.$vs.loading.close();
-          if(!this.tableLoaded){
-            // document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+      api.searchUsersQuery(this.searchbarUser, page - 1, this.sortString)
+              .then((response) => {
+                this.users = response.data.content;
+                this.users = this.users.filter(x => typeof (x) == "object")
+                this.resultSize = response.data.totalElements;
+                this.totalPages = response.data.totalPages;
+                this.searchIndexMin = response.data.number * 10 + 1;
+                this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
+                this.$vs.loading.close();
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+                this.error = "Failed to load users";
+              })
+              .finally(() => {
+                if (!this.tableLoaded) {
+                  // document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
-            //Event listeners for vuesax buttons on table since they're generated afterwards
-            this.tableLoaded = true;
-        }
-      })
+                  //Event listeners for vuesax buttons on table since they're generated afterwards
+                  this.tableLoaded = true;
+                }
+              })
     },
 
     /**
@@ -322,13 +322,13 @@ const Search = {
            this.businesses = this.businesses.filter(x => typeof(x) == "object");
            this.searchIndexMin = response.data.number*10+1;
            this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
+           this.$vs.loading.close();
          })
          .catch((error) => {
            this.$log.debug(error);
            this.error = "Failed to load businesses";
          })
          .finally(() => {
-           this.$vs.loading.close();
            if(!this.tableLoaded){
              //document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
