@@ -152,7 +152,7 @@ beforeEach(() => {
         methods: {},
         data () {
             return {
-                users: mockUsersFromSearch
+                users: mockUsersFromSearch.content
             }
         }
     });
