@@ -30,11 +30,6 @@ package org.seng302;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.seng302.repositories.BusinessRepository;
-import org.seng302.repositories.ProductRepository;
-import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.InventoryRepository;
-import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.SchedAdminCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -59,7 +54,6 @@ public class MainApplicationRunner implements ApplicationRunner {
    * This constructor is implicitly called by Spring (purpose of the @Autowired
    * annotation). Injected constructors can be supplied with instances of other
    * classes (i.e. dependency injection)
-   *
    */
   @Autowired
   public MainApplicationRunner() {
