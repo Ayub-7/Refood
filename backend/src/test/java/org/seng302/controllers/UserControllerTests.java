@@ -208,7 +208,7 @@ class UserControllerTests {
     void testGettingNonExistingUser() throws Exception {
         MvcResult userNotFound = mockMvc.perform(get("/users/{id}", 0))
                 .andReturn();
-        assert userNotFound.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
+        assert(userNotFound.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value());
     }
 
     @Test
@@ -275,9 +275,10 @@ class UserControllerTests {
         users.add(user1);
         users.add(user2);
         users.add(user3);
-        Mockito.when(userFinder.queryByName("Smith")).thenReturn(users);
+        Mockito.when(userRepository.findAll()).thenReturn(users);
         MvcResult results = mockMvc.perform(get("/users/search")
-                .param("searchQuery", "Smith"))
+                .param("searchQuery", "Smith")
+                .param("pageNum", String.valueOf(0)))
                 .andReturn();
         assert results.getResponse().getStatus() == HttpStatus.OK.value();
 
@@ -382,7 +383,7 @@ class UserControllerTests {
         MvcResult result = mockMvc.perform(get("/users/{id}", user.getId())).andReturn();
 
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_ACCEPTABLE.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("");
+        assertThat(result.getResponse().getContentAsString()).isEmpty();
 
     }
 
@@ -519,5 +520,4 @@ class UserControllerTests {
         UserIdResponse response = new UserIdResponse(user);
         assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
     }
-
 }
