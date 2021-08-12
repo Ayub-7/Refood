@@ -430,10 +430,13 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchListingsQuery: async(businessQuery, productQuery, addressQuery, sortBy, businessTypes,
+    filterListingsQuery: async(businessQuery, productQuery, addressQuery, sortBy, businessTypes,
                           minPrice, maxPrice, minClosingDate, maxClosingDate, count, page, sortDirection) =>
         instance.post('/businesses/listings', {businessQuery, productQuery, addressQuery, sortBy, businessTypes, minPrice, maxPrice, minClosingDate, maxClosingDate},
-            {params: {count: count, page: page, sortDirection: sortDirection}})
+            {params: {count: count, page: page, sortDirection: sortDirection}}, { withCredentials: true }),
 
+
+    searchListings: async(query, count, page) =>
+        instance.get('/businesses/listings', {params: {query: query, count: count, page: page}},{ withCredentials: true })
 
 }

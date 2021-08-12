@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "86c3aeb3-9f92-4d60-8c40-35a31d1ea4dc",
+		"_postman_id": "4a3f1f33-cde1-49ea-b5b6-3ac4141876be",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -191,8 +191,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Business",
@@ -248,158 +247,17 @@
 					"response": []
 				},
 				{
-					"name": "Search businesses with type",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body does not contain other types\", function () {",
-									"    pm.expect(pm.response.text()).to.not.include(\"Accommodation and Food Services\");",
-									"    pm.expect(pm.response.text()).to.not.include(\"Charitable organisation\");",
-									"    pm.expect(pm.response.text()).to.not.include(\"Non-profit organisation\");  ",
-									"     ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
+					"name": "Search businesses",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/search?query=&type=Retail Trade",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": ""
-								},
-								{
-									"key": "type",
-									"value": "Retail Trade"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search businesses with no type and query",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Dabshots\");",
-									"});",
-									"",
-									"var data = ",
-									"",
-									"",
-									"pm.test('Only one result is returned', function () {",
-									"    pm.expect(pm.response.json().length).to.equal(1);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{URL}}/businesses/search?query=Dabshots&type=",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "Dabshots"
-								},
-								{
-									"key": "type",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get business types",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"//Checks if correct status",
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"//Checks if correct values are there",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Accommodation and Food Services\");",
-									"});",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Information Media and Telecommunication\");",
-									"});",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Electricity, Gas, Water and Waste Services\");",
-									"});",
-									"",
-									"pm.test(\"All business types are returned\", function () {",
-									"    pm.expect(pm.response.json().length).to.equal(21)",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{URL}}/businesses/types",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								"types"
-							]
+							"raw": ""
 						}
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Users",
@@ -470,8 +328,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Inventory",
@@ -552,8 +409,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Listings",
@@ -625,12 +481,21 @@
 					"response": []
 				},
 				{
-					"name": "GET Listings by title or businesss",
+					"name": "All Sales Listings",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productQuery\": \"\",\r\n    \"sortBy\": null,\r\n    \"minPrice\": 10.00,\r\n    \"maxPrice\": 20.00,\r\n    \"businessType\": \"Retail Trade\",\r\n    \"minClosingDate\": \"2021-08-08 12:00:00\",\r\n    \"maxClosingDate\": \"2021-09-09 12:00:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{URL}}/businesses/listings?page=10&count=10&query=dabshot",
+							"raw": "{{URL}}/businesses/listings?count=10&offset=0&sortDirection=asc",
 							"host": [
 								"{{URL}}"
 							],
@@ -640,24 +505,23 @@
 							],
 							"query": [
 								{
-									"key": "page",
-									"value": "10"
-								},
-								{
 									"key": "count",
 									"value": "10"
 								},
 								{
-									"key": "query",
-									"value": "dabshot"
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "sortDirection",
+									"value": "asc"
 								}
 							]
 						}
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Products",
@@ -716,8 +580,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Cards",
@@ -950,8 +813,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
 	],
 	"event": [
@@ -976,11 +838,8 @@
 	],
 	"variable": [
 		{
-			"id": "3ff23668-e63c-49a8-9259-d8ba55989d19",
 			"key": "URL",
-			"value": "localhost:9499",
-			"type": "string"
+			"value": "localhost:9499"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

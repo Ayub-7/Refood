@@ -1,14 +1,12 @@
 package org.seng302.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.With;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
-import org.seng302.finders.ListingFinder;
-import org.seng302.finders.ListingSpecifications;
+import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
 import org.seng302.models.requests.NewListingRequest;
@@ -39,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ListingController.class)
 @ContextConfiguration(classes = TestApplication.class)
-
 class ListingControllerTest {
 
     @Autowired
@@ -54,10 +51,10 @@ class ListingControllerTest {
     private InventoryRepository inventoryRepository;
     @MockBean
     private ListingRepository listingRepository;
+    @MockBean
+    private ProductFinder productFinder;
     @Autowired
     private ObjectMapper mapper;
-    @MockBean
-    private ListingFinder listingFinder;
 
     private User ownerUser;
     private User adminUser;
@@ -234,32 +231,6 @@ class ListingControllerTest {
 
     @Test
     @WithMockUser(roles="USER")
-    void testPostWithBadInventory() throws Exception {
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-
-        mvc.perform(post("/businesses/{id}/listings", business.getId())
-                        .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(newListingRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(roles="USER")
-    void testPostWithBadBusiness() throws Exception {
-        Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-
-        mvc.perform(post("/businesses/{id}/listings", business.getId())
-                        .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(newListingRequest)))
-                .andExpect(status().isNotAcceptable());
-    }
-
-    @Test
-    @WithMockUser(roles="USER")
     void testPostWithQuantityLargerThanInventoryQuantity() throws Exception {
         //inventory quantity is 10
         inventory1.setQuantity(4);
@@ -388,7 +359,7 @@ class ListingControllerTest {
     void testPostAllListings_validRequest_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
         requestParams.add("sortDirection", "asc");
 
         List<Listing> results = new ArrayList<>();
@@ -410,7 +381,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByProductName_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -435,7 +406,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByExpiry_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -460,7 +431,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByCloseDate_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -485,7 +456,7 @@ class ListingControllerTest {
     void testPostAllListings_sortByCountry_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -510,7 +481,7 @@ class ListingControllerTest {
     void testPostAllListings_sortBySeller_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
         requestParams.add("sortDirection", "asc");
 
         BusinessListingSearchRequest request = new BusinessListingSearchRequest();
@@ -531,57 +502,53 @@ class ListingControllerTest {
     }
 
     @Test
-    @WithMockUser
-    void testFindListing_returnOk() throws Exception {
+    @WithMockUser(roles="USER")
+    void testPostAllListings_zeroLengthProductQuery_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("query", "Business1");
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
+        requestParams.add("sortDirection", "asc");
+
+        BusinessListingSearchRequest request = new BusinessListingSearchRequest();
+        request.setProductQuery("");
 
         List<Listing> results = new ArrayList<>();
         results.add(listing1);
         results.add(listing2);
 
         Mockito.when(listingRepository.findAll()).thenReturn(results);
-        mvc.perform(get("/businesses/listings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .params(requestParams))
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
+
     }
 
     @Test
-    void testFindListing_noUserLoggedIn() throws Exception {
+    @WithMockUser(roles="USER")
+    void testPostAllListings_nullProductQuery_returnOk() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("query", "Business1");
         requestParams.add("count", "5");
-        requestParams.add("page", "1");
+        requestParams.add("offset", "1");
+        requestParams.add("sortDirection", "asc");
+
+        BusinessListingSearchRequest request = new BusinessListingSearchRequest();
+        request.setProductQuery(null);
 
         List<Listing> results = new ArrayList<>();
         results.add(listing1);
         results.add(listing2);
 
         Mockito.when(listingRepository.findAll()).thenReturn(results);
-        mvc.perform(get("/businesses/listings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .params(requestParams))
-                .andExpect(status().isUnauthorized());
+
+        mvc.perform(post("/businesses/listings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(requestParams)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
     }
 
-    @Test
-    @WithMockUser
-    void testFindListing_missingParams() throws Exception {
-        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("query", "Business1");
-        requestParams.add("count", "5");
-
-        List<Listing> results = new ArrayList<>();
-        results.add(listing1);
-        results.add(listing2);
-
-        Mockito.when(listingRepository.findAll()).thenReturn(results);
-        mvc.perform(get("/businesses/listings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .params(requestParams))
-                .andExpect(status().isBadRequest());
-    }
 }

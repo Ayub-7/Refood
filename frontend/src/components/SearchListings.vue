@@ -9,7 +9,7 @@
 
         <div id="catalogue-options">
           <vs-input class="search-input" type="search" placeholder="Enter a listing..." name="searchbarUser" v-model="searchbarListings" style="width: 400px; font-size: 24px" size="medium"/>
-          <vs-button class="header-button" >Search</vs-button>
+          <vs-button class="header-button" @click="searchListings">Search</vs-button>
 
         </div>
 
@@ -23,8 +23,8 @@
                 <h3 class="filter-label">
                   Business Type:
                 </h3>
-                <vs-select v-model="businessType">
-                  <option disabled value="">Please select one</option>
+                <vs-select v-model="businessTypes" multiple>
+                  <option disabled value="">Select types</option>
                   <option value="name">listings Name</option>
                   <option value="country">Country</option>
                   <option value="recommendedRetailPrice">Recommended Retail Price</option>
@@ -35,7 +35,7 @@
                 <h3 class="filter-label">
                   Business Name:
                 </h3>
-                <vs-input class="filter-input" type="search" placeholder="Business name.." name="searchbarUser"  style="width: 400px; font-size: 24px" size="medium"/>
+                <vs-input class="filter-input" v-model="businessQuery" type="search" placeholder="Business name.." style="width: 400px; font-size: 24px" size="medium"/>
               </div>
               </div>
               <div class="parameter" id="listings">
@@ -43,14 +43,14 @@
                 <h3 class="filter-label">
                   Product Name:
                 </h3>
-                <vs-input class="filter-input" type="search" placeholder="Product name.." name="searchbarUser"  style="width: 400px; font-size: 24px" size="medium"/>
+                <vs-input class="filter-input" v-model="productQuery" type="search" placeholder="Product name.."  style="width: 400px; font-size: 24px" size="medium"/>
               </div>
               <div class="vert-row">
                 <h3 class="filter-label">
                   Price range:
                 </h3>
-                <vs-input class="price-input" type="search" placeholder="Min" name="searchbarUser"  style="width: 400px; font-size: 24px" size="medium"/>
-                <vs-input class="price-input" type="search" placeholder="Max" name="searchbarUser"  style="width: 400px; font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="minPrice" type="search" placeholder="Min" style="width: 400px; font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="maxPrice" type="search" placeholder="Max"  style="width: 400px; font-size: 24px" size="medium"/>
               </div>
               </div>
 
@@ -59,14 +59,19 @@
                 <h3 class="filter-label">
                   Location:
                 </h3>
-                <vs-input class="filter-input" type="search" placeholder="Country.." name="searchbarUser"  style="width: 400px; font-size: 24px" size="medium"/>
+                <vs-input class="filter-input" v-model="addressQuery" type="search" placeholder="Address.." style="width: 400px; font-size: 24px" size="medium"/>
               </div>
                 <div class="vert-row">
                 <h3 class="filter-label">
-                  Closing Date:
+                  Min Closing Date:
                 </h3>
-                <vs-input class="filter-input" type="date" name="searchbarUser"  style="width: 400px; font-size: 24px"/>
+                <vs-input class="filter-input" v-model="minClosingDate" type="date" style="width: 400px; font-size: 24px"/>
               </div>
+                <div class="vert-row">
+                  <h3 class="filter-label">Max Closing Date:
+                  </h3>
+                  <vs-input class="filter-input" v-model="maxClosingDate" type="date"  style="width: 400px; font-size: 24px"/>
+                </div>
             </div>
             </div>
             <div class="vl"></div>
@@ -81,7 +86,7 @@
                   <option value="recommendedRetailPrice">Recommended Retail Price</option>
                   <option value="expiryDate">Expiry Date</option>
                 </vs-select>
-                <vs-button class="sort-btn"  style="width: 100px">Sort</vs-button>
+                <vs-button class="sort-btn" @click="filterListings" style="width: 100px">Sort</vs-button>
                 </div>
                 </div>
             </div>
@@ -537,10 +542,22 @@ const SearchListings = {
       errors: [],
       toggle: [1,1,1,1,1],
       filteredListings: [],
-      enableTable: false,
-      displaytype: true,
       currencySymbol: "",
       selected: "",
+
+      businessQuery: null,
+      productQuery: null,
+      addressQuery: null,
+      sortBy: null,
+      businessTypes: null,
+      minPrice: null,
+      maxPrice: null,
+      minClosingDate: null,
+      maxClosingDate: null,
+
+      numListings: 10,
+      pageNum: 1,
+      sortDirection: "desc"
     };
   },
 
@@ -568,8 +585,27 @@ const SearchListings = {
       });
     },
 
-    searchListings: function(){
+    filterListings: function(){
+      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
+      this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum, this.sortDirection)
+      .then((response) => {
+        this.listings = response.data
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+    },
 
+    searchListings: function(){
+      api.searchListings(this.searchbarListings, this.numListings,  this.pageNum)
+          .then((response) => {
+            this.listings = response.data
+            console.log(response)
+          })
+          .catch((error) => {
+            console.log(error)
+          });
     }
   },
 }
