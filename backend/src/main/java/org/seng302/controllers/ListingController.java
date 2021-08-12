@@ -4,16 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import org.seng302.finders.ListingFinder;
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
 import org.seng302.models.requests.NewListingRequest;
+import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.BusinessRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,14 +20,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
-
-import java.util.List;
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -37,7 +36,9 @@ import static org.springframework.data.jpa.domain.Specification.where;
 public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
-    @Autowired private BusinessRepository businessRepository;
+    @Autowired
+    private BusinessRepository businessRepository;
+
 
     @Autowired
     private ListingRepository listingRepository;
@@ -50,6 +51,9 @@ public class ListingController {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private ListingFinder listingFinder;
 
     /**
      * Constructor used for cucumber testing.
@@ -97,7 +101,7 @@ public class ListingController {
     @PostMapping("/businesses/listings")
     public ResponseEntity<String> getAllListings(@RequestBody BusinessListingSearchRequest request,
                                                  @RequestParam("count") int count,
-                                                 @RequestParam("offset") int offset,
+                                                 @RequestParam("page") int offset,
                                                  @RequestParam("sortDirection") String sortDirection) throws JsonProcessingException {
 
         Sort sort;
@@ -152,6 +156,27 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }
 
+    /**
+     * GET endpoint that retrieves businesses' listings by a search query.
+     * @param query A string with the search's query
+     * @param count how many results will show per page.
+     * @param offset how many PAGES (not results) to skip before returning the results.
+     * @param session current user session.
+     * @return Response with the JSONified list of the businesses' listings
+     * @throws JsonProcessingException
+     */
+    @GetMapping("/businesses/listings")
+    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
+                                              @RequestParam("count") int count,
+                                              @RequestParam("page") int offset,
+                                              HttpSession session) throws JsonProcessingException {
+        logger.debug("Searching for Listings...");
+        Specification<Listing> specification = listingFinder.findListing(query);
+        Pageable pageRange = PageRequest.of(offset, count);
+        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
+    }
 
     /**
      * Creates a new product and adds it to the product catalogue of the current acting business

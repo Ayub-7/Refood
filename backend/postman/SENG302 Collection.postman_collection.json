@@ -520,8 +520,41 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Listings by title or businesss",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings?page=10&count=10&query=dabshot",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "10"
+								},
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "query",
+									"value": "dabshot"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Products",

@@ -15,7 +15,6 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 
 tags:
-  # User stories
   - name: 'U1: Registering and logging into an individual account'
   - name: 'U2: Cities, States/Regions, Countries'
     description: 'This story is implemented inside the client alone, and as such requires no associated API endpoints to be created'
@@ -44,6 +43,7 @@ tags:
   - name: 'UCM8: Contacting other marketplace users'
   - name: 'UCM9: Edit card'
   - name: 'U29 : Browse/search sale listings'
+  - name: 'U31 : Purchases'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -2140,22 +2140,25 @@ components:
           example: '2021-07-07 17:59:00'
           readOnly: true
           description: The time and date when the message was sent to the receiver
-
     BusinessTypesResponse:
-      type: object
-      properties:
-        businessTypes:
-          type: array
-          items:
-            type: string
-            enum:
-              - Accommodation and Food Services
-              - Retail Trade
-              - Charitable organisation
-              - Non-profit organisation
-          example: ["Accommodation and Food Services", "Retail Trade", "Charitable organisation", "Non-profit organisation"]
-          description: "Get all business types"
-
+      type: array
+      items:
+        type: string
+        enum:
+          - Accommodation and Food Services
+          - Retail Trade
+          - Charitable organisation
+          - Non-profit organisation
+          - Administrative and Support services
+          - Agriculture, Forestry and Fishing
+      example:
+        - Accommodation and Food Services
+        - Retail Trade
+        - Charitable organisation
+        - Non-profit organisation
+        - Administrative and Support services
+        - Agriculture, Forestry and Fishing
+      description: Get all business types
     BusinessListingSearchRequest:
       type: object
       properties:
@@ -2241,5 +2244,19 @@ components:
           enum:
             - Expired
             - Bought
+        created:
+          type: string
+          format: date
+          description: The date the notification was created
+          readOnly: true
+    ListOfNotifications:
+      example: [{"sender": 43,
+                 "listing": 43,
+                 "message": "Honda Civic 2007 has been sold!",
+                 "status": "Expired"},
+        {"sender": 44,
+         "listing": 69,
+         "message": "You have successfully bought Toyota Corolla 1998!",
+         "status": "Bought"}]
 
 
