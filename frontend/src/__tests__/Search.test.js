@@ -6,77 +6,130 @@ import api from "../Api";
 let wrapper;
 
 //Mock response data from search request
-const mockUsersFromSearch = [ 
-    {
-        "id": 28,
-        "firstName": "Raquela",
-        "middleName": "YEP",
-        "lastName": "Haylands",
-        "nickname": "Future-proofed",
-        "bio": "24/7 workforce",
-        "email": "rhaylands5@shutterfly.com",
-        "dateOfBirth": "2004-10-06",
-        "phoneNumber": "+86 944 435 8212",
-        "homeAddress": {
-            "streetNumber": "32",
-            "streetName": "Little Fleur Trail",
-            "city": "Christchurch",
-            "region": "Canterbury",
-            "country": "New Zealand",
-            "postcode": "8080"
-        },
-        "created": "2021-05-01 03:51:26",
-        "role": "USER",
-        "businessesAdministered": [],
-        "country": "New Zealand",
-        "city": "Christchurch"
-    }
-]
-
-const mockBusinessesFromSearch = [
-    {
-        "name": "Dabshots",
-        "id": 1,
-        "administrators": [
+const mockUsersFromSearch = {
+        "content": [
             {
-                "id": 1,
-                "firstName": "Wilma",
-                "middleName": "Janet",
-                "lastName": "Sails",
-                "nickname": "Open-architected",
-                "bio": "Profit-focused scalable moratorium",
-                "email": "jsails0@go.com",
-                "dateOfBirth": "1989-02-28",
-                "phoneNumber": "+57 242 190 0153",
+                "id": 2001,
+                "firstName": "Aaren",
+                "middleName": "Ronald",
+                "lastName": "Wain",
+                "nickname": "Diverse",
+                "bio": "Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.",
+                "email": "rwainr8@examiner.com",
+                "dateOfBirth": "1989-03-28",
+                "phoneNumber": "+267 898 773 7001",
                 "homeAddress": {
-                    "streetNumber": "44",
-                    "streetName": "Menomonie Way",
+                    "streetNumber": "2549",
+                    "streetName": "Tennyson",
                     "suburb": null,
-                    "city": "Zhashkiv",
+                    "city": "Nizhniy Tsasuchey",
                     "region": null,
-                    "country": "Ukraine",
-                    "postcode": null
+                    "country": "Russia",
+                    "postcode": "674480"
                 },
-                "created": "2020-08-06 23:35:52",
+                "created": "2019-04-08 13:31:19",
                 "role": "USER",
-                "businessesAdministered": null
+                "businessesAdministered": []
             }
         ],
-        "primaryAdministratorId": 1,
-        "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
-        "address": {
-            "streetNumber": "0",
-            "streetName": "Vernon Place",
-            "suburb": null,
-            "city": "Sarpang",
-            "region": null,
-            "country": "Bhutan",
-            "postcode": null
+        "pageable": {
+            "sort": {
+                "sorted": true,
+                "unsorted": false,
+                "empty": false
+            },
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 10,
+            "paged": true,
+            "unpaged": false
         },
-        "businessType": "Charitable organisation",
-        "created": "2020-05-18 09:06:11"
+        "last": false,
+        "totalElements": 9418,
+        "totalPages": 942,
+        "number": 0,
+        "size": 10,
+        "sort": {
+            "sorted": true,
+            "unsorted": false,
+            "empty": false
+        },
+        "first": true,
+        "numberOfElements": 10,
+        "empty": false
     }
-]
+
+const mockBusinessesFromSearch = {
+    "content": [
+        {
+            "name": "Dabshots",
+            "id": 1,
+            "administrators": [
+                {
+                    "id": 1,
+                    "firstName": "Wilma",
+                    "middleName": "Janet",
+                    "lastName": "Sails",
+                    "nickname": "Open-architected",
+                    "bio": "Profit-focused scalable moratorium",
+                    "email": "jsails0@go.com",
+                    "dateOfBirth": "1989-02-28",
+                    "phoneNumber": "+57 242 190 0153",
+                    "homeAddress": {
+                        "streetNumber": "44",
+                        "streetName": "Menomonie Way",
+                        "suburb": null,
+                        "city": "Zhashkiv",
+                        "region": null,
+                        "country": "Ukraine",
+                        "postcode": null
+                    },
+                    "created": "2020-08-06 23:35:52",
+                    "role": "USER",
+                    "businessesAdministered": null
+                }
+            ],
+            "primaryAdministratorId": 1,
+            "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+            "address": {
+                "streetNumber": "0",
+                "streetName": "Vernon Place",
+                "suburb": null,
+                "city": "Sarpang",
+                "region": null,
+                "country": "Bhutan",
+                "postcode": null
+            },
+            "businessType": "Charitable organisation",
+            "created": "2020-05-18 09:06:11"
+        }
+    ],
+    "pageable": {
+        "sort": {
+            "sorted": false,
+            "unsorted": true,
+            "empty": true
+        },
+        "offset": 0,
+        "pageNumber": 0,
+        "pageSize": 10,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": false,
+    "totalElements": 505,
+    "totalPages": 51,
+    "number": 0,
+    "size": 10,
+    "sort": {
+        "sorted": false,
+        "unsorted": true,
+        "empty": true
+    },
+    "first": true,
+    "numberOfElements": 10,
+    "empty": false
+}
 
 let $vs = {
     loading: jest.fn(),
@@ -108,7 +161,7 @@ beforeEach(() => {
         return Promise.resolve({data: mockUsersFromSearch, status: 200}).finally();
     });
 
-    api.searchBusinessesQuery = jest.fn(() => {
+    api.searchBusinessesWithTypeQuery = jest.fn(() => {
         return Promise.resolve({data: mockBusinessesFromSearch, status: 200}).finally();
     });
 });
@@ -141,14 +194,15 @@ describe('Search page tests', () => {
 describe("Test searching without query", () => {
    test("Successful search for users - No query", async () => {
       wrapper.vm.searchbarUser = "";
-      await wrapper.vm.searchUsers();
+      wrapper.vm.sortString = "";
+      await wrapper.vm.searchUsers(1);
       expect(wrapper.vm.$vs.loading).not.toBeCalled();
    });
 
 
     test("Successful search for businesses - No query", async () => {
         wrapper.vm.searchbarBusiness = "";
-        await wrapper.vm.searchBusiness();
+        await wrapper.vm.searchBusiness(1);
         expect(wrapper.vm.$vs.loading).toBeCalled();
     });
 
@@ -159,6 +213,7 @@ describe("Test searching with query", () => {
     test("Successful user search - with query", async () => {
         wrapper.vm.$vs.loading.close = jest.fn();
         wrapper.vm.searchbarUser = "Something";
+        wrapper.vm.sortString = null;
         wrapper.vm.tableLoaded = true;
         await wrapper.vm.searchUsers();
         expect(wrapper.vm.$vs.loading).toBeCalled();

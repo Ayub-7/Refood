@@ -288,7 +288,6 @@ const Search = {
           this.totalPages = response.data.totalPages;
           this.searchIndexMin = response.data.number*10+1;
           this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
-          //this.paginator(this.users);
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -300,9 +299,6 @@ const Search = {
             // document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
             //Event listeners for vuesax buttons on table since they're generated afterwards
-            document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
-            document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
-
             this.tableLoaded = true;
         }
       })
@@ -313,9 +309,7 @@ const Search = {
      * to find the businesses based on the input in the search box.
      */
     searchBusiness: function(page) {
-      if (this.users.length) {
-        this.users = [];
-      }
+      this.users = [];
       this.$vs.loading();
       if (!this.businessType) {
         this.businessType = "";
