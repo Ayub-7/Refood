@@ -108,7 +108,7 @@ export default {
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    searchUsersQuery: (query, pageNum, sortString) => instance.get(`/users/search`,{params: {searchQuery: query, pageNum: pageNum, sortString: sortString}, withCredentials: true}),
 
     /**
      *  Query search that returns businesses based on the parameter query

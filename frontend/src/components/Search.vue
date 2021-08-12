@@ -1,8 +1,8 @@
 <template>
   <div class="main" id="body">
     <div id="search">
-      <vs-input v-on:keyup.enter="searchUsers()"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers">Search</vs-button>
+      <vs-input v-on:keyup.enter="searchUsers(1)"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers(1)">Search</vs-button>
       <vs-input v-on:keyup.enter="searchBusiness(1)" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
       <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness(1)">Search</vs-button>
 
@@ -21,7 +21,7 @@
     <vs-divider style="padding: 0 1em 1em"></vs-divider>
 
     <div v-if="users.length" class="data-table">
-      <vs-table :data="this.users" max-items="10" pagination stripe>
+      <vs-table :data="this.users">
         <template slot="thead" id="usersTableHeader">
           <vs-th sort-key="firstName" style="border-radius: 4px 0 0 0;">
             First name
@@ -64,7 +64,16 @@
           </vs-tr>
         </template>
       </vs-table>
-      <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{users.length}} results</div>
+      <div class="title-container">
+        <div class="title-centre">
+          <vs-pagination v-model="page" :total="totalPages" @change="searchUsers(page)"/>
+        </div>
+      </div>
+      <div class="title-container">
+        <div class="title-centre">
+          <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{resultSize}} results</div>
+        </div>
+      </div>
     </div>
 
     <!-- === BUSINESS TABLE === -->
@@ -123,10 +132,13 @@ const Search = {
   name: "Search",
   data: function() {
     return {
-      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
+      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade", "Administrative and Support Services",
+      "Agriculture Forestry and Fishing", "Arts and Recreation Services", "Construction", "Education and Training", "Electricity, Gas, Water and Waste Services", "Financial and Insurance Services", "Health Care and Social Assistance",
+      "Information Media and Telecommunication", "Manufacturing", "Mining", "Professional, Scientific and Technical Services", "Public Administration and Safety", "Rental Hiring and Real Estate Services", "Transport, Postal and Warehousing", "Wholesale Trade", "Other Services"],
       businessType: null,
       tableLoaded: false,
       searchbarUser: "",
+      sortString: null,
       searchbarBusiness: "",
       mobileMode: false,
       errors: [],
@@ -180,7 +192,6 @@ const Search = {
      */
     setMobileMode: function() {
       if(window.innerWidth < 500) {
-        console.log(99);
         this.mobileMode = true
       } else {
         this.mobileMode = false;
@@ -259,7 +270,7 @@ const Search = {
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
      */
-    searchUsers: function () {
+    searchUsers: function (page) {
       this.businesses = [];
       if (sessionStorage.getItem('businessesCache') !== null) {
         if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
@@ -269,11 +280,15 @@ const Search = {
       }
       if (this.searchbarUser === "") return;
       this.$vs.loading();
-      api.searchUsersQuery(this.searchbarUser)
+      api.searchUsersQuery(this.searchbarUser, page-1, this.sortString)
         .then((response) => {
-          this.users = response.data;
+          this.users = response.data.content;
           this.users = this.users.filter(x => typeof(x) == "object")
-          this.paginator(this.users);
+          this.resultSize = response.data.totalElements;
+          this.totalPages = response.data.totalPages;
+          this.searchIndexMin = response.data.number*10+1;
+          this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
+          //this.paginator(this.users);
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -307,7 +322,6 @@ const Search = {
       }
       api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType, page-1)
          .then((response) => {
-           console.log(response.data);
            this.resultSize = response.data.totalElements;
            this.businesses = response.data.content;
            this.totalPages = response.data.totalPages;
@@ -322,7 +336,7 @@ const Search = {
          .finally(() => {
            this.$vs.loading.close();
            if(!this.tableLoaded){
-             document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+             //document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
 
              //Event listeners for vuesax buttons on table since they're generated afterwards
              // document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRangeForBusiness);

@@ -53,10 +53,10 @@ public class BusinessFinder {
      */
     private Specification<Business> typeFilter(String type) throws ResponseStatusException {
         String attribute = "businessType";
-        switch (type.toUpperCase()) {
+        switch (type.toUpperCase().replace(",", "")) {
             case "ACCOMMODATION AND FOOD SERVICES":
                 return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(criteriaBuilder.lower(root.get(attribute)), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
             case "RETAIL TRADE":
                 return (root, query, criteriaBuilder)
                         -> criteriaBuilder.equal(root.get(attribute), BusinessType.RETAIL_TRADE);
@@ -87,7 +87,7 @@ public class BusinessFinder {
             case "FINANCIAL AND INSURANCE SERVICES":
                 return (root, query, criteriaBuilder)
                         -> criteriaBuilder.equal(root.get(attribute), BusinessType.FINANCIAL_AND_INSURANCE_SERVICES);
-            case "HEALTH CAR AND SOCIAL ASSISTANCE":
+            case "HEALTH CARE AND SOCIAL ASSISTANCE":
                 return (root, query, criteriaBuilder)
                         -> criteriaBuilder.equal(root.get(attribute), BusinessType.HEALTH_CAR_AND_SOCIAL_ASSISTANCE);
             case "INFORMATION MEDIA AND TELECOMMUNICATION":
