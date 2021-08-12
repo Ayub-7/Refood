@@ -12,10 +12,7 @@ import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -87,5 +84,31 @@ public class ListingLikeController {
         List<Listing> listings = likedListings.stream().map(ListingLike::getListing).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(listings);
+    }
+
+
+    /**
+     * Removes a user's like from a sale listing (unlikes it).
+     * @param id the unique identifier of the sale listing to unlike.
+     * @param session the current user session - used to figure out who is doing the unliking.
+     * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
+     */
+    @DeleteMapping("/businesses/listings/{id}/like")
+    public ResponseEntity<String> removeLikeFromListing(@PathVariable long id, HttpSession session) {
+        Listing listing = listingRepository.findListingById(id);
+
+        if (listing == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Listing with this id does not exist.");
+        }
+
+        User sessionUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        ListingLike like = listingLikeRepository.findListingLikeByListingIdAndUserId(id, sessionUser.getId());
+
+        if (like == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        listingLikeRepository.delete(like);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
