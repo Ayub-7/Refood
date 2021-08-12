@@ -567,6 +567,10 @@ const SearchListings = {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
+
+    searchListings: function(){
+
+    }
   },
 }
 
