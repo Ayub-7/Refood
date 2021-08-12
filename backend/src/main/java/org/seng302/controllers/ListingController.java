@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.ListingFinder;
 import org.seng302.finders.ListingSpecifications;
+import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
 import org.seng302.models.requests.NewListingRequest;
@@ -44,6 +45,9 @@ public class ListingController {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private ProductFinder productFinder;
 
     @Autowired
     private ObjectMapper mapper;
@@ -127,7 +131,7 @@ public class ListingController {
             sort = Sort.by("inventoryItem.product.business.name");
         }
         else { // Sort By parameter is not what we were expecting.
-            logger.error("Unknown sort parameter: " + request.getSortBy());
+            logger.error(String.format("Unknown sort parameter: %s", request.getSortBy()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected sort parameter.");
         }
 
@@ -139,12 +143,15 @@ public class ListingController {
             sort = sort.ascending();
         }
 
-
         ListingSpecifications specifications = new ListingSpecifications(request);
         Pageable pageRange = PageRequest.of(offset, count, sort);
-        Page<Listing> result = listingRepository.findAll(where(specifications.hasPriceSet())
-                                                        .and(specifications.hasClosingDateSet()),
-                                                        pageRange);
+
+        Specification<Listing> specs = where(specifications.hasPriceSet()).and(specifications.hasClosingDateSet());
+        if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
+            specs = specs.and(productFinder.findProduct(request.getProductQuery()));
+        }
+
+        Page<Listing> result = listingRepository.findAll(specs, pageRange);
 
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }

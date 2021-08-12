@@ -50,6 +50,7 @@ public class ListingLikeController {
         Listing listing = listingRepository.findListingById(id);
 
         if (listing == null) {
+            logger.error(String.format("Attempted to like unknown listing with id: %d", id));
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 
