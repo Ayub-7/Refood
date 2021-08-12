@@ -1,21 +1,24 @@
 <template>
-  <vs-card id="listing-detail-container">
+  <vs-card v-if="listing" id="listing-detail-container">
     <vs-row>
       <!-- Image area -->
-      <vs-col vs-w="6" id="image-area">
+      <vs-col vs-w="6" vs-sm="12" vs-xs="12" vs-justify="center" id="image-area">
         <div id="listing-image-container">
-          <ReImage id="listing-image" :imagePath="currentImage"></ReImage>
+          <transition name="slide-fade" mode="out-in">
+            <ReImage id="listing-image" :key="currentImage" :imagePath="currentImage"></ReImage>
+          </transition>
+          <div v-if="listingImages.length > 0">
+            <vs-button @click="previousImage(currentImage)">
+              <vs-icon icon="arrow_back"></vs-icon>
+            </vs-button>
+            <vs-button @click="nextImage(currentImage)">
+              <vs-icon icon="arrow_forward"></vs-icon>
+            </vs-button>
         </div>
-                  <vs-button @click="previousImage(currentImage)">
-            <vs-icon icon="arrow_back"></vs-icon>
-          </vs-button>
-
-          <vs-button @click="nextImage(currentImage)">
-            <vs-icon icon="arrow_forward"></vs-icon>
-          </vs-button>
+        </div>
       </vs-col>
       <!-- Listing details (closing date, business, etc) -->
-      <vs-col vs-w="6" id="listing-info-area">
+      <vs-col vs-w="6" vs-sm="12" id="listing-info-area">
         <div id="listing-info-container">
           <div id="business-name">Business: {{listing.inventoryItem.product.business.name}}</div>
           <div> Price: {{currency.symbol}}{{listing.price}} {{currency.code}}</div>
@@ -35,6 +38,7 @@
     </vs-row>
 
     <vs-row>
+      <!-- Product & Inventory details (manufacturer, description, inventory dates, etc) -->
       <vs-col vs-w="12">
         <div id="product-info-area">
           <div id="listing-name">{{listing.inventoryItem.product.name}}</div> 
@@ -77,6 +81,10 @@ export default {
   },
 
   mounted() {
+
+    if(store.actingAsBusinessId != null) {
+      this.$router.push({path: "/home"}) //Only users should be able to access this page (as a logged-in user)
+    }
     this.businessId = this.$route.params.businessId
     this.listingId = this.$route.params.listingId
 
@@ -86,7 +94,6 @@ export default {
 
 
   methods: {
-
     /**
      * Gets business listings by calling get endpoint
      * @param businessId ID of the business that has the listings
@@ -95,14 +102,11 @@ export default {
     getBusinessListings(businessId, listingId) {
       api.getBusinessListings(businessId)
         .then((response) => {
-          console.log(response.data)
           this.listing = this.filterListingFromListingsResponse(response.data, listingId)
           this.listingImages = this.getListingImages(this.listing.inventoryItem.product.images)
           this.currentImage = this.getPrimaryImage(this.listingImages, this.listing)
         }).catch((error) => {
-          if(error.response.status == 406) {
-            this.noBusiness = false;
-          }
+          this.$log.error(error);
         })
     },
 
@@ -114,7 +118,7 @@ export default {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
         .then(response => {
           console.log(response)
-          this.currency = {
+          this.currency = { //need symbol and code
             symbol: response.data[0].currencies[0].symbol,
             code: response.data[0].currencies[0].code
           }
@@ -134,12 +138,18 @@ export default {
     },
 
 
+    /**
+     * Gets all image paths from listing, also mutates path to fit into ReImage component
+     * @param images list of images of the listing
+     * @return Array of listing image paths
+     */
     getListingImages(images) {
       let productImages = [];
       for (let image of images) {
-        console.log(image.fileName.split('/'));
+        //Reformat path name to match ReImage path requirements
         let imagePathSplit = image.fileName.split('/')
         let imagePath = imagePathSplit.splice(imagePathSplit.length - 2, 2).join('/')
+
         productImages.push(imagePath)
       }
 
@@ -147,24 +157,33 @@ export default {
     },
 
 
+    /**
+     * Gets primary image from list of images and primary image path
+     * @param images list of product images
+     * @param listing listing used to get primaryImagePath to filter images
+     * @return image path of primary image
+     */
     getPrimaryImage(images, listing) {
       return images.filter(imagePath => imagePath == listing.inventoryItem.product.primaryImagePath)[0]
     },
 
+    /**
+     * Sets current image to next image in image list
+     * @param currentImage the current image that is being displayed
+     */
     nextImage(currentImage) {
-      console.log(this.listingImages)
       let indexOfImage = this.listingImages.indexOf(currentImage);
-      console.log(indexOfImage)
       this.currentImage = this.listingImages[(indexOfImage + 1) % this.listingImages.length]
-
     },
 
+    /**
+     * Sets current image to previous image in image list
+     * @param currentImage the current image that is being displayed
+     */
     previousImage(currentImage) {
-      console.log(this.listingImages)
       let indexOfImage = this.listingImages.indexOf(currentImage);
-      console.log(indexOfImage)
-      this.currentImage = this.listingImages[(indexOfImage - 1) % this.listingImages.length]
-
+      let length = this.listingImages.length
+      this.currentImage = this.listingImages[(((indexOfImage - 1) % length) + length) % length] //Negative modulo in JavaScript doesn't work since it's just remainder
     }
 
 
@@ -174,6 +193,18 @@ export default {
 </script>
 
 <style>
+
+
+.slide-fade-enter-active {
+  transition: all .1s ease;
+}
+.slide-fade-leave-active {
+  transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
 
 #listing-detail-container {
   height: 100%;
@@ -186,17 +217,15 @@ export default {
   font-size: 15px;
 }
 
-
 #listing-image-container {
   margin: auto;
   width: 80%;
-  overflow: hidden;
 }
 
 #listing-image > img {
-  max-height: 300px;
-  min-height: 300px;
-  width: 100%;
+  width:  400px;
+  height: 300px;
+  object-fit: cover;
 }
 
 #product-info-area {
@@ -220,5 +249,73 @@ export default {
   margin-top: 5px;
   width: 40%;
 }
+
+
+@media screen and (max-width: 1300px) {
+  #listing-image > img {
+    width:  300px;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  #product-info-area {
+    margin-top: 3em;
+    text-align: center;
+    font-size: 12px;
+    padding-bottom: 2em;
+  }
+
+  #listing-info-area {
+    text-align: center;
+    font-size: 12px;
+  }
+
+  #listing-name {
+    font-size: 20px;
+    margin-bottom: 5px;
+  }
+
+  #business-name {
+    
+    font-size: 20px;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+  }
+
+  .listing-detail-btn {
+    margin-top: 5px;
+    width: 150px;
+  }
+
+  #listing-image {
+        margin: auto;
+  }
+  #listing-image-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+
+@media screen and (max-width: 600px) {
+  #listing-detail-container {
+    width: 90%;
+  }
+}
+
+
+@media screen and (max-width: 400px) {
+  #listing-detail-container {
+    width: 100%;
+  }
+
+  #listing-image > img {
+    width:  200px;
+    height: 150px;
+    object-fit: cover;
+  }
+}
+
 
 </style>
