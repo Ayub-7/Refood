@@ -103,7 +103,6 @@ public class ListingLikeController {
 
         User sessionUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         ListingLike like = listingLikeRepository.findListingLikeByListingIdAndUserId(id, sessionUser.getId());
-
         if (like == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
