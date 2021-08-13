@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.models.requests.ListingNotificationRequest;
+import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.ListingNotificationRepository;
 import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.UserRepository;
@@ -42,8 +43,11 @@ public class ListingNotificationControllerTests {
     private ListingNotificationRepository listingLikeRepository;
     @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private BusinessRepository businessRepository;
 
     private User user;
+    private Business business;
     private Listing listing;
     private ListingNotification notification;
     private ListingNotificationRequest request;
@@ -51,18 +55,26 @@ public class ListingNotificationControllerTests {
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException {
-        user = new User("Rayna", "YEP", "Dalgety", "Universal", "" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902", null,"ATQWJM");
+        user = new User("Rayna", "YEP", "Dalgety", "Universal", "", "rdalgety3@ocn.ne.jp", "2006-03-30", "+7 684 622 5902", null, "ATQWJM");
         user.setId(1L);
         userRepository.save(user);
 
+        Address address = new Address("39", "Ilam Rd", "Christchurch", "Canterbury", "New Zealand", "8041");
+
+        business = new Business("Howdy", "Partner", address, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+        business.setId(1L);
+        businessRepository.save(business);
+
         Inventory inventory = new Inventory("07-4957066", 1, 10, 2.0, 20.0, new Date(), new Date(), new Date(), new Date());
         listing = new Listing(inventory, 5, 2.0, "Seller may be interested in offers", new Date(), new Date());
+        listing.setId(1L);
+        listingRepository.save(listing);
         notification = new ListingNotification(user, listing, NotificationStatus.BOUGHT);
 
         notificationList = new ArrayList<>();
         notificationList.add(notification);
         assertThat(notificationList.size()).isEqualTo(1);
-        request = new ListingNotificationRequest(1, 1, "test", notification.getStatus());
+        request = new ListingNotificationRequest(1, 1, 1, notification.getStatus(), notification.getCreated());
     }
 
     //
@@ -71,15 +83,43 @@ public class ListingNotificationControllerTests {
 
     @Test
     void testPostNewNotification_noAuth_returnUnauthorized() throws Exception {
-        mvc.perform(post("/users/{id}/notify", listing.getId()))
+        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-    void testPostNewNotification_noExistingListing_returnUnauthorized() throws Exception {
-        Mockito.when(listingRepository.findListingById(1)).thenReturn(null);
-        mvc.perform(post("/users/{id}/notify", 1).contentType("application/json")
+    void testPostNewNotification_noExistingUser_returnNotAcceptable() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testPostNewNotification_noExistingListing_returnNotAcceptable() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(null);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).contentType("application/json")
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testPostNewNotification_noExistingBusiness_returnNotAcceptable() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
+        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).contentType("application/json")
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isNotAcceptable());
     }
@@ -87,9 +127,11 @@ public class ListingNotificationControllerTests {
     @Test
     @WithMockUser
     void testPostNewNotification_successfulNotification_returnCreated() throws Exception {
-        ListingNotificationRequest request = new ListingNotificationRequest(1, 1, "test", notification.getStatus());
-        Mockito.when(listingRepository.findListingById(1)).thenReturn(listing);
-        mvc.perform(post("/users/{id}/notify", listing.getId()).contentType("application/json")
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).contentType("application/json")
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
     }

@@ -781,17 +781,49 @@
 					"name": "Add Listing Notification",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"sender\": 43,\r\n    \"listing\": 43,\r\n     \"message\": \"Honda Civic 2007 has been sold!\",\r\n    \"status\": \"Bought\"\r\n}"
+							"raw": "{\r\n    \"id\": 1,\r\n    \"userId\": 1,\r\n    \"listingId\": 1,\r\n    \"status\": \"Expired\",\r\n    \"created\": \"2021-04-27\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
-							"raw": "/users/{id}/notify",
+							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"host": [
+								"{{URL}}"
+							],
 							"path": [
+								"businesses",
+								":businessId",
+								"listings",
+								":listingId",
 								"users",
-								"{id}",
+								":userId",
 								"notify"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								},
+								{
+									"key": "listingId",
+									"value": "1"
+								},
+								{
+									"key": "userId",
+									"value": "1"
+								}
 							]
 						}
 					},

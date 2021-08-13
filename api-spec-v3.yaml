@@ -15,7 +15,6 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 
 tags:
-  # User stories
   - name: 'U1: Registering and logging into an individual account'
   - name: 'U2: Cities, States/Regions, Countries'
     description: 'This story is implemented inside the client alone, and as such requires no associated API endpoints to be created'
@@ -44,6 +43,7 @@ tags:
   - name: 'UCM8: Contacting other marketplace users'
   - name: 'UCM9: Edit card'
   - name: 'U29 : Browse/search sale listings'
+  - name: 'U31 : Purchases'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -953,6 +953,112 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  '/businesses/{businessId}/listings/{listingId}/users/{userId}/notify':
+    post:
+      tags:
+        - 'Listings / sales'
+        - 'U31 : Purchases'
+      summary: Notify a user about any changes of items they liked or purchased.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: businessId
+          schema:
+            type: integer
+          description: Id of the business owning the listing
+          required: true
+          example: 582
+        - in: path
+          name: listingId
+          schema:
+            type: integer
+          description: Id of the listing that has been updated
+          required: true
+          example: 54343
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          description: Id of the user who is about to receive the notification
+          required: true
+          example: 111
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: The ID of the notification
+                  example: 43
+                userId:
+                  type: object
+                  description: The ID of the user who sent the notification
+                  example: 50
+                listingId:
+                  type: object
+                  description: The ID of the listing that has been updated
+                  example: 30
+                status:
+                  type: string
+                  description: The status of the notification. Can be Bought or Expired.
+                  example: "Expired"
+                created:
+                  type: string
+                  description: The date of the notification's creation
+                  example: "2021-04-27"
+      responses:
+        '201':
+          description: Successful notification
+        '401':
+          description: Cannot send a notification to a user when the sender is
+            not logged in.
+        '400':
+          description: Bad request
+    get:
+      tags:
+        - 'Listings / sales'
+        - 'U31 : Purchases'
+      summary: User can retrieve all notifications related to listings they have received.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: listingId
+          schema:
+            type: integer
+          description: Id of the listing that has been updated.
+          required: true
+          example: 54343
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          description: Id of the user who is about to receive the notification
+          required: true
+          example: 111
+      responses:
+        '200':
+          description: Successful retrieval of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListOfNotifications'
+        '401':
+          description: Cannot send a notification to a user when the sender is
+            not logged in.
+        '400':
+          description: Bad request
+
+
   '/cards/{id}':
     get:
       tags:
@@ -1825,94 +1931,94 @@ components:
         content:
           type: object
           example: [
-          {
-            "name": "Grain n Simple",
-            "id": 5,
-            "administrators": [
             {
+              "name": "Grain n Simple",
               "id": 5,
-              "firstName": "Shermy",
-              "middleName": "Pearle",
-              "lastName": "Layborn",
-              "nickname": "artificial intelligence",
-              "bio": "Intuitive client-server standardization",
-              "email": "playborn4@amazon.com",
-              "dateOfBirth": "2000-12-30",
-              "phoneNumber": "+62 527 277 7359",
-              "homeAddress": {
-                "streetNumber": "5",
-                "streetName": "Hagan Avenue",
+              "administrators": [
+                {
+                  "id": 5,
+                  "firstName": "Shermy",
+                  "middleName": "Pearle",
+                  "lastName": "Layborn",
+                  "nickname": "artificial intelligence",
+                  "bio": "Intuitive client-server standardization",
+                  "email": "playborn4@amazon.com",
+                  "dateOfBirth": "2000-12-30",
+                  "phoneNumber": "+62 527 277 7359",
+                  "homeAddress": {
+                    "streetNumber": "5",
+                    "streetName": "Hagan Avenue",
+                    "suburb": null,
+                    "city": "Chengdong",
+                    "region": null,
+                    "country": "China",
+                    "postcode": null
+                  },
+                  "created": "2020-10-17 00:47:11",
+                  "role": "USER",
+                  "businessesAdministered": null
+                },
+                {
+                  "id": 9,
+                  "firstName": "Ruthe",
+                  "middleName": "Ogdan",
+                  "lastName": "Ruit",
+                  "nickname": "Open-architected",
+                  "bio": "Configurable coherent capacity",
+                  "email": "oruit8@reddit.com",
+                  "dateOfBirth": "1995-05-10",
+                  "phoneNumber": "+62 283 517 0351",
+                  "homeAddress": {
+                    "streetNumber": "9885",
+                    "streetName": "Oak Parkway",
+                    "suburb": null,
+                    "city": "Ambato",
+                    "region": null,
+                    "country": "Ecuador",
+                    "postcode": null
+                  },
+                  "created": "2020-09-24 18:01:34",
+                  "role": "USER",
+                  "businessesAdministered": null
+                },
+                {
+                  "id": 8,
+                  "firstName": "Elysee",
+                  "middleName": "Maurene",
+                  "lastName": "Took",
+                  "nickname": "benchmark",
+                  "bio": "Team-oriented interactive installation",
+                  "email": "mtook7@chron.com",
+                  "dateOfBirth": "1985-11-09",
+                  "phoneNumber": "+234 186 824 2303",
+                  "homeAddress": {
+                    "streetNumber": "5",
+                    "streetName": "Utah Terrace",
+                    "suburb": null,
+                    "city": "Huangfang",
+                    "region": null,
+                    "country": "China",
+                    "postcode": null
+                  },
+                  "created": "2020-10-31 22:39:42",
+                  "role": "USER",
+                  "businessesAdministered": null
+                }
+              ],
+              "primaryAdministratorId": 5,
+              "description": "Praesent blandit. Nam nulla.",
+              "address": {
+                "streetNumber": "302",
+                "streetName": "Forest Run Place",
                 "suburb": null,
-                "city": "Chengdong",
+                "city": "Putinci",
                 "region": null,
-                "country": "China",
+                "country": "Serbia",
                 "postcode": null
               },
-              "created": "2020-10-17 00:47:11",
-              "role": "USER",
-              "businessesAdministered": null
-            },
-            {
-              "id": 9,
-              "firstName": "Ruthe",
-              "middleName": "Ogdan",
-              "lastName": "Ruit",
-              "nickname": "Open-architected",
-              "bio": "Configurable coherent capacity",
-              "email": "oruit8@reddit.com",
-              "dateOfBirth": "1995-05-10",
-              "phoneNumber": "+62 283 517 0351",
-              "homeAddress": {
-                "streetNumber": "9885",
-                "streetName": "Oak Parkway",
-                "suburb": null,
-                "city": "Ambato",
-                "region": null,
-                "country": "Ecuador",
-                "postcode": null
-              },
-              "created": "2020-09-24 18:01:34",
-              "role": "USER",
-              "businessesAdministered": null
-            },
-            {
-              "id": 8,
-              "firstName": "Elysee",
-              "middleName": "Maurene",
-              "lastName": "Took",
-              "nickname": "benchmark",
-              "bio": "Team-oriented interactive installation",
-              "email": "mtook7@chron.com",
-              "dateOfBirth": "1985-11-09",
-              "phoneNumber": "+234 186 824 2303",
-              "homeAddress": {
-                "streetNumber": "5",
-                "streetName": "Utah Terrace",
-                "suburb": null,
-                "city": "Huangfang",
-                "region": null,
-                "country": "China",
-                "postcode": null
-              },
-              "created": "2020-10-31 22:39:42",
-              "role": "USER",
-              "businessesAdministered": null
+              "businessType": "Retail Trade",
+              "created": "2020-05-22 20:21:22"
             }
-            ],
-            "primaryAdministratorId": 5,
-            "description": "Praesent blandit. Nam nulla.",
-            "address": {
-              "streetNumber": "302",
-              "streetName": "Forest Run Place",
-              "suburb": null,
-              "city": "Putinci",
-              "region": null,
-              "country": "Serbia",
-              "postcode": null
-            },
-            "businessType": "Retail Trade",
-            "created": "2020-05-22 20:21:22"
-          }
           ]
         pageable:
           type: object
@@ -2140,22 +2246,25 @@ components:
           example: '2021-07-07 17:59:00'
           readOnly: true
           description: The time and date when the message was sent to the receiver
-
     BusinessTypesResponse:
-      type: object
-      properties:
-        businessTypes:
-          type: array
-          items:
-            type: string
-            enum:
-              - Accommodation and Food Services
-              - Retail Trade
-              - Charitable organisation
-              - Non-profit organisation
-          example: ["Accommodation and Food Services", "Retail Trade", "Charitable organisation", "Non-profit organisation"]
-          description: "Get all business types"
-
+      type: array
+      items:
+        type: string
+        enum:
+          - Accommodation and Food Services
+          - Retail Trade
+          - Charitable organisation
+          - Non-profit organisation
+          - Administrative and Support services
+          - Agriculture, Forestry and Fishing
+      example:
+        - Accommodation and Food Services
+        - Retail Trade
+        - Charitable organisation
+        - Non-profit organisation
+        - Administrative and Support services
+        - Agriculture, Forestry and Fishing
+      description: Get all business types
     BusinessListingSearchRequest:
       type: object
       properties:
@@ -2217,3 +2326,45 @@ components:
           $ref: '#/components/schemas/User'
         listing:
           $ref: '#/components/schemas/Listing'
+
+    ListingNotification:
+      type: object
+      description: An entity representing a notification associated with a listing
+      required:
+        - id
+        - user
+        - listing
+        - status
+      properties:
+        id:
+          type: number
+          description: Unique id of the notification
+          example: 5
+        user:
+          $ref: '#/components/schemas/User'
+        listing:
+          $ref: '#/components/schemas/Listing'
+        status:
+          type: string
+          description: The status of the notification
+          enum:
+            - Expired
+            - Bought
+        created:
+          type: string
+          format: date
+          description: The date the notification was created
+          readOnly: true
+    ListOfNotifications:
+      example: [{id: 43,
+                 userId: 50,
+                 listingId: 30,
+                 status: Expired,
+                 created: '2021-04-27'
+      },
+        {id: 50,
+         userId: 60,
+         listingId: 40,
+         status: Expired,
+         created: '2021-05-27'
+        }]
