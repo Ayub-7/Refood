@@ -84,7 +84,7 @@ const routes = [
   {path: '/businesses/:id/products', component: ProductCatalogue},
   {path: '/marketplace', component: CommunityMarketplace},
   {path: '/businesses/:id', name: 'Business', component: Business},
-  {path: '/businesses/:businessId/listing/:listingId', name: 'Listing', component: ListingDetail},
+  {path: '/businesses/:businessId/listings/:listingId', name: 'Listing', component: ListingDetail},
   {
     path: '*',
     name: 'catchAll',
@@ -96,7 +96,7 @@ const routes = [
 const router = new VueRouter({
   routes,
 
-  
+
 });
 
 updateSessionOnRouterChange(router);

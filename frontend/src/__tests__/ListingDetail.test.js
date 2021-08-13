@@ -43,28 +43,28 @@ let testListing = {
                   "id": "0",
                   "thumbnailFilename": "./src/main/resources/media/images/businesses/business_1/0_thumbnail.png",
                   "name": "Screen Shot 2021-07-14 at 2.10.52 PM.png",
-                  "fileName": "./src/main/resources/media/images/businesses/business_1/0.png"
+                  "fileName": ".\\src\\main\\resources\\media\\images\\businesses\\business_1\\0.png"
               },
               {
                   "id": "1",
                   "thumbnailFilename": "./src/main/resources/media/images/businesses/business_1/1_thumbnail.jpg",
                   "name": "2D9C9C8C-F6D7-47D9-975A-B5DC86C05D93.jpeg",
-                  "fileName": "./src/main/resources/media/images/businesses/business_1/1.jpg"
+                  "fileName": ".\\src\\main\\resources\\media\\images\\businesses\\business_1\\1.jpg"
               },
               {
                   "id": "2",
                   "thumbnailFilename": "./src/main/resources/media/images/businesses/business_1/2_thumbnail.jpg",
                   "name": "77C5D008-CF03-4E74-AA13-3604DA450AB3_1_201_a.jpeg",
-                  "fileName": "./src/main/resources/media/images/businesses/business_1/2.jpg"
+                  "fileName": ".\\src\\main\\resources\\media\\images\\businesses\\business_1\\2.jpg"
               },
               {
                   "id": "3",
                   "thumbnailFilename": "./src/main/resources/media/images/businesses/business_1/3_thumbnail.jpg",
                   "name": "078EAAE4-42F1-47B0-B578-A098C03232C8_1_201_a.jpeg",
-                  "fileName": "./src/main/resources/media/images/businesses/business_1/3.jpg"
+                  "fileName": ".\\src\\main\\resources\\media\\images\\businesses\\business_1\\3.jpg"
               }
           ],
-          "primaryImagePath": "business_1/0.png"
+          "primaryImagePath": "business_1\\0.png"
       },
       "quantity": 10,
       "pricePerItem": 5,
@@ -161,7 +161,7 @@ describe('Testing methods', () => {
 
     let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
 
-    expect(primaryImage).toBe(primaryImagePath)
+    expect(primaryImage).toBe(".\\src\\main\\resources\\media\\images\\businesses\\" + primaryImagePath)
   })
 
   test('Filter listing response returns correct listing', () => {
@@ -170,8 +170,8 @@ describe('Testing methods', () => {
     let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 1);
 
     expect(fakeListing).toBe(fakeResponse[0]);
-  }) 
-  
+  })
+
 
   test('Filter listing response returns nothing with bad values', () => {
     let fakeResponse = [{id: 2}, {id: 3}, {id: 4}];
@@ -179,7 +179,7 @@ describe('Testing methods', () => {
     let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 1);
 
     expect(fakeListing).toBe(undefined);
-  }) 
+  })
 
   test('Filter listing response with duplicated id returns first occurrence', () => {
     let fakeResponse = [{id: 1}, {id: 2}, {id: 2}];
@@ -187,7 +187,7 @@ describe('Testing methods', () => {
     let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 2);
 
     expect(fakeListing).toBe(fakeResponse[1]);
-  }) 
+  })
 
 
   test('nextImage goes to next image in list', () => {

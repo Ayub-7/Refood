@@ -41,7 +41,7 @@
       <!-- Product & Inventory details (manufacturer, description, inventory dates, etc) -->
       <vs-col vs-w="12">
         <div id="product-info-area">
-          <div id="listing-name">{{listing.inventoryItem.product.name}}</div> 
+          <div id="listing-name">{{listing.inventoryItem.product.name}}</div>
           <div>Manufacturer: {{listing.inventoryItem.product.manufacturer}} </div>
           <div v-if="listing.inventoryItem.manufactured">Manufactured: {{listing.inventoryItem.manufactured}}</div>
           <div v-if="listing.inventoryItem.sellBy">Sell By: {{listing.inventoryItem.sellBy}}</div>
@@ -53,7 +53,7 @@
 
 
     </vs-row>
-    
+
   </vs-card>
 </template>
 
@@ -102,8 +102,8 @@ export default {
     getBusinessListings(businessId, listingId) {
       api.getBusinessListings(businessId)
         .then((response) => {
-          this.listing = this.filterListingFromListingsResponse(response.data, listingId)
-          this.listingImages = this.getListingImages(this.listing.inventoryItem.product.images)
+          this.listing = this.filterListingFromListingsResponse(response.data, listingId);
+          this.listingImages = this.getListingImages(this.listing.inventoryItem.product.images);
           this.currentImage = this.getPrimaryImage(this.listingImages, this.listing)
         }).catch((error) => {
           this.$log.error(error);
@@ -144,27 +144,17 @@ export default {
      * @return Array of listing image paths
      */
     getListingImages(images) {
-      let productImages = [];
-      for (let image of images) {
-        //Reformat path name to match ReImage path requirements
-        let imagePathSplit = image.fileName.split('/')
-        let imagePath = imagePathSplit.splice(imagePathSplit.length - 2, 2).join("\\")
-
-        productImages.push(imagePath)
-      }
-
-      return productImages;
+      return images.map(image => image.fileName);
     },
 
 
     /**
      * Gets primary image from list of images and primary image path
-     * @param images list of product images
      * @param listing listing used to get primaryImagePath to filter images
      * @return image path of primary image
      */
     getPrimaryImage(images, listing) {
-      return images.filter(imagePath => imagePath.replace('\\', '/') == listing.inventoryItem.product.primaryImagePath)[0]
+      return ".\\src\\main\\resources\\media\\images\\businesses\\" + listing.inventoryItem.product.primaryImagePath.replace("/", "\\");
     },
 
     /**
@@ -276,7 +266,7 @@ export default {
   }
 
   #business-name {
-    
+
     font-size: 20px;
     margin-top: 1em;
     margin-bottom: 0.5em;
