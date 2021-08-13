@@ -965,7 +965,14 @@ paths:
             - defaultGlobalApplicationAdmin
       parameters:
         - in: path
-          name: id
+          name: listingId
+          schema:
+            type: integer
+          description: Id of the listing that has been updated.
+          required: true
+          example: 54343
+        - in: path
+          name: userId
           schema:
             type: integer
           description: Id of the user who is about to receive the notification
@@ -977,13 +984,13 @@ paths:
             schema:
               type: object
               properties:
-                sender:
+                senderId:
                   type: integer
                   description: The ID of the user who sent the notification
                   example: 43
-                listing:
+                listingId:
                   type: integer
-                  description: The ID of the listing of interest.
+                  description: The ID of the listing that has been updated
                   example: 43
                 message:
                   type: string
@@ -1005,14 +1012,21 @@ paths:
       tags:
         - Users
         - 'U31 : Purchases'
-      summary: User can retrieve all notifications they have received.
+      summary: User can retrieve all notifications related to listings they have received.
       security:
         - CookieAuth:
             - globalApplicationAdmin
             - defaultGlobalApplicationAdmin
       parameters:
         - in: path
-          name: id
+          name: listingId
+          schema:
+            type: integer
+          description: Id of the listing that has been updated.
+          required: true
+          example: 54343
+        - in: path
+          name: userId
           schema:
             type: integer
           description: Id of the user who is about to receive the notification
@@ -2331,12 +2345,12 @@ components:
           description: The date the notification was created
           readOnly: true
     ListOfNotifications:
-      example: [{"sender": 43,
-                 "listing": 43,
+      example: [{"senderId": 43,
+                 "listingId": 43,
                  "message": "Honda Civic 2007 has been sold!",
                  "status": "Expired"},
-        {"sender": 44,
-         "listing": 69,
+        {"senderId": 44,
+         "listingId": 69,
          "message": "You have successfully bought Toyota Corolla 1998!",
          "status": "Bought"}]
 
