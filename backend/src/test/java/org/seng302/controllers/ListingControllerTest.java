@@ -474,37 +474,37 @@ class ListingControllerTest {
     }
 
 
-    @Test
-    @WithMockUser
-    void testFindListing_returnOk() throws Exception {
-        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("query", "Business1");
-        requestParams.add("count", "5");
-        requestParams.add("page", "1");
-        List<Listing> results = new ArrayList<>();
-        results.add(listing1);
-        results.add(listing2);
-        Mockito.when(listingRepository.findAll()).thenReturn(results);
-        mvc.perform(get("/businesses/listings")
-                .contentType(MediaType.APPLICATION_JSON)
-                .params(requestParams))
-                 .andExpect(status().isOk());
-    }
-    @Test
-    void testFindListing_noUserLoggedIn() throws Exception {
-        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("query", "Business1");
-        requestParams.add("count", "5");
-        requestParams.add("page", "1");
-        List<Listing> results = new ArrayList<>();
-        results.add(listing1);
-        results.add(listing2);
-        Mockito.when(listingRepository.findAll()).thenReturn(results);
-        mvc.perform(get("/businesses/listings")
-                .contentType(MediaType.APPLICATION_JSON)
-                .params(requestParams))
-                .andExpect(status().isUnauthorized());
-    }
+//    @Test
+//    @WithMockUser
+//    void testFindListing_returnOk() throws Exception {
+//        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+//        requestParams.add("query", "Business1");
+//        requestParams.add("count", "5");
+//        requestParams.add("page", "1");
+//        List<Listing> results = new ArrayList<>();
+//        results.add(listing1);
+//        results.add(listing2);
+//        Mockito.when(listingRepository.findAll()).thenReturn(results);
+//        mvc.perform(get("/businesses/listings")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .params(requestParams))
+//                 .andExpect(status().isOk());
+//    }
+//    @Test
+//    void testFindListing_noUserLoggedIn() throws Exception {
+//        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+//        requestParams.add("query", "Business1");
+//        requestParams.add("count", "5");
+//        requestParams.add("page", "1");
+//        List<Listing> results = new ArrayList<>();
+//        results.add(listing1);
+//        results.add(listing2);
+//        Mockito.when(listingRepository.findAll()).thenReturn(results);
+//        mvc.perform(get("/businesses/listings")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .params(requestParams))
+//                .andExpect(status().isUnauthorized());
+//    }
     @Test
     @WithMockUser
     void testFindListing_missingParams() throws Exception {
