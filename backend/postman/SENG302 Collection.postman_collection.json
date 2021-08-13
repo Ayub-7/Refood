@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "600e0a3b-4b75-4a85-8d78-3e762d472bff",
+		"_postman_id": "bb01f58f-7fcc-4ecd-b37d-0a063a663efa",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -864,6 +864,63 @@
 							"variable": [
 								{
 									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listing Notification",
+			"item": [
+				{
+					"name": "Add Listing Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"userId\": 1,\r\n    \"listingId\": 1,\r\n    \"status\": \"Expired\",\r\n    \"created\": \"2021-04-27\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"listings",
+								":listingId",
+								"users",
+								":userId",
+								"notify"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								},
+								{
+									"key": "listingId",
+									"value": "1"
+								},
+								{
+									"key": "userId",
 									"value": "1"
 								}
 							]
