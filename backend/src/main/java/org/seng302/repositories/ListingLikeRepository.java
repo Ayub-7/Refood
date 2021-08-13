@@ -8,4 +8,6 @@ import java.util.List;
 public interface ListingLikeRepository extends JpaRepository<ListingLike, Long> {
 
     List<ListingLike> findListingLikesByUserId(long id);
+
+    ListingLike findListingLikeByListingIdAndUserId(long listingId, long userId);
 }

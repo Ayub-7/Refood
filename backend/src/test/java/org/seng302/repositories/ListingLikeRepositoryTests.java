@@ -78,4 +78,10 @@ public class ListingLikeRepositoryTests {
         assertThat(likes.size()).isEqualTo(1);
     }
 
+    @Test
+    void findListingLikesByUserIdAndListingId() {
+        ListingLike like = listingLikeRepository.findListingLikeByListingIdAndUserId(listing.getId(), user.getId());
+        assertThat(like).isNotNull();
+    }
+
 }
