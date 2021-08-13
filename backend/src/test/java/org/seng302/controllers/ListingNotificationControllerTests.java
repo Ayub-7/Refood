@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ListingNotificationController.class)
@@ -40,7 +40,7 @@ public class ListingNotificationControllerTests {
     @MockBean
     private ListingRepository listingRepository;
     @MockBean
-    private ListingNotificationRepository listingLikeRepository;
+    private ListingNotificationRepository listingNotificationRepository;
     @MockBean
     private UserRepository userRepository;
     @MockBean
@@ -49,7 +49,9 @@ public class ListingNotificationControllerTests {
     private User user;
     private Business business;
     private Listing listing;
+    private Listing listing2;
     private ListingNotification notification;
+    private ListingNotification notification2;
     private ListingNotificationRequest request;
     private List<ListingNotification> notificationList;
 
@@ -66,14 +68,20 @@ public class ListingNotificationControllerTests {
         businessRepository.save(business);
 
         Inventory inventory = new Inventory("07-4957066", 1, 10, 2.0, 20.0, new Date(), new Date(), new Date(), new Date());
+        Inventory inventory2 = new Inventory("12-3456678", 1, 10, 5.0, 50.0, new Date(), new Date(), new Date(), new Date());
         listing = new Listing(inventory, 5, 2.0, "Seller may be interested in offers", new Date(), new Date());
         listing.setId(1L);
+        listing2 = new Listing(inventory2, 5, 5.0, "Test more info", new Date(), new Date());
+        listing2.setId(2L);
         listingRepository.save(listing);
+        listingRepository.save(listing2);
         notification = new ListingNotification(user, listing, NotificationStatus.BOUGHT);
+        notification2 = new ListingNotification(user, listing2, NotificationStatus.BOUGHT);
 
         notificationList = new ArrayList<>();
         notificationList.add(notification);
-        assertThat(notificationList.size()).isEqualTo(1);
+        notificationList.add(notification2);
+        assertThat(notificationList.size()).isEqualTo(2);
         request = new ListingNotificationRequest(1, 1, 1, notification.getStatus(), notification.getCreated());
     }
 
@@ -149,5 +157,80 @@ public class ListingNotificationControllerTests {
                 business.getId(), listing.getId(), user.getId()).contentType("application/json")
                 .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
+    }
+
+    //
+    // GET - Listing Notification
+    //
+
+    /**
+     * Tests not logged in user, should return Unauthorized
+     * @throws Exception
+     */
+    @Test
+    void testNoAuthGetListingNotifications() throws Exception {
+        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId())).andExpect(status().isUnauthorized());
+    }
+
+    /**
+     * Tests unsuccessful retrieval of all listing notifications due to invalid userId
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testGetNotifications_invalidUserId_returnNotAcceptable() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(user.getId())).thenReturn(null);
+        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    /**
+     * Tests unsuccessful retrieval of all listing notifications due to invalid listingId
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testGetNotifications_invalidListingId_returnNotAcceptable() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(null);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    /**
+     * Tests unsuccessful retrieval of all listing notifications due to invalid businessId
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testGetNotifications_invalidBusinessId_returnNotAcceptable() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
+        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    /**
+     * Tests successful retrieval of all listing notifications
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testGetNotifications_successfulRetrieval_returnOk() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
+                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
     }
 }
