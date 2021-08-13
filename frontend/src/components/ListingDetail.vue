@@ -148,7 +148,7 @@ export default {
       for (let image of images) {
         //Reformat path name to match ReImage path requirements
         let imagePathSplit = image.fileName.split('/')
-        let imagePath = imagePathSplit.splice(imagePathSplit.length - 2, 2).join('/')
+        let imagePath = imagePathSplit.splice(imagePathSplit.length - 2, 2).join("\\")
 
         productImages.push(imagePath)
       }
@@ -164,7 +164,7 @@ export default {
      * @return image path of primary image
      */
     getPrimaryImage(images, listing) {
-      return images.filter(imagePath => imagePath == listing.inventoryItem.product.primaryImagePath)[0]
+      return images.filter(imagePath => imagePath.replace('\\', '/') == listing.inventoryItem.product.primaryImagePath)[0]
     },
 
     /**
