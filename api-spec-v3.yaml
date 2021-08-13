@@ -953,10 +953,10 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  '/listing/{listingId}/user/{userId}/notify':
+  '/businesses/{businessId}/listings/{listingId}/users/{userId}/notify':
     post:
       tags:
-        - Users
+        - 'Listings / sales'
         - 'U31 : Purchases'
       summary: Notify a user about any changes of items they liked or purchased.
       security:
@@ -984,22 +984,26 @@ paths:
             schema:
               type: object
               properties:
-                senderId:
+                id:
                   type: integer
+                  description: The ID of the notification
+                  example: 43
+                userId:
+                  type: object
                   description: The ID of the user who sent the notification
-                  example: 43
+                  example: 50
                 listingId:
-                  type: integer
+                  type: object
                   description: The ID of the listing that has been updated
-                  example: 43
-                message:
-                  type: string
-                  description: The notification message
-                  example: "Honda Civic 2007 has been sold!"
+                  example: 30
                 status:
                   type: string
                   description: The status of the notification. Can be Bought or Expired.
                   example: "Expired"
+                created:
+                  type: string
+                  description: The date of the notification's creation
+                  example: "2021-04-27"
       responses:
         '201':
           description: Successful notification
@@ -1010,7 +1014,7 @@ paths:
           description: Bad request
     get:
       tags:
-        - Users
+        - 'Listings / sales'
         - 'U31 : Purchases'
       summary: User can retrieve all notifications related to listings they have received.
       security:
@@ -2345,13 +2349,17 @@ components:
           description: The date the notification was created
           readOnly: true
     ListOfNotifications:
-      example: [{"senderId": 43,
-                 "listingId": 43,
-                 "message": "Honda Civic 2007 has been sold!",
-                 "status": "Expired"},
-        {"senderId": 44,
-         "listingId": 69,
-         "message": "You have successfully bought Toyota Corolla 1998!",
-         "status": "Bought"}]
+      example: [{id: 43,
+                 userId: 50,
+                 listingId: 30,
+                 status: Expired,
+                 created: '2021-04-27'
+      },
+        {id: 50,
+         userId: 60,
+         listingId: 40,
+         status: Expired,
+         created: '2021-05-27'
+        }]
 
 
