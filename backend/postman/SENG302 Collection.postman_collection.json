@@ -479,6 +479,79 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "All Sales Listings",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productQuery\": \"\",\r\n    \"sortBy\": null,\r\n    \"minPrice\": 10.00,\r\n    \"maxPrice\": 20.00,\r\n    \"businessType\": \"Retail Trade\",\r\n    \"minClosingDate\": \"2021-08-08 12:00:00\",\r\n    \"maxClosingDate\": \"2021-09-09 12:00:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/listings?count=10&offset=0&sortDirection=asc",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings"
+							],
+							"query": [
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "sortDirection",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Listings by title or businesss",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings?page=10&count=10&query=dabshot",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "10"
+								},
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "query",
+									"value": "dabshot"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -761,6 +834,32 @@
 								"users",
 								":id",
 								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a user's like",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id/like",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id",
+								"like"
 							],
 							"variable": [
 								{

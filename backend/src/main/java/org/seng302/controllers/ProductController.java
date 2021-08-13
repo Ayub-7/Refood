@@ -322,7 +322,6 @@ public class ProductController {
         extensions.add(".gif");
         for (String ext: extensions) {
             Path path = Paths.get(imageDir + ext);
-            System.out.println(path.toString());
             if (Files.exists(path)) {
                 extension = ext;
                 break;
@@ -342,7 +341,7 @@ public class ProductController {
          * @param businessId unique identifier of the business that the image is relating to.
          * @param productId product identifier that the image is relating to.
          * @param image a multipart image of the file
-         * @return
+         * @return ResponseEntity<String>
          * @throws IOException
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")

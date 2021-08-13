@@ -30,11 +30,6 @@ package org.seng302;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.seng302.repositories.BusinessRepository;
-import org.seng302.repositories.ProductRepository;
-import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.InventoryRepository;
-import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.SchedAdminCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -50,12 +45,8 @@ import org.springframework.stereotype.Component;
 public class MainApplicationRunner implements ApplicationRunner {
 
   private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
-  private UserRepository userRepository;
-  private BusinessRepository businessRepository;
-  @Autowired private ProductRepository productRepository;
-  @Autowired private ListingRepository listingRepository;
-  @Autowired private InventoryRepository inventoryRepository;
 
+  @Autowired
   private SchedAdminCheck schedAdminCheck;
 
 
@@ -63,14 +54,10 @@ public class MainApplicationRunner implements ApplicationRunner {
    * This constructor is implicitly called by Spring (purpose of the @Autowired
    * annotation). Injected constructors can be supplied with instances of other
    * classes (i.e. dependency injection)
-   *
-   * @param userRepository the user repository.
    */
   @Autowired
-  public MainApplicationRunner(UserRepository userRepository, BusinessRepository businessRepository, SchedAdminCheck schedAdminCheck) {
-    this.userRepository = userRepository;
-    this.businessRepository = businessRepository;
-    this.schedAdminCheck = schedAdminCheck;
+  public MainApplicationRunner() {
+
   }
 
   /**

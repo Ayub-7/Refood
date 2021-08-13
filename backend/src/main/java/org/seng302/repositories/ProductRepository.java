@@ -1,7 +1,9 @@
 package org.seng302.repositories;
 
 import org.seng302.models.Product;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,11 +17,13 @@ import java.util.List;
  * JPA Repository for the Product entity/table.
  */
 @RepositoryRestResource
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
+    List<Product> findAll(Specification spec);
     Product findProductByIdAndBusinessId(String id, long businessId);
 
     List<Product> findProductsByBusinessId(long businessId);
+
 
     @Modifying(clearAutomatically = true)
     @Transactional
