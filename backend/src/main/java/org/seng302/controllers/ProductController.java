@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.exceptions.InvalidImageExtensionException;
-import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -41,8 +40,6 @@ public class ProductController {
     @Autowired private ProductRepository productRepository;
     @Autowired private BusinessRepository businessRepository;
     @Autowired private FileService fileService;
-
-    @Autowired private ProductFinder productFinder;
 
     @Autowired private ObjectMapper mapper;
 

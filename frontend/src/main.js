@@ -40,6 +40,7 @@ import BusinessRegister from "./components/BusinessRegister";
 import Register from "./components/Register";
 import Users from "./components/Users.vue";
 import Search from "./components/Search.vue";
+import SearchListings from "./components/SearchListings.vue"
 import Business from "./components/Business.vue";
 import Homepage from "./components/Homepage"
 import ProductCatalogue from "@/components/ProductCatalogue";
@@ -75,6 +76,7 @@ const routes = [
   {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/', component: Login},
   {path: '/register', component: Register},
+  {name: 'SearchListings', path: '/search-listings', component: SearchListings},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
   {name: 'BusinessInventory', path: '/businesses/:id/inventory', component: BusinessInventory},
