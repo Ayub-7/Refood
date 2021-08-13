@@ -965,10 +965,17 @@ paths:
             - defaultGlobalApplicationAdmin
       parameters:
         - in: path
+          name: businessId
+          schema:
+            type: integer
+          description: Id of the business owning the listing
+          required: true
+          example: 582
+        - in: path
           name: listingId
           schema:
             type: integer
-          description: Id of the listing that has been updated.
+          description: Id of the listing that has been updated
           required: true
           example: 54343
         - in: path
@@ -2361,5 +2368,3 @@ components:
          status: Expired,
          created: '2021-05-27'
         }]
-
-
