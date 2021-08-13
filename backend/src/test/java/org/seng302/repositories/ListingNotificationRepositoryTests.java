@@ -70,8 +70,11 @@ public class ListingNotificationRepositoryTests {
         listingNotificationRepository.save(notification);
     }
 
+    /**
+     * Tests that the number of notifications received is correct (1)
+     */
     @Test
-    void findListingNotificationByUserId_correctNumberOfLikes() {
+    void findListingNotificationByUserId_correctNumberOfNotifications() {
         List<ListingNotification> notificationList = listingNotificationRepository.findListingNotificationsByUserId(user.getId());
         assertThat(notificationList.size()).isEqualTo(1);
     }

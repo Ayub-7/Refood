@@ -81,6 +81,9 @@ public class ListingNotificationControllerTests {
     // POST - Listing Notification
     //
 
+    /**
+     * Tests that a user not logged in can't make the POST
+     */
     @Test
     void testPostNewNotification_noAuth_returnUnauthorized() throws Exception {
         mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
@@ -88,6 +91,9 @@ public class ListingNotificationControllerTests {
                 .andExpect(status().isUnauthorized());
     }
 
+    /**
+     * An invalid user returns 406 (not acceptable)
+     */
     @Test
     @WithMockUser
     void testPostNewNotification_noExistingUser_returnNotAcceptable() throws Exception {
@@ -100,6 +106,9 @@ public class ListingNotificationControllerTests {
                 .andExpect(status().isNotAcceptable());
     }
 
+    /**
+     * An invalid listing returns 406 (not acceptable)
+     */
     @Test
     @WithMockUser
     void testPostNewNotification_noExistingListing_returnNotAcceptable() throws Exception {
@@ -112,6 +121,9 @@ public class ListingNotificationControllerTests {
                 .andExpect(status().isNotAcceptable());
     }
 
+    /**
+     * An invalid business returns 406 (not acceptable)
+     */
     @Test
     @WithMockUser
     void testPostNewNotification_noExistingBusiness_returnNotAcceptable() throws Exception {
@@ -124,6 +136,9 @@ public class ListingNotificationControllerTests {
                 .andExpect(status().isNotAcceptable());
     }
 
+    /**
+     * Works as expected with valid user, listing, business and valid IDs
+     */
     @Test
     @WithMockUser
     void testPostNewNotification_successfulNotification_returnCreated() throws Exception {
