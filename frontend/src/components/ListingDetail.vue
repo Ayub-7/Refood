@@ -7,7 +7,7 @@
           <transition name="slide-fade" mode="out-in">
             <ReImage id="listing-image" :key="currentImage" :imagePath="currentImage"></ReImage>
           </transition>
-          <div v-if="listingImages.length > 0">
+          <div v-if="listingImages.length > 1">
             <vs-button @click="previousImage(currentImage)">
               <vs-icon icon="arrow_back"></vs-icon>
             </vs-button>
