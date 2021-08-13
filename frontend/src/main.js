@@ -47,6 +47,7 @@ import ProductCatalogue from "@/components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
 import CommunityMarketplace from "@/components/CommunityMarketplace";
 import BusinessInventory from "@/components/BusinessInventory";
+import BusinessSalesHistory from "@/components/BusinessSalesHistory";
 
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
@@ -85,6 +86,7 @@ const routes = [
   {path: '/businesses/:id/products', component: ProductCatalogue},
   {path: '/marketplace', component: CommunityMarketplace},
   {path: '/businesses/:id', name: 'Business', component: Business},
+  {path: '/businesses/:id/sales-history', name: 'BusinessSalesHistory', component: BusinessSalesHistory},
   {
     path: '*',
     name: 'catchAll',
