@@ -168,7 +168,7 @@ public class ListingController {
      * @return Response with the JSONified list of the businesses' listings
      * @throws JsonProcessingException
      */
-    @GetMapping("/businesses/listings")
+    @GetMapping("/businesses/listingsss")
     public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
                                               @RequestParam("count") int count,
                                               @RequestParam("page") int offset,
