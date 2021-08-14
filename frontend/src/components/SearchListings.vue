@@ -79,12 +79,22 @@
               <div>
                 <h3 class="filter-label" style="margin: auto; padding-right: 4px;">Sort By </h3>
                 <div>
-                <vs-select v-model="selected">
-                  <option disabled value="">Please select one</option>
-                  <option value="name">listings Name</option>
-                  <option value="country">Country</option>
-                  <option value="recommendedRetailPrice">Recommended Retail Price</option>
-                  <option value="expiryDate">Expiry Date</option>
+                <vs-select v-model="sortBy" autocomplete class="form-control">
+                  <vs-select-item disabled value="">Please select one</vs-select-item>
+                  <vs-select-item value="price">Price</vs-select-item>
+                  <vs-select-item value="closes">Closing Date</vs-select-item>
+                  <vs-select-item value="created">Created Date</vs-select-item>
+                  <vs-select-item value="city">City</vs-select-item>
+                  <vs-select-item value="country">Country</vs-select-item>
+                  <vs-select-item value="businessType">Business Type</vs-select-item>
+                  <vs-select-item value="name">Product Name</vs-select-item>
+                  <vs-select-item value="quantity">Quantity</vs-select-item>
+                  <vs-select-item value="manufacturer">Manufacturer</vs-select-item>
+                  <vs-select-item value="seller">Seller</vs-select-item>
+                </vs-select>
+                  <vs-select v-model="sortDirection">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
                 </vs-select>
                 <vs-button class="sort-btn" @click="filterListings" style="width: 100px">Sort</vs-button>
                 </div>
@@ -141,7 +151,7 @@ const SearchListings = {
       businessQuery: null,
       productQuery: null,
       addressQuery: null,
-      sortBy: "businessType",
+      sortBy: null,
       businessTypes: null,
       minPrice: null,
       maxPrice: null,
@@ -150,7 +160,7 @@ const SearchListings = {
 
       numListings: 10,
       pageNum: 0,
-      sortDirection: "desc"
+      sortDirection: "asc"
     };
   },
 
@@ -180,11 +190,6 @@ const SearchListings = {
     },
 
     filterListings: function(){
-      // this.sortBy = "businessType"
-      // this.minPrice = 10.00
-      // this.maxPrice = 20.00
-      // this.minClosingDate = "2021-09-01 06:00:00"
-      // this.maxClosingDate = "2021-09-30 23:59:59"
       api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
       this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum, this.sortDirection)
       .then((response) => {
