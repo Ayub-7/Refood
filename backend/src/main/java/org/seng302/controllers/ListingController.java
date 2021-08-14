@@ -163,8 +163,9 @@ public class ListingController {
             specs = specs.and(listingFinder.findListing(request.getBusinessQuery(), "seller"));
         }
         if (request.getBusinessTypes() != null && !request.getBusinessTypes().isEmpty()) {
-            for (BusinessType type : request.getBusinessTypes()) {
-                specs = specs.and(listingFinder.findListing(type.toString(), "types"));
+            specs = specs.and(listingFinder.findListing('"' + request.getBusinessTypes().get(0).toString() + '"', "types"));
+            for (int i = 1; i < request.getBusinessTypes().size(); i++) {
+                specs = specs.or(listingFinder.findListing('"' + request.getBusinessTypes().get(i).toString() + '"', "types"));
             }
         }
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
@@ -173,7 +174,7 @@ public class ListingController {
         if (request.getAddressQuery() != null && request.getAddressQuery().length() > 0) { // Prevent product finder from crashing.
             specs = specs.and(addressFinder.findAddress(request.getAddressQuery()));
         }
-
+        System.out.println(specs.toString());
         Page<Listing> result = listingRepository.findAll(specs, pageRange);
 
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));

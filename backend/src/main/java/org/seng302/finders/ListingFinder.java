@@ -1,10 +1,11 @@
 package org.seng302.finders;
 
+import org.seng302.models.BusinessType;
 import org.seng302.models.Listing;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,8 +39,8 @@ public class ListingFinder {
 
     private Specification<Listing> businessTypeSpec(String term) {
         return (root, query, criteriaBuilder)
-                -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product")
-                .get("business").get("businessType")), "%"+term.toLowerCase()+"%");
+                -> criteriaBuilder.equal(root.get("inventoryItem").get("product")
+                .get("business").get("businessType"), BusinessType.valueOf(term.toUpperCase().replace(' ', '_').replace('-', '_')));
     }
 
     /**
@@ -94,7 +95,12 @@ public class ListingFinder {
     private Specification<Listing> buildAddressSpec(String query, String queryBy) {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
-        Specification<Listing> specification = sellerContains(terms.get(0));
+        Specification<Listing> specification;
+        if (query.equalsIgnoreCase("seller")) {
+            specification = sellerContains(terms.get(0));
+        } else {
+            specification = businessTypeSpec(terms.get(0));
+        }
         for (String term : terms) {
             specification = getNextSpecification(specification, queryBy, term, terms);
         }
