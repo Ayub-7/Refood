@@ -97,7 +97,8 @@
               <div slot="media">
                 <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
               </div>
-              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.listingsName }}</div>
+              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
+              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.business.name }}</div>
               <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
                 <div>{{ currencySymbol }}{{ listing.price }}</div>
                 <div>{{ listing.quantity }}x</div>
@@ -128,415 +129,7 @@ const SearchListings = {
   components: {ReImage},
   data: function() {
     return {
-      listings: [
-        {
-          "id": 9030,
-          "inventoryItem": {
-            "id": 5509,
-            "product": {
-              "id": "SEO-487ATE",
-              "name": "Garlic - Peeled",
-              "description": "Ut at dolor quis odio consequat varius.",
-              "manufacturer": "Reenolds Ranch",
-              "recommendedRetailPrice": 47.96,
-              "created": "2021-01-13 00:03:00",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 49,
-            "pricePerItem": 50.76,
-            "totalPrice": 2487.24,
-            "manufactured": "2020-09-13",
-            "sellBy": "2020-11-22",
-            "bestBefore": "2020-07-27",
-            "expires": "2021-06-05"
-          },
-          "quantity": 12,
-          "price": 609.1,
-          "moreInfo": null,
-          "created": "2021-04-26 21:54:09",
-          "closes": "2021-06-05 15:06:38",
-          "productName": "Garlic - Peeled"
-        },
-        {
-          "id": 4,
-          "inventoryItem": {
-            "id": 2,
-            "product": {
-              "id": "W04GP5EC0B1798680",
-              "name": "Compound - Mocha",
-              "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
-              "manufacturer": "Nestle",
-              "recommendedRetailPrice": 88.93,
-              "created": "2021-01-11 07:54:46",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 7,
-            "pricePerItem": 3,
-            "totalPrice": 80,
-            "manufactured": "2020-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-08-27",
-            "expires": "2021-08-27"
-          },
-          "quantity": 1,
-          "price": 15.5,
-          "moreInfo": "Contact us for more information.",
-          "created": "2021-02-01 23:00:00",
-          "closes": "2021-09-08 00:00:00",
-          "productName": "Compound - Mocha"
-        },
-        {
-          "id": 5,
-          "inventoryItem": {
-            "id": 2,
-            "product": {
-              "id": "W04GP5EC0B1798680",
-              "name": "Compound - Mocha",
-              "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
-              "manufacturer": "Nestle",
-              "recommendedRetailPrice": 88.93,
-              "created": "2021-01-11 07:54:46",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 7,
-            "pricePerItem": 3,
-            "totalPrice": 80,
-            "manufactured": "2020-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-08-27",
-            "expires": "2021-08-27"
-          },
-          "quantity": 2,
-          "price": 5.99,
-          "moreInfo": "Do not contact us for more information.",
-          "created": "2021-02-02 23:00:00",
-          "closes": "2021-10-18 23:00:00",
-          "productName": "Compound - Mocha"
-        },
-        {
-          "id": 1219,
-          "inventoryItem": {
-            "id": 2,
-            "product": {
-              "id": "W04GP5EC0B1798680",
-              "name": "Compound - Mocha",
-              "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
-              "manufacturer": "Nestle",
-              "recommendedRetailPrice": 88.93,
-              "created": "2021-01-11 07:54:46",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 7,
-            "pricePerItem": 3,
-            "totalPrice": 80,
-            "manufactured": "2020-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-08-27",
-            "expires": "2021-08-27"
-          },
-          "quantity": 1,
-          "price": 3,
-          "moreInfo": "Nullam porttitor lacus at turpis.",
-          "created": "2021-05-24 08:03:32",
-          "closes": "2021-08-26 13:01:09",
-          "productName": "Compound - Mocha"
-        },
-        {
-          "id": 4086,
-          "inventoryItem": {
-            "id": 2,
-            "product": {
-              "id": "W04GP5EC0B1798680",
-              "name": "Compound - Mocha",
-              "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
-              "manufacturer": "Nestle",
-              "recommendedRetailPrice": 88.93,
-              "created": "2021-01-11 07:54:46",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 7,
-            "pricePerItem": 3,
-            "totalPrice": 80,
-            "manufactured": "2020-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-08-27",
-            "expires": "2021-08-27"
-          },
-          "quantity": 2,
-          "price": 6,
-          "moreInfo": null,
-          "created": "2021-04-01 19:26:03",
-          "closes": "2021-08-27 03:06:29",
-          "productName": "Compound - Mocha"
-        },
-        {
-          "id": 9922,
-          "inventoryItem": {
-            "id": 2,
-            "product": {
-              "id": "W04GP5EC0B1798680",
-              "name": "Compound - Mocha",
-              "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
-              "manufacturer": "Nestle",
-              "recommendedRetailPrice": 88.93,
-              "created": "2021-01-11 07:54:46",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 7,
-            "pricePerItem": 3,
-            "totalPrice": 80,
-            "manufactured": "2020-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-08-27",
-            "expires": "2021-08-27"
-          },
-          "quantity": 3,
-          "price": 9,
-          "moreInfo": null,
-          "created": "2021-03-23 12:20:45",
-          "closes": "2021-08-27 11:01:03",
-          "productName": "Compound - Mocha"
-        },
-        {
-          "id": 1,
-          "inventoryItem": {
-            "id": 1,
-            "product": {
-              "id": "WAUVT64B54N722288",
-              "name": "Pastry - Cheese Baked Scones",
-              "description": "amet erat nulla tempus vivamus",
-              "manufacturer": "Watties",
-              "recommendedRetailPrice": 19.88,
-              "created": "2021-03-05 01:36:54",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 10,
-            "pricePerItem": 5,
-            "totalPrice": 50,
-            "manufactured": "2021-01-26",
-            "sellBy": "2021-05-25",
-            "bestBefore": "2021-05-27",
-            "expires": "2021-05-27"
-          },
-          "quantity": 3,
-          "price": 10,
-          "moreInfo": "Not negotiable.",
-          "created": "2021-01-26 23:00:00",
-          "closes": "2021-09-22 00:00:00",
-          "productName": "Pastry - Cheese Baked Scones"
-        },
-        {
-          "id": 2,
-          "inventoryItem": {
-            "id": 1,
-            "product": {
-              "id": "WAUVT64B54N722288",
-              "name": "Pastry - Cheese Baked Scones",
-              "description": "amet erat nulla tempus vivamus",
-              "manufacturer": "Watties",
-              "recommendedRetailPrice": 19.88,
-              "created": "2021-03-05 01:36:54",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 10,
-            "pricePerItem": 5,
-            "totalPrice": 50,
-            "manufactured": "2021-01-26",
-            "sellBy": "2021-05-25",
-            "bestBefore": "2021-05-27",
-            "expires": "2021-05-27"
-          },
-          "quantity": 5,
-          "price": 10,
-          "moreInfo": "Could be negotiable.",
-          "created": "2021-01-27 23:00:00",
-          "closes": "2021-10-26 23:00:00",
-          "productName": "Pastry - Cheese Baked Scones"
-        },
-        {
-          "id": 3,
-          "inventoryItem": {
-            "id": 1,
-            "product": {
-              "id": "WAUVT64B54N722288",
-              "name": "Pastry - Cheese Baked Scones",
-              "description": "amet erat nulla tempus vivamus",
-              "manufacturer": "Watties",
-              "recommendedRetailPrice": 19.88,
-              "created": "2021-03-05 01:36:54",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 10,
-            "pricePerItem": 5,
-            "totalPrice": 50,
-            "manufactured": "2021-01-26",
-            "sellBy": "2021-05-25",
-            "bestBefore": "2021-05-27",
-            "expires": "2021-05-27"
-          },
-          "quantity": 5,
-          "price": 10,
-          "moreInfo": "Price is negotiable.",
-          "created": "2021-01-31 23:00:00",
-          "closes": "2021-11-11 23:00:00",
-          "productName": "Pastry - Cheese Baked Scones"
-        },
-        {
-          "id": 4939,
-          "inventoryItem": {
-            "id": 4,
-            "product": {
-              "id": "WAUVT64B54N722288",
-              "name": "Pastry - Cheese Baked Scones",
-              "description": "amet erat nulla tempus vivamus",
-              "manufacturer": "Watties",
-              "recommendedRetailPrice": 19.88,
-              "created": "2021-03-05 01:36:54",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 1,
-            "pricePerItem": 6,
-            "totalPrice": 50,
-            "manufactured": "2021-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-09-26",
-            "expires": "2021-11-26"
-          },
-          "quantity": 1,
-          "price": 6,
-          "moreInfo": "Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
-          "created": "2021-03-20 20:19:35",
-          "closes": "2021-11-27 09:13:51",
-          "productName": "Pastry - Cheese Baked Scones"
-        },
-        {
-          "id": 6733,
-          "inventoryItem": {
-            "id": 5,
-            "product": {
-              "id": "WAUVT64B54N722288",
-              "name": "Pastry - Cheese Baked Scones",
-              "description": "amet erat nulla tempus vivamus",
-              "manufacturer": "Watties",
-              "recommendedRetailPrice": 19.88,
-              "created": "2021-03-05 01:36:54",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 1,
-            "pricePerItem": 6,
-            "totalPrice": 50,
-            "manufactured": "2021-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-09-26",
-            "expires": "2021-11-26"
-          },
-          "quantity": 1,
-          "price": 6,
-          "moreInfo": "Sed vel enim sit amet nunc viverra dapibus.",
-          "created": "2021-04-30 22:03:38",
-          "closes": "2021-11-26 11:41:25",
-          "productName": "Pastry - Cheese Baked Scones"
-        },
-        {
-          "id": 8380,
-          "inventoryItem": {
-            "id": 5,
-            "product": {
-              "id": "WAUVT64B54N722288",
-              "name": "Pastry - Cheese Baked Scones",
-              "description": "amet erat nulla tempus vivamus",
-              "manufacturer": "Watties",
-              "recommendedRetailPrice": 19.88,
-              "created": "2021-03-05 01:36:54",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 1,
-            "pricePerItem": 6,
-            "totalPrice": 50,
-            "manufactured": "2021-01-26",
-            "sellBy": null,
-            "bestBefore": "2021-09-26",
-            "expires": "2021-11-26"
-          },
-          "quantity": 1,
-          "price": 6,
-          "moreInfo": "Duis mattis egestas metus.",
-          "created": "2021-05-23 14:35:36",
-          "closes": "2021-11-26 11:00:50",
-          "productName": "Pastry - Cheese Baked Scones"
-        },
-        {
-          "id": 3717,
-          "inventoryItem": {
-            "id": 8725,
-            "product": {
-              "id": "WAUVT64B54N722288",
-              "name": "Pastry - Cheese Baked Scones",
-              "description": "amet erat nulla tempus vivamus",
-              "manufacturer": "Watties",
-              "recommendedRetailPrice": 19.88,
-              "created": "2021-03-05 01:36:54",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 51,
-            "pricePerItem": 18.87,
-            "totalPrice": 962.37,
-            "manufactured": "2020-07-07",
-            "sellBy": "2021-01-12",
-            "bestBefore": "2021-02-19",
-            "expires": "2022-02-01"
-          },
-          "quantity": 4,
-          "price": 75.5,
-          "moreInfo": "Praesent blandit lacinia erat.",
-          "created": "2021-04-13 02:02:01",
-          "closes": "2022-02-01 18:38:03",
-          "productName": "Pastry - Cheese Baked Scones"
-        },
-        {
-          "id": 9871,
-          "inventoryItem": {
-            "id": 781,
-            "product": {
-              "id": "ZSP-632VBQ",
-              "name": "Tomato - Peeled Italian Canned",
-              "description": "In hac habitasse platea dictumst.",
-              "manufacturer": "Parturient Montes Foundation",
-              "recommendedRetailPrice": 45.11,
-              "created": "2021-02-05 21:09:46",
-              "images": [],
-              "primaryImagePath": null
-            },
-            "quantity": 35,
-            "pricePerItem": 44.43,
-            "totalPrice": 1555.05,
-            "manufactured": "2020-11-15",
-            "sellBy": "2021-02-25",
-            "bestBefore": "2021-03-08",
-            "expires": "2021-05-25"
-          },
-          "quantity": 17,
-          "price": 755.3,
-          "moreInfo": "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam.",
-          "created": "2021-03-01 23:35:12",
-          "closes": "2021-05-25 18:47:59",
-          "productName": "Tomato - Peeled Italian Canned"
-        }
-      ],
-      currentPage: 1,
+      listings: [],
       searchbarListings: "",
       businessType: "",
       errors: [],
@@ -548,7 +141,7 @@ const SearchListings = {
       businessQuery: null,
       productQuery: null,
       addressQuery: null,
-      sortBy: null,
+      sortBy: "businessType",
       businessTypes: null,
       minPrice: null,
       maxPrice: null,
@@ -556,7 +149,7 @@ const SearchListings = {
       maxClosingDate: null,
 
       numListings: 10,
-      pageNum: 1,
+      pageNum: 0,
       sortDirection: "desc"
     };
   },
@@ -565,6 +158,7 @@ const SearchListings = {
     api.checkSession()
       .then((response) => {
         this.userId = response.data.id;
+        this.filterListings();
       }).catch((err) => {
       throw new Error(`Error trying to get user id: ${err}`);
     })
@@ -586,29 +180,26 @@ const SearchListings = {
     },
 
     filterListings: function(){
+      // this.sortBy = "businessType"
+      // this.minPrice = 10.00
+      // this.maxPrice = 20.00
+      // this.minClosingDate = "2021-09-01 06:00:00"
+      // this.maxClosingDate = "2021-09-30 23:59:59"
       api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
       this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum, this.sortDirection)
       .then((response) => {
-        this.listings = response.data
-        console.log(response)
+        this.listings = response.data.content
+        console.log(this.listings)
       })
       .catch((error) => {
         console.log(error)
       });
     },
-
-    searchListings: function(){
-      api.searchListings(this.searchbarListings, this.numListings,  this.pageNum)
-          .then((response) => {
-            this.listings = response.data
-            console.log(response)
-          })
-          .catch((error) => {
-            console.log(error)
-          });
-    }
   },
 }
+
+
+
 
 export default SearchListings;
 </script>
