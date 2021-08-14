@@ -32,7 +32,7 @@ public class Business implements Serializable {
                     inverseJoinColumns = @JoinColumn(name="USER_ID"))
     private List<User> administrators = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="USER_ID")
     @JsonSerialize(using = PrimaryAdministratorSerializer.class)
     @JsonProperty("primaryAdministratorId") // while the entity itself stores the user object, when we output to a JSON,

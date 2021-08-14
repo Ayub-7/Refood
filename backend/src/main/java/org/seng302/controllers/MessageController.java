@@ -11,8 +11,6 @@ import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.CardRepository;
 import org.seng302.models.responses.MessageIdResponse;
 
-import org.seng302.repositories.MessageRepository;
-import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

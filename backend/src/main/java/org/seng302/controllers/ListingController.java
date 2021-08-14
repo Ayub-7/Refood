@@ -1,19 +1,30 @@
 package org.seng302.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.seng302.finders.ListingSpecifications;
+import org.seng302.finders.ListingFinder;
+import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
+import org.seng302.models.requests.BusinessListingSearchRequest;
+import org.seng302.repositories.BusinessRepository;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.finders.AddressFinder;
 import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.BusinessRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,17 +34,23 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
 
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @RestController
 public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
+
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired private BusinessRepository businessRepository;
+    @Autowired
+    private BusinessRepository businessRepository;
+
 
     @Autowired
     private ListingRepository listingRepository;
@@ -44,14 +61,32 @@ public class ListingController {
     @Autowired
     private AddressFinder addressFinder;
 
+    @Autowired
+    private ProductFinder productFinder;
+
+    @Autowired
+    private ListingFinder listingFinder;
+
+    @Autowired
+    private ObjectMapper mapper;
+
+    /**
+     * Constructor used for cucumber testing.
+     * @param listingRepository repository for listings
+     */
+    public ListingController(ListingRepository listingRepository, ObjectMapper mapper) {
+        this.listingRepository = listingRepository;
+        this.mapper = mapper;
+    }
+
+
     /**
      * Get request mapping for getting Listing by id
      * @param id the businesses' id
      * @return ResponseEntity - 401 when unauthorized (handled by spring sec). 406 when Listing doesn't exist. 200 otherwise.
-     * @throws JsonProcessingException when json mapping object to a json string fails unexpectedly.
      */
     @GetMapping("/businesses/{id}/listings")
-    public ResponseEntity<List<Listing>> getListings(@PathVariable long id) throws JsonProcessingException {
+    public ResponseEntity<List<Listing>> getBusinessListings(@PathVariable long id) {
         Business business = businessRepository.findBusinessById(id);
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
@@ -69,6 +104,95 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(listings);
     }
 
+    /**
+     * POST (but actually a GET) endpoint that retrieves listings from all businesses.
+     * Body may contain extra search filters and parameters to get specific results.
+     * The results are paginated.
+     * @param request the search filter/sort information.
+     * @param count how many results will show per page.
+     * @param offset how many PAGES (not results) to skip before returning the results.
+     * @return Response - 400 if body is missing or parameters are invalid, 401 if unauthorized, 200 with paginated results otherwise.
+     * @throws JsonProcessingException when writing the results as a string value goes wrong.
+     */
+    @PostMapping("/businesses/listings")
+    public ResponseEntity<String> getAllListings(@RequestBody BusinessListingSearchRequest request,
+                                                 @RequestParam("count") int count,
+                                                 @RequestParam("offset") int offset,
+                                                 @RequestParam("sortDirection") String sortDirection) throws JsonProcessingException {
+
+        Sort sort;
+        String sortBy = request.getSortBy();
+        // Sort category
+        if (sortBy == null) {
+            sort = Sort.unsorted();
+        }
+        else if (sortBy.equalsIgnoreCase("price") ||
+                sortBy.equalsIgnoreCase("quantity") ||
+                sortBy.equalsIgnoreCase("created") ||
+                sortBy.equalsIgnoreCase("closes")) {
+            sort = Sort.by(request.getSortBy());
+        }
+        else if (sortBy.equalsIgnoreCase("name") || sortBy.equalsIgnoreCase("manufacturer")) {
+            sort = Sort.by("inventoryItem.product." + request.getSortBy());
+        }
+        else if (sortBy.equalsIgnoreCase("expires")) {
+            sort = Sort.by("inventoryItem.expires");
+        }
+        else if (sortBy.equalsIgnoreCase("city") ||
+                sortBy.equalsIgnoreCase("country") ||
+                sortBy.equalsIgnoreCase("businessType")) {
+            sort = Sort.by("inventoryItem.product.business." + request.getSortBy());
+        }
+        else if (sortBy.equalsIgnoreCase("seller")) {
+            sort = Sort.by("inventoryItem.product.business.name");
+        }
+        else { // Sort By parameter is not what we were expecting.
+            logger.error(String.format("Unknown sort parameter: %s", request.getSortBy()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected sort parameter.");
+        }
+
+        // Sort direction
+        if (sortDirection.equalsIgnoreCase("desc")) {
+            sort = sort.descending();
+        }
+        else {
+            sort = sort.ascending();
+        }
+
+        ListingSpecifications specifications = new ListingSpecifications(request);
+        Pageable pageRange = PageRequest.of(offset, count, sort);
+
+        Specification<Listing> specs = where(specifications.hasPriceSet()).and(specifications.hasClosingDateSet());
+        if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
+            specs = specs.and(productFinder.findProduct(request.getProductQuery()));
+        }
+
+        Page<Listing> result = listingRepository.findAll(specs, pageRange);
+
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
+    }
+
+//    /**
+//     * GET endpoint that retrieves businesses' listings by a search query.
+//     * @param query A string with the search's query
+//     * @param count how many results will show per page.
+//     * @param offset how many PAGES (not results) to skip before returning the results.
+//     * @param session current user session.
+//     * @return Response with the JSONified list of the businesses' listings
+//     * @throws JsonProcessingException
+//     */
+//    @GetMapping("/businesses/listings")
+//    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
+//                                              @RequestParam("count") int count,
+//                                              @RequestParam("page") int offset,
+//                                              HttpSession session) throws JsonProcessingException {
+//        logger.debug("Searching for Listings...");
+//        Specification<Listing> specification = listingFinder.findListing(query);
+//        Pageable pageRange = PageRequest.of(offset, count);
+//        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
+//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
+//    }
+
 
     /**
      * Creates a new product and adds it to the product catalogue of the current acting business
@@ -77,14 +201,13 @@ public class ListingController {
      * @param request the request body for the new listing object
      * @param session http session which holds the authenticated user
      * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
-     * @throws JsonProcessingException
      */
     @PostMapping("/businesses/{id}/listings")
     public ResponseEntity<String> createListing(@PathVariable long id, @RequestBody NewListingRequest request, HttpSession session) {
         Business business = businessRepository.findBusinessById(id);
         Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
 
-        if(inventory == null){ //inventory item doesen't exist for business
+        if(inventory == null){ //inventory item doesn't exist for business
             logger.debug(request.getInventoryItemId());
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -108,13 +231,5 @@ public class ListingController {
             }
         }
     }
-
-    @GetMapping("/businesses/location")
-            public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, HttpSession session) throws JsonProcessingException {
-                logger.debug("Searching for businesses...address");
-                Specification<Listing> specification = addressFinder.findAddress(query);
-                List<Listing> businesses = listingRepository.findAll(specification);
-                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
-            }
 
 }

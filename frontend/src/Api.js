@@ -310,13 +310,16 @@ export default {
      * @param section the name of the section to retrieve the cards from.
      * @param sortBy The expected values are CREATED, TITLE, COUNTRY, and KEYWORDS.
      *               Where the cards will be sorted by one of the four attributes, and the default is by CREATED.
-     * @param ascending Not always passed but the default is ascending order; however, if false is passed, the list will
-     *                  be sorted in descending order.
+     * @param reverse Default is false, which will return the order of cards in ascending order.
+     Otherwise, will return them in descending order.
      * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
      */
-    getCardsBySection: (section, sortBy, ascending) => instance.get(`/cards`, {params: {section: section,
+    getCardsBySection: (section, pageNum, resultsPerPage, sortBy, reverse) => instance.get(`/cards`,
+                                                            {params:{section: section,
+                                                                     pageNum: pageNum,
+                                                                     resultsPerPage: resultsPerPage,
                                                                      sortBy: sortBy,
-                                                                     ascending: ascending}, withCredentials: true}),
+                                                                     reverse: reverse}, withCredentials: true}),
 
     /**
      * Deletes a community marketplace card.

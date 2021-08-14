@@ -8,21 +8,24 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
-import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.NotificationRepository;
+import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -83,20 +86,50 @@ public class CardController {
     }
 
     /**
+     * Helper function to sort and paginate cards. Only available in this class.
+     * @param pageNum Page number
+     * @param resultsPerPage Results per page
+     * @param orderBy attribute to order with
+     * @param reverse If false, will be ascending order. Otherwise, descending.
+     * @return PageRequest to help with respository request.
+     */
+    private PageRequest sortAndPaginateCards(int pageNum, int resultsPerPage, String orderBy, boolean reverse) {
+        Sort.Direction orderDirection = Sort.Direction.DESC;
+        if (!reverse) {
+            orderDirection = Sort.Direction.ASC;
+        }
+        Set<String> sortAttributes = Set.of("title", "created", "keywords", "country");
+        if (orderBy == null || !sortAttributes.contains(orderBy)) {
+            orderBy = "created";
+        }
+        List<Sort.Order> order;
+        if (orderBy.equals("country")) {
+            order = List.of(new Sort.Order(orderDirection, "user.homeAddress.country").ignoreCase());
+        } else {
+            order = List.of(new Sort.Order(orderDirection, orderBy).ignoreCase());
+        }
+        return PageRequest.of(pageNum-1, resultsPerPage, Sort.by(order));
+    }
+
+    /**
      * Retrieves all cards from a given section parameter.
      * @param section the string section name.
+     * @param pageNum Number of page, the bounds start from 1. Anything below 1 will return 500 HTTP Status error.
+     * @param resultsPerPage Number of results per page.
      * @param sortBy The expected values are CREATED, TITLE, COUNTRY, and KEYWORDS.
      *               Where the cards will be sorted by one of the four attributes, and the default is by CREATED.
-     * @param ascending Not always passed but the default is ascending order; however, if false is passed, the list will
-     *                  be sorted in descending order.
+     * @param reverse Default is false, which will return the order of cards in ascending order.
+                      Otherwise, will return them in descending order.
      * @return 401 (if no auth), 400 if section does not exist, 200 otherwise, along with the list of cards in that section.
      * @throws JsonProcessingException if converting the list of cards into a JSON string fails.
      */
     @GetMapping("/cards")
     public ResponseEntity<String> getCardsFromSection(@RequestParam(name="section") String section,
+                                                      @RequestParam int pageNum,
+                                                      @RequestParam int resultsPerPage,
                                                       @RequestParam(required = false) String sortBy,
-                                                      @RequestParam(required = false) boolean ascending) throws JsonProcessingException {
-        MarketplaceSection marketplaceSection = null;
+                                                      @RequestParam(required = false) boolean reverse) throws JsonProcessingException {
+        MarketplaceSection marketplaceSection;
 
         // Attempt to get the section enum (string is made uppercase to get correct value).
         try {
@@ -105,28 +138,8 @@ public class CardController {
             logger.error("Bad section parameter input.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Section does not exist.");
         }
-        List<Card> cards = cardRepository.findAllBySection(marketplaceSection);
-        if (sortBy != null && sortBy.length() > 0) {
-            switch (sortBy.toUpperCase()) {
-                case "TITLE":
-                    cards.sort(Comparator.comparing(Card::getTitle));
-                    break;
-                case "CREATED":
-                    cards.sort(Comparator.comparing(Card::getCreated));
-                    break;
-                case "KEYWORDS":
-                    cards.sort(Comparator.comparing(Card::getKeywords));
-                    break;
-                case "COUNTRY":
-                    cards.sort(Comparator.comparing(c -> c.getUser().getHomeAddress().getCountry()));
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + sortBy.toUpperCase());
-            }
-        }
-        if (!ascending) {
-            Collections.reverse(cards);
-        }
+        Page<Card> cards = cardRepository.findAllBySection(marketplaceSection,
+                this.sortAndPaginateCards(pageNum, resultsPerPage, sortBy, reverse));
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(cards));
     }
 

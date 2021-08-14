@@ -9,48 +9,99 @@ localVue.use(Vuesax);
 
 
 // will get jest specific errors if there is no full user object
-let cards = [
-    {
-        "id": 1,
-        "user":{"id":7848,"firstName":"Alyson","middleName":"Lexis","lastName":"Sealy","nickname":"analyzing","bio":"Duis mattis egestas metus. Aenean fermentum.","email":"lsealymz@tumblr.com","dateOfBirth":"1989-11-28","phoneNumber":"+93 680 161 9001","homeAddress":{"streetNumber":null,"streetName":null,"suburb":null,"city":null,"region":null,"country":"Philippines","postcode":null},"created":"2020-04-23 12:22:09","role":"USER","businessesAdministered":[]},
-        "title": "Beans - Green",
-        "description": "Integer ac leo.",
-        "created": "2021-06-01 06:32:38",
-        "displayPeriodEnd": 1623738758000,
-        "keywords": "aliquam augue quam",
-        "section": "Wanted"
+let cards = {
+    "content": [
+        {
+            "id": 9028,
+            "user": {
+                "id": 7538,
+                "firstName": "Audre",
+                "middleName": "Romain",
+                "lastName": "Tower",
+                "nickname": "pricing structure",
+                "bio": "Aenean auctor gravida sem. Praesent id massa id nisl venenatis lacinia.",
+                "email": "rtowered@google.cn",
+                "dateOfBirth": "1994-01-25",
+                "phoneNumber": "+51 299 332 0265",
+                "homeAddress": {
+                    "streetNumber": null,
+                    "streetName": null,
+                    "suburb": null,
+                    "city": null,
+                    "region": null,
+                    "country": "Russia",
+                    "postcode": null
+                },
+                "created": "2020-09-14 06:35:19",
+                "role": "USER",
+                "businessesAdministered": []
+            },
+            "title": "Pastry - Choclate Baked",
+            "description": "Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo.",
+            "created": "2021-05-13 18:47:50",
+            "displayPeriodEnd": "2021-06-25 18:47:50",
+            "keywords": "congue risus semper",
+            "section": "ForSale"
+        },
+        {
+            "id": 9072,
+            "user": {
+                "id": 9584,
+                "firstName": "Ragnar",
+                "middleName": "Mariel",
+                "lastName": "Northfield",
+                "nickname": "Team-oriented",
+                "bio": "Nulla ac enim.",
+                "email": "mnorthfieldfn@weather.com",
+                "dateOfBirth": "1981-05-22",
+                "phoneNumber": "+86 256 685 8481",
+                "homeAddress": {
+                    "streetNumber": "7091",
+                    "streetName": "Quincy",
+                    "suburb": null,
+                    "city": "Al QadmÅ«s",
+                    "region": null,
+                    "country": "Syria",
+                    "postcode": null
+                },
+                "created": "2019-07-24 05:50:57",
+                "role": "USER",
+                "businessesAdministered": []
+            },
+            "title": "Truffle Shells - Semi - Sweet",
+            "description": "Aliquam quis turpis eget elit sodales scelerisque.",
+            "created": "2021-05-13 18:47:50",
+            "displayPeriodEnd": "2021-06-22 18:47:50",
+            "keywords": "hac",
+            "section": "ForSale"
+        }
+    ],
+    "pageable": {
+        "sort": {
+            "sorted": true,
+            "unsorted": false,
+            "empty": false
+        },
+        "offset": 0,
+        "pageSize": 2,
+        "pageNumber": 0,
+        "unpaged": false,
+        "paged": true
     },
-    {
-        "id": 5,
-        "user":{
-            "id":6151,
-            "firstName":"Ashley",
-            "middleName":"Lorraine",
-            "lastName":"Losemann",
-            "nickname":"leverage",
-            "bio":"Nunc nisl. Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa.",
-            "email":"llosemann3m@businessweek.com",
-            "dateOfBirth":"1984-10-23",
-            "phoneNumber":"+63 225 255 8996",
-            "homeAddress":{
-                "streetNumber":"599",
-                "streetName":"Quincy",
-                "suburb":null,
-                "city":"Khotiv",
-                "region":null,
-                "country":"Ukraine",
-                "postcode":null},
-            "created":"2019-03-30 07:39:01",
-            "role":"USER",
-            "businessesAdministered":[]},
-        "title": "Glycerine",
-        "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",
-        "created": "2021-06-06 06:32:38",
-        "displayPeriodEnd": 1624170758000,
-        "keywords": "semper sapien a",
-        "section": "Wanted"
+    "last": false,
+    "totalElements": 3300,
+    "totalPages": 1650,
+    "size": 2,
+    "number": 0,
+    "sort": {
+        "sorted": true,
+        "unsorted": false,
+        "empty": false
     },
-];
+    "first": true,
+    "numberOfElements": 2,
+    "empty": false
+}
 
 jest.mock("../Api.js", () => jest.fn);
 api.getCardsBySection = jest.fn(() => {
@@ -111,7 +162,7 @@ describe('CommunityMarketplace toggle tests', () => {
 describe('Method tests', () => {
    test('Cards is successfully set.', async () => {
        await wrapper.vm.getSectionCards('forSale');
-       expect(wrapper.vm.cards).toStrictEqual(cards);
+       expect(wrapper.vm.cards).toStrictEqual(cards.content);
    });
 
    test('Switching tab to Wanted', () => {

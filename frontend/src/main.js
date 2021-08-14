@@ -40,12 +40,14 @@ import BusinessRegister from "./components/BusinessRegister";
 import Register from "./components/Register";
 import Users from "./components/Users.vue";
 import Search from "./components/Search.vue";
+import SearchListings from "./components/SearchListings.vue"
 import Business from "./components/Business.vue";
 import Homepage from "./components/Homepage"
 import ProductCatalogue from "@/components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
 import CommunityMarketplace from "@/components/CommunityMarketplace";
 import BusinessInventory from "@/components/BusinessInventory";
+import ListingDetail from "@/components/ListingDetail";
 
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
@@ -75,6 +77,7 @@ const routes = [
   {path: '/businesses', component: BusinessRegister},
   {name: 'LoginPage', path: '/', component: Login},
   {path: '/register', component: Register},
+  {name: 'SearchListings', path: '/search-listings', component: SearchListings},
   {name: 'UserPage', path: '/users/:id', component: Users},
   {name: 'AddToCatalogue', path: '/addtocatalogue', component: AddToCatalogue},
   {name: 'BusinessInventory', path: '/businesses/:id/inventory', component: BusinessInventory},
@@ -83,6 +86,7 @@ const routes = [
   {path: '/businesses/:id/products', component: ProductCatalogue},
   {path: '/marketplace', component: CommunityMarketplace},
   {path: '/businesses/:id', name: 'Business', component: Business},
+  {path: '/businesses/:businessId/listings/:listingId', name: 'Listing', component: ListingDetail},
   {
     path: '*',
     name: 'catchAll',
@@ -94,7 +98,7 @@ const routes = [
 const router = new VueRouter({
   routes,
 
-  
+
 });
 
 updateSessionOnRouterChange(router);
