@@ -39,7 +39,7 @@ class InventoryRepositoryTests {
 
     private Product testProd1;
 
-    private Inventory testInven1;
+    private Inventory testInvent1;
 
     private Date dateBefore;
     private Date dateAfter;
@@ -76,19 +76,19 @@ class InventoryRepositoryTests {
         productRepository.save(testProd1);
 
         assertThat(inventoryRepository).isNotNull();
-        testInven1 = new Inventory("07-4957066", 1, 5, 2.0, 10.0, dateBefore, dateAfter, dateAfter, dateAfter);
-        inventoryRepository.save(testInven1);
+        testInvent1 = new Inventory("07-4957066", 1, 5, 2.0, 10.0, dateBefore, dateAfter, dateAfter, dateAfter);
+        inventoryRepository.save(testInvent1);
 
     }
 
 
     @Test
     void saveInventory() {
-        Inventory inventoryItem = inventoryRepository.findInventoryByIdAndBusinessId(testInven1.getId(), testInven1.getBusinessId());
+        Inventory inventoryItem = inventoryRepository.findInventoryByIdAndBusinessId(testInvent1.getId(), testInvent1.getBusinessId());
 
-        Assertions.assertEquals(testInven1.getId(), inventoryItem.getId());
-        assertThat(testInven1.getProductId()).isEqualTo(inventoryItem.getProductId());
-        assertThat(testInven1.getQuantity()).isEqualTo(inventoryItem.getQuantity());
+        Assertions.assertEquals(testInvent1.getId(), inventoryItem.getId());
+        assertThat(testInvent1.getProductId()).isEqualTo(inventoryItem.getProductId());
+        assertThat(testInvent1.getQuantity()).isEqualTo(inventoryItem.getQuantity());
 
         // Test if insertion is properly inserting values.
         List<Inventory> inventoryItems = inventoryRepository.findInventoryByProductIdAndBusinessId("07-4957066", 1);
