@@ -165,6 +165,9 @@ public class ListingController {
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
             specs = specs.and(productFinder.findProduct(request.getProductQuery()));
         }
+        if (request.getAddressQuery() != null && request.getAddressQuery().length() > 0) { // Prevent product finder from crashing.
+            specs = specs.and(addressFinder.findAddress(request.getAddressQuery()));
+        }
 
         Page<Listing> result = listingRepository.findAll(specs, pageRange);
 
