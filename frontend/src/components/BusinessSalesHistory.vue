@@ -36,10 +36,14 @@
 </template>
 
 <script>
-import ReImage from "@/components/ReImage";
+import ReImage from "./ReImage";
+import api from "../Api";
+import axios from "axios";
+
 export default {
   name: "BusinessSalesHistory",
   components: {ReImage},
+
   data: function() {
     return {
       currency: "$",
@@ -82,8 +86,39 @@ export default {
         }
       ]
     }
-  }
+  },
 
+  methods: {
+    /**
+     * Calls get session endpoint to get user country, if successful calls setCurrency ()
+     */
+    getSession: function() {
+      api.checkSession()
+        .then((response) => {
+          this.setCurrency(response.data.homeAddress.country)
+        })
+        .catch(err => {
+          this.$log.debug(err);
+      });
+    },
+
+    /**
+     * Sets display currency based on the user's home country.
+     */
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+        .then(response => {
+          this.currency = response.data[0].currencies[0].symbol;
+        })
+        .catch(err => {
+          this.$log.debug(err);
+      });
+    },
+  },
+
+  mounted: function() {
+    this.getSession();
+  }
 }
 </script>
 
