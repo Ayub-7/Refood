@@ -8,8 +8,8 @@
         <vs-divider style="padding: 4px;"></vs-divider>
 
         <div id="catalogue-options">
-          <vs-input class="search-input" type="search" placeholder="Enter a listing..." name="searchbarUser" v-model="searchbarListings" style="width: 400px; font-size: 24px" size="medium"/>
-          <vs-button class="header-button" @click="searchListings">Search</vs-button>
+          <vs-input class="search-input" type="search" placeholder="Enter a listing..." name="searchbarUser" v-model="productQuery" style="width: 400px; font-size: 24px" size="medium"/>
+          <vs-button class="header-button" @click="filterListings">Search</vs-button>
 
         </div>
 
@@ -153,14 +153,14 @@ const SearchListings = {
       addressQuery: null,
       sortBy: null,
       businessTypes: null,
-      minPrice: null,
-      maxPrice: null,
+      minPrice: 10.0,
+      maxPrice: 20.0,
       minClosingDate: null,
       maxClosingDate: null,
 
       numListings: 10,
       pageNum: 0,
-      sortDirection: "asc"
+      sortDirection: "desc"
     };
   },
 
