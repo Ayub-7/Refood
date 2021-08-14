@@ -434,9 +434,4 @@ export default {
                           minPrice, maxPrice, minClosingDate, maxClosingDate, count, offset, sortDirection) =>
         instance.post('/businesses/listings', {businessQuery, productQuery, addressQuery, sortBy, businessTypes, minPrice, maxPrice, minClosingDate, maxClosingDate},
             {params: {count: count, offset: offset, sortDirection: sortDirection}}, { withCredentials: true }),
-
-
-    searchListings: async(query, count, offset) =>
-        instance.get('/businesses/listings', {params: {query: query, count: count, offset: offset}},{ withCredentials: true })
-
 }
