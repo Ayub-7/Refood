@@ -32,7 +32,7 @@ public class Listing {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date closes;
 
-    @Formula("select count(*) from LISTING_LIKE l where l.listing_id = id")
+    @Formula("select count(*) from listing_like l where l.listing_id = id")
     private int likes; // Will not appear as a column
 
     /**
