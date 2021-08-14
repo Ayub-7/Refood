@@ -124,6 +124,7 @@ const SearchListings = {
   components: {ReImage},
   data: function() {
     return {
+      user: null,
       listings: [],
       searchbarListings: "",
       businessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
@@ -165,8 +166,9 @@ const SearchListings = {
   mounted() {
     api.checkSession()
       .then((response) => {
-        this.userId = response.data.id;
+        this.user = response.data
         this.filterListings();
+        this.setCurrency(this.user.homeAddress.country)
       }).catch((err) => {
       throw new Error(`Error trying to get user id: ${err}`);
     })
