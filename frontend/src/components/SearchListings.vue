@@ -349,7 +349,7 @@ div#filter-box {
 
 .con-select, .filter-input {
   width: auto;
-  margin-right: 30px;
+  margin-right: 15px;
   clear: both;
 }
 
@@ -392,10 +392,6 @@ div#search-parameters {
 
 .filter-label {
   color: white;
-}
-
-.filter-input {
-  width: 200px !important;
 }
 
 .price-input {
