@@ -17,6 +17,7 @@ import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -198,15 +199,63 @@ public class BusinessController {
     }
 
     /**
+     *
+     * @param sortString
+     * @return
+     * @throws ResponseStatusException
+     */
+    private Sort getSortType(String sortString) throws ResponseStatusException {
+        Sort sortBy = Sort.by(Sort.Order.asc("id").ignoreCase());
+        switch (sortString) {
+            case "id":
+                break;
+            case "nameAsc":
+                sortBy = Sort.by(Sort.Order.asc("name").ignoreCase()).and(sortBy);
+                break;
+            case "businessTypeAsc":
+                sortBy = Sort.by(Sort.Order.asc("businessType").ignoreCase()).and(sortBy);
+                break;
+            case "cityAsc":
+                sortBy = Sort.by(Sort.Order.asc("address.city").ignoreCase()).and(sortBy);
+                break;
+            case "countryAsc":
+                sortBy = Sort.by(Sort.Order.asc("address.country").ignoreCase()).and(sortBy);
+                break;
+            case "nameDesc":
+                sortBy = Sort.by(Sort.Order.desc("name").ignoreCase()).and(sortBy);
+                break;
+            case "businessTypeDesc":
+                sortBy = Sort.by(Sort.Order.desc("businessType").ignoreCase()).and(sortBy);
+                break;
+            case "cityDesc":
+                sortBy = Sort.by(Sort.Order.desc("address.city").ignoreCase()).and(sortBy);
+                break;
+            case "countryDesc":
+                sortBy = Sort.by(Sort.Order.desc("address.country").ignoreCase()).and(sortBy);
+                break;
+            default:
+                logger.error("400 error - invalid sort by parameter {}", sortString);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid sortString");
+        }
+        return sortBy;
+    }
+
+    /**
      * Searches for businesses, with credintials
      * @param query A string with the search's query
      * @param type Type of business
      * @return Http status code and list of businesses with name/names matching request.
      */
     @GetMapping("/businesses/search")
-    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, @RequestParam(name="page") int page, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, @RequestParam(name="page") int page,  @RequestParam(defaultValue="id") String sortString, HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        Sort sortType;
+        try {
+            sortType = getSortType(sortString);
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err.getMessage());
+        }
+        PageRequest pageRequest = PageRequest.of(page, 10, sortType);
         Specification<Business> matches;
         try {
             matches = businessFinder.findBusinesses(query, type);
