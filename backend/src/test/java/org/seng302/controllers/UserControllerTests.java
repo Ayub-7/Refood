@@ -68,12 +68,26 @@ class UserControllerTests {
     private ObjectMapper mapper;
 
     User user;
+    List<User> users;
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         user = new User("John", "Smith", addr, "johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
-
+        users = new ArrayList<User>();
+        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
+        User user1 = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        User user2 = new User("Jennifer", "Riley", "Smith", "Jenny",
+                "Likes long walks on the beach", "jenthar95@gmail.com",
+                "1995-05-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        User user3 = new User("Oliver", "Alfred", "Smith", "Ollie",
+                "Likes long walks on the beach", "ollie69@gmail.com",
+                "1969-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        users.add(user1);
+        users.add(user2);
+        users.add(user3);
     }
 
     @Test
@@ -261,27 +275,37 @@ class UserControllerTests {
     @Test
     @WithMockUser(roles="USER")
     void testGoodUserSearch() throws Exception {
-        List<User> users = new ArrayList<User>();
-        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
-        User user1 = new User("John", "Hector", "Smith", "Jonny",
-                "Likes long walks on the beach", "johnsmith99@gmail.com",
-                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        User user2 = new User("Jennifer", "Riley", "Smith", "Jenny",
-                "Likes long walks on the beach", "jenthar95@gmail.com",
-                "1995-05-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        User user3 = new User("Oliver", "Alfred", "Smith", "Ollie",
-                "Likes long walks on the beach", "ollie69@gmail.com",
-                "1969-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        users.add(user1);
-        users.add(user2);
-        users.add(user3);
-        Mockito.when(userRepository.findAll()).thenReturn(users);
+        Mockito.when(userRepository.findAll()).thenReturn(this.users);
         MvcResult results = mockMvc.perform(get("/users/search")
                 .param("searchQuery", "Smith")
                 .param("pageNum", String.valueOf(0)))
                 .andReturn();
         assert results.getResponse().getStatus() == HttpStatus.OK.value();
 
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testGoodUserSearchWithSortString() throws Exception {
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+        MvcResult results = mockMvc.perform(get("/users/search")
+                .param("searchQuery", "Smith")
+                .param("pageNum", String.valueOf(0))
+                .param("sortString", "emailDesc"))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testUserSearchWithBadSortString() throws Exception {
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+        MvcResult results = mockMvc.perform(get("/users/search")
+                .param("searchQuery", "Smith")
+                .param("pageNum", String.valueOf(0))
+                .param("sortString", "badSortString"))
+                .andReturn();
+        assert results.getResponse().getStatus() == HttpStatus.BAD_REQUEST.value();
     }
 
     @Test

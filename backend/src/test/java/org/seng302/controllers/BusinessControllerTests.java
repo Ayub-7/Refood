@@ -365,10 +365,9 @@ class BusinessControllerTests {
 
     @Test
     void testNoSessionBusinessSearch() throws Exception {
-        MvcResult results = mvc.perform(get("/businesses/search")
+        mvc.perform(get("/businesses/search")
                 .param("query", "Pizza"))
-                .andReturn();
-        assert results.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -383,9 +382,43 @@ class BusinessControllerTests {
         businessList.add(business);
         Mockito.when(businessRepository.findAll()).thenReturn(businessList);
 
-        MvcResult results = mvc.perform(get("/businesses/search")
+        mvc.perform(get("/businesses/search")
                 .params(requestParams))
-                .andReturn();
-        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testSuccessfulBusinessSearchWithSortParameter() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("type", "");
+        requestParams.add("page", "0");
+        requestParams.add("sortString", "countryDesc");
+
+        List<Business> businessList = new ArrayList<Business>();
+        businessList.add(business);
+        Mockito.when(businessRepository.findAll()).thenReturn(businessList);
+
+        mvc.perform(get("/businesses/search")
+                .params(requestParams))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testBusinessSearchWithBadSortParameter() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("type", "");
+        requestParams.add("page", "0");
+        requestParams.add("sortString", "badSortString");
+
+        List<Business> businessList = new ArrayList<Business>();
+        businessList.add(business);
+
+        mvc.perform(get("/businesses/search")
+                .params(requestParams))
+                .andExpect(status().isBadRequest());
     }
 }

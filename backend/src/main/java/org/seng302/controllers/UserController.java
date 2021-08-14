@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
-import org.seng302.models.Message;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -212,6 +211,12 @@ public class UserController {
         return diff >= 13;
     }
 
+    /**
+     * Creates a sort object to be used by pageRequest to sort search results.
+     * @param sortString
+     * @return Sort sortBy Sort specification
+     * @throws ResponseStatusException
+     */
     private Sort getSortType(String sortString) throws ResponseStatusException {
         Sort sortBy = Sort.by(Sort.Order.asc("email").ignoreCase());
         switch (sortString) {

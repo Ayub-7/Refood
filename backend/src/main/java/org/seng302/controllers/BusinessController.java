@@ -199,9 +199,9 @@ public class BusinessController {
     }
 
     /**
-     *
+     * Creates a sort object to be used by pageRequest to sort search results.
      * @param sortString
-     * @return
+     * @return Sort sortBy Sort specification
      * @throws ResponseStatusException
      */
     private Sort getSortType(String sortString) throws ResponseStatusException {
