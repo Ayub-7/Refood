@@ -33,8 +33,31 @@
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container">
-          <h3>Watchlist:</h3>
+          <div style="margin-top: 1px; margin-left: -20px" class="message-detail-container message">
+            <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
+            <div id="message-detail-message">
+              watchlist
+            </div>
+            {{likes}}
+          </div>
+          <vs-divider style="margin-top: -30px"></vs-divider>
+          <div v-for="item in likedItem" :key="item.id" >
+            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
+              <div id="likes-notification-container">
+                <div v-if="item.likes != 0">
+                  <vs-icon id="like-icon" icon="favorite" class="msg-icon" @click="unlike(item.id); item.likes = 0"></vs-icon>
+                </div>
+                <div v-else>
+                  <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon"></vs-icon>
+                </div>
+                <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                <div id="product-seller"><b>Seller: </b>{{item.inventoryItem.product.business.name}}</div>
+                <div id="product-closes"><b>Closes: </b>{{item.closes}}</div>
+              </div>
+            </vs-card>
+          </div>
         </div>
+
 
       </div>
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
@@ -57,6 +80,9 @@
         This user has no active cards on the marketplace right now.
       </div>
     </vs-popup>
+    <vs-popup title="Listing Details" :active.sync="showListing" id="listing-card-modal">
+      <listing-detail></listing-detail>
+    </vs-popup>
   </div>
 </template>
 
@@ -65,12 +91,17 @@ import api from "../Api";
 import {mutations, store} from "../store"
 import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
+import ListingDetail from "./ListingDetail";
 
 const Homepage = {
   name: "Homepage",
-  components: {HomePageMessages, MarketplaceGrid},
+  components: {ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
+      unliked: false,
+      showListing: false,
+      likes: 0,
+      likedItem: [],
       userId: null,
       businesses: [],
       actingAsBusinessId: null,
@@ -81,8 +112,58 @@ const Homepage = {
       user: null,
     }
   },
+  /**
+   * Sets the userId variable equal to the userId from the store when the component
+   * is first rendered, then gets the users details from the backend using the API
+   */
+  mounted() {
+    this.checkUserSession();
+    this.getLikes(this.userId);
+  },
 
   methods: {
+    /**
+     * open listing
+     */
+    openListing: function () {
+      this.showListing = true;
+      console.log(this.showListing)
+    },
+
+    /**
+     * unlike an item
+     */
+    unlike: function (id) {
+      api.unlikeListing(id)
+      .then(() => {
+        this.$vs.notify({title: "Successfully unliked listing", color: "success"});
+        this.likes -= 1;
+      })
+      .catch((error) => {
+        if (error.response) {
+          this.$vs.notify({title: "Error unliking listing", color: "danger"});
+        }
+        this.$log.debug(error);
+      })
+
+    },
+    /**
+     * Retrieves all the cards that the user has liked.
+     */
+    getLikes: function (userId) {
+      api.getLikedListings(userId)
+        .then((res) => {
+          this.likedItem = res.data;
+          this.likes = res.data.length;
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving likes", color: "danger"});
+          }
+          this.$log.debug(error);
+        })
+    },
+
     /**
      * Retrieves all the cards that the user has created.
      */
@@ -243,22 +324,32 @@ const Homepage = {
           });
     }
   },
-
-  /**
-   * Sets the userId variable equal to the userId from the store when the component
-   * is first rendered, then gets the users details from the backend using the API
-   */
-  mounted: function () {
-    this.checkUserSession();
-  }
-
-
 }
 
 export default Homepage;
 </script>
 
 <style scoped>
+#product-name {
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+#product-closes {
+  font-size: 12px;
+}
+
+#like-icon {
+  font-size: 13px;
+  margin-left: 150px;
+  cursor: pointer
+}
+
+#unlike-icon {
+  font-size: 13px;
+  margin-left: 150px;
+  cursor: pointer
+}
 
 #market-card-modal >>> .vs-popup {
   width: 1200px;
