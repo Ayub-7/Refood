@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -115,7 +114,8 @@ public class ListingController {
     public ResponseEntity<String> getAllListings(@RequestBody BusinessListingSearchRequest request,
                                                  @RequestParam("count") int count,
                                                  @RequestParam("offset") int offset,
-                                                 @RequestParam("sortDirection") String sortDirection) throws JsonProcessingException {
+                                                 @RequestParam("sortDirection") String sortDirection,
+                                                 HttpSession session) throws JsonProcessingException {
         Sort sort;
         String sortBy = request.getSortBy();
         // Sort category
@@ -159,7 +159,7 @@ public class ListingController {
         Pageable pageRange = PageRequest.of(offset, count, sort);
 
         Specification<Listing> specs = where(specifications.hasPriceSet()).and(specifications.hasClosingDateSet());
-        if (request.getBusinessQuery().length() > 0) {
+        if (request.getBusinessQuery() != null && request.getBusinessQuery().length() > 0) {
             specs = specs.and(listingFinder.findListing(request.getBusinessQuery()));
         }
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
@@ -170,27 +170,6 @@ public class ListingController {
 
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }
-
-//    /**
-//     * GET endpoint that retrieves businesses' listings by a search query.
-//     * @param query A string with the search's query
-//     * @param count how many results will show per page.
-//     * @param offset how many PAGES (not results) to skip before returning the results.
-//     * @param session current user session.
-//     * @return Response with the JSONified list of the businesses' listings
-//     * @throws JsonProcessingException
-//     */
-//    @GetMapping("/businesses/listings")
-//    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
-//                                              @RequestParam("count") int count,
-//                                              @RequestParam("page") int offset,
-//                                              HttpSession session) throws JsonProcessingException {
-//        logger.debug("Searching for Listings...");
-//        Specification<Listing> specification = listingFinder.findListing(query);
-//        Pageable pageRange = PageRequest.of(offset, count);
-//        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
-//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
-//    }
 
 
     /**
