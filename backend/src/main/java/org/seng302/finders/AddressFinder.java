@@ -24,57 +24,64 @@ public class AddressFinder {
      */
     private ArrayList<String> searchQueryKeywords(String query) {
         ArrayList<String> terms = new ArrayList<>();
-        Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
+        var matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
         while (matcher.find()) {
-            var temp = matcher.group().replace("\"", "");
-            temp = temp.replace(" ", "");
+            boolean fullMatch = matcher.group().trim().startsWith("\"") && matcher.group().trim().endsWith("\"");
+
+            String temp;
+            if(!fullMatch) { //If not inside quotes
+                temp = matcher.group().replace("\"", "").trim();
+            } else {
+                temp = matcher.group().trim().replace("\"", ""); //need to trim beforehand as spaces are needed
+            }
+
             terms.add(temp);
         }
+
         return terms;
     }
 
     /**
-     * Gets specification objects if their name matches query
-     * @param name name of product, used to find all instances of
+     * Gets specification object to search a field with a term
+     * @param term term that is going to be search
+     * @param field field in entity that is going to be search
      * @return Specification<Product> containing matches for name
      */
-    private Specification<Listing> countryContains(String term) {
-        return (root, query, criteriaBuilder)
-        -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("country")), "%"+term.toLowerCase()+"%");
-    }
 
-    private Specification<Listing> suburbContains(String term) {
+    private Specification<Listing> containsTerm(String term, String field) {
       return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("suburb")), "%"+term.toLowerCase()+"%");
-    }
-
-    private Specification<Listing> cityContains(String term) {
-      return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("city")), "%"+term.toLowerCase()+"%");
-    }
-
-    private Specification<Listing> regionContains(String term) {
-      return (root, query, criteriaBuilder)
-            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get("region")), "%"+term.toLowerCase()+"%");
+            -> criteriaBuilder.like(criteriaBuilder.lower(root.get("inventoryItem").get("product").get("business").get("address").get(field)), "%"+term.toLowerCase()+"%");
     }
 
 
+    /**
+     * Builds query using term, goes through each field and checks if the term is inside
+     * @param term term that is going to be check
+     * @return Specification containing matches for that query
+     */
     private Specification<Listing> buildQuery(String term) {
-        Specification<Listing> newSpec = countryContains(term);
-        newSpec = newSpec.or(suburbContains(term));
-        newSpec = newSpec.or(cityContains(term));
-        newSpec = newSpec.or(regionContains(term));
+        Specification<Listing> newSpec = containsTerm(term, "country");
+        newSpec = newSpec.or(containsTerm(term, "suburb"));
+        newSpec = newSpec.or(containsTerm(term, "city"));
+        newSpec = newSpec.or(containsTerm(term, "region"));
 
         return newSpec;
     }
 
-    private Specification<Listing> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
+    /**
+     * Builds query for next term then computes AND/OR depending on what predicate is given
+     * @param currentSpecification existing specification that is going to be extended with more terms
+     * @param nextTerm term that is going to be added to specification
+     * @param predicate OR/AND terms used to compute correct predicate
+     * @return Specification with full query of the next term
+     */
+    private Specification<Listing> checkFields(Specification<Listing> currentSpecification, String nextTerm, Logic predicate) {
         Specification<Listing> newSpec = buildQuery(nextTerm);
 
         if(predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {
-             currentSpecification = currentSpecification.or(newSpec);
+            currentSpecification = currentSpecification.or(newSpec);
         }
         return currentSpecification;
     }
@@ -123,7 +130,6 @@ public class AddressFinder {
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
     public Specification<Listing> findAddress(String query) {
-        Specification<Listing> matches = buildAddressSpec(query);
-        return matches;
+        return buildAddressSpec(query);
     }
 }
