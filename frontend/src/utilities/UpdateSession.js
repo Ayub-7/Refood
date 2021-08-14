@@ -7,6 +7,11 @@ import { mutations } from '../store';
  */
 function updateSessionOnRouterChange(router) {
     router.beforeEach((to, from, next) => {
+        //Clears values when leaving from business page (so it doesn't stay when you come back to business page)
+        if(from.path.includes('/businesses/') && !from.path.includes('/listings/')) {
+            sessionStorage.removeItem("previousListing")
+            sessionStorage.removeItem("businessesCache")
+        }
         api.checkSession()
         .then((response) => {
           if(response.data.id != null && (to.path != '/' && to.path != '/register' && to.name != 'catchAll')){ //If logged in

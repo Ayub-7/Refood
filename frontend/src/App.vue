@@ -161,6 +161,10 @@ const app = {
       if (sessionStorage.getItem('businessesCache') !== null) {
         sessionStorage.removeItem("businessesCache");
       }
+
+      if (sessionStorage.getItem("previousListing") !== null) {
+        sessionStorage.removeItem("previousListing");
+      }
     }
   },
 
