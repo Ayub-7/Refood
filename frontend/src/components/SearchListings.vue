@@ -411,6 +411,25 @@ div#search-parameters {
 }
 
 @media screen and (max-width: 900px) {
+  /* Mobile view for filters*/
+
+  .parameter {
+    width: 100%;
+  }
+
+  #filter-box {
+    display: block !important;
+  }
+
+  #search-parameters {
+    width: 100% !important;
+  }
+
+  #sort-container {
+    width: auto;
+    display: block;
+  }
+
   #catalogue-options {
     flex-direction: column;
   }
