@@ -27,7 +27,7 @@ public class ListingLike {
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private User user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "listing_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Listing listing;
 
