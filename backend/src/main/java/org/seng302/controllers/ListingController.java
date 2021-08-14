@@ -45,9 +45,6 @@ import static org.springframework.data.jpa.domain.Specification.where;
 public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
-
-    private final ObjectMapper mapper = new ObjectMapper();
-
     @Autowired
     private BusinessRepository businessRepository;
 
