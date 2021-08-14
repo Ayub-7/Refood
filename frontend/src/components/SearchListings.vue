@@ -23,7 +23,7 @@
                 <h3 class="filter-label">
                   Business Type:
                 </h3>
-                <vs-select v-model="businessType" class="form-control">
+                <vs-select v-model="selectedTypes" multiple class="form-control">
                   <vs-select-item :key="business" :value="business" :text="business" v-for="business in businessTypes"></vs-select-item>
                 </vs-select>
                 </div>
@@ -55,12 +55,12 @@
                 <h3 class="filter-label">
                   Min Closing Date:
                 </h3>
-                <vs-input class="filter-input" v-model="minClosingDate" type="date" style="font-size: 24px"/>
+                <vs-input class="filter-input" v-model="minClosingDate" type="datetime-local" style="font-size: 24px"/>
               </div>
                 <div class="vert-row">
                   <h3 class="filter-label">Max Closing Date:
                   </h3>
-                  <vs-input class="filter-input" v-model="maxClosingDate" type="date"  style="font-size: 24px"/>
+                  <vs-input class="filter-input" v-model="maxClosingDate" type="datetime-local"  style="font-size: 24px"/>
                 </div>
             </div>
             </div>
@@ -148,9 +148,10 @@ const SearchListings = {
       productQuery: null,
       addressQuery: null,
       businessType: null,
-      sortBy: null,
+      sortBy: "closes",
       minPrice: 10.0,
       maxPrice: 20.0,
+      selectedTypes: [],
       minClosingDate: null,
       maxClosingDate: null,
 
@@ -187,6 +188,8 @@ const SearchListings = {
     },
 
     filterListings: function(){
+      console.log(this.minClosingDate)
+      console.log(this.maxClosingDate)
       api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessType, this.minPrice, this.maxPrice,
       this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
       .then((response) => {
@@ -290,6 +293,10 @@ export default SearchListings;
   display: flex;
   justify-content: space-between;
   padding: 0;
+}
+
+i.vs-icon.notranslate.icon-scale.icon-item.vs-select--item-icon.material-icons.null {
+  font-size: 17px;
 }
 
 .grid-item >>> footer {
