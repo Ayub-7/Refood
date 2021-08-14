@@ -23,15 +23,15 @@
                 <h3 class="filter-label">
                   Business Type:
                 </h3>
-                <vs-select v-model="businessTypes" multiple >
-                  <vs-select-item :key="item.value" :value="item.value" :text="item.text" v-for="item in businessTypes">Please select one</vs-select-item>
+                <vs-select v-model="businessType" class="form-control">
+                  <vs-select-item :key="business" :value="business" :text="business" v-for="business in businessTypes"></vs-select-item>
                 </vs-select>
                 </div>
                 <div class="vert-row">
                 <h3 class="filter-label">
                   Business Name:
                 </h3>
-                <vs-input class="filter-input" v-model="businessQuery" type="search" placeholder="Business name.." style="width: 400px; font-size: 24px" size="medium"/>
+                <vs-input class="filter-input" v-model="businessQuery" type="search" placeholder="Business name.." style="font-size: 24px" size="medium"/>
               </div>
               </div>
               <div class="parameter" id="listings">
@@ -39,14 +39,14 @@
                   <h3 class="filter-label">
                     Location:
                   </h3>
-                  <vs-input class="filter-input" v-model="addressQuery" type="search" placeholder="Address.." style="width: 400px; font-size: 24px" size="medium"/>
+                  <vs-input class="filter-input" v-model="addressQuery" type="search" placeholder="Address.." style="font-size: 24px" size="medium"/>
                 </div>
               <div class="vert-row">
                 <h3 class="filter-label">
                   Price range:
                 </h3>
-                <vs-input class="price-input" v-model="minPrice" type="search" placeholder="Min" style="width: 400px; font-size: 24px" size="medium"/>
-                <vs-input class="price-input" v-model="maxPrice" type="search" placeholder="Max"  style="width: 400px; font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="minPrice" type="search" placeholder="Min" style="font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="maxPrice" type="search" placeholder="Max"  style="font-size: 24px" size="medium"/>
               </div>
               </div>
 
@@ -55,12 +55,12 @@
                 <h3 class="filter-label">
                   Min Closing Date:
                 </h3>
-                <vs-input class="filter-input" v-model="minClosingDate" type="date" style="width: 400px; font-size: 24px"/>
+                <vs-input class="filter-input" v-model="minClosingDate" type="date" style="font-size: 24px"/>
               </div>
                 <div class="vert-row">
                   <h3 class="filter-label">Max Closing Date:
                   </h3>
-                  <vs-input class="filter-input" v-model="maxClosingDate" type="date"  style="width: 400px; font-size: 24px"/>
+                  <vs-input class="filter-input" v-model="maxClosingDate" type="date"  style="font-size: 24px"/>
                 </div>
             </div>
             </div>
@@ -126,8 +126,7 @@ const SearchListings = {
     return {
       listings: [],
       searchbarListings: "",
-      businessType: "",
-      businessTypes: [],
+      businessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
       errors: [],
       toggle: [1,1,1,1,1],
       filteredListings: [],
@@ -148,6 +147,7 @@ const SearchListings = {
       businessQuery: null,
       productQuery: null,
       addressQuery: null,
+      businessType: null,
       sortBy: null,
       minPrice: 10.0,
       maxPrice: 20.0,
@@ -187,7 +187,7 @@ const SearchListings = {
     },
 
     filterListings: function(){
-      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
+      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessType, this.minPrice, this.maxPrice,
       this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
       .then((response) => {
         console.log(response.data)
@@ -345,6 +345,16 @@ th {
 div#filter-box {
   display: flex;
   border-radius: 10px;
+}
+
+.con-select, .filter-input {
+  width: auto;
+  margin-right: 30px;
+  clear: both;
+}
+
+#sort-container .con-select {
+  margin-right: 0px;
 }
 
 #search-parameter {
