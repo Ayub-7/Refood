@@ -160,7 +160,12 @@ public class ListingController {
 
         Specification<Listing> specs = where(specifications.hasPriceSet()).and(specifications.hasClosingDateSet());
         if (request.getBusinessQuery() != null && request.getBusinessQuery().length() > 0) {
-            specs = specs.and(listingFinder.findListing(request.getBusinessQuery()));
+            specs = specs.and(listingFinder.findListing(request.getBusinessQuery(), "seller"));
+        }
+        if (request.getBusinessTypes() != null && !request.getBusinessTypes().isEmpty()) {
+            for (BusinessType type : request.getBusinessTypes()) {
+                specs = specs.and(listingFinder.findListing(type.toString(), "types"));
+            }
         }
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
             specs = specs.and(productFinder.findProduct(request.getProductQuery()));
