@@ -23,12 +23,8 @@
                 <h3 class="filter-label">
                   Business Type:
                 </h3>
-                <vs-select v-model="businessTypes" multiple>
-                  <option disabled value="">Select types</option>
-                  <option value="name">listings Name</option>
-                  <option value="country">Country</option>
-                  <option value="recommendedRetailPrice">Recommended Retail Price</option>
-                  <option value="expiryDate">Expiry Date</option>
+                <vs-select v-model="businessTypes" multiple >
+                  <vs-select-item :key="item.value" :value="item.value" :text="item.text" v-for="item in businessTypes">Please select one</vs-select-item>
                 </vs-select>
                 </div>
                 <div class="vert-row">
@@ -40,11 +36,11 @@
               </div>
               <div class="parameter" id="listings">
                 <div class="vert-row">
-                <h3 class="filter-label">
-                  Product Name:
-                </h3>
-                <vs-input class="filter-input" v-model="productQuery" type="search" placeholder="Product name.."  style="width: 400px; font-size: 24px" size="medium"/>
-              </div>
+                  <h3 class="filter-label">
+                    Location:
+                  </h3>
+                  <vs-input class="filter-input" v-model="addressQuery" type="search" placeholder="Address.." style="width: 400px; font-size: 24px" size="medium"/>
+                </div>
               <div class="vert-row">
                 <h3 class="filter-label">
                   Price range:
@@ -55,12 +51,6 @@
               </div>
 
               <div class="parameter" id="address-closing-date">
-                <div class="vert-row">
-                <h3 class="filter-label">
-                  Location:
-                </h3>
-                <vs-input class="filter-input" v-model="addressQuery" type="search" placeholder="Address.." style="width: 400px; font-size: 24px" size="medium"/>
-              </div>
                 <div class="vert-row">
                 <h3 class="filter-label">
                   Min Closing Date:
@@ -79,22 +69,12 @@
               <div>
                 <h3 class="filter-label" style="margin: auto; padding-right: 4px;">Sort By </h3>
                 <div>
-                <vs-select v-model="sortBy" autocomplete class="form-control">
-                  <vs-select-item disabled value="">Please select one</vs-select-item>
-                  <vs-select-item value="price">Price</vs-select-item>
-                  <vs-select-item value="closes">Closing Date</vs-select-item>
-                  <vs-select-item value="created">Created Date</vs-select-item>
-                  <vs-select-item value="city">City</vs-select-item>
-                  <vs-select-item value="country">Country</vs-select-item>
-                  <vs-select-item value="businessType">Business Type</vs-select-item>
-                  <vs-select-item value="name">Product Name</vs-select-item>
-                  <vs-select-item value="quantity">Quantity</vs-select-item>
-                  <vs-select-item value="manufacturer">Manufacturer</vs-select-item>
-                  <vs-select-item value="seller">Seller</vs-select-item>
+                <vs-select v-model="sortBy" autocomplete class="form-control" style="margin-bottom: 10px;">
+                  <vs-select-item :key="item.value" :value="item.value" :text="item.text" v-for="item in sortOptions">Please select one</vs-select-item>
                 </vs-select>
                   <vs-select v-model="sortDirection">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
+                    <vs-select-item key="asc" value="asc" text="Ascending"></vs-select-item>
+                    <vs-select-item key="desc" value="desc" text="Descending"></vs-select-item>
                 </vs-select>
                 <vs-button class="sort-btn" @click="filterListings" style="width: 100px">Sort</vs-button>
                 </div>
@@ -142,17 +122,28 @@ const SearchListings = {
       listings: [],
       searchbarListings: "",
       businessType: "",
+      businessTypes: [],
       errors: [],
       toggle: [1,1,1,1,1],
       filteredListings: [],
       currencySymbol: "",
       selected: "",
-
+      sortOptions:[
+        {text: 'Price', value: "price"},
+        {text: 'Closing Date', value: "closes"},
+        {text: 'Created Date', value: "created"},
+        {text: 'City', value: "city"},
+        {text: 'Country', value: "country"},
+        {text: 'Business Type', value: "businessType"},
+        {text: 'Product Name', value: "name"},
+        {text: 'Quantity', value: "quantity"},
+        {text: 'Manufacturer', value: "manufacturer"},
+        {text: 'Seller', value: "seller"},
+      ],
       businessQuery: null,
       productQuery: null,
       addressQuery: null,
       sortBy: null,
-      businessTypes: null,
       minPrice: 10.0,
       maxPrice: 20.0,
       minClosingDate: null,
@@ -161,7 +152,7 @@ const SearchListings = {
       numListings: 10,
       pageNum: 0,
       sortDirection: "desc"
-    };
+    }
   },
 
   mounted() {
@@ -193,6 +184,7 @@ const SearchListings = {
       api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
       this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum, this.sortDirection)
       .then((response) => {
+        console.log(response.data)
         this.listings = response.data.content
         console.log(this.listings)
       })
@@ -340,8 +332,7 @@ th {
 }
 
 #sort-container {
-  width: 12%;
-  float: right;
+  width: auto;
 }
 
 div#filter-box {
