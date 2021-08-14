@@ -106,6 +106,11 @@
             </div>
           </div>
         </div>
+    <div class="title-container">
+      <div class="title-centre">
+        <vs-pagination v-model="pageNum" :total="totalPages" @change="filterListings"/>
+      </div>
+    </div>
   </vs-card>
 </template>
 
@@ -150,7 +155,8 @@ const SearchListings = {
       maxClosingDate: null,
 
       numListings: 10,
-      pageNum: 0,
+      pageNum: 1,
+      totalPages: 0,
       sortDirection: "desc"
     }
   },
@@ -182,11 +188,12 @@ const SearchListings = {
 
     filterListings: function(){
       api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
-      this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum, this.sortDirection)
+      this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
       .then((response) => {
         console.log(response.data)
         this.listings = response.data.content
         console.log(this.listings)
+        this.totalPages = response.data.totalPages;
       })
       .catch((error) => {
         console.log(error)
