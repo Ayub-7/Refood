@@ -149,6 +149,9 @@ public class ListingController {
         Pageable pageRange = PageRequest.of(offset, count, sort);
 
         Specification<Listing> specs = where(specifications.hasPriceSet()).and(specifications.hasClosingDateSet());
+        if (request.getBusinessQuery().length() > 0) {
+            specs = specs.and(listingFinder.findListing(request.getBusinessQuery()));
+        }
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
             specs = specs.and(productFinder.findProduct(request.getProductQuery()));
         }
