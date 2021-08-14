@@ -1,10 +1,10 @@
 <template>
   <div class="main" id="body">
     <div id="search">
-      <vs-input v-on:keyup.enter="searchUsers(1)"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers(1)">Search</vs-button>
-      <vs-input v-on:keyup.enter="searchBusiness(1)" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness(1)">Search</vs-button>
+      <vs-input v-on:keyup.enter="clearSort(), searchUsers(1)"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchUser" size="large" type="border" @click="clearSort(), searchUsers(1)">Search</vs-button>
+      <vs-input v-on:keyup.enter="clearSort(), searchBusiness(1)" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchBusiness" size="large" type="border" @click="clearSort(), searchBusiness(1)">Search</vs-button>
 
       <vs-select
           width="10%"
@@ -21,6 +21,15 @@
     <vs-divider style="padding: 0 1em 1em"></vs-divider>
 
     <div v-if="users.length" class="data-table">
+      <div class="title-left" >
+        <vs-select class="selectExample" v-model="selectSortBy">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy"/>
+        </vs-select>
+        <vs-select id="AscendingOrDescendingDropbox" class="selectAscOrDesc" v-model="ascending">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsAscending"/>
+        </vs-select>
+        <vs-button @click="searchUsers(1);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+      </div>
       <vs-table :data="this.users">
         <template slot="thead" id="usersTableHeader">
           <vs-th sort-key="firstName" style="border-radius: 4px 0 0 0;">
@@ -51,11 +60,11 @@
           <vs-tr :key="indextr" v-for="(tr, indextr) in data" class="data-row">
             <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
             <vs-td :data="data[indextr].lastName">{{data[indextr].lastName}}</vs-td>
-            <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
-            <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].country}`}}</vs-td>
+            <vs-td :data="data[indextr].city">{{`${data[indextr].homeAddress.city}`}}</vs-td>
+            <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].homeAddress.country}`}}</vs-td>
             <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
             <vs-td>
-              <vs-button id="goToProfileButton" @click="goToUserProfile(data[indextr].id)">Go to profile</vs-button>
+              <vs-button class="goToProfileButton" @click="goToUserProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
             <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
             <vs-td v-if="isDGAA" class="dgaaCheckbox">
@@ -78,6 +87,15 @@
 
     <!-- === BUSINESS TABLE === -->
     <div v-if="businesses.length" class="data-table">
+      <div class="title-left" >
+        <vs-select class="selectExample" v-model="selectSortBy">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in businessOptionsSortBy"/>
+        </vs-select>
+        <vs-select id="AscendingOrDescendingDropbox" class="selectAscOrDesc" v-model="ascending">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsAscending"/>
+        </vs-select>
+        <vs-button @click="searchBusiness(1);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+      </div>
       <vs-table :data="this.businesses">
         <template slot="thead" id="businessesTableHeader">
           <vs-th sort-key="name" style="border-radius: 4px 0 0 0;">
@@ -104,7 +122,7 @@
             <vs-td :data="data[indextr].address.city" v-if="mobileMode==false">{{data[indextr].address.city}}</vs-td>
             <vs-td :data="data[indextr].address.country" v-if="mobileMode==false">{{data[indextr].address.country}}</vs-td>
             <vs-td>
-              <vs-button id="goToProfileButton" @click="goToBusinessProfile(data[indextr].id)">Go to profile</vs-button>
+              <vs-button class="goToProfileButton" @click="goToBusinessProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
           </vs-tr>
         </template>
@@ -138,6 +156,24 @@ const Search = {
       businessType: null,
       tableLoaded: false,
       searchbarUser: "",
+      optionsSortBy: [
+        {text:'First Name',value:'firstName'},
+        {text:'Last Name',value:'lastName'},
+        {text:'City',value:'city'},
+        {text:'Country',value:'country'},
+        {text:'Email',value:'email'}
+      ],
+      businessOptionsSortBy: [
+        {text:'Name',value:'name'},
+        {text:'City',value:'city'},
+        {text:'Country',value:'country'},
+      ],
+      optionsAscending: [
+      {text: "Alphabetical Order", value:"Asc"},
+      {text: "Alphabetical Reverse", value:"Desc"},
+      ],
+      selectSortBy: null,
+      ascending: null,
       sortString: null,
       searchbarBusiness: "",
       mobileMode: false,
@@ -186,6 +222,11 @@ const Search = {
 
 
   methods: {
+
+    clearSort: function() {
+      this.ascending = null;
+      this.selectSortBy = null;
+    },
 
     /**
      * If page reaches certain width set mobile mode on, this removes columns from the table to ensure it fits on the page
@@ -279,6 +320,11 @@ const Search = {
         }
       }
       if (this.searchbarUser === "") return;
+      if (this.selectSortBy && this.ascending) {
+        this.sortString = this.selectSortBy + this.ascending;
+      } else {
+        this.sortString = null;
+      }
       this.$vs.loading();
       api.searchUsersQuery(this.searchbarUser, page - 1, this.sortString)
               .then((response) => {
@@ -288,6 +334,7 @@ const Search = {
                 this.totalPages = response.data.totalPages;
                 this.searchIndexMin = response.data.number * 10 + 1;
                 this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
+                console.log(this.users)
                 this.$vs.loading.close();
               })
               .catch((error) => {
@@ -296,8 +343,6 @@ const Search = {
               })
               .finally(() => {
                 if (!this.tableLoaded) {
-                  // document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
-
                   //Event listeners for vuesax buttons on table since they're generated afterwards
                   this.tableLoaded = true;
                 }
@@ -314,7 +359,12 @@ const Search = {
       if (!this.businessType) {
         this.businessType = "";
       }
-      api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType, page-1)
+      if (this.selectSortBy && this.ascending) {
+        this.sortString = this.selectSortBy + this.ascending;
+      } else {
+        this.sortString = null;
+      }
+      api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType, page-1, this.sortString)
          .then((response) => {
            this.resultSize = response.data.totalElements;
            this.businesses = response.data.content;
@@ -322,6 +372,7 @@ const Search = {
            this.businesses = this.businesses.filter(x => typeof(x) == "object");
            this.searchIndexMin = response.data.number*10+1;
            this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
+           console.log(this.businesses);
            this.$vs.loading.close();
          })
          .catch((error) => {
@@ -330,8 +381,6 @@ const Search = {
          })
          .finally(() => {
            if(!this.tableLoaded){
-             //document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
-
              //Event listeners for vuesax buttons on table since they're generated afterwards
              // document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRangeForBusiness);
              // document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRangeForBusiness);
@@ -409,9 +458,16 @@ export default Search;
   margin: 4px 0;
 }
 
-#goToProfileButton {
+.goToProfileButton {
   cursor: pointer;
   height: 35px;
+}
+
+.title-left {
+  margin-right: auto;
+  margin-left: 4px;
+  margin-bottom: .5em;
+  display: flex;
 }
 
 #submitSearchUser {
