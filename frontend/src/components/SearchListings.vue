@@ -190,9 +190,8 @@ const SearchListings = {
     },
 
     filterListings: function(){
-      console.log(this.minClosingDate)
-      console.log(this.maxClosingDate)
-      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessType, this.minPrice, this.maxPrice,
+      console.log(this.selectedTypes)
+      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
       this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
       .then((response) => {
         console.log(response.data)
