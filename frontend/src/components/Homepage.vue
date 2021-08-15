@@ -136,10 +136,10 @@ const Homepage = {
      * unlike an item
      */
     unlike: function (id) {
+      this.likes -= 1;
       api.unlikeListing(id)
       .then(() => {
         this.$vs.notify({title: "Successfully unliked listing", color: "success"});
-        this.likes -= 1;
       })
       .catch((error) => {
         if (error.response) {

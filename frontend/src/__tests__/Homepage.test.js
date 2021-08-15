@@ -132,6 +132,10 @@ api.getLikedListings = jest.fn(() => {
     return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
+api.unlikeListing = jest.fn(() => {
+    return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
+})
+
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
 getUserName.mockImplementation(() =>  {
     return 'Rayna';
@@ -270,4 +274,12 @@ describe("Tests for functionality", ()=> {
        expect(wrapper.vm.businesses).toEqual([]);
        expect(wrapper.vm.userLoggedIn).toBeFalsy();
    });
+});
+
+describe("Tests for wishlist functionality", ()=> {
+    test("Unlike listing successfully", async () => {
+        expect(wrapper.vm.likes).toBe(1);
+        await wrapper.vm.unlike(4);
+        expect(wrapper.vm.likes).toBe(0);
+    });
 });
