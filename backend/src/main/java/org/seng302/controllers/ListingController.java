@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -95,9 +94,10 @@ public class ListingController {
      * POST (but actually a GET) endpoint that retrieves listings from all businesses.
      * Body may contain extra search filters and parameters to get specific results.
      * The results are paginated.
+     *
      * @param request the search filter/sort information.
-     * @param count how many results will show per page.
-     * @param offset how many PAGES (not results) to skip before returning the results.
+     * @param count   how many results will show per page.
+     * @param offset  how many PAGES (not results) to skip before returning the results.
      * @return Response - 400 if body is missing or parameters are invalid, 401 if unauthorized, 200 with paginated results otherwise.
      * @throws JsonProcessingException when writing the results as a string value goes wrong.
      */
@@ -112,28 +112,22 @@ public class ListingController {
         // Sort category
         if (sortBy == null) {
             sort = Sort.unsorted();
-        }
-        else if (sortBy.equalsIgnoreCase("price") ||
+        } else if (sortBy.equalsIgnoreCase("price") ||
                 sortBy.equalsIgnoreCase("quantity") ||
                 sortBy.equalsIgnoreCase("created") ||
                 sortBy.equalsIgnoreCase("closes")) {
             sort = Sort.by(request.getSortBy());
-        }
-        else if (sortBy.equalsIgnoreCase("name") || sortBy.equalsIgnoreCase("manufacturer")) {
+        } else if (sortBy.equalsIgnoreCase("name") || sortBy.equalsIgnoreCase("manufacturer")) {
             sort = Sort.by("inventoryItem.product." + request.getSortBy());
-        }
-        else if (sortBy.equalsIgnoreCase("expires")) {
+        } else if (sortBy.equalsIgnoreCase("expires")) {
             sort = Sort.by("inventoryItem.expires");
-        }
-        else if (sortBy.equalsIgnoreCase("city") ||
+        } else if (sortBy.equalsIgnoreCase("city") ||
                 sortBy.equalsIgnoreCase("country") ||
                 sortBy.equalsIgnoreCase("businessType")) {
             sort = Sort.by("inventoryItem.product.business." + request.getSortBy());
-        }
-        else if (sortBy.equalsIgnoreCase("seller")) {
+        } else if (sortBy.equalsIgnoreCase("seller")) {
             sort = Sort.by("inventoryItem.product.business.name");
-        }
-        else { // Sort By parameter is not what we were expecting.
+        } else { // Sort By parameter is not what we were expecting.
             logger.error(String.format("Unknown sort parameter: %s", request.getSortBy()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected sort parameter.");
         }
@@ -141,8 +135,7 @@ public class ListingController {
         // Sort direction
         if (sortDirection.equalsIgnoreCase("desc")) {
             sort = sort.descending();
-        }
-        else {
+        } else {
             sort = sort.ascending();
         }
 
@@ -184,7 +177,8 @@ public class ListingController {
     /**
      * Creates a new product and adds it to the product catalogue of the current acting business
      * Authentication is required, user must be a business admin or a default global admin
-     * @param id unique identifier of the business
+     *
+     * @param id      unique identifier of the business
      * @param request the request body for the new listing object
      * @param session http session which holds the authenticated user
      * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
@@ -194,9 +188,9 @@ public class ListingController {
         Business business = businessRepository.findBusinessById(id);
         Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
 
-        if(inventory == null){ //inventory item doesn't exist for business
+        if (inventory == null) { //inventory item doesn't exist for business
             logger.debug(request.getInventoryItemId());
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         if (business == null) { // Business does not exist
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
@@ -212,10 +206,17 @@ public class ListingController {
                     inventoryRepository.updateInventoryQuantity(inventory.getQuantity() - request.getQuantity(), request.getInventoryItemId());
                     listingRepository.save(newListing);
                     return ResponseEntity.status(HttpStatus.CREATED).build();
-                } catch (ValidationException e){
+                } catch (ValidationException e) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
             }
         }
+    }
+
+    @DeleteMapping("/businesses/listings/{id}")
+    public ResponseEntity<String> deleteListing(@PathVariable long id, HttpSession session) {
+        Listing listing = listingRepository.findListingById(id);
+        listingRepository.delete(listing);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
