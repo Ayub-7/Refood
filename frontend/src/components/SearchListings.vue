@@ -91,8 +91,13 @@
                 </div>
                 <div class="click" @click="viewListing(listing)">
                 <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
-                <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.business.name }}</div>
-                <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
+                <div style="margin: 2px 4px; font-size: 14px; font-weight: bold;">{{ listing.inventoryItem.product.business.name }}</div>
+
+                  <div v-if="listing.inventoryItem.product.business.address.city" style="margin: 2px 4px; font-size: 14px; font-weight: bold;">{{ listing.inventoryItem.product.business.address.city }}, {{listing.inventoryItem.product.business.address.country}}</div>
+                  <div v-else style="margin: 2px 4px; font-size: 14px; font-weight: bold;">
+                    {{listing.inventoryItem.product.business.address.country}}
+                  </div>
+                <div style="font-size: 14px; padding-left: 4px; margin: auto 0; width: 100%;">
                   <div>{{ currencySymbol }}{{ listing.price }}</div>
                   <div>{{ listing.quantity }}x</div>
                 </div>
