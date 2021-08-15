@@ -48,7 +48,7 @@ import AddToCatalogue from "./components/AddToCatalogue";
 import CommunityMarketplace from "@/components/CommunityMarketplace";
 import BusinessInventory from "@/components/BusinessInventory";
 import BusinessSalesHistory from "@/components/BusinessSalesHistory";
-
+import ListingDetail from "@/components/ListingDetail";
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
 import { updateSessionOnRouterChange } from './utilities/UpdateSession';
@@ -87,6 +87,7 @@ const routes = [
   {path: '/marketplace', component: CommunityMarketplace},
   {path: '/businesses/:id', name: 'Business', component: Business},
   {path: '/businesses/:id/sales-history', name: 'BusinessSalesHistory', component: BusinessSalesHistory},
+  {path: '/businesses/:businessId/listings/:listingId', name: 'Listing', component: ListingDetail},
   {
     path: '*',
     name: 'catchAll',
