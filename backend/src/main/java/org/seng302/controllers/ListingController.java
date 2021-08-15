@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.MediaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.finders.ListingFinder;
@@ -13,6 +15,7 @@ import org.seng302.models.requests.BusinessListingSearchRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
+import org.seng302.finders.AddressFinder;
 import org.seng302.repositories.ListingRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.jpa.domain.Specification;
+
 
 import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
@@ -43,11 +48,15 @@ public class ListingController {
     @Autowired
     private BusinessRepository businessRepository;
 
+
     @Autowired
     private ListingRepository listingRepository;
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private AddressFinder addressFinder;
 
     @Autowired
     private ProductFinder productFinder;
@@ -66,6 +75,7 @@ public class ListingController {
         this.listingRepository = listingRepository;
         this.mapper = mapper;
     }
+
 
     /**
      * Get request mapping for getting Listing by id
@@ -159,26 +169,26 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }
 
-    /**
-     * GET endpoint that retrieves businesses' listings by a search query.
-     * @param query A string with the search's query
-     * @param count how many results will show per page.
-     * @param offset how many PAGES (not results) to skip before returning the results.
-     * @param session current user session.
-     * @return Response with the JSONified list of the businesses' listings
-     * @throws JsonProcessingException
-     */
-    @GetMapping("/businesses/listings")
-    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
-                                              @RequestParam("count") int count,
-                                              @RequestParam("page") int offset,
-                                              HttpSession session) throws JsonProcessingException {
-        logger.debug("Searching for Listings...");
-        Specification<Listing> specification = listingFinder.findListing(query);
-        Pageable pageRange = PageRequest.of(offset, count);
-        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
-        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
-    }
+//    /**
+//     * GET endpoint that retrieves businesses' listings by a search query.
+//     * @param query A string with the search's query
+//     * @param count how many results will show per page.
+//     * @param offset how many PAGES (not results) to skip before returning the results.
+//     * @param session current user session.
+//     * @return Response with the JSONified list of the businesses' listings
+//     * @throws JsonProcessingException
+//     */
+//    @GetMapping("/businesses/listings")
+//    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
+//                                              @RequestParam("count") int count,
+//                                              @RequestParam("page") int offset,
+//                                              HttpSession session) throws JsonProcessingException {
+//        logger.debug("Searching for Listings...");
+//        Specification<Listing> specification = listingFinder.findListing(query);
+//        Pageable pageRange = PageRequest.of(offset, count);
+//        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
+//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
+//    }
 
 
     /**
@@ -218,4 +228,5 @@ public class ListingController {
             }
         }
     }
+
 }
