@@ -45,8 +45,8 @@
                 <h3 class="filter-label">
                   Price range:
                 </h3>
-                <vs-input class="price-input" v-model="minPrice" type="search" placeholder="Min" style="font-size: 24px" size="medium"/>
-                <vs-input class="price-input" v-model="maxPrice" type="search" placeholder="Max"  style="font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="minPrice" type="number" :danger="(errors.includes('invalid-minprice'))" danger-text="Invalid"  min="0" placeholder="Min" style="font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="maxPrice" type="number" :danger="(errors.includes('invalid-maxprice'))" danger-text="Invalid" min="0" placeholder="Max"  style="font-size: 24px" size="medium"/>
               </div>
               </div>
 
@@ -55,12 +55,14 @@
                 <h3 class="filter-label">
                   Min Closing Date:
                 </h3>
-                <vs-input class="filter-input" v-model="minClosingDate" type="datetime-local" style="font-size: 24px"/>
+                <vs-input class="filter-input" v-model="minClosingDate" :danger="(errors.includes('past-min-date'))"
+                          danger-text="Date can not be in past." type="datetime-local" style="font-size: 24px"/>
               </div>
                 <div class="vert-row">
                   <h3 class="filter-label">Max Closing Date:
                   </h3>
-                  <vs-input class="filter-input" v-model="maxClosingDate" type="datetime-local"  style="font-size: 24px"/>
+                  <vs-input class="filter-input" v-model="maxClosingDate" :danger="(errors.includes('past-max-date'))"
+                            danger-text="Max closing date must be after min date and in future" type="datetime-local"  style="font-size: 24px"/>
                 </div>
             </div>
             </div>
@@ -150,8 +152,8 @@ const SearchListings = {
       addressQuery: null,
       businessType: null,
       sortBy: "closes",
-      minPrice: 10.0,
-      maxPrice: 20.0,
+      minPrice: null,
+      maxPrice: null,
       selectedTypes: [],
       minClosingDate: null,
       maxClosingDate: null,
@@ -190,19 +192,75 @@ const SearchListings = {
     },
 
     filterListings: function(){
-      console.log(this.selectedTypes)
-      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
-      this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
-      .then((response) => {
-        console.log(response.data)
-        this.listings = response.data.content
-        console.log(this.listings)
-        this.totalPages = response.data.totalPages;
-      })
-      .catch((error) => {
-        console.log(error)
-      });
+      if(!this.minClosingDate){
+        this.minClosingDate = Date.now()
+      }
+      if(this.checkForm()){
+        api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
+            this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
+            .then((response) => {
+              this.listings = response.data.content
+              this.totalPages = response.data.totalPages;
+            })
+            .catch((error) => {
+              console.log(error)
+            });
+      }
+
     },
+    /**
+     * Checks the form inputs, validating the inputted values.
+     * @return boolean true if no errors found, false otherwise.
+     */
+    checkForm: function() {
+      this.errors = [];
+      let today = new Date();
+
+      if(this.minPrice != null){
+        if(this.minPrice < 0){
+          this.errors.push('invalid-minprice');
+        }
+      }
+
+      if(this.maxPrice != null){
+        if(this.maxPrice < 0){
+          this.errors.push('invalid-maxprice');
+        } else if (this.maxPrice < this.minPrice){
+          this.errors.push('invalid-maxprice');
+        }
+      }
+
+      const dateInPast = function(firstDate, secondDate) {
+        return firstDate.setHours(0, 0, 0, 0) <= secondDate.setHours(0, 0, 0, 0);
+      }
+
+      let minTimestamp;
+      let minDateObject;
+      if (this.minClosingDate !== null) {
+        minTimestamp = Date.parse(this.minClosingDate);
+        minDateObject = new Date(minTimestamp)
+        if (dateInPast(minDateObject, today) === true) {
+          this.errors.push('past-min-date');
+        }
+      }
+
+      let maxTimestamp;
+      let maxTimeObject;
+      if (this.maxClosingDate !== null) {
+        maxTimestamp = Date.parse(this.maxClosingDate);
+        maxTimeObject = new Date(maxTimestamp)
+        if(maxTimeObject < minDateObject){
+          this.errors.push('past-max-date');
+        } else if (dateInPast(maxTimeObject, today) === true) {
+          this.errors.push('past-max-date');
+        }
+      }
+
+      if (this.errors.length > 0) {
+        return false;
+      }
+      return true;
+    }
   },
 }
 
@@ -222,7 +280,6 @@ export default SearchListings;
   background: #ffffff !important;
   color: black;
 }
-
 
 #page-title {
   font-size: 30px;
@@ -409,6 +466,11 @@ div#search-parameters {
 .con-vs-card.fixedHeight {
   height: auto;
 }
+
+.vert-row .con-text-validation.span-text-validation-danger.vs-input--text-validation-span.v-enter-to span-text-validation {
+  color: white !important;
+}
+
 
 @media screen and (max-width: 900px) {
   /* Mobile view for filters*/
