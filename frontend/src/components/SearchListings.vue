@@ -170,7 +170,23 @@ const SearchListings = {
   mounted() {
     api.checkSession()
       .then((response) => {
-        this.user = response.data
+        this.user = response.data;
+        if (sessionStorage.getItem('listingSearchCache') !== null) {
+          let prevSearch;
+          prevSearch = JSON.parse(sessionStorage.getItem('listingSearchCache'));
+          this.businessQuery = prevSearch['businessQuery']
+          this.productQuery = prevSearch['productQuery']
+          this.addressQuery = prevSearch['addressQuery']
+          this.sortBy = prevSearch['sortBy']
+          this.selectedTypes = prevSearch['selectedTypes']
+          this.minPrice = prevSearch['minPrice']
+          this.maxPrice = prevSearch['maxPrice']
+          this.minClosingDate = prevSearch['minClosingDate']
+          this.maxClosingDate = prevSearch['maxClosingDate']
+          this.numListings = prevSearch['numListings']
+          this.pageNum = prevSearch['pageNum']
+          this.sortDirection = prevSearch['sortDirection']
+        }
         this.filterListings();
         this.setCurrency(this.user.homeAddress.country)
       }).catch((err) => {
@@ -193,6 +209,10 @@ const SearchListings = {
       });
     },
 
+    /**
+     * Searches all listings in the ReFood database, applies the filters
+     * that the user has filled in, along with the chosen sort
+     * */
     filterListings: function(){
       if(!this.minClosingDate){
         this.minClosingDate = Date.now()
@@ -215,6 +235,21 @@ const SearchListings = {
      * or the user profile page, if acting as an individual
      */
     viewListing: function(listing) {
+      let searchQuery = {
+        businessQuery: this.businessQuery,
+        productQuery: this.productQuery,
+        addressQuery: this.addressQuery,
+        sortBy: this.sortBy,
+        selectedTypes: this.selectedTypes,
+        minPrice: this.minPrice,
+        maxPrice: this.maxPrice,
+        minClosingDate: this.minClosingDate,
+        maxClosingDate: this.maxClosingDate,
+        numListings: this.numListings,
+        pageNum: this.pageNum,
+        sortDirection: this.sortDirection
+      }
+      sessionStorage.setItem("listingSearchCache", JSON.stringify(searchQuery));
       this.$router.push({path: `/businesses/${listing.inventoryItem.product.business.id }/listings/${listing.id}`});
     },
     /**
@@ -270,7 +305,7 @@ const SearchListings = {
       }
       return true;
     }
-  },
+  }
 }
 
 
