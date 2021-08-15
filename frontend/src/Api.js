@@ -32,7 +32,7 @@ import axios from 'axios'
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
-const instance = axios.create({  
+const instance = axios.create({
   baseURL: SERVER_URL,
   timeout: 10000
 });
@@ -360,7 +360,7 @@ export default {
      * Extends card display period by 24 hours (from current time)
      * @param cardId card that is going to be extended
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful
      */
     extendCardDisplayPeriod: (cardId) => instance.put(`/cards/${cardId}/extenddisplayperiod`, {}, {withCredentials: true}),
 
@@ -370,9 +370,9 @@ export default {
      * Gets users notifications, which can contain a deleted or expiring notification
      * @param userId ID of user we want notifications for
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful
      */
-     
+
 
     getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
 
@@ -423,6 +423,17 @@ export default {
      * @param userId
      * @returns {Promise<AxiosResponse<any>>} Messages of the user
      */
-    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
 
+
+    // === LISTING NOTIFICATIONS
+
+    /**
+     * GET all notifications relating to listings.
+     * @param businessId
+     * @param listingId
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    getListingNotifications: (userId) => instance.get(`/businesses/1/listings/1/users/${userId}/notify`, { withCredentials: true }),
 }

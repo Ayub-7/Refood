@@ -125,6 +125,7 @@ export default {
 
     mounted() {
       this.getMessages();
+      this.getListingNotifications();
     },
 
     methods: {
@@ -161,6 +162,14 @@ export default {
             });
       },
 
+      getListingNotifications: function() {
+        api.getListingNotifications(store.loggedInUserId)
+          .then((res) => {
+            console.log(res.data);
+          })
+          .catch();
+      },
+
       /**
        * Sends user message by calling POST messages
        * @param cardId ID of card whose owner the user is going to message
@@ -195,7 +204,6 @@ export default {
        * Simply check a blank message is not sent and the message is under the maximum character limit
        */
       checkMessage() {
-
         if (this.message == null || this.message === "") {
           this.errors.push('bad-content');
 

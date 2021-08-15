@@ -85,9 +85,9 @@ public class ListingNotificationController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    if (listing == null || user == null || business == null) {
-      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-    }
+//    if (listing == null || user == null || business == null) {
+//      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+//    }
 
     List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByUserId(userId);
     return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
