@@ -86,22 +86,24 @@
           <vs-divider style="padding: 4px;"></vs-divider>
           <div class="grid-container" style="margin: auto">
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
-              <div slot="media">
-                <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
-              </div>
-              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
-              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.business.name }}</div>
-              <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
-                <div>{{ currencySymbol }}{{ listing.price }}</div>
-                <div>{{ listing.quantity }}x</div>
-              </div>
+                <div slot="media" @click="viewListing(listing)">
+                  <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
+                </div>
+                <div class="click" @click="viewListing(listing)">
+                <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
+                <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.business.name }}</div>
+                <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
+                  <div>{{ currencySymbol }}{{ listing.price }}</div>
+                  <div>{{ listing.quantity }}x</div>
+                </div>
 
-              <div style="font-size: 12px"> Closes: {{ listing.closes }}</div>
-              <vs-divider style="margin-top: 0"></vs-divider>
+                <div style="font-size: 12px"> Closes: {{ listing.closes }}</div>
+                <vs-divider style="margin-top: 0"></vs-divider>
 
-              <div>{{ listing.moreInfo }}</div>
-              <div slot="footer" class="grid-card-footer">
-                Listed: {{ listing.created }}
+                <div>{{ listing.moreInfo }}</div>
+                <div slot="footer" class="grid-card-footer">
+                  Listed: {{ listing.created }}
+                </div>
               </div>
             </vs-card>
             <div class="title-centre">
@@ -207,6 +209,13 @@ const SearchListings = {
             });
       }
 
+    },
+    /**
+     * Redirects the user to either the business profile page, if acting as a business,
+     * or the user profile page, if acting as an individual
+     */
+    viewListing: function(listing) {
+      this.$router.push({path: `/businesses/${listing.inventoryItem.product.business.id }/listings/${listing.id}`});
     },
     /**
      * Checks the form inputs, validating the inputted values.
