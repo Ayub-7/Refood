@@ -33,6 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                  .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                  .antMatchers(HttpMethod.PUT, "/users/{id}/makeAdmin", "/users/{id}/revokeAdmin").hasRole("DGAA")
                  .antMatchers(HttpMethod.PUT, "/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary").authenticated()
+                 .antMatchers(HttpMethod.POST, "/businesses/listings/{id}/like").authenticated()
                  .antMatchers("/users/**", "/messages", "/messages/**").authenticated()
                  .antMatchers("/businesses", "/businesses/**", "/cards", "/cards/**", "/actasbusiness").authenticated()
                  .anyRequest().permitAll()

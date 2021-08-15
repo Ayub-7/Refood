@@ -92,7 +92,7 @@
               <div slot="media">
                 <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
               </div>
-              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.listingsName }}</div>
+              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
               <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
                 <div>{{ currencySymbol }}{{ listing.price }}</div>
                 <div>{{ listing.quantity }}x</div>
@@ -105,8 +105,14 @@
               <div slot="footer" class="grid-card-footer">
                 Listed: {{ listing.created }}
               </div>
-              <vs-button color="primary" type="border" icon="thumb_up"></vs-button>
-              <vs-button color="primary" type="border" icon="thumb_down"></vs-button>
+              <div v-if="likedListingsIds.includes(listing.id)">
+                <vs-button disabled color="primary" type="border" icon="thumb_up"></vs-button>
+                <vs-button color="danger" type="border" icon="thumb_down"></vs-button>
+              </div>
+              <div v-else>
+                <vs-button color="primary" type="border" icon="thumb_up" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-button>
+                <vs-button disabled color="danger" type="border" icon="thumb_down"></vs-button>
+              </div>
             </vs-card>
             <div class="title-centre">
             </div>
@@ -543,6 +549,8 @@ const SearchListings = {
       displaytype: true,
       currencySymbol: "",
       selected: "",
+      likedListingsIds: [],
+
     };
   },
 
@@ -550,6 +558,14 @@ const SearchListings = {
     api.checkSession()
       .then((response) => {
         this.userId = response.data.id;
+        api.getUserLikedListings(this.userId)
+        .then((response) => {
+          for (let i = 0; i < response.data.length; i++) {
+            this.likedListingsIds.push(response.data[i]["id"]);
+          }
+        }).catch((err) => {
+          throw new Error(`Error trying to get user's likes: ${err}`)
+        })
       }).catch((err) => {
       throw new Error(`Error trying to get user id: ${err}`);
     })
@@ -569,6 +585,26 @@ const SearchListings = {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
+
+    sendLike: function(listingId, listingName) {
+      api.addLikeToListing(listingId)
+        .then(() => {
+          this.$vs.notify(`${listingName} has been added to your watchlist!`);
+        })
+        .catch((err) => {
+          throw new Error(`Error trying to like listing ${listingId}: ${err}`);
+        })
+    },
+
+    deleteLike: function(listingId, listingName) {
+      api.removeLikeFromLising(listingId)
+          .then(() => {
+            this.$vs.notify(`${listingName} has been deleted from your watchlist!`);
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
+          })
+    }
   },
 }
 
