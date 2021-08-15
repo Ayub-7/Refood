@@ -152,7 +152,7 @@ const Homepage = {
     /**
      * Retrieves all the cards that the user has liked.
      */
-    getLikes: function (userId) {
+    getLikes: function(userId) {
       api.getLikedListings(userId)
         .then((res) => {
           this.likedItem = res.data;
@@ -162,7 +162,6 @@ const Homepage = {
           if (error.response) {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
-          this.$log.debug(error);
         })
     },
 

@@ -436,6 +436,5 @@ export default {
      * Get router endpoint for unliking listing
      * @param id
      */
-    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
-
+    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true})
 }
