@@ -133,5 +133,19 @@ describe('New sale listing modal tests', () => {
         expect(wrapper.vm.price).toBe(invItem.pricePerItem);
         expect(wrapper.vm.listingQuantityMax).toBe(invItem.quantity);
         expect(wrapper.vm.closes).toBe(invItem.expires + 'T00:00');
-    })
+    });
+
+    test("Full product info modal appears when clicking image", async () => {
+        wrapper.vm.inventory = mockInventory;
+        await wrapper.vm.$nextTick();
+        let image = wrapper.find('.inventory-image');
+        expect(image).toBeTruthy();
+
+        await image.trigger('click');
+
+        expect(wrapper.vm.showFullProduct).toBeTruthy();
+        expect(wrapper.find('#full-product-modal'))
+
+    });
+
 });

@@ -20,38 +20,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class ListingLikeRepositoryTests {
+public class ListingNotificationRepositoryTests {
 
     @Autowired
-    private TestEntityManager entityManager;
+    private ListingNotificationRepository listingNotificationRepository;
     @Autowired
     private ListingRepository listingRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private ListingLikeRepository listingLikeRepository;
+    private TestEntityManager entityManager;
 
     private User user;
-    private Listing listing;
-    private ListingLike like;
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException {
+        listingNotificationRepository.deleteAll();
+        listingNotificationRepository.flush();
         listingRepository.deleteAll();
         listingRepository.flush();
         userRepository.deleteAll();
         userRepository.flush();
-        listingLikeRepository.deleteAll();
-        listingLikeRepository.flush();
-
-        user = new User("Rayna", "YEP", "Dalgety", "Universal", "", "rdalgety3@ocn.ne.jp", "2006-03-30", "+7 684 622 5902", null, "ATQWJM");
-        user.setId(1L);
-        userRepository.save(user);
 
         Calendar calendar = Calendar.getInstance();
         Date dateCreated = calendar.getTime();
         calendar.add(Calendar.YEAR, 2);
         Date dateCloses = calendar.getTime();
+
+        user = new User("Rayna", "YEP", "Dalgety", "Universal", "", "rdalgety3@ocn.ne.jp", "2006-03-30", "+7 684 622 5902", null, "ATQWJM");
+        user.setId(1L);
+        userRepository.save(user);
 
         Business business = new Business("Business Name", "Description here.", null, BusinessType.RETAIL_TRADE);
         entityManager.persist(business);
@@ -65,23 +63,19 @@ public class ListingLikeRepositoryTests {
         entityManager.persist(inventory);
         entityManager.flush();
 
-        listing = new Listing(inventory, 5, 2.0, "Seller may be interested in offers", new Date(), new Date());
+        Listing listing = new Listing(inventory, 5, 2.0, "Seller may be interested in offers", new Date(), new Date());
         listingRepository.save(listing);
 
-        ListingLike like = new ListingLike(user, listing);
-        listingLikeRepository.save(like);
+        ListingNotification notification = new ListingNotification(user, listing, NotificationStatus.BOUGHT);
+        listingNotificationRepository.save(notification);
     }
 
+    /**
+     * Tests that the number of notifications received is correct (1)
+     */
     @Test
-    void findListingLikesByUserId_correctNumberOfLikes() {
-        List<ListingLike> likes = listingLikeRepository.findListingLikesByUserId(user.getId());
-        assertThat(likes.size()).isEqualTo(1);
+    void findListingNotificationByUserId_correctNumberOfNotifications() {
+        List<ListingNotification> notificationList = listingNotificationRepository.findListingNotificationsByUserId(user.getId());
+        assertThat(notificationList.size()).isEqualTo(1);
     }
-
-    @Test
-    void findListingLikesByUserIdAndListingId() {
-        ListingLike like = listingLikeRepository.findListingLikeByListingIdAndUserId(listing.getId(), user.getId());
-        assertThat(like).isNotNull();
-    }
-
 }

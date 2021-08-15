@@ -37,9 +37,10 @@
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
-          <div id="grid-pagination">
-            <div class="displaying">Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of
-              {{ filteredProducts.length }}</div>
+          <div class="grid-pagination">
+            <div class="displaying">
+              Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of {{ filteredProducts.length }}
+            </div>
             <div v-if="filteredProducts.length > 10" style="display: flex;">
               <div v-if="filteredProducts.length > productsPerPage" style="display: flex;">
                 <vs-pagination v-model="currentPage" :total="Math.round(products.length/productsPerPage +0.4)"/>
@@ -101,11 +102,19 @@
                 </vs-dropdown>
               </div>
             </vs-card>
-            <div class="title-centre">
-              <vs-pagination v-model="currentPage" :total="Math.round(products.length/productsPerPage +0.4)"/>
+          </div>
+          <div class="grid-pagination" style="justify-content: flex-end">
+            <div class="displaying" style="margin: auto 1em auto auto;">
+              Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of {{ filteredProducts.length }}
+            </div>
+            <div v-if="filteredProducts.length > 10" style="display: flex;">
+              <div v-if="filteredProducts.length > productsPerPage" style="display: flex;">
+                <vs-pagination v-model="currentPage" :total="Math.round(products.length/productsPerPage +0.4)"/>
+              </div>
             </div>
           </div>
         </div>
+
 
 
         <div v-if="!displaytype">
@@ -252,7 +261,6 @@ const ProductCatalogue = {
 
         api.getBusinessProducts(this.businessId)
             .then((innerResponse) => {
-              this.$log.debug("Data loaded: ", innerResponse.data);
               this.products = innerResponse.data;
               this.filteredProducts = innerResponse.data;
             })
@@ -609,7 +617,7 @@ export default ProductCatalogue;
   margin-bottom: 1em;
 }
 
-#grid-pagination {
+.grid-pagination {
   margin: auto 0 auto auto;
   display: flex;
 }
@@ -636,7 +644,7 @@ th {
     flex-direction: column;
   }
 
-  #grid-pagination {
+  .grid-pagination {
     margin: 1em auto 0 0;
   }
 

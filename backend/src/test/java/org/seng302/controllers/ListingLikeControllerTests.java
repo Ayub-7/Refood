@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ListingLikeController.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class ListingLikeControllerTests {
+class ListingLikeControllerTests {
 
     @Autowired
     private MockMvc mvc;
@@ -138,6 +137,44 @@ public class ListingLikeControllerTests {
         Mockito.when(listingLikeRepository.findListingLikesByUserId(user.getId())).thenReturn(likedList);
 
         mvc.perform(get("/users/{id}/likes", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    //
+    // DELETE - User like on listing
+    //
+
+    @Test
+    void testDeleteUserLike_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(delete("/businesses/listings/{id}/like", listing.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testDeleteUserLike_noListing_returnNotAcceptable() throws Exception {
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(null);
+        mvc.perform(delete("/businesses/listings/{id}/like", listing.getId()))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testDeleteUserLike_noExistingLike_returnBadRequest() throws Exception {
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(listingLikeRepository.findListingLikeByListingIdAndUserId(listing.getId(), user.getId())).thenReturn(null);
+        mvc.perform(delete("/businesses/listings/{id}/like", listing.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void testDeleteUserLike_hasLike_returnOk() throws Exception {
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(listingLikeRepository.findListingLikeByListingIdAndUserId(listing.getId(), user.getId())).thenReturn(likedList.get(0));
+        mvc.perform(delete("/businesses/listings/{id}/like", listing.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
     }

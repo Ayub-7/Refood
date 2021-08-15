@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "86c3aeb3-9f92-4d60-8c40-35a31d1ea4dc",
+		"_postman_id": "bb01f58f-7fcc-4ecd-b37d-0a063a663efa",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -191,8 +191,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Business",
@@ -248,158 +247,17 @@
 					"response": []
 				},
 				{
-					"name": "Search businesses with type",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body does not contain other types\", function () {",
-									"    pm.expect(pm.response.text()).to.not.include(\"Accommodation and Food Services\");",
-									"    pm.expect(pm.response.text()).to.not.include(\"Charitable organisation\");",
-									"    pm.expect(pm.response.text()).to.not.include(\"Non-profit organisation\");  ",
-									"     ",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
+					"name": "Search businesses",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/search?query=&type=Retail Trade",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": ""
-								},
-								{
-									"key": "type",
-									"value": "Retail Trade"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search businesses with no type and query",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Dabshots\");",
-									"});",
-									"",
-									"var data = ",
-									"",
-									"",
-									"pm.test('Only one result is returned', function () {",
-									"    pm.expect(pm.response.json().length).to.equal(1);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{URL}}/businesses/search?query=Dabshots&type=",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "Dabshots"
-								},
-								{
-									"key": "type",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get business types",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"//Checks if correct status",
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"//Checks if correct values are there",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Accommodation and Food Services\");",
-									"});",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Information Media and Telecommunication\");",
-									"});",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Electricity, Gas, Water and Waste Services\");",
-									"});",
-									"",
-									"pm.test(\"All business types are returned\", function () {",
-									"    pm.expect(pm.response.json().length).to.equal(21)",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{URL}}/businesses/types",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								"types"
-							]
+							"raw": ""
 						}
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Users",
@@ -470,8 +328,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Inventory",
@@ -552,8 +409,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Listings",
@@ -623,41 +479,8 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "GET Listings by title or businesss",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{URL}}/businesses/listings?page=10&count=10&query=dabshot",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"businesses",
-								"listings"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "10"
-								},
-								{
-									"key": "count",
-									"value": "10"
-								},
-								{
-									"key": "query",
-									"value": "dabshot"
-								}
-							]
-						}
-					},
-					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Products",
@@ -716,8 +539,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Cards",
@@ -950,8 +772,101 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
+		},
+		{
+			"name": "Listing Notification",
+			"item": [
+				{
+					"name": "Add Listing Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"userId\": 1,\r\n    \"listingId\": 1,\r\n    \"status\": \"Expired\",\r\n    \"created\": \"2021-04-27\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"listings",
+								":listingId",
+								"users",
+								":userId",
+								"notify"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								},
+								{
+									"key": "listingId",
+									"value": "1"
+								},
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Listing Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"listings",
+								":listingId",
+								"users",
+								":userId",
+								"notify"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								},
+								{
+									"key": "listingId",
+									"value": "1"
+								},
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -976,11 +891,8 @@
 	],
 	"variable": [
 		{
-			"id": "3ff23668-e63c-49a8-9259-d8ba55989d19",
 			"key": "URL",
-			"value": "localhost:9499",
-			"type": "string"
+			"value": "localhost:9499"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
