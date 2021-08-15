@@ -4,18 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.finders.*;
 import org.springframework.http.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.seng302.finders.ListingSpecifications;
-import org.seng302.finders.ListingFinder;
-import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
-import org.seng302.finders.AddressFinder;
 import org.seng302.repositories.ListingRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +59,9 @@ public class ListingController {
 
     @Autowired
     private ListingFinder listingFinder;
+
+    @Autowired
+    private BusinessTypeFinder businessTypeFinder;
 
     @Autowired
     private ObjectMapper mapper;
@@ -160,12 +160,12 @@ public class ListingController {
 
         Specification<Listing> specs = where(specifications.hasPriceSet()).and(specifications.hasClosingDateSet());
         if (request.getBusinessQuery() != null && request.getBusinessQuery().length() > 0) {
-            specs = specs.and(listingFinder.findListing(request.getBusinessQuery(), "seller"));
+            specs = specs.and(listingFinder.findListing(request.getBusinessQuery()));
         }
         if (request.getBusinessTypes() != null && !request.getBusinessTypes().isEmpty()) {
-            specs = specs.and(listingFinder.findListing('"' + request.getBusinessTypes().get(0).toString() + '"', "types"));
+            specs = specs.and(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(0).toString() + '"'));
             for (int i = 1; i < request.getBusinessTypes().size(); i++) {
-                specs = specs.or(listingFinder.findListing('"' + request.getBusinessTypes().get(i).toString() + '"', "types"));
+                specs = specs.or(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(i).toString() + '"'));
             }
         }
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
@@ -174,7 +174,6 @@ public class ListingController {
         if (request.getAddressQuery() != null && request.getAddressQuery().length() > 0) { // Prevent product finder from crashing.
             specs = specs.and(addressFinder.findAddress(request.getAddressQuery()));
         }
-        System.out.println(specs.toString());
         Page<Listing> result = listingRepository.findAll(specs, pageRange);
 
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
