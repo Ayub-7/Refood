@@ -86,7 +86,7 @@
           <vs-divider style="padding: 4px;"></vs-divider>
           <div class="grid-container" style="margin: auto">
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
-                <div slot="media" @click="viewListing(listing)">
+                <div slot="media" id="media-div" @click="viewListing(listing)">
                   <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
                 </div>
                 <div class="click" @click="viewListing(listing)">
@@ -228,6 +228,7 @@ const SearchListings = {
             .then((response) => {
               this.listings = response.data.content
               this.totalPages = response.data.totalPages;
+              console.log(this.listings)
             })
             .catch((error) => {
               console.log(error)
