@@ -44,12 +44,18 @@
           <div v-for="item in likedItem" :key="item.id" >
             <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
               <div id="likes-notification-container">
-                <div v-if="item.likes != 0">
-                  <vs-icon id="like-icon" icon="favorite" class="msg-icon" @click="unlike(item.id); item.likes = 0"></vs-icon>
-                </div>
-                <div v-else>
-                  <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon"></vs-icon>
-                </div>
+                  <vs-row v-if="item.likes != 0">
+                    <vs-col vs-type="flex" vs-align="center">
+                      <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" @click="unlike(item.id); item.likes = 0"></vs-icon>
+                    </vs-col>
+                  </vs-row>
+                <vs-row v-else>
+                  <vs-col vs-type="flex" vs-align="center">
+                    <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" ></vs-icon>
+                  </vs-col>
+                </vs-row>
                 <div id="product-name">{{item.inventoryItem.product.name}}</div>
                 <div id="product-seller"><b>Seller: </b>{{item.inventoryItem.product.business.name}}</div>
                 <div id="product-closes"><b>Closes: </b>{{item.closes}}</div>
@@ -79,9 +85,6 @@
       <div v-else class="container">
         This user has no active cards on the marketplace right now.
       </div>
-    </vs-popup>
-    <vs-popup title="Listing Details" :active.sync="showListing" id="listing-card-modal">
-      <listing-detail></listing-detail>
     </vs-popup>
   </div>
 </template>
@@ -125,9 +128,8 @@ const Homepage = {
     /**
      * open listing
      */
-    openListing: function () {
-      this.showListing = true;
-      console.log(this.showListing)
+    viewListing: function (businessId, listingId) {
+      this.$router.push({name: "Listing", params: {businessId: businessId, listingId: listingId}})
     },
 
     /**
@@ -337,6 +339,18 @@ export default Homepage;
 }
 #product-closes {
   font-size: 12px;
+}
+
+#view-icon {
+  font-size: 15px;
+  margin-left: -1px;
+  cursor: pointer
+}
+
+#view-unlike-icon {
+  font-size: 15px;
+  margin-left: -1px;
+  cursor: pointer
 }
 
 #like-icon {
