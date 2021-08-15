@@ -37,12 +37,6 @@ public class ListingFinder {
                 .get("business").get("name")), "%"+term.toLowerCase()+"%");
     }
 
-    private Specification<Listing> businessTypeSpec(String term) {
-        return (root, query, criteriaBuilder)
-                -> criteriaBuilder.equal(root.get("inventoryItem").get("product")
-                .get("business").get("businessType"), BusinessType.valueOf(term.toUpperCase().replace(' ', '_').replace('-', '_')));
-    }
-
     /**
      * Helper function that checks the fields if a predicate contains AND, OR, or any other term.
      * @param currentSpecification Specification object to be checked
@@ -50,13 +44,8 @@ public class ListingFinder {
      * @param predicate Predicate object
      * @return Specification<Listing> object
      */
-    private Specification<Listing> checkFields(Specification currentSpecification, String queryBy, String nextTerm, Logic predicate) {
-        Specification<Listing> newSpec;
-        if (queryBy.equalsIgnoreCase("seller")) {
-            newSpec = sellerContains(nextTerm);
-        } else {
-            newSpec = businessTypeSpec(nextTerm);
-        }
+    private Specification<Listing> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
+        Specification<Listing> newSpec = sellerContains(nextTerm);
         if (predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {
@@ -72,15 +61,15 @@ public class ListingFinder {
      * @param terms list of terms, used to get next term in sequence
      * @return Specification<Listing> current specification with AND or OR operation applied
      */
-    private Specification<Listing> getNextSpecification(Specification<Listing> specification, String queryBy, String term, ArrayList<String> terms) {
+    private Specification<Listing> getNextSpecification(Specification<Listing> specification, String term, ArrayList<String> terms) {
         if (terms.indexOf(term) != terms.size() - 1) {
             String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
             if (term.strip().equals("AND")) {
-                specification = checkFields(specification, queryBy, nextTerm, Logic.AND);
+                specification = checkFields(specification, nextTerm, Logic.AND);
             } else if (term.strip().equals("OR")) {
-                specification = checkFields(specification, queryBy, nextTerm, Logic.OR);
+                specification = checkFields(specification, nextTerm, Logic.OR);
             } else if(!nextTerm.equals("AND") && !nextTerm.equals("OR")) {
-                specification = checkFields(specification, queryBy, nextTerm, Logic.AND);
+                specification = checkFields(specification, nextTerm, Logic.AND);
             }
         }
         return specification;
@@ -92,17 +81,13 @@ public class ListingFinder {
      * @param query search query, will be split up into terms and processed
      * @return Specification<Listing> resulting specification that will contain all predicates
      */
-    private Specification<Listing> buildAddressSpec(String query, String queryBy) {
+    private Specification<Listing> buildAddressSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
         Specification<Listing> specification;
-        if (query.equalsIgnoreCase("seller")) {
-            specification = sellerContains(terms.get(0));
-        } else {
-            specification = businessTypeSpec(terms.get(0));
-        }
+        specification = sellerContains(terms.get(0));
         for (String term : terms) {
-            specification = getNextSpecification(specification, queryBy, term, terms);
+            specification = getNextSpecification(specification, term, terms);
         }
         return specification;
     }
@@ -112,8 +97,8 @@ public class ListingFinder {
      * @param query The search query to be used to filter search results
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
-    public Specification<Listing> findListing(String query, String queryBy) {
-        Specification<Listing> matches = buildAddressSpec(query, queryBy);
+    public Specification<Listing> findListing(String query) {
+        Specification<Listing> matches = buildAddressSpec(query);
         return matches;
     }
 }
