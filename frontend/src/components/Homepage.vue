@@ -41,13 +41,13 @@
             {{likes}}
           </div>
           <vs-divider style="margin-top: -30px"></vs-divider>
-          <div v-for="item in likedItem" :key="item.id" >
+          <div v-for="(item, index) in likedItem" :key="item.id" >
             <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
               <div id="likes-notification-container">
                   <vs-row v-if="item.likes != 0">
                     <vs-col vs-type="flex" vs-align="center">
                       <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" @click="unlike(item.id); item.likes = 0"></vs-icon>
+                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
                     </vs-col>
                   </vs-row>
                 <vs-row v-else>
@@ -135,8 +135,9 @@ const Homepage = {
     /**
      * unlike an item
      */
-    unlike: function (id) {
+    unlike: function (id, index) {
       this.likes -= 1;
+      this.likedItem.splice(index, 1)
       api.unlikeListing(id)
       .then(() => {
         this.$vs.notify({title: "Successfully unliked listing", color: "success"});
