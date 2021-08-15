@@ -105,6 +105,8 @@
               <div slot="footer" class="grid-card-footer">
                 Listed: {{ listing.created }}
               </div>
+              <vs-button color="primary" type="border" icon="thumb_up"></vs-button>
+              <vs-button color="primary" type="border" icon="thumb_down"></vs-button>
             </vs-card>
             <div class="title-centre">
             </div>
