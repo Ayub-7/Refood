@@ -21,6 +21,9 @@ public class ListingNotification {
     private User user; // User receiving the notification
 
     @ManyToOne
+    private BoughtListing boughtListing;
+
+    @ManyToOne
     private Listing listing;
 
     // Expired - it has been bought or removed by another user.
@@ -34,9 +37,16 @@ public class ListingNotification {
     /**
      * Basic constructor.
      * @param user the user receiving the notification.
-     * @param listing the listing being notified about.
+     * @param boughtListing the listing being notified about.
      * @param status the listing status.
      */
+    public ListingNotification(User user, BoughtListing boughtListing, NotificationStatus status) {
+        this.user = user;
+        this.boughtListing = boughtListing;
+        this.status = status;
+        this.created = new Date();
+    }
+
     public ListingNotification(User user, Listing listing, NotificationStatus status) {
         this.user = user;
         this.listing = listing;

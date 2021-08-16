@@ -83,5 +83,4 @@ public class ListingLikeRepositoryTests {
         ListingLike like = listingLikeRepository.findListingLikeByListingIdAndUserId(listing.getId(), user.getId());
         assertThat(like).isNotNull();
     }
-
 }
