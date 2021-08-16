@@ -30,7 +30,6 @@ import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
 
 
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -221,17 +220,18 @@ public class ListingController {
     @DeleteMapping("/businesses/listings/{id}")
     public ResponseEntity<String> deleteListing(@PathVariable long id, HttpSession session) {
         Listing listing = listingRepository.findListingById(id);
-
+        if (listing == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Inventory inventory = listing.getInventoryItem();
 
-        BoughtListing boughtListing = new BoughtListing(user, listing.getInventoryItem().getProduct(), listing.getLikes(), listing.getQuantity());
+        BoughtListing boughtListing = new BoughtListing(user, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated());
         boughtListingRepository.save(boughtListing);
-
-
-
+        if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).isEmpty()) {
+            inventoryRepository.delete(inventory);
+        }
         listingRepository.delete(listing);
-
-
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

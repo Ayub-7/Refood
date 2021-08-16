@@ -24,6 +24,9 @@ public class BoughtListing {
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date sold;
 
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    private Date listed;
+
     private int likes;
 
     private int quantity;
@@ -31,7 +34,7 @@ public class BoughtListing {
     /**
      * Empty constructor for JPA use
      */
-    protected BoughtListing(){};
+    protected BoughtListing() {}
 
     /**
      * Bought Listing constructor class, created when a listing is sold.
@@ -40,11 +43,12 @@ public class BoughtListing {
      * @param likes
      * @param quantity
      */
-    public BoughtListing(User buyer, Product product, int likes, int quantity) {
+    public BoughtListing(User buyer, Product product, int likes, int quantity, Date listed) {
         this.buyer = buyer;
         this.product = product;
         this.likes = likes;
         this.quantity = quantity;
         this.sold = new Date();
+        this.listed = listed;
     }
 }
