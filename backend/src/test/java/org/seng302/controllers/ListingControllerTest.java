@@ -12,10 +12,7 @@ import org.seng302.finders.ListingSpecifications;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
 import org.seng302.models.requests.NewListingRequest;
-import org.seng302.repositories.BusinessRepository;
-import org.seng302.repositories.InventoryRepository;
-import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.ProductRepository;
+import org.seng302.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -48,6 +45,8 @@ class ListingControllerTest {
     private InventoryRepository inventoryRepository;
     @MockBean
     private ListingRepository listingRepository;
+    @MockBean
+    private BoughtListingRepository boughtListingRepository;
     @MockBean
     private ProductFinder productFinder;
     @Autowired
@@ -125,8 +124,9 @@ class ListingControllerTest {
     //
     @Test
     void testNoAuthPostListing() throws Exception {
-        mvc.perform(post("/businesses/{id}/listings", business.getId()));
+        mvc.perform(post("/businesses/{id}/listings", business.getId())).andExpect(status().isUnauthorized());
     }
+
     @Test
     @WithMockUser(roles="USER")
     void testForbiddenUserPostListing() throws Exception {
