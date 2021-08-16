@@ -186,16 +186,4 @@ describe('Component', () => {
         expect(wrapper.vm.errors).toStrictEqual([]);
         expect(wrapper.vm.product).toBe(mockProduct);
     });
-
-    test("Full product info modal appears when clicking image", async () => {
-      let image = wrapper.find('.image');
-      expect(image).toBeTruthy();
-
-      await image.trigger('click');
-
-      expect(wrapper.vm.showFullProduct).toBeTruthy();
-      expect(wrapper.find('#full-product-modal'))
-
-    });
-
 });

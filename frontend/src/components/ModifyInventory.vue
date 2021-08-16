@@ -3,11 +3,7 @@
     <vs-popup title="Modify Inventory Entry" :active.sync="modifyInv" id="modify-modal">
       <div id="header-row">
         <div id="image-container">
-          <vs-tooltip text="Click here for more product details">
-            <vs-tooltip :text="currentProduct.description" title="Description" position="bottom">
-              <ReImage :image-path="currentProduct.primaryImagePath" class="image" @click.native="showFullProduct = true"/>
-            </vs-tooltip>
-          </vs-tooltip>
+          <ReImage :image-path="currentProduct.primaryImagePath" class="image"/>
         </div>
         <div id="product-name">
           <div class="sub-header">Product</div>
@@ -95,27 +91,6 @@
         <vs-button type="border">Cancel</vs-button>
       </div>
     </vs-popup>
-
-    <!-- SHOW FULL PRODUCT INFO MODAL -->
-    <!-- Accessed by pressing the image of the product. -->
-    <vs-popup id="full-product-modal" title="Full Product" :active.sync="showFullProduct" >
-      <div>
-        <ReImage :image-path="currentProduct.primaryImagePath" class="full-image"/>
-      </div>
-
-      <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
-        <div style="display: flex; flex-direction: column; justify-content: space-between">
-          <div style="font-size: 16px; font-weight: bold;  text-align: justify; word-break: break-all;">{{ currentProduct.name }} </div>
-          <p>{{ currentProduct.id }}</p>
-        </div>
-        <vs-divider></vs-divider>
-        <div style="font-size: 16px; font-weight: bold; height: 24px;">{{ currentProduct.manufacturer }} </div>
-        <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ currentProduct.created }} </p>
-        <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ currentProduct.description }} </div>
-      </div>
-
-      <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currency + currentProduct.recommendedRetailPrice }} </div>
-    </vs-popup>
   </div>
 </template>
 
@@ -148,7 +123,6 @@ export default {
       products: [],
       errors: [],
 
-      showFullProduct: false,
       currency: "$",
     }
   },
@@ -466,16 +440,7 @@ export default {
 
 #image-container {
   margin: auto;
-  cursor: pointer;
-
-  transition: .5s ease;
-  backface-visibility: hidden;
 }
-
-#image-container:hover {
-  opacity: 0.5;
-}
-
 
 @media screen and (max-width: 630px) {
   #header-row {

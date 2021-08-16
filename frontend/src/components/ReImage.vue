@@ -30,13 +30,13 @@ export default {
       } else if (product === true) {
         return '/test/ProductShoot.jpg';
       } else if (this.imagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + this.imagePath.toString().replace("\\", "/")
+        return '/prod/prod_images/' + this.imagePath.replace("/\\/g", "/");
       } else if (this.imagePath != null && process.env.NODE_ENV !== 'development') {
-        return '/test/prod_images/' + this.imagePath.toString().replace("\\", "/")
+        return '/test/prod_images/' + this.imagePath.replace("/\\/g", "/");
       } else if (this.imagePath != null) {
-        return this.imagePath.toString().replace("\\", "/")
+        return this.imagePath.replace(/\\/g, "/").replace("./src/main/resources/media/images/businesses/", "");
       } else {
-        return '../../public/ProductShoot.jpg'
+        return '../../public/ProductShoot.jpg';
       }
     },
 

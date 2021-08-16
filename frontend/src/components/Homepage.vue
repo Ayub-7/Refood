@@ -21,6 +21,7 @@
             <!-- When each list item is clicked, redirects to the relevant page in the application -->
             <vs-button class="left-nav-item" id="bus-profile-btn" @click.native='goToProfile()'>Business Profile</vs-button>
             <vs-button class="left-nav-item" id="bus-catalogue-btn" @click.native='goToProductCatalogue()'>Product Catalogue</vs-button>
+            <vs-button class="left-nav-item" @click.native='goToSalesHistory()'>Sales History</vs-button>
           </div>
           </div>
           <div class="userinfo-container" v-else>
@@ -230,6 +231,10 @@ const Homepage = {
      */
     goToProductCatalogue: function() {
       this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
+    },
+
+    goToSalesHistory: function() {
+      this.$router.push({path: `/businesses/${this.getBusinessId()}/sales-history`});
     },
 
     checkUserSession: function() {

@@ -43,12 +43,14 @@ describe("ReImage tests", () => {
     test("Item image url is retrieved - development", async () => {
         process.env.NODE_ENV = "development";
         await wrapper.setProps({imagePath: mockImagePath});
+        console.log(wrapper.vm.imagePath);
         expect(wrapper.vm.getImgUrl()).toEqual('/media/images/23987192387509-123908794328.png');
     });
 
     test("Item image url is retrieved - production", async () => {
         process.env.NODE_ENV = "production";
         await wrapper.setProps({imagePath: mockImagePath});
+        expect(wrapper.vm.imagePath).toBe(mockImagePath);
         expect(wrapper.vm.getImgUrl()).toEqual('/prod/prod_images//media/images/23987192387509-123908794328.png');
     });
 

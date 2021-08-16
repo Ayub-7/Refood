@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.BusinessFinder;
+import org.seng302.finders.AddressFinder;
 import org.seng302.models.Business;
 import org.seng302.models.BusinessType;
 import org.seng302.models.Role;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
@@ -40,6 +42,8 @@ public class BusinessController {
 
     @Autowired
     private BusinessFinder businessFinder;
+
+
 
     /**
      * Get request mapping for getting business by id
