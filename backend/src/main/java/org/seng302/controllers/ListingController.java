@@ -225,13 +225,13 @@ public class ListingController {
         }
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         Inventory inventory = listing.getInventoryItem();
-
         BoughtListing boughtListing = new BoughtListing(user, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated());
         boughtListingRepository.save(boughtListing);
-        if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).isEmpty()) {
-            inventoryRepository.delete(inventory);
-        }
         listingRepository.delete(listing);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).size() == 1) {
+            inventoryRepository.delete(inventory);
+            return ResponseEntity.status(HttpStatus.OK).body("Listing and Inventory Item Deleted");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("Listing Deleted");
     }
 }

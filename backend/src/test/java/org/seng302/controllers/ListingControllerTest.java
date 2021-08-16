@@ -30,6 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @WebMvcTest(controllers = ListingController.class)
 @ContextConfiguration(classes = TestApplication.class)
 class ListingControllerTest {
@@ -84,7 +86,7 @@ class ListingControllerTest {
         Date beforeDate = beforeCalendar.getTime();
         inventory1 = new Inventory("07-4957066", 1, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
         newListingRequest = new NewListingRequest(inventory1.getId(), 2, 2.99, "more info", laterDate);
-        listing1 = new Listing(inventory1, 5, 2.0, "Seller may be interested in offers", new Date(), laterDate);
+        listing1 = new Listing(inventory1, 10, 2.0, "Seller may be interested in offers", new Date(), laterDate);
         listingRepository.save(listing1);
         afterCalendar.set(2022, 2, 2);
         Date anotherLaterDate = afterCalendar.getTime();
@@ -473,7 +475,31 @@ class ListingControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @WithMockUser(roles="USER")
+    void testDeleteListingNonExistent() throws Exception {
+        mvc.perform(delete("/businesses/listings/10")).andExpect(status().isNotAcceptable());
+    }
 
+    @Test
+    @WithMockUser(roles="USER")
+    void testDeleteListingSuccessful() throws Exception {
+        Mockito.when(listingRepository.findListingById(1)).thenReturn(listing1);
+        mvc.perform(delete("/businesses/listings/1")).andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testDeleteFinalListingFromInventoryAndInventoryAlso() throws Exception {
+        inventory1.setQuantity(0);
+        listing1.setInventoryItem(inventory1);
+        Mockito.when(listingRepository.findListingById(1)).thenReturn(listing1);
+        Inventory inventory = listing1.getInventoryItem();
+        List<Listing> listings = new ArrayList<>();
+        listings.add(listing1);
+        Mockito.when(listingRepository.findListingsByInventoryItem(inventory)).thenReturn(listings);
+        mvc.perform(delete("/businesses/listings/1")).andExpect(status().isOk()).andExpect(content().string("Listing and Inventory Item Deleted"));
+    }
 //    @Test
 //    @WithMockUser
 //    void testFindListing_returnOk() throws Exception {
