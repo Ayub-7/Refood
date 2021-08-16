@@ -815,8 +815,8 @@ div#search-parameters {
 .like-button.vs-icon:hover {
   transition: opacity 0.3s, font-size 0.3s, right 0.3s;
   opacity: 1.5;
-  font-size: 48px!important;
-  right: 24px;
+  font-size: 42px!important;
+  right: 16px;
 }
 
 
