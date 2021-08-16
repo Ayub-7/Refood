@@ -91,6 +91,13 @@
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
               <div slot="media">
                 <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
+                <div v-if="!likedListingsIds.includes(listing.id)">
+                  <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                </div>
+                <div v-else>
+                  <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                </div>
+
               </div>
               <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
               <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
@@ -104,10 +111,6 @@
               <div>{{ listing.moreInfo }}</div>
               <div slot="footer" class="grid-card-footer">
                 Listed: {{ listing.created }}
-              </div>
-              <div>
-                <vs-button :disabled="likedListingsIds.includes(listing.id)" color="primary" type="border" icon="thumb_up" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-button>
-                <vs-button :disabled="!likedListingsIds.includes(listing.id)" color="danger" type="border" icon="thumb_down"  @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-button>
               </div>
             </vs-card>
             <div class="title-centre">
@@ -797,6 +800,25 @@ div#search-parameters {
 .con-vs-card.fixedHeight {
   height: auto;
 }
+
+.like-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+
+  cursor: pointer;
+  text-align: right;
+
+  transition: 0.3s;
+}
+
+.like-button.vs-icon:hover {
+  transition: opacity 0.3s, font-size 0.3s, right 0.3s;
+  opacity: 1.5;
+  font-size: 48px!important;
+  right: 24px;
+}
+
 
 @media screen and (max-width: 900px) {
   #catalogue-options {
