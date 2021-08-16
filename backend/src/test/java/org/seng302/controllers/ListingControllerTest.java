@@ -51,6 +51,10 @@ class ListingControllerTest {
     @MockBean
     private BoughtListingRepository boughtListingRepository;
     @MockBean
+    private ListingLikeRepository listingLikeRepository;
+    @MockBean
+    private ListingNotificationRepository listingNotificationRepository;
+    @MockBean
     private ProductFinder productFinder;
     @Autowired
     private ObjectMapper mapper;
@@ -106,6 +110,7 @@ class ListingControllerTest {
         mvc.perform(get("/businesses/{id}/listings", business.getId()))
                 .andExpect(status().isUnauthorized());
     }
+
     @Test
     @WithMockUser(roles="USER")
     void testSuccessfulGetBusinessListings() throws Exception {
@@ -117,6 +122,7 @@ class ListingControllerTest {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
     }
+
     @Test
     @WithMockUser(roles="USER")
     void testGetListingForNullBusiness() throws Exception {
