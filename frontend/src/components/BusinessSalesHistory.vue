@@ -7,7 +7,7 @@
     <vs-divider/>
 
     <vs-table
-        :data="testData"
+        :data="salesHistory"
         noDataText="Your listings will be displayed here once you have sold at least one product."
         stripe>
       <template slot="thead">
@@ -21,13 +21,13 @@
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="(listing, index) in data" :key="index">
-          <vs-td class="listing-image-column"><ReImage :image-path="listing.inventoryItem.product.primaryImagePath" class="listing-image"/></vs-td>
-          <vs-td>{{listing.inventoryItem.product.name}}</vs-td>
-          <vs-td>{{listing.sold}}</vs-td>
+          <vs-td class="listing-image-column"><ReImage :image-path="listing.listing.inventoryItem.product.primaryImagePath" class="listing-image"/></vs-td>
+          <vs-td>{{listing.listing.inventoryItem.product.name}}</vs-td>
           <vs-td>{{listing.created}}</vs-td>
-          <vs-td>{{listing.quantity}}</vs-td>
-          <vs-td>{{currency}}{{listing.price}}</vs-td>
-          <vs-td>{{listing.likes}}</vs-td>
+          <vs-td>{{listing.listing.created}}</vs-td>
+          <vs-td>{{listing.listing.quantity}}</vs-td>
+          <vs-td>{{currency}}{{listing.listing.price}}</vs-td>
+          <vs-td>{{listing.listing.likes}}</vs-td>
         </vs-tr>
 
       </template>
@@ -37,6 +37,7 @@
 
 <script>
 import ReImage from "./ReImage";
+import {store} from "../store"
 import api from "../Api";
 import axios from "axios";
 
@@ -47,6 +48,8 @@ export default {
   data: function() {
     return {
       currency: "$",
+      notifications: [],
+      salesHistory: [],
       testData: [
         {
           "id": 1,
@@ -88,7 +91,41 @@ export default {
     }
   },
 
+  mounted: function() {
+    this.getSalesHistory();
+    this.getSession();
+    console.log(this.salesHistory)
+  },
+
   methods: {
+    /**
+     * Calls get sales history
+     */
+    filterNotifications: function () {
+      console.log("second")
+      console.log("third");
+      for (const item of this.notifications) {
+        if (item.status == "Bought") {
+          this.salesHistory.push(item);
+        }
+      }
+    },
+
+    /**
+     * Calls get sales history
+     */
+    getSalesHistory: function () {
+      api.getSales(store.loggedInUserId, this.$route.params.id, 1)
+        .then((res) => {
+          this.notifications = res.data;
+          console.log("first");
+          this.filterNotifications();
+        })
+        .catch(err => {
+          this.$log.debug(err);
+        });
+    },
+
     /**
      * Calls get session endpoint to get user country, if successful calls setCurrency ()
      */
@@ -115,10 +152,6 @@ export default {
       });
     },
   },
-
-  mounted: function() {
-    this.getSession();
-  }
 }
 </script>
 

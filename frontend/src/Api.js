@@ -436,5 +436,13 @@ export default {
      * Get router endpoint for unliking listing
      * @param id
      */
-    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true})
+    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
+
+    /**
+     * Get router endpoint for listing sales
+     * @param userId
+     * @param businessId
+     * @param listingId
+     */
+    getSales: (userId, businessId, listingId) => instance.get(`/businesses/${businessId}/listings/${listingId}/users/${userId}/notify`, {withCredentials: true})
 }
