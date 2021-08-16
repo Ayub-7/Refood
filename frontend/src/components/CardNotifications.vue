@@ -13,7 +13,7 @@
                 <div class="dropdown-item-name">
 
                     <!-- If card is expired -->
-                    <div class="cardContainer" v-if="notification.status == expired">
+                    <div class="cardContainer" v-if="notification.status === expired">
                         <div id="text">
                         {{notification.title}} has expired
                         </div>
@@ -24,9 +24,14 @@
                     </div>
 
                     <!-- If card is deleted -->
-                    <div class="cardContainer" v-else-if="notification.status == deleted">
+                    <div class="cardContainer" v-else-if="notification.status === deleted">
                         {{notification.title}} has been removed
                     </div>
+
+                  <!-- If listing has been purchased -->
+                  <div class="cardContainer" v-else-if="notification.status === Bought">
+                    {{notification.title}} has been purchased by another user
+                  </div>
 
                 </div>
             </div>
@@ -95,6 +100,16 @@ export default {
         .then((response) => {
             mutations.setNotifications(response.data);
         })
+      },
+
+      /**
+       * Calls api method to get notifications for listings
+       */
+      getListingNotifications() {
+        api.getListingNotifications(store.loggedInUserId)
+            .then((response) => {
+              mutations.setNotifications( response.data);
+            })
       }
     },
 

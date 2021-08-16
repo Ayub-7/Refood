@@ -439,11 +439,12 @@ export default {
 
     /**
      * Get a list of a user's listing notifications
-     * @param userId
      * @param businessId
+     * @param listingId
+     * @param userId
      * @return {Promise<AxiosResponse<any>>}
      */
-    getBusinessListingNotifications: (userId, businessId) => instance.get(`/businesses/{businessId}/listings/{listingId}/users/{userId}/notify`, {withCredentials: true}),
+    //getBusinessListingNotifications: (businessId, listingId, userId) => instance.get(`/businesses/{businessId}/listings/{listingId}/users/{userId}/notify`, {withCredentials: true}),
 
     /**
      * Get router endpoint for retrieving a users liked listings
