@@ -334,7 +334,7 @@ api.checkSession = jest.fn(() => {
 });
 
 api.getSales = jest.fn(() => {
-    return Promise.resolve({data: mockUser, status: 200});
+    return Promise.resolve({data: mockUser, status: 200}).catch({response: {message: "Bad request", status: 400}});
 });
 
 axios.get = jest.fn(() => {
