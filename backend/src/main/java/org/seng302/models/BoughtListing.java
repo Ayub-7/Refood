@@ -31,6 +31,8 @@ public class BoughtListing {
 
     private int quantity;
 
+    private long listingId;
+
     /**
      * Empty constructor for JPA use
      */
@@ -43,12 +45,28 @@ public class BoughtListing {
      * @param likes
      * @param quantity
      */
-    public BoughtListing(User buyer, Product product, int likes, int quantity, Date listed) {
+    public BoughtListing(User buyer, Product product, int likes, int quantity, Date listed, long listingId) {
         this.buyer = buyer;
         this.product = product;
         this.likes = likes;
         this.quantity = quantity;
         this.sold = new Date();
         this.listed = listed;
+        this.listingId = listingId;
+    }
+
+    /**
+     * Barebones constructor for boughtListing
+     * @param buyer User object that purchased listing
+     * @param listing Listing object that was purchased
+     */
+    public BoughtListing(User buyer, Listing listing) {
+        this.buyer = buyer;
+        this.product = listing.getInventoryItem().getProduct();
+        this.likes = listing.getLikes();
+        this.quantity = listing.getQuantity();
+        this.sold = new Date();
+        this.listed = listing.getCreated();
+        this.listingId = listing.getId();
     }
 }
