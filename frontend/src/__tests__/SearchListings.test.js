@@ -799,7 +799,6 @@ beforeEach(() => {
     api.filterListingsQuery = jest.fn(() => {
         return Promise.resolve({data: mockListingsFromSearch, status: 200}).finally();
     });
-
     wrapper.vm.filterListings = jest.fn();
 });
 
@@ -808,16 +807,30 @@ afterEach(() => {
 });
 
 describe('Button clicks', () => {
-    test('Clicking search button calls search method', async ()  => {
-        wrapper.vm.filterListings = jest.fn();
+    test('Clicking search button calls correct method', async ()  => {
         //wrapper.vm.checkForm = jest.fn();
-        // expect(wrapper.find('.header-button').exists()).toBe(true);
         let button = wrapper.find('#main-search-btn')
         button.trigger('click')
-        //expect(wrapper.find('.header-button').exists()).toBe(true);
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.filterListings).toBeCalled();
-    })
+        expect(wrapper.vm.checkForm).toBeCalled();
+    });
+
+    test('Clicking sort button calls correct method', async ()  => {
+        wrapper.vm.filterListings();
+        expect(wrapper.vm.checkForm).toBeCalled();
+    });
+
+
+    test('Clicking pagination button calls correct method', async ()  => {
+        wrapper.vm.checkForm = jest.fn();
+        let button = wrapper.find('.vs-pagination--nav')
+        button.trigger('change')
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.checkForm).toBeCalled();
+    });
+
+
+
 });
 
 describe('Filter validation', () => {
@@ -846,10 +859,14 @@ describe('Listings search page tests', () => {
         expect(wrapper.find('.grid-container').exists()).toBe(true);
     });
 
-    test('Clicking on a listing redirects to details page', () => {
-        //wrapper.vm.filterListings = jest.fn();
-        expect(wrapper.find('#media-div').exists()).toBe(true);
-        //expect(wrapper.vm.filterListings).toBeCalled();
+    test('Clicking on a listing redirects to details page', async () => {
+        wrapper.vm.viewListing = jest.fn();
+        let clickableImg = wrapper.find('#media-div')
+        clickableImg.trigger('click');
+        await wrapper.vm.$nextTick();
+
+        //expect(wrapper.find('#media-div').exists()).toBe(true);
+        expect(wrapper.vm.viewListing).toBeCalled();
     });
 
 

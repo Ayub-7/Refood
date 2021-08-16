@@ -78,7 +78,7 @@
                     <vs-select-item key="asc" value="asc" text="Ascending"></vs-select-item>
                     <vs-select-item key="desc" value="desc" text="Descending"></vs-select-item>
                 </vs-select>
-                <vs-button class="sort-btn" @click="filterListings" style="width: 100px">Sort</vs-button>
+                <vs-button class="sort-btn" id="sort-button" @click="filterListings" style="width: 100px">Sort</vs-button>
                 </div>
                 </div>
             </div>
@@ -219,9 +219,9 @@ const SearchListings = {
      * that the user has filled in, along with the chosen sort
      * */
     filterListings: function(){
-      if(!this.minClosingDate){
-        this.minClosingDate = Date.now()
-      }
+      // if(!this.minClosingDate){
+      //   this.minClosingDate = Date.now()
+      // }
       if(this.checkForm()){
         api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
             this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
