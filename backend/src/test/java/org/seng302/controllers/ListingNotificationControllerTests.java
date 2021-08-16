@@ -8,10 +8,8 @@ import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.models.requests.ListingNotificationRequest;
-import org.seng302.repositories.BusinessRepository;
-import org.seng302.repositories.ListingNotificationRepository;
-import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.*;
+import org.seng302.controllers.ListingLikeController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,6 +37,8 @@ public class ListingNotificationControllerTests {
     private ListingNotificationController listingLikeController;
     @MockBean
     private ListingRepository listingRepository;
+    @MockBean
+    private ListingLikeRepository listingLikeRepository;
     @MockBean
     private ListingNotificationRepository listingNotificationRepository;
     @MockBean
@@ -94,24 +94,8 @@ public class ListingNotificationControllerTests {
      */
     @Test
     void testPostNewNotification_noAuth_returnUnauthorized() throws Exception {
-        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()))
+        mvc.perform(post("/listings/{listingId}/notify", listing.getId()))
                 .andExpect(status().isUnauthorized());
-    }
-
-    /**
-     * An invalid user returns 406 (not acceptable)
-     */
-    @Test
-    @WithMockUser
-    void testPostNewNotification_noExistingUser_returnNotAcceptable() throws Exception {
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).contentType("application/json")
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isNotAcceptable());
     }
 
     /**
@@ -120,42 +104,21 @@ public class ListingNotificationControllerTests {
     @Test
     @WithMockUser
     void testPostNewNotification_noExistingListing_returnNotAcceptable() throws Exception {
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(null);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).contentType("application/json")
-                .content(mapper.writeValueAsString(request)))
+        mvc.perform(post("/listings/{listingId}/notify", listing.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
     }
 
     /**
-     * An invalid business returns 406 (not acceptable)
-     */
-    @Test
-    @WithMockUser
-    void testPostNewNotification_noExistingBusiness_returnNotAcceptable() throws Exception {
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
-        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).contentType("application/json")
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isNotAcceptable());
-    }
-
-    /**
-     * Works as expected with valid user, listing, business and valid IDs
+     * Works as expected with valid user, listing and valid IDs
      */
     @Test
     @WithMockUser
     void testPostNewNotification_successfulNotification_returnCreated() throws Exception {
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        mvc.perform(post("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).contentType("application/json")
-                .content(mapper.writeValueAsString(request)))
+        mvc.perform(post("/listings/{listingId}/notify", listing.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isCreated());
     }
 
@@ -169,8 +132,7 @@ public class ListingNotificationControllerTests {
      */
     @Test
     void testNoAuthGetListingNotifications() throws Exception {
-        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId())).andExpect(status().isUnauthorized());
+        mvc.perform(get("/users/{userId}/notifications", user.getId())).andExpect(status().isUnauthorized());
     }
 
     /**
@@ -181,41 +143,9 @@ public class ListingNotificationControllerTests {
     @WithMockUser
     void testGetNotifications_invalidUserId_returnNotAcceptable() throws Exception {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(user.getId())).thenReturn(null);
-        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-                .andExpect(status().isNotAcceptable());
-    }
-
-    /**
-     * Tests unsuccessful retrieval of all listing notifications due to invalid listingId
-     * @throws Exception
-     */
-    @Test
-    @WithMockUser
-    void testGetNotifications_invalidListingId_returnNotAcceptable() throws Exception {
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(null);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-                .andExpect(status().isNotAcceptable());
-    }
-
-    /**
-     * Tests unsuccessful retrieval of all listing notifications due to invalid businessId
-     * @throws Exception
-     */
-    @Test
-    @WithMockUser
-    void testGetNotifications_invalidBusinessId_returnNotAcceptable() throws Exception {
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
-        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+        mvc.perform(get("/users/{userId}/notifications", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
     }
 
@@ -227,10 +157,9 @@ public class ListingNotificationControllerTests {
     @WithMockUser
     void testGetNotifications_successfulRetrieval_returnOk() throws Exception {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
-        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
-        mvc.perform(get("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify",
-                business.getId(), listing.getId(), user.getId()).sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+        Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(user.getId())).thenReturn(null);
+        mvc.perform(get("/users/{userId}/notifications", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
     }
 }

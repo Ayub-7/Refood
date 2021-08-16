@@ -953,7 +953,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  '/businesses/{businessId}/listings/{listingId}/users/{userId}/notify':
+  '/listings/{listingId}/notify':
     post:
       tags:
         - 'Listings / sales'
@@ -965,60 +965,22 @@ paths:
             - defaultGlobalApplicationAdmin
       parameters:
         - in: path
-          name: businessId
-          schema:
-            type: integer
-          description: Id of the business owning the listing
-          required: true
-          example: 582
-        - in: path
           name: listingId
           schema:
             type: integer
           description: Id of the listing that has been updated
           required: true
           example: 54343
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          description: Id of the user who is about to receive the notification
-          required: true
-          example: 111
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  description: The ID of the notification
-                  example: 43
-                userId:
-                  type: object
-                  description: The ID of the user who sent the notification
-                  example: 50
-                listingId:
-                  type: object
-                  description: The ID of the listing that has been updated
-                  example: 30
-                status:
-                  type: string
-                  description: The status of the notification. Can be Bought or Expired.
-                  example: "Expired"
-                created:
-                  type: string
-                  description: The date of the notification's creation
-                  example: "2021-04-27"
       responses:
         '201':
           description: Successful notification
         '401':
           description: Cannot send a notification to a user when the sender is
             not logged in.
-        '400':
-          description: Bad request
+        '406':
+          description: Listing ID not found
+
+  '/users/{userId}/notifications':
     get:
       tags:
         - 'Listings / sales'
@@ -1029,13 +991,6 @@ paths:
             - globalApplicationAdmin
             - defaultGlobalApplicationAdmin
       parameters:
-        - in: path
-          name: listingId
-          schema:
-            type: integer
-          description: Id of the listing that has been updated.
-          required: true
-          example: 54343
         - in: path
           name: userId
           schema:
@@ -1053,10 +1008,48 @@ paths:
                 items:
                   $ref: '#/components/schemas/ListOfNotifications'
         '401':
-          description: Cannot send a notification to a user when the sender is
+          description: Cannot send a notification to a user when the receiver is
             not logged in.
         '400':
           description: Bad request
+        '406':
+          description: User ID not found
+
+
+  '/businesses/{businessId}/notifications':
+    get:
+      tags:
+        - 'Listings / sales'
+        - 'U31 : Purchases'
+      summary: Business can retrieve all notifications related to listings they have sold.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: businessId
+          schema:
+            type: integer
+          description: Id of the business who is about to receive the notification
+          required: true
+          example: 111
+      responses:
+        '200':
+          description: Successful retrieval of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListOfNotifications'
+        '401':
+          description: Cannot send a notification to a user when the receiver is
+            not logged in.
+        '400':
+          description: Bad request
+        '406':
+          description: Business ID not found
 
 
   '/cards/{id}':
