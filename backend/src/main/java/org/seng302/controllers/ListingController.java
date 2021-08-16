@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.finders.ListingFinder;
@@ -22,13 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.jpa.domain.Specification;
 
 
 import javax.xml.bind.ValidationException;
@@ -192,7 +189,7 @@ public class ListingController {
 
 
     /**
-     * Creates a new product and adds it to the product catalogue of the current acting business
+     * Creates a new listing and adds it to the listings of the current acting business
      * Authentication is required, user must be a business admin or a default global admin
      * @param id unique identifier of the business
      * @param request the request body for the new listing object

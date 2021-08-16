@@ -34,8 +34,37 @@
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container">
-          <h3>Watchlist:</h3>
+          <div style="margin-top: 1px; margin-left: -20px" class="message-detail-container message">
+            <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
+            <div id="message-detail-message">
+              watchlist
+            </div>
+            {{likes}}
+          </div>
+          <vs-divider style="margin-top: -30px"></vs-divider>
+          <div v-for="(item, index) in likedItem" :key="item.id" >
+            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
+              <div id="likes-notification-container">
+                  <vs-row v-if="item.likes != 0">
+                    <vs-col vs-type="flex" vs-align="center">
+                      <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
+                    </vs-col>
+                  </vs-row>
+                <vs-row v-else>
+                  <vs-col vs-type="flex" vs-align="center">
+                    <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" ></vs-icon>
+                  </vs-col>
+                </vs-row>
+                <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                <div id="product-seller"><b>Seller: </b>{{item.inventoryItem.product.business.name}}</div>
+                <div id="product-closes"><b>Closes: </b>{{item.closes}}</div>
+              </div>
+            </vs-card>
+          </div>
         </div>
+
 
       </div>
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
@@ -66,12 +95,17 @@ import api from "../Api";
 import {mutations, store} from "../store"
 import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
+import ListingDetail from "./ListingDetail";
 
 const Homepage = {
   name: "Homepage",
-  components: {HomePageMessages, MarketplaceGrid},
+  components: {ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
+      unliked: false,
+      showListing: false,
+      likes: 0,
+      likedItem: [],
       userId: null,
       businesses: [],
       actingAsBusinessId: null,
@@ -82,8 +116,57 @@ const Homepage = {
       user: null,
     }
   },
+  /**
+   * Sets the userId variable equal to the userId from the store when the component
+   * is first rendered, then gets the users details from the backend using the API
+   */
+  mounted() {
+    this.checkUserSession();
+    this.getLikes(this.userId);
+  },
 
   methods: {
+    /**
+     * open listing
+     */
+    viewListing: function (businessId, listingId) {
+      this.$router.push({name: "Listing", params: {businessId: businessId, listingId: listingId}})
+    },
+
+    /**
+     * unlike an item
+     */
+    unlike: function (id, index) {
+      this.likes -= 1;
+      this.likedItem.splice(index, 1)
+      api.unlikeListing(id)
+      .then(() => {
+        this.$vs.notify({title: "Successfully unliked listing", color: "success"});
+      })
+      .catch((error) => {
+        if (error.response) {
+          this.$vs.notify({title: "Error unliking listing", color: "danger"});
+        }
+        this.$log.debug(error);
+      })
+
+    },
+    /**
+     * Retrieves all the cards that the user has liked.
+     */
+    getLikes: function(userId) {
+      api.getLikedListings(userId)
+        .then((res) => {
+          this.likedItem = res.data;
+          this.likes = res.data.length;
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving likes", color: "danger"});
+          }
+        })
+    },
+
     /**
      * Retrieves all the cards that the user has created.
      */
@@ -248,22 +331,44 @@ const Homepage = {
           });
     }
   },
-
-  /**
-   * Sets the userId variable equal to the userId from the store when the component
-   * is first rendered, then gets the users details from the backend using the API
-   */
-  mounted: function () {
-    this.checkUserSession();
-  }
-
-
 }
 
 export default Homepage;
 </script>
 
 <style scoped>
+#product-name {
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+#product-closes {
+  font-size: 12px;
+}
+
+#view-icon {
+  font-size: 15px;
+  margin-left: -1px;
+  cursor: pointer
+}
+
+#view-unlike-icon {
+  font-size: 15px;
+  margin-left: -1px;
+  cursor: pointer
+}
+
+#like-icon {
+  font-size: 13px;
+  margin-left: 150px;
+  cursor: pointer
+}
+
+#unlike-icon {
+  font-size: 13px;
+  margin-left: 150px;
+  cursor: pointer
+}
 
 #market-card-modal >>> .vs-popup {
   width: 1200px;
