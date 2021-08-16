@@ -280,7 +280,8 @@ const SearchListings = {
       if(this.maxPrice != null){
         if(this.maxPrice < 0){
           this.errors.push('invalid-maxprice');
-        } else if (this.maxPrice < this.minPrice){
+        }
+        if (this.maxPrice < this.minPrice){
           this.errors.push('invalid-maxprice');
         }
       }
