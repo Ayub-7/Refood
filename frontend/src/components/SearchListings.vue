@@ -585,6 +585,11 @@ const SearchListings = {
       });
     },
 
+    /**
+     * method to submit a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
     sendLike: function(listingId, listingName) {
       api.addLikeToListing(listingId)
         .then(() => {
@@ -596,6 +601,11 @@ const SearchListings = {
         })
     },
 
+    /**
+     * Deletes a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
     deleteLike: function(listingId, listingName) {
       api.removeLikeFromListing(listingId)
           .then(() => {
