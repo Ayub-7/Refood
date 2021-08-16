@@ -432,7 +432,7 @@ export default {
      * @return 401 if unauthorized, 406 if the listing does not exist, 201 otherwise.
      */
     addLikeToListing: (listingId) =>
-        instance.post(`/businesses/listings/${listingId}/like`, {withCredentials: true}),
+        instance.post(`/businesses/listings/${listingId}/like`, {}, {withCredentials: true}),
 
     /**
      * Retrieves and returns a list of LISTINGS that the user has liked.
