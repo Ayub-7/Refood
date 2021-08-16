@@ -102,7 +102,7 @@ describe('User acting as tests', () => {
     })
 });
 
-describe( 'functionality tests', () => {
+describe( 'Backend error checking tests', () => {
     beforeEach(() => {
         wrapper = mount(ActingAs, {
             propsData: {},
@@ -129,6 +129,19 @@ describe( 'functionality tests', () => {
 
     test('When setActingAsBusinessId returns 200, the cache is refreshed and the user acts as a business', async () => {
         api.actAsBusiness = jest.fn(() => {
+            return Promise.resolve({status: 201, data: {id: 1}});
+        });
+        wrapper.vm.refreshCachedItems = jest.fn();
+        wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.refreshCachedItems).toBeCalled();
+        expect(wrapper.vm.$router.push).toBeCalled();
+    });
+
+    test('When setActingAsBusinessId returns an unspecified error (500), the problem is printed to debug', async () => {
+        api.actAsBusiness = jest.fn(() => {
             return Promise.reject({response: {status: 500}});
         });
 
@@ -137,74 +150,32 @@ describe( 'functionality tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(api.actAsBusiness).toBeCalled()
-        expect(wrapper.vm.testvar).toBe(1);
-
-        //expect(wrapper.vm.$log.debug).toBeCalled();
-
-    });
-})
-
-/*
-
-
-    test('When  unspecified error (500), User is notified', () => {
-        api.actAsBusiness = jest.fn(() => {
-            return Promise.reject({response: {status: 500}});
-        });
-
-        wrapper.vm.setActingAsUser();
         expect(wrapper.vm.$log.debug).toBeCalled();
-
-        //expect(wrapper.vm.$vs.notify).toBeCalled();
     });
 
-
-
-    test('When setActingAsBusinessId returns 200, the cache is refreshed and the user acts as a business', () => {
+    test('When setActingAsUser returns 200, the cache is refreshed and the user acts as a business', async () => {
         api.actAsBusiness = jest.fn(() => {
             return Promise.resolve({status: 201, data: {id: 1}});
         });
+        wrapper.vm.refreshCachedItems = jest.fn();
+        wrapper.vm.setActingAsUser();
 
+        await wrapper.vm.$nextTick();
 
-        //api.actAsBusiness(0);
-
-        //wrapper.vm.refreshCachedItems = jest.fn();
-        wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
-
-        //wrapper.vm.refreshCachedItems();
-
-        //expect(wrapper.vm.sessionStorage.getItem).toBeCalled();
-
-        //expect(api.actAsBusiness).toBeCalled();
-        expect(wrapper.vm.testvar).toBe(1);
-        //expect(wrapper.vm.$log.debug).toBeCalled();
-
+        expect(wrapper.vm.refreshCachedItems).toBeCalled();
+        expect(wrapper.vm.$router.push).toBeCalled();
     });
 
-
-    test('When setActingAsBusinessId returns 200, the cache is refreshed and the user acts as a business', () => {
+    test('When setActingAsUser returns an unspecified error (500), the problem is printed to debug', async () => {
         api.actAsBusiness = jest.fn(() => {
-            return Promise.resolve({status: 200, data: {id: 1}});
+            return Promise.reject({response: {status: 500, message: "unspecified error"}});
         });
-        wrapper.vm.refreshCachedItems = jest.fn();
+
         wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
 
-        //wrapper.vm.refreshCachedItems();
+        await wrapper.vm.$nextTick();
 
-        //expect(wrapper.vm.sessionStorage.getItem).toBeCalled();
-        expect(wrapper.vm.refreshCachedItems).toBeCalled();
-
-    })
-
-
-        test('When setActingAsBusinessId returns error, the result is printed to debug', () => {
-            api.actAsBusiness = jest.fn(() => {
-                return Promise.reject({response: {message: "Bad request", status: 403}});
-            });
-
-            wrapper.vm.setActingAsBusiness = jest.fn();
-            wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
-
-            expect(wrapper.vm.$log.debug).toBeCalled();
-        })
-    */
+        expect(api.actAsBusiness).toBeCalled()
+        expect(wrapper.vm.$log.debug).toBeCalled();
+    });
+});
