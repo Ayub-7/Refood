@@ -47,7 +47,8 @@ const actingAs =  {
       role: null,
       userBusinesses: [],
       actingAsBusinessId: null,
-      actingAsBusinessName: null
+      actingAsBusinessName: null,
+      testvar: 0
     }
   },
   methods: {
@@ -73,12 +74,14 @@ const actingAs =  {
             this.refreshCachedItems();
             mutations.setActingAsBusiness(businessId, businessName)
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+            this.testvar = 1;
           }).catch((error) => {
         if(error.response) {
           this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
 
         }
         this.$log.debug("Error Status:", error)
+        this.testvar = 1;
       });
 
       // Prominent vue-router contributor suggests to catch error and do nothing with it.
@@ -91,10 +94,13 @@ const actingAs =  {
             this.refreshCachedItems();
             mutations.setActingAsUser();
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+            this.testvar = 1;
           }).catch((error) => {
         if(error.response) {
           this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
         }
+        this.testvar = 1;
+
         this.$log.debug("Error Status:", error)
       });
     },

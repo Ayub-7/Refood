@@ -794,6 +794,7 @@ describe('Listings search page tests', () => {
     //     //expect(wrapper.vm.filterListings).toBeCalled();
     // });
     //
+    /*
     test('Clicking search button calls search method', () => {
         wrapper.vm.filterListings = jest.fn();
 
@@ -801,6 +802,7 @@ describe('Listings search page tests', () => {
         wrapper.find('.header-button').trigger('click');
         expect(wrapper.vm.filterListings).toBeCalled();
     })
+*/
     //
     // test('Clicking sort button calls search method', () => {
     //     expect(wrapper.find('.grid-container').exists()).toBe(true);
