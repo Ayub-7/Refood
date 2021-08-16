@@ -449,6 +449,6 @@ export default {
      * @param session the current user session - used to figure out who is doing the unliking.
      * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
      */
-    removeLikeFromLising: (id) =>
+    removeLikeFromListing: (id) =>
         instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 }
