@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.AddressFinder;
 import org.seng302.finders.ProductFinder;
 import org.seng302.finders.ListingFinder;
 import org.seng302.finders.ListingSpecifications;
@@ -54,6 +55,8 @@ class ListingControllerTest {
     @Autowired
     private ObjectMapper mapper;
     @MockBean
+    private AddressFinder addressFinder;
+    @MockBean
     private ListingFinder listingFinder;
     private User ownerUser;
     private User adminUser;
@@ -64,6 +67,7 @@ class ListingControllerTest {
     private Listing listing1;
     private Listing listing2;
     private NewListingRequest newListingRequest;
+    
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
         ownerUser = new User("Rayna", "YEP", "Dalgety", "Universal", "zero tolerance task-force" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ATQWJM");
@@ -77,7 +81,9 @@ class ListingControllerTest {
         business.setId(1L);
         business.createBusiness(ownerUser);
         business.getAdministrators().add(adminUser);
+
         product1 = new Product("07-4957066", business, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
+
         Calendar afterCalendar = Calendar.getInstance();
         afterCalendar.set(2022, 1, 1);
         Date laterDate = afterCalendar.getTime();

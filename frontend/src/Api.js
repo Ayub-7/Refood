@@ -423,6 +423,18 @@ export default {
      * @param userId
      * @returns {Promise<AxiosResponse<any>>} Messages of the user
      */
-    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
 
+    /**
+     * Get router endpoint for retrieving a users liked listings
+     * @param id
+     * @returns {Promise<AxiosResponse<any>>} liked listings
+     */
+    getLikedListings: (id) => instance.get(`/users/${id}/likes`, {withCredentials: true}),
+
+    /**
+     * Get router endpoint for unliking listing
+     * @param id
+     */
+    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true})
 }

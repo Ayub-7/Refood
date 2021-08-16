@@ -840,6 +840,196 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Cards by Section",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/cards?section=ForSale&pageNum=1&resultsPerPage=3&reverse=true",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cards"
+							],
+							"query": [
+								{
+									"key": "section",
+									"value": "ForSale"
+								},
+								{
+									"key": "pageNum",
+									"value": "1"
+								},
+								{
+									"key": "resultsPerPage",
+									"value": "3"
+								},
+								{
+									"key": "sortBy",
+									"value": "country",
+									"disabled": true
+								},
+								{
+									"key": "reverse",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Likes",
+			"item": [
+				{
+					"name": "Add New Like",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id/like",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Liked Listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/likes",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listing Notification",
+			"item": [
+				{
+					"name": "Add Listing Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"userId\": 1,\r\n    \"listingId\": 1,\r\n    \"status\": \"Expired\",\r\n    \"created\": \"2021-04-27\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"listings",
+								":listingId",
+								"users",
+								":userId",
+								"notify"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								},
+								{
+									"key": "listingId",
+									"value": "1"
+								},
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Listing Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"listings",
+								":listingId",
+								"users",
+								":userId",
+								"notify"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								},
+								{
+									"key": "listingId",
+									"value": "1"
+								},
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

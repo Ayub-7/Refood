@@ -1,5 +1,6 @@
 package org.seng302.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
@@ -11,10 +12,10 @@ import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 @RestController
@@ -59,5 +60,36 @@ public class ListingNotificationController {
     listingNotificationRepository.save(listingNotification);
 
     return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  /**
+   * Endpoint for retrieving a list of a user's listing notifications
+   * @param businessId ID of the business owning the listing
+   * @param listingId ID of the listing
+   * @param userId ID of the user
+   * @param session the current active user session
+   * @return 200 if successful with a list of listing notifications
+   * @throws JsonProcessingException when json mapping object to a json string fails unexpectedly
+   */
+  @GetMapping("/businesses/{businessId}/listings/{listingId}/users/{userId}/notify")
+  public ResponseEntity<List<ListingNotification>> getListingNotifications(@PathVariable("businessId") long businessId,
+                                                                           @PathVariable("listingId") long listingId,
+                                                                           @PathVariable("userId") long userId,
+                                                                           HttpSession session) throws JsonProcessingException {
+    User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+    Business business = businessRepository.findBusinessById(businessId);
+    User user = userRepository.findUserById(userId);
+    Listing listing = listingRepository.findListingById(listingId);
+
+    if (currentUser == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    if (listing == null || user == null || business == null) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+    }
+
+    List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByUserId(userId);
+    return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
   }
 }

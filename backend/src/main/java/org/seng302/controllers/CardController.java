@@ -191,7 +191,7 @@ public class CardController {
      *
      *
      */
-    @Scheduled(fixedDelay = 60000, initialDelay = 0)
+//    @Scheduled(fixedDelay = 60000, initialDelay = 0)
     public void updateExpiredCards() {
         logger.info("Checking for expired cards");
         Date date = new Date();
