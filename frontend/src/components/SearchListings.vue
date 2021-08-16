@@ -9,7 +9,7 @@
 
         <div id="catalogue-options">
           <vs-input class="search-input" type="search" placeholder="Enter a listing..." name="searchbarUser" v-model="productQuery" style="width: 400px; font-size: 24px" size="medium"/>
-          <vs-button class="header-button" @click="filterListings">Search</vs-button>
+          <vs-button class="header-button" id="main-search-btn" @click="filterListings">Search</vs-button>
 
         </div>
 
@@ -228,10 +228,15 @@ const SearchListings = {
             .then((response) => {
               this.listings = response.data.content
               this.totalPages = response.data.totalPages;
-              console.log(this.listings)
             })
-            .catch((error) => {
-              console.log(error)
+            .catch(err => {
+              if(err.response.status === 400) { // Catch 400 Bad Request
+                this.$vs.notify({title:'Error', text:'Some filters are invalid', color:'danger'});
+
+              }
+              else { // Catch anything else.
+                this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+              }
             });
       }
 

@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import SearchListings from '../components/SearchListings.vue';
 import Vuesax from 'vuesax';
 import api from "../Api";
@@ -7,478 +7,505 @@ import axios from "axios";
 let wrapper;
 
 //Mock response data from search request
-const mockListingsFromSearch = [
-    {
-        "id": 8101,
-        "inventoryItem": {
-            "id": 3625,
-            "product": {
-                "id": "WAUVT68E95A621381",
-                "business": {
-                    "name": "Bluezoom",
-                    "id": 371,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": "Pellentesque at nulla.",
-                    "address": {
-                        "streetNumber": "96",
-                        "streetName": "Veith",
-                        "suburb": null,
-                        "city": "Okulovka",
-                        "region": null,
-                        "country": "Russia",
-                        "postcode": "174350"
+const mockListingsFromSearch = {
+    "content": [
+        {
+            "id": 8101,
+            "inventoryItem": {
+                "id": 3625,
+                "product": {
+                    "id": "WAUVT68E95A621381",
+                    "business": {
+                        "name": "Bluezoom",
+                        "id": 371,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": "Pellentesque at nulla.",
+                        "address": {
+                            "streetNumber": "96",
+                            "streetName": "Veith",
+                            "suburb": null,
+                            "city": "Okulovka",
+                            "region": null,
+                            "country": "Russia",
+                            "postcode": "174350"
+                        },
+                        "businessType": "Electricity, Gas, Water and Waste Services",
+                        "created": "2019-04-12 09:28:16"
                     },
-                    "businessType": "Electricity, Gas, Water and Waste Services",
-                    "created": "2019-04-12 09:28:16"
+                    "name": "Longos - Chicken Cordon Bleu",
+                    "description": "Suspendisse accumsan tortor quis turpis.",
+                    "manufacturer": "Tempor Est Foundation",
+                    "recommendedRetailPrice": 98.53,
+                    "created": "2021-02-03 02:50:51",
+                    "images": [],
+                    "primaryImagePath": null
                 },
-                "name": "Longos - Chicken Cordon Bleu",
-                "description": "Suspendisse accumsan tortor quis turpis.",
-                "manufacturer": "Tempor Est Foundation",
-                "recommendedRetailPrice": 98.53,
-                "created": "2021-02-03 02:50:51",
-                "images": [],
-                "primaryImagePath": null
+                "quantity": 99,
+                "pricePerItem": 98.4,
+                "totalPrice": 9741.6,
+                "manufactured": "2021-03-02",
+                "sellBy": "2021-09-04",
+                "bestBefore": "2021-01-17",
+                "expires": "2022-10-30"
             },
-            "quantity": 99,
-            "pricePerItem": 98.4,
-            "totalPrice": 9741.6,
-            "manufactured": "2021-03-02",
-            "sellBy": "2021-09-04",
-            "bestBefore": "2021-01-17",
-            "expires": "2022-10-30"
+            "quantity": 44,
+            "price": 4329.6,
+            "moreInfo": "Morbi non quam nec dui luctus rutrum.",
+            "created": "2021-03-01 09:06:18",
+            "closes": "2022-10-31 08:12:42",
+            "likes": 0
         },
-        "quantity": 44,
-        "price": 4329.6,
-        "moreInfo": "Morbi non quam nec dui luctus rutrum.",
-        "created": "2021-03-01 09:06:18",
-        "closes": "2022-10-31 08:12:42",
-        "likes": 0
-    },
-    {
-        "id": 2009,
-        "inventoryItem": {
-            "id": 5628,
-            "product": {
-                "id": "5UXZW0C56D0221636",
-                "business": {
-                    "name": "Meemm",
-                    "id": 305,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": "Nunc nisl.",
-                    "address": {
-                        "streetNumber": null,
-                        "streetName": null,
-                        "suburb": null,
-                        "city": null,
-                        "region": null,
-                        "country": "Greece",
-                        "postcode": null
+        {
+            "id": 2009,
+            "inventoryItem": {
+                "id": 5628,
+                "product": {
+                    "id": "5UXZW0C56D0221636",
+                    "business": {
+                        "name": "Meemm",
+                        "id": 305,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": "Nunc nisl.",
+                        "address": {
+                            "streetNumber": null,
+                            "streetName": null,
+                            "suburb": null,
+                            "city": null,
+                            "region": null,
+                            "country": "Greece",
+                            "postcode": null
+                        },
+                        "businessType": "Mining",
+                        "created": "2019-12-21 12:22:34"
                     },
-                    "businessType": "Mining",
-                    "created": "2019-12-21 12:22:34"
-                },
-                "name": "Beer - Original Organic Lager",
-                "description": null,
-                "manufacturer": "Quam Quis Diam Institute",
-                "recommendedRetailPrice": 20.21,
-                "created": "2021-03-24 00:02:32",
-                "images": [],
-                "primaryImagePath": null
-            },
-            "quantity": 46,
-            "pricePerItem": 19.27,
-            "totalPrice": 886.42,
-            "manufactured": "2021-03-13",
-            "sellBy": "2021-10-09",
-            "bestBefore": "2020-06-10",
-            "expires": "2022-10-30"
-        },
-        "quantity": 5,
-        "price": 96.3,
-        "moreInfo": "Proin leo odio, porttitor id, consequat in, consequat ut, nulla.",
-        "created": "2021-05-27 12:16:12",
-        "closes": "2022-10-31 06:57:10",
-        "likes": 0
-    },
-    {
-        "id": 4775,
-        "inventoryItem": {
-            "id": 7304,
-            "product": {
-                "id": "WTU-433YPJ",
-                "business": {
-                    "name": "Abatz",
-                    "id": 234,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": "Sed ante.",
-                    "address": {
-                        "streetNumber": "310",
-                        "streetName": "Buell",
-                        "suburb": null,
-                        "city": "Liuhuang",
-                        "region": null,
-                        "country": "China",
-                        "postcode": null
-                    },
-                    "businessType": "Electricity, Gas, Water and Waste Services",
-                    "created": "2020-01-18 02:14:41"
-                },
-                "name": "Cleaner - Pine Sol",
-                "description": "Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla.",
-                "manufacturer": "Nulla Institute",
-                "recommendedRetailPrice": 3.84,
-                "created": "2021-01-15 00:18:04",
-                "images": [],
-                "primaryImagePath": null
-            },
-            "quantity": 20,
-            "pricePerItem": -0.4,
-            "totalPrice": -8,
-            "manufactured": null,
-            "sellBy": "2021-09-25",
-            "bestBefore": null,
-            "expires": "2022-10-30"
-        },
-        "quantity": 4,
-        "price": -1.6,
-        "moreInfo": "Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo.",
-        "created": "2021-06-06 04:32:43",
-        "closes": "2022-10-31 06:33:05",
-        "likes": 0
-    },
-    {
-        "id": 783,
-        "inventoryItem": {
-            "id": 7710,
-            "product": {
-                "id": "5FRYD3H99GB136715",
-                "business": {
-                    "name": "Abata",
-                    "id": 75,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
+                    "name": "Beer - Original Organic Lager",
                     "description": null,
-                    "address": {
-                        "streetNumber": "1",
-                        "streetName": "Mandrake",
-                        "suburb": null,
-                        "city": "Kinmparana",
-                        "region": null,
-                        "country": "Mali",
-                        "postcode": null
-                    },
-                    "businessType": "Construction",
-                    "created": "2020-04-06 10:13:49"
+                    "manufacturer": "Quam Quis Diam Institute",
+                    "recommendedRetailPrice": 20.21,
+                    "created": "2021-03-24 00:02:32",
+                    "images": [],
+                    "primaryImagePath": null
                 },
-                "name": "Pork Casing",
-                "description": "Duis ac nibh.",
-                "manufacturer": "Lobortis Ultrices Ltd",
-                "recommendedRetailPrice": 26.06,
-                "created": "2021-01-24 10:43:15",
-                "images": [],
-                "primaryImagePath": null
-            },
-            "quantity": 33,
-            "pricePerItem": 25.48,
-            "totalPrice": 840.84,
-            "manufactured": null,
-            "sellBy": "2021-12-19",
-            "bestBefore": null,
-            "expires": "2022-10-30"
-        },
-        "quantity": 15,
-        "price": 382.2,
-        "moreInfo": "Pellentesque at nulla.",
-        "created": "2021-04-09 20:06:00",
-        "closes": "2022-10-31 05:05:38",
-        "likes": 0
-    },
-    {
-        "id": 7261,
-        "inventoryItem": {
-            "id": 9582,
-            "product": {
-                "id": "WAULFAFH1EN811277",
-                "business": {
-                    "name": "Livepath",
-                    "id": 318,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": null,
-                    "address": {
-                        "streetNumber": "647",
-                        "streetName": "Mccormick",
-                        "suburb": null,
-                        "city": "Sikka",
-                        "region": null,
-                        "country": "Indonesia",
-                        "postcode": null
-                    },
-                    "businessType": "Charitable organisation",
-                    "created": "2019-02-20 22:31:12"
-                },
-                "name": "Mop Head - Cotton, 24 Oz",
-                "description": "Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.",
-                "manufacturer": "Cum Sociis Corp.",
-                "recommendedRetailPrice": 14.36,
-                "created": "2021-01-17 20:34:31",
-                "images": [],
-                "primaryImagePath": null
-            },
-            "quantity": 4,
-            "pricePerItem": 14.02,
-            "totalPrice": 56.08,
-            "manufactured": "2020-11-17",
-            "sellBy": "2021-11-04",
-            "bestBefore": "2021-03-08",
-            "expires": "2022-10-30"
-        },
-        "quantity": 2,
-        "price": 28,
-        "moreInfo": "Duis at velit eu est congue elementum.",
-        "created": "2021-05-16 20:42:28",
-        "closes": "2022-10-31 04:52:15",
-        "likes": 0
-    },
-    {
-        "id": 2912,
-        "inventoryItem": {
-            "id": 9785,
-            "product": {
-                "id": "RFO-226IW7",
-                "business": {
-                    "name": "Quaxo",
-                    "id": 440,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": null,
-                    "address": {
-                        "streetNumber": "8663",
-                        "streetName": "Sachtjen",
-                        "suburb": null,
-                        "city": "Del Rosario",
-                        "region": null,
-                        "country": "Philippines",
-                        "postcode": "5408"
-                    },
-                    "businessType": "Information Media and Telecommunication",
-                    "created": "2021-01-08 10:23:31"
-                },
-                "name": "Beer - Corona",
-                "description": null,
-                "manufacturer": null,
-                "recommendedRetailPrice": 41.93,
-                "created": "2021-05-25 00:51:20",
-                "images": [],
-                "primaryImagePath": null
-            },
-            "quantity": 10,
-            "pricePerItem": 42.13,
-            "totalPrice": 421.3,
-            "manufactured": null,
-            "sellBy": "2021-03-02",
-            "bestBefore": null,
-            "expires": "2022-10-30"
-        },
-        "quantity": 2,
-        "price": 84.3,
-        "moreInfo": "Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.",
-        "created": "2021-04-30 09:50:01",
-        "closes": "2022-10-31 04:16:53",
-        "likes": 0
-    },
-    {
-        "id": 5016,
-        "inventoryItem": {
-            "id": 6027,
-            "product": {
-                "id": "2C3CDXEJ1FH737616",
-                "business": {
-                    "name": "Twiyo",
-                    "id": 419,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": null,
-                    "address": {
-                        "streetNumber": "685",
-                        "streetName": "Algoma",
-                        "suburb": null,
-                        "city": "Mranggen",
-                        "region": null,
-                        "country": "Indonesia",
-                        "postcode": null
-                    },
-                    "businessType": "Wholesale Trade",
-                    "created": "2020-04-17 07:01:03"
-                },
-                "name": "Mace Ground",
-                "description": "Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.",
-                "manufacturer": "Non PC",
-                "recommendedRetailPrice": 71.71,
-                "created": "2021-02-20 05:30:58",
-                "images": [],
-                "primaryImagePath": null
-            },
-            "quantity": 89,
-            "pricePerItem": 71.27,
-            "totalPrice": 6343.03,
-            "manufactured": null,
-            "sellBy": "2021-07-18",
-            "bestBefore": null,
-            "expires": "2022-10-30"
-        },
-        "quantity": 21,
-        "price": 1496.7,
-        "moreInfo": "Nulla ac enim.",
-        "created": "2021-03-28 14:39:02",
-        "closes": "2022-10-31 03:37:35",
-        "likes": 0
-    },
-    {
-        "id": 8707,
-        "inventoryItem": {
-            "id": 5372,
-            "product": {
-                "id": "QNL-4241JO",
-                "business": {
-                    "name": "Jabbertype",
-                    "id": 392,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": null,
-                    "address": {
-                        "streetNumber": "0",
-                        "streetName": "Florence",
-                        "suburb": null,
-                        "city": "Wugong",
-                        "region": null,
-                        "country": "China",
-                        "postcode": null
-                    },
-                    "businessType": "Accommodation and Food Services",
-                    "created": "2019-03-26 21:19:14"
-                },
-                "name": "Longan",
-                "description": null,
-                "manufacturer": null,
-                "recommendedRetailPrice": 84.36,
-                "created": "2021-04-05 17:28:40",
-                "images": [],
-                "primaryImagePath": null
+                "quantity": 46,
+                "pricePerItem": 19.27,
+                "totalPrice": 886.42,
+                "manufactured": "2021-03-13",
+                "sellBy": "2021-10-09",
+                "bestBefore": "2020-06-10",
+                "expires": "2022-10-30"
             },
             "quantity": 5,
-            "pricePerItem": 84.89,
-            "totalPrice": 424.45,
-            "manufactured": "2021-04-05",
-            "sellBy": "2021-11-12",
-            "bestBefore": "2021-04-27",
-            "expires": "2022-10-30"
+            "price": 96.3,
+            "moreInfo": "Proin leo odio, porttitor id, consequat in, consequat ut, nulla.",
+            "created": "2021-05-27 12:16:12",
+            "closes": "2022-10-31 06:57:10",
+            "likes": 0
         },
-        "quantity": 2,
-        "price": 169.8,
-        "moreInfo": "Aenean fermentum.",
-        "created": "2021-03-20 16:19:11",
-        "closes": "2022-10-31 03:25:17",
-        "likes": 0
-    },
-    {
-        "id": 7550,
-        "inventoryItem": {
-            "id": 7189,
-            "product": {
-                "id": "VYI-366QA8",
-                "business": {
-                    "name": "Aibox",
-                    "id": 176,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": null,
-                    "address": {
-                        "streetNumber": "0771",
-                        "streetName": "Bellgrove",
-                        "suburb": null,
-                        "city": "La Jicaral",
-                        "region": null,
-                        "country": "Nicaragua",
-                        "postcode": null
+        {
+            "id": 4775,
+            "inventoryItem": {
+                "id": 7304,
+                "product": {
+                    "id": "WTU-433YPJ",
+                    "business": {
+                        "name": "Abatz",
+                        "id": 234,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": "Sed ante.",
+                        "address": {
+                            "streetNumber": "310",
+                            "streetName": "Buell",
+                            "suburb": null,
+                            "city": "Liuhuang",
+                            "region": null,
+                            "country": "China",
+                            "postcode": null
+                        },
+                        "businessType": "Electricity, Gas, Water and Waste Services",
+                        "created": "2020-01-18 02:14:41"
                     },
-                    "businessType": "Transport, Postal and Warehousing",
-                    "created": "2020-05-14 22:40:23"
+                    "name": "Cleaner - Pine Sol",
+                    "description": "Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla.",
+                    "manufacturer": "Nulla Institute",
+                    "recommendedRetailPrice": 3.84,
+                    "created": "2021-01-15 00:18:04",
+                    "images": [],
+                    "primaryImagePath": null
                 },
-                "name": "Soup - Cream Of Broccoli",
-                "description": "Phasellus id sapien in sapien iaculis congue.",
-                "manufacturer": "Nulla Institute",
-                "recommendedRetailPrice": 6.29,
-                "created": "2021-02-18 22:54:59",
-                "images": [],
-                "primaryImagePath": null
+                "quantity": 20,
+                "pricePerItem": -0.4,
+                "totalPrice": -8,
+                "manufactured": null,
+                "sellBy": "2021-09-25",
+                "bestBefore": null,
+                "expires": "2022-10-30"
             },
-            "quantity": 83,
-            "pricePerItem": 4.95,
-            "totalPrice": 410.85,
-            "manufactured": "2020-11-05",
-            "sellBy": "2021-04-30",
-            "bestBefore": "2021-05-16",
-            "expires": "2022-10-30"
+            "quantity": 4,
+            "price": -1.6,
+            "moreInfo": "Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo.",
+            "created": "2021-06-06 04:32:43",
+            "closes": "2022-10-31 06:33:05",
+            "likes": 0
         },
-        "quantity": 19,
-        "price": 94,
-        "moreInfo": null,
-        "created": "2021-04-12 04:33:39",
-        "closes": "2022-10-31 01:22:48",
-        "likes": 0
-    },
-    {
-        "id": 9449,
-        "inventoryItem": {
-            "id": 6027,
-            "product": {
-                "id": "2C3CDXEJ1FH737616",
-                "business": {
-                    "name": "Twiyo",
-                    "id": 419,
-                    "administrators": [],
-                    "primaryAdministratorId": null,
-                    "description": null,
-                    "address": {
-                        "streetNumber": "685",
-                        "streetName": "Algoma",
-                        "suburb": null,
-                        "city": "Mranggen",
-                        "region": null,
-                        "country": "Indonesia",
-                        "postcode": null
+        {
+            "id": 783,
+            "inventoryItem": {
+                "id": 7710,
+                "product": {
+                    "id": "5FRYD3H99GB136715",
+                    "business": {
+                        "name": "Abata",
+                        "id": 75,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": null,
+                        "address": {
+                            "streetNumber": "1",
+                            "streetName": "Mandrake",
+                            "suburb": null,
+                            "city": "Kinmparana",
+                            "region": null,
+                            "country": "Mali",
+                            "postcode": null
+                        },
+                        "businessType": "Construction",
+                        "created": "2020-04-06 10:13:49"
                     },
-                    "businessType": "Wholesale Trade",
-                    "created": "2020-04-17 07:01:03"
+                    "name": "Pork Casing",
+                    "description": "Duis ac nibh.",
+                    "manufacturer": "Lobortis Ultrices Ltd",
+                    "recommendedRetailPrice": 26.06,
+                    "created": "2021-01-24 10:43:15",
+                    "images": [],
+                    "primaryImagePath": null
                 },
-                "name": "Mace Ground",
-                "description": "Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.",
-                "manufacturer": "Non PC",
-                "recommendedRetailPrice": 71.71,
-                "created": "2021-02-20 05:30:58",
-                "images": [],
-                "primaryImagePath": null
+                "quantity": 33,
+                "pricePerItem": 25.48,
+                "totalPrice": 840.84,
+                "manufactured": null,
+                "sellBy": "2021-12-19",
+                "bestBefore": null,
+                "expires": "2022-10-30"
             },
-            "quantity": 89,
-            "pricePerItem": 71.27,
-            "totalPrice": 6343.03,
-            "manufactured": null,
-            "sellBy": "2021-07-18",
-            "bestBefore": null,
-            "expires": "2022-10-30"
+            "quantity": 15,
+            "price": 382.2,
+            "moreInfo": "Pellentesque at nulla.",
+            "created": "2021-04-09 20:06:00",
+            "closes": "2022-10-31 05:05:38",
+            "likes": 0
         },
-        "quantity": 24,
-        "price": 1710.5,
-        "moreInfo": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",
-        "created": "2021-04-19 01:16:08",
-        "closes": "2022-10-31 01:15:54",
-        "likes": 0
-    }
-]
+        {
+            "id": 7261,
+            "inventoryItem": {
+                "id": 9582,
+                "product": {
+                    "id": "WAULFAFH1EN811277",
+                    "business": {
+                        "name": "Livepath",
+                        "id": 318,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": null,
+                        "address": {
+                            "streetNumber": "647",
+                            "streetName": "Mccormick",
+                            "suburb": null,
+                            "city": "Sikka",
+                            "region": null,
+                            "country": "Indonesia",
+                            "postcode": null
+                        },
+                        "businessType": "Charitable organisation",
+                        "created": "2019-02-20 22:31:12"
+                    },
+                    "name": "Mop Head - Cotton, 24 Oz",
+                    "description": "Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.",
+                    "manufacturer": "Cum Sociis Corp.",
+                    "recommendedRetailPrice": 14.36,
+                    "created": "2021-01-17 20:34:31",
+                    "images": [],
+                    "primaryImagePath": null
+                },
+                "quantity": 4,
+                "pricePerItem": 14.02,
+                "totalPrice": 56.08,
+                "manufactured": "2020-11-17",
+                "sellBy": "2021-11-04",
+                "bestBefore": "2021-03-08",
+                "expires": "2022-10-30"
+            },
+            "quantity": 2,
+            "price": 28,
+            "moreInfo": "Duis at velit eu est congue elementum.",
+            "created": "2021-05-16 20:42:28",
+            "closes": "2022-10-31 04:52:15",
+            "likes": 0
+        },
+        {
+            "id": 2912,
+            "inventoryItem": {
+                "id": 9785,
+                "product": {
+                    "id": "RFO-226IW7",
+                    "business": {
+                        "name": "Quaxo",
+                        "id": 440,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": null,
+                        "address": {
+                            "streetNumber": "8663",
+                            "streetName": "Sachtjen",
+                            "suburb": null,
+                            "city": "Del Rosario",
+                            "region": null,
+                            "country": "Philippines",
+                            "postcode": "5408"
+                        },
+                        "businessType": "Information Media and Telecommunication",
+                        "created": "2021-01-08 10:23:31"
+                    },
+                    "name": "Beer - Corona",
+                    "description": null,
+                    "manufacturer": null,
+                    "recommendedRetailPrice": 41.93,
+                    "created": "2021-05-25 00:51:20",
+                    "images": [],
+                    "primaryImagePath": null
+                },
+                "quantity": 10,
+                "pricePerItem": 42.13,
+                "totalPrice": 421.3,
+                "manufactured": null,
+                "sellBy": "2021-03-02",
+                "bestBefore": null,
+                "expires": "2022-10-30"
+            },
+            "quantity": 2,
+            "price": 84.3,
+            "moreInfo": "Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.",
+            "created": "2021-04-30 09:50:01",
+            "closes": "2022-10-31 04:16:53",
+            "likes": 0
+        },
+        {
+            "id": 5016,
+            "inventoryItem": {
+                "id": 6027,
+                "product": {
+                    "id": "2C3CDXEJ1FH737616",
+                    "business": {
+                        "name": "Twiyo",
+                        "id": 419,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": null,
+                        "address": {
+                            "streetNumber": "685",
+                            "streetName": "Algoma",
+                            "suburb": null,
+                            "city": "Mranggen",
+                            "region": null,
+                            "country": "Indonesia",
+                            "postcode": null
+                        },
+                        "businessType": "Wholesale Trade",
+                        "created": "2020-04-17 07:01:03"
+                    },
+                    "name": "Mace Ground",
+                    "description": "Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.",
+                    "manufacturer": "Non PC",
+                    "recommendedRetailPrice": 71.71,
+                    "created": "2021-02-20 05:30:58",
+                    "images": [],
+                    "primaryImagePath": null
+                },
+                "quantity": 89,
+                "pricePerItem": 71.27,
+                "totalPrice": 6343.03,
+                "manufactured": null,
+                "sellBy": "2021-07-18",
+                "bestBefore": null,
+                "expires": "2022-10-30"
+            },
+            "quantity": 21,
+            "price": 1496.7,
+            "moreInfo": "Nulla ac enim.",
+            "created": "2021-03-28 14:39:02",
+            "closes": "2022-10-31 03:37:35",
+            "likes": 0
+        },
+        {
+            "id": 8707,
+            "inventoryItem": {
+                "id": 5372,
+                "product": {
+                    "id": "QNL-4241JO",
+                    "business": {
+                        "name": "Jabbertype",
+                        "id": 392,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": null,
+                        "address": {
+                            "streetNumber": "0",
+                            "streetName": "Florence",
+                            "suburb": null,
+                            "city": "Wugong",
+                            "region": null,
+                            "country": "China",
+                            "postcode": null
+                        },
+                        "businessType": "Accommodation and Food Services",
+                        "created": "2019-03-26 21:19:14"
+                    },
+                    "name": "Longan",
+                    "description": null,
+                    "manufacturer": null,
+                    "recommendedRetailPrice": 84.36,
+                    "created": "2021-04-05 17:28:40",
+                    "images": [],
+                    "primaryImagePath": null
+                },
+                "quantity": 5,
+                "pricePerItem": 84.89,
+                "totalPrice": 424.45,
+                "manufactured": "2021-04-05",
+                "sellBy": "2021-11-12",
+                "bestBefore": "2021-04-27",
+                "expires": "2022-10-30"
+            },
+            "quantity": 2,
+            "price": 169.8,
+            "moreInfo": "Aenean fermentum.",
+            "created": "2021-03-20 16:19:11",
+            "closes": "2022-10-31 03:25:17",
+            "likes": 0
+        },
+        {
+            "id": 7550,
+            "inventoryItem": {
+                "id": 7189,
+                "product": {
+                    "id": "VYI-366QA8",
+                    "business": {
+                        "name": "Aibox",
+                        "id": 176,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": null,
+                        "address": {
+                            "streetNumber": "0771",
+                            "streetName": "Bellgrove",
+                            "suburb": null,
+                            "city": "La Jicaral",
+                            "region": null,
+                            "country": "Nicaragua",
+                            "postcode": null
+                        },
+                        "businessType": "Transport, Postal and Warehousing",
+                        "created": "2020-05-14 22:40:23"
+                    },
+                    "name": "Soup - Cream Of Broccoli",
+                    "description": "Phasellus id sapien in sapien iaculis congue.",
+                    "manufacturer": "Nulla Institute",
+                    "recommendedRetailPrice": 6.29,
+                    "created": "2021-02-18 22:54:59",
+                    "images": [],
+                    "primaryImagePath": null
+                },
+                "quantity": 83,
+                "pricePerItem": 4.95,
+                "totalPrice": 410.85,
+                "manufactured": "2020-11-05",
+                "sellBy": "2021-04-30",
+                "bestBefore": "2021-05-16",
+                "expires": "2022-10-30"
+            },
+            "quantity": 19,
+            "price": 94,
+            "moreInfo": null,
+            "created": "2021-04-12 04:33:39",
+            "closes": "2022-10-31 01:22:48",
+            "likes": 0
+        },
+        {
+            "id": 9449,
+            "inventoryItem": {
+                "id": 6027,
+                "product": {
+                    "id": "2C3CDXEJ1FH737616",
+                    "business": {
+                        "name": "Twiyo",
+                        "id": 419,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": null,
+                        "address": {
+                            "streetNumber": "685",
+                            "streetName": "Algoma",
+                            "suburb": null,
+                            "city": "Mranggen",
+                            "region": null,
+                            "country": "Indonesia",
+                            "postcode": null
+                        },
+                        "businessType": "Wholesale Trade",
+                        "created": "2020-04-17 07:01:03"
+                    },
+                    "name": "Mace Ground",
+                    "description": "Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.",
+                    "manufacturer": "Non PC",
+                    "recommendedRetailPrice": 71.71,
+                    "created": "2021-02-20 05:30:58",
+                    "images": [],
+                    "primaryImagePath": null
+                },
+                "quantity": 89,
+                "pricePerItem": 71.27,
+                "totalPrice": 6343.03,
+                "manufactured": null,
+                "sellBy": "2021-07-18",
+                "bestBefore": null,
+                "expires": "2022-10-30"
+            },
+            "quantity": 24,
+            "price": 1710.5,
+            "moreInfo": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",
+            "created": "2021-04-19 01:16:08",
+            "closes": "2022-10-31 01:15:54",
+            "likes": 0
+        }
+    ],
+    "pageable": {
+        "sort": {
+            "sorted": true,
+            "unsorted": false,
+            "empty": false
+        },
+        "offset": 0,
+        "pageSize": 10,
+        "pageNumber": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": false,
+    "totalPages": 597,
+    "totalElements": 5961,
+    "size": 10,
+    "number": 0,
+    "sort": {
+        "sorted": true,
+        "unsorted": false,
+        "empty": false
+    },
+    "first": true,
+    "numberOfElements": 10,
+    "empty": false
+}
 
 const mockUser = {
     "id": 1,
@@ -744,7 +771,7 @@ const localVue = createLocalVue();
 localVue.use(Vuesax);
 
 beforeEach(() => {
-    wrapper = shallowMount(SearchListings, {
+    wrapper = mount(SearchListings, {
         localVue,
         propsData: {},
         mocks: {$log},
@@ -752,14 +779,15 @@ beforeEach(() => {
         methods: {},
         data () {
             return {
-                listings: mockListingsFromSearch
+                listings: mockListingsFromSearch.content
             }
         }
     });
     expect(wrapper).toBeTruthy();
+
     axios.get = jest.fn(() => {
         return Promise.resolve({data: [{
-                currencies: [{symbol: "€", code: "EUR"}],
+                currencies: [{symbol: "€"}],
             }]}
         );
     });
@@ -779,6 +807,36 @@ afterEach(() => {
     wrapper.destroy();
 });
 
+describe('Button clicks', () => {
+    test('Clicking search button calls search method', async ()  => {
+        wrapper.vm.filterListings = jest.fn();
+        //wrapper.vm.checkForm = jest.fn();
+        // expect(wrapper.find('.header-button').exists()).toBe(true);
+        let button = wrapper.find('#main-search-btn')
+        button.trigger('click')
+        //expect(wrapper.find('.header-button').exists()).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.filterListings).toBeCalled();
+    })
+});
+
+describe('Filter validation', () => {
+    test('No filters passes validation', async ()  => {
+        wrapper.vm.businessQuery = null;
+        wrapper.vm.productQuery = null;
+        wrapper.vm.addressQuery = null;
+        wrapper.vm.businessType = null;
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = null;
+        wrapper.vm.maxPrice = null;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = null;
+        wrapper.vm.maxClosingDate = null;
+        expect(wrapper.vm.checkForm()).toBe(true);
+        //expect(wrapper.vm.errors).toContain("pricePerItem");
+    })
+});
+
 describe('Listings search page tests', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
@@ -788,19 +846,13 @@ describe('Listings search page tests', () => {
         expect(wrapper.find('.grid-container').exists()).toBe(true);
     });
 
-    // test('Clicking on a listing redirects to details page', () => {
-    //     //wrapper.vm.filterListings = jest.fn();
-    //     expect(wrapper.find('#media-div').exists()).toBe(true);
-    //     //expect(wrapper.vm.filterListings).toBeCalled();
-    // });
-    //
-    test('Clicking search button calls search method', () => {
-        wrapper.vm.filterListings = jest.fn();
+    test('Clicking on a listing redirects to details page', () => {
+        //wrapper.vm.filterListings = jest.fn();
+        expect(wrapper.find('#media-div').exists()).toBe(true);
+        //expect(wrapper.vm.filterListings).toBeCalled();
+    });
 
-        expect(wrapper.find('.header-button').exists()).toBe(true);
-        wrapper.find('.header-button').trigger('click');
-        expect(wrapper.vm.filterListings).toBeCalled();
-    })
+
     //
     // test('Clicking sort button calls search method', () => {
     //     expect(wrapper.find('.grid-container').exists()).toBe(true);
