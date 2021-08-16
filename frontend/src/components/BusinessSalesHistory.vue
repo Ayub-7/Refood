@@ -94,7 +94,6 @@ export default {
   mounted: function() {
     this.getSalesHistory();
     this.getSession();
-    console.log(this.salesHistory)
   },
 
   methods: {
@@ -102,8 +101,6 @@ export default {
      * Calls get sales history
      */
     filterNotifications: function () {
-      console.log("second")
-      console.log("third");
       for (const item of this.notifications) {
         if (item.status == "Bought") {
           this.salesHistory.push(item);
@@ -118,11 +115,10 @@ export default {
       api.getSales(store.loggedInUserId, this.$route.params.id, 1)
         .then((res) => {
           this.notifications = res.data;
-          console.log("first");
           this.filterNotifications();
         })
         .catch(err => {
-          this.$log.debug(err);
+          console.log(err)
         });
     },
 
