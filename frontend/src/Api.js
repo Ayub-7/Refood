@@ -376,7 +376,6 @@ export default {
 
     getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
 
-
     /**
      * Deletes a message with ID
      * If the user is not the recipient, they cannot delete it.
@@ -387,6 +386,7 @@ export default {
      * 400 if there are errors with data, 201 otherwise
      */
     deleteMessage: (messageId) => instance.delete(`/messages/${messageId}`, {withCredentials: true}),
+
 
     /**
      * Modifies a selected card. of type:
@@ -436,4 +436,14 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     getListingNotifications: (userId) => instance.get(`/businesses/1/listings/1/users/${userId}/notify`, { withCredentials: true }),
+
+
+    /**
+     * Get a list of a user's listing notifications
+     * @param userId
+     * @param businessId
+     * @return {Promise<AxiosResponse<any>>}
+     */
+    getBusinessListingNotifications: (userId, businessId) => instance.get(`/businesses/{businessId}/listings/{listingId}/users/{userId}/notify`, {withCredentials: true}),
+
 }
