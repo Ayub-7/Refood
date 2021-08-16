@@ -4,7 +4,7 @@
           <vs-row id="marketRow">
             <!-- Change vs-lg to 2 if you want 6 per row or 3 if you want 4 per row -->
             <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cardData" :key="card.id">
-              <div style="margin: 10px; width: 90%;" @click="openCardModal(card)">
+              <div id="bOpenModal" style="margin: 10px; width: 90%;" @click="openCardModal(card)">
                 <!-- Marketplace Card -->
                 <vs-card>
                   <div>

@@ -1,6 +1,7 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import ActingAs from '../components/ActingAs';
 import Vuesax from 'vuesax';
+import api from "../Api";
 
 const localVue = createLocalVue();
 let wrapper;
@@ -11,9 +12,13 @@ let store = {
     role: "USER",
     userName: "Wileen Tisley",
     userPrimaryBusinesses: [],
-    actingAsBusinessId: null,
-    actingAsBusinessName: null
+    actingAsBusinessId: 1,
+    actingAsBusinessName: "Dabshots"
 }
+
+let $router;
+let mutations;
+let sessionStorage;
 
 let $log = {
     debug: jest.fn()
@@ -22,11 +27,25 @@ let $log = {
 beforeEach(() => {
     wrapper = shallowMount(ActingAs, {
         propsData: {},
-        mocks: {store, $log},
+        mocks: {store, $log, $router, mutations, sessionStorage},
         stubs: ['router-link', 'router-view'],
         methods: {},
         localVue,
     });
+
+    mutations = {
+        setActingAsBusiness: jest.fn(),
+        setActingAsUser: jest.fn()
+    };
+
+    sessionStorage = {
+        getItem: jest.fn(),
+        removeItem: jest.fn()
+    };
+
+    $router = {
+        push: jest.fn()
+    }
 
     const getUserRoleMethod = jest.spyOn(ActingAs.methods, 'getUserRole')
     getUserRoleMethod.mockImplementation(() => {
@@ -81,5 +100,33 @@ describe('User acting as tests', () => {
         wrapper.vm.setActingAsUser = jest.fn();
         userName.trigger('click');
         expect(wrapper.vm.setActingAsUser).toBeCalled;
-    });
+    })
+
+    /*
+        test('When setActingAsBusinessId returns 200, the cache is refreshed and the user acts as a business', () => {
+            api.actAsBusiness = jest.fn(() => {
+                return Promise.resolve({status: 200, data: {id: 1}});
+            });
+            wrapper.vm.refreshCachedItems = jest.fn();
+            wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
+
+            //wrapper.vm.refreshCachedItems();
+
+            //expect(wrapper.vm.sessionStorage.getItem).toBeCalled();
+            expect(wrapper.vm.refreshCachedItems).toBeCalled();
+
+        })
+
+
+            test('When setActingAsBusinessId returns error, the result is printed to debug', () => {
+                api.actAsBusiness = jest.fn(() => {
+                    return Promise.reject({response: {message: "Bad request", status: 403}});
+                });
+
+                wrapper.vm.setActingAsBusiness = jest.fn();
+                wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
+
+                expect(wrapper.vm.$log.debug).toBeCalled();
+            })
+        */
 });
