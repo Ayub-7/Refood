@@ -10,6 +10,7 @@ import org.seng302.finders.ListingFinder;
 import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
+import org.seng302.repositories.BoughtListingRepository;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
@@ -29,6 +30,7 @@ import javax.xml.bind.ValidationException;
 import javax.servlet.http.HttpSession;
 
 
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -47,6 +49,9 @@ public class ListingController {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private BoughtListingRepository boughtListingRepository;
 
     @Autowired
     private ProductFinder productFinder;
@@ -216,7 +221,17 @@ public class ListingController {
     @DeleteMapping("/businesses/listings/{id}")
     public ResponseEntity<String> deleteListing(@PathVariable long id, HttpSession session) {
         Listing listing = listingRepository.findListingById(id);
+
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        BoughtListing boughtListing = new BoughtListing(user, listing.getInventoryItem().getProduct(), listing.getLikes(), listing.getQuantity());
+        boughtListingRepository.save(boughtListing);
+
+
+
         listingRepository.delete(listing);
+
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
