@@ -423,6 +423,15 @@ export default {
      * @param userId
      * @returns {Promise<AxiosResponse<any>>} Messages of the user
      */
-    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true })
+    getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
 
+
+    /**
+     * Query search results that uses searchQuery function
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    filterListingsQuery: async(businessQuery, productQuery, addressQuery, sortBy, businessTypes,
+                          minPrice, maxPrice, minClosingDate, maxClosingDate, count, offset, sortDirection) =>
+        instance.post('/businesses/listings', {businessQuery, productQuery, addressQuery, sortBy, businessTypes, minPrice, maxPrice, minClosingDate, maxClosingDate},
+            {params: {count: count, offset: offset, sortDirection: sortDirection}}, { withCredentials: true }),
 }
