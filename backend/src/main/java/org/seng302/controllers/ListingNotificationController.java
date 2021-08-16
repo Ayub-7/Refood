@@ -5,10 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
 import org.seng302.models.requests.ListingNotificationRequest;
-import org.seng302.repositories.ListingLikeRepository;
-import org.seng302.repositories.ListingRepository;
-import org.seng302.repositories.ListingNotificationRepository;
-import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +33,9 @@ public class ListingNotificationController {
   @Autowired
   private ListingNotificationRepository listingNotificationRepository;
 
+  @Autowired
+  private BoughtListingRepository boughtListingRepository;
+
   /**
    * Endpoint for creating a notification for a listing that's just been purchased.
    * @param listingId ID of the listing
@@ -45,21 +45,21 @@ public class ListingNotificationController {
   public ResponseEntity<String> addNotificationToListing(@PathVariable("listingId") long listingId,
                                                          HttpSession session) {
     User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-    Listing listing = listingRepository.findListingById(listingId);
+    BoughtListing boughtListing = boughtListingRepository.findBoughtListingByListingId(listingId);
     NotificationStatus status = NotificationStatus.BOUGHT;
     if (currentUser == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-    if (listing == null) {
+    if (boughtListing == null) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
     List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(listingId);
     List<User> receivers = userLikes.stream().map(ListingLike::getUser).collect(Collectors.toList());
     for (User receiver : receivers) {
-      ListingNotification listingNotification = new ListingNotification(receiver, listing, status);
+      ListingNotification listingNotification = new ListingNotification(receiver, boughtListing, status);
       listingNotificationRepository.save(listingNotification);
     }
-    ListingNotification listingNotification = new ListingNotification(currentUser, listing, status);
+    ListingNotification listingNotification = new ListingNotification(currentUser, boughtListing, status);
     listingNotificationRepository.save(listingNotification);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }

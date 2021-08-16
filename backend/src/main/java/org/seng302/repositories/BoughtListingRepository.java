@@ -12,4 +12,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource
 public interface BoughtListingRepository extends JpaRepository<BoughtListing, Long> {
 
+    BoughtListing findBoughtListingByListingId(long listingId);
+
 }

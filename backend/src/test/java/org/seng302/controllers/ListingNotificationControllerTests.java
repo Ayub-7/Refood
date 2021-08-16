@@ -45,14 +45,17 @@ public class ListingNotificationControllerTests {
     private UserRepository userRepository;
     @MockBean
     private BusinessRepository businessRepository;
+    @MockBean
+    private BoughtListingRepository boughtListingRepository;
 
     private User user;
     private Business business;
     private Listing listing;
     private Listing listing2;
+    private BoughtListing boughtListing1;
+    private BoughtListing boughtListing2;
     private ListingNotification notification;
     private ListingNotification notification2;
-    private ListingNotificationRequest request;
     private List<ListingNotification> notificationList;
 
     @BeforeEach
@@ -73,16 +76,19 @@ public class ListingNotificationControllerTests {
         listing.setId(1L);
         listing2 = new Listing(inventory2, 5, 5.0, "Test more info", new Date(), new Date());
         listing2.setId(2L);
-        listingRepository.save(listing);
-        listingRepository.save(listing2);
-        notification = new ListingNotification(user, listing, NotificationStatus.BOUGHT);
-        notification2 = new ListingNotification(user, listing2, NotificationStatus.BOUGHT);
+        boughtListing1 = new BoughtListing(user, listing);
+        boughtListing2 = new BoughtListing(user, listing2);
+        boughtListing1.setId(1L);
+        boughtListing2.setId(2L);
+        boughtListingRepository.save(boughtListing1);
+        boughtListingRepository.save(boughtListing2);
+        notification = new ListingNotification(user, boughtListing1, NotificationStatus.BOUGHT);
+        notification2 = new ListingNotification(user, boughtListing2, NotificationStatus.BOUGHT);
 
         notificationList = new ArrayList<>();
         notificationList.add(notification);
         notificationList.add(notification2);
         assertThat(notificationList.size()).isEqualTo(2);
-        request = new ListingNotificationRequest(1, 1, 1, notification.getStatus(), notification.getCreated());
     }
 
     //
@@ -104,7 +110,7 @@ public class ListingNotificationControllerTests {
     @Test
     @WithMockUser
     void testPostNewNotification_noExistingListing_returnNotAcceptable() throws Exception {
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(null);
+        Mockito.when(boughtListingRepository.findBoughtListingByListingId(listing.getId())).thenReturn(null);
         mvc.perform(post("/listings/{listingId}/notify", listing.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
@@ -116,7 +122,7 @@ public class ListingNotificationControllerTests {
     @Test
     @WithMockUser
     void testPostNewNotification_successfulNotification_returnCreated() throws Exception {
-        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(boughtListingRepository.findBoughtListingByListingId(listing.getId())).thenReturn(boughtListing1);
         mvc.perform(post("/listings/{listingId}/notify", listing.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isCreated());

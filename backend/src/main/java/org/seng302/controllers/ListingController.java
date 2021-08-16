@@ -118,7 +118,8 @@ public class ListingController {
 
         Sort sort;
         String sortBy = request.getSortBy();
-        // Sort category
+        // Sort category        ListingNotification notification = new ListingNotification(sessionUser, listing, NotificationStatus.UNLIKED);
+
         if (sortBy == null) {
             sort = Sort.unsorted();
         } else if (sortBy.equalsIgnoreCase("price") ||
@@ -230,7 +231,7 @@ public class ListingController {
         }
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         Inventory inventory = listing.getInventoryItem();
-        BoughtListing boughtListing = new BoughtListing(user, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated());
+        BoughtListing boughtListing = new BoughtListing(user, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId());
         boughtListingRepository.save(boughtListing);
         listingRepository.delete(listing);
         if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).size() == 1) {
