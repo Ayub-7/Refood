@@ -427,9 +427,7 @@ export default {
 
     /**
      * Post api endpoint to post listing notification for particular listing
-     * @param businessId ID of the business owning the listing
      * @param listingId ID of the listing
-     * @param userId ID of the user
      * @param status Status of the listing (bought)
      * @returns {Promise<AxiosResponse<any>>}
      *          201 if created
@@ -437,8 +435,8 @@ export default {
      *          401 if not logged in
      *          406 if business, user or listing are invalid
      */
-    postListingNotification: async(businessId, listingId, userId, status) =>
-        instance.post(`/businesses/${businessId}/listings/${listingId}/users/${userId}/notify`, {status}, {withCredentials: true}),
+    postListingNotification: async(listingId, status) =>
+        instance.post(`/listings/{listingId}/notify`, {status}, {withCredentials: true}),
 
     /**
      *

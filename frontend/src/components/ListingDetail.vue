@@ -177,9 +177,7 @@ export default {
     },
 
     buy() {
-      let userId = store.loggedInUserId;
-
-      api.postListingNotification(this.businessId, this.listingId, userId, "Bought")
+      api.postListingNotification(this.listingId, "Bought")
               .then((response) => {
                 this.$vs.notify({title:'Success', text:`Successfully purchased!\n${response.status}`, color:'success'})
                 this.$router.push({path: `/home`});

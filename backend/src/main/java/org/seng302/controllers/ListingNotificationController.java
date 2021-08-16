@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
-import org.seng302.models.requests.ListingNotificationRequest;
 import org.seng302.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +17,6 @@ import java.util.stream.Collectors;
 
 @RestController
 public class ListingNotificationController {
-
-  private static final Logger logger = LogManager.getLogger(ListingNotificationController.class.getName());
 
   @Autowired
   private ListingRepository listingRepository;
@@ -45,14 +42,14 @@ public class ListingNotificationController {
   public ResponseEntity<String> addNotificationToListing(@PathVariable("listingId") long listingId,
                                                          HttpSession session) {
     User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-    BoughtListing boughtListing = boughtListingRepository.findBoughtListingByListingId(listingId);
-    NotificationStatus status = NotificationStatus.BOUGHT;
-    if (currentUser == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-    if (boughtListing == null) {
+    Listing listing = listingRepository.findListingById(listingId);
+    if (listing == null || currentUser == null) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
+    Inventory inventory = listing.getInventoryItem();
+    BoughtListing boughtListing = new BoughtListing(currentUser, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId());
+    boughtListingRepository.save(boughtListing);
+    NotificationStatus status = NotificationStatus.BOUGHT;
     List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(listingId);
     List<User> receivers = userLikes.stream().map(ListingLike::getUser).collect(Collectors.toList());
     for (User receiver : receivers) {
@@ -86,7 +83,6 @@ public class ListingNotificationController {
     }
 
     List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByUserId(userId);
-    System.out.println(listingNotifications);
     return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
   }
 }

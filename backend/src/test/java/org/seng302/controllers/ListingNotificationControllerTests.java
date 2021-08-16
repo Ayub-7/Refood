@@ -76,8 +76,8 @@ public class ListingNotificationControllerTests {
         listing.setId(1L);
         listing2 = new Listing(inventory2, 5, 5.0, "Test more info", new Date(), new Date());
         listing2.setId(2L);
-        boughtListing1 = new BoughtListing(user, listing);
-        boughtListing2 = new BoughtListing(user, listing2);
+        boughtListing1 = new BoughtListing(user, listing.getInventoryItem().getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated());
+        boughtListing2 = new BoughtListing(user, listing2.getInventoryItem().getProduct(), listing2.getLikes(), listing2.getQuantity(), listing2.getCreated());
         boughtListing1.setId(1L);
         boughtListing2.setId(2L);
         boughtListingRepository.save(boughtListing1);

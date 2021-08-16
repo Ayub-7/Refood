@@ -54,19 +54,4 @@ public class BoughtListing {
         this.listed = listed;
         this.listingId = listingId;
     }
-
-    /**
-     * Barebones constructor for boughtListing
-     * @param buyer User object that purchased listing
-     * @param listing Listing object that was purchased
-     */
-    public BoughtListing(User buyer, Listing listing) {
-        this.buyer = buyer;
-        this.product = listing.getInventoryItem().getProduct();
-        this.likes = listing.getLikes();
-        this.quantity = listing.getQuantity();
-        this.sold = new Date();
-        this.listed = listing.getCreated();
-        this.listingId = listing.getId();
-    }
 }
