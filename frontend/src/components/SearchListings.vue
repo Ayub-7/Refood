@@ -92,10 +92,10 @@
               <div slot="media">
                 <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
                 <div v-if="!likedListingsIds.includes(listing.id)">
-                  <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                  <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
                 </div>
                 <div v-else>
-                  <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                  <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
                 </div>
 
               </div>
