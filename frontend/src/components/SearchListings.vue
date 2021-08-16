@@ -219,9 +219,9 @@ const SearchListings = {
      * that the user has filled in, along with the chosen sort
      * */
     filterListings: function(){
-      // if(!this.minClosingDate){
-      //   this.minClosingDate = Date.now()
-      // }
+      if(!this.minClosingDate){
+        this.minClosingDate = Date.now()
+      }
       if(this.checkForm()){
         api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
             this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)

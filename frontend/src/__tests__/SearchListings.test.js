@@ -808,27 +808,26 @@ afterEach(() => {
 
 describe('Button clicks', () => {
     test('Clicking search button calls correct method', async ()  => {
-        //wrapper.vm.checkForm = jest.fn();
         let button = wrapper.find('#main-search-btn')
         button.trigger('click')
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.checkForm).toBeCalled();
+        expect(api.filterListingsQuery).toBeCalled();
     });
 
     test('Clicking sort button calls correct method', async ()  => {
-        wrapper.vm.filterListings();
-        expect(wrapper.vm.checkForm).toBeCalled();
+        let button = wrapper.find('#sort-button')
+        button.trigger('click')
+        await wrapper.vm.$nextTick();
+        expect(api.filterListingsQuery).toBeCalled();
     });
 
 
     test('Clicking pagination button calls correct method', async ()  => {
-        wrapper.vm.checkForm = jest.fn();
         let button = wrapper.find('.vs-pagination--nav')
         button.trigger('change')
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.checkForm).toBeCalled();
+        expect(api.filterListingsQuery).toBeCalled();
     });
-
 
 
 });
@@ -838,7 +837,6 @@ describe('Filter validation', () => {
         wrapper.vm.businessQuery = null;
         wrapper.vm.productQuery = null;
         wrapper.vm.addressQuery = null;
-        wrapper.vm.businessType = null;
         wrapper.vm.sortBy = "closes";
         wrapper.vm.minPrice = null;
         wrapper.vm.maxPrice = null;
@@ -846,7 +844,103 @@ describe('Filter validation', () => {
         wrapper.vm.minClosingDate = null;
         wrapper.vm.maxClosingDate = null;
         expect(wrapper.vm.checkForm()).toBe(true);
-        //expect(wrapper.vm.errors).toContain("pricePerItem");
+    })
+
+    test('Normal values passes validation', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 15;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-08-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-10-30T16:46";
+        expect(wrapper.vm.checkForm()).toBe(true);
+    })
+
+    test('Invalid min price fails validation', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = -5;
+        wrapper.vm.maxPrice = 15;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-08-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-10-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("invalid-minprice");
+    })
+
+    test('Invalid max price fails validation', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = -15;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-12-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-12-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("invalid-maxprice");
+    })
+
+    test('Max price less than min price', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-12-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-12-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("invalid-maxprice");
+    })
+
+    test('Min closing date in past', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-08-15T17:10";
+        wrapper.vm.maxClosingDate = "2021-12-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("past-min-date");
+    })
+
+    test('Max closing date in past', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = null;
+        wrapper.vm.maxClosingDate = "2021-08-15T17:10";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("past-max-date");
+    })
+
+    test('Max closing date before min closing date', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-12-17T17:10";
+        wrapper.vm.maxClosingDate = "2021-12-09T17:13";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("past-max-date");
     })
 });
 
@@ -864,53 +958,6 @@ describe('Listings search page tests', () => {
         let clickableImg = wrapper.find('#media-div')
         clickableImg.trigger('click');
         await wrapper.vm.$nextTick();
-
-        //expect(wrapper.find('#media-div').exists()).toBe(true);
         expect(wrapper.vm.viewListing).toBeCalled();
     });
-
-
-    //
-    // test('Clicking sort button calls search method', () => {
-    //     expect(wrapper.find('.grid-container').exists()).toBe(true);
-    // })
-    //
-    // test('Clicking a button in pagination calls search method', () => {
-    //     expect(wrapper.find('.grid-container').exists()).toBe(true);
-    // })
-
 });
-//
-// describe("Test invalid filter value validation", () => {
-//     test("Successful search for users - No query", async () => {
-//         wrapper.vm.searchbarUser = "";
-//         await wrapper.vm.searchUsers();
-//         expect(wrapper.vm.$vs.loading).not.toBeCalled();
-//     });
-//
-//
-//     test("Successful search for businesses - No query", async () => {
-//         wrapper.vm.searchbarBusiness = "";
-//         await wrapper.vm.searchBusiness();
-//         expect(wrapper.vm.$vs.loading).toBeCalled();
-//     });
-//
-// });
-//
-//
-// describe("Test searching with query", () => {
-//     test("Successful user search - with query", async () => {
-//         wrapper.vm.$vs.loading.close = jest.fn();
-//         wrapper.vm.searchbarUser = "Something";
-//         wrapper.vm.tableLoaded = true;
-//         await wrapper.vm.searchUsers();
-//         expect(wrapper.vm.$vs.loading).toBeCalled();
-//     });
-//     test("Successful business search - with query", async () => {
-//         wrapper.vm.$vs.loading.close = jest.fn();
-//         wrapper.vm.searchbarBusiness = "Something";
-//         wrapper.vm.tableLoaded = true;
-//         await wrapper.vm.searchBusiness();
-//         expect(wrapper.vm.$vs.loading).toBeCalled();
-//     });
-// });
