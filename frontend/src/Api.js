@@ -436,8 +436,7 @@ export default {
      * Get router endpoint for unliking listing
      * @param id
      */
-    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true})
-    // === LISTING NOTIFICATIONS
+    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 
     /**
      * GET all notifications relating to listings.
@@ -446,5 +445,5 @@ export default {
      * @param userId
      * @returns {Promise<AxiosResponse<any>>}
      */
-    getListingNotifications: (userId) => instance.get(`/businesses/1/listings/1/users/${userId}/notify`, { withCredentials: true }),
+    getListingNotifications: (userId) => instance.get(`users/${userId}/notifications`, { withCredentials: true }),
 }

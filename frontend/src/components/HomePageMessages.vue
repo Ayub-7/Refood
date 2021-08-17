@@ -49,7 +49,6 @@
 
     </vs-popup>
 
-
       <vs-card v-for="message in messages" :key="message.id" id="message-notification-card" class="notification-card" actionable>
           <div @click="openDetailedModal(message)">
             <div style="display: flex; justify-content: space-between">
@@ -63,49 +62,46 @@
       </vs-card>
 
     <!-- PURCHASE LISTING NOTIFICATIONS -->
-    <vs-card class="notification-card">
-      <div class="pln-top-row">
-        <p class="sub-header">PURCHASED LISTING - 2021-08-08</p>
-        <div style="display: flex;">
-          <vs-button color="danger" icon="close" class="pln-delete-button delete-button"></vs-button>
-        </div>
-      </div>
-      <h2>Honda Civic</h2>
-      <h5>Company Name</h5>
-      <div class="pln-bottom-row">
-        <div style="display: flex; margin-top: auto;">
-          <h2>
-            $69.99
-          </h2>
-          <div style="padding-left: 1em">
-            Collect at Ilam Road, Christchurch, New Zealand
+    <div v-for="notification in listingNotifications" :key="notification.id">
+      <vs-card class="notification-card" v-if="notification.boughtListing.buyer === currentUserId">
+        <div class="pln-top-row">
+          <p class="sub-header">PURCHASED LISTING - {{ notification.boughtListing.sold }}</p>
+          <div style="display: flex;">
+            <vs-button color="danger" icon="close" class="pln-delete-button delete-button"></vs-button>
           </div>
         </div>
-        <div>
-          <vs-button>View Listing</vs-button>
+        <h2>{{ notification.boughtListing.product.name }}</h2>
+        <h5>{{ notification.boughtListing.product.business.name }}</h5>
+        <div class="pln-bottom-row">
+          <h2>
+            <!--TODO: CURRENCY -->
+            {{ notification.boughtListing.price }}
+          </h2>
+          <div>
+            Collect at {{ createAddressString(notification.boughtListing.product.business.address) }}
+          </div>
         </div>
-      </div>
-    </vs-card>
+      </vs-card>
 
-    <!-- LIKED LISTING NOTIFICATIONS -->
-    <vs-card class="liked-listing-notification notification-card">
-      <p class="sub-header">LIKED LISTING - 2021-08-08</p>
-      <div class="lln-description">
-        <b>Honda Civic</b>, by Company Name was purchased by someone else, and is no longer available.
-      </div>
-      <div class="lln-button-group">
-        <vs-button>View Listing</vs-button>
-        <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
-      </div>
+      <!-- LIKED LISTING NOTIFICATIONS -->
+      <vs-card class="liked-listing-notification notification-card" v-else>
+        <p class="sub-header">LIKED LISTING - {{ notification.boughtListing.sold }}</p>
+        <div class="lln-description">
+          <b>{{ notification.boughtListing.product.name }}</b>, by {{ notification.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
+        </div>
+        <div class="lln-button-group">
+          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
+        </div>
 
-    </vs-card>
+      </vs-card>
+    </div>
+
 
   </div>
 
 </template>
 
 <script>
-
 import api from "../Api";
 import { store } from '../store';
 
@@ -120,15 +116,34 @@ export default {
         users: {},
         detailedView: false,
         currentMessage: null,
+
+        listingNotifications: [],
+        currentUserId: null,
+
+        feedItems: [],
       }
     },
 
     mounted() {
       this.getMessages();
       this.getListingNotifications();
+      this.currentUserId = store.loggedInUserId;
+      this.combineFeedMessages();
     },
 
     methods: {
+      combineFeedMessages: function() {
+        this.feedItems = this.messages + this.listingNotifications;
+        this.feedItems.sort(function(a, b) {
+          if (a.created < b.created) return -1;
+          if (a.created > b.created) return 1;
+          return 0;
+        });
+
+        console.log(this.feedItems);
+      },
+
+
       getMessages: function() {
         api.getMessages(store.loggedInUserId)
         .then((response) => {
@@ -136,6 +151,11 @@ export default {
           for (let message of this.messages) {
             this.users[message.sender.id] = message.sender;
           }
+          this.messages = this.messages.map(message => {
+            message.created = message.sent;
+            return message;
+          });
+          console.log(this.messages);
         }).catch((error) => {
           this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
@@ -166,6 +186,7 @@ export default {
         api.getListingNotifications(store.loggedInUserId)
           .then((res) => {
             console.log(res.data);
+            this.listingNotifications = res.data;
           })
           .catch();
       },
@@ -226,6 +247,18 @@ export default {
         this.currentMessage = message;
         this.detailedView = true;
         this.showing = true;
+      },
+
+      createAddressString: function(address) {
+        let location = "";
+        if (address.streetNumber) location += address.streetNumber + " ";
+        if (address.streetName) location += address.streetName + ", ";
+        if (address.suburb) location += address.suburb + ", ";
+        if (address.city) location += address.city + ", ";
+        if (address.region) location += address.region + ", ";
+        if (address.country) location += address.country;
+
+        return location;
       }
 
     },
