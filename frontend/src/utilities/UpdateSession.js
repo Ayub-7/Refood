@@ -1,5 +1,5 @@
 import api from '../Api';
-import {mutations} from '../store';
+import {mutations, store} from '../store';
 
 /**
  * Updates user session on every router change, this will stop the issue of having to call checksession on every single page
@@ -45,6 +45,12 @@ function getNotifications(userId) {
     api.getNotifications(userId)
     .then((response) => {
         mutations.setNotifications(response.data);
+    });
+
+    //the (card) notifications from the previous call are concatenated with listing notifications
+    api.getListingNotifications(userId)
+    .then((response) => {
+        mutations.setNotifications(store.notifications.concat(response.data));
     });
 }
 
