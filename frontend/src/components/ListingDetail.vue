@@ -177,9 +177,7 @@ export default {
     },
 
     buy() {
-      let userId = store.loggedInUserId;
-
-      api.postListingNotification(this.businessId, this.listingId, userId, "Bought")
+      api.postListingNotification(this.listingId)
               .then((response) => {
                 this.$vs.notify({title:'Success', text:`Successfully purchased!\n${response.status}`, color:'success'})
                 this.$router.push({path: `/home`});
@@ -194,9 +192,7 @@ export default {
                 }
               });
       api.deleteListing(this.listingId)
-              .then((res) => {
-                console.log(res);
-              }).catch(err => {
+              .catch(err => {
         if (err.response.status === 406) {
           this.$vs.notify({title: 'Purchase Failed', text: '406 Not Acceptable', color: 'danger'})
         } else {
