@@ -102,6 +102,11 @@ jest.mock("../Api.js", () => jest.fn);
 api.getBusinessListings = jest.fn(() => {
     return Promise.resolve({data: testListing, status: 200});
 });
+
+api.deleteListing = jest.fn(() => {
+    return Promise.resolve();
+});
+
 api.postListingNotification = jest.fn(() => {
     return Promise.resolve({status: 201});
 });
