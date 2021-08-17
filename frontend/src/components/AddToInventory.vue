@@ -4,11 +4,7 @@
       <!-- Product Image -->
       <div id="header-row">
         <div id="image-container">
-          <vs-tooltip text="Click here for more product details">
-            <vs-tooltip :text="product.description" title="Description" position="bottom">
-              <ReImage :image-path="product.primaryImagePath" class="image" @click.native="showFullProduct = true"/>
-            </vs-tooltip>
-          </vs-tooltip>
+          <ReImage :image-path="product.primaryImagePath" class="image"/>
         </div>
         <div id="product-name">
           <div class="sub-header">Product</div>
@@ -92,28 +88,6 @@
         <vs-button @click="addInventory">Add To Inventory</vs-button>
       </div>
     </vs-popup>
-
-    <!-- SHOW FULL PRODUCT INFO MODAL -->
-    <!-- Accessed by pressing the image of the product. -->
-    <vs-popup id="full-product-modal" title="Full Product" :active.sync="showFullProduct">
-        <div>
-          <ReImage :image-path="product.primaryImagePath" class="full-image"/>
-        </div>
-
-        <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
-          <div style="display: flex; flex-direction: column; justify-content: space-between">
-            <div style="font-size: 16px; font-weight: bold;  text-align: justify; word-break: break-all;">{{ product.name }} </div>
-            <p>{{ product.id }}</p>
-          </div>
-          <vs-divider></vs-divider>
-          <div style="font-size: 16px; font-weight: bold; height: 24px;">{{ product.manufacturer }} </div>
-          <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ product.created }} </p>
-          <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ product.description }} </div>
-        </div>
-
-        <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currency + product.recommendedRetailPrice }} </div>
-    </vs-popup>
-
   </div>
 </template>
 
@@ -145,7 +119,6 @@ export default {
       addNewInv: false,
       errors: [],
 
-      showFullProduct: false,
     }
 
   },
@@ -453,14 +426,6 @@ export default {
 
 #image-container {
   margin: auto;
-  cursor: pointer;
-
-  transition: .5s ease;
-  backface-visibility: hidden;
-}
-
-#image-container:hover {
-  opacity: 0.5;
 }
 
 .vs-popup-primary .vs-popup--header {

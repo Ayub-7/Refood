@@ -27,6 +27,57 @@ const mockUser = {
     ]
 }
 
+const mockListing =
+    [
+        {
+            "id": 4,
+            "inventoryItem": {
+                "id": 2,
+                "product": {
+                    "id": "W04GP5EC0B1798680",
+                    "business": {
+                        "name": "Dabshots",
+                        "id": 1,
+                        "administrators": [],
+                        "primaryAdministratorId": null,
+                        "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+                        "address": {
+                            "streetNumber": "0",
+                            "streetName": "Vernon Place",
+                            "suburb": null,
+                            "city": "Sarpang",
+                            "region": null,
+                            "country": "Bhutan",
+                            "postcode": null
+                        },
+                        "businessType": "Charitable organisation",
+                        "created": "2020-05-18 09:06:11"
+                    },
+                    "name": "Compound - Mocha",
+                    "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
+                    "manufacturer": "Nestle",
+                    "recommendedRetailPrice": 88.93,
+                    "created": "2021-01-11 07:54:46",
+                    "images": [],
+                    "primaryImagePath": null
+                },
+                "quantity": 7,
+                "pricePerItem": 3.0,
+                "totalPrice": 80.0,
+                "manufactured": "2020-01-26",
+                "sellBy": null,
+                "bestBefore": "2021-08-27",
+                "expires": "2021-08-27"
+            },
+            "quantity": 1,
+            "price": 15.5,
+            "moreInfo": "Contact us for more information.",
+            "created": "2021-02-01 23:00:00",
+            "closes": "2021-09-08 00:00:00",
+            "likes": 1
+        }
+    ]
+
 const mockBusiness =
     {
         "id": 1,
@@ -77,6 +128,13 @@ api.getMessages = jest.fn(() => {
   return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
+api.getUserLikedListings = jest.fn(() => {
+    return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
+})
+
+api.removeLikeFromListing = jest.fn(() => {
+    return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
+})
 
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
 getUserName.mockImplementation(() =>  {
@@ -216,4 +274,12 @@ describe("Tests for functionality", ()=> {
        expect(wrapper.vm.businesses).toEqual([]);
        expect(wrapper.vm.userLoggedIn).toBeFalsy();
    });
+});
+
+describe("Tests for wishlist functionality", ()=> {
+    test("Unlike listing successfully", async () => {
+        expect(wrapper.vm.likes).toBe(1);
+        await wrapper.vm.unlike(4);
+        expect(wrapper.vm.likes).toBe(0);
+    });
 });

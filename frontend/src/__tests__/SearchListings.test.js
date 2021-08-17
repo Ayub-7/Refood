@@ -799,6 +799,20 @@ beforeEach(() => {
     api.filterListingsQuery = jest.fn(() => {
         return Promise.resolve({data: mockListingsFromSearch, status: 200}).finally();
     });
+
+    api.addLikeToListing = jest.fn(() => {
+        return Promise.resolve({status: 201});
+    });
+
+    api.removeLikeFromListing = jest.fn(() => {
+        return Promise.resolve({status: 200});
+    });
+
+    api.getUserLikedListings = jest.fn(() => {
+        return Promise.resolve({data:{}, status: 200});
+    });
+
+
     wrapper.vm.filterListings = jest.fn();
 });
 
@@ -960,4 +974,19 @@ describe('Listings search page tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.viewListing).toBeCalled();
     });
+});
+
+describe('Liking items', () => {
+    test('Liking an item', async () => {
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+    })
+
+    test('Unliking an item', async () => {
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+        await wrapper.vm.deleteLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+    })
 });

@@ -88,6 +88,12 @@
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
                 <div slot="media" id="media-div" @click="viewListing(listing)">
                   <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
+                  <div v-if="!likedListingsIds.includes(listing.id)">
+                    <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                  </div>
+                  <div v-else>
+                    <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                  </div>
                 </div>
                 <div class="click" @click="viewListing(listing)">
                 <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
@@ -165,6 +171,7 @@ const SearchListings = {
       minClosingDate: null,
       maxClosingDate: null,
 
+      likedListingsIds: [],
       numListings: 10,
       pageNum: 1,
       totalPages: 0,
@@ -192,6 +199,14 @@ const SearchListings = {
           this.pageNum = prevSearch['pageNum']
           this.sortDirection = prevSearch['sortDirection']
         }
+        api.getUserLikedListings(this.userId)
+            .then((response) => {
+              for (let i = 0; i < response.data.length; i++) {
+                this.likedListingsIds.push(response.data[i]["id"]);
+              }
+            }).catch((err) => {
+          throw new Error(`Error trying to get user's likes: ${err}`)
+        })
         this.filterListings();
         this.setCurrency(this.user.homeAddress.country)
       }).catch((err) => {
@@ -316,6 +331,37 @@ const SearchListings = {
         return false;
       }
       return true;
+    },
+    /**
+     * method to submit a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    sendLike: function(listingId, listingName) {
+      api.addLikeToListing(listingId)
+          .then(() => {
+            this.likedListingsIds.push(listingId);
+            this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to like listing ${listingId}: ${err}`);
+          })
+    },
+
+    /**
+     * Deletes a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    deleteLike: function(listingId, listingName) {
+      api.removeLikeFromListing(listingId)
+          .then(() => {
+            this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
+            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
+          })
     }
   }
 }
@@ -525,6 +571,25 @@ div#search-parameters {
 
 .vert-row .con-text-validation.span-text-validation-danger.vs-input--text-validation-span.v-enter-to span-text-validation {
   color: white !important;
+}
+
+
+.like-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+
+  cursor: pointer;
+  text-align: right;
+
+  transition: 0.3s;
+}
+
+.like-button.vs-icon:hover {
+  transition: opacity 0.3s, font-size 0.3s, right 0.3s;
+  opacity: 1.5;
+  font-size: 42px!important;
+  right: 16px;
 }
 
 

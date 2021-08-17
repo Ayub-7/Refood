@@ -28,6 +28,7 @@ public enum BusinessType {
     WHOLESALE_TRADE("Wholesale Trade"),
     OTHER_SERVICES("Other Services");
 
+
     private final String label;
 
     BusinessType(String label) {

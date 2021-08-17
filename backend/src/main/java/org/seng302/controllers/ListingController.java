@@ -6,13 +6,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.*;
 import org.springframework.http.MediaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.seng302.finders.ListingSpecifications;
+import org.seng302.finders.ListingFinder;
+import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
+import org.seng302.repositories.BoughtListingRepository;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.models.requests.NewListingRequest;
 import org.seng302.repositories.InventoryRepository;
+import org.seng302.finders.AddressFinder;
 import org.seng302.repositories.ListingRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.jpa.domain.Specification;
 
 
 import javax.xml.bind.ValidationException;
@@ -53,6 +56,9 @@ public class ListingController {
 
     @Autowired
     private AddressFinder addressFinder;
+
+    @Autowired
+    private BoughtListingRepository boughtListingRepository;
 
     @Autowired
     private ProductFinder productFinder;
@@ -121,30 +127,22 @@ public class ListingController {
         // Sort category
         if (sortBy == null) {
             sort = Sort.unsorted();
-        }
-        else if (sortBy.equalsIgnoreCase("price") ||
+        } else if (sortBy.equalsIgnoreCase("price") ||
                 sortBy.equalsIgnoreCase("quantity") ||
                 sortBy.equalsIgnoreCase("created") ||
                 sortBy.equalsIgnoreCase("closes")) {
-            sort = Sort.by(request.getSortBy());
-        }
-        else if (sortBy.equalsIgnoreCase("name") || sortBy.equalsIgnoreCase("manufacturer")) {
+                sort = Sort.by(request.getSortBy());
+        } else if (sortBy.equalsIgnoreCase("name") || sortBy.equalsIgnoreCase("manufacturer")) {
             sort = Sort.by("inventoryItem.product." + request.getSortBy());
-        }
-        else if (sortBy.equalsIgnoreCase("expires")) {
+        } else if (sortBy.equalsIgnoreCase("expires")) {
             sort = Sort.by("inventoryItem.expires");
-        }
-        else if (sortBy.equalsIgnoreCase("businessType")) {
+        } else if (sortBy.equalsIgnoreCase("businessType")) {
             sort = Sort.by("inventoryItem.product.business." + request.getSortBy());
-        }
-        else if (sortBy.equalsIgnoreCase("city") ||
-                sortBy.equalsIgnoreCase("country")) {
+        } else if (sortBy.equalsIgnoreCase("city") || sortBy.equalsIgnoreCase("country")) {
             sort = Sort.by("inventoryItem.product.business.address." + request.getSortBy());
-        }
-        else if (sortBy.equalsIgnoreCase("seller")) {
+        } else if (sortBy.equalsIgnoreCase("seller")) {
             sort = Sort.by("inventoryItem.product.business.name");
-        }
-        else { // Sort By parameter is not what we were expecting.
+        } else { // Sort By parameter is not what we were expecting.
             logger.error(String.format("Unknown sort parameter: %s", request.getSortBy()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected sort parameter.");
         }
@@ -183,9 +181,10 @@ public class ListingController {
 
 
     /**
-     * Creates a new product and adds it to the product catalogue of the current acting business
+     * Creates a new listing and adds it to the listings of the current acting business
      * Authentication is required, user must be a business admin or a default global admin
-     * @param id unique identifier of the business
+     *
+     * @param id      unique identifier of the business
      * @param request the request body for the new listing object
      * @param session http session which holds the authenticated user
      * @return error codes: 403 (forbidden user), 400 (bad request for product), 201 (object valid and created)
@@ -195,9 +194,9 @@ public class ListingController {
         Business business = businessRepository.findBusinessById(id);
         Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
 
-        if(inventory == null){ //inventory item doesn't exist for business
+        if (inventory == null) { //inventory item doesn't exist for business
             logger.debug(request.getInventoryItemId());
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         if (business == null) { // Business does not exist
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
@@ -213,11 +212,28 @@ public class ListingController {
                     inventoryRepository.updateInventoryQuantity(inventory.getQuantity() - request.getQuantity(), request.getInventoryItemId());
                     listingRepository.save(newListing);
                     return ResponseEntity.status(HttpStatus.CREATED).build();
-                } catch (ValidationException e){
+                } catch (ValidationException e) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
             }
         }
     }
 
+    @DeleteMapping("/businesses/listings/{id}")
+    public ResponseEntity<String> deleteListing(@PathVariable long id, HttpSession session) {
+        Listing listing = listingRepository.findListingById(id);
+        if (listing == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Inventory inventory = listing.getInventoryItem();
+        BoughtListing boughtListing = new BoughtListing(user, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId());
+        boughtListingRepository.save(boughtListing);
+        listingRepository.delete(listing);
+        if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).size() == 1) {
+            inventoryRepository.delete(inventory);
+            return ResponseEntity.status(HttpStatus.OK).body("Listing and Inventory Item Deleted");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("Listing Deleted");
+    }
 }

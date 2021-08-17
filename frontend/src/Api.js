@@ -97,26 +97,28 @@ export default {
      */
     //searchQuery: async(input) => instance.post('users/search', input),
 
-    /**
-     * Query search results that uses searchQuery function
-     * @returns {Promise<AxiosResponse<any>>}
-     */
-    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    // /**
+    //  * Query search results that uses searchQuery function
+    //  * @returns {Promise<AxiosResponse<any>>}
+    //  */
+    // searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
 
     /**
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    searchUsersQuery: (query, pageNum, sortString) => instance.get(`/users/search`,{params: {searchQuery: query, pageNum: pageNum, sortString: sortString}, withCredentials: true}),
 
     /**
      *  Query search that returns businesses based on the parameter query
      * @param query to help narrow down the businesses
      * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
+     * @param page
+     * @param sortString
      * @returns {*}
      */
-    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
+    searchBusinessesWithTypeQuery: (query, type, page, sortString) => instance.get('/businesses/search', {params: {query: query, type: type, page: page, sortString: sortString}, withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
@@ -425,6 +427,32 @@ export default {
      */
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
 
+    /**
+     * POST endpoint - Adds a new like to a business sale listing.
+     * @param id of the sale listing to add a new like to.
+     * @param session the current active user session.
+     * @return 401 if unauthorized, 406 if the listing does not exist, 201 otherwise.
+     */
+    addLikeToListing: (listingId) =>
+        instance.post(`/businesses/listings/${listingId}/like`, {}, {withCredentials: true}),
+
+   /**
+     * Retrieves and returns a list of LISTINGS that the user has liked.
+     * @param id unique identifier of the user.
+     * @param session current active user session.
+     * @return 401 if unauthorized, 403 if forbidden (not dgaa or correct user), 406 if the user does not exist.
+     * 200 otherwise, may return an empty list (because the user has not liked anything).
+     */
+    getUserLikedListings: (id) => instance.get(`/users/${id}/likes`, {withCredentials: true}),
+
+    /**
+     * Removes a user's like from a sale listing (unlikes it).
+     * @param id the unique identifier of the sale listing to unlike.
+     * @param session the current user session - used to figure out who is doing the unliking.
+     * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
+     */
+    removeLikeFromListing: (id) =>
+        instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 
     /**
      * Query search results that uses searchQuery function
