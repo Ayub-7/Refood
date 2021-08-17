@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "9630c8b9-979b-4b95-83d0-ef7e43598a02",
-		"name": "SENG302 Collection copy",
+		"_postman_id": "82ac8e1c-cca3-47ee-8d0f-34b6098d39a0",
+		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -632,7 +632,9 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": ""
+						}
 					},
 					"response": []
 				},
@@ -641,7 +643,23 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
 					},
 					"response": []
 				}
@@ -955,7 +973,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 1,\r\n    \"userId\": 1,\r\n    \"listingId\": 1,\r\n    \"status\": \"Expired\",\r\n    \"created\": \"2021-04-27\"\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -963,28 +981,41 @@
 							}
 						},
 						"url": {
-							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"raw": "{{URL}}/listings/:listingId/notify",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
-								"businesses",
-								":businessId",
 								"listings",
 								":listingId",
-								"users",
-								":userId",
 								"notify"
 							],
 							"variable": [
 								{
-									"key": "businessId",
-									"value": "1"
-								},
-								{
 									"key": "listingId",
 									"value": "1"
-								},
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Listing Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:userId/notifications",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"notifications"
+							],
+							"variable": [
 								{
 									"key": "userId",
 									"value": "1"
@@ -995,35 +1026,23 @@
 					"response": []
 				},
 				{
-					"name": "Get Listing Notifications",
+					"name": "Get Business Listing Notifications",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/:businessId/listings/:listingId/users/:userId/notify",
+							"raw": "{{URL}}/businesses/:businessId/notifications",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
 								"businesses",
 								":businessId",
-								"listings",
-								":listingId",
-								"users",
-								":userId",
-								"notify"
+								"notifications"
 							],
 							"variable": [
 								{
 									"key": "businessId",
-									"value": "1"
-								},
-								{
-									"key": "listingId",
-									"value": "1"
-								},
-								{
-									"key": "userId",
 									"value": "1"
 								}
 							]
