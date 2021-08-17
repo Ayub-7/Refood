@@ -83,10 +83,14 @@ let oneMessage = [{
 }]
 
 
-api.getMessages = jest.fn().mockResolvedValue({data: oneMessage});
+api.getMessages = jest.fn(() => {
+    return Promise.resolve({data: oneMessage}).catch({message: "Error", status: 400});
+})
+
+    //jest.fn().mockResolvedValue({data: oneMessage});
 
 api.deleteMessage = jest.fn(() => {
-    return Promise.resolve({data: oneMessage[0].id, status: 200});
+    return Promise.resolve({data: oneMessage[0].id, status: 200}).catch({message: "Error", status: 400});
 });
 
 beforeEach(() => {
@@ -102,7 +106,7 @@ beforeEach(() => {
 afterEach(() => {
     wrapper.destroy();
 });
-
+/*
 describe('Homepage Messages functionality', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
@@ -129,11 +133,15 @@ describe('Homepage Messages functionality', () => {
     //     expect(wrapper.vm.$vs.notify()).toBeCalled();
     // });
 });
-describe('Message validation', () => {
-    test('When message is valid, check passes', () => {
+
+ */
+describe('Message validation',  () => {
+    test('When message is valid, check passes', async () => {
         wrapper.vm.message = 'Simple correct message';
 
         let res = wrapper.vm.checkMessage();
+
+        await wrapper.vm.$nextTick();
 
         expect(res).toBeTruthy();
         expect(wrapper.vm.errors).toStrictEqual([]);
@@ -147,6 +155,7 @@ describe('Message validation', () => {
         expect(res).toBeFalsy();
         expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
     });
+
 
     test('When message is over character limit, check fails', () => {
         wrapper.vm.message = ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris condimentum metus mauris, ut vehicula lacus sollicitudin vel. Etiam consectetur maximus vulputate. Etiam non laoreet velit, sed consequat lectus. Ut rhoncus suscipit urna sed maximus. Vestibulum volutpat iaculis lorem ac faucibus. Quisque ultrices nisi et augue consectetur, maximus fringilla neque aliquam. Cras et felis vitae justo iaculis egestas eu eu nisl. Integer pellentesque arcu eget erat finibus dapibus. Cras eleifend ante eget suscipit vestibulum. Sed nunc nisi, hendrerit id sodales nec, varius fermentum turpis. Suspendisse dictum mollis est, sit amet dignissim elit vehicula nec. Nullam eget dui ac augue laoreet ultrices. Cras laoreet rhoncus odio. ';
