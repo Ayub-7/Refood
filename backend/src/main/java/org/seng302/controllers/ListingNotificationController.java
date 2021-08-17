@@ -79,7 +79,7 @@ public class ListingNotificationController {
     }
 
     if (currentUser.getId() != user.getId()) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByUserId(userId);

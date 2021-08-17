@@ -31,7 +31,7 @@ public class ListingNotification {
     @Enumerated(EnumType.STRING)
     private NotificationStatus status;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date created;
 
     /**
@@ -55,13 +55,4 @@ public class ListingNotification {
     }
 
     public ListingNotification() {}
-
-    public void setStatus(NotificationStatus status) {
-        if (status == NotificationStatus.BOUGHT || status == NotificationStatus.EXPIRED) {
-            this.status = status;
-        }
-        else {
-            throw new IllegalArgumentException(status + " status is not allowed");
-        }
-    }
 }

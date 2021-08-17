@@ -360,7 +360,7 @@ export default {
      * Extends card display period by 24 hours (from current time)
      * @param cardId card that is going to be extended
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful
      */
     extendCardDisplayPeriod: (cardId) => instance.put(`/cards/${cardId}/extenddisplayperiod`, {}, {withCredentials: true}),
 
@@ -370,9 +370,9 @@ export default {
      * Gets users notifications, which can contain a deleted or expiring notification
      * @param userId ID of user we want notifications for
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful
      */
-     
+
 
     getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
 
@@ -477,5 +477,5 @@ export default {
      * Get router endpoint for unliking listing
      * @param id
      */
-    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true})
+    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 }

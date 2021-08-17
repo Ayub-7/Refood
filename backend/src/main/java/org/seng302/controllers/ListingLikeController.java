@@ -59,7 +59,7 @@ public class ListingLikeController {
 
         //Remove liked/unliked notification if it exists
         ListingNotification oldNotification = listingNotificationRepository.findListingNotificationsByUserIdAndListing(user.getId(), listing);
-        if(oldNotification != null) {
+        if (oldNotification != null) {
             listingNotificationRepository.delete(oldNotification);
         }
 

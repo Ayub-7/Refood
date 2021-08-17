@@ -21,10 +21,10 @@ public class BoughtListing {
     @ManyToOne
     private Product product;
 
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date sold;
 
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date listed;
 
     private int likes;
@@ -32,6 +32,8 @@ public class BoughtListing {
     private int quantity;
 
     private long listingId;
+
+    private double price;
 
     /**
      * Empty constructor for JPA use
@@ -45,7 +47,7 @@ public class BoughtListing {
      * @param likes
      * @param quantity
      */
-    public BoughtListing(User buyer, Product product, int likes, int quantity, Date listed, long listingId) {
+    public BoughtListing(User buyer, Product product, int likes, int quantity, Date listed, long listingId, double price) {
         this.buyer = buyer;
         this.product = product;
         this.likes = likes;
@@ -53,5 +55,22 @@ public class BoughtListing {
         this.sold = new Date();
         this.listed = listed;
         this.listingId = listingId;
+        this.price = price;
+    }
+
+    /**
+     * Barebones constructor for boughtListing
+     * @param buyer User object that purchased listing
+     * @param listing Listing object that was purchased
+     */
+    public BoughtListing(User buyer, Listing listing) {
+        this.buyer = buyer;
+        this.product = listing.getInventoryItem().getProduct();
+        this.likes = listing.getLikes();
+        this.quantity = listing.getQuantity();
+        this.sold = new Date();
+        this.listed = listing.getCreated();
+        this.listingId = listing.getId();
+        this.price = listing.getPrice();
     }
 }

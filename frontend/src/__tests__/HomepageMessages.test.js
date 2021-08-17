@@ -6,10 +6,15 @@ import api from "../Api";
 let wrapper;
 let localVue = createLocalVue();
 localVue.use(Vuesax);
+
 let $route = {
     params: {
         id: 1,
     }
+}
+
+let $router = {
+    push: jest.fn(),
 }
 
 let $log = {
@@ -80,22 +85,64 @@ let oneMessage = [{
     },
     "description": "asdsaddas",
     "sent": "2021-07-23 13:09:52"
-}]
+}];
+
+let listingNotifications = [
+    {
+        buyer: 1,
+        id: 1,
+        likes: 5,
+        listed: "2021-08-10 12:00:00",
+        listingId: 1,
+        price: 20.5,
+        quantity: 10,
+        sold: "2021-08-17 12:00:00",
+        product: {
+            name: "Garlic",
+            business: {
+                name: "Dabshots",
+                address: {
+                    streetNumber: "88",
+                    streetName: "Ilam Road",
+                    suburb: "Ilam",
+                    city: "Christchurch",
+                    region: "Canterbury",
+                    country: "New Zealand"
+                },
+            }
+        }
+    },
+    {
+        id: 2,
+        status: "Liked",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                      id: 1
+                    },
+                }
+            }
+        }
+    }
+];
 
 
-api.getMessages = jest.fn(() => {
-    return Promise.resolve({data: oneMessage}).catch({message: "Error", status: 400});
-})
-
-    //jest.fn().mockResolvedValue({data: oneMessage});
+api.getMessages = jest.fn().mockResolvedValue({data: oneMessage});
 
 api.deleteMessage = jest.fn(() => {
-    return Promise.resolve({data: oneMessage[0].id, status: 200}).catch({message: "Error", status: 400});
+    return Promise.resolve({data: oneMessage[0].id, status: 200});
+});
+
+api.getListingNotifications = jest.fn( () => {
+   return Promise.resolve({status: 200, data: listingNotifications});
 });
 
 beforeEach(() => {
     wrapper = mount(HomepageMessages, {
-        mocks: {$route, $log, $vs},
+        mocks: {$route, $log, $vs, $router},
         stubs: {},
         methods: {},
         localVue,
@@ -106,7 +153,7 @@ beforeEach(() => {
 afterEach(() => {
     wrapper.destroy();
 });
-/*
+
 describe('Homepage Messages functionality', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
@@ -127,21 +174,13 @@ describe('Homepage Messages functionality', () => {
         //Result
         expect(wrapper.vm.detailedView).toBe(true);
     })
-
-    // test('Delete message, actually deletes it', async () => {
-    //     await wrapper.vm.deleteMessage(3);
-    //     expect(wrapper.vm.$vs.notify()).toBeCalled();
-    // });
 });
 
- */
-describe('Message validation',  () => {
-    test('When message is valid, check passes', async () => {
+describe('Message validation', () => {
+    test('When message is valid, check passes', () => {
         wrapper.vm.message = 'Simple correct message';
 
         let res = wrapper.vm.checkMessage();
-
-        await wrapper.vm.$nextTick();
 
         expect(res).toBeTruthy();
         expect(wrapper.vm.errors).toStrictEqual([]);
@@ -156,7 +195,6 @@ describe('Message validation',  () => {
         expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
     });
 
-
     test('When message is over character limit, check fails', () => {
         wrapper.vm.message = ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris condimentum metus mauris, ut vehicula lacus sollicitudin vel. Etiam consectetur maximus vulputate. Etiam non laoreet velit, sed consequat lectus. Ut rhoncus suscipit urna sed maximus. Vestibulum volutpat iaculis lorem ac faucibus. Quisque ultrices nisi et augue consectetur, maximus fringilla neque aliquam. Cras et felis vitae justo iaculis egestas eu eu nisl. Integer pellentesque arcu eget erat finibus dapibus. Cras eleifend ante eget suscipit vestibulum. Sed nunc nisi, hendrerit id sodales nec, varius fermentum turpis. Suspendisse dictum mollis est, sit amet dignissim elit vehicula nec. Nullam eget dui ac augue laoreet ultrices. Cras laoreet rhoncus odio. ';
 
@@ -165,30 +203,44 @@ describe('Message validation',  () => {
         expect(res).toBeFalsy();
         expect(wrapper.vm.errors.includes('bad-content')).toBeTruthy();
     });
-
 });
 
+describe('Listing notification methods tests', () => {
+   test('City and country address string is returned', () => {
+     let address = {city: "Christchurch", country: "New Zealand"};
 
+     expect(wrapper.vm.createAddressString(address)).toBe("Christchurch, New Zealand");
+   });
 
+    test('Full address string is returned', () => {
+        let address = {
+            streetNumber: "88",
+            streetName: "Ilam Road",
+            suburb: "Ilam",
+            city: "Christchurch",
+            region: "Canterbury",
+            country: "New Zealand"
+        };
 
-// describe('Detailed message UI', () => {
-//
-//     test('Message button opens message box', () => {
-//         //Setup
-//         //wrapper.vm.showing = true;
-//         wrapper.vm.currentMessage = oneMessage[0];
-//         wrapper.vm.detailedView = true;
-//         wrapper.vm.showing = true;
-//
-//         let button2 = wrapper.find(".card-modal-message-button")
-//
-//         //Execution
-//         button2.trigger("click")
-//
-//         //Result
-//         expect(wrapper.vm.messaging).toBeTruthy();
-//         expect(wrapper.find("#card-modal-message")).toBeTruthy();
-//     });
-//
-//
-// });
+        expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
+    });
+});
+
+describe('Listing notification functionality tests', () => {
+    test("Bought listings are shown", () => {
+        expect(wrapper.find(".bought-listing-notification-card")).toBeTruthy();
+    });
+
+    test("Liked listings notifications are shown", () => {
+        expect(wrapper.find(".liked-listing-notification")).toBeTruthy();
+    });
+
+    test("Liked listing view button redirects to listing page on click", async () => {
+        let button = wrapper.find(".view-listing-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(wrapper.vm.$router.push).toBeCalled();
+    });
+
+});
