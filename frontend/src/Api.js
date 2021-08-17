@@ -435,8 +435,8 @@ export default {
      *          401 if not logged in
      *          406 if business, user or listing are invalid
      */
-    postListingNotification: async(listingId, status) =>
-        instance.post(`/listings/{listingId}/notify`, {status}, {withCredentials: true}),
+    postListingNotification: async(listingId) =>
+        instance.post(`/listings/${listingId}/notify`, {}, {withCredentials: true}),
 
     /**
      *
