@@ -65,7 +65,7 @@
       </vs-card>
 
       <!-- USER BOUGHT LISTING NOTIFICATION -->
-      <vs-card class="notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
+      <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
           <div style="display: flex;">
@@ -98,13 +98,13 @@
 
       <!-- NEW LIKED LISTING NOTIFICATIONS -->
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
-        <p class="sub-header">UNLIKED LISTING - {{ item.created }}</p>
+        <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
         <div class="lln-description">
           <span v-if="item.status === 'Liked'">You have liked <b>{{ item.listing.inventoryItem.product.name }}</b>.</span>
           <span v-else>You have unliked <b>{{ item.listing.inventoryItem.product.name }}</b>.</span>
         </div>
         <div class="lln-button-group">
-          <vs-button class="lln-delete-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+          <vs-button class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
           <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
         </div>
       </vs-card>
@@ -188,6 +188,7 @@ export default {
 
     /**
      * Calls the backend to delete a given message's id.
+     * @param messageId the unique id of the message to be deleted.
      */
     deleteMessage: function(messageId) {
       api.deleteMessage(messageId)
@@ -229,30 +230,30 @@ export default {
 
     /**
      * Sends user message by calling POST messages
-     * @param cardId ID of card whose owner the user is going to message
+     * @param originalMessage the object of the originally sent message.
+     * @param message the text string to send back.
      */
     sendMessage(originalMessage, message) {
       if (this.checkMessage(message)) {
         //the server can return either the sender object or it's id
         //we resolve which it is so we are always posting to the correct user
-        let senderId=null;
+        let senderId = null;
         if (originalMessage.sender.id) {
-          senderId=originalMessage.sender.id;
+          senderId = originalMessage.sender.id;
         } else {
-          senderId=originalMessage.sender;
+          senderId = originalMessage.sender;
         }
-
         api.postMessage(senderId, originalMessage.card.id, message)
-            .then(() => {
-              this.$vs.notify({title: 'Reply Sent!', color: 'success'});
-              //reset the message after success
-              this.message = "";
-              this.errors=[];
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-              this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
-            });
+          .then(() => {
+            this.$vs.notify({title: 'Reply Sent!', color: 'success'});
+            //reset the message after success
+            this.message = "";
+            this.errors = [];
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
+          });
       }
 
     },
