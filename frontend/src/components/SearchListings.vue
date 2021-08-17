@@ -125,7 +125,7 @@
         </div>
     <div class="title-container">
       <div class="title-centre">
-        <vs-pagination v-model="pageNum" :total="totalPages" @change="filterListings"/>
+        <vs-pagination v-model="pageNum" :total="totalPages" @change="filterListings(); resetCache()" />
       </div>
     </div>
   </vs-card>
@@ -220,6 +220,11 @@ const SearchListings = {
   },
 
   methods: {
+    resetCache: function() {
+      if (sessionStorage.getItem('listingSearchCache') !== null) {
+        sessionStorage.removeItem('listingSearchCache');
+      }
+    },
     /**
      * Gets all business types from the database, to
      * be used by business type filter
@@ -299,6 +304,7 @@ const SearchListings = {
         sortDirection: this.sortDirection
       }
       sessionStorage.setItem("listingSearchCache", JSON.stringify(searchQuery));
+      console.log(this.pageNum)
       this.$router.push({path: `/businesses/${listing.inventoryItem.product.business.id }/listings/${listing.id}`});
     },
     /**
