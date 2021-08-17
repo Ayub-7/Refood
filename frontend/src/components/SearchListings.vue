@@ -176,7 +176,7 @@ const SearchListings = {
       maxClosingDate: null,
 
       likedListingsIds: [],
-      numListings: 10,
+      numListings: 12,
       pageNum: 1,
       totalPages: 0,
       sortDirection: "desc"
