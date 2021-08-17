@@ -103,6 +103,19 @@ api.getBusinessListings = jest.fn(() => {
     return Promise.resolve({data: testListing, status: 200});
 });
 
+
+api.addLikeToListing = jest.fn(() => {
+    return Promise.resolve({status: 201});
+});
+
+api.removeLikeFromListing = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+
+api.getUserLikedListings = jest.fn(() => {
+    return Promise.resolve({data:{}, status: 200});
+});
+
 let $log = {
     error: jest.fn(),
     debug: jest.fn(),
@@ -237,3 +250,18 @@ describe('Testing methods', () => {
     expect(wrapper.vm.currentImage).toBe(listImages[listImages.length - 1]);
   })
 })
+
+describe('Liking items', () => {
+    test('Liking an item', async () => {
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+    })
+
+    test('Unliking an item', async () => {
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+        await wrapper.vm.deleteLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+    })
+});
