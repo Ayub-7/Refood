@@ -97,26 +97,28 @@ export default {
      */
     //searchQuery: async(input) => instance.post('users/search', input),
 
-    /**
-     * Query search results that uses searchQuery function
-     * @returns {Promise<AxiosResponse<any>>}
-     */
-    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    // /**
+    //  * Query search results that uses searchQuery function
+    //  * @returns {Promise<AxiosResponse<any>>}
+    //  */
+    // searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
 
 
     /**
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    searchUsersQuery: (query, pageNum, sortString) => instance.get(`/users/search`,{params: {searchQuery: query, pageNum: pageNum, sortString: sortString}, withCredentials: true}),
 
     /**
      *  Query search that returns businesses based on the parameter query
      * @param query to help narrow down the businesses
      * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
+     * @param page
+     * @param sortString
      * @returns {*}
      */
-    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
+    searchBusinessesWithTypeQuery: (query, type, page, sortString) => instance.get('/businesses/search', {params: {query: query, type: type, page: page, sortString: sortString}, withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
