@@ -120,8 +120,6 @@ public class ListingController {
 
         Sort sort;
         String sortBy = request.getSortBy();
-        // Sort category        ListingNotification notification = new ListingNotification(sessionUser, listing, NotificationStatus.UNLIKED);
-
         if (sortBy == null) {
             sort = Sort.unsorted();
         } else if (sortBy.equalsIgnoreCase("price") ||
@@ -163,27 +161,6 @@ public class ListingController {
 
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }
-
-//    /**
-//     * GET endpoint that retrieves businesses' listings by a search query.
-//     * @param query A string with the search's query
-//     * @param count how many results will show per page.
-//     * @param offset how many PAGES (not results) to skip before returning the results.
-//     * @param session current user session.
-//     * @return Response with the JSONified list of the businesses' listings
-//     * @throws JsonProcessingException
-//     */
-//    @GetMapping("/businesses/listings")
-//    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
-//                                              @RequestParam("count") int count,
-//                                              @RequestParam("page") int offset,
-//                                              HttpSession session) throws JsonProcessingException {
-//        logger.debug("Searching for Listings...");
-//        Specification<Listing> specification = listingFinder.findListing(query);
-//        Pageable pageRange = PageRequest.of(offset, count);
-//        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
-//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
-//    }
 
 
     /**
@@ -246,10 +223,6 @@ public class ListingController {
             if(oldNotification != null) {
                 listingNotificationRepository.delete(oldNotification);
             }
-            //Create liked notification
-            BoughtListing boughtListing = boughtListingRepository.findBoughtListingByListingId(listing.getId());
-            ListingNotification notification = new ListingNotification(user, boughtListing, NotificationStatus.BOUGHT);
-            listingNotificationRepository.save(notification);
             listingLikeRepository.delete(like);
         }
         listingRepository.delete(listing);
