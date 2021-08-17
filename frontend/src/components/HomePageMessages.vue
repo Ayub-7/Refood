@@ -276,7 +276,10 @@ export default {
       return true;
     },
 
-
+    /**
+     * Opens the expanded message information modal, allowing the user to view the full message content.
+     * @param message the message to expand.
+     */
     openDetailedModal: function(message) {
       this.currentMessage = message;
       this.detailedView = true;
