@@ -39,7 +39,7 @@ public class ListingSpecifications {
                     return cb.greaterThanOrEqualTo(root.get("price"), request.getMinPrice());
                 }
                 else if (request.getMaxPrice() != null) {
-                    return cb.greaterThanOrEqualTo(root.get("price"), request.getMaxPrice());
+                    return cb.lessThanOrEqualTo(root.get("price"), request.getMaxPrice());
                 }
 
                 return null;

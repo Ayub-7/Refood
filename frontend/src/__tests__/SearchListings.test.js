@@ -762,6 +762,62 @@ const mockUser = {
     ]
 }
 
+const busTypes = {
+    "data": [
+        "Accommodation and Food Services",
+        "Retail Trade",
+        "Charitable organisation",
+        "Non-profit organisation",
+        "Administrative and Support services",
+        "Agriculture, Forestry and Fishing",
+        "Arts and Recreation Services",
+        "Construction",
+        "Education and Training",
+        "Electricity, Gas, Water and Waste Services",
+        "Financial and Insurance Services",
+        "Health Care and Social Assistance",
+        "Information Media and Telecommunication",
+        "Manufacturing",
+        "Mining",
+        "Professional, Scientific and Technical Services",
+        "Public Administration and Safety",
+        "Rental, Hiring and Real Estate Services",
+        "Transport, Postal and Warehousing",
+        "Wholesale Trade",
+        "Other Services"
+    ],
+    "status": 200,
+    "statusText": "",
+    "headers": {
+        "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+        "content-length": "628",
+        "content-type": "application/json",
+        "expires": "0",
+        "pragma": "no-cache"
+    },
+    "config": {
+        "url": "/businesses/types",
+        "method": "get",
+        "headers": {
+            "Accept": "application/json, text/plain, */*"
+        },
+        "baseURL": "http://localhost:9499",
+        "transformRequest": [
+            null
+        ],
+        "transformResponse": [
+            null
+        ],
+        "timeout": 10000,
+        "withCredentials": true,
+        "xsrfCookieName": "XSRF-TOKEN",
+        "xsrfHeaderName": "X-XSRF-TOKEN",
+        "maxContentLength": -1,
+        "maxBodyLength": -1
+    },
+    "request": {}
+}
+
 let $log = {
     debug: jest.fn(),
     error: jest.fn()
@@ -779,7 +835,8 @@ beforeEach(() => {
         methods: {},
         data () {
             return {
-                listings: mockListingsFromSearch.content
+                listings: mockListingsFromSearch.content,
+                businessTypes: busTypes.data
             }
         }
     });
@@ -802,6 +859,10 @@ beforeEach(() => {
 
     api.addLikeToListing = jest.fn(() => {
         return Promise.resolve({status: 201});
+    });
+
+    api.getBusinessTypes = jest.fn(() => {
+        return Promise.resolve({status: 200});
     });
 
     api.removeLikeFromListing = jest.fn(() => {
@@ -969,7 +1030,7 @@ describe('Listings search page tests', () => {
 
     test('Clicking on a listing redirects to details page', async () => {
         wrapper.vm.viewListing = jest.fn();
-        let clickableImg = wrapper.find('#media-div')
+        let clickableImg = wrapper.find('#img-wrap')
         clickableImg.trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.viewListing).toBeCalled();

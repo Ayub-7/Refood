@@ -227,6 +227,7 @@ const SearchListings = {
       api.getBusinessTypes()
       .then((response) => {
         this.businessTypes = response.data
+        console.log(response)
       }).catch((err) => {
         if(err.response.status === 401) {
           this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
@@ -308,19 +309,25 @@ const SearchListings = {
       let today = new Date();
 
       if(this.minPrice != null){
-        if(this.minPrice < 0){
+        if(parseInt(this.minPrice) < 0){
           this.errors.push('invalid-minprice');
         }
       }
 
       if(this.maxPrice != null){
-        if(this.maxPrice < 0){
-          this.errors.push('invalid-maxprice');
-        }
-        if (this.maxPrice < this.minPrice){
+        if(parseInt(this.maxPrice) < 0){
           this.errors.push('invalid-maxprice');
         }
       }
+
+      if(this.maxPrice != null && this.minPrice != null){
+        if (parseInt(this.maxPrice) < parseInt(this.minPrice)){
+          this.errors.push('invalid-maxprice');
+        }
+      }
+
+
+
 
       const dateInPast = function(firstDate, secondDate) {
         return firstDate.setHours(0, 0, 0, 0) <= secondDate.setHours(0, 0, 0, 0);
