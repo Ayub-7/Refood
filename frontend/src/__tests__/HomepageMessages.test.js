@@ -129,7 +129,6 @@ let listingNotifications = [
     }
 ];
 
-
 api.getMessages = jest.fn().mockResolvedValue({data: oneMessage});
 
 api.deleteMessage = jest.fn(() => {
