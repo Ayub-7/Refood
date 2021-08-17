@@ -53,72 +53,12 @@ public class BusinessFinder {
      */
     private Specification<Business> typeFilter(String type) throws ResponseStatusException {
         String attribute = "businessType";
-        switch (type.toUpperCase().replace(",", "")) {
-            case "ACCOMMODATION AND FOOD SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-            case "RETAIL TRADE":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.RETAIL_TRADE);
-            case "CHARITABLE ORGANISATION":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.CHARITABLE_ORGANISATION);
-            case "NON-PROFIT ORGANISATION":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.NON_PROFIT_ORGANISATION);
-            case "ADMINISTRATIVE AND SUPPORT SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.ADMINISTRATIVE_AND_SUPPORT_SERVICES);
-            case "AGRICULTURE FORESTRY AND FISHING":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.AGRICULTURE_FORESTRY_AND_FISHING);
-            case "ARTS AND RECREATION SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.ARTS_AND_RECREATION_SERVICES);
-            case "CONSTRUCTION":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.CONSTRUCTION);
-            case "EDUCATION AND TRAINING":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.EDUCATION_AND_TRAINING);
-            case "ELECTRICITY GAS WATER AND WASTE SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES);
-            case "FINANCIAL AND INSURANCE SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.FINANCIAL_AND_INSURANCE_SERVICES);
-            case "HEALTH CARE AND SOCIAL ASSISTANCE":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.HEALTH_CAR_AND_SOCIAL_ASSISTANCE);
-            case "INFORMATION MEDIA AND TELECOMMUNICATION":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.INFORMATION_MEDIA_AND_TELECOMMUNICATION);
-            case "MANUFACTURING":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.MANUFACTURING);
-            case "MINING":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.MINING);
-            case "PROFESSIONAL SCIENTIFIC AND TECHNICAL SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_SERVICES);
-            case "PUBLIC ADMINISTRATION AND SAFETY":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.PUBLIC_ADMINISTRATION_AND_SAFETY);
-            case "RENTAL HIRING AND REAL ESTATE SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.RENTAL_HIRING_AND_REAL_ESTATE_SERVICES);
-            case "TRANSPORT POSTAL AND WAREHOUSING":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.TRANSPORT_POSTAL_AND_WAREHOUSING);
-            case "WHOLESALE TRADE":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.WHOLESALE_TRADE);
-            case "OTHER SERVICES":
-                return (root, query, criteriaBuilder)
-                        -> criteriaBuilder.equal(root.get(attribute), BusinessType.OTHER_SERVICES);
-            default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid businessType");
+        try {
+            BusinessType typeEnum = BusinessType.valueOf(type.toUpperCase().replace(",", "").replace(" ", "_"));
+            return (root, query, criteriaBuilder)
+                    -> criteriaBuilder.equal(root.get(attribute), typeEnum);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid businessType");
         }
     }
 
