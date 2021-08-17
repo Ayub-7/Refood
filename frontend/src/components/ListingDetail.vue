@@ -21,6 +21,7 @@
       <vs-col vs-w="6" vs-sm="12" id="listing-info-area">
         <div id="listing-info-container">
           <div id="business-name">Business: {{listing.inventoryItem.product.business.name}}</div>
+          <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
           <div> Price: {{currency.symbol}}{{listing.price}} {{currency.code}}</div>
           <div>Quantity: {{listing.quantity}}</div>
           <div>Closes: {{listing.created}}</div>
@@ -157,6 +158,15 @@ export default {
       return images.map(image => image.fileName);
     },
 
+    /**
+     * Goes to business profile page, also stores listing value in session storage so user can come back to page
+     * @param businessId id of business page that we are going to
+     */
+    goToBusinessProfile(businessId) {
+      this.$router.push({path: `/businesses/${businessId}`})
+      sessionStorage.setItem('previousListing', this.listing.id)
+    },
+
 
     /**
      * Gets primary image from list of images and primary image path
@@ -271,7 +281,12 @@ export default {
 
 #business-name {
   font-size: 25px;
+  cursor: pointer;
+}
+
+#business-profile-button{
   margin-bottom: 1em;
+  margin-top: 0.5em;
 }
 
 .listing-detail-btn {
@@ -304,21 +319,25 @@ export default {
     margin-bottom: 5px;
   }
 
-  #business-name {
 
+  #business-name {
     font-size: 20px;
     margin-top: 1em;
     margin-bottom: 0.5em;
   }
+
 
   .listing-detail-btn {
     margin-top: 5px;
     width: 150px;
   }
 
+
+
   #listing-image {
         margin: auto;
   }
+
   #listing-image-container {
     display: flex;
     flex-direction: column;
