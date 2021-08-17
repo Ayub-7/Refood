@@ -128,11 +128,11 @@ api.getMessages = jest.fn(() => {
   return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
-api.getLikedListings = jest.fn(() => {
+api.getUserLikedListings = jest.fn(() => {
     return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
-api.unlikeListing = jest.fn(() => {
+api.removeLikeFromListing = jest.fn(() => {
     return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
