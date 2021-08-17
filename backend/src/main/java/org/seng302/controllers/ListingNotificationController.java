@@ -1,10 +1,6 @@
 package org.seng302.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
-import org.seng302.models.requests.ListingNotificationRequest;
 import org.seng302.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,11 +15,6 @@ import java.util.stream.Collectors;
 @RestController
 public class ListingNotificationController {
 
-  private static final Logger logger = LogManager.getLogger(ListingNotificationController.class.getName());
-
-  @Autowired
-  private ListingRepository listingRepository;
-
   @Autowired
   private UserRepository userRepository;
 
@@ -36,6 +27,9 @@ public class ListingNotificationController {
   @Autowired
   private BoughtListingRepository boughtListingRepository;
 
+  @Autowired
+  private BusinessRepository businessRepository;
+
   /**
    * Endpoint for creating a notification for a listing that's just been purchased.
    * @param listingId ID of the listing
@@ -45,21 +39,22 @@ public class ListingNotificationController {
   public ResponseEntity<String> addNotificationToListing(@PathVariable("listingId") long listingId,
                                                          HttpSession session) {
     User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-    BoughtListing boughtListing = boughtListingRepository.findBoughtListingByListingId(listingId);
-    NotificationStatus status = NotificationStatus.BOUGHT;
     if (currentUser == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    BoughtListing boughtListing = boughtListingRepository.findBoughtListingByListingId(listingId);
     if (boughtListing == null) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
+    Business business = businessRepository.findBusinessById(boughtListing.getProduct().getBusinessId());
+    NotificationStatus status = NotificationStatus.BOUGHT;
     List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(listingId);
     List<User> receivers = userLikes.stream().map(ListingLike::getUser).collect(Collectors.toList());
     for (User receiver : receivers) {
       ListingNotification listingNotification = new ListingNotification(receiver, boughtListing, status);
       listingNotificationRepository.save(listingNotification);
     }
-    ListingNotification listingNotification = new ListingNotification(currentUser, boughtListing, status);
+    ListingNotification listingNotification = new ListingNotification(currentUser, business, boughtListing, status);
     listingNotificationRepository.save(listingNotification);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
@@ -69,11 +64,9 @@ public class ListingNotificationController {
    * @param userId ID of the user
    * @param session the current active user session
    * @return 200 if successful with a list of listing notifications
-   * @throws JsonProcessingException when json mapping object to a json string fails unexpectedly
    */
-  @GetMapping("users/{userId}/notifications")
-  public ResponseEntity<List<ListingNotification>> getUserListingNotifications(@PathVariable("userId") long userId,
-                                                                           HttpSession session) throws JsonProcessingException {
+  @GetMapping("/users/{userId}/notifications")
+  public ResponseEntity<List<ListingNotification>> getUserListingNotifications(@PathVariable("userId") long userId, HttpSession session) {
     User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
     User user = userRepository.findUserById(userId);
 
@@ -86,7 +79,23 @@ public class ListingNotificationController {
     }
 
     List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByUserId(userId);
-    System.out.println(listingNotifications);
+    return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
+  }
+
+  /**
+   * Endpoint for retrieving a list of a business's listing notifications
+   * @param businessId Business' ID
+   * @return 200 if successful with a list of listing notifications
+   */
+  @GetMapping("/businesses/{businessId}/notifications")
+  public ResponseEntity<List<ListingNotification>> getBusinessListingNotifications(@PathVariable("businessId") long businessId) {
+    Business business = businessRepository.findBusinessById(businessId);
+
+    if (business == null) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+    }
+
+    List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationByBusinessId(businessId);
     return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
   }
 }
