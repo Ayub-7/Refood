@@ -11,6 +11,10 @@ function updateSessionOnRouterChange(router) {
         if(from.path.includes('/listings/')) {
             sessionStorage.removeItem("businessesCache")
         }
+
+        if(from.path.includes('/search')) {
+            sessionStorage.removeItem("previousListing");
+        }
         api.checkSession()
         .then((response) => {
           if(response.data.id != null && (to.path != '/' && to.path != '/register' && to.name != 'catchAll')){ //If logged in
