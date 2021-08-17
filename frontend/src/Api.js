@@ -426,15 +426,29 @@ export default {
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
 
     /**
-     * Get router endpoint for retrieving a users liked listings
-     * @param id
-     * @returns {Promise<AxiosResponse<any>>} liked listings
+     * POST endpoint - Adds a new like to a business sale listing.
+     * @param id of the sale listing to add a new like to.
+     * @param session the current active user session.
+     * @return 401 if unauthorized, 406 if the listing does not exist, 201 otherwise.
      */
-    getLikedListings: (id) => instance.get(`/users/${id}/likes`, {withCredentials: true}),
+    addLikeToListing: (listingId) =>
+        instance.post(`/businesses/listings/${listingId}/like`, {}, {withCredentials: true}),
+
+   /**
+     * Retrieves and returns a list of LISTINGS that the user has liked.
+     * @param id unique identifier of the user.
+     * @param session current active user session.
+     * @return 401 if unauthorized, 403 if forbidden (not dgaa or correct user), 406 if the user does not exist.
+     * 200 otherwise, may return an empty list (because the user has not liked anything).
+     */
+    getUserLikedListings: (id) => instance.get(`/users/${id}/likes`, {withCredentials: true}),
 
     /**
-     * Get router endpoint for unliking listing
-     * @param id
+     * Removes a user's like from a sale listing (unlikes it).
+     * @param id the unique identifier of the sale listing to unlike.
+     * @param session the current user session - used to figure out who is doing the unliking.
+     * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
      */
-    unlikeListing: (id) => instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true})
+    removeLikeFromListing: (id) =>
+        instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 }

@@ -37,7 +37,7 @@
           <div style="margin-top: 1px; margin-left: -20px" class="message-detail-container message">
             <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
             <div id="message-detail-message">
-              watchlist
+              Watchlist
             </div>
             {{likes}}
           </div>
@@ -139,7 +139,7 @@ const Homepage = {
     unlike: function (id, index) {
       this.likes -= 1;
       this.likedItem.splice(index, 1)
-      api.unlikeListing(id)
+      api.removeLikeFromListing(id)
       .then(() => {
         this.$vs.notify({title: "Successfully unliked listing", color: "success"});
       })
@@ -155,7 +155,7 @@ const Homepage = {
      * Retrieves all the cards that the user has liked.
      */
     getLikes: function(userId) {
-      api.getLikedListings(userId)
+      api.getUserLikedListings(userId)
         .then((res) => {
           this.likedItem = res.data;
           this.likes = res.data.length;
