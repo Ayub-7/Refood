@@ -893,7 +893,7 @@ describe('Button clicks', () => {
         let button = wrapper.find('#sort-button')
         button.trigger('click')
         await wrapper.vm.$nextTick();
-        expect(api.filterListingsQuery).toBeCalled();
+        expect(wrapper.vm.filterListings).toBeCalled();
     });
 
 
@@ -901,7 +901,7 @@ describe('Button clicks', () => {
         let button = wrapper.find('.vs-pagination--nav')
         button.trigger('change')
         await wrapper.vm.$nextTick();
-        expect(api.filterListingsQuery).toBeCalled();
+        expect(wrapper.vm.filterListings).toBeCalled();
     });
 
 
