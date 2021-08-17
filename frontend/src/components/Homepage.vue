@@ -35,44 +35,42 @@
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container">
           <div>
-            <span style="display: inline-block; vertical-align: middle;">
-              <vs-icon icon="favorite_border"/>
-            </span>
-            <span class="watchlist-title">Watchlist</span>
+            <div id="watchlist-header-container">
+              <div>
+                <span style="display: inline-block; vertical-align: middle;"><vs-icon icon="favorite_border" color="red"/></span>
+                <span class="watchlist-title">Watchlist</span>
+              </div>
+              <h3 style="margin-top: 3px"> {{likes}} </h3>
+            </div>
             <vs-divider style="margin-top: 8px;"/>
           </div>
-          <div style="margin-top: 1px; margin-left: -20px" class="message-detail-container message">
-            <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
-            <div id="message-detail-message">
-              watchlist
-            </div>
-            {{likes}}
-          </div>
-          <vs-divider style="margin-top: -30px"></vs-divider>
+
           <div v-for="(item, index) in likedItem" :key="item.id" >
-            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
+            <vs-card id="message-notification-card">
               <div id="likes-notification-container">
-                  <vs-row v-if="item.likes != 0">
-                    <vs-col vs-type="flex" vs-align="center">
+                <vs-row v-if="item.likes != 0">
+                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                    <vs-tooltip text="View Listing">
                       <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
-                    </vs-col>
-                  </vs-row>
+                    </vs-tooltip>
+                    <vs-tooltip text="Unlike">
+                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
+                    </vs-tooltip>
+                  </vs-col>
+                </vs-row>
                 <vs-row v-else>
-                  <vs-col vs-type="flex" vs-align="center">
+                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
                     <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" ></vs-icon>
+                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
                   </vs-col>
                 </vs-row>
                 <div id="product-name">{{item.inventoryItem.product.name}}</div>
                 <div id="product-seller"><b>Seller: </b>{{item.inventoryItem.product.business.name}}</div>
-                <div id="product-closes"><b>Closes: </b>{{item.closes}}</div>
+                <div id="product-closes" slot="footer"><b>Closes: </b>{{item.closes}}</div>
               </div>
             </vs-card>
           </div>
         </div>
-
-
       </div>
 
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
@@ -86,7 +84,7 @@
             </div>
           </nav>
           <vs-divider style="padding: 0 1em;"/>
-          <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
+          <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
         </main>
 
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
@@ -108,6 +106,7 @@ import {mutations, store} from "../store"
 import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
+import axios from "axios";
 
 const Homepage = {
   name: "Homepage",
@@ -126,6 +125,7 @@ const Homepage = {
       cards: [],
       currentCardPage: 1,
       user: null,
+      currencySymbol: "$",
     }
   },
   /**
@@ -138,6 +138,20 @@ const Homepage = {
   },
 
   methods: {
+    /**
+     * Sets display currency based on the user's home country.
+     * @param country country for which currency is going to be retrieved
+     */
+    setCurrency(country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+        .then(response => {
+          this.currencySymbol = response.data[0].currencies[0].symbol;
+        })
+        .catch(err => {
+          this.$log.debug(err);
+      });
+    },
+
     /**
      * open listing
      */
@@ -188,23 +202,23 @@ const Homepage = {
       });
       this.cards = [];
       api.getUserCards(id)
-          .then((res) => {
-            this.cards = res.data;
-            for(let i = 0; i < this.cards.length; i++){
-              if(!this.cards[i].user.homeAddress){
-                this.cards[i].user = this.user;
-              }
+        .then((res) => {
+          this.cards = res.data;
+          for(let i = 0; i < this.cards.length; i++){
+            if(!this.cards[i].user.homeAddress){
+              this.cards[i].user = this.user;
             }
-          })
-          .catch((error) => {
-            if (error.response) {
-              this.$vs.notify({title: "Error retrieving cards", color: "danger"});
-            }
-            this.$log.debug(error);
-          })
-          .finally(() => {
-            this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
-          });
+          }
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving cards", color: "danger"});
+          }
+          this.$log.debug(error);
+        })
+        .finally(() => {
+          this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
+        });
     },
 
     /**
@@ -241,12 +255,12 @@ const Homepage = {
     openMarketModal: function() {
       this.showMarketModal = true;
       api.checkSession()
-          .then(() => {
-            this.getUserCards(this.user.id);
-          })
-          .catch((error) => {
-            this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
-          });
+        .then(() => {
+          this.getUserCards(this.user.id);
+        })
+        .catch((error) => {
+          this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+        });
     },
 
     /**
@@ -334,13 +348,13 @@ const Homepage = {
 
     checkUserSession: function() {
       api.checkSession()
-          .then((response) => {
-            this.getUserDetails(response.data.id);
-          })
-          .catch((error) => {
-            this.$log.error("Error checking sessions: " + error);
-            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-          });
+        .then((response) => {
+          this.getUserDetails(response.data.id);
+        })
+        .catch((error) => {
+          this.$log.error("Error checking sessions: " + error);
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+        });
     }
   },
 }
@@ -349,31 +363,52 @@ export default Homepage;
 </script>
 
 <style scoped>
+#message-notification-card {
+  min-height: 100px;
+}
+
+.con-vs-card >>> .vs-card--content {
+  margin-bottom: 4px;
+}
+
 #product-name {
-  text-align: center;
+  text-align: left;
   font-size: 12px;
   font-weight: bold;
 }
+
 #product-closes {
   font-size: 12px;
 }
 
 #view-icon {
-  font-size: 15px;
+  font-size: 16px;
   margin-left: -1px;
-  cursor: pointer
+  cursor: pointer;
+  transition: font-size 0.3s;
 }
 
 #view-unlike-icon {
-  font-size: 15px;
+  font-size: 16px;
   margin-left: -1px;
-  cursor: pointer
+  cursor: pointer;
+  transition: font-size 0.3s;
+}
+
+#view-icon:hover {
+  transition: font-size 0.3s;
+  font-size: 20px!important;
+}
+
+#like-icon:hover {
+  transition: font-size 0.3s;
+  font-size: 20px!important;
 }
 
 #like-icon {
-  font-size: 13px;
-  margin-left: 150px;
-  cursor: pointer
+  font-size: 16px;
+  cursor: pointer;
+  transition: font-size 0.3s;
 }
 
 #unlike-icon {
@@ -404,7 +439,6 @@ export default Homepage;
   padding: 0 2em;
 }
 
-
 /* Top Name Container */
 #name-container {
   grid-column: 2 / 4;
@@ -422,6 +456,11 @@ export default Homepage;
   font-size: 32px;
   padding: 0.5em 0;
   line-height: 1.2em;
+}
+
+#business-name {
+  font-size: 32px;
+  margin: auto;
 }
 
 .newsfeed-title {
@@ -454,12 +493,18 @@ export default Homepage;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(1, auto) repeat(1, 1fr);
-  grid-row-gap: 2em;
+  grid-row-gap: 0.5em;
+}
+
+#watchlist-header-container {
+  display: flex;
+  justify-content: space-between;
 }
 
 .watchlist-title {
   font-size: 18px;
   margin-left: 4px;
+  transition: 0.3s;
 }
 
 /* News feed styles. */
@@ -493,6 +538,13 @@ main {
   letter-spacing: 1px;
 }
 
+@media screen and (max-width: 1200px) {
+  .watchlist-title {
+    transition: 0.3s;
+    font-size: 16px;
+    margin-left: 0;
+  }
+}
 
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {
@@ -521,6 +573,12 @@ main {
 
   #newsfeed-navbar {
     align-content: center;
+  }
+
+  .watchlist-title {
+    font-size: 18px;
+    margin-left: 4px;
+    transition: 0.3s;
   }
 
 }

@@ -49,56 +49,68 @@
 
     </vs-popup>
 
-      <vs-card v-for="message in messages" :key="message.id" id="message-notification-card" class="notification-card" actionable>
-          <div @click="openDetailedModal(message)">
-            <div style="display: flex; justify-content: space-between">
-              <p class="sub-header">MARKETPLACE - {{message.sent}}</p>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(message.id)" icon="close"></vs-button>
-            </div>
-            <div id="message-notification-container">
-              <div id="message-text">New message from {{users[message.sender.id || message.sender].firstName}} {{users[message.sender.id || message.sender].lastName}} about {{message.card.title}}</div>
-            </div>
-         </div>
+    <!-- === NEWSFEED ITEMS === -->
+    <div v-for="item in feedItems" :key="item.id">
+      <!-- CARD MESSAGE -->
+      <vs-card v-if="item.card" id="message-notification-card" class="notification-card" actionable>
+        <div @click="openDetailedModal(item)">
+          <div style="display: flex; justify-content: space-between">
+            <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
+            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
+          </div>
+          <div id="message-notification-container">
+            <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <b>{{item.card.title}}</b></div>
+          </div>
+        </div>
       </vs-card>
 
-    <!-- PURCHASE LISTING NOTIFICATIONS -->
-    <div v-for="notification in listingNotifications" :key="notification.id">
-      <vs-card class="notification-card" v-if="notification.boughtListing.buyer === currentUserId">
+      <!-- USER BOUGHT LISTING NOTIFICATION -->
+      <vs-card class="notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
         <div class="pln-top-row">
-          <p class="sub-header">PURCHASED LISTING - {{ notification.boughtListing.sold }}</p>
+          <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
           <div style="display: flex;">
             <vs-button color="danger" icon="close" class="pln-delete-button delete-button"></vs-button>
           </div>
         </div>
-        <h2>{{ notification.boughtListing.product.name }}</h2>
-        <h5>{{ notification.boughtListing.product.business.name }}</h5>
+        <h3>{{ item.boughtListing.product.name }}</h3>
+        <h5>{{ item.boughtListing.product.business.name }}</h5>
         <div class="pln-bottom-row">
-          <h2>
-            <!--TODO: CURRENCY -->
-            {{ notification.boughtListing.price }}
-          </h2>
+          <h4>
+            {{ currency }}
+            {{ item.boughtListing.price }}
+          </h4>
           <div>
-            Collect at {{ createAddressString(notification.boughtListing.product.business.address) }}
+            Collect your purchase at <b>{{ createAddressString(item.boughtListing.product.business.address) }}</b>
           </div>
         </div>
       </vs-card>
 
-      <!-- LIKED LISTING NOTIFICATIONS -->
-      <vs-card class="liked-listing-notification notification-card" v-else>
-        <p class="sub-header">LIKED LISTING - {{ notification.boughtListing.sold }}</p>
+      <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
+      <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
+        <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
         <div class="lln-description">
-          <b>{{ notification.boughtListing.product.name }}</b>, by {{ notification.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
+          <b>{{ item.boughtListing.product.name }}</b>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
         </div>
         <div class="lln-button-group">
           <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
         </div>
+      </vs-card>
 
+      <!-- NEW LIKED LISTING NOTIFICATIONS -->
+      <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
+        <p class="sub-header">UNLIKED LISTING - {{ item.created }}</p>
+        <div class="lln-description">
+          <span v-if="item.status === 'Liked'">You have liked <b>{{ item.listing.inventoryItem.product.name }}</b>.</span>
+          <span v-else>You have unliked <b>{{ item.listing.inventoryItem.product.name }}</b>.</span>
+        </div>
+        <div class="lln-button-group">
+          <vs-button class="lln-delete-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
+        </div>
       </vs-card>
     </div>
 
-
   </div>
-
 </template>
 
 <script>
@@ -106,170 +118,205 @@ import api from "../Api";
 import { store } from '../store';
 
 export default {
-    data() {
-      return {
-        messages: [],
-        messaging: false,
-        showing: false,
-        message: '',
-        errors: [],
-        users: {},
-        detailedView: false,
-        currentMessage: null,
 
-        listingNotifications: [],
-        currentUserId: null,
+  props: {
+    currency: {
+      type: String,
+      default: "$",
+    }
+  },
 
-        feedItems: [],
-      }
+  data() {
+    return {
+      messaging: false,
+      showing: false,
+      message: '',
+      errors: [],
+      users: {},
+      detailedView: false,
+      currentMessage: null,
+
+      currentUserId: null,
+
+      messages: [],
+      listingNotifications: [],
+      feedItems: [],
+    }
+  },
+
+  mounted() {
+    this.currentUserId = store.loggedInUserId;
+    this.getMessages();
+    this.getListingNotifications();
+  },
+
+  methods: {
+
+    /**
+     * Combines the different news feed item types into a single list.
+     * Sorts the list by newest messages first.
+     */
+    combineFeedMessages: function() {
+      this.feedItems = this.messages.concat(this.listingNotifications);
+      this.feedItems.sort(function(a, b) {
+        return new Date(b.created) - new Date(a.created);
+      });
     },
 
-    mounted() {
-      this.getMessages();
-      this.getListingNotifications();
-      this.currentUserId = store.loggedInUserId;
-      this.combineFeedMessages();
-    },
-
-    methods: {
-      combineFeedMessages: function() {
-        this.feedItems = this.messages + this.listingNotifications;
-        this.feedItems.sort(function(a, b) {
-          if (a.created < b.created) return -1;
-          if (a.created > b.created) return 1;
-          return 0;
-        });
-
-        console.log(this.feedItems);
-      },
-
-
-      getMessages: function() {
-        api.getMessages(store.loggedInUserId)
+    /**
+     * Calls the backend to retrieve all of the messages for the current user.
+     */
+    getMessages: function() {
+      api.getMessages(this.currentUserId)
         .then((response) => {
           this.messages = response.data;
           for (let message of this.messages) {
             this.users[message.sender.id] = message.sender;
           }
+
           this.messages = this.messages.map(message => {
+            // Map the sent date to a new created attribute - to be used for sorting.
             message.created = message.sent;
             return message;
           });
-          console.log(this.messages);
-        }).catch((error) => {
+        })
+        .catch((error) => {
           this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
+        });
+    },
 
+    /**
+     * Calls the backend to delete a given message's id.
+     */
+    deleteMessage: function(messageId) {
+      api.deleteMessage(messageId)
+        .then((response) => {
+          this.$vs.notify({
+            title: `Message Deleted`,
+            text: response.data.sender.firstName +" "+response.data.sender.lastName+ ": "+ response.data.description,
+            color: 'success'
+          });
+          this.getMessages();
         })
-      },
+        .catch((error) => {
+          this.$vs.notify({
+            title: 'Failed to delete the message',
+            color: 'danger'
+          });
+          this.$log.debug("Error Status:", error);
+        });
+    },
 
-      deleteMessage: function(messageId) {
-        api.deleteMessage(messageId)
-            .then((response) => {
-              this.$vs.notify( {
-                title: `Message Deleted`,
-                text: response.data.sender.firstName +" "+response.data.sender.lastName+ ": "+ response.data.description,
-                color: 'success'
-              });
-              this.getMessages();
+    /**
+     * Retrieves the notifications relating to purchased listings.
+     */
+    getListingNotifications: function() {
+      api.getListingNotifications(store.loggedInUserId)
+        .then((res) => {
+          this.listingNotifications = res.data;
+          this.combineFeedMessages();
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          if (error && error.response) {
+            this.$vs.notify({title: `Error ${error.response}`,
+                              text: "There was a problem getting your newsfeed.",
+                              color: "danger"});
+          }
+        });
+    },
+
+    /**
+     * Sends user message by calling POST messages
+     * @param cardId ID of card whose owner the user is going to message
+     */
+    sendMessage(originalMessage, message) {
+      if (this.checkMessage(message)) {
+        //the server can return either the sender object or it's id
+        //we resolve which it is so we are always posting to the correct user
+        let senderId=null;
+        if (originalMessage.sender.id) {
+          senderId=originalMessage.sender.id;
+        } else {
+          senderId=originalMessage.sender;
+        }
+
+        api.postMessage(senderId, originalMessage.card.id, message)
+            .then(() => {
+              this.$vs.notify({title: 'Reply Sent!', color: 'success'});
+              //reset the message after success
+              this.message = "";
+              this.errors=[];
             })
             .catch((error) => {
-              this.$vs.notify({
-                title: 'Failed to delete the message',
-                color: 'danger'
-              });
-              this.$log.debug("Error Status:", error);
+              this.$log.debug(error);
+              this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
             });
-      },
-
-      getListingNotifications: function() {
-        api.getListingNotifications(store.loggedInUserId)
-          .then((res) => {
-            console.log(res.data);
-            this.listingNotifications = res.data;
-          })
-          .catch();
-      },
-
-      /**
-       * Sends user message by calling POST messages
-       * @param cardId ID of card whose owner the user is going to message
-       */
-      sendMessage(originalMessage, message) {
-        if (this.checkMessage(message)) {
-          //the server can return either the sender object or it's id
-          //we resolve which it is so we are always posting to the correct user
-          let senderId=null;
-          if (originalMessage.sender.id) {
-            senderId=originalMessage.sender.id;
-          } else {
-            senderId=originalMessage.sender;
-          }
-
-          api.postMessage(senderId, originalMessage.card.id, message)
-              .then(() => {
-                this.$vs.notify({title: 'Reply Sent!', color: 'success'});
-                //reset the message after success
-                this.message = "";
-                this.errors=[];
-              })
-              .catch((error) => {
-                this.$log.debug(error);
-                this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
-              });
-        }
-
-      },
-      /**
-       * Check the message contents
-       * Simply check a blank message is not sent and the message is under the maximum character limit
-       */
-      checkMessage() {
-        if (this.message == null || this.message === "") {
-          this.errors.push('bad-content');
-
-          this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
-          return false;
-        }
-
-        if (this.message.length > 250) {
-          this.errors.push('bad-content');
-
-          this.$vs.notify({title:'Error sending message', text:`Message is too long. Consider sending it in parts.`, color:'danger'});
-          return false;
-        }
-
-        return true;
-      },
-
-
-      openDetailedModal: function(message) {
-        this.currentMessage = message;
-        this.detailedView = true;
-        this.showing = true;
-      },
-
-      createAddressString: function(address) {
-        let location = "";
-        if (address.streetNumber) location += address.streetNumber + " ";
-        if (address.streetName) location += address.streetName + ", ";
-        if (address.suburb) location += address.suburb + ", ";
-        if (address.city) location += address.city + ", ";
-        if (address.region) location += address.region + ", ";
-        if (address.country) location += address.country;
-
-        return location;
       }
 
     },
-    computed: {
-      /**
-       * Weird computed property to stop closing transition from happening when opening modal
-       */
-      showTransition: function() {
-        return this.showing || !this.messaging;
+    /**
+     * Check the message contents
+     * Simply check a blank message is not sent and the message is under the maximum character limit
+     */
+    checkMessage() {
+      if (this.message == null || this.message === "") {
+        this.errors.push('bad-content');
+        this.$vs.notify({title:'Error sending message', text:`No message content`, color:'danger'});
+        return false;
       }
+
+      if (this.message.length > 250) {
+        this.errors.push('bad-content');
+        this.$vs.notify({title:'Error sending message', text:`Message is too long. Consider sending it in parts.`, color:'danger'});
+        return false;
+      }
+
+      return true;
+    },
+
+
+    openDetailedModal: function(message) {
+      this.currentMessage = message;
+      this.detailedView = true;
+      this.showing = true;
+    },
+
+    /**
+     * Creates and returns a string of a given address to display on the page.
+     * @param address the address entity to concatenate information from.
+     * @return location string.
+     */
+    createAddressString: function(address) {
+      let location = "";
+      if (address.streetNumber) location += address.streetNumber + " ";
+      if (address.streetName) location += address.streetName + ", ";
+      if (address.suburb) location += address.suburb + ", ";
+      if (address.city) location += address.city + ", ";
+      if (address.region) location += address.region + ", ";
+      if (address.country) location += address.country;
+
+      return location;
+    },
+
+    /**
+     * Redirects the page to the given full listing page.
+     * @param listing the listing page to redirect the browser to.
+     */
+    goToListing: function(listing) {
+      this.$router.push(`/businesses/${listing.inventoryItem.product.business.id}/listings/${listing.id}`);
     }
+
+  },
+  computed: {
+    /**
+     * Weird computed property to stop closing transition from happening when opening modal
+     */
+    showTransition: function() {
+      return this.showing || !this.messaging;
+    }
+  }
 }
 </script>
 
@@ -412,10 +459,6 @@ export default {
   #message-text {
     margin-bottom: 10px;
     height: 100%;
-  }
-
-  #delete-btn{
-
   }
 
   .lln-button-group {

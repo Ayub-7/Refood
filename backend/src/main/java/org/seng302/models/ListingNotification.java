@@ -55,13 +55,4 @@ public class ListingNotification {
     }
 
     public ListingNotification() {}
-
-    public void setStatus(NotificationStatus status) {
-        if (status == NotificationStatus.BOUGHT || status == NotificationStatus.EXPIRED) {
-            this.status = status;
-        }
-        else {
-            throw new IllegalArgumentException(status + " status is not allowed");
-        }
-    }
 }

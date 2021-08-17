@@ -2348,6 +2348,7 @@ components:
           format: date
           description: The date the notification was created
           readOnly: true
+
     ListOfNotifications:
       example: [{id: 43,
                  userId: 50,

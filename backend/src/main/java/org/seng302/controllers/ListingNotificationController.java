@@ -82,15 +82,10 @@ public class ListingNotificationController {
     }
 
     if (currentUser.getId() != user.getId()) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-//    if (listing == null || user == null || business == null) {
-//      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-//    }
-
     List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByUserId(userId);
-    System.out.println(listingNotifications);
     return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
   }
 }
