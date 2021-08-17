@@ -31,7 +31,7 @@ public class ListingNotification {
     @Enumerated(EnumType.STRING)
     private NotificationStatus status;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date created;
 
     /**
