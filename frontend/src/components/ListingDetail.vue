@@ -29,7 +29,8 @@
           <div id="listing-moreInfo">{{listing.moreInfo}}</div>
           <div>Likes: {{listing.likes}}</div>
           <div>
-            <vs-button class="listing-detail-btn">Like listing</vs-button>
+            <vs-button v-if="!likedListingsIds.includes(listing.id)" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">Like listing</vs-button>
+            <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">Unlike listing</vs-button>
           </div>
           <div>
             <vs-button class="listing-detail-btn">Buy</vs-button>
@@ -77,7 +78,8 @@ export default {
       noBusiness: false,
       currency: {symbol: '$', code: 'NZD'},
       currentImage: null,
-      listingImages: []
+      listingImages: [],
+      likedListingsIds: [],
     }
   },
 
@@ -86,6 +88,14 @@ export default {
     if(store.actingAsBusinessId != null) {
       this.$router.push({path: "/home"}) //Only users should be able to access this page (as a logged-in user)
     }
+    api.getUserLikedListings(this.userId)
+        .then((response) => {
+          for (let i = 0; i < response.data.length; i++) {
+            this.likedListingsIds.push(response.data[i]["id"]);
+          }
+        }).catch((err) => {
+      throw new Error(`Error trying to get user's likes: ${err}`)
+    })
     this.businessId = this.$route.params.businessId
     this.listingId = this.$route.params.listingId
 
@@ -184,10 +194,39 @@ export default {
       let indexOfImage = this.listingImages.indexOf(currentImage);
       let length = this.listingImages.length
       this.currentImage = this.listingImages[(((indexOfImage - 1) % length) + length) % length] //Negative modulo in JavaScript doesn't work since it's just remainder
+    },
+    /**
+     * method to submit a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    sendLike: function(listingId, listingName) {
+      api.addLikeToListing(listingId)
+          .then(() => {
+            this.likedListingsIds.push(listingId);
+            this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to like listing ${listingId}: ${err}`);
+          })
+    },
+
+    /**
+     * Deletes a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    deleteLike: function(listingId, listingName) {
+      api.removeLikeFromListing(listingId)
+          .then(() => {
+            this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
+            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
+          })
     }
-
-
-  }
+  },
 
 }
 </script>

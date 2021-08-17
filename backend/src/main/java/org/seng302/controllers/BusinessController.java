@@ -17,11 +17,16 @@ import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
@@ -42,8 +47,6 @@ public class BusinessController {
 
     @Autowired
     private BusinessFinder businessFinder;
-
-
 
     /**
      * Get request mapping for getting business by id
@@ -200,16 +203,72 @@ public class BusinessController {
     }
 
     /**
+     * Creates a sort object to be used by pageRequest to sort search results.
+     * @param sortString
+     * @return Sort sortBy Sort specification
+     * @throws ResponseStatusException
+     */
+    private Sort getSortType(String sortString) throws ResponseStatusException {
+        Sort sortBy = Sort.by(Sort.Order.asc("id").ignoreCase());
+        switch (sortString) {
+            case "id":
+                break;
+            case "nameAsc":
+                sortBy = Sort.by(Sort.Order.asc("name").ignoreCase()).and(sortBy);
+                break;
+            case "businessTypeAsc":
+                sortBy = Sort.by(Sort.Order.asc("businessType").ignoreCase()).and(sortBy);
+                break;
+            case "cityAsc":
+                sortBy = Sort.by(Sort.Order.asc("address.city").ignoreCase()).and(sortBy);
+                break;
+            case "countryAsc":
+                sortBy = Sort.by(Sort.Order.asc("address.country").ignoreCase()).and(sortBy);
+                break;
+            case "nameDesc":
+                sortBy = Sort.by(Sort.Order.desc("name").ignoreCase()).and(sortBy);
+                break;
+            case "businessTypeDesc":
+                sortBy = Sort.by(Sort.Order.desc("businessType").ignoreCase()).and(sortBy);
+                break;
+            case "cityDesc":
+                sortBy = Sort.by(Sort.Order.desc("address.city").ignoreCase()).and(sortBy);
+                break;
+            case "countryDesc":
+                sortBy = Sort.by(Sort.Order.desc("address.country").ignoreCase()).and(sortBy);
+                break;
+            default:
+                logger.error("400 error - invalid sort by parameter {}", sortString);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid sortString");
+        }
+        return sortBy;
+    }
+
+    /**
      * Searches for businesses, with credintials
      * @param query A string with the search's query
      * @param type Type of business
      * @return Http status code and list of businesses with name/names matching request.
      */
     @GetMapping("/businesses/search")
-    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<String> findBusinesses(@RequestParam(name="query") String query, @RequestParam(name="type") String type, @RequestParam(name="page") int page,  @RequestParam(defaultValue="id") String sortString, HttpSession session) throws JsonProcessingException {
         logger.debug("Searching for businesses...");
-        List<Business> businesses = removeBusinessesAdministered(businessFinder.findBusinesses(query, type));
-
+        Sort sortType;
+        try {
+            sortType = getSortType(sortString);
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err.getMessage());
+        }
+        PageRequest pageRequest = PageRequest.of(page, 10, sortType);
+        Specification<Business> matches;
+        try {
+            matches = businessFinder.findBusinesses(query, type);
+        } catch (ResponseStatusException e) {
+            logger.error("{} error - invalid type parameter {}", e.getStatus(), type);
+            return ResponseEntity.status(e.getStatus()).body(e.getReason());
+        }
+        Page<Business> unfilteredBusinesses =  businessRepository.findAll(matches, pageRequest);
+        Page<Business> businesses = removeBusinessesAdministered(unfilteredBusinesses);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(businesses));
     }
 
@@ -220,16 +279,18 @@ public class BusinessController {
      * @param businesses List of businesses that needs businessesAdministered removed
      * @return List of businesses with businessesAdministered field set to null
      */
-    private List<Business> removeBusinessesAdministered(List<Business> businesses) {
+    private Page<Business> removeBusinessesAdministered(Page<Business> businesses) {
         logger.debug("Removing businessesAdministered...");
-        for(Business business: businesses) {
-            List<User> admins = business.getAdministrators();
-            for(User admin: admins) {
-                admin.setBusinessesAdministered(null);
+        if (businesses != null) {
+            for(Business business: businesses) {
+                List<User> admins = business.getAdministrators();
+                for(User admin: admins) {
+                    admin.setBusinessesAdministered(null);
+                }
             }
-        }
 
-        logger.debug("businessesAdministered removed");
+            logger.debug("businessesAdministered removed");
+        }
         return businesses;
     }
 

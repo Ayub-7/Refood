@@ -91,8 +91,15 @@
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
               <div slot="media">
                 <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
+                <div v-if="!likedListingsIds.includes(listing.id)">
+                  <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                </div>
+                <div v-else>
+                  <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                </div>
+
               </div>
-              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.listingsName }}</div>
+              <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
               <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
                 <div>{{ currencySymbol }}{{ listing.price }}</div>
                 <div>{{ listing.quantity }}x</div>
@@ -541,6 +548,8 @@ const SearchListings = {
       displaytype: true,
       currencySymbol: "",
       selected: "",
+      likedListingsIds: [],
+
     };
   },
 
@@ -548,6 +557,14 @@ const SearchListings = {
     api.checkSession()
       .then((response) => {
         this.userId = response.data.id;
+        api.getUserLikedListings(this.userId)
+        .then((response) => {
+          for (let i = 0; i < response.data.length; i++) {
+            this.likedListingsIds.push(response.data[i]["id"]);
+          }
+        }).catch((err) => {
+          throw new Error(`Error trying to get user's likes: ${err}`)
+        })
       }).catch((err) => {
       throw new Error(`Error trying to get user id: ${err}`);
     })
@@ -567,6 +584,38 @@ const SearchListings = {
         console.log("Error with getting cities from REST Countries." + err);
       });
     },
+
+    /**
+     * method to submit a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    sendLike: function(listingId, listingName) {
+      api.addLikeToListing(listingId)
+        .then(() => {
+          this.likedListingsIds.push(listingId);
+          this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+        })
+        .catch((err) => {
+          throw new Error(`Error trying to like listing ${listingId}: ${err}`);
+        })
+    },
+
+    /**
+     * Deletes a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    deleteLike: function(listingId, listingName) {
+      api.removeLikeFromListing(listingId)
+          .then(() => {
+            this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
+            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
+          })
+    }
   },
 }
 
@@ -761,6 +810,25 @@ div#search-parameters {
 .con-vs-card.fixedHeight {
   height: auto;
 }
+
+.like-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+
+  cursor: pointer;
+  text-align: right;
+
+  transition: 0.3s;
+}
+
+.like-button.vs-icon:hover {
+  transition: opacity 0.3s, font-size 0.3s, right 0.3s;
+  opacity: 1.5;
+  font-size: 42px!important;
+  right: 16px;
+}
+
 
 @media screen and (max-width: 900px) {
   #catalogue-options {

@@ -9,6 +9,7 @@ import org.seng302.models.*;
 import org.seng302.repositories.ListingLikeRepository;
 import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.repositories.ListingNotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,6 +37,8 @@ class ListingLikeControllerTests {
     private ListingRepository listingRepository;
     @MockBean
     private ListingLikeRepository listingLikeRepository;
+    @MockBean
+    private ListingNotificationRepository listingNotificationRepository;
     @MockBean
     private UserRepository userRepository;
 

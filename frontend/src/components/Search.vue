@@ -1,10 +1,10 @@
 <template>
   <div class="main" id="body">
     <div id="search">
-      <vs-input v-on:keyup.enter="searchUsers()"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearchUser" size="large" type="border" @click="searchUsers">Search</vs-button>
-      <vs-input v-on:keyup.enter="searchBusiness()" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
-      <vs-button id="submitSearchBusiness" size="large" type="border" @click="searchBusiness">Search</vs-button>
+      <vs-input v-on:keyup.enter="clearSort(), searchUsers(1)"  class="search-input" type="search" placeholder="Search for user" name="searchbarUser" v-model="searchbarUser" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchUser" size="large" type="border" @click="clearSort(), searchUsers(1)">Search</vs-button>
+      <vs-input v-on:keyup.enter="clearSort(), searchBusiness(1)" class="search-input" type="search" placeholder="Search for business" name="searchbarBusiness" v-model="searchbarBusiness" style="width: 400px; font-size: 24px" size="large"/>
+      <vs-button id="submitSearchBusiness" size="large" type="border" @click="clearSort(), searchBusiness(1)">Search</vs-button>
 
       <vs-select
           width="10%"
@@ -21,7 +21,16 @@
     <vs-divider style="padding: 0 1em 1em"></vs-divider>
 
     <div v-if="users.length" class="data-table">
-      <vs-table :data="this.users" max-items="10" pagination stripe>
+      <div class="title-left" >
+        <vs-select class="selectExample" v-model="selectSortBy">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsSortBy"/>
+        </vs-select>
+        <vs-select id="AscendingOrDescendingDropbox" class="selectAscOrDesc" v-model="ascending">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsAscending"/>
+        </vs-select>
+        <vs-button @click="searchUsers(1);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+      </div>
+      <vs-table :data="this.users">
         <template slot="thead" id="usersTableHeader">
           <vs-th sort-key="firstName" style="border-radius: 4px 0 0 0;">
             First name
@@ -51,11 +60,11 @@
           <vs-tr :key="indextr" v-for="(tr, indextr) in data" class="data-row">
             <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
             <vs-td :data="data[indextr].lastName">{{data[indextr].lastName}}</vs-td>
-            <vs-td :data="data[indextr].city">{{`${data[indextr].city}`}}</vs-td>
-            <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].country}`}}</vs-td>
+            <vs-td :data="data[indextr].city">{{`${data[indextr].homeAddress.city}`}}</vs-td>
+            <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].homeAddress.country}`}}</vs-td>
             <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
             <vs-td>
-              <vs-button id="goToProfileButton" @click="goToUserProfile(data[indextr].id)">Go to profile</vs-button>
+              <vs-button class="goToProfileButton" @click="goToUserProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
             <vs-td :data="data[indextr].role" v-if="isDGAA"> {{data[indextr].role}} </vs-td>
             <vs-td v-if="isDGAA" class="dgaaCheckbox">
@@ -64,12 +73,30 @@
           </vs-tr>
         </template>
       </vs-table>
-      <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{users.length}} results</div>
+      <div class="title-container">
+        <div class="title-centre">
+          <vs-pagination v-model="page" :total="totalPages" @change="searchUsers(page)"/>
+        </div>
+      </div>
+      <div class="title-container">
+        <div class="title-centre">
+          <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{resultSize}} results</div>
+        </div>
+      </div>
     </div>
 
     <!-- === BUSINESS TABLE === -->
     <div v-if="businesses.length" class="data-table">
-      <vs-table :data="this.businesses" max-items="10" pagination stripe >
+      <div class="title-left" >
+        <vs-select class="selectExample" v-model="selectSortBy">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in businessOptionsSortBy"/>
+        </vs-select>
+        <vs-select id="AscendingOrDescendingDropbox" class="selectAscOrDesc" v-model="ascending">
+          <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item, index) in optionsAscending"/>
+        </vs-select>
+        <vs-button @click="searchBusiness(1);" style="margin: 0 2em 0 0.5em; width: 100px">Sort</vs-button>
+      </div>
+      <vs-table :data="this.businesses">
         <template slot="thead" id="businessesTableHeader">
           <vs-th sort-key="name" style="border-radius: 4px 0 0 0;">
             Business name
@@ -95,13 +122,21 @@
             <vs-td :data="data[indextr].address.city" v-if="mobileMode==false">{{data[indextr].address.city}}</vs-td>
             <vs-td :data="data[indextr].address.country" v-if="mobileMode==false">{{data[indextr].address.country}}</vs-td>
             <vs-td>
-              <vs-button id="goToProfileButton" @click="goToBusinessProfile(data[indextr].id)">Go to profile</vs-button>
+              <vs-button class="goToProfileButton" @click="goToBusinessProfile(data[indextr].id)">Go to profile</vs-button>
             </vs-td>
           </vs-tr>
         </template>
       </vs-table>
-
-      <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{businesses.length}} results</div>
+      <div class="title-container">
+        <div class="title-centre">
+          <vs-pagination v-model="page" :total="totalPages" @change="searchBusiness(page)"/>
+        </div>
+      </div>
+      <div class="title-container">
+        <div class="title-centre">
+          <div class="displaying-results">Showing {{searchIndexMin}} - {{searchIndexMax}} of {{resultSize}} results</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -115,10 +150,31 @@ const Search = {
   name: "Search",
   data: function() {
     return {
-      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
+      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade", "Administrative and Support Services",
+        "Agriculture Forestry and Fishing", "Arts and Recreation Services", "Construction", "Education and Training", "Electricity, Gas, Water and Waste Services", "Financial and Insurance Services", "Health Care and Social Assistance",
+        "Information Media and Telecommunication", "Manufacturing", "Mining", "Professional, Scientific and Technical Services", "Public Administration and Safety", "Rental Hiring and Real Estate Services", "Transport, Postal and Warehousing", "Wholesale Trade", "Other Services"],
       businessType: null,
       tableLoaded: false,
       searchbarUser: "",
+      optionsSortBy: [
+        {text:'First Name',value:'firstName'},
+        {text:'Last Name',value:'lastName'},
+        {text:'City',value:'city'},
+        {text:'Country',value:'country'},
+        {text:'Email',value:'email'}
+      ],
+      businessOptionsSortBy: [
+        {text:'Name',value:'name'},
+        {text:'City',value:'city'},
+        {text:'Country',value:'country'},
+      ],
+      optionsAscending: [
+        {text: "Alphabetical Order", value:"Asc"},
+        {text: "Alphabetical Reverse", value:"Desc"},
+      ],
+      selectSortBy: null,
+      ascending: null,
+      sortString: null,
       searchbarBusiness: "",
       mobileMode: false,
       errors: [],
@@ -128,6 +184,9 @@ const Search = {
       searchIndexMin: 1,
       searchIndexMax: 10,
 
+      page: 1,
+      resultSize: 0,
+      totalPages: 0,
       isDGAA: false
     };
   },
@@ -166,11 +225,16 @@ const Search = {
 
   methods: {
 
+    clearSort: function() {
+      this.ascending = null;
+      this.selectSortBy = null;
+    },
+
     /**
      * If page reaches certain width set mobile mode on, this removes columns from the table to ensure it fits on the page
      */
     setMobileMode: function() {
-      if(window.innerWidth < 1300) {
+      if(window.innerWidth < 500) {
         this.mobileMode = true
       } else {
         this.mobileMode = false;
@@ -192,18 +256,6 @@ const Search = {
     /**
      * Increases search range to be shown on page
      */
-    increaseSearchRangeForBusiness: function() {
-      this.searchIndexMin += 10;
-      if(this.searchIndexMax + 10 > this.businesses.length) {
-        this.searchIndexMax = this.businesses.length;
-      } else {
-        this.searchIndexMax += 10;
-      }
-    },
-
-    /**
-     * Decreases search range to be shown on page
-     */
     decreaseSearchRange: function() {
       this.searchIndexMin -= 10;
       if(this.searchIndexMax % 10 !== 0){
@@ -213,21 +265,6 @@ const Search = {
       }
     },
 
-    /**
-     * Decrease search range to be shown on page for businesses
-     */
-    decreaseSearchRangeForBusiness: function() {
-      this.searchIndexMin -= 10;
-      if(this.searchIndexMax % 10 !== 0){
-        this.searchIndexMax -= this.searchIndexMax % 10;
-      } else {
-        this.searchIndexMax -= 10;
-      }
-    },
-
-    /**
-     * Retrieve the role of the user
-     */
     getUserRole: function () {
       return store.role;
     },
@@ -255,8 +292,10 @@ const Search = {
     paginator(data) {
       //Need to set properties of user object so they can be sorted by
       for(let user of data) {
-        user.country = user.homeAddress.country;
-        user.city = user.homeAddress.city;
+        if (user.country) {
+          user.country = user.homeAddress.country;
+          user.city = user.homeAddress.city;
+        }
       }
 
       if(data.length < 10) {
@@ -270,13 +309,12 @@ const Search = {
         this.searchIndexMax = 10;
       }
     },
-
     /**
      * Searches for the users in the database by calling the API function with an SQL query to find the
      * users based on the input in the search box.
      */
-    searchUsers: function () {
-
+    searchUsers: function (page) {
+      this.businesses = [];
       if (sessionStorage.getItem('businessesCache') !== null) {
         if (this.businesses.length || JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
           sessionStorage.setItem("businessesCache", []);
@@ -284,65 +322,74 @@ const Search = {
         }
       }
       if (this.searchbarUser === "") return;
+      if (this.selectSortBy && this.ascending) {
+        this.sortString = this.selectSortBy + this.ascending;
+      } else {
+        this.sortString = null;
+      }
       this.$vs.loading();
-      api.searchUsersQuery(this.searchbarUser)
-        .then((response) => {
-          this.users = response.data;
-          this.users = this.users.filter(x => typeof(x) == "object").slice(0,100)
-          this.paginator(this.users);
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load users";
-        })
-        .finally(() => {
-          this.$vs.loading.close();
-          if(!this.tableLoaded){
-            // document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
-
-            //Event listeners for vuesax buttons on table since they're generated afterwards
-            document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRange);
-            document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRange);
-
-            this.tableLoaded = true;
-        }
-      })
+      api.searchUsersQuery(this.searchbarUser, page - 1, this.sortString)
+          .then((response) => {
+            this.users = response.data.content;
+            this.users = this.users.filter(x => typeof (x) == "object")
+            this.resultSize = response.data.totalElements;
+            this.totalPages = response.data.totalPages;
+            this.searchIndexMin = response.data.number * 10 + 1;
+            this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
+            console.log(this.users)
+            this.$vs.loading.close();
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to load users";
+          })
+          .finally(() => {
+            if (!this.tableLoaded) {
+              //Event listeners for vuesax buttons on table since they're generated afterwards
+              this.tableLoaded = true;
+            }
+          })
     },
 
     /**
      * Searches for the businesses in the database by calling the API function with an SQL query
      * to find the businesses based on the input in the search box.
      */
-    searchBusiness: function() {
-      if (this.users.length) {
-        this.users = [];
-      }
+    searchBusiness: function(page) {
+      this.users = [];
       this.$vs.loading();
       if (!this.businessType) {
         this.businessType = "";
       }
-      api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType)
-         .then((response) => {
-           this.businesses = response.data.slice(0,100);
-           this.businesses = this.businesses.filter(x => typeof(x) == "object");
-           this.paginator(this.businesses);
-         })
-         .catch((error) => {
-           this.$log.debug(error);
-           this.error = "Failed to load businesses";
-         })
-         .finally(() => {
-           this.$vs.loading.close();
-           if(!this.tableLoaded){
-             document.getElementsByClassName("vs-pagination--ul")[0].remove(); //remove vuesax table number listing
+      if (this.selectSortBy && this.ascending) {
+        this.sortString = this.selectSortBy + this.ascending;
+      } else {
+        this.sortString = null;
+      }
+      api.searchBusinessesWithTypeQuery(this.searchbarBusiness, this.businessType, page-1, this.sortString)
+          .then((response) => {
+            this.resultSize = response.data.totalElements;
+            this.businesses = response.data.content;
+            this.totalPages = response.data.totalPages;
+            this.businesses = this.businesses.filter(x => typeof(x) == "object");
+            this.searchIndexMin = response.data.number*10+1;
+            this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
+            console.log(this.businesses);
+            this.$vs.loading.close();
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to load businesses";
+          })
+          .finally(() => {
+            if(!this.tableLoaded){
+              //Event listeners for vuesax buttons on table since they're generated afterwards
+              // document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRangeForBusiness);
+              // document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRangeForBusiness);
 
-             //Event listeners for vuesax buttons on table since they're generated afterwards
-             document.getElementsByClassName("btn-next-pagination")[0].addEventListener('click', this.increaseSearchRangeForBusiness);
-             document.getElementsByClassName("btn-prev-pagination")[0].addEventListener('click', this.decreaseSearchRangeForBusiness);
-
-             this.tableLoaded = true;
-           }
-         })
+              this.tableLoaded = true;
+            }
+          })
     },
 
     /**
@@ -368,6 +415,19 @@ export default Search;
 
 .displaying-results {
   text-align: right;
+}
+
+.title-centre {
+  margin-right: auto;
+  margin-left: auto;
+  display: flex;
+}
+
+.title-container {
+  display: flex;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 0.5em;
 }
 
 #search {
@@ -400,9 +460,16 @@ export default Search;
   margin: 4px 0;
 }
 
-#goToProfileButton {
+.goToProfileButton {
   cursor: pointer;
   height: 35px;
+}
+
+.title-left {
+  margin-right: auto;
+  margin-left: 4px;
+  margin-bottom: .5em;
+  display: flex;
 }
 
 #submitSearchUser {
