@@ -31,7 +31,7 @@
             <vs-button class="listing-detail-btn">Like listing</vs-button>
           </div>
           <div>
-            <vs-button class="listing-detail-btn">Buy</vs-button>
+            <vs-button class="listing-detail-btn" @click="buy()">Buy</vs-button>
           </div>
         </div>
       </vs-col>
@@ -174,8 +174,36 @@ export default {
       let indexOfImage = this.listingImages.indexOf(currentImage);
       let length = this.listingImages.length
       this.currentImage = this.listingImages[(((indexOfImage - 1) % length) + length) % length] //Negative modulo in JavaScript doesn't work since it's just remainder
-    }
+    },
 
+    buy() {
+      let userId = store.loggedInUserId;
+
+      api.postListingNotification(this.businessId, this.listingId, userId, "Bought")
+              .then((response) => {
+                this.$vs.notify({title:'Success', text:`Successfully purchased!\n${response.status}`, color:'success'})
+                this.$router.push({path: `/home`});
+              })
+              .catch(err => {
+                if (err.response.status === 400) {
+                  this.$vs.notify({title:'Purchase Failed', text:'400 Bad Request', color:'danger'})
+                } else if (err.response.status === 401) {
+                  this.$vs.notify({title:'Purchase Failed', text:'401 Not Logged In', color:'danger'})
+                } else {
+                  this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
+                }
+              });
+      api.deleteListing(this.listingId)
+              .then((res) => {
+                console.log(res);
+              }).catch(err => {
+        if (err.response.status === 406) {
+          this.$vs.notify({title: 'Purchase Failed', text: '406 Not Acceptable', color: 'danger'})
+        } else {
+          this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
+        }
+      });
+    }
 
   }
 

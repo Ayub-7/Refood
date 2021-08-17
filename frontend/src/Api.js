@@ -447,6 +447,28 @@ export default {
     //getBusinessListingNotifications: (businessId, listingId, userId) => instance.get(`/businesses/{businessId}/listings/{listingId}/users/{userId}/notify`, {withCredentials: true}),
 
     /**
+     * Post api endpoint to post listing notification for particular listing
+     * @param businessId ID of the business owning the listing
+     * @param listingId ID of the listing
+     * @param userId ID of the user
+     * @param status Status of the listing (bought)
+     * @returns {Promise<AxiosResponse<any>>}
+     *          201 if created
+     *          400 if bad request
+     *          401 if not logged in
+     *          406 if business, user or listing are invalid
+     */
+    postListingNotification: async(businessId, listingId, userId, status) =>
+        instance.post(`/businesses/${businessId}/listings/${listingId}/users/${userId}/notify`, {status}, {withCredentials: true}),
+
+    /**
+     *
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteListing: (listingId) => instance.delete(`/businesses/listings/${listingId}`, {withCredentials: true}),
+
+    /**
      * Get router endpoint for retrieving a users liked listings
      * @param id
      * @returns {Promise<AxiosResponse<any>>} liked listings
