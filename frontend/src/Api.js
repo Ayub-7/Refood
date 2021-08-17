@@ -434,7 +434,7 @@ export default {
      * @param userId
      * @returns {Promise<AxiosResponse<any>>}
      */
-    getListingNotifications: (userId) => instance.get(`/businesses/1/listings/1/users/${userId}/notify`, { withCredentials: true }),
+    getListingNotifications: (userId) => instance.get(`/users/${userId}/notifications`, { withCredentials: true }),
 
 
     /**

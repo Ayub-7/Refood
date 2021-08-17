@@ -4,7 +4,7 @@
       <vs-dropdown id="dropdownButton" vs-trigger-click>
         <div id="notificationContainer">
           <vs-avatar icon="notifications" size="30" name="avatar" />
-          <span id="dropdownButtonName">{{ this.notifications.length}}</span>
+          <span id="dropdownButtonName">{{ notifications.length }}</span>
         </div>
         <vs-dropdown-menu>
 
@@ -29,9 +29,22 @@
                     </div>
 
                   <!-- If listing has been purchased -->
-                  <div class="cardContainer" v-else-if="notification.status === Bought">
-                    {{notification.title}} has been purchased by another user
+                  <div class="cardContainer" v-else-if="validPurchaseNotification(notification)" >
+                    <p>
+                      {{notification.boughtListing.product.name}} has been purchased
+                      <br>
+                      {{dateConverter(notification.boughtListing.sold)}}
+                    </p>
                   </div>
+
+                  <div class="cardContainer" v-else-if="!validPurchaseNotification(notification)" >
+                    <p>
+                      You have purchased {{notification.boughtListing.product.name}}
+                      <br>
+                      {{dateConverter(notification.boughtListing.sold)}}
+                    </p>
+                  </div>
+
 
                 </div>
             </div>
@@ -54,14 +67,32 @@ export default {
 
     data: function() {
         return {
-
+          bought: 'Bought',
           expired: 'Expired',
           deleted: 'Deleted',
-
+          userId: store.loggedInUserId
         };
     },
 
     methods: {
+      /**
+       * Check if the item has be bought by the user
+       */
+      validPurchaseNotification(notification) {
+        if (notification.status === this.bought && this.userId !== notification.boughtListing.buyer) {
+          return true;
+        }
+        return false;
+      },
+
+      /**
+       * Converts a regular date to day month year
+       */
+      dateConverter (dateStr) {
+        let simpleDate = new Date(dateStr);
+        return simpleDate.getDay() + "-" + simpleDate.getMonth() + "-" + simpleDate.getFullYear();
+      },
+
       /**
        * Calls api method to extend card display period
        * @param cardId card that is going to extended
@@ -101,21 +132,12 @@ export default {
             mutations.setNotifications(response.data);
         })
       },
-
-      /**
-       * Calls api method to get notifications for listings
-       */
-      getListingNotifications() {
-        api.getListingNotifications(store.loggedInUserId)
-            .then((response) => {
-              mutations.setNotifications( response.data);
-            })
-      }
     },
 
-    computed: {
+  computed: {
         notifications: {
             get() {
+
                 return store.notifications
             },
             set(val) { //setter for testing purposes
@@ -123,7 +145,6 @@ export default {
             }
         }
     }
-
 }
 </script>
 
