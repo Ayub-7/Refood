@@ -196,8 +196,17 @@ class BusinessFinderTests {
         Assertions.assertEquals(1, businesses.size());
     }
 
+    @Test
+    @Transactional
+    void testBusinessFind_BusinessAInQuotesWithSpace_ReturnsNothing() {
+        Specification<Business> spec = businessFinder.findBusinesses("\"The Sk \"", "");
+        Sort sortType = Sort.by(Sort.Order.asc("id").ignoreCase());
+        PageRequest pageRequest = PageRequest.of(0, 10, sortType);
+        Page<Business> result = businessRepository.findAll(spec, pageRequest);
 
+        List<Business> businesses = result.stream().collect(Collectors.toList());
 
-
+        Assertions.assertEquals(0, businesses.size());
+    }
 
 }

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
@@ -111,7 +110,7 @@ public class AddressFinder {
      */
     private Specification<Listing> getNextSpecification(Specification<Listing> specification, String term, ArrayList<String> terms) {
         if (terms.indexOf(term) != terms.size() - 1) {
-            String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
+            String nextTerm = terms.get(terms.indexOf(term) + 1);
 
             if (term.strip().equals("AND")) {
                 specification = checkFields(specification, nextTerm, Logic.AND);

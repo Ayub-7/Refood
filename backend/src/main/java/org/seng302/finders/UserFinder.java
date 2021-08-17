@@ -7,7 +7,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -26,10 +25,20 @@ public class UserFinder {
      */
     private ArrayList<String> searchQueryKeywords(String query) {
         ArrayList<String> terms = new ArrayList<>();
-        Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
+        var matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
         while (matcher.find()) {
-            terms.add(matcher.group().replace("\"", ""));
+            boolean fullMatch = matcher.group().trim().startsWith("\"") && matcher.group().trim().endsWith("\"");
+
+            String temp;
+            if(!fullMatch) { //If not inside quotes
+                temp = matcher.group().replace("\"", "").trim();
+            } else {
+                temp = matcher.group().trim().replace("\"", ""); //need to trim beforehand as spaces are needed
+            }
+
+            terms.add(temp);
         }
+
         return terms;
     }
 
@@ -88,7 +97,7 @@ public class UserFinder {
      */
     private Specification<User> buildUserSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
-        Specification<User> specification = nameContains(terms.get(0).trim());
+        Specification<User> specification = nameContains(terms.get(0));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }
@@ -105,7 +114,7 @@ public class UserFinder {
      */
     private Specification<User> getNextSpecification(Specification<User> specification, String term, ArrayList<String> terms) {
         if (terms.indexOf(term) != terms.size() - 1) {
-            String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
+            String nextTerm = terms.get(terms.indexOf(term) + 1);
 
             if (term.strip().equals("AND")) {
                 specification = specification.and(nameContains(nextTerm));
