@@ -40,10 +40,10 @@ public class BoughtListing {
 
     /**
      * Bought Listing constructor class, created when a listing is sold.
-     * @param buyer
-     * @param product
-     * @param likes
-     * @param quantity
+     * @param buyer user that is purchasing the listing
+     * @param product the product the listing belongs to
+     * @param likes the number of likes the listing had
+     * @param quantity the quantity of the products
      */
     public BoughtListing(User buyer, Product product, int likes, int quantity, Date listed, long listingId) {
         this.buyer = buyer;
@@ -60,9 +60,9 @@ public class BoughtListing {
      * @param buyer User object that purchased listing
      * @param listing Listing object that was purchased
      */
-    public BoughtListing(User buyer, Listing listing) {
+    public BoughtListing(User buyer, Product product, Listing listing) {
         this.buyer = buyer;
-        this.product = listing.getInventoryItem().getProduct();
+        this.product = product;
         this.likes = listing.getLikes();
         this.quantity = listing.getQuantity();
         this.sold = new Date();

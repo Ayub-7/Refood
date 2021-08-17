@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ListingNotificationController.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class ListingNotificationControllerTests {
+class ListingNotificationControllerTests {
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -47,9 +47,15 @@ public class ListingNotificationControllerTests {
     private BusinessRepository businessRepository;
     @MockBean
     private BoughtListingRepository boughtListingRepository;
+    @MockBean
+    private ProductRepository productRepository;
+    @MockBean
+    private InventoryRepository inventoryRepository;
 
     private User user;
     private Business business;
+    private Product product1;
+    private Product product2;
     private Listing listing;
     private Listing listing2;
     private BoughtListing boughtListing1;
@@ -70,20 +76,28 @@ public class ListingNotificationControllerTests {
         business.setId(1L);
         businessRepository.save(business);
 
+        product1 = new Product("07-4957066", business, "Uno", "desc", "", 2.0, new Date());
+        product2 = new Product("12-3456678", business, "Dos", "desc", "", 5.0, new Date());
+        productRepository.save(product1);
+        productRepository.save(product2);
+
         Inventory inventory = new Inventory("07-4957066", 1, 10, 2.0, 20.0, new Date(), new Date(), new Date(), new Date());
         Inventory inventory2 = new Inventory("12-3456678", 1, 10, 5.0, 50.0, new Date(), new Date(), new Date(), new Date());
+        inventoryRepository.save(inventory);
+        inventoryRepository.save(inventory2);
+
         listing = new Listing(inventory, 5, 2.0, "Seller may be interested in offers", new Date(), new Date());
         listing.setId(1L);
         listing2 = new Listing(inventory2, 5, 5.0, "Test more info", new Date(), new Date());
         listing2.setId(2L);
-        boughtListing1 = new BoughtListing(user, listing);
-        boughtListing2 = new BoughtListing(user, listing2);
+        boughtListing1 = new BoughtListing(user, product1, listing);
+        boughtListing2 = new BoughtListing(user, product2, listing2);
         boughtListing1.setId(1L);
         boughtListing2.setId(2L);
         boughtListingRepository.save(boughtListing1);
         boughtListingRepository.save(boughtListing2);
         notification = new ListingNotification(user, boughtListing1, NotificationStatus.BOUGHT);
-        notification2 = new ListingNotification(user, boughtListing2, NotificationStatus.BOUGHT);
+        notification2 = new ListingNotification(user, business, boughtListing2, NotificationStatus.BOUGHT);
 
         notificationList = new ArrayList<>();
         notificationList.add(notification);
@@ -137,7 +151,7 @@ public class ListingNotificationControllerTests {
      * @throws Exception
      */
     @Test
-    void testNoAuthGetListingNotifications() throws Exception {
+    void testNoAuthGetUserListingNotifications() throws Exception {
         mvc.perform(get("/users/{userId}/notifications", user.getId())).andExpect(status().isUnauthorized());
     }
 
@@ -147,25 +161,51 @@ public class ListingNotificationControllerTests {
      */
     @Test
     @WithMockUser
-    void testGetNotifications_invalidUserId_returnNotAcceptable() throws Exception {
+    void testGetUserNotifications_invalidUserId_returnNotAcceptable() throws Exception {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
-        Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(user.getId())).thenReturn(null);
+        Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(user.getId())).thenReturn(notificationList);
         mvc.perform(get("/users/{userId}/notifications", user.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
     }
 
     /**
-     * Tests successful retrieval of all listing notifications
+     * Tests successful retrieval of all user's listing notifications
      * @throws Exception
      */
     @Test
     @WithMockUser
-    void testGetNotifications_successfulRetrieval_returnOk() throws Exception {
+    void testGetUserNotifications_successfulRetrieval_returnOk() throws Exception {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(user.getId())).thenReturn(null);
+        Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(user.getId())).thenReturn(notificationList);
         mvc.perform(get("/users/{userId}/notifications", user.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests unsuccessful retrieval of all listing notifications due to invalid businessId
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testGetBusinessNotifications_invalidBusinessId_returnNotAcceptable() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
+        Mockito.when(listingNotificationRepository.findListingNotificationsByUserId(business.getId())).thenReturn(notificationList);
+        mvc.perform(get("/businesses/{businessId}/notifications", business.getId()))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    /**
+     * Tests successful retrieval of all business' listing notifications
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testGetBusinessNotifications_successfulRetrieval_returnOk() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(listingNotificationRepository.findListingNotificationByBusinessId(business.getId())).thenReturn(notificationList);
+        mvc.perform(get("/businesses/{businessId}/notifications", business.getId()))
                 .andExpect(status().isOk());
     }
 }
