@@ -146,6 +146,8 @@ const Search = {
       if (JSON.parse(sessionStorage.getItem('businessesCache')).length > 0) {
         this.businesses = JSON.parse(sessionStorage.getItem('businessesCache'));
         this.paginator(this.businesses)
+
+        sessionStorage.removeItem('businessesCache');
       }
     }
     if ( this.getUserRole() === 'DGAA') {
