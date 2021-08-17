@@ -33,7 +33,7 @@
             <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">Unlike listing</vs-button>
           </div>
           <div>
-            <vs-button class="listing-detail-btn">Buy</vs-button>
+            <vs-button class="listing-detail-btn" @click="buy()">Buy</vs-button>
           </div>
         </div>
       </vs-col>
@@ -225,8 +225,36 @@ export default {
           .catch((err) => {
             throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
           })
+    },
+
+    /**
+     * Calls the post notification and delete listing endpoints after the buy buton is clicked
+     */
+    buy() {
+      api.postListingNotification(this.listingId)
+              .then((response) => {
+                this.$vs.notify({title:'Success', text:`Successfully purchased!\n${response.status}`, color:'success'})
+                this.$router.push({path: `/home`});
+              })
+              .catch(err => {
+                if (err.response.status === 400) {
+                  this.$vs.notify({title:'Purchase Failed', text:'400 Bad Request', color:'danger'})
+                } else if (err.response.status === 401) {
+                  this.$vs.notify({title:'Purchase Failed', text:'401 Not Logged In', color:'danger'})
+                } else {
+                  this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
+                }
+              });
+      api.deleteListing(this.listingId)
+              .catch(err => {
+        if (err.response.status === 406) {
+          this.$vs.notify({title: 'Purchase Failed', text: '406 Not Acceptable', color: 'danger'})
+        } else {
+          this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
+        }
+      });
     }
-  },
+  }
 
 }
 </script>
@@ -331,8 +359,6 @@ export default {
     margin-top: 5px;
     width: 150px;
   }
-
-
 
   #listing-image {
         margin: auto;

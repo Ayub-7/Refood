@@ -76,8 +76,8 @@ public class ListingNotificationControllerTests {
         listing.setId(1L);
         listing2 = new Listing(inventory2, 5, 5.0, "Test more info", new Date(), new Date());
         listing2.setId(2L);
-        boughtListing1 = new BoughtListing(user, listing);
-        boughtListing2 = new BoughtListing(user, listing2);
+        boughtListing1 = new BoughtListing(user, listing.getInventoryItem().getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId());
+        boughtListing2 = new BoughtListing(user, listing2.getInventoryItem().getProduct(), listing2.getLikes(), listing2.getQuantity(), listing2.getCreated(), listing.getId());
         boughtListing1.setId(1L);
         boughtListing2.setId(2L);
         boughtListingRepository.save(boughtListing1);
@@ -122,7 +122,7 @@ public class ListingNotificationControllerTests {
     @Test
     @WithMockUser
     void testPostNewNotification_successfulNotification_returnCreated() throws Exception {
-        Mockito.when(boughtListingRepository.findBoughtListingByListingId(listing.getId())).thenReturn(boughtListing1);
+        Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
         mvc.perform(post("/listings/{listingId}/notify", listing.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isCreated());

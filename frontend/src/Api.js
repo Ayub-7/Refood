@@ -428,6 +428,26 @@ export default {
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
 
     /**
+     * Post api endpoint to post listing notification for particular listing
+     * @param listingId ID of the listing
+     * @param status Status of the listing (bought)
+     * @returns {Promise<AxiosResponse<any>>}
+     *          201 if created
+     *          400 if bad request
+     *          401 if not logged in
+     *          406 if business, user or listing are invalid
+     */
+    postListingNotification: async(listingId) =>
+        instance.post(`/listings/${listingId}/notify`, {}, {withCredentials: true}),
+
+    /**
+     *
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteListing: (listingId) => instance.delete(`/businesses/listings/${listingId}`, {withCredentials: true}),
+
+    /**
      * POST endpoint - Adds a new like to a business sale listing.
      * @param id of the sale listing to add a new like to.
      * @param session the current active user session.

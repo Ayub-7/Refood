@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.repositories.*;
 import org.springframework.http.MediaType;
 
 import org.seng302.finders.ListingSpecifications;
@@ -11,12 +12,7 @@ import org.seng302.finders.ListingFinder;
 import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.BusinessListingSearchRequest;
-import org.seng302.repositories.BoughtListingRepository;
-import org.seng302.repositories.BusinessRepository;
 import org.seng302.models.requests.NewListingRequest;
-import org.seng302.repositories.InventoryRepository;
-import org.seng302.finders.AddressFinder;
-import org.seng302.repositories.ListingRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -54,7 +50,13 @@ public class ListingController {
     private InventoryRepository inventoryRepository;
 
     @Autowired
+    private ListingLikeRepository listingLikeRepository;
+
+    @Autowired
     private BoughtListingRepository boughtListingRepository;
+
+    @Autowired
+    private ListingNotificationRepository listingNotificationRepository;
 
     @Autowired
     private ProductFinder productFinder;
@@ -118,8 +120,6 @@ public class ListingController {
 
         Sort sort;
         String sortBy = request.getSortBy();
-        // Sort category        ListingNotification notification = new ListingNotification(sessionUser, listing, NotificationStatus.UNLIKED);
-
         if (sortBy == null) {
             sort = Sort.unsorted();
         } else if (sortBy.equalsIgnoreCase("price") ||
@@ -162,27 +162,6 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));
     }
 
-//    /**
-//     * GET endpoint that retrieves businesses' listings by a search query.
-//     * @param query A string with the search's query
-//     * @param count how many results will show per page.
-//     * @param offset how many PAGES (not results) to skip before returning the results.
-//     * @param session current user session.
-//     * @return Response with the JSONified list of the businesses' listings
-//     * @throws JsonProcessingException
-//     */
-//    @GetMapping("/businesses/listings")
-//    public ResponseEntity<String> findListing(@RequestParam(name="query") String query,
-//                                              @RequestParam("count") int count,
-//                                              @RequestParam("page") int offset,
-//                                              HttpSession session) throws JsonProcessingException {
-//        logger.debug("Searching for Listings...");
-//        Specification<Listing> specification = listingFinder.findListing(query);
-//        Pageable pageRange = PageRequest.of(offset, count);
-//        Page<Listing> listings = listingRepository.findAll(specification, pageRange);
-//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(listings));
-//    }
-
 
     /**
      * Creates a new listing and adds it to the listings of the current acting business
@@ -223,16 +202,29 @@ public class ListingController {
         }
     }
 
+    /**
+     * Delete Listing endpoint, called when a listing is purchased. Deletes notifications and likes related to listing
+     * and creates new notification for the boughtListing object. Deletes the inventory item if the listing was the final
+     * listing for the item.
+     * @param id
+     * @return
+     */
     @DeleteMapping("/businesses/listings/{id}")
-    public ResponseEntity<String> deleteListing(@PathVariable long id, HttpSession session) {
+    public ResponseEntity<String> deleteListing(@PathVariable long id) {
         Listing listing = listingRepository.findListingById(id);
         if (listing == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(id);
         Inventory inventory = listing.getInventoryItem();
-        BoughtListing boughtListing = new BoughtListing(user, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId());
-        boughtListingRepository.save(boughtListing);
+        for (ListingLike like: userLikes) {
+            User user = like.getUser();
+            ListingNotification oldNotification = listingNotificationRepository.findListingNotificationsByUserIdAndListing(user.getId(), listing);
+            if(oldNotification != null) {
+                listingNotificationRepository.delete(oldNotification);
+            }
+            listingLikeRepository.delete(like);
+        }
         listingRepository.delete(listing);
         if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).size() == 1) {
             inventoryRepository.delete(inventory);
