@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.repositories.*;
 import org.springframework.http.MediaType;
+import org.seng302.finders.*;
 
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.finders.ListingFinder;
@@ -53,6 +54,9 @@ public class ListingController {
     private ListingLikeRepository listingLikeRepository;
 
     @Autowired
+    private AddressFinder addressFinder;
+
+    @Autowired
     private BoughtListingRepository boughtListingRepository;
 
     @Autowired
@@ -63,6 +67,9 @@ public class ListingController {
 
     @Autowired
     private ListingFinder listingFinder;
+
+    @Autowired
+    private BusinessTypeFinder businessTypeFinder;
 
     @Autowired
     private ObjectMapper mapper;
@@ -105,10 +112,9 @@ public class ListingController {
      * POST (but actually a GET) endpoint that retrieves listings from all businesses.
      * Body may contain extra search filters and parameters to get specific results.
      * The results are paginated.
-     *
      * @param request the search filter/sort information.
-     * @param count   how many results will show per page.
-     * @param offset  how many PAGES (not results) to skip before returning the results.
+     * @param count how many results will show per page.
+     * @param offset how many PAGES (not results) to skip before returning the results.
      * @return Response - 400 if body is missing or parameters are invalid, 401 if unauthorized, 200 with paginated results otherwise.
      * @throws JsonProcessingException when writing the results as a string value goes wrong.
      */
@@ -116,8 +122,8 @@ public class ListingController {
     public ResponseEntity<String> getAllListings(@RequestBody BusinessListingSearchRequest request,
                                                  @RequestParam("count") int count,
                                                  @RequestParam("offset") int offset,
-                                                 @RequestParam("sortDirection") String sortDirection) throws JsonProcessingException {
-
+                                                 @RequestParam("sortDirection") String sortDirection,
+                                                 HttpSession session) throws JsonProcessingException {
         Sort sort;
         String sortBy = request.getSortBy();
         if (sortBy == null) {
@@ -126,15 +132,15 @@ public class ListingController {
                 sortBy.equalsIgnoreCase("quantity") ||
                 sortBy.equalsIgnoreCase("created") ||
                 sortBy.equalsIgnoreCase("closes")) {
-            sort = Sort.by(request.getSortBy());
+                sort = Sort.by(request.getSortBy());
         } else if (sortBy.equalsIgnoreCase("name") || sortBy.equalsIgnoreCase("manufacturer")) {
             sort = Sort.by("inventoryItem.product." + request.getSortBy());
         } else if (sortBy.equalsIgnoreCase("expires")) {
             sort = Sort.by("inventoryItem.expires");
-        } else if (sortBy.equalsIgnoreCase("city") ||
-                sortBy.equalsIgnoreCase("country") ||
-                sortBy.equalsIgnoreCase("businessType")) {
+        } else if (sortBy.equalsIgnoreCase("businessType")) {
             sort = Sort.by("inventoryItem.product.business." + request.getSortBy());
+        } else if (sortBy.equalsIgnoreCase("city") || sortBy.equalsIgnoreCase("country")) {
+            sort = Sort.by("inventoryItem.product.business.address." + request.getSortBy());
         } else if (sortBy.equalsIgnoreCase("seller")) {
             sort = Sort.by("inventoryItem.product.business.name");
         } else { // Sort By parameter is not what we were expecting.
@@ -145,7 +151,8 @@ public class ListingController {
         // Sort direction
         if (sortDirection.equalsIgnoreCase("desc")) {
             sort = sort.descending();
-        } else {
+        }
+        else {
             sort = sort.ascending();
         }
 
@@ -153,10 +160,21 @@ public class ListingController {
         Pageable pageRange = PageRequest.of(offset, count, sort);
 
         Specification<Listing> specs = where(specifications.hasPriceSet()).and(specifications.hasClosingDateSet());
+        if (request.getBusinessQuery() != null && request.getBusinessQuery().length() > 0) {
+            specs = specs.and(listingFinder.findListing(request.getBusinessQuery()));
+        }
+        if (request.getBusinessTypes() != null && !request.getBusinessTypes().isEmpty()) {
+            specs = specs.and(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(0).toString().replace(",", "") + '"'));
+            for (int i = 1; i < request.getBusinessTypes().size(); i++) {
+                specs = specs.or(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(i).toString().replace(",", "") + '"'));
+            }
+        }
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.
             specs = specs.and(productFinder.findProduct(request.getProductQuery()));
         }
-
+        if (request.getAddressQuery() != null && request.getAddressQuery().length() > 0) { // Prevent product finder from crashing.
+            specs = specs.and(addressFinder.findAddress(request.getAddressQuery()));
+        }
         Page<Listing> result = listingRepository.findAll(specs, pageRange);
 
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(result));

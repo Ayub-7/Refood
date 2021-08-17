@@ -1,5 +1,8 @@
 <template>
   <vs-card v-if="listing" id="listing-detail-container">
+    <div v-if="fromSearch" class="return-button">
+      <vs-button @click="returnToSearch()" title="Go Back">Return To Search</vs-button>
+    </div>
     <vs-row>
       <!-- Image area -->
       <vs-col vs-w="6" vs-sm="12" vs-xs="12" vs-justify="center" id="image-area">
@@ -72,6 +75,7 @@ export default {
 
   data() {
     return {
+      fromSearch: sessionStorage.getItem("listingSearchCache"),
       listingId: null,
       businessId: null,
       listing: null,
@@ -210,6 +214,13 @@ export default {
             throw new Error(`Error trying to like listing ${listingId}: ${err}`);
           })
     },
+    /**
+     * Returns user to listing search page,
+     * their previous search is shown
+     */
+    returnToSearch: function() {
+      this.$router.push({path: '/search-listings'})
+    },
 
     /**
      * Deletes a like for a listing.
@@ -261,6 +272,12 @@ export default {
 
 <style>
 
+.return-button {
+  margin-top: -15px;
+  padding-left: 10px;
+  position: fixed;
+  left: 0px;
+}
 
 .slide-fade-enter-active {
   transition: all .1s ease;

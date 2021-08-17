@@ -1,10 +1,11 @@
 package org.seng302.finders;
 
+import org.seng302.models.BusinessType;
 import org.seng302.models.Listing;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,7 +84,8 @@ public class ListingFinder {
     private Specification<Listing> buildAddressSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
-        Specification<Listing> specification = sellerContains(terms.get(0));
+        Specification<Listing> specification;
+        specification = sellerContains(terms.get(0));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }

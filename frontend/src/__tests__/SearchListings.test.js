@@ -762,6 +762,62 @@ const mockUser = {
     ]
 }
 
+const busTypes = {
+    "data": [
+        "Accommodation and Food Services",
+        "Retail Trade",
+        "Charitable organisation",
+        "Non-profit organisation",
+        "Administrative and Support services",
+        "Agriculture, Forestry and Fishing",
+        "Arts and Recreation Services",
+        "Construction",
+        "Education and Training",
+        "Electricity, Gas, Water and Waste Services",
+        "Financial and Insurance Services",
+        "Health Care and Social Assistance",
+        "Information Media and Telecommunication",
+        "Manufacturing",
+        "Mining",
+        "Professional, Scientific and Technical Services",
+        "Public Administration and Safety",
+        "Rental, Hiring and Real Estate Services",
+        "Transport, Postal and Warehousing",
+        "Wholesale Trade",
+        "Other Services"
+    ],
+    "status": 200,
+    "statusText": "",
+    "headers": {
+        "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+        "content-length": "628",
+        "content-type": "application/json",
+        "expires": "0",
+        "pragma": "no-cache"
+    },
+    "config": {
+        "url": "/businesses/types",
+        "method": "get",
+        "headers": {
+            "Accept": "application/json, text/plain, */*"
+        },
+        "baseURL": "http://localhost:9499",
+        "transformRequest": [
+            null
+        ],
+        "transformResponse": [
+            null
+        ],
+        "timeout": 10000,
+        "withCredentials": true,
+        "xsrfCookieName": "XSRF-TOKEN",
+        "xsrfHeaderName": "X-XSRF-TOKEN",
+        "maxContentLength": -1,
+        "maxBodyLength": -1
+    },
+    "request": {}
+}
+
 let $log = {
     debug: jest.fn(),
     error: jest.fn()
@@ -779,7 +835,8 @@ beforeEach(() => {
         methods: {},
         data () {
             return {
-                listings: mockListingsFromSearch.content
+                listings: mockListingsFromSearch.content,
+                businessTypes: busTypes.data
             }
         }
     });
@@ -796,8 +853,16 @@ beforeEach(() => {
         return Promise.resolve({data: mockUser, status: 200});
     });
 
+    api.filterListingsQuery = jest.fn(() => {
+        return Promise.resolve({data: mockListingsFromSearch, status: 200}).finally();
+    });
+
     api.addLikeToListing = jest.fn(() => {
         return Promise.resolve({status: 201});
+    });
+
+    api.getBusinessTypes = jest.fn(() => {
+        return Promise.resolve({status: 200});
     });
 
     api.removeLikeFromListing = jest.fn(() => {
@@ -808,9 +873,6 @@ beforeEach(() => {
         return Promise.resolve({data:{}, status: 200});
     });
 
-    api.filterListingsQuery = jest.fn(() => {
-        return Promise.resolve({data: mockListingsFromSearch, status: 200}).finally();
-    });
 
     wrapper.vm.filterListings = jest.fn();
 });
@@ -819,18 +881,141 @@ afterEach(() => {
     wrapper.destroy();
 });
 
-describe('Liking items', () => {
-   test('Liking an item', async () => {
-       expect(wrapper.vm.likedListingsIds.length).toEqual(0);
-       await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
-       expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
-   })
+describe('Button clicks', () => {
+    test('Clicking search button calls correct method', async ()  => {
+        let button = wrapper.find('#main-search-btn')
+        button.trigger('click')
+        await wrapper.vm.$nextTick();
+        expect(api.filterListingsQuery).toBeCalled();
+    });
 
-    test('Unliking an item', async () => {
-        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
-        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
-        await wrapper.vm.deleteLike(8101, "Longos - Chicken Cordon Bleu");
-        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+    test('Clicking sort button calls correct method', async ()  => {
+        let button = wrapper.find('#sort-button')
+        button.trigger('click')
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.filterListings).toBeCalled();
+    });
+
+
+    test('Clicking pagination button calls correct method', async ()  => {
+        let button = wrapper.find('.vs-pagination--nav')
+        button.trigger('change')
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.filterListings).toBeCalled();
+    });
+
+
+});
+
+describe('Filter validation', () => {
+    test('No filters passes validation', async ()  => {
+        wrapper.vm.businessQuery = null;
+        wrapper.vm.productQuery = null;
+        wrapper.vm.addressQuery = null;
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = null;
+        wrapper.vm.maxPrice = null;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = null;
+        wrapper.vm.maxClosingDate = null;
+        expect(wrapper.vm.checkForm()).toBe(true);
+    })
+
+    test('Normal values passes validation', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 15;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-08-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-10-30T16:46";
+        expect(wrapper.vm.checkForm()).toBe(true);
+    })
+
+    test('Invalid min price fails validation', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = -5;
+        wrapper.vm.maxPrice = 15;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-08-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-10-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("invalid-minprice");
+    })
+
+    test('Invalid max price fails validation', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = -15;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-12-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-12-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("invalid-maxprice");
+    })
+
+    test('Max price less than min price', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-12-18T16:47";
+        wrapper.vm.maxClosingDate = "2021-12-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("invalid-maxprice");
+    })
+
+    test('Min closing date in past', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-08-15T17:10";
+        wrapper.vm.maxClosingDate = "2021-12-30T16:46";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("past-min-date");
+    })
+
+    test('Max closing date in past', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = null;
+        wrapper.vm.maxClosingDate = "2021-08-15T17:10";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("past-max-date");
+    })
+
+    test('Max closing date before min closing date', async ()  => {
+        wrapper.vm.businessQuery = "Dab";
+        wrapper.vm.productQuery = "Pa";
+        wrapper.vm.addressQuery = "France";
+        wrapper.vm.sortBy = "closes";
+        wrapper.vm.minPrice = 5;
+        wrapper.vm.maxPrice = 2;
+        wrapper.vm.selectedTypes = [];
+        wrapper.vm.minClosingDate = "2021-12-17T17:10";
+        wrapper.vm.maxClosingDate = "2021-12-09T17:13";
+        expect(wrapper.vm.checkForm()).toBeFalsy();
+        expect(wrapper.vm.errors).toContain("past-max-date");
     })
 });
 
@@ -843,47 +1028,26 @@ describe('Listings search page tests', () => {
         expect(wrapper.find('.grid-container').exists()).toBe(true);
     });
 
-    //
-    // test('Clicking sort button calls search method', () => {
-    //     expect(wrapper.find('.grid-container').exists()).toBe(true);
-    // })
-    //
-    // test('Clicking a button in pagination calls search method', () => {
-    //     expect(wrapper.find('.grid-container').exists()).toBe(true);
-    // })
-
+    test('Clicking on a listing redirects to details page', async () => {
+        wrapper.vm.viewListing = jest.fn();
+        let clickableImg = wrapper.find('#img-wrap')
+        clickableImg.trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.viewListing).toBeCalled();
+    });
 });
-//
-// describe("Test invalid filter value validation", () => {
-//     test("Successful search for users - No query", async () => {
-//         wrapper.vm.searchbarUser = "";
-//         await wrapper.vm.searchUsers();
-//         expect(wrapper.vm.$vs.loading).not.toBeCalled();
-//     });
-//
-//
-//     test("Successful search for businesses - No query", async () => {
-//         wrapper.vm.searchbarBusiness = "";
-//         await wrapper.vm.searchBusiness();
-//         expect(wrapper.vm.$vs.loading).toBeCalled();
-//     });
-//
-// });
-//
-//
-// describe("Test searching with query", () => {
-//     test("Successful user search - with query", async () => {
-//         wrapper.vm.$vs.loading.close = jest.fn();
-//         wrapper.vm.searchbarUser = "Something";
-//         wrapper.vm.tableLoaded = true;
-//         await wrapper.vm.searchUsers();
-//         expect(wrapper.vm.$vs.loading).toBeCalled();
-//     });
-//     test("Successful business search - with query", async () => {
-//         wrapper.vm.$vs.loading.close = jest.fn();
-//         wrapper.vm.searchbarBusiness = "Something";
-//         wrapper.vm.tableLoaded = true;
-//         await wrapper.vm.searchBusiness();
-//         expect(wrapper.vm.$vs.loading).toBeCalled();
-//     });
-// });
+
+describe('Liking items', () => {
+    test('Liking an item', async () => {
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+    })
+
+    test('Unliking an item', async () => {
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+        await wrapper.vm.deleteLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+    })
+});

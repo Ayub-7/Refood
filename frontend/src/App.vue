@@ -161,6 +161,9 @@ const app = {
       if (sessionStorage.getItem('businessesCache') !== null) {
         sessionStorage.removeItem("businessesCache");
       }
+      if (sessionStorage.getItem('listingSearchCache') !== null) {
+        sessionStorage.removeItem("listingSearchCache");
+      }
 
       if (sessionStorage.getItem("previousListing") !== null) {
         sessionStorage.removeItem("previousListing");
