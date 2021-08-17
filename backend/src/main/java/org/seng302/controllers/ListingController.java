@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.*;
-import org.springframework.http.MediaType;
 
 import org.seng302.finders.ListingSpecifications;
 import org.seng302.finders.ListingFinder;
@@ -163,9 +162,9 @@ public class ListingController {
             specs = specs.and(listingFinder.findListing(request.getBusinessQuery()));
         }
         if (request.getBusinessTypes() != null && !request.getBusinessTypes().isEmpty()) {
-            specs = specs.and(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(0).toString() + '"'));
+            specs = specs.and(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(0).toString().replace(",", "") + '"'));
             for (int i = 1; i < request.getBusinessTypes().size(); i++) {
-                specs = specs.or(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(i).toString() + '"'));
+                specs = specs.or(businessTypeFinder.findListingByBizType('"' + request.getBusinessTypes().get(i).toString().replace(",", "") + '"'));
             }
         }
         if (request.getProductQuery() != null && request.getProductQuery().length() > 1) { // Prevent product finder from crashing.

@@ -162,6 +162,7 @@ const SearchListings = {
         {text: 'Quantity', value: "quantity"},
         {text: 'Manufacturer', value: "manufacturer"},
         {text: 'Seller', value: "seller"},
+        {text: 'Expiry Date', value: "expires"}
       ],
       businessQuery: null,
       productQuery: null,
@@ -175,7 +176,7 @@ const SearchListings = {
       maxClosingDate: null,
 
       likedListingsIds: [],
-      numListings: 10,
+      numListings: 12,
       pageNum: 1,
       totalPages: 0,
       sortDirection: "desc"
