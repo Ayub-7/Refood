@@ -462,4 +462,12 @@ export default {
                           minPrice, maxPrice, minClosingDate, maxClosingDate, count, offset, sortDirection) =>
         instance.post('/businesses/listings', {businessQuery, productQuery, addressQuery, sortBy, businessTypes, minPrice, maxPrice, minClosingDate, maxClosingDate},
             {params: {count: count, offset: offset, sortDirection: sortDirection}}, { withCredentials: true }),
+
+
+    /**
+     * Get all business types
+     * @returns 401 if unauthorized, 200 if authenticated and requested correct endpoint
+     */
+    getBusinessTypes: () => instance.get('/businesses/types', {withCredentials: true})
+
 }

@@ -86,8 +86,10 @@
           <vs-divider style="padding: 4px;"></vs-divider>
           <div class="grid-container" style="margin: auto">
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
-                <div slot="media" id="media-div" @click="viewListing(listing)">
+                <div slot="media" id="media-div" >
+                  <div id="img-wrap" @click="viewListing(listing)">
                   <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
+                  </div>
                   <div v-if="!likedListingsIds.includes(listing.id)">
                     <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
                   </div>
@@ -142,7 +144,8 @@ const SearchListings = {
       user: null,
       listings: [],
       searchbarListings: "",
-      businessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
+      businessTypes: [],
+      // businessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
       errors: [],
       toggle: [1,1,1,1,1],
       filteredListings: [],
@@ -208,6 +211,7 @@ const SearchListings = {
             }).catch((err) => {
           throw new Error(`Error trying to get user's likes: ${err}`)
         })
+        this.getBusinessTypes();
         this.filterListings();
         this.setCurrency(this.user.homeAddress.country)
       }).catch((err) => {
@@ -216,6 +220,23 @@ const SearchListings = {
   },
 
   methods: {
+    /**
+     * Gets all business types from the database, to
+     * be used by business type filter
+     * */
+    getBusinessTypes: function() {
+      api.getBusinessTypes()
+      .then((response) => {
+        this.businessTypes = response.data
+      }).catch((err) => {
+        if(err.response.status === 401) {
+          this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
+        }
+        else {
+          this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+        }
+      });
+    },
     /**
      * Calls the third-party RESTCountries API to retrieve currency information based on user home country.
      * Sets the currency symbol view to the retrieved data.
