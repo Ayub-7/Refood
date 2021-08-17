@@ -76,7 +76,7 @@ export default {
 
     methods: {
       /**
-       * Check if the item has be bought by the user
+       * Check if the listing has been bought by the user
        */
       validPurchaseNotification(notification) {
         if (notification.status === this.bought && this.userId !== notification.boughtListing.buyer) {

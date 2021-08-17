@@ -46,14 +46,6 @@ function getNotifications(userId) {
     .then((response) => {
         mutations.setNotifications(response.data);
     });
-
-    api.getListingNotifications(userId)
-    .then((response) => {
-
-        mutations.setNotifications(response.data);
-        console.log("user's liked has been bought ")
-        console.log(response.data);
-    });
 }
 
 
