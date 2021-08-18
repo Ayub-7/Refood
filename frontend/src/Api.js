@@ -372,8 +372,6 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}:
      *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful
      */
-
-
     getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
 
 
@@ -435,16 +433,6 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     getListingNotifications: (userId) => instance.get(`/users/${userId}/notifications`, { withCredentials: true }),
-
-
-    /**
-     * Get a list of a user's listing notifications
-     * @param businessId
-     * @param listingId
-     * @param userId
-     * @return {Promise<AxiosResponse<any>>}
-     */
-    //getBusinessListingNotifications: (businessId, listingId, userId) => instance.get(`/businesses/{businessId}/listings/{listingId}/users/{userId}/notify`, {withCredentials: true}),
 
     /**
      * Post api endpoint to post listing notification for particular listing
