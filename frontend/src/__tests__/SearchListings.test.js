@@ -929,8 +929,8 @@ describe('Filter validation', () => {
         wrapper.vm.minPrice = 5;
         wrapper.vm.maxPrice = 15;
         wrapper.vm.selectedTypes = [];
-        wrapper.vm.minClosingDate = "2021-08-18T16:47";
-        wrapper.vm.maxClosingDate = "2021-10-30T16:46";
+        wrapper.vm.minClosingDate = "2022-08-18T16:47";
+        wrapper.vm.maxClosingDate = "2022-10-30T16:46";
         expect(wrapper.vm.checkForm()).toBe(true);
     })
 
