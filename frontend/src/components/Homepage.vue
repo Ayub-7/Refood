@@ -67,13 +67,6 @@
               </div>
             </vs-card>
           </div>
-          <div>
-            <span style="display: inline-block; vertical-align: middle;">
-              <vs-icon icon="favorite_border"/>
-            </span>
-            <span class="watchlist-title">Watchlist</span>
-            <vs-divider style="margin-top: 8px;"/>
-          </div>
         </div>
       </div>
 
@@ -497,7 +490,7 @@ export default Homepage;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(1, auto) repeat(1, 1fr);
-  grid-row-gap: 0.5em;
+  grid-row-gap: 2em;
 }
 
 #watchlist-header-container {
