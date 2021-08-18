@@ -46,6 +46,9 @@ public class BoughtListing {
      * @param product
      * @param likes
      * @param quantity
+     * @param listed
+     * @param listingId
+     * @param price
      */
     public BoughtListing(User buyer, Product product, int likes, int quantity, Date listed, long listingId, double price) {
         this.buyer = buyer;
