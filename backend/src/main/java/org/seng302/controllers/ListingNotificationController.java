@@ -1,8 +1,6 @@
 package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
 import org.seng302.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +45,7 @@ public class ListingNotificationController {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
     Inventory inventory = listing.getInventoryItem();
-    BoughtListing boughtListing = new BoughtListing(currentUser, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId());
+    BoughtListing boughtListing = new BoughtListing(currentUser, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId(), listing.getPrice());
     boughtListingRepository.save(boughtListing);
     NotificationStatus status = NotificationStatus.BOUGHT;
     List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(listingId);
@@ -79,7 +77,7 @@ public class ListingNotificationController {
     }
 
     if (currentUser.getId() != user.getId()) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByUserId(userId);
