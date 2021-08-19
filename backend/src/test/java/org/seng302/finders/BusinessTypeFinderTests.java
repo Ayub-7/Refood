@@ -111,7 +111,7 @@ public class BusinessTypeFinderTests {
     @Test
     @Transactional
     void testBusinessTypeFind_SearchByConstruction_ReturnsBusinessC() {
-        Specification<Listing> spec = businessTypeFinder.findListingByBizType("construction");
+        Specification<Listing> spec = businessTypeFinder.findListingByBizType('"' + BusinessType.CONSTRUCTION.toString().replace(",", "") + '"');
         Sort sort = Sort.unsorted();
         PageRequest pageRequest = PageRequest.of(0, 10, sort);
         Page<Listing> result = listingRepository.findAll(spec, pageRequest);
@@ -122,7 +122,7 @@ public class BusinessTypeFinderTests {
     @Test
     @Transactional
     void testBusinessTypeFind_SearchByAccommodationAndFoodServices_ReturnsBusinessB() {
-        Specification<Listing> spec = businessTypeFinder.findListingByBizType("Accommodation_and_Food_Services");
+        Specification<Listing> spec = businessTypeFinder.findListingByBizType('"' + BusinessType.ACCOMMODATION_AND_FOOD_SERVICES.toString().replace(",", "") + '"');
         Sort sort = Sort.unsorted();
         PageRequest pageRequest = PageRequest.of(0, 10, sort);
         Page<Listing> result = listingRepository.findAll(spec, pageRequest);
@@ -133,7 +133,7 @@ public class BusinessTypeFinderTests {
     @Test
     @Transactional
     void testBusinessTypeFind_SearchByRetailTrade_ReturnsBusinessA() {
-        Specification<Listing> spec = businessTypeFinder.findListingByBizType("Retail_Trade");
+        Specification<Listing> spec = businessTypeFinder.findListingByBizType('"' + BusinessType.RETAIL_TRADE.toString().replace(",", "") + '"');
         Sort sort = Sort.unsorted();
         PageRequest pageRequest = PageRequest.of(0, 10, sort);
         Page<Listing> result = listingRepository.findAll(spec, pageRequest);

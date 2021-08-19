@@ -27,44 +27,15 @@ public class BusinessTypeFinder {
                 .get("business").get("businessType"), BusinessType.valueOf(term.toUpperCase().replace(' ', '_').replace('-', '_')));
     }
 
-    private Specification<Listing> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
-        Specification<Listing> newSpec = businessTypeSpec(nextTerm);
-        if (predicate.equals(Logic.AND)) {
-            currentSpecification = currentSpecification.and(newSpec);
-        } else if (predicate.equals(Logic.OR)) {
-            currentSpecification = currentSpecification.or(newSpec);
-        }
-        return currentSpecification;
-    }
-
-    private Specification<Listing> getNextSpecification(Specification<Listing> specification, String term, ArrayList<String> terms) {
-        if (terms.indexOf(term) != terms.size() - 1) {
-            String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
-            if (term.strip().equals("AND")) {
-                specification = checkFields(specification, nextTerm, Logic.AND);
-            } else if (term.strip().equals("OR")) {
-                specification = checkFields(specification, nextTerm, Logic.OR);
-            } else if(!nextTerm.equals("AND") && !nextTerm.equals("OR")) {
-                specification = checkFields(specification, nextTerm, Logic.AND);
-            }
-        }
-        return specification;
-
-    }
-
     private Specification<Listing> buildBusinessTypeSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
         System.out.println(terms);
         Specification<Listing> specification;
         specification = businessTypeSpec(terms.get(0));
-        for (String term : terms) {
-            specification = getNextSpecification(specification, term, terms);
-        }
         return specification;
     }
 
     public Specification<Listing> findListingByBizType(String query) {
-        Specification<Listing> matches = buildBusinessTypeSpec(query);
-        return matches;
+        return buildBusinessTypeSpec(query);
     }
 }
