@@ -12,6 +12,11 @@ import java.util.regex.Pattern;
 @Component
 public class BusinessTypeFinder {
 
+    /**
+     * Helper function that breaks a query into smaller chunks.
+     * @param query Query string for filtering the businesses
+     * @return list of terms derived from query.
+     */
     private ArrayList<String> searchQueryKeywords(String query) {
         ArrayList<String> terms = new ArrayList<>();
         Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
@@ -21,21 +26,26 @@ public class BusinessTypeFinder {
         return terms;
     }
 
+    /**
+     * Query builder for filtering business by their types.
+     * @param term Part of query string for filtering the businesses
+     * @return Specification<Listing> object to help with filtering businesses by their types.
+     */
     private Specification<Listing> businessTypeSpec(String term) {
         return (root, query, criteriaBuilder)
                 -> criteriaBuilder.equal(root.get("inventoryItem").get("product")
                 .get("business").get("businessType"), BusinessType.valueOf(term.toUpperCase().replace(' ', '_').replace('-', '_')));
     }
 
-    private Specification<Listing> buildBusinessTypeSpec(String query) {
-        ArrayList<String> terms = searchQueryKeywords(query);
-        System.out.println(terms);
-        Specification<Listing> specification;
-        specification = businessTypeSpec(terms.get(0));
-        return specification;
-    }
-
+    /**
+     * The only public method in this class, this method retrieves a Specification object to help with
+     * querying businesses by their types.
+     * @param query Query string for filtering the businesses
+     * @return Specification<Listing> object to help with filtering businesses by their types.
+     */
     public Specification<Listing> findListingByBizType(String query) {
-        return buildBusinessTypeSpec(query);
+        ArrayList<String> terms = searchQueryKeywords(query);
+        Specification<Listing> specification = businessTypeSpec(terms.get(0));
+        return specification;
     }
 }

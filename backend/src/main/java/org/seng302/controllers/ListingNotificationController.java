@@ -12,7 +12,9 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * Class with endpoints for adding or deleting notifications for listings.
+ */
 @RestController
 public class ListingNotificationController {
 

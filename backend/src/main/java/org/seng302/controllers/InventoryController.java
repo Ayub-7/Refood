@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class with endpoints for searching, adding, modifying, or deleting Inventory.
+ */
 @RestController
 public class InventoryController {
 
