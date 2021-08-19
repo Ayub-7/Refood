@@ -116,6 +116,7 @@ export default {
     getSalesHistory: function () {
       api.getBusinessListingNotifications(this.businessId)
         .then((res) => {
+
           this.notifications = res.data[0];
           console.log(this.notifications.created)
           //this.filterNotifications();
