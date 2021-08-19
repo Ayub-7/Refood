@@ -118,4 +118,26 @@ public class BusinessTypeFinderTests {
         Listing returnedBiz = result.stream().collect(Collectors.toList()).get(0);
         Assertions.assertEquals(listingC.getQuantity(), returnedBiz.getQuantity());
     }
+
+    @Test
+    @Transactional
+    void testBusinessTypeFind_SearchByAccommodationAndFoodServices_ReturnsBusinessB() {
+        Specification<Listing> spec = businessTypeFinder.findListingByBizType("Accommodation_and_Food_Services");
+        Sort sort = Sort.unsorted();
+        PageRequest pageRequest = PageRequest.of(0, 10, sort);
+        Page<Listing> result = listingRepository.findAll(spec, pageRequest);
+        Listing returnedBiz = result.stream().collect(Collectors.toList()).get(0);
+        Assertions.assertEquals(listingB.getQuantity(), returnedBiz.getQuantity());
+    }
+
+    @Test
+    @Transactional
+    void testBusinessTypeFind_SearchByRetailTrade_ReturnsBusinessA() {
+        Specification<Listing> spec = businessTypeFinder.findListingByBizType("Retail_Trade");
+        Sort sort = Sort.unsorted();
+        PageRequest pageRequest = PageRequest.of(0, 10, sort);
+        Page<Listing> result = listingRepository.findAll(spec, pageRequest);
+        Listing returnedBiz = result.stream().collect(Collectors.toList()).get(0);
+        Assertions.assertEquals(listingA.getQuantity(), returnedBiz.getQuantity());
+    }
 }
