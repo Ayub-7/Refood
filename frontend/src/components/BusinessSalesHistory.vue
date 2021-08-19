@@ -7,7 +7,7 @@
     <vs-divider/>
 
     <vs-table
-        :data="salesHistory"
+        :data="notifications"
         noDataText="Your listings will be displayed here once you have sold at least one product."
         stripe>
       <template slot="thead">
@@ -21,13 +21,13 @@
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="(listing, index) in data" :key="index">
-          <vs-td class="listing-image-column"><ReImage :image-path="listing.listing.inventoryItem.product.primaryImagePath" class="listing-image"/></vs-td>
-          <vs-td>{{listing.listing.inventoryItem.product.name}}</vs-td>
+          <vs-td class="listing-image-column"><ReImage :image-path="listing.boughtListing.product.primaryImagePath" class="listing-image"/></vs-td>
+<!--          <vs-td>{{listing.listing.inventoryItem.product.name}}</vs-td>-->
           <vs-td>{{listing.created}}</vs-td>
-          <vs-td>{{listing.listing.created}}</vs-td>
-          <vs-td>{{listing.listing.quantity}}</vs-td>
-          <vs-td>{{currency}}{{listing.listing.price}}</vs-td>
-          <vs-td>{{listing.listing.likes}}</vs-td>
+<!--          <vs-td>{{listing.listing.created}}</vs-td>-->
+<!--          <vs-td>{{listing.listing.quantity}}</vs-td>-->
+<!--          <vs-td>{{currency}}{{listing.listing.price}}</vs-td>-->
+<!--          <vs-td>{{listing.listing.likes}}</vs-td>-->
         </vs-tr>
 
       </template>
@@ -37,7 +37,7 @@
 
 <script>
 import ReImage from "./ReImage";
-import {store} from "../store"
+//import {store} from "../store"
 import api from "../Api";
 import axios from "axios";
 
@@ -48,6 +48,7 @@ export default {
   data: function() {
     return {
       currency: "$",
+      businessId: '',
       notifications: [],
       salesHistory: [],
       testData: [
@@ -92,6 +93,7 @@ export default {
   },
 
   mounted: function() {
+    this.businessId = this.$route.params.id;
     this.getSalesHistory();
     this.getSession();
   },
@@ -112,10 +114,11 @@ export default {
      * Calls get sales history
      */
     getSalesHistory: function () {
-      api.getSales(store.loggedInUserId, this.$route.params.id, 1)
+      api.getBusinessListingNotifications(this.businessId)
         .then((res) => {
-          this.notifications = res.data;
-          this.filterNotifications();
+          this.notifications = res.data[0];
+          console.log(this.notifications.created)
+          //this.filterNotifications();
         })
         .catch(err => {
           console.log(err)
