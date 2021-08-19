@@ -87,14 +87,14 @@ public class BusinessTypeFinderTests {
         productRepository.save(productC);
 
         Calendar afterCalendar = Calendar.getInstance();
-        afterCalendar.set(2022, 1, 1);
+        afterCalendar.set(2022, Calendar.FEBRUARY, 1);
         Date laterDate = afterCalendar.getTime();
         Calendar beforeCalendar = Calendar.getInstance();
-        afterCalendar.set(2020, 1, 1);
+        afterCalendar.set(2020, Calendar.FEBRUARY, 1);
         Date beforeDate = beforeCalendar.getTime();
-        inventoryA = new Inventory("40-ABC", 1, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
-        inventoryB = new Inventory("50-ALPHA", 2, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
-        inventoryC = new Inventory("60-BETA", 3, 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
+        inventoryA = new Inventory("40-ABC", businessA.getId(), 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
+        inventoryB = new Inventory("50-ALPHA", businessB.getId(), 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
+        inventoryC = new Inventory("60-BETA", businessC.getId(), 10, 2.0, 20.0, beforeDate, laterDate, laterDate, laterDate);
 
         inventoryRepository.save(inventoryA);
         inventoryRepository.save(inventoryB);
