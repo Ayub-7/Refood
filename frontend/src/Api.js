@@ -483,7 +483,7 @@ export default {
      * Get all business types
      * @returns 401 if unauthorized, 200 if authenticated and requested correct endpoint
      */
-    getBusinessTypes: () => instance.get('/businesses/types', {withCredentials: true})
+    getBusinessTypes: () => instance.get('/businesses/types', {withCredentials: true}),
 
 
     /**
