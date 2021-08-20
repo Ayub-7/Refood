@@ -485,4 +485,12 @@ export default {
      */
     getBusinessTypes: () => instance.get('/businesses/types', {withCredentials: true})
 
+
+    /**
+     * gets business notifications
+     * @param business ID
+     * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
+     */
+    getBusinessListingNotifications: (businessId) =>
+        instance.get(`/businesses/${businessId}/notifications`, {withCredentials: true}),
 }

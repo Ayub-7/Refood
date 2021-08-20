@@ -64,11 +64,12 @@ public class BoughtListing {
     /**
      * Barebones constructor for boughtListing
      * @param buyer User object that purchased listing
+     * @param product Product the product that has been purchased
      * @param listing Listing object that was purchased
      */
-    public BoughtListing(User buyer, Listing listing) {
+    public BoughtListing(User buyer, Product product, Listing listing) {
         this.buyer = buyer;
-        this.product = listing.getInventoryItem().getProduct();
+        this.product = product;
         this.likes = listing.getLikes();
         this.quantity = listing.getQuantity();
         this.sold = new Date();

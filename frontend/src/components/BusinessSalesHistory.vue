@@ -7,7 +7,7 @@
     <vs-divider/>
 
     <vs-table
-        :data="testData"
+        :data="notifications"
         noDataText="Your listings will be displayed here once you have sold at least one product."
         stripe>
       <template slot="thead">
@@ -21,13 +21,14 @@
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="(listing, index) in data" :key="index">
-          <vs-td class="listing-image-column"><ReImage :image-path="listing.inventoryItem.product.primaryImagePath" class="listing-image"/></vs-td>
-          <vs-td>{{listing.inventoryItem.product.name}}</vs-td>
-          <vs-td>{{listing.sold}}</vs-td>
+          <vs-td class="listing-image-column"><ReImage :image-path="listing.boughtListing.product.primaryImagePath" class="listing-image"/></vs-td>
+<!--          <vs-td>{{listing.listing.inventoryItem.product.name}}</vs-td>-->
+          <vs-td>{{listing.boughtListing.product.name}}</vs-td>
           <vs-td>{{listing.created}}</vs-td>
-          <vs-td>{{listing.quantity}}</vs-td>
-          <vs-td>{{currency}}{{listing.price}}</vs-td>
-          <vs-td>{{listing.likes}}</vs-td>
+          <vs-td>{{listing.boughtListing.sold}}</vs-td>
+          <vs-td>{{listing.boughtListing.quantity}}</vs-td>
+          <vs-td>{{listing.boughtListing.product.recommendedRetailPrice}}</vs-td>
+          <vs-td>{{listing.boughtListing.likes}}</vs-td>
         </vs-tr>
 
       </template>
@@ -46,49 +47,33 @@ export default {
 
   data: function() {
     return {
+
       currency: "$",
-      testData: [
-        {
-          "id": 1,
-          "inventoryItem": {
-            "id": 101,
-            "product": {
-              "id": "WATT-420-BEANS",
-              "name": "Watties Baked Beans - 420g can",
-            },
-          },
-          "quantity": 3,
-          "price": 17.99,
-          "moreInfo": "Seller may be willing to consider near offers",
-          "created": "2021-07-14 11:44:00",
-          "closes": "2021-07-21T23:59:00Z",
-          "productName": "Watties Baked Beans - 420g can",
-          "sold": "2021-08-08 12:00:00",
-          "likes": 5
-        },
-        {
-          "id": 2,
-          "inventoryItem": {
-            "id": 102,
-            "product": {
-              "id": "Doritos",
-              "name": "Doritos - The spicy purple one",
-            },
-          },
-          "quantity": 5,
-          "price": 5.99,
-          "moreInfo": "Seller may be willing to consider near offers",
-          "created": "2021-07-15 11:44:00",
-          "closes": "2021-07-20T23:59:00Z",
-          "productName": "Doritos - The spicy purple one",
-          "sold": "2021-08-08 12:00:00",
-          "likes": 10
-        }
-      ]
+      businessId: '',
+      notifications: []
     }
   },
 
+  mounted: function() {
+    this.businessId = this.$route.params.id;
+    this.getSalesHistory();
+    this.getSession();
+  },
+
   methods: {
+    /**
+     * Calls get sales history
+     */
+    getSalesHistory: function () {
+      api.getBusinessListingNotifications(this.businessId)
+        .then((res) => {
+          this.notifications = res.data;
+        })
+        .catch(err => {
+          console.log(err)
+        });
+    },
+
     /**
      * Calls get session endpoint to get user country, if successful calls setCurrency ()
      */
@@ -115,10 +100,6 @@ export default {
       });
     },
   },
-
-  mounted: function() {
-    this.getSession();
-  }
 }
 </script>
 
