@@ -23,11 +23,12 @@
         <vs-tr v-for="(listing, index) in data" :key="index">
           <vs-td class="listing-image-column"><ReImage :image-path="listing.boughtListing.product.primaryImagePath" class="listing-image"/></vs-td>
 <!--          <vs-td>{{listing.listing.inventoryItem.product.name}}</vs-td>-->
+          <vs-td>{{listing.boughtListing.product.name}}</vs-td>
           <vs-td>{{listing.created}}</vs-td>
-<!--          <vs-td>{{listing.listing.created}}</vs-td>-->
-<!--          <vs-td>{{listing.listing.quantity}}</vs-td>-->
-<!--          <vs-td>{{currency}}{{listing.listing.price}}</vs-td>-->
-<!--          <vs-td>{{listing.listing.likes}}</vs-td>-->
+          <vs-td>{{listing.boughtListing.sold}}</vs-td>
+          <vs-td>{{listing.boughtListing.quantity}}</vs-td>
+          <vs-td>{{listing.boughtListing.product.recommendedRetailPrice}}</vs-td>
+          <vs-td>{{listing.boughtListing.likes}}</vs-td>
         </vs-tr>
 
       </template>
@@ -37,7 +38,6 @@
 
 <script>
 import ReImage from "./ReImage";
-//import {store} from "../store"
 import api from "../Api";
 import axios from "axios";
 
@@ -47,48 +47,10 @@ export default {
 
   data: function() {
     return {
+
       currency: "$",
       businessId: '',
-      notifications: [],
-      salesHistory: [],
-      testData: [
-        {
-          "id": 1,
-          "inventoryItem": {
-            "id": 101,
-            "product": {
-              "id": "WATT-420-BEANS",
-              "name": "Watties Baked Beans - 420g can",
-            },
-          },
-          "quantity": 3,
-          "price": 17.99,
-          "moreInfo": "Seller may be willing to consider near offers",
-          "created": "2021-07-14 11:44:00",
-          "closes": "2021-07-21T23:59:00Z",
-          "productName": "Watties Baked Beans - 420g can",
-          "sold": "2021-08-08 12:00:00",
-          "likes": 5
-        },
-        {
-          "id": 2,
-          "inventoryItem": {
-            "id": 102,
-            "product": {
-              "id": "Doritos",
-              "name": "Doritos - The spicy purple one",
-            },
-          },
-          "quantity": 5,
-          "price": 5.99,
-          "moreInfo": "Seller may be willing to consider near offers",
-          "created": "2021-07-15 11:44:00",
-          "closes": "2021-07-20T23:59:00Z",
-          "productName": "Doritos - The spicy purple one",
-          "sold": "2021-08-08 12:00:00",
-          "likes": 10
-        }
-      ]
+      notifications: []
     }
   },
 
@@ -102,24 +64,10 @@ export default {
     /**
      * Calls get sales history
      */
-    filterNotifications: function () {
-      for (const item of this.notifications) {
-        if (item.status == "Bought") {
-          this.salesHistory.push(item);
-        }
-      }
-    },
-
-    /**
-     * Calls get sales history
-     */
     getSalesHistory: function () {
       api.getBusinessListingNotifications(this.businessId)
         .then((res) => {
-
-          this.notifications = res.data[0];
-          console.log(this.notifications.created)
-          //this.filterNotifications();
+          this.notifications = res.data;
         })
         .catch(err => {
           console.log(err)
