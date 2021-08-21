@@ -110,7 +110,6 @@ public class Inventory {
         } else if (req.getBestBefore() != null && req.getBestBefore().after(req.getExpires())) {
             return false;
         }
-
         return true;
 
     }

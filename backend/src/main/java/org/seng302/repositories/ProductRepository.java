@@ -24,6 +24,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     List<Product> findProductsByBusinessId(long businessId);
 
+    Product findProductById(String id);
+
 
     @Modifying(clearAutomatically = true)
     @Transactional

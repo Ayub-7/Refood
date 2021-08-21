@@ -131,12 +131,14 @@ class ListingNotificationControllerTests {
     }
 
     /**
-     * Works as expected with valid user, listing and valid IDs
+     * A BoughtListing notification is created when endpoint called with valid user, listing and valid IDs
      */
     @Test
     @WithMockUser
     void testPostNewNotification_successfulNotification_returnCreated() throws Exception {
         Mockito.when(listingRepository.findListingById(listing.getId())).thenReturn(listing);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        Mockito.when(productRepository.findProductById("07-4957066")).thenReturn(product1);
         mvc.perform(post("/listings/{listingId}/notify", listing.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isCreated());

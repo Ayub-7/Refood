@@ -34,6 +34,9 @@ public class ListingNotificationController {
   @Autowired
   private BusinessRepository businessRepository;
 
+  @Autowired
+  private ProductRepository productRepository;
+
   /**
    * Endpoint for creating a notification for a listing that's just been purchased.
    * @param listingId ID of the listing
@@ -48,7 +51,8 @@ public class ListingNotificationController {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
     Inventory inventory = listing.getInventoryItem();
-    BoughtListing boughtListing = new BoughtListing(currentUser, inventory.getProduct(), listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId(), listing.getPrice());
+    Product product = productRepository.findProductById(inventory.getProductId());
+    BoughtListing boughtListing = new BoughtListing(currentUser, product, listing.getLikes(), listing.getQuantity(), listing.getCreated(), listing.getId(), listing.getPrice());
     boughtListingRepository.save(boughtListing);
     NotificationStatus status = NotificationStatus.BOUGHT;
     Business business = businessRepository.findBusinessById(boughtListing.getProduct().getBusinessId());
