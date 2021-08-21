@@ -45,7 +45,6 @@ public class BusinessTypeFinder {
      */
     public Specification<Listing> findListingByBizType(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
-        Specification<Listing> specification = businessTypeSpec(terms.get(0));
-        return specification;
+        return businessTypeSpec(terms.get(0));
     }
 }
