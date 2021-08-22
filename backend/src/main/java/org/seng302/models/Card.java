@@ -77,14 +77,15 @@ public class Card {
      */
     public Card(NewCardRequest newCardRequest, User user) throws ValidationException {
         try {
-            if (!validateNewCard(newCardRequest)) return;
-            this.user = user;
-            this.title = newCardRequest.getTitle();
-            this.description = newCardRequest.getDescription();
-            this.created = new Date();
-            this.displayPeriodEnd = getDisplayPeriodEndDate();
-            this.keywords = newCardRequest.getKeywords();
-            this.section = newCardRequest.getSection();
+            if (validateNewCard(newCardRequest)) {
+                this.user = user;
+                this.title = newCardRequest.getTitle();
+                this.description = newCardRequest.getDescription();
+                this.created = new Date();
+                this.displayPeriodEnd = getDisplayPeriodEndDate();
+                this.keywords = newCardRequest.getKeywords();
+                this.section = newCardRequest.getSection();
+            }
         }
         catch (ValidationException exception) {
             throw new ValidationException(exception.getMessage());

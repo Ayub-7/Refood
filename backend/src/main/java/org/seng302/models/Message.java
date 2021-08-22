@@ -66,14 +66,13 @@ public class Message {
      */
     public Message(NewMessageRequest newMessageRequest, User sender, User receiver, Card card) throws ValidationException {
         try {
-            if (!validateNewMessage(newMessageRequest)) {
-                return;
+            if (validateNewMessage(newMessageRequest)) {
+                this.sender = sender;
+                this.receiver = receiver;
+                this.card = card;
+                this.description = newMessageRequest.getDescription();
+                this.sent = new Date();
             }
-            this.sender = sender;
-            this.receiver = receiver;
-            this.card = card;
-            this.description = newMessageRequest.getDescription();
-            this.sent = new Date();
         }
         catch (ValidationException exception) {
             throw new ValidationException(exception.getMessage());
