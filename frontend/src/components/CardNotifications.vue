@@ -4,7 +4,7 @@
       <vs-dropdown id="dropdownButton" vs-trigger-click>
         <div id="notificationContainer">
           <vs-avatar icon="notifications" size="30" name="avatar" />
-          <span id="dropdownButtonName">{{ this.notifications.length}}</span>
+          <span id="dropdownButtonName">{{ notifications.length }}</span>
         </div>
         <vs-dropdown-menu>
 
@@ -13,7 +13,7 @@
                 <div class="dropdown-item-name">
 
                     <!-- If card is expired -->
-                    <div class="cardContainer" v-if="notification.status == expired">
+                    <div class="cardContainer" v-if="notification.status === expired">
                         <div id="text">
                         {{notification.title}} has expired
                         </div>
@@ -24,9 +24,27 @@
                     </div>
 
                     <!-- If card is deleted -->
-                    <div class="cardContainer" v-else-if="notification.status == deleted">
+                    <div class="cardContainer" v-else-if="notification.status === deleted">
                         {{notification.title}} has been removed
                     </div>
+
+                  <!-- If listing has been purchased -->
+                  <div class="cardContainer" v-else-if="validPurchaseNotification(notification)" >
+                    <p>
+                      {{notification.boughtListing.product.name}} has been purchased
+                      <br>
+                      {{dateConverter(notification.boughtListing.sold)}}
+                    </p>
+                  </div>
+
+                  <div class="cardContainer" v-else-if="!validPurchaseNotification(notification)" >
+                    <p>
+                      You have purchased {{notification.boughtListing.product.name}}
+                      <br>
+                      {{dateConverter(notification.boughtListing.sold)}}
+                    </p>
+                  </div>
+
 
                 </div>
             </div>
@@ -49,14 +67,32 @@ export default {
 
     data: function() {
         return {
-
+          bought: 'Bought',
           expired: 'Expired',
           deleted: 'Deleted',
-
+          userId: store.loggedInUserId
         };
     },
 
     methods: {
+      /**
+       * Check if the listing has been bought by the user
+       */
+      validPurchaseNotification(notification) {
+        if (notification.status === this.bought && this.userId !== notification.boughtListing.buyer) {
+          return true;
+        }
+        return false;
+      },
+
+      /**
+       * Converts a regular date to day month year
+       */
+      dateConverter (dateStr) {
+        let simpleDate = new Date(dateStr);
+        return simpleDate.getDay() + "-" + simpleDate.getMonth() + "-" + simpleDate.getFullYear();
+      },
+
       /**
        * Calls api method to extend card display period
        * @param cardId card that is going to extended
@@ -95,12 +131,13 @@ export default {
         .then((response) => {
             mutations.setNotifications(response.data);
         })
-      }
+      },
     },
 
-    computed: {
+  computed: {
         notifications: {
             get() {
+
                 return store.notifications
             },
             set(val) { //setter for testing purposes
@@ -108,7 +145,6 @@ export default {
             }
         }
     }
-
 }
 </script>
 

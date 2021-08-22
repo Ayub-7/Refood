@@ -4,13 +4,13 @@
     <h3 class="card-header">Modify Catalog Product</h3>
     <form>
       <div id="info-field">
-        <div id="product-name">
+        <div id="product-name-field">
           <vs-input
               :danger="(errors.includes(productName))"
               danger-text="Product name is required"
               class="form-control"
               type="text"
-              label-placeholder="Product name (required)"
+              label="Product name *"
               v-model="productName"/>
         </div>
         <div id="product-id">
@@ -19,7 +19,7 @@
               danger-text="Product id is required"
               class="form-control"
               type="text"
-              label-placeholder="Product ID (required)"
+              label="Product ID *"
               v-model="productId"/>
         </div>
         <div id="rrp">
@@ -28,7 +28,7 @@
               :danger="(errors.includes('no-rrp') || errors.includes('rrp') || errors.includes('invalid-rrp'))"
               danger-text="RRP is required and must be at least 0 and a Number."
               id="currencyInput"
-              label-placeholder="Recommended Retail Price (required)"
+              label="Recommended Retail Price *"
               type="text"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
@@ -39,8 +39,7 @@
               danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
-              value="fdwsd"
-              label-placeholder="Manufacturer (required)"
+              label="Manufacturer *"
               v-model="manufacturer"/>
         </div>
         <div id="description">
@@ -49,20 +48,19 @@
               danger-text="Description is Required."
               class="form-control"
               type="text"
-              label="Description (required)"
-              width="400px"
+              label="Description"
+              width="450px"
               v-model="description"/>
         </div>
 
       </div>
-      <button
-          type="button"
+      <vs-button
           class="add-button"
-          @click="checkForm(); ModifyItem();">Save Changes</button>
-      <button
-          type="button"
+          @click="checkForm(); ModifyItem();">Save Changes</vs-button>
+      <vs-button
+          type="border"
           class="add-button"
-          @click="cancel();">Cancel</button>
+          @click="cancel();">Cancel</vs-button>
     </form>
   </div>
 </template>
@@ -107,12 +105,15 @@ const ModifyCatalog = {
       if (this.productName.match(invalidName)) {
         this.errors.push("invalid-chars");
       }
+
       if (this.productId.match(invalidChars)) {
         this.errors.push("invalid-chars");
       }
-      if (this.manufacturer.match(invalidName)) {
+
+      if (this.manufacturer && this.manufacturer.match(invalidName)) {
         this.errors.push("invalid-chars");
       }
+
       if (this.productName.length === 0) {
         this.errors.push(this.productName);
       }
@@ -129,11 +130,7 @@ const ModifyCatalog = {
         this.errors.push("long-id");
       }
 
-      if (this.description.length === 0) {
-        this.errors.push('no-desc');
-      }
-
-      if (this.description.length > 200) {
+      if (this.description && this.description.length > 200) {
         this.errors.push('long-desc');
       }
 
@@ -306,7 +303,7 @@ const ModifyCatalog = {
   mounted() {
 
     this.checkUserSession();
-    
+
     // this.presetValues();
   }
 }
@@ -320,16 +317,8 @@ export default ModifyCatalog;
 Add button's styling
  */
 .add-button {
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  z-index: 1000;
   padding: 10px 40px;
-  margin: 2em;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+  margin: 2em auto;
 }
 
 /**
@@ -403,9 +392,19 @@ Styling for form elements.
   grid-template-rows: repeat(5, auto);
 }
 
-#product-name {
+#product-name-field {
   grid-column: 1;
   grid-row: 1;
+}
+
+#product-name-field >>> .vs-input {
+  padding-left: 2px;
+  padding-right: 0;
+}
+
+#product-id >>> .vs-input {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 #product-id {
@@ -418,10 +417,23 @@ Styling for form elements.
   grid-row: 2;
 }
 
+#manufacturer >>> .vs-input {
+  margin-bottom: 1em;
+  margin-top: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 #description {
   grid-column: 1 / 3;
   grid-row: 3;
   width: 100%;
+}
+
+#description >>> .vs-con-textarea > textarea {
+  min-height: 100px;
+  max-height: 100px;
 }
 
 #rrp {

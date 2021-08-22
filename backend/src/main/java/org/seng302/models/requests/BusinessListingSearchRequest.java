@@ -1,6 +1,5 @@
 package org.seng302.models.requests;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.seng302.models.BusinessType;
 

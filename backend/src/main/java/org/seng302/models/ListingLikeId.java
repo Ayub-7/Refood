@@ -16,6 +16,11 @@ public class ListingLikeId implements Serializable {
     @Column(name = "listing_id")
     private long listingId;
 
-    public ListingLikeId() {}
+    /**
+     * Empty constructor for JPA use.
+     */
+    public ListingLikeId() {
+        //Empty constructor for JPA use.
+    }
 
 }

@@ -12,6 +12,11 @@ import java.util.regex.Pattern;
 @Component
 public class BusinessTypeFinder {
 
+    /**
+     * Helper function that breaks a query into smaller chunks.
+     * @param query Query string for filtering the businesses
+     * @return list of terms derived from query.
+     */
     private ArrayList<String> searchQueryKeywords(String query) {
         ArrayList<String> terms = new ArrayList<>();
         Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
@@ -21,50 +26,25 @@ public class BusinessTypeFinder {
         return terms;
     }
 
+    /**
+     * Query builder for filtering business by their types.
+     * @param term Part of query string for filtering the businesses
+     * @return Specification<Listing> object to help with filtering businesses by their types.
+     */
     private Specification<Listing> businessTypeSpec(String term) {
         return (root, query, criteriaBuilder)
                 -> criteriaBuilder.equal(root.get("inventoryItem").get("product")
                 .get("business").get("businessType"), BusinessType.valueOf(term.toUpperCase().replace(' ', '_').replace('-', '_')));
     }
 
-    private Specification<Listing> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
-        Specification<Listing> newSpec = businessTypeSpec(nextTerm);
-        if (predicate.equals(Logic.AND)) {
-            currentSpecification = currentSpecification.and(newSpec);
-        } else if (predicate.equals(Logic.OR)) {
-            currentSpecification = currentSpecification.or(newSpec);
-        }
-        return currentSpecification;
-    }
-
-    private Specification<Listing> getNextSpecification(Specification<Listing> specification, String term, ArrayList<String> terms) {
-        if (terms.indexOf(term) != terms.size() - 1) {
-            String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
-            if (term.strip().equals("AND")) {
-                specification = checkFields(specification, nextTerm, Logic.AND);
-            } else if (term.strip().equals("OR")) {
-                specification = checkFields(specification, nextTerm, Logic.OR);
-            } else if(!nextTerm.equals("AND") && !nextTerm.equals("OR")) {
-                specification = checkFields(specification, nextTerm, Logic.AND);
-            }
-        }
-        return specification;
-
-    }
-
-    private Specification<Listing> buildBusinessTypeSpec(String query) {
-        ArrayList<String> terms = searchQueryKeywords(query);
-        System.out.println(terms);
-        Specification<Listing> specification;
-        specification = businessTypeSpec(terms.get(0));
-        for (String term : terms) {
-            specification = getNextSpecification(specification, term, terms);
-        }
-        return specification;
-    }
-
+    /**
+     * The only public method in this class, this method retrieves a Specification object to help with
+     * querying businesses by their types.
+     * @param query Query string for filtering the businesses
+     * @return Specification<Listing> object to help with filtering businesses by their types.
+     */
     public Specification<Listing> findListingByBizType(String query) {
-        Specification<Listing> matches = buildBusinessTypeSpec(query);
-        return matches;
+        ArrayList<String> terms = searchQueryKeywords(query);
+        return businessTypeSpec(terms.get(0));
     }
 }

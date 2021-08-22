@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class ListingLikeRepositoryTests {
+class ListingLikeRepositoryTests {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -83,5 +83,4 @@ public class ListingLikeRepositoryTests {
         ListingLike like = listingLikeRepository.findListingLikeByListingIdAndUserId(listing.getId(), user.getId());
         assertThat(like).isNotNull();
     }
-
 }

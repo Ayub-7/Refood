@@ -57,7 +57,7 @@ public class MainApplicationRunner implements ApplicationRunner {
    */
   @Autowired
   public MainApplicationRunner() {
-
+    //Empty constructor for JPA use.
   }
 
   /**

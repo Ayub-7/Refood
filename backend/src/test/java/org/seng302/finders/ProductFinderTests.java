@@ -24,7 +24,7 @@ import java.util.List;
 
 @SpringBootTest(classes = Main.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class ProductFinderTests {
+class ProductFinderTests {
 
     @Autowired
     private ProductRepository productRepository;
@@ -160,6 +160,15 @@ public class ProductFinderTests {
         boolean contains = products.stream().anyMatch(o -> o.equals(listing1));
         Assertions.assertTrue(contains);
         Assertions.assertEquals(1, products.size());
+    }
+
+    @Test
+    @Transactional
+    void testProductFindWithQuotesWithSpaceReturnsNothing() throws Exception {
+        Specification<Listing> spec = productFinder.findProduct("\"Chinese Food \"");
+        List<Listing> products = listingRepository.findAll(spec);
+
+        Assertions.assertEquals(0, products.size());
     }
 
     @Test

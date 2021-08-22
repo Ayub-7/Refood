@@ -1,12 +1,9 @@
 package org.seng302.finders;
 
-import org.seng302.models.BusinessType;
 import org.seng302.models.Listing;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
-import java.util.Locale;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
@@ -19,10 +16,20 @@ public class ListingFinder {
      */
     private ArrayList<String> searchQueryKeywords(String query) {
         ArrayList<String> terms = new ArrayList<>();
-        Matcher matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
+        var matcher = Pattern.compile("([^\"]\\S*|\"[^\"]*+\")\\s*").matcher(query);
         while (matcher.find()) {
-            terms.add(matcher.group().replace("\"", ""));
+            boolean fullMatch = matcher.group().trim().startsWith("\"") && matcher.group().trim().endsWith("\"");
+
+            String temp;
+            if(!fullMatch) { //If not inside quotes
+                temp = matcher.group().replace("\"", "").trim();
+            } else {
+                temp = matcher.group().trim().replace("\"", ""); //need to trim beforehand as spaces are needed
+            }
+
+            terms.add(temp);
         }
+
         return terms;
     }
 
@@ -44,7 +51,7 @@ public class ListingFinder {
      * @param predicate Predicate object
      * @return Specification<Listing> object
      */
-    private Specification<Listing> checkFields(Specification currentSpecification, String nextTerm, Logic predicate) {
+    private Specification<Listing> checkFields(Specification<Listing> currentSpecification, String nextTerm, Logic predicate) {
         Specification<Listing> newSpec = sellerContains(nextTerm);
         if (predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
@@ -63,7 +70,7 @@ public class ListingFinder {
      */
     private Specification<Listing> getNextSpecification(Specification<Listing> specification, String term, ArrayList<String> terms) {
         if (terms.indexOf(term) != terms.size() - 1) {
-            String nextTerm = terms.get(terms.indexOf(term) + 1).trim();
+            String nextTerm = terms.get(terms.indexOf(term) + 1);
             if (term.strip().equals("AND")) {
                 specification = checkFields(specification, nextTerm, Logic.AND);
             } else if (term.strip().equals("OR")) {
@@ -83,9 +90,8 @@ public class ListingFinder {
      */
     private Specification<Listing> buildAddressSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
-        System.out.println(terms);
-        Specification<Listing> specification;
-        specification = sellerContains(terms.get(0));
+
+        Specification<Listing> specification = sellerContains(terms.get(0));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }
@@ -98,7 +104,6 @@ public class ListingFinder {
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
     public Specification<Listing> findListing(String query) {
-        Specification<Listing> matches = buildAddressSpec(query);
-        return matches;
+        return buildAddressSpec(query);
     }
 }

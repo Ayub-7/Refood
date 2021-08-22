@@ -1,10 +1,11 @@
 package org.seng302.repositories;
 
 import org.seng302.models.Business;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.jpa.domain.Specification;
-import java.util.List;
 
 
 @RepositoryRestResource
@@ -17,6 +18,12 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
      */
     Business findBusinessById(long id);
 
-    List<Business> findAll(Specification<Business> query);
+    /**
+     * Retrieve buiness objects that match specification
+     * @param spec
+     * @param pageable
+     * @return
+     */
+    Page<Business> findAll(Specification<Business> spec, Pageable pageable);
 
 }

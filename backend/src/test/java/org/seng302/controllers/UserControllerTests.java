@@ -1,20 +1,15 @@
 package org.seng302.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.finders.UserFinder;
@@ -24,29 +19,18 @@ import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.models.requests.NewUserRequest;
-import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import java.security.NoSuchAlgorithmException;
@@ -68,12 +52,26 @@ class UserControllerTests {
     private ObjectMapper mapper;
 
     User user;
+    List<User> users;
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         user = new User("John", "Smith", addr, "johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
-
+        users = new ArrayList<User>();
+        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
+        User user1 = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        User user2 = new User("Jennifer", "Riley", "Smith", "Jenny",
+                "Likes long walks on the beach", "jenthar95@gmail.com",
+                "1995-05-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        User user3 = new User("Oliver", "Alfred", "Smith", "Ollie",
+                "Likes long walks on the beach", "ollie69@gmail.com",
+                "1969-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+        users.add(user1);
+        users.add(user2);
+        users.add(user3);
     }
 
     @Test
@@ -200,7 +198,7 @@ class UserControllerTests {
         MvcResult userFound = mockMvc.perform(get("/users/{id}",0)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andReturn();
-        assert userFound.getResponse().getStatus() == HttpStatus.OK.value();
+        Assertions.assertEquals(userFound.getResponse().getStatus(), HttpStatus.OK.value());
     }
 
     @Test
@@ -208,14 +206,14 @@ class UserControllerTests {
     void testGettingNonExistingUser() throws Exception {
         MvcResult userNotFound = mockMvc.perform(get("/users/{id}", 0))
                 .andReturn();
-        assert userNotFound.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
+        Assertions.assertEquals(userNotFound.getResponse().getStatus(), HttpStatus.NOT_ACCEPTABLE.value());
     }
 
     @Test
     void testUnauthorizedGettingUser() throws Exception {
         MvcResult userNotFound = mockMvc.perform(get("/users/{id}", 0))
                 .andReturn();
-        assert userNotFound.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+        Assertions.assertEquals(userNotFound.getResponse().getStatus(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -230,7 +228,7 @@ class UserControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(loginReq)))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.OK.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.OK.value());
     }
 
     @Test
@@ -245,7 +243,7 @@ class UserControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(loginReq)))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.BAD_REQUEST.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -255,32 +253,43 @@ class UserControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(loginReq)))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.BAD_REQUEST.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     @WithMockUser(roles="USER")
     void testGoodUserSearch() throws Exception {
-        List<User> users = new ArrayList<User>();
-        Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
-        User user1 = new User("John", "Hector", "Smith", "Jonny",
-                "Likes long walks on the beach", "johnsmith99@gmail.com",
-                "1999-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        User user2 = new User("Jennifer", "Riley", "Smith", "Jenny",
-                "Likes long walks on the beach", "jenthar95@gmail.com",
-                "1995-05-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        User user3 = new User("Oliver", "Alfred", "Smith", "Ollie",
-                "Likes long walks on the beach", "ollie69@gmail.com",
-                "1969-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
-        users.add(user1);
-        users.add(user2);
-        users.add(user3);
-        Mockito.when(userFinder.queryByName("Smith")).thenReturn(users);
+        Mockito.when(userRepository.findAll()).thenReturn(this.users);
         MvcResult results = mockMvc.perform(get("/users/search")
-                .param("searchQuery", "Smith"))
+                .param("searchQuery", "Smith")
+                .param("pageNum", String.valueOf(0)))
                 .andReturn();
-        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+        Assertions.assertEquals(results.getResponse().getStatus(), HttpStatus.OK.value());
 
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testGoodUserSearchWithSortString() throws Exception {
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+        MvcResult results = mockMvc.perform(get("/users/search")
+                .param("searchQuery", "Smith")
+                .param("pageNum", String.valueOf(0))
+                .param("sortString", "emailDesc"))
+                .andReturn();
+        Assertions.assertEquals(results.getResponse().getStatus(), HttpStatus.OK.value());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testUserSearchWithBadSortString() throws Exception {
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+        MvcResult results = mockMvc.perform(get("/users/search")
+                .param("searchQuery", "Smith")
+                .param("pageNum", String.valueOf(0))
+                .param("sortString", "badSortString"))
+                .andReturn();
+        Assertions.assertEquals(results.getResponse().getStatus(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -293,7 +302,7 @@ class UserControllerTests {
         Mockito.when(userRepository.findUserById(0)).thenReturn(user);
         MvcResult success =  mockMvc.perform(put("/users/{id}/makeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.OK.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.OK.value());
     }
 
     @Test
@@ -301,14 +310,14 @@ class UserControllerTests {
     void testBadIdUserAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/makeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.NOT_ACCEPTABLE.value());
     }
 
     @Test
     void testNoTokenUserAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/makeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -316,7 +325,7 @@ class UserControllerTests {
     void testNoAuthorityUserAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/makeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.FORBIDDEN.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.FORBIDDEN.value());
     }
 
 
@@ -331,7 +340,7 @@ class UserControllerTests {
         Mockito.when(userRepository.findUserById(0)).thenReturn(user);
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.OK.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.OK.value());
     }
 
 
@@ -340,14 +349,14 @@ class UserControllerTests {
     void testBadIdUserRevokeAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.NOT_ACCEPTABLE.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.NOT_ACCEPTABLE.value());
     }
 
     @Test
     void testNoTokenUserRevokeAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -355,7 +364,7 @@ class UserControllerTests {
     void testNoAuthorityUserRevokeAdmin() throws Exception {
         MvcResult success =  mockMvc.perform(put("/users/{id}/revokeAdmin", 0))
                 .andReturn();
-        assert success.getResponse().getStatus() == HttpStatus.FORBIDDEN.value();
+        Assertions.assertEquals(success.getResponse().getStatus(), HttpStatus.FORBIDDEN.value());
     }
 
     @Test
@@ -382,7 +391,7 @@ class UserControllerTests {
         MvcResult result = mockMvc.perform(get("/users/{id}", user.getId())).andReturn();
 
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_ACCEPTABLE.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("");
+        assertThat(result.getResponse().getContentAsString()).isEmpty();
 
     }
 
@@ -519,5 +528,4 @@ class UserControllerTests {
         UserIdResponse response = new UserIdResponse(user);
         assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
     }
-
 }

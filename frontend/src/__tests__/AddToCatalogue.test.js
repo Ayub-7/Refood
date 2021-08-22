@@ -1,10 +1,7 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import AddToCatalogue from '../components/AddToCatalogue';
 import Vuesax from 'vuesax';
 import {store} from "../store";
-
-//import {CurrencyInput} from "../components/CurrencyInput";
-//import api from "../Api";
 
 let wrapper;
 
@@ -42,7 +39,7 @@ let $log = {
 }
 
 beforeEach(() => {
-    wrapper = shallowMount(AddToCatalogue, {
+    wrapper = mount(AddToCatalogue, {
         propsData: {},
         mocks: {store, $log},
         stubs: ['router-link', 'router-view'],

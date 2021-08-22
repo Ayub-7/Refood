@@ -9,7 +9,7 @@
 
         <div id="catalogue-options">
           <vs-input class="search-input" type="search" placeholder="Enter a listing..." name="searchbarUser" v-model="productQuery" style="width: 400px; font-size: 24px" size="medium"/>
-          <vs-button class="header-button" @click="filterListings">Search</vs-button>
+          <vs-button class="header-button" id="main-search-btn" @click="filterListings">Search</vs-button>
 
         </div>
 
@@ -78,7 +78,7 @@
                     <vs-select-item key="asc" value="asc" text="Ascending"></vs-select-item>
                     <vs-select-item key="desc" value="desc" text="Descending"></vs-select-item>
                 </vs-select>
-                <vs-button class="sort-btn" @click="filterListings" style="width: 100px">Sort</vs-button>
+                <vs-button class="sort-btn" id="sort-button" @click="filterListings" style="width: 100px">Sort</vs-button>
                 </div>
                 </div>
             </div>
@@ -86,8 +86,16 @@
           <vs-divider style="padding: 4px;"></vs-divider>
           <div class="grid-container" style="margin: auto">
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
-                <div slot="media" id="media-div" @click="viewListing(listing)">
+                <div slot="media" id="media-div" >
+                  <div id="img-wrap" @click="viewListing(listing)">
                   <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
+                  </div>
+                  <div v-if="!likedListingsIds.includes(listing.id)">
+                    <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                  </div>
+                  <div v-else>
+                    <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                  </div>
                 </div>
                 <div class="click" @click="viewListing(listing)">
                 <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
@@ -117,7 +125,7 @@
         </div>
     <div class="title-container">
       <div class="title-centre">
-        <vs-pagination v-model="pageNum" :total="totalPages" @change="filterListings"/>
+        <vs-pagination v-model="pageNum" :total="totalPages" @change="filterListings(); resetCache()" />
       </div>
     </div>
   </vs-card>
@@ -136,7 +144,8 @@ const SearchListings = {
       user: null,
       listings: [],
       searchbarListings: "",
-      businessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
+      businessTypes: [],
+      // businessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
       errors: [],
       toggle: [1,1,1,1,1],
       filteredListings: [],
@@ -153,6 +162,7 @@ const SearchListings = {
         {text: 'Quantity', value: "quantity"},
         {text: 'Manufacturer', value: "manufacturer"},
         {text: 'Seller', value: "seller"},
+        {text: 'Expiry Date', value: "expires"}
       ],
       businessQuery: null,
       productQuery: null,
@@ -165,7 +175,8 @@ const SearchListings = {
       minClosingDate: null,
       maxClosingDate: null,
 
-      numListings: 10,
+      likedListingsIds: [],
+      numListings: 12,
       pageNum: 1,
       totalPages: 0,
       sortDirection: "desc"
@@ -192,6 +203,15 @@ const SearchListings = {
           this.pageNum = prevSearch['pageNum']
           this.sortDirection = prevSearch['sortDirection']
         }
+        api.getUserLikedListings(this.user.id)
+          .then((res) => {
+            for (let i = 0; i < res.data.length; i++) {
+              this.likedListingsIds.push(res.data[i]["id"]);
+            }
+          }).catch((err) => {
+            throw new Error(`Error trying to get user's likes: ${err}`)
+        });
+        this.getBusinessTypes();
         this.filterListings();
         this.setCurrency(this.user.homeAddress.country)
       }).catch((err) => {
@@ -200,6 +220,28 @@ const SearchListings = {
   },
 
   methods: {
+    resetCache: function() {
+      if (sessionStorage.getItem('listingSearchCache') !== null) {
+        sessionStorage.removeItem('listingSearchCache');
+      }
+    },
+    /**
+     * Gets all business types from the database, to
+     * be used by business type filter
+     * */
+    getBusinessTypes: function() {
+      api.getBusinessTypes()
+      .then((response) => {
+        this.businessTypes = response.data
+      }).catch((err) => {
+        if(err.response.status === 401) {
+          this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
+        }
+        else {
+          this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+        }
+      });
+    },
     /**
      * Calls the third-party RESTCountries API to retrieve currency information based on user home country.
      * Sets the currency symbol view to the retrieved data.
@@ -207,10 +249,10 @@ const SearchListings = {
      **/
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
-          .then( response => {
-            this.currencySymbol = response.data[0].currencies[0].symbol;
-          }).catch( err => {
-        console.log("Error with getting cities from REST Countries." + err);
+        .then( response => {
+          this.currencySymbol = response.data[0].currencies[0].symbol;
+        }).catch( err => {
+          console.log("Error with getting cities from REST Countries." + err);
       });
     },
 
@@ -228,10 +270,15 @@ const SearchListings = {
             .then((response) => {
               this.listings = response.data.content
               this.totalPages = response.data.totalPages;
-              console.log(this.listings)
             })
-            .catch((error) => {
-              console.log(error)
+            .catch(err => {
+              if(err.response.status === 400) { // Catch 400 Bad Request
+                this.$vs.notify({title:'Error', text:'Some filters are invalid', color:'danger'});
+
+              }
+              else { // Catch anything else.
+                this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+              }
             });
       }
 
@@ -267,18 +314,25 @@ const SearchListings = {
       let today = new Date();
 
       if(this.minPrice != null){
-        if(this.minPrice < 0){
+        if(parseInt(this.minPrice) < 0){
           this.errors.push('invalid-minprice');
         }
       }
 
       if(this.maxPrice != null){
-        if(this.maxPrice < 0){
-          this.errors.push('invalid-maxprice');
-        } else if (this.maxPrice < this.minPrice){
+        if(parseInt(this.maxPrice) < 0){
           this.errors.push('invalid-maxprice');
         }
       }
+
+      if(this.maxPrice != null && this.minPrice != null){
+        if (parseInt(this.maxPrice) < parseInt(this.minPrice)){
+          this.errors.push('invalid-maxprice');
+        }
+      }
+
+
+
 
       const dateInPast = function(firstDate, secondDate) {
         return firstDate.setHours(0, 0, 0, 0) <= secondDate.setHours(0, 0, 0, 0);
@@ -298,10 +352,9 @@ const SearchListings = {
       let maxTimeObject;
       if (this.maxClosingDate !== null) {
         maxTimestamp = Date.parse(this.maxClosingDate);
-        maxTimeObject = new Date(maxTimestamp)
-        if(maxTimeObject < minDateObject){
-          this.errors.push('past-max-date');
-        } else if (dateInPast(maxTimeObject, today) === true) {
+        maxTimeObject = new Date(maxTimestamp);
+
+        if(maxTimeObject < minDateObject || dateInPast(maxTimeObject, today) === true){
           this.errors.push('past-max-date');
         }
       }
@@ -310,6 +363,37 @@ const SearchListings = {
         return false;
       }
       return true;
+    },
+    /**
+     * method to submit a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    sendLike: function(listingId, listingName) {
+      api.addLikeToListing(listingId)
+          .then(() => {
+            this.likedListingsIds.push(listingId);
+            this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to like listing ${listingId}: ${err}`);
+          })
+    },
+
+    /**
+     * Deletes a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    deleteLike: function(listingId, listingName) {
+      api.removeLikeFromListing(listingId)
+          .then(() => {
+            this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
+            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
+          })
     }
   }
 }
@@ -343,6 +427,11 @@ export default SearchListings;
 
 #sort-container {
   display: flex;
+  width: auto;
+}
+
+#sort-container .con-select {
+  margin-right: 0px;
 }
 
 .header-button {
@@ -453,10 +542,6 @@ th {
   cursor: pointer;
 }
 
-#sort-container {
-  width: auto;
-}
-
 div#filter-box {
   display: flex;
   border-radius: 10px;
@@ -466,10 +551,6 @@ div#filter-box {
   width: auto;
   margin-right: 15px;
   clear: both;
-}
-
-#sort-container .con-select {
-  margin-right: 0px;
 }
 
 #search-parameter {
@@ -517,8 +598,27 @@ div#search-parameters {
   height: auto;
 }
 
-.vert-row .con-text-validation.span-text-validation-danger.vs-input--text-validation-span.v-enter-to span-text-validation {
+.vert-row .con-text-validation.span-text-validation-danger.vs-input--text-validation-span.v-enter-to .span-text-validation {
   color: white !important;
+}
+
+
+.like-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+
+  cursor: pointer;
+  text-align: right;
+
+  transition: 0.3s;
+}
+
+.like-button.vs-icon:hover {
+  transition: opacity 0.3s, font-size 0.3s, right 0.3s;
+  opacity: 1.5;
+  font-size: 42px!important;
+  right: 16px;
 }
 
 

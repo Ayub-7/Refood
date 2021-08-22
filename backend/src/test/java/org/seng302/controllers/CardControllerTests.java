@@ -436,7 +436,7 @@ class CardControllerTests {
 
     @Test
     @WithMockUser
-    public void testDeleteCard_asDGAA() throws Exception {
+    void testDeleteCard_asDGAA() throws Exception {
         Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
 
         anotherUser.setRole(Role.DGAA);

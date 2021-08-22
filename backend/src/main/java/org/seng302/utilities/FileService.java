@@ -19,8 +19,8 @@ public class FileService {
 
     private static final Logger logger = LogManager.getLogger(FileService.class.getName());
 
-    private final int THUMBNAIL_SCALE_HEIGHT = 4;
-    private final int THUMBNAIL_SCALE_WIDTH = 4;
+    private static final int THUMBNAIL_SCALE_HEIGHT = 4;
+    private static final int THUMBNAIL_SCALE_WIDTH = 4;
 
     /**
      * Uploads an image to a given directory.
@@ -29,17 +29,14 @@ public class FileService {
      * @throws IOException when writing file fails.
      */
     public void uploadImage(File file, byte[] bytes) throws IOException {
-        logger.info("Uploading Image at " + file);
+        logger.info(String.format("Uploading Image at %s", file));
         if (file.createNewFile()) {
-            BufferedOutputStream stream = null;
-            try {
-                stream = new BufferedOutputStream(new FileOutputStream((file)));
+            try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream((file)));) {
                 stream.write(bytes);
-            } finally {
                 Objects.requireNonNull(stream).close();
             }
         } else {
-            logger.info("Failed to upload image from " + file);
+            logger.info(String.format("Failed to upload image from %s", file));
         }
     }
 
@@ -51,7 +48,7 @@ public class FileService {
      * @throws IOException when writing the new thumbnail fails.
      */
     public void createAndUploadThumbnailImage(File imageLocation, File thumbnailLocation, String imageExtension) throws IOException {
-        logger.info("Uploading thumbnail image at " + thumbnailLocation);
+        logger.info(String.format("Uploading thumbnail image at %s", thumbnailLocation));
         BufferedImage img = ImageIO.read(imageLocation);
         imageExtension = imageExtension.replace(".", ""); // remove any . before the extension.
 
@@ -62,7 +59,7 @@ public class FileService {
 
 
     public byte[] getImage(File file) throws IOException {
-        logger.info("Retrieving Image from " + file);
+        logger.info(String.format("Retrieving Image from %s", file));
         BufferedImage bufferedImage = ImageIO.read(file);
         // get DataBufferBytes from Raster
         WritableRaster raster = bufferedImage .getRaster();

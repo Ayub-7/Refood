@@ -32,7 +32,7 @@ import axios from 'axios'
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
-const instance = axios.create({  
+const instance = axios.create({
   baseURL: SERVER_URL,
   timeout: 10000
 });
@@ -91,32 +91,20 @@ export default {
     }),
 
     /**
-     * Search for one or more users from the database from a given input.
-     * @param input Any information relating to the user. (e.g: firstname, lastname, ...etc)
-     * @returns {Promise<AxiosResponse<any>>}
-     */
-    //searchQuery: async(input) => instance.post('users/search', input),
-
-    /**
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
-    searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
-
-
-    /**
-     * Query search results that uses searchQuery function
-     * @returns {Promise<AxiosResponse<any>>}
-     */
-    searchUsersQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
+    searchUsersQuery: (query, pageNum, sortString) => instance.get(`/users/search`,{params: {searchQuery: query, pageNum: pageNum, sortString: sortString}, withCredentials: true}),
 
     /**
      *  Query search that returns businesses based on the parameter query
      * @param query to help narrow down the businesses
      * @param type String that contains the business type, if the type does not exist, the backend will ignore it.
+     * @param page
+     * @param sortString
      * @returns {*}
      */
-    searchBusinessesWithTypeQuery: (query, type) => instance.get('/businesses/search', {params: {query: query, type: type}, withCredentials: true}),
+    searchBusinessesWithTypeQuery: (query, type, page, sortString) => instance.get('/businesses/search', {params: {query: query, type: type, page: page, sortString: sortString}, withCredentials: true}),
 
     /**
      * Method (frontend) to let a DGAA user make a user an GAA admin user.
@@ -360,7 +348,7 @@ export default {
      * Extends card display period by 24 hours (from current time)
      * @param cardId card that is going to be extended
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful
      */
     extendCardDisplayPeriod: (cardId) => instance.put(`/cards/${cardId}/extenddisplayperiod`, {}, {withCredentials: true}),
 
@@ -370,10 +358,8 @@ export default {
      * Gets users notifications, which can contain a deleted or expiring notification
      * @param userId ID of user we want notifications for
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful
      */
-     
-
     getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
 
 
@@ -425,6 +411,63 @@ export default {
      */
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
 
+    // === LISTING NOTIFICATIONS
+
+    /**
+     * GET all notifications relating to listings.
+     * @param businessId
+     * @param listingId
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    getListingNotifications: (userId) => instance.get(`/users/${userId}/notifications`, { withCredentials: true }),
+
+    /**
+     * Post api endpoint to post listing notification for particular listing
+     * @param listingId ID of the listing
+     * @param status Status of the listing (bought)
+     * @returns {Promise<AxiosResponse<any>>}
+     *          201 if created
+     *          400 if bad request
+     *          401 if not logged in
+     *          406 if business, user or listing are invalid
+     */
+    postListingNotification: async(listingId) =>
+        instance.post(`/listings/${listingId}/notify`, {}, {withCredentials: true}),
+
+    /**
+     *
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteListing: (listingId) => instance.delete(`/businesses/listings/${listingId}`, {withCredentials: true}),
+
+    /**
+     * POST endpoint - Adds a new like to a business sale listing.
+     * @param id of the sale listing to add a new like to.
+     * @param session the current active user session.
+     * @return 401 if unauthorized, 406 if the listing does not exist, 201 otherwise.
+     */
+    addLikeToListing: (listingId) =>
+        instance.post(`/businesses/listings/${listingId}/like`, {}, {withCredentials: true}),
+
+   /**
+     * Retrieves and returns a list of LISTINGS that the user has liked.
+     * @param id unique identifier of the user.
+     * @param session current active user session.
+     * @return 401 if unauthorized, 403 if forbidden (not dgaa or correct user), 406 if the user does not exist.
+     * 200 otherwise, may return an empty list (because the user has not liked anything).
+     */
+    getUserLikedListings: (id) => instance.get(`/users/${id}/likes`, {withCredentials: true}),
+
+    /**
+     * Removes a user's like from a sale listing (unlikes it).
+     * @param id the unique identifier of the sale listing to unlike.
+     * @param session the current user session - used to figure out who is doing the unliking.
+     * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
+     */
+    removeLikeFromListing: (id) =>
+        instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 
     /**
      * Query search results that uses searchQuery function
@@ -434,4 +477,20 @@ export default {
                           minPrice, maxPrice, minClosingDate, maxClosingDate, count, offset, sortDirection) =>
         instance.post('/businesses/listings', {businessQuery, productQuery, addressQuery, sortBy, businessTypes, minPrice, maxPrice, minClosingDate, maxClosingDate},
             {params: {count: count, offset: offset, sortDirection: sortDirection}}, { withCredentials: true }),
+
+
+    /**
+     * Get all business types
+     * @returns 401 if unauthorized, 200 if authenticated and requested correct endpoint
+     */
+    getBusinessTypes: () => instance.get('/businesses/types', {withCredentials: true}),
+
+
+    /**
+     * gets business notifications
+     * @param business ID
+     * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
+     */
+    getBusinessListingNotifications: (businessId) =>
+        instance.get(`/businesses/${businessId}/notifications`, {withCredentials: true}),
 }

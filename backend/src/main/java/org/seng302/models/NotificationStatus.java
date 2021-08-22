@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum NotificationStatus {
     EXPIRED("Expired"),
     BOUGHT("Bought"),
-    DELETED("Deleted");
+    DELETED("Deleted"),
+    LIKED("Liked"),
+    UNLIKED("Unliked");
 
     private final String label;
 

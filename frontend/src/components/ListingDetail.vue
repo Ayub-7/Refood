@@ -21,20 +21,22 @@
         </div>
       </vs-col>
       <!-- Listing details (closing date, business, etc) -->
-      <vs-col vs-w="6" vs-sm="12" id="listing-info-area">
+      <vs-col vs-w="6" vs-sm="12" vs-xs="12" id="listing-info-area">
         <div id="listing-info-container">
-          <div id="business-name">Business: {{listing.inventoryItem.product.business.name}}</div>
-          <div> Price: {{currency.symbol}}{{listing.price}} {{currency.code}}</div>
-          <div>Quantity: {{listing.quantity}}</div>
-          <div>Closes: {{listing.created}}</div>
-          <div>Created: {{listing.closes}}</div>
-          <div id="listing-moreInfo">{{listing.moreInfo}}</div>
-          <div>Likes: {{listing.likes}}</div>
-          <div>
-            <vs-button class="listing-detail-btn">Like listing</vs-button>
+          <div id="business-name"><b>Business:</b> {{listing.inventoryItem.product.business.name}}</div>
+          <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
+          <p vs-justify="left"><b>Price:</b> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
+          <p><b>Quantity:</b> {{listing.quantity}}</p>
+          <p><b>Closes:</b> {{listing.created}}</p>
+          <p><b>Created:</b> {{listing.closes}}</p>
+          <p id="listing-moreInfo">{{listing.moreInfo}}</p>
+          <p><b>Likes:</b> {{listing.likes}}</p>
+          <div class="">
+            <vs-button v-if="!likedListingsIds.includes(listing.id)" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">Like listing</vs-button>
+            <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">Unlike listing</vs-button>
           </div>
           <div>
-            <vs-button class="listing-detail-btn">Buy</vs-button>
+            <vs-button class="listing-detail-btn" @click="buy()">Buy</vs-button>
           </div>
         </div>
       </vs-col>
@@ -44,13 +46,13 @@
       <!-- Product & Inventory details (manufacturer, description, inventory dates, etc) -->
       <vs-col vs-w="12">
         <div id="product-info-area">
-          <div id="listing-name">{{listing.inventoryItem.product.name}}</div>
-          <div>Manufacturer: {{listing.inventoryItem.product.manufacturer}} </div>
-          <div v-if="listing.inventoryItem.manufactured">Manufactured: {{listing.inventoryItem.manufactured}}</div>
-          <div v-if="listing.inventoryItem.sellBy">Sell By: {{listing.inventoryItem.sellBy}}</div>
-          <div v-if="listing.inventoryItem.bestBefore">Best Before: {{listing.inventoryItem.bestBefore}}</div>
-          <div v-if="listing.inventoryItem.expires">Expires: {{listing.inventoryItem.expires}}</div>
-          <div>{{listing.inventoryItem.product.description}}</div>
+          <p id="listing-name">{{listing.inventoryItem.product.name}}</p>
+          <p><b>Manufacturer:</b> {{listing.inventoryItem.product.manufacturer}} </p>
+          <p v-if="listing.inventoryItem.manufactured"><b>Manufactured:</b> {{listing.inventoryItem.manufactured}}</p>
+          <p v-if="listing.inventoryItem.sellBy"><b>Sell By:</b> {{listing.inventoryItem.sellBy}}</p>
+          <p v-if="listing.inventoryItem.bestBefore"><b>Best Before:</b> {{listing.inventoryItem.bestBefore}}</p>
+          <p v-if="listing.inventoryItem.expires"><b>Expires:</b> {{listing.inventoryItem.expires}}</p>
+          <p>{{listing.inventoryItem.product.description}}</p>
         </div>
       </vs-col>
 
@@ -80,7 +82,8 @@ export default {
       noBusiness: false,
       currency: {symbol: '$', code: 'NZD'},
       currentImage: null,
-      listingImages: []
+      listingImages: [],
+      likedListingsIds: [],
     }
   },
 
@@ -89,6 +92,14 @@ export default {
     if(store.actingAsBusinessId != null) {
       this.$router.push({path: "/home"}) //Only users should be able to access this page (as a logged-in user)
     }
+    api.getUserLikedListings(this.userId)
+        .then((response) => {
+          for (let i = 0; i < response.data.length; i++) {
+            this.likedListingsIds.push(response.data[i]["id"]);
+          }
+        }).catch((err) => {
+      throw new Error(`Error trying to get user's likes: ${err}`)
+    })
     this.businessId = this.$route.params.businessId
     this.listingId = this.$route.params.listingId
 
@@ -151,6 +162,15 @@ export default {
       return images.map(image => image.fileName);
     },
 
+    /**
+     * Goes to business profile page, also stores listing value in session storage so user can come back to page
+     * @param businessId id of business page that we are going to
+     */
+    goToBusinessProfile(businessId) {
+      this.$router.push({path: `/businesses/${businessId}`})
+      sessionStorage.setItem('previousListing', this.listing.id)
+    },
+
 
     /**
      * Gets primary image from list of images and primary image path
@@ -180,6 +200,21 @@ export default {
       this.currentImage = this.listingImages[(((indexOfImage - 1) % length) + length) % length] //Negative modulo in JavaScript doesn't work since it's just remainder
     },
     /**
+     * method to submit a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    sendLike: function(listingId, listingName) {
+      api.addLikeToListing(listingId)
+          .then(() => {
+            this.likedListingsIds.push(listingId);
+            this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to like listing ${listingId}: ${err}`);
+          })
+    },
+    /**
      * Returns user to listing search page,
      * their previous search is shown
      */
@@ -187,7 +222,49 @@ export default {
       this.$router.push({path: '/search-listings'})
     },
 
+    /**
+     * Deletes a like for a listing.
+     * @param listingId Id of the listing.
+     * @param listingName Name of the listing.
+     */
+    deleteLike: function(listingId, listingName) {
+      api.removeLikeFromListing(listingId)
+          .then(() => {
+            this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
+            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+          })
+          .catch((err) => {
+            throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
+          })
+    },
 
+    /**
+     * Calls the post notification and delete listing endpoints after the buy buton is clicked
+     */
+    buy() {
+      api.postListingNotification(this.listingId)
+              .then((response) => {
+                this.$vs.notify({title:'Success', text:`Successfully purchased!\n${response.status}`, color:'success'})
+                this.$router.push({path: `/home`});
+              })
+              .catch(err => {
+                if (err.response.status === 400) {
+                  this.$vs.notify({title:'Purchase Failed', text:'400 Bad Request', color:'danger'})
+                } else if (err.response.status === 401) {
+                  this.$vs.notify({title:'Purchase Failed', text:'401 Not Logged In', color:'danger'})
+                } else {
+                  this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
+                }
+              });
+      api.deleteListing(this.listingId)
+              .catch(err => {
+        if (err.response.status === 406) {
+          this.$vs.notify({title: 'Purchase Failed', text: '406 Not Acceptable', color: 'danger'})
+        } else {
+          this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
+        }
+      });
+    }
   }
 
 }
@@ -242,6 +319,21 @@ export default {
   padding-bottom: 2em;
 }
 
+p {
+  text-align: left;
+  margin-left: 75px;
+}
+
+#business-name {
+  text-align: center;
+  margin-left: 50px;
+}
+
+#business-profile-button {
+  text-align: center;
+  margin-left: 50px;
+}
+
 #listing-name {
   font-size: 25px;
   margin-bottom: 10px;
@@ -249,12 +341,19 @@ export default {
 
 #business-name {
   font-size: 25px;
+  cursor: pointer;
+}
+
+#business-profile-button{
   margin-bottom: 1em;
+  margin-top: 0.5em;
 }
 
 .listing-detail-btn {
   margin-top: 5px;
   width: 40%;
+  text-align: center;
+  margin-left: 50px;
 }
 
 
@@ -266,10 +365,11 @@ export default {
   }
 
   #product-info-area {
-    margin-top: 3em;
     text-align: center;
     font-size: 12px;
     padding-bottom: 2em;
+    margin-top: 5px;
+    width: 150px;
   }
 
   #listing-info-area {
@@ -282,21 +382,17 @@ export default {
     margin-bottom: 5px;
   }
 
-  #business-name {
 
+  #business-name {
     font-size: 20px;
     margin-top: 1em;
     margin-bottom: 0.5em;
   }
 
-  .listing-detail-btn {
-    margin-top: 5px;
-    width: 150px;
-  }
-
   #listing-image {
         margin: auto;
   }
+
   #listing-image-container {
     display: flex;
     flex-direction: column;

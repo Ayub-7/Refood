@@ -2,11 +2,9 @@ package org.seng302.controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.models.Listing;
-import org.seng302.models.ListingLike;
-import org.seng302.models.Role;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.repositories.ListingLikeRepository;
+import org.seng302.repositories.ListingNotificationRepository;
 import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,9 @@ public class ListingLikeController {
     private ListingLikeRepository listingLikeRepository;
 
     @Autowired
+    private ListingNotificationRepository listingNotificationRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
 
@@ -55,6 +56,16 @@ public class ListingLikeController {
 
         ListingLike like = new ListingLike(user, listing);
         listingLikeRepository.save(like);
+
+        //Remove liked/unliked notification if it exists
+        ListingNotification oldNotification = listingNotificationRepository.findListingNotificationsByUserIdAndListing(user.getId(), listing);
+        if (oldNotification != null) {
+            listingNotificationRepository.delete(oldNotification);
+        }
+
+        //Create liked notification
+        ListingNotification notification = new ListingNotification(user, listing, NotificationStatus.LIKED);
+        listingNotificationRepository.save(notification);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -108,6 +119,14 @@ public class ListingLikeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         listingLikeRepository.delete(like);
+
+        //Remove old liked notification
+        ListingNotification oldNotification = listingNotificationRepository.findListingNotificationsByUserIdAndListing(sessionUser.getId(), listing);
+        listingNotificationRepository.delete(oldNotification);
+
+        //Add new liked notification
+        ListingNotification notification = new ListingNotification(sessionUser, listing, NotificationStatus.UNLIKED);
+        listingNotificationRepository.save(notification);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

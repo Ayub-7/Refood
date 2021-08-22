@@ -103,6 +103,35 @@ api.getBusinessListings = jest.fn(() => {
     return Promise.resolve({data: testListing, status: 200});
 });
 
+api.deleteListing = jest.fn(() => {
+    return Promise.resolve();
+});
+
+api.postListingNotification = jest.fn(() => {
+    return Promise.resolve({status: 201});
+});
+
+const $router = {
+    push: jest.fn()
+}
+
+const $vs = {
+    notify: jest.fn()
+}
+
+
+api.addLikeToListing = jest.fn(() => {
+    return Promise.resolve({status: 201});
+});
+
+api.removeLikeFromListing = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+
+api.getUserLikedListings = jest.fn(() => {
+    return Promise.resolve({data:{}, status: 200});
+});
+
 let $log = {
     error: jest.fn(),
     debug: jest.fn(),
@@ -110,7 +139,7 @@ let $log = {
 
 beforeEach(() => {
     wrapper = mount(ListingDetail, {
-        mocks: {$log, api, $route},
+        mocks: {$log, api, $route, $router, $vs},
         stubs: {},
         methods: {},
         localVue,
@@ -136,104 +165,125 @@ describe('Component', () => {
 
 
 describe('Testing methods', () => {
-  test('Get listing images returns correct amount of images', () => {
-    let images = wrapper.vm.listing.inventoryItem.product.images;
-    let listImages = wrapper.vm.getListingImages(images);
-    expect(listImages.length).toBe(images.length)
-  })
+    test('Get listing images returns correct amount of images', () => {
+        let images = wrapper.vm.listing.inventoryItem.product.images;
+        let listImages = wrapper.vm.getListingImages(images);
+        expect(listImages.length).toBe(images.length)
+    })
 
-  test('Get listing images returns correct amount of images with no images', () => {
-    let listImages = wrapper.vm.getListingImages([]);
-    expect(listImages.length).toBe(0)
-  })
+    test('Get listing images returns correct amount of images with no images', () => {
+        let listImages = wrapper.vm.getListingImages([]);
+        expect(listImages.length).toBe(0)
+        })
 
-  test('Get listing images returns correct amount of images with random data', () => {
-    let listImages = wrapper.vm.getListingImages([{fileName: 'aaa'}, {fileName: 'aadsadsaa'}, {fileName: 'aabbbbb'}]);
-    expect(listImages.length).toBe(3)
-  })
-
-
-  test('Get primary image returns correct image', () => {
-    wrapper.vm.listing = testListing;
-    let images = wrapper.vm.listing.inventoryItem.product.images;
-    let primaryImagePath = wrapper.vm.listing.inventoryItem.product.primaryImagePath
-    let listImages = wrapper.vm.getListingImages(images);
-
-    let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
-
-    expect(primaryImage).toBe(".\\src\\main\\resources\\media\\images\\businesses\\" + primaryImagePath)
-  })
-
-  test('Filter listing response returns correct listing', () => {
-    let fakeResponse = [{id: 1}, {id: 2}, {id: 3}];
-
-    let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 1);
-
-    expect(fakeListing).toBe(fakeResponse[0]);
-  })
+        test('Get listing images returns correct amount of images with random data', () => {
+        let listImages = wrapper.vm.getListingImages([{fileName: 'aaa'}, {fileName: 'aadsadsaa'}, {fileName: 'aabbbbb'}]);
+        expect(listImages.length).toBe(3)
+    })
 
 
-  test('Filter listing response returns nothing with bad values', () => {
-    let fakeResponse = [{id: 2}, {id: 3}, {id: 4}];
+    test('Get primary image returns correct image', () => {
+        wrapper.vm.listing = testListing;
+        let images = wrapper.vm.listing.inventoryItem.product.images;
+        let primaryImagePath = wrapper.vm.listing.inventoryItem.product.primaryImagePath
+        let listImages = wrapper.vm.getListingImages(images);
 
-    let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 1);
+        let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
 
-    expect(fakeListing).toBe(undefined);
-  })
+        expect(primaryImage).toBe(".\\src\\main\\resources\\media\\images\\businesses\\" + primaryImagePath)
+        })
 
-  test('Filter listing response with duplicated id returns first occurrence', () => {
-    let fakeResponse = [{id: 1}, {id: 2}, {id: 2}];
+        test('Filter listing response returns correct listing', () => {
+        let fakeResponse = [{id: 1}, {id: 2}, {id: 3}];
 
-    let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 2);
+        let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 1);
 
-    expect(fakeListing).toBe(fakeResponse[1]);
-  })
-
-
-  test('nextImage goes to next image in list', () => {
-    let images = wrapper.vm.listing.inventoryItem.product.images;
-    let listImages = wrapper.vm.getListingImages(images);
-    let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
-    wrapper.vm.listingImages = listImages;
-    wrapper.vm.currentImage = primaryImage;
-    wrapper.vm.nextImage(wrapper.vm.currentImage);
-
-    expect(wrapper.vm.currentImage).toBe(listImages[1])
-  })
-
-  test('nextImage resets to first image at end of list', () => {
-    let images = wrapper.vm.listing.inventoryItem.product.images;
-    let listImages = wrapper.vm.getListingImages(images);
-    let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
-    wrapper.vm.listingImages = listImages;
-    wrapper.vm.currentImage = listImages[listImages.length - 1];
-    wrapper.vm.nextImage(wrapper.vm.currentImage);
-
-    expect(wrapper.vm.currentImage).toBe(listImages[0])
-  })
+        expect(fakeListing).toBe(fakeResponse[0]);
+    })
 
 
+    test('Filter listing response returns nothing with bad values', () => {
+        let fakeResponse = [{id: 2}, {id: 3}, {id: 4}];
 
-  test('previousImage goes to previous image', () => {
-    let images = wrapper.vm.listing.inventoryItem.product.images;
-    let listImages = wrapper.vm.getListingImages(images);
-    let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
-    wrapper.vm.listingImages = listImages;
-    wrapper.vm.currentImage = listImages[2];
-    wrapper.vm.previousImage(wrapper.vm.currentImage);
+        let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 1);
 
-    expect(wrapper.vm.currentImage).toBe(listImages[1]);
-  })
+        expect(fakeListing).toBe(undefined);
+        })
+
+        test('Filter listing response with duplicated id returns first occurrence', () => {
+        let fakeResponse = [{id: 1}, {id: 2}, {id: 2}];
+
+        let fakeListing = wrapper.vm.filterListingFromListingsResponse(fakeResponse, 2);
+
+        expect(fakeListing).toBe(fakeResponse[1]);
+    })
 
 
-  test('previousImage goes to end of list when at start', () => {
-    let images = wrapper.vm.listing.inventoryItem.product.images;
-    let listImages = wrapper.vm.getListingImages(images);
-    let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
-    wrapper.vm.listingImages = listImages;
-    wrapper.vm.currentImage = primaryImage;
-    wrapper.vm.previousImage(wrapper.vm.currentImage);
+    test('nextImage goes to next image in list', () => {
+        let images = wrapper.vm.listing.inventoryItem.product.images;
+        let listImages = wrapper.vm.getListingImages(images);
+        let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
+        wrapper.vm.listingImages = listImages;
+        wrapper.vm.currentImage = primaryImage;
+        wrapper.vm.nextImage(wrapper.vm.currentImage);
 
-    expect(wrapper.vm.currentImage).toBe(listImages[listImages.length - 1]);
-  })
+        expect(wrapper.vm.currentImage).toBe(listImages[1])
+    })
+
+    test('nextImage resets to first image at end of list', () => {
+        let images = wrapper.vm.listing.inventoryItem.product.images;
+        let listImages = wrapper.vm.getListingImages(images);
+        let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
+        wrapper.vm.listingImages = listImages;
+        wrapper.vm.currentImage = listImages[listImages.length - 1];
+        wrapper.vm.nextImage(wrapper.vm.currentImage);
+
+        expect(wrapper.vm.currentImage).toBe(listImages[0])
+    })
+
+
+
+    test('previousImage goes to previous image', () => {
+        let images = wrapper.vm.listing.inventoryItem.product.images;
+        let listImages = wrapper.vm.getListingImages(images);
+        let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
+        wrapper.vm.listingImages = listImages;
+        wrapper.vm.currentImage = listImages[2];
+        wrapper.vm.previousImage(wrapper.vm.currentImage);
+
+        expect(wrapper.vm.currentImage).toBe(listImages[1]);
+    })
+
+
+    test('previousImage goes to end of list when at start', () => {
+        let images = wrapper.vm.listing.inventoryItem.product.images;
+        let listImages = wrapper.vm.getListingImages(images);
+        let primaryImage = wrapper.vm.getPrimaryImage(listImages, wrapper.vm.listing);
+        wrapper.vm.listingImages = listImages;
+        wrapper.vm.currentImage = primaryImage;
+        wrapper.vm.previousImage(wrapper.vm.currentImage);
+
+        expect(wrapper.vm.currentImage).toBe(listImages[listImages.length - 1]);
+    })
+
+    test('Test buy item', async () => {
+        await wrapper.vm.buy();
+        await expect(wrapper.vm.$vs.notify).toBeCalled();
+        await expect(wrapper.vm.$router.push).toBeCalled();
+    })
 })
+
+describe('Liking items', () => {
+    test('Liking an item', async () => {
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+    })
+
+    test('Unliking an item', async () => {
+        await wrapper.vm.sendLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds[0]).toEqual(8101);
+        await wrapper.vm.deleteLike(8101, "Longos - Chicken Cordon Bleu");
+        expect(wrapper.vm.likedListingsIds.length).toEqual(0);
+    })
+});
