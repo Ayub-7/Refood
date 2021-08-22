@@ -61,8 +61,10 @@ public class ListingNotificationController {
     List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(listingId);
     List<User> receivers = userLikes.stream().map(ListingLike::getUser).collect(Collectors.toList());
     for (User receiver : receivers) {
-      ListingNotification listingNotification = new ListingNotification(receiver, boughtListing, status);
-      listingNotificationRepository.save(listingNotification);
+      if (receiver.getId() != currentUser.getId()) {
+        ListingNotification listingNotification = new ListingNotification(receiver, boughtListing, status);
+        listingNotificationRepository.save(listingNotification);
+      }
     }
     ListingNotification listingNotification = new ListingNotification(currentUser, business, boughtListing, status);
     listingNotificationRepository.save(listingNotification);
