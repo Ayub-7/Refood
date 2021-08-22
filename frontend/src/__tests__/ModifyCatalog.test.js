@@ -179,5 +179,7 @@ describe('Add To Catalogue form error checking', () => {
         expect(wrapper.vm.errors.length).toBe(7);
         expect(wrapper.vm.errors).toStrictEqual(["invalid-chars", "invalid-chars", "invalid-chars", "long-name", "long-id", "long-desc", "invalid-rrp"]);
     });
+
+
 });
 
