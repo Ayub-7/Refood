@@ -66,6 +66,9 @@ public class Message {
      */
     public Message(NewMessageRequest newMessageRequest, User sender, User receiver, Card card) throws ValidationException {
         try {
+            if (!validateNewMessage(newMessageRequest)) {
+                return;
+            }
             this.sender = sender;
             this.receiver = receiver;
             this.card = card;

@@ -77,6 +77,7 @@ public class Card {
      */
     public Card(NewCardRequest newCardRequest, User user) throws ValidationException {
         try {
+            if (!validateNewCard(newCardRequest)) return;
             this.user = user;
             this.title = newCardRequest.getTitle();
             this.description = newCardRequest.getDescription();

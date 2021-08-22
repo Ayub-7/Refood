@@ -98,12 +98,12 @@ public class Inventory {
      */
     private boolean validInventoryRequest(NewInventoryRequest req) {
         Date today = Calendar.getInstance().getTime();
-        return (req.getQuantity() < 1 || req.getTotalPrice() < 0 || req.getPricePerItem() < 0) ||
+        return !((req.getQuantity() < 1 || req.getTotalPrice() < 0 || req.getPricePerItem() < 0) ||
                 req.getExpires() == null || req.getExpires().before(today) ||
                 req.getManufactured() != null && req.getManufactured().after(today) ||
                 req.getSellBy() != null && req.getSellBy().before(today) ||
                 req.getBestBefore() != null && (req.getBestBefore().before(today) ||
-                        req.getBestBefore().after(req.getExpires()));
+                        req.getBestBefore().after(req.getExpires())));
 
     }
 
