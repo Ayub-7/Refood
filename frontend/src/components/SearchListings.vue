@@ -602,7 +602,7 @@ div#search-parameters {
   height: auto;
 }
 
-.vert-row .con-text-validation.span-text-validation-danger.vs-input--text-validation-span.v-enter-to span-text-validation {
+.vert-row .con-text-validation.span-text-validation-danger.vs-input--text-validation-span.v-enter-to .span-text-validation {
   color: white !important;
 }
 

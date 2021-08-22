@@ -381,7 +381,6 @@ export default {
       }
       else if (this.description.length > 250){
         this.editErrors.description.error = true;
-        this
       }
       else {
         this.editErrors.title.error = false;

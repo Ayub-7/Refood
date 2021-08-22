@@ -59,7 +59,7 @@
             <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
           </div>
           <div id="message-notification-container">
-            <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <b>{{item.card.title}}</b></div>
+            <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
           </div>
         </div>
       </vs-card>
@@ -80,7 +80,7 @@
             {{ item.boughtListing.price }}
           </h4>
           <div>
-            Collect your purchase at <b>{{ createAddressString(item.boughtListing.product.business.address) }}</b>
+            Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
           </div>
         </div>
       </vs-card>
@@ -89,7 +89,7 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
         <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
         <div class="lln-description">
-          <b>{{ item.boughtListing.product.name }}</b>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
+          <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
         </div>
         <div class="lln-button-group">
           <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
@@ -100,8 +100,8 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
         <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
         <div class="lln-description">
-          <span v-if="item.status === 'Liked'">You have liked <b>{{ item.listing.inventoryItem.product.name }}</b>.</span>
-          <span v-else>You have unliked <b>{{ item.listing.inventoryItem.product.name }}</b>.</span>
+          <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+          <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
         </div>
         <div class="lln-button-group">
           <vs-button class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>

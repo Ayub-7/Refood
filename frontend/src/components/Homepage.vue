@@ -62,8 +62,8 @@
                   </vs-col>
                 </vs-row>
                 <div id="product-name">{{item.inventoryItem.product.name}}</div>
-                <div id="product-seller"><b>Seller: </b>{{item.inventoryItem.product.business.name}}</div>
-                <div id="product-closes" slot="footer"><b>Closes: </b>{{item.closes}}</div>
+                <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
               </div>
             </vs-card>
           </div>
