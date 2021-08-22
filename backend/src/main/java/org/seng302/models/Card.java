@@ -77,15 +77,13 @@ public class Card {
      */
     public Card(NewCardRequest newCardRequest, User user) throws ValidationException {
         try {
-            if (validateNewCard(newCardRequest)) {
-                this.user = user;
-                this.title = newCardRequest.getTitle();
-                this.description = newCardRequest.getDescription();
-                this.created = new Date();
-                this.displayPeriodEnd = getDisplayPeriodEndDate();
-                this.keywords = newCardRequest.getKeywords();
-                this.section = newCardRequest.getSection();
-            }
+            this.user = user;
+            this.title = newCardRequest.getTitle();
+            this.description = newCardRequest.getDescription();
+            this.created = new Date();
+            this.displayPeriodEnd = getDisplayPeriodEndDate();
+            this.keywords = newCardRequest.getKeywords();
+            this.section = newCardRequest.getSection();
         }
         catch (ValidationException exception) {
             throw new ValidationException(exception.getMessage());
@@ -132,8 +130,7 @@ public class Card {
 
         Calendar displayPeriodEndCalendar = Calendar.getInstance();
         displayPeriodEndCalendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
-        Date displayPeriodEndDate = displayPeriodEndCalendar.getTime();
-        return displayPeriodEndDate;
+        return displayPeriodEndCalendar.getTime();
     }
 
     /**
