@@ -8,7 +8,7 @@
         <vs-divider style="padding: 4px;"></vs-divider>
 
         <div id="catalogue-options">
-          <vs-input class="search-input" type="search" placeholder="Enter a listing..." name="searchbarUser" v-model="productQuery" style="width: 400px; font-size: 24px" size="medium"/>
+          <vs-input class="search-input" type="search" v-on:keyup.enter="filterListings" placeholder="Enter a listing..." name="searchbarUser" v-model="productQuery" style="width: 400px; font-size: 24px" size="medium"/>
           <vs-button class="header-button" id="main-search-btn" @click="filterListings">Search</vs-button>
 
         </div>
@@ -86,18 +86,18 @@
           <vs-divider style="padding: 4px;"></vs-divider>
           <div class="grid-container" style="margin: auto">
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
-                <div slot="media" id="media-div" >
-                  <div id="img-wrap" @click="viewListing(listing)">
-                  <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
-                  </div>
-                  <div v-if="!likedListingsIds.includes(listing.id)">
-                    <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
-                  </div>
-                  <div v-else>
-                    <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
-                  </div>
+              <div slot="media" id="media-div" >
+                <div id="img-wrap" @click="viewListing(listing)">
+                <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
                 </div>
-                <div class="click" @click="viewListing(listing)">
+                <div v-if="!likedListingsIds.includes(listing.id)">
+                  <vs-icon icon="favorite_border" size="32px" class="like-button" color="red" @click="sendLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                </div>
+                <div v-else>
+                  <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
+                </div>
+              </div>
+              <div @click="viewListing(listing)">
                 <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
                 <div style="margin: 2px 4px; font-size: 14px; font-weight: bold;">{{ listing.inventoryItem.product.business.name }}</div>
 
@@ -600,6 +600,11 @@ div#search-parameters {
 
 .vert-row .con-text-validation.span-text-validation-danger.vs-input--text-validation-span.v-enter-to .span-text-validation {
   color: white !important;
+}
+
+.listing-card:hover {
+  filter: brightness(75%);
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
 }
 
 

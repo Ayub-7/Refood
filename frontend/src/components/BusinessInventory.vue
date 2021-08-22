@@ -1,5 +1,5 @@
 <template>
-  <vs-card id="container">
+  <vs-card id="container" class="listing-card">
     <div id="header-container">
       <div style="display: flex;">
         <div id="title"> Inventory </div>

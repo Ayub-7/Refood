@@ -922,6 +922,7 @@ describe('Filter validation', () => {
     })
 
     test('Normal values passes validation', async ()  => {
+        wrapper.vm.errors = [];
         wrapper.vm.businessQuery = "Dab";
         wrapper.vm.productQuery = "Pa";
         wrapper.vm.addressQuery = "France";
