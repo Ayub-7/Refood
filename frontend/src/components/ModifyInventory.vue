@@ -428,12 +428,6 @@ export default {
   border-radius: 4px;
 }
 
-.vs-popup--header {
-  background-color: #1F74FF;
-  color: #FFFFFF;
-}
-
-
 #cancel-button {
   margin-left: 4px;
 }

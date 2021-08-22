@@ -462,8 +462,7 @@ export default Homepage;
 
 .newsfeed-title {
   font-size: 24px;
-  padding: 1em 0 0 1em;
-  line-height: 1.2em;
+  padding: 4px 0 0 0.5em;
 }
 
 /* Side-bar panel on left side */

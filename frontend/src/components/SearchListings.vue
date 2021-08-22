@@ -204,13 +204,13 @@ const SearchListings = {
           this.sortDirection = prevSearch['sortDirection']
         }
         api.getUserLikedListings(this.user.id)
-            .then((response) => {
-              for (let i = 0; i < response.data.length; i++) {
-                this.likedListingsIds.push(response.data[i]["id"]);
-              }
-            }).catch((err) => {
-          throw new Error(`Error trying to get user's likes: ${err}`)
-        })
+          .then((res) => {
+            for (let i = 0; i < res.data.length; i++) {
+              this.likedListingsIds.push(res.data[i]["id"]);
+            }
+          }).catch((err) => {
+            throw new Error(`Error trying to get user's likes: ${err}`)
+        });
         this.getBusinessTypes();
         this.filterListings();
         this.setCurrency(this.user.homeAddress.country)
@@ -249,10 +249,10 @@ const SearchListings = {
      **/
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
-          .then( response => {
-            this.currencySymbol = response.data[0].currencies[0].symbol;
-          }).catch( err => {
-        console.log("Error with getting cities from REST Countries." + err);
+        .then( response => {
+          this.currencySymbol = response.data[0].currencies[0].symbol;
+        }).catch( err => {
+          console.log("Error with getting cities from REST Countries." + err);
       });
     },
 
@@ -352,10 +352,9 @@ const SearchListings = {
       let maxTimeObject;
       if (this.maxClosingDate !== null) {
         maxTimestamp = Date.parse(this.maxClosingDate);
-        maxTimeObject = new Date(maxTimestamp)
-        if(maxTimeObject < minDateObject){
-          this.errors.push('past-max-date');
-        } else if (dateInPast(maxTimeObject, today) === true) {
+        maxTimeObject = new Date(maxTimestamp);
+
+        if(maxTimeObject < minDateObject || dateInPast(maxTimeObject, today) === true){
           this.errors.push('past-max-date');
         }
       }
@@ -428,6 +427,11 @@ export default SearchListings;
 
 #sort-container {
   display: flex;
+  width: auto;
+}
+
+#sort-container .con-select {
+  margin-right: 0px;
 }
 
 .header-button {
@@ -538,10 +542,6 @@ th {
   cursor: pointer;
 }
 
-#sort-container {
-  width: auto;
-}
-
 div#filter-box {
   display: flex;
   border-radius: 10px;
@@ -551,10 +551,6 @@ div#filter-box {
   width: auto;
   margin-right: 15px;
   clear: both;
-}
-
-#sort-container .con-select {
-  margin-right: 0px;
 }
 
 #search-parameter {

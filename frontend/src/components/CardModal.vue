@@ -560,11 +560,4 @@ export default {
   margin-bottom: 0;
 }
 
-.edit-error {
-  font-size: 10px;
-  position: relative;
-  color: #FF4757;
-  margin-left: 8px;
-}
-
 </style>

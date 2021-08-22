@@ -22,7 +22,6 @@
       <template slot-scope="{data}">
         <vs-tr v-for="(listing, index) in data" :key="index">
           <vs-td class="listing-image-column"><ReImage :image-path="listing.boughtListing.product.primaryImagePath" class="listing-image"/></vs-td>
-<!--          <vs-td>{{listing.listing.inventoryItem.product.name}}</vs-td>-->
           <vs-td>{{listing.boughtListing.product.name}}</vs-td>
           <vs-td>{{listing.created}}</vs-td>
           <vs-td>{{listing.boughtListing.sold}}</vs-td>
