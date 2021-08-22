@@ -21,17 +21,17 @@
         </div>
       </vs-col>
       <!-- Listing details (closing date, business, etc) -->
-      <vs-col vs-w="6" vs-sm="12" id="listing-info-area">
+      <vs-col vs-w="6" vs-sm="12" vs-xs="12" id="listing-info-area">
         <div id="listing-info-container">
-          <div id="business-name">Business: {{listing.inventoryItem.product.business.name}}</div>
+          <div id="business-name"><b>Business:</b> {{listing.inventoryItem.product.business.name}}</div>
           <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
-          <div> Price: {{currency.symbol}}{{listing.price}} {{currency.code}}</div>
-          <div>Quantity: {{listing.quantity}}</div>
-          <div>Closes: {{listing.created}}</div>
-          <div>Created: {{listing.closes}}</div>
-          <div id="listing-moreInfo">{{listing.moreInfo}}</div>
-          <div>Likes: {{listing.likes}}</div>
-          <div>
+          <p vs-justify="left"><b>Price:</b> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
+          <p><b>Quantity:</b> {{listing.quantity}}</p>
+          <p><b>Closes:</b> {{listing.created}}</p>
+          <p><b>Created:</b> {{listing.closes}}</p>
+          <p id="listing-moreInfo">{{listing.moreInfo}}</p>
+          <p><b>Likes:</b> {{listing.likes}}</p>
+          <div class="">
             <vs-button v-if="!likedListingsIds.includes(listing.id)" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">Like listing</vs-button>
             <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">Unlike listing</vs-button>
           </div>
@@ -46,13 +46,13 @@
       <!-- Product & Inventory details (manufacturer, description, inventory dates, etc) -->
       <vs-col vs-w="12">
         <div id="product-info-area">
-          <div id="listing-name">{{listing.inventoryItem.product.name}}</div>
-          <div>Manufacturer: {{listing.inventoryItem.product.manufacturer}} </div>
-          <div v-if="listing.inventoryItem.manufactured">Manufactured: {{listing.inventoryItem.manufactured}}</div>
-          <div v-if="listing.inventoryItem.sellBy">Sell By: {{listing.inventoryItem.sellBy}}</div>
-          <div v-if="listing.inventoryItem.bestBefore">Best Before: {{listing.inventoryItem.bestBefore}}</div>
-          <div v-if="listing.inventoryItem.expires">Expires: {{listing.inventoryItem.expires}}</div>
-          <div>{{listing.inventoryItem.product.description}}</div>
+          <p id="listing-name">{{listing.inventoryItem.product.name}}</p>
+          <p><b>Manufacturer:</b> {{listing.inventoryItem.product.manufacturer}} </p>
+          <p v-if="listing.inventoryItem.manufactured"><b>Manufactured:</b> {{listing.inventoryItem.manufactured}}</p>
+          <p v-if="listing.inventoryItem.sellBy"><b>Sell By:</b> {{listing.inventoryItem.sellBy}}</p>
+          <p v-if="listing.inventoryItem.bestBefore"><b>Best Before:</b> {{listing.inventoryItem.bestBefore}}</p>
+          <p v-if="listing.inventoryItem.expires"><b>Expires:</b> {{listing.inventoryItem.expires}}</p>
+          <p>{{listing.inventoryItem.product.description}}</p>
         </div>
       </vs-col>
 
@@ -319,6 +319,21 @@ export default {
   padding-bottom: 2em;
 }
 
+p {
+  text-align: left;
+  margin-left: 75px;
+}
+
+#business-name {
+  text-align: center;
+  margin-left: 50px;
+}
+
+#business-profile-button {
+  text-align: center;
+  margin-left: 50px;
+}
+
 #listing-name {
   font-size: 25px;
   margin-bottom: 10px;
@@ -337,6 +352,8 @@ export default {
 .listing-detail-btn {
   margin-top: 5px;
   width: 40%;
+  text-align: center;
+  margin-left: 50px;
 }
 
 
@@ -348,10 +365,11 @@ export default {
   }
 
   #product-info-area {
-    margin-top: 3em;
     text-align: center;
     font-size: 12px;
     padding-bottom: 2em;
+    margin-top: 5px;
+    width: 150px;
   }
 
   #listing-info-area {
@@ -369,12 +387,6 @@ export default {
     font-size: 20px;
     margin-top: 1em;
     margin-bottom: 0.5em;
-  }
-
-
-  .listing-detail-btn {
-    margin-top: 5px;
-    width: 150px;
   }
 
   #listing-image {
