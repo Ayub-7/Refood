@@ -6,7 +6,7 @@
             <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cardData" :key="card.id">
               <div style="margin: 10px; width: 90%;" @click="openCardModal(card)">
                 <!-- Marketplace Card -->
-                <vs-card>
+                <vs-card class="listing-card">
                   <div>
                     <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
                     <div id="cardCreationDate">{{card.created}}</div>
@@ -174,5 +174,9 @@ export default {
   box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
+.listing-card:hover {
+  filter: brightness(75%);
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+}
 
 </style>
