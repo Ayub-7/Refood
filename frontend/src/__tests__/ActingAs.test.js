@@ -127,6 +127,8 @@ describe( 'Backend error checking tests', () => {
         wrapper.destroy();
     });
 
+
+
     test('When setActingAsBusinessId returns 200, the cache is refreshed and the user acts as a business', async () => {
         api.actAsBusiness = jest.fn(() => {
             return Promise.resolve({status: 201, data: {id: 1}});
@@ -178,4 +180,7 @@ describe( 'Backend error checking tests', () => {
         expect(api.actAsBusiness).toBeCalled()
         expect(wrapper.vm.$log.debug).toBeCalled();
     });
+
+
+
 });
