@@ -1,12 +1,9 @@
 package org.seng302.finders;
 
-import org.seng302.models.BusinessType;
 import org.seng302.models.Listing;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
-import java.util.Locale;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component

@@ -17,7 +17,7 @@ public enum BusinessType {
     EDUCATION_AND_TRAINING("Education and Training"),
     ELECTRICITY_GAS_WATER_AND_WASTE_SERVICES("Electricity, Gas, Water and Waste Services"),
     FINANCIAL_AND_INSURANCE_SERVICES("Financial and Insurance Services"),
-    HEALTH_CAR_AND_SOCIAL_ASSISTANCE("Health Care and Social Assistance"),
+    HEALTH_CARE_AND_SOCIAL_ASSISTANCE("Health Care and Social Assistance"),
     INFORMATION_MEDIA_AND_TELECOMMUNICATION("Information Media and Telecommunication"),
     MANUFACTURING("Manufacturing"),
     MINING("Mining"),

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.repositories.*;
-import org.springframework.http.MediaType;
 import org.seng302.finders.*;
 
 import org.seng302.finders.ListingSpecifications;
@@ -36,6 +35,9 @@ import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
+/**
+ * Class with endpoints for searching, adding, or deleting listings
+ */
 @RestController
 public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());

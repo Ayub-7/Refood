@@ -132,8 +132,7 @@ public class Card {
 
         Calendar displayPeriodEndCalendar = Calendar.getInstance();
         displayPeriodEndCalendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
-        Date displayPeriodEndDate = displayPeriodEndCalendar.getTime();
-        return displayPeriodEndDate;
+        return displayPeriodEndCalendar.getTime();
     }
 
     /**

@@ -32,7 +32,7 @@ import axios from 'axios'
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
-const instance = axios.create({  
+const instance = axios.create({
   baseURL: SERVER_URL,
   timeout: 10000
 });
@@ -89,20 +89,6 @@ export default {
             return data? JSON.parse(data)._embedded.students : data;
         }]
     }),
-
-    /**
-     * Search for one or more users from the database from a given input.
-     * @param input Any information relating to the user. (e.g: firstname, lastname, ...etc)
-     * @returns {Promise<AxiosResponse<any>>}
-     */
-    //searchQuery: async(input) => instance.post('users/search', input),
-
-    // /**
-    //  * Query search results that uses searchQuery function
-    //  * @returns {Promise<AxiosResponse<any>>}
-    //  */
-    // searchQuery: (query) => instance.get(`/users/search?searchQuery="${query}"`,{withCredentials: true}),
-
 
     /**
      * Query search results that uses searchQuery function
@@ -362,7 +348,7 @@ export default {
      * Extends card display period by 24 hours (from current time)
      * @param cardId card that is going to be extended
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not users card, 406 if bad ID, 200 if successful
      */
     extendCardDisplayPeriod: (cardId) => instance.put(`/cards/${cardId}/extenddisplayperiod`, {}, {withCredentials: true}),
 
@@ -372,10 +358,8 @@ export default {
      * Gets users notifications, which can contain a deleted or expiring notification
      * @param userId ID of user we want notifications for
      * @returns {Promise<AxiosResponse<any>>}:
-     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful 
+     *  401 if no auth, 403 if not user, 406 if bad ID, 200 if successful
      */
-     
-
     getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
 
 
@@ -426,6 +410,17 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} Messages of the user
      */
     getMessages: (userId) => instance.get(`/users/${userId}/messages`, { withCredentials: true }),
+
+    // === LISTING NOTIFICATIONS
+
+    /**
+     * GET all notifications relating to listings.
+     * @param businessId
+     * @param listingId
+     * @param userId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    getListingNotifications: (userId) => instance.get(`/users/${userId}/notifications`, { withCredentials: true }),
 
     /**
      * Post api endpoint to post listing notification for particular listing
@@ -488,6 +483,14 @@ export default {
      * Get all business types
      * @returns 401 if unauthorized, 200 if authenticated and requested correct endpoint
      */
-    getBusinessTypes: () => instance.get('/businesses/types', {withCredentials: true})
+    getBusinessTypes: () => instance.get('/businesses/types', {withCredentials: true}),
 
+
+    /**
+     * gets business notifications
+     * @param business ID
+     * @return 401 if unauthorized, 400 if it wasn't liked already, 406 if the listing doesn't exist, 200 otherwise.
+     */
+    getBusinessListingNotifications: (businessId) =>
+        instance.get(`/businesses/${businessId}/notifications`, {withCredentials: true}),
 }

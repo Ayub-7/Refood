@@ -21,6 +21,9 @@ public class ListingNotification {
     private User user; // User receiving the notification
 
     @ManyToOne
+    private Business business; // Business that sold the listing
+
+    @ManyToOne
     private BoughtListing boughtListing;
 
     @ManyToOne
@@ -31,7 +34,7 @@ public class ListingNotification {
     @Enumerated(EnumType.STRING)
     private NotificationStatus status;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date created;
 
     /**
@@ -47,6 +50,21 @@ public class ListingNotification {
         this.created = new Date();
     }
 
+    /**
+     * Business constructor.
+     * @param user the user receiving the notification.
+     * @param business the business receiving the notification.
+     * @param boughtListing the listing being notified about.
+     * @param status the listing status.
+     */
+    public ListingNotification(User user, Business business, BoughtListing boughtListing, NotificationStatus status) {
+        this.user = user;
+        this.business = business;
+        this.boughtListing = boughtListing;
+        this.status = status;
+        this.created = new Date();
+    }
+
     public ListingNotification(User user, Listing listing, NotificationStatus status) {
         this.user = user;
         this.listing = listing;
@@ -55,13 +73,4 @@ public class ListingNotification {
     }
 
     public ListingNotification() {}
-
-    public void setStatus(NotificationStatus status) {
-        if (status == NotificationStatus.BOUGHT || status == NotificationStatus.EXPIRED) {
-            this.status = status;
-        }
-        else {
-            throw new IllegalArgumentException(status + " status is not allowed");
-        }
-    }
 }

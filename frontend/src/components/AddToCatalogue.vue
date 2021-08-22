@@ -3,13 +3,13 @@
     <h3 class="card-header">Add a Product to your Catalogue</h3>
     <form>
       <div id="info-field">
-        <div id="product-name">
+        <div id="product-name-field">
           <vs-input
               :danger="(errors.includes(productName))"
               danger-text="Product name is required"
               class="form-control"
               type="text"
-              label-placeholder="Product name (required)"
+              label="Product name *"
               v-model="productName"/>
         </div>
         <div id="product-id">
@@ -18,7 +18,7 @@
               danger-text="Product id is required"
               class="form-control"
               type="text"
-              label-placeholder="Product ID (required)"
+              label="Product ID *"
               v-model="productId"/>
         </div>
         <div id="rrp">
@@ -27,7 +27,7 @@
               :danger="(errors.includes('no-rrp') || errors.includes('rrp') || errors.includes('invalid-rrp'))"
               danger-text="RRP is required and must be at least 0 and a Number."
               id="currencyInput"
-              label-placeholder="Recommended Retail Price"
+              label="Recommended Retail Price *"
               type="text"
               v-model="rrp"/>
           <div id="currencyCode">{{this.currencyCode}}</div>
@@ -38,22 +38,21 @@
               danger-text="Manufacturer is Required."
               class="form-control"
               type="text"
-              label-placeholder="Manufacturer"
+              label="Manufacturer *"
               v-model="manufacturer"/>
         </div>
         <div id="description">
           <vs-textarea
               class="form-control"
               type="text"
-              width="400px"
+              width="450px"
               label="Description"
               v-model="description"/>
         </div>
       </div>
-      <button
-          type="button"
+      <vs-button
           class="add-button"
-          @click="checkForm(); createItem();">Add Item to Catalogue</button>
+          @click="checkForm(); createItem();">Add Item to Catalogue</vs-button>
     </form>
   </div>
 </template>
@@ -138,6 +137,7 @@ const AddToCatalogue = {
         });
       }
     },
+
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
@@ -146,12 +146,12 @@ const AddToCatalogue = {
       //https://www.npmjs.com/package/json-server
       if (this.errors.length === 0) {
         api.createProduct(store.actingAsBusinessId, this.productId, this.productName, this.description, this.manufacturer, this.rrp)
-            .then((response) => {
-              this.$log.debug("New catalogue item created:", response.data);
-              this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
-            }).catch((error) => {
+          .then((response) => {
+            this.$log.debug("New catalogue item created:", response.data);
+            this.$router.push({path: `/businesses/${store.actingAsBusinessId}/products`});
+          }).catch((error) => {
           if (error.response) {
-            console.log(error);
+            this.$log.debug(error);
             if (error.response.status === 400) {
               this.$vs.notify({
                 title: 'Failed to create catalogue item',
@@ -159,19 +159,22 @@ const AddToCatalogue = {
                 color: 'danger'
               });
             }
-            console.log(error.response.status);
+            this.$log.debug(error.response.status);
           }
           this.$log.debug("Error Status:", error)
         });
       }
     },
 
+    /**
+     * Retrieves the current user information.
+     */
     getUserInfo: function (userId) {
       api.getUserFromID(userId) //Get user data
-          .then((response) => {
-            this.user = response.data;
-            this.setCurrency(this.user.homeAddress.country);
-          }).catch((err) => {
+        .then((response) => {
+          this.user = response.data;
+          this.setCurrency(this.user.homeAddress.country);
+        }).catch((err) => {
         if (err.response.status === 401) {
           this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
           this.$router.push({name: 'LoginPage'});
@@ -181,26 +184,36 @@ const AddToCatalogue = {
       });
     },
 
+    /**
+     * Sets the currency symbol and code display to the current user's country.
+     * Calls a third party API to retrieve the information.
+     * @param country the user's country to retrieve information for.
+     */
     setCurrency: function (country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
-          .then(response => {
-            this.currencySymbol = response.data[0].currencies[0].symbol;
-            this.currencyCode = response.data[0].currencies[0].code;
-          }).catch(err => {
-        this.$log.debug(err);
+        .then(response => {
+          this.currencySymbol = response.data[0].currencies[0].symbol;
+          this.currencyCode = response.data[0].currencies[0].code;
+        }).catch(err => {
+          this.$log.debug(err);
       });
     },
+
+    /**
+     * Checks the user session to see if the user is logged in.
+     */
     checkUserSession: function() {
       api.checkSession()
-          .then((response) => {
-            this.getUserInfo(response.data.id);
-          })
-          .catch((error) => {
-            this.$log.debug("Error checking sessions: " + error);
-            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-          });
+        .then((response) => {
+          this.getUserInfo(response.data.id);
+        })
+        .catch((error) => {
+          this.$log.debug("Error checking sessions: " + error);
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+        });
     }
   },
+
   mounted: function () {
     this.checkUserSession();
   }
@@ -218,17 +231,8 @@ Add button's styling
 .add-button {
   grid-column: 1 / 3;
 
-  cursor: pointer;
-  border-radius: 5em;
-  color: #fff;
-  background: #1F74FF;
-  border: 0;
-  z-index: 1000;
   padding: 10px 40px;
   margin: 2em auto;
-  font-size: 13px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
-  text-align: center;
 }
 
 /**
@@ -302,14 +306,24 @@ Styling for form elements.
   grid-template-rows: repeat(5, auto);
 }
 
-#product-name {
+#product-name-field {
   grid-column: 1;
   grid-row: 1;
+}
+
+#product-name-field >>> .vs-input {
+  padding-left: 2px;
+  padding-right: 0;
 }
 
 #product-id {
   grid-column: 2;
   grid-row: 1;
+}
+
+#product-id >>> .vs-input {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 #manufacturer {
@@ -320,6 +334,11 @@ Styling for form elements.
 #description {
   grid-column: 1 / 3;
   grid-row: 3;
+}
+
+#description >>> .vs-con-textarea > textarea {
+  min-height: 100px;
+  max-height: 100px;
 }
 
 #rrp {
@@ -349,6 +368,14 @@ Styling for form elements.
 
   margin: auto;
   font-size: 15px;
+}
+
+#manufacturer >>> .vs-input {
+  margin-bottom: 1em;
+  margin-top: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 

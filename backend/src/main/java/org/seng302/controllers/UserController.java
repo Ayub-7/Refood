@@ -10,7 +10,6 @@ import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
-import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
