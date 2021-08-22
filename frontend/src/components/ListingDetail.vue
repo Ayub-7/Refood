@@ -245,7 +245,7 @@ export default {
       api.postListingNotification(this.listingId)
               .then((response) => {
                 this.$vs.notify({title:'Success', text:`Successfully purchased!\n${response.status}`, color:'success'})
-                this.$router.push({path: '/search-listings'})
+                this.$router.push({path: `/home`});
               })
               .catch(err => {
                 if (err.response.status === 400) {
