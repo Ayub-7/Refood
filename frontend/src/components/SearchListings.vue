@@ -87,7 +87,7 @@
           <div class="grid-container" style="margin: auto">
             <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
               <div slot="media" id="media-div" >
-                <div id="img-wrap" @click="viewListing(listing)">
+                <div id="img-wrap" @click="viewListing(listing)" style="cursor: pointer;">
                 <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
                 </div>
                 <div v-if="!likedListingsIds.includes(listing.id)">
@@ -97,7 +97,7 @@
                   <vs-icon icon="favorite" size="32px" class="like-button" color="red" @click="deleteLike(listing.id, listing.inventoryItem.product.name)"></vs-icon>
                 </div>
               </div>
-              <div @click="viewListing(listing)">
+              <div @click="viewListing(listing)" style="cursor: pointer;">
                 <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.inventoryItem.product.name }}</div>
                 <div style="margin: 2px 4px; font-size: 14px; font-weight: bold;">{{ listing.inventoryItem.product.business.name }}</div>
 
