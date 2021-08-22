@@ -92,7 +92,7 @@
           <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
         </div>
         <div class="lln-button-group">
-          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
+<!--          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>-->
         </div>
       </vs-card>
 
@@ -105,7 +105,7 @@
         </div>
         <div class="lln-button-group">
           <vs-button class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
-          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>
+<!--          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>-->
         </div>
       </vs-card>
     </div>
