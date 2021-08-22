@@ -203,7 +203,7 @@ const SearchListings = {
           this.pageNum = prevSearch['pageNum']
           this.sortDirection = prevSearch['sortDirection']
         }
-        api.getUserLikedListings(this.userId)
+        api.getUserLikedListings(this.user.id)
             .then((response) => {
               for (let i = 0; i < response.data.length; i++) {
                 this.likedListingsIds.push(response.data[i]["id"]);
@@ -233,7 +233,6 @@ const SearchListings = {
       api.getBusinessTypes()
       .then((response) => {
         this.businessTypes = response.data
-        console.log(response)
       }).catch((err) => {
         if(err.response.status === 401) {
           this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
@@ -304,7 +303,6 @@ const SearchListings = {
         sortDirection: this.sortDirection
       }
       sessionStorage.setItem("listingSearchCache", JSON.stringify(searchQuery));
-      console.log(this.pageNum)
       this.$router.push({path: `/businesses/${listing.inventoryItem.product.business.id }/listings/${listing.id}`});
     },
     /**

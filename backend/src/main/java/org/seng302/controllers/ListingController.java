@@ -36,6 +36,9 @@ import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
+/**
+ * Class with endpoints for searching, adding, or deleting listings
+ */
 @RestController
 public class ListingController {
     private static final Logger logger = LogManager.getLogger(ListingController.class.getName());

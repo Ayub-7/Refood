@@ -32,6 +32,9 @@ import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Class with endpoints for searching, adding, modifying, or deleting businesses.
+ */
 @RestController
 public class BusinessController {
 
