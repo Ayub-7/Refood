@@ -3,19 +3,17 @@ package org.seng302.repositories;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-
-import java.util.List;
-
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 @RepositoryRestResource
@@ -49,7 +47,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param pageable
      * @return
      */
-    Page<User> findAll(Specification spec, Pageable pageable);
+    Page<User> findAll(Specification<User> spec, Pageable pageable);
 
 
 }
