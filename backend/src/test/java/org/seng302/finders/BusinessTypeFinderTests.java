@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @SpringBootTest(classes = Main.class)
 @ContextConfiguration(classes = TestApplication.class)
-public class BusinessTypeFinderTests {
+class BusinessTypeFinderTests {
 
     @Autowired
     private BusinessRepository businessRepository;

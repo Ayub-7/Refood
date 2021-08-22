@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class ListingLikeRepositoryTests {
+class ListingLikeRepositoryTests {
 
     @Autowired
     private TestEntityManager entityManager;

@@ -99,6 +99,6 @@ public class registerStepDefs {
 
     @Then("Password is hashed and not stored in plain text")
     public void passwordIsHashedAndNotStoredInPlainText() throws JsonProcessingException {
-        assertThat(this.userRepository.findUserByEmail(em).getPassword() != pass);
+        assertThat(this.userRepository.findUserByEmail(em).getPassword()).isNotEqualTo(pass);
     }
 }

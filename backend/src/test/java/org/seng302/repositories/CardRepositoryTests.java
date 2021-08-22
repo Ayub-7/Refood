@@ -136,7 +136,7 @@ class CardRepositoryTests {
     void findInventoryBySectionExpectsEmptyList() {
         Pageable mockPageable = PageRequest.of(1, 10, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "created").ignoreCase())));
         Page<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED, mockPageable);
-        assertThat(cardList.getTotalElements()).isEqualTo(0);
+        assertThat(cardList.getTotalElements()).isZero();
     }
 
     /**
@@ -146,10 +146,10 @@ class CardRepositoryTests {
      * deleted by deleteCardById(testCard.id)
      */
     @Test
-    public void deleteCardByIdExpectsEmptyList() {
+    void deleteCardByIdExpectsEmptyList() {
         cardRepository.deleteCardById(testCard1.getId());
         Card card1 = cardRepository.findCardById(testCard1.getId());
-        assertThat(card1).isEqualTo(null);
+        assertThat(card1).isNull();
     }
 
     /**
