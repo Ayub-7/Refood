@@ -133,6 +133,7 @@ const mockBusinessesFromSearch = {
 
 let $vs = {
     loading: jest.fn(),
+    notify: jest.fn()
 }
 
 let $log = {
