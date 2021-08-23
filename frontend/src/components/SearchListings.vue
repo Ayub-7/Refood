@@ -45,8 +45,8 @@
                 <h3 class="filter-label">
                   Price range:
                 </h3>
-                <vs-input class="price-input" v-model="minPrice" type="number" :danger="(errors.includes('invalid-minprice'))" danger-text="Invalid"  min="0" placeholder="Min" style="font-size: 24px" size="medium"/>
-                <vs-input class="price-input" v-model="maxPrice" type="number" :danger="(errors.includes('invalid-maxprice'))" danger-text="Invalid" min="0" placeholder="Max"  style="font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="minPrice" type="number" @keypress="checkNumber($event)" :danger="(errors.includes('invalid-minprice'))" danger-text="Invalid"  min="0" placeholder="Min" style="font-size: 24px" size="medium"/>
+                <vs-input class="price-input" v-model="maxPrice" type="number" @keypress="checkNumber($event)" :danger="(errors.includes('invalid-maxprice'))" danger-text="Invalid" min="0" placeholder="Max"  style="font-size: 24px" size="medium"/>
               </div>
               </div>
 
@@ -222,6 +222,16 @@ const SearchListings = {
     resetCache: function() {
       if (sessionStorage.getItem('listingSearchCache') !== null) {
         sessionStorage.removeItem('listingSearchCache');
+      }
+    },
+
+    /**
+     * checks whether the input is a number
+     */
+    checkNumber ($event) {
+      let keyCode = $event.keyCode;
+      if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) { // 46 is dot
+        $event.preventDefault();
       }
     },
     /**
