@@ -125,7 +125,7 @@
         </div>
     <div class="title-container">
       <div class="title-centre">
-        <vs-pagination v-model="pageNum" :total="totalPages" @change="filterListings(); resetCache()" />
+        <vs-pagination v-model="pageNum" :total="totalPages" @change="filterListings(); resetCache();" />
       </div>
     </div>
   </vs-card>
@@ -183,25 +183,25 @@ const SearchListings = {
   },
 
   mounted() {
+    if (sessionStorage.getItem('listingSearchCache') !== null) {
+      let prevSearch;
+      prevSearch = JSON.parse(sessionStorage.getItem('listingSearchCache'));
+      this.businessQuery = prevSearch['businessQuery']
+      this.productQuery = prevSearch['productQuery']
+      this.addressQuery = prevSearch['addressQuery']
+      this.sortBy = prevSearch['sortBy']
+      this.selectedTypes = prevSearch['selectedTypes']
+      this.minPrice = prevSearch['minPrice']
+      this.maxPrice = prevSearch['maxPrice']
+      this.minClosingDate = prevSearch['minClosingDate']
+      this.maxClosingDate = prevSearch['maxClosingDate']
+      this.numListings = prevSearch['numListings']
+      this.pageNum = prevSearch['pageNum']
+      this.sortDirection = prevSearch['sortDirection']
+    }
     api.checkSession()
       .then((response) => {
         this.user = response.data;
-        if (sessionStorage.getItem('listingSearchCache') !== null) {
-          let prevSearch;
-          prevSearch = JSON.parse(sessionStorage.getItem('listingSearchCache'));
-          this.businessQuery = prevSearch['businessQuery']
-          this.productQuery = prevSearch['productQuery']
-          this.addressQuery = prevSearch['addressQuery']
-          this.sortBy = prevSearch['sortBy']
-          this.selectedTypes = prevSearch['selectedTypes']
-          this.minPrice = prevSearch['minPrice']
-          this.maxPrice = prevSearch['maxPrice']
-          this.minClosingDate = prevSearch['minClosingDate']
-          this.maxClosingDate = prevSearch['maxClosingDate']
-          this.numListings = prevSearch['numListings']
-          this.pageNum = prevSearch['pageNum']
-          this.sortDirection = prevSearch['sortDirection']
-        }
         api.getUserLikedListings(this.user.id)
           .then((res) => {
             for (let i = 0; i < res.data.length; i++) {
