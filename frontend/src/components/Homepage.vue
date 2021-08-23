@@ -34,12 +34,14 @@
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container">
-          <div style="margin-top: 1px; margin-left: -20px" class="message-detail-container message">
-            <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
-            <div id="message-detail-message">
-              Watchlist
+          <div id="watchlist-header-container">
+            <div style="display: flex;">
+              <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
+              <div class="watchlist-title">
+                Watchlist
+              </div>
             </div>
-            {{likes}}
+            <span style="margin: auto 0;">{{likes}}</span>
           </div>
           <vs-divider style="margin-top: -30px"></vs-divider>
           <div v-for="(item, index) in likedItem" :key="item.id" >
@@ -499,7 +501,7 @@ export default Homepage;
 
 .watchlist-title {
   font-size: 18px;
-  margin-left: 4px;
+  margin: auto auto auto 2px;
   transition: 0.3s;
 }
 
@@ -519,10 +521,7 @@ main {
   grid-row: 1;
   font-size: 18px;
   padding-top: 1em;
-  padding-bottom: 1em;
-  box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
-  border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
+  padding-left: 4px;
 }
 
 /* left navigation panel styling */

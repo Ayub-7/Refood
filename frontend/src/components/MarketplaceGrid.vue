@@ -83,17 +83,13 @@ export default {
       if (section === "ForSale") return "For Sale";
       return section;
     }
-    },
-
-
-
-
+  },
 }
 
 
 </script>
 
-<style>
+<style scoped>
 
 #card-modal-message-button {
   margin-left: 5px;

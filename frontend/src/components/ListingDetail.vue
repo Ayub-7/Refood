@@ -270,7 +270,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 .return-button {
   margin-top: -15px;
@@ -306,7 +306,7 @@ export default {
   width: 80%;
 }
 
-#listing-image > img {
+#listing-image >>> img {
   width:  400px;
   height: 300px;
   object-fit: cover;
@@ -327,11 +327,15 @@ p {
 #business-name {
   text-align: center;
   margin-left: 50px;
+  font-size: 25px;
+  cursor: pointer;
 }
 
 #business-profile-button {
   text-align: center;
   margin-left: 50px;
+  margin-bottom: 1em;
+  margin-top: 0.5em;
 }
 
 #listing-name {
@@ -339,15 +343,6 @@ p {
   margin-bottom: 10px;
 }
 
-#business-name {
-  font-size: 25px;
-  cursor: pointer;
-}
-
-#business-profile-button{
-  margin-bottom: 1em;
-  margin-top: 0.5em;
-}
 
 .listing-detail-btn {
   margin-top: 5px;

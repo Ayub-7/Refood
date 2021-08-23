@@ -2,7 +2,7 @@
   <vs-card class="main">
     <div class="container">
       <div class="title-container">
-        <vs-icon icon="local_offer"/>
+        <vs-icon icon="local_offer" style="margin: auto 0;"/>
         <h1 id="title" class="title-left title" >Community Marketplace</h1>
         <div class="title-right">
           <div style="display: flex;">
@@ -187,7 +187,7 @@ export default {
 
 
   mounted() {
-  
+
     api.checkSession()
       .then(() => {
         if(store.actingAsBusinessId != null) {
@@ -252,8 +252,7 @@ export default {
   padding-top: 0.5em;
 }
 .title-left {
-  margin-right: auto;
-  margin-left: 4px;
+  margin: auto auto auto 4px;
   display: flex;
 }
 
@@ -268,7 +267,6 @@ export default {
   margin-left: auto;
   display: flex;
 }
-
 
 .menu-title {
   margin: auto;

@@ -68,9 +68,6 @@
       <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-          <div style="display: flex;">
-            <vs-button color="danger" icon="close" class="pln-delete-button delete-button"></vs-button>
-          </div>
         </div>
         <h3>{{ item.boughtListing.product.name }}</h3>
         <h5>{{ item.boughtListing.product.business.name }}</h5>
@@ -87,25 +84,25 @@
 
       <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
-        <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+        <div class="pln-top-row">
+          <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+        </div>
         <div class="lln-description">
           <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
-        </div>
-        <div class="lln-button-group">
-<!--          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>-->
         </div>
       </vs-card>
 
       <!-- NEW LIKED LISTING NOTIFICATIONS -->
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
         <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-        <div class="lln-description">
-          <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
-          <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
-        </div>
-        <div class="lln-button-group">
-          <vs-button class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
-<!--          <vs-button color="danger" icon="close" class="lln-delete-button delete-button"></vs-button>-->
+        <div style="display: flex">
+          <div class="lln-description">
+            <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+            <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+          </div>
+          <div class="lln-button-group">
+            <vs-button class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+          </div>
         </div>
       </vs-card>
     </div>
@@ -347,7 +344,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .notification-card {
   margin: 1em;
   width: auto;
@@ -358,8 +355,8 @@ export default {
   height: 25px!important;
 }
 
-.delete-button > i.material-icons {
-  font-size: 18px;
+.delete-button >>> i.material-icons {
+  font-size: 20px;
 }
 
 #message-notification-container {
@@ -458,6 +455,7 @@ export default {
 
 .lln-description {
   grid-row: 2;
+  margin: auto 0;
 }
 
 .lln-button-group {
@@ -488,17 +486,10 @@ export default {
     height: 100%;
   }
 
-  .lln-button-group {
-    flex-direction: column-reverse;
-  }
-
   .lln-delete-button {
-    margin-left: auto;
     margin-bottom: 4px;
   }
-
 }
-
 
 /* Taken from https://codepen.io/kdydesign/pen/VrQZqx */
 .slide-enter-active {
@@ -533,7 +524,4 @@ export default {
   max-height: 0;
 }
 
-/* .msg-icon {
-  margin-top: 6%;
-} */
 </style>

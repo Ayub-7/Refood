@@ -1,9 +1,9 @@
 <template>
   <vs-card class="main">
         <div id="header-container">
-          <div id="page-title">
+          <h1 id="page-title">
             <vs-icon icon="local_offer"/>
-            Sales Listings</div>
+            Sales Listings</h1>
           </div>
         <vs-divider style="padding: 4px;"></vs-divider>
 
@@ -417,7 +417,7 @@ export default SearchListings;
 
 #page-title {
   font-size: 30px;
-  margin: auto 0;
+  margin: 12px 8px 4px;
 }
 
 #header-container {
@@ -517,13 +517,10 @@ i.vs-icon.notranslate.icon-scale.icon-item.vs-select--item-icon.material-icons.n
   width: 10%;
 }
 
-
-
 #grid-pagination {
   margin: auto 0 auto auto;
   display: flex;
 }
-
 
 th {
   background: #1F74FF;
