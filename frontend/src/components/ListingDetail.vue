@@ -84,6 +84,7 @@ export default {
       currentImage: null,
       listingImages: [],
       likedListingsIds: [],
+      userId: store.loggedInUserId
     }
   },
 
@@ -98,7 +99,7 @@ export default {
             this.likedListingsIds.push(response.data[i]["id"]);
           }
         }).catch((err) => {
-      throw new Error(`Error trying to get user's likes: ${err}`)
+          throw new Error(`Error trying to get user's likes: ${err}`)
     })
     this.businessId = this.$route.params.businessId
     this.listingId = this.$route.params.listingId
@@ -132,7 +133,6 @@ export default {
     setCurrency(country) {
       axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
         .then(response => {
-          console.log(response)
           this.currency = { //need symbol and code
             symbol: response.data[0].currencies[0].symbol,
             code: response.data[0].currencies[0].code
