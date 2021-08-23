@@ -236,7 +236,7 @@ describe('Listing notification functionality tests', () => {
 
     test("Liked listing view button redirects to listing page on click", async () => {
         await wrapper.vm.$nextTick();
-        let button = wrapper.find(".view-listing-button");
+        let button = wrapper.find("#view-listing-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
