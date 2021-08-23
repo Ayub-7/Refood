@@ -56,13 +56,13 @@
                   Min Closing Date:
                 </h3>
                 <vs-input class="filter-input" v-model="minClosingDate" :danger="(errors.includes('past-min-date'))"
-                          danger-text="Date can not be in past." type="datetime-local" style="font-size: 24px"/>
+                          danger-text="Date can not be in past." type="date" style="font-size: 24px"/>
               </div>
                 <div class="vert-row">
                   <h3 class="filter-label">Max Closing Date:
                   </h3>
                   <vs-input class="filter-input" v-model="maxClosingDate" :danger="(errors.includes('past-max-date'))"
-                            danger-text="Max closing date must be after min date and in future" type="datetime-local"  style="font-size: 24px"/>
+                            danger-text="Max closing date must be after min date and in future" type="date" style="font-size: 24px"/>
                 </div>
             </div>
             </div>
