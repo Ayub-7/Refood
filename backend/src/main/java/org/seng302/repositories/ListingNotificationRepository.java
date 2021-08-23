@@ -20,4 +20,6 @@ public interface ListingNotificationRepository extends JpaRepository<ListingNoti
     List<ListingNotification> findListingNotificationByBusinessId(long id);
 
     ListingNotification findListingNotificationsByUserIdAndListing(long id, Listing listing);
+
+    List<ListingNotification> findListingNotificationsByListing(Listing listing);
 }

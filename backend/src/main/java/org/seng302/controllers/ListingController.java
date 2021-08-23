@@ -245,6 +245,12 @@ public class ListingController {
             }
             listingLikeRepository.delete(like);
         }
+        List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationsByListing(listing);
+        for (ListingNotification notification: listingNotifications) {
+            if (notification.getStatus() != NotificationStatus.BOUGHT) {
+                listingNotificationRepository.delete(notification);
+            }
+        }
         listingRepository.delete(listing);
         if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).size() == 1) {
             inventoryRepository.delete(inventory);
