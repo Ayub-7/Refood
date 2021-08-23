@@ -396,7 +396,7 @@ const Search = {
     getBusinessTypes: function() {
       api.getBusinessTypes()
         .then((response) => {
-          this.businessTypes = response.data
+          this.availableBusinessTypes = response.data
         }).catch((err) => {
           if (err.response) {
             if(err.response.status === 401) {
