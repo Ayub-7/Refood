@@ -386,7 +386,7 @@ describe('Messaging', () => {
     });
 });
 
-describe('Messaging returns', await () => {
+describe('Messaging returns', async () => {
     test('When a modified card is saved, User is notified, card closes and delete event', () => {
         api.modifyCard = jest.fn(() => {
             return Promise.resolve({status: 201, data: {messageId: 1}});
