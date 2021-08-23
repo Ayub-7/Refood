@@ -213,29 +213,6 @@ export default {
       api.getListingNotifications(store.loggedInUserId)
         .then((res) => {
           this.listingNotifications = res.data;
-          let tempList = [];
-          for (let i=0; i < this.listingNotifications.length; i++) {
-            let alreadyThere = false;
-            for (let j = 0; j < tempList.length; j++) {
-              if (tempList[j].boughtListing !== null) {
-                if (this.listingNotifications[i].boughtListing !== null) {
-                  if (this.listingNotifications[i].boughtListing.product.name === tempList[j].boughtListing.product.name) {
-                    alreadyThere = true;
-                  }
-                }
-              } else {
-                if (this.listingNotifications[i].listing !== null) {
-                  if (this.listingNotifications[i].listing.inventoryItem.product.name === tempList[j].listing.inventoryItem.product.name) {
-                    alreadyThere = true;
-                  }
-                }
-              }
-            }
-            if (!alreadyThere) {
-              tempList.push(this.listingNotifications[i]);
-            }
-          }
-          this.listingNotifications = tempList;
           this.combineFeedMessages();
         })
         .catch((error) => {
