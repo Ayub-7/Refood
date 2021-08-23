@@ -150,9 +150,7 @@ const Search = {
   name: "Search",
   data: function() {
     return {
-      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade", "Administrative and Support Services",
-        "Agriculture Forestry and Fishing", "Arts and Recreation Services", "Construction", "Education and Training", "Electricity, Gas, Water and Waste Services", "Financial and Insurance Services", "Health Care and Social Assistance",
-        "Information Media and Telecommunication", "Manufacturing", "Mining", "Professional, Scientific and Technical Services", "Public Administration and Safety", "Rental Hiring and Real Estate Services", "Transport, Postal and Warehousing", "Wholesale Trade", "Other Services"],
+      availableBusinessTypes: [],
       businessType: null,
       tableLoaded: false,
       searchbarUser: "",
@@ -213,6 +211,7 @@ const Search = {
       this.isDGAA = true;
     }
     this.setMobileMode()
+    this.getBusinessTypes();
   },
 
   created() {
@@ -390,6 +389,24 @@ const Search = {
               this.tableLoaded = true;
             }
           })
+    },
+
+    /**
+     * Gets all business types from the database, to
+     * be used by business type filter
+     * */
+    getBusinessTypes: function() {
+      api.getBusinessTypes()
+          .then((response) => {
+            this.businessTypes = response.data
+          }).catch((err) => {
+        if(err.response.status === 401) {
+          this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
+        }
+        else {
+          this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+        }
+      });
     },
 
     /**

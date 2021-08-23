@@ -145,7 +145,6 @@ const SearchListings = {
       listings: [],
       searchbarListings: "",
       businessTypes: [],
-      // businessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
       errors: [],
       toggle: [1,1,1,1,1],
       filteredListings: [],

@@ -69,8 +69,7 @@ const BusinessRegister = {
   name: "BusinessRegister",
   data: function () {
     return {
-      availableBusinessTypes: ["Accommodation and Food Services", "Charitable organisation", "Non-profit organisation", "Retail Trade"],
-
+      availableBusinessTypes: [],
       errors: [],
       businessName: "",
 
@@ -242,6 +241,24 @@ const BusinessRegister = {
     },
 
     /**
+     * Gets all business types from the database, to
+     * be used by business type filter
+     * */
+    getBusinessTypes: function() {
+      api.getBusinessTypes()
+          .then((response) => {
+            this.availableBusinessTypes = response.data
+          }).catch((err) => {
+        if(err.response.status === 401) {
+          this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
+        }
+        else {
+          this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+        }
+      });
+    },
+
+    /**
      * Set the country as the new country.
      * @param selectedCountry the country string to set as.
      */
@@ -280,6 +297,7 @@ const BusinessRegister = {
         }).catch(() => {
       this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
     });
+    this.getBusinessTypes();
   }
 
 

@@ -101,7 +101,7 @@
             <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
           </div>
           <div class="lln-button-group">
-            <vs-button class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+            <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
           </div>
         </div>
       </vs-card>
