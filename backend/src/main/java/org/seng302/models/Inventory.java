@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Entity class that holds the information of a businesss product inventory.
+ * Entity class that holds the information of a business product inventory.
  */
 @Data
 @Entity
@@ -55,7 +55,8 @@ public class Inventory {
 
     protected Inventory() { }
 
-    public Inventory(String productId, long businessId, int quantity, double pricePerItem, double totalPrice, Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
+    public Inventory(String productId, long businessId, int quantity, double pricePerItem, double totalPrice,
+                     Date manufacturedDate, Date sellByDate, Date bestBeforeDate, Date expiryDate) {
         this.productId = productId;
         this.businessId = businessId;
         this.quantity = quantity;
@@ -97,21 +98,12 @@ public class Inventory {
      */
     private boolean validInventoryRequest(NewInventoryRequest req) {
         Date today = Calendar.getInstance().getTime();
-        if(req.getQuantity() < 1 || req.getTotalPrice() < 0 || req.getPricePerItem() < 0) {
-            return false;
-        } else if (req.getExpires() == null || req.getExpires().before(today)) {
-            return false;
-        } else if (req.getManufactured() != null && req.getManufactured().after(today)) {
-            return false;
-        } else if (req.getSellBy() != null && req.getSellBy().before(today)) {
-            return false;
-        } else if (req.getBestBefore() != null && req.getBestBefore().before(today)) {
-            return false;
-        } else if (req.getBestBefore() != null && req.getBestBefore().after(req.getExpires())) {
-            return false;
-        }
-
-        return true;
+        return !((req.getQuantity() < 1 || req.getTotalPrice() < 0 || req.getPricePerItem() < 0) ||
+                req.getExpires() == null || req.getExpires().before(today) ||
+                req.getManufactured() != null && req.getManufactured().after(today) ||
+                req.getSellBy() != null && req.getSellBy().before(today) ||
+                req.getBestBefore() != null && (req.getBestBefore().before(today) ||
+                        req.getBestBefore().after(req.getExpires())));
 
     }
 

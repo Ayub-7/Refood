@@ -47,7 +47,7 @@ const actingAs =  {
       role: null,
       userBusinesses: [],
       actingAsBusinessId: null,
-      actingAsBusinessName: null
+      actingAsBusinessName: null,
     }
   },
   methods: {
@@ -95,6 +95,7 @@ const actingAs =  {
         if(error.response) {
           this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
         }
+
         this.$log.debug("Error Status:", error)
       });
     },

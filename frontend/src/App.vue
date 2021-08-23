@@ -37,6 +37,9 @@
         </vs-navbar-item>
         <!-- Acting As User -->
         <div v-if="getActingAsUserId() == null" class="sub-navbar-group">
+          <vs-navbar-item index="1-1">
+            <router-link @click.native="refreshCachedItems" :to="{path: '/search-listings'}">Browse Listings</router-link>
+          </vs-navbar-item>
           <vs-navbar-item index="2-0">
             <router-link @click.native="refreshCachedItems" to="/marketplace">Marketplace</router-link>
           </vs-navbar-item>
@@ -157,6 +160,13 @@ const app = {
     refreshCachedItems() {
       if (sessionStorage.getItem('businessesCache') !== null) {
         sessionStorage.removeItem("businessesCache");
+      }
+      if (sessionStorage.getItem('listingSearchCache') !== null) {
+        sessionStorage.removeItem("listingSearchCache");
+      }
+
+      if (sessionStorage.getItem("previousListing") !== null) {
+        sessionStorage.removeItem("previousListing");
       }
     }
   },

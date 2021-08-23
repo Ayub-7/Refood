@@ -4,6 +4,10 @@
     <div v-if="fromSearch" class="return-button">
       <vs-button @click="returnToSearch()" title="Go Back">Return To Search</vs-button>
     </div>
+    <div v-else-if="fromListing" class="return-button">
+      <vs-button @click="returnToListing()" title="Go Back">Return To Listing</vs-button>
+    </div>
+
     <div id="container" v-if="this.business != null">
       <!-- Left Side Business Information Panel -->
       <div id="business-name-container">
@@ -63,6 +67,7 @@ const Business = {
   // App's initial state.
   data: function () {
     return {
+      fromListing: sessionStorage.getItem("previousListing"),
       fromSearch: sessionStorage.getItem("businessesCache"),
       business: null,
       adminList: null,
@@ -106,6 +111,10 @@ const Business = {
 
     returnToSearch: function() {
       this.$router.push({path: '/search'})
+    },
+
+    returnToListing: function() {
+      this.$router.push({path: `/businesses/${this.business.id}/listings/${this.fromListing}`})
     },
 
     checkUserSession: function() {

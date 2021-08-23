@@ -37,12 +37,14 @@
           </div>
 
           <!-- If search query returns more than 10 products then this should be active -->
-          <div id="grid-pagination">
-            <div class="displaying">Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of
-              {{ filteredProducts.length }}</div>
+          <div class="grid-pagination">
+            <div class="displaying">
+              Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of {{ filteredProducts.length }}
+            </div>
             <div v-if="filteredProducts.length > 10" style="display: flex;">
-              <vs-button type="border" class='prevNextSearchButton' @click="decreaseSearchRange()">Previous</vs-button>
-              <vs-button type="border" class='prevNextSearchButton' @click="increaseSearchRange()">Next</vs-button>
+              <div v-if="filteredProducts.length > productsPerPage" style="display: flex;">
+                <vs-pagination v-model="currentPage" :total="Math.round(products.length/productsPerPage +0.4)"/>
+              </div>
             </div>
           </div>
         </div>
@@ -52,7 +54,7 @@
         <div v-if="displaytype">
           <div class="grid-container" style="margin: auto">
             <vs-card class="grid-item"
-                    v-for="product in filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)"
+                    v-for="product in filteredProducts.slice(productsPerPage*(currentPage-1),currentPage*productsPerPage)"
                     v-bind:href="product.id"
                     :key="product.id">
 
@@ -101,7 +103,18 @@
               </div>
             </vs-card>
           </div>
+          <div class="grid-pagination" style="justify-content: flex-end">
+            <div class="displaying" style="margin: auto 1em auto auto;">
+              Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of {{ filteredProducts.length }}
+            </div>
+            <div v-if="filteredProducts.length > 10" style="display: flex;">
+              <div v-if="filteredProducts.length > productsPerPage" style="display: flex;">
+                <vs-pagination v-model="currentPage" :total="Math.round(products.length/productsPerPage +0.4)"/>
+              </div>
+            </div>
+          </div>
         </div>
+
 
 
         <div v-if="!displaytype">
@@ -109,7 +122,7 @@
             entries within the page by matching the search field to the product's firstname, middlename or lastname -->
             <!-- When each heading is clicked, the sortByName() function is called, passing the json field name and a reference to the toggle array -->
 
-            <vs-table :data="filteredProducts.slice(productSearchIndexMin, productSearchIndexMax)" style="border-spacing: 0 20px; margin: 1em" stripe>
+            <vs-table :data="filteredProducts.slice(productsPerPage*(currentPage-1),currentPage*productsPerPage)" style="border-spacing: 0 20px; margin: 1em" stripe>
                 <template slot="thead" style="background:blue">
                   <vs-th sort-key="id" style="border-radius: 4px 0 0 0;">
                       <div>ID</div>
@@ -183,8 +196,9 @@
                     <td></td>
                     <td class="displaying">Displaying {{ searchRange[0] }}-{{ searchRange[1] }} of
                       {{ filteredProducts.length }}</td>
-                    <td><vs-button class='prevNextSearchButton' type='border' @click="decreaseSearchRange()">Previous</vs-button></td>
-                    <td><vs-button class='prevNextSearchButton' type='border' @click="increaseSearchRange()">Next</vs-button></td>
+                    <div class="title-centre">
+                      <vs-pagination v-model="currentPage" :total="Math.round(products.length/productsPerPage +0.4)"/>
+                    </div>
                   </tr>
                   </tfoot>
                 </template>
@@ -215,6 +229,8 @@ const ProductCatalogue = {
       products: [],
       business: null,
       businessId: null,
+      currentPage: 1,
+      productsPerPage: 12,
 
       errors: [],
       toggle: [1,1,1,1,1],
@@ -245,7 +261,6 @@ const ProductCatalogue = {
 
         api.getBusinessProducts(this.businessId)
             .then((innerResponse) => {
-              this.$log.debug("Data loaded: ", innerResponse.data);
               this.products = innerResponse.data;
               this.filteredProducts = innerResponse.data;
             })
@@ -602,7 +617,7 @@ export default ProductCatalogue;
   margin-bottom: 1em;
 }
 
-#grid-pagination {
+.grid-pagination {
   margin: auto 0 auto auto;
   display: flex;
 }
@@ -629,7 +644,7 @@ th {
     flex-direction: column;
   }
 
-  #grid-pagination {
+  .grid-pagination {
     margin: 1em auto 0 0;
   }
 

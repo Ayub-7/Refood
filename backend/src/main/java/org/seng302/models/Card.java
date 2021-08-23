@@ -26,7 +26,7 @@ public class Card {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
     private String title;
     private String description;
@@ -132,8 +132,7 @@ public class Card {
 
         Calendar displayPeriodEndCalendar = Calendar.getInstance();
         displayPeriodEndCalendar.add(Calendar.DAY_OF_YEAR, displayPeriod);
-        Date displayPeriodEndDate = displayPeriodEndCalendar.getTime();
-        return displayPeriodEndDate;
+        return displayPeriodEndCalendar.getTime();
     }
 
     /**

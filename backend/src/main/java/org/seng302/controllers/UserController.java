@@ -5,16 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
-import org.seng302.models.Message;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
-import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -52,7 +55,6 @@ public class UserController {
 
 //    @Autowired
     private UserRepository userRepository;
-    private MessageRepository messageRepository;
 
 //    @Autowired
     private UserFinder userFinder;
@@ -89,18 +91,15 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpSession session) throws NoSuchAlgorithmException, JsonProcessingException {
         User existingUser = userRepository.findUserByEmail(loginRequest.getEmail());
-        if (existingUser != null) {
-            if (Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
-                UserIdResponse userIdResponse = new UserIdResponse(existingUser);
-                session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
-                Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+        if (existingUser != null && Encrypter.hashString(loginRequest.getPassword()).equals(existingUser.getPassword())) {
+            UserIdResponse userIdResponse = new UserIdResponse(existingUser);
+            session.setAttribute(User.USER_SESSION_ATTRIBUTE, existingUser);
+            Authentication auth = new UsernamePasswordAuthenticationToken(existingUser.getEmail(), existingUser.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + existingUser.getRole()));
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
-                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(userIdResponse));
-
-            }
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(userIdResponse));
         }
-        
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -131,7 +130,7 @@ public class UserController {
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
             List<String> registrationErrors = registrationUserCheck(user);
-            if (registrationErrors.size() == 0) { // No errors found.
+            if (registrationErrors.isEmpty()) { // No errors found.
                 User newUser = new User(user);
                 userRepository.save(newUser);
 
@@ -211,14 +210,70 @@ public class UserController {
     }
 
     /**
+     * Creates a sort object to be used by pageRequest to sort search results.
+     * @param sortString
+     * @return Sort sortBy Sort specification
+     * @throws ResponseStatusException
+     */
+    private Sort getSortType(String sortString) throws ResponseStatusException {
+        Sort sortBy = Sort.by(Sort.Order.asc("email").ignoreCase());
+        switch (sortString) {
+            case "firstNameAsc":
+                sortBy = Sort.by(Sort.Order.asc("firstName").ignoreCase()).and(sortBy);
+                break;
+            case "lastNameAsc":
+                sortBy = Sort.by(Sort.Order.asc("lastName").ignoreCase()).and(sortBy);
+                break;
+            case "cityAsc":
+                sortBy = Sort.by(Sort.Order.asc("homeAddress.city").ignoreCase()).and(sortBy);
+                break;
+            case "countryAsc":
+                sortBy = Sort.by(Sort.Order.asc("homeAddress.country").ignoreCase()).and(sortBy);
+                break;
+            case "emailAsc":
+                break;
+            case "firstNameDesc":
+                sortBy = Sort.by(Sort.Order.desc("firstName").ignoreCase()).and(sortBy);
+                break;
+            case "lastNameDesc":
+                sortBy = Sort.by(Sort.Order.desc("lastName").ignoreCase()).and(sortBy);
+                break;
+            case "cityDesc":
+                sortBy = Sort.by(Sort.Order.desc("homeAddress.city").ignoreCase()).and(sortBy);
+                break;
+            case "countryDesc":
+                sortBy = Sort.by(Sort.Order.desc("homeAddress.country").ignoreCase()).and(sortBy);
+                break;
+            case "emailDesc":
+                sortBy = Sort.by(Sort.Order.desc("email").ignoreCase());
+                break;
+            default:
+                logger.error("400 error - invalid sort by parameter {}", sortString);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid sortString");
+        }
+        return sortBy;
+    }
+
+
+    /**
      * This method retrieves user information by name.
      * @param query Body of the incoming request.
      * @return Http status code and list of users with name/names matching request.
      */
     @GetMapping("/users/search")
-    public  ResponseEntity<String> searchUser(@RequestParam(name="searchQuery") String query) throws JsonProcessingException {
-        System.out.println("search called");
-        List<User> users = userFinder.queryByName(query);
+    public  ResponseEntity<String> searchUser(@RequestParam(name="searchQuery") String query,
+                                              @RequestParam(name="pageNum") int pageNum,
+                                              @RequestParam(defaultValue="firstNameAsc") String sortString) throws JsonProcessingException {
+        logger.debug("search called");
+        Sort sortType;
+        try {
+            sortType = getSortType(sortString);
+        } catch (ResponseStatusException err) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err.getMessage());
+        }
+        PageRequest pageRequest = PageRequest.of(pageNum, 10, sortType);
+        Specification<User> matches = userFinder.findUsers(query);
+        Page<User> users = userRepository.findAll(matches, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
     }
 
@@ -251,10 +306,8 @@ public class UserController {
         }
 
         User self = (User) session.getAttribute("user");
-        if (self != null) {
-            if (self.getId() == id) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
+        if (self != null && self.getId() == id) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         userRepository.updateUserRole(id, Role.USER);

@@ -4,12 +4,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.finders.BusinessFinder;
@@ -25,16 +24,20 @@ import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.util.LinkedMultiValueMap;
 
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
+
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests relating to the REST Business Controller.
@@ -54,7 +57,7 @@ class BusinessControllerTests {
     @Autowired
     ObjectMapper mapper;
     @MockBean
-    private BusinessFinder businessFinder;
+    BusinessFinder businessFinder;
 
     User ownerUser;
     User adminUser;
@@ -76,7 +79,6 @@ class BusinessControllerTests {
         business.createBusiness(ownerUser);
         business.getAdministrators().add(adminUser);
         assertThat(business.getAdministrators().size()).isEqualTo(2);
-
     }
 
     @Test
@@ -360,26 +362,116 @@ class BusinessControllerTests {
     }
 
     @Test
-    void noSessionBusinessSearch() throws Exception {
-        MvcResult results = mvc.perform(get("/businesses/search")
+    void testNoSessionBusinessSearch() throws Exception {
+        mvc.perform(get("/businesses/search")
                 .param("query", "Pizza"))
-                .andReturn();
-        assert results.getResponse().getStatus() == HttpStatus.UNAUTHORIZED.value();
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
-    void loggedInBusinessSearch() throws Exception {
-        MvcResult results = mvc.perform(get("/businesses/search")
+    void testSuccessfulBusinessSearch() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("type", "");
+        requestParams.add("page", "0");
+
+        List<Business> businessList = new ArrayList<Business>();
+        businessList.add(business);
+        Mockito.when(businessRepository.findAll()).thenReturn(businessList);
+
+        mvc.perform(get("/businesses/search")
+                .params(requestParams))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testSuccessfulBusinessSearchWithSortParameter() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("type", "");
+        requestParams.add("page", "0");
+        requestParams.add("sortString", "countryDesc");
+
+        List<Business> businessList = new ArrayList<Business>();
+        businessList.add(business);
+        Mockito.when(businessRepository.findAll()).thenReturn(businessList);
+
+        mvc.perform(get("/businesses/search")
+                .params(requestParams))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testBusinessSearchWithBadSortParameter() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("query", "Business1");
+        requestParams.add("type", "");
+        requestParams.add("page", "0");
+        requestParams.add("sortString", "badSortString");
+
+        List<Business> businessList = new ArrayList<Business>();
+        businessList.add(business);
+
+        mvc.perform(get("/businesses/search")
+                .params(requestParams))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void loggedInBusinessSearch_newBusinessType_returns200() throws Exception {
+        mvc.perform(get("/businesses/search")
                 .param("query", "Pizza")
-                .param("type", "Retail Trade"))
-                .andReturn();
-        assert results.getResponse().getStatus() == HttpStatus.OK.value();
+                .param("type", "AGRICULTURE FORESTRY AND FISHING")
+                .param("page", "0")
+                .param("sortString", ""))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void loggedInBusinessSearch_newBusinessType2_returns200() throws Exception {
+        mvc.perform(get("/businesses/search")
+                .param("query", "Pizza")
+                .param("type", "INFORMATION MEDIA AND TELECOMMUNICATION")
+                .param("page", "0")
+                .param("sortString", ""))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void loggedInBusinessSearch_InvalidBusinessType_returns200() throws Exception {
+        mvc.perform(get("/businesses/search")
+                .param("query", "Pizza")
+                .param("type", ".,/.,1!#@@%^$^&*(())sauiul';';")
+                .param("page", "0")
+                .param("sortString", ""))
+                .andExpect(status().isOk());
     }
 
 
+    @Test
+    void getTypesMethod_GetsAllTypes() throws Exception {
+        List<BusinessType> types = businessController.getAllTypes();
+        Assertions.assertEquals(types.size(), BusinessType.values().length);
+    }
 
+    @Test
+    @WithMockUser
+    void getBusinessTypes_loggedIn_returns200() throws Exception {
+        mvc.perform(get("/businesses/types")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isOk());
+    }
 
-
-
+    @Test
+    void getBusinessTypes_noAuth_returns401() throws Exception {
+        mvc.perform(get("/businesses/types")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isUnauthorized());
+    }
 }

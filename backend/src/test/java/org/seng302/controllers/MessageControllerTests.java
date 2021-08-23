@@ -1,16 +1,13 @@
 package org.seng302.controllers;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.seng302.controllers.MessageController;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.requests.NewMessageRequest;
@@ -32,8 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = MessageController.class)
@@ -62,8 +58,7 @@ class MessageControllerTests {
     private Card cardA;
     private Card cardB;
 
-
-
+    private Message message;
     private List<Message> messages;
 
     @BeforeEach
@@ -73,13 +68,11 @@ class MessageControllerTests {
         testUserB = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ItqVNvM2JBA");
         testUserB.setId(2L);
 
-
-
         NewCardRequest cardRequest = new NewCardRequest(testUserA.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         Card card = new Card(cardRequest, testUserA);
 
-        Message message = new Message(testUserB, testUserA, card, "hello", new Date());
+        message = new Message(testUserB, testUserA, card, "hello", new Date());
         cardRequest = new NewCardRequest(testUserA.getId(), "Card Title", "Desc", "Test, Two", MarketplaceSection.FORSALE);
 
         cardA = new Card(cardRequest, testUserA);
@@ -239,6 +232,59 @@ class MessageControllerTests {
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(newMessageRequest)))
                 .andExpect(status().isForbidden());
+    }
+
+    //
+    // DELETE - Message by id
+    //
+    @Test
+    void deleteMessage_noAuth_returnUnauthorized() throws Exception {
+        mvc.perform(delete("/messages/{messageId}", 1))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void deleteMessage_noExistingMessage_returnNotAcceptable() throws Exception {
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(null);
+
+        mvc.perform(delete("/messages/{messageId}", message.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void deleteMessage_wrongUserAndNotGAA_returnForbidden() throws Exception {
+        message.getReceiver().setId(5);
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(message);
+
+        mvc.perform(delete("/messages/{messageId}", message.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    void deleteMessage_isUser_returnOk() throws Exception {
+        message.setReceiver(testUserB);
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(message);
+
+        mvc.perform(delete("/messages/{messageId}", message.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void deleteMessage_isDgaa_returnOk() throws Exception {
+        message.getReceiver().setId(5);
+        testUserB.setRole(Role.DGAA);
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(message);
+
+        mvc.perform(delete("/messages/{messageId}", message.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
+                .andExpect(status().isOk());
     }
 
 

@@ -381,7 +381,6 @@ export default {
       }
       else if (this.description.length > 250){
         this.editErrors.description.error = true;
-        this
       }
       else {
         this.editErrors.title.error = false;
@@ -559,13 +558,6 @@ export default {
 
 .title-input { /* Is being used. */
   margin-bottom: 0;
-}
-
-.edit-error {
-  font-size: 10px;
-  position: relative;
-  color: #FF4757;
-  margin-left: 8px;
 }
 
 </style>

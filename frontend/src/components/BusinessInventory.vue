@@ -1,9 +1,12 @@
 <template>
-  <vs-card id="container">
+  <vs-card id="container" class="listing-card">
     <div id="header-container">
-      <div id="title"> Inventory </div>
+      <div style="display: flex;">
+        <div id="title"> Inventory </div>
+      </div>
       <div id="header-buttongroup">
         <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/products`)">Product Catalogue</vs-button>
+        <vs-button class="header-button" @click="$router.push(`/businesses/${$route.params.id}/sales-history`)">Sales History</vs-button>
       </div>
     </div>
 
@@ -81,8 +84,12 @@
         <vs-tr v-for="inventory in data" :key="inventory.id">
           <vs-td id="productIdCol" :data="inventory.productId">
           {{inventory.productId}}
-          <div style="height: 80px">
-            <ReImage :imagePath="inventory.product.primaryImagePath" class="inventory-image"/>
+          <div style="height: 80px" @click="openFullProductModal(inventory)">
+            <vs-tooltip text="Click here for more product details">
+              <vs-tooltip :text="inventory.product.description" title="Description" position="bottom">
+                <ReImage :imagePath="inventory.product.primaryImagePath" class="inventory-image"/>
+              </vs-tooltip>
+            </vs-tooltip>
           </div>
             </vs-td>
           <vs-td :data="inventory.productName" class="product-cell"> {{inventory.productName}} </vs-td>
@@ -107,6 +114,27 @@
       </template>
     </vs-table>
     <ModifyInventory ref="modifyInventoryModal" @submitted="onSuccess" :item="activeModifyItem"></ModifyInventory>
+
+    <!-- SHOW FULL PRODUCT INFO MODAL -->
+    <!-- Accessed by pressing the image of the product. -->
+    <vs-popup id="full-product-modal" title="Full Product" :active.sync="showFullProduct" v-if="showFullProduct">
+      <div>
+        <ReImage :image-path="selectedProduct.primaryImagePath" class="full-image"/>
+      </div>
+
+      <div style="font-size: 13pt; height:100%; line-height: 1.5; display:flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: column; justify-content: space-between">
+          <div style="font-size: 16px; font-weight: bold;  text-align: justify; word-break: break-all; margin-top: 4px;">{{ selectedProduct.name }} </div>
+          <p>{{ selectedProduct.id }}</p>
+        </div>
+        <vs-divider></vs-divider>
+        <div style="font-size: 16px; font-weight: bold; height: 24px;">{{ selectedProduct.manufacturer }} </div>
+        <p style="font-size: 14px; margin-bottom: 8px;">Created: {{ selectedProduct.created }} </p>
+        <div style="height: 75px; font-size: 14px; overflow-y: auto; ">{{ selectedProduct.description }} </div>
+      </div>
+
+      <div style="font-size: 25pt; font-weight: bold; margin: auto 0" >{{currency + selectedProduct.recommendedRetailPrice }} </div>
+    </vs-popup>
   </vs-card>
 </template>
 
@@ -144,6 +172,9 @@ export default {
       price: 0.0,
       moreInfo: "",
       closes: "",
+
+      showFullProduct: false,
+      selectedProduct: null,
     }
   },
 
@@ -178,15 +209,13 @@ export default {
     },
 
     getInventory() {
-      let filteredInventory = this.inventory.filter(item => (item.quantity>0));
-      return filteredInventory;
+      return this.inventory.filter(item => (item.quantity>0));
     },
 
     getProducts(businessId) {
       api.getBusinessProducts(businessId)
         .then((response) => {
           this.products = response.data;
-          this.$log.debug("Data loaded: ", this.products);
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -194,7 +223,6 @@ export default {
         });
 
     },
-
 
     /**
      * Validates the fields for a new public listing.
@@ -262,6 +290,11 @@ export default {
       }
     },
 
+    openFullProductModal: function(inventory) {
+      this.showFullProduct = true;
+      this.selectedProduct = inventory.product;
+    },
+
     /**
      * Closes the new listing modal, and reset error fields.
      */
@@ -295,7 +328,7 @@ export default {
       });
     },
 
-    /** 
+    /**
      * Calls API get businessInventory function, also adds new fields to inventory object for sorting and sets default order
     */
     getBusinessInventory() {
@@ -350,8 +383,10 @@ export default {
   }
 
   .header-button {
-    margin: 0 1em;
+    margin: 0 0.5em;
+    width: 150px;
   }
+
 
   /* ===== NEW LISTING DIALOG/PROMPT ====== */
 
@@ -480,10 +515,17 @@ export default {
   }
 
   .inventory-image >>> img {
+    cursor: pointer;
     width: 100px;
     border-radius: 4px;
     object-fit: cover;
   }
+
+  .inventory-image:hover {
+    transition: opacity 0.3s;
+    opacity: 0.5;
+  }
+
 
   .image >>> img {
     margin: auto;

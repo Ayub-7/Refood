@@ -20,6 +20,10 @@ api.getUserFromID = jest.fn(() => {
     return Promise.resolve({data: mockUser, status: 200});
 });
 
+api.getBusinessTypes = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+
 
 let $vs = {
     notify: jest.fn()

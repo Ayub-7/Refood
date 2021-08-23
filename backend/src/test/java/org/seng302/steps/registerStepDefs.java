@@ -1,4 +1,4 @@
-package org.seng302.team900.steps;
+package org.seng302.steps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.Before;
@@ -99,6 +99,6 @@ public class registerStepDefs {
 
     @Then("Password is hashed and not stored in plain text")
     public void passwordIsHashedAndNotStoredInPlainText() throws JsonProcessingException {
-        assertThat(this.userRepository.findUserByEmail(em).getPassword() != pass);
+        assertThat(this.userRepository.findUserByEmail(em).getPassword()).isNotEqualTo(pass);
     }
 }

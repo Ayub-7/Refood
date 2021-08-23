@@ -210,7 +210,7 @@ public class ProductController {
      * @throws IOException Thrown when file writing fails.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
-    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws Exception {
+    public ResponseEntity<String> addProductImage(@PathVariable long businessId, @PathVariable String productId, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws InvalidImageExtensionException, IOException {
         Business business = businessRepository.findBusinessById(businessId);
         if (business == null)  {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
@@ -238,9 +238,9 @@ public class ProductController {
         }
 
         // Check if business' own folder directory exists - make directory if false.
-        File businessDir = new File(rootImageDir + "business_" + businessId);
+        File businessDir = new File(String.format("%sbusiness_%d", rootImageDir, businessId));
         if (businessDir.mkdirs()) {
-            logger.info("Image of business directory did not exist - new directory created of " + businessDir.getPath());
+            logger.info(String.format("Image of business directory did not exist - new directory created of %s", businessDir.getPath()));
         }
 
         String id = "";
@@ -249,9 +249,9 @@ public class ProductController {
 
         while (!freeImage) {
             id = String.valueOf(count);
-            File checkFile1 = new File(businessDir + "/" + id + ".jpg");
-            File checkFile2 = new File(businessDir + "/" + id + ".png");
-            File checkFile3 = new File(businessDir + "/" + id + ".gif");
+            File checkFile1 = new File(String.format("%s/%s.jpg", businessDir, id));
+            File checkFile2 = new File(String.format("%s/%s.png", businessDir, id));
+            File checkFile3 = new File(String.format("%s/%s.gif", businessDir, id));
             if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
                 count++;
             }
@@ -260,8 +260,8 @@ public class ProductController {
             }
         }
 
-        File file = new File(businessDir + "/" + id + imageExtension);
-        File thumbnailFile = new File( businessDir + "/" + id + "_thumbnail" + imageExtension);
+        File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
+        File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
         System.out.println(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
@@ -272,9 +272,9 @@ public class ProductController {
         product.addProductImage(newImage);
         if (product.getPrimaryImagePath() == null) {
             if (System.getProperty("os.name").startsWith("windows")) {
-                product.setPrimaryImage("business_" + businessId + "\\" + id + imageExtension);
+                product.setPrimaryImage(String.format("business_%d\\%s%s", businessId, id, imageExtension));
             } else {
-                product.setPrimaryImage("business_" + businessId + "/" + id + imageExtension);
+                product.setPrimaryImage(String.format("business_%d/%s%s", businessId, id, imageExtension));
             }
         }
         productRepository.save(product);
@@ -290,7 +290,7 @@ public class ProductController {
      * @return ResponseEntity with the appropriate status codes - 200, 401, 403, 406.
      */
     @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
-    public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) throws IOException {
+    public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session) {
         Business business = businessRepository.findBusinessById(businessId);
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         Product product = productRepository.findProductByIdAndBusinessId(productId, businessId);
@@ -322,16 +322,15 @@ public class ProductController {
         extensions.add(".gif");
         for (String ext: extensions) {
             Path path = Paths.get(imageDir + ext);
-            System.out.println(path.toString());
             if (Files.exists(path)) {
                 extension = ext;
                 break;
             }
         }
         if (System.getProperty("os.name").startsWith("Windows")) {
-            product.setPrimaryImage("business_" + businessId + "\\" + imageId + extension);
+            product.setPrimaryImage(String.format("business_%d\\%s%s", businessId, imageId, extension));
         } else {
-            product.setPrimaryImage("business_" + businessId + "/" + imageId + extension);
+            product.setPrimaryImage(String.format("business_%d/%s%s", businessId, imageId, extension));
         }
         productRepository.save(product);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -342,11 +341,11 @@ public class ProductController {
          * @param businessId unique identifier of the business that the image is relating to.
          * @param productId product identifier that the image is relating to.
          * @param image a multipart image of the file
-         * @return
+         * @return ResponseEntity<String>
          * @throws IOException
          */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
-    public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session, HttpServletRequest request) throws Exception {
+    public ResponseEntity<String> deleteProductImage(@PathVariable long businessId, @PathVariable String productId, @PathVariable String imageId, HttpSession session, HttpServletRequest request) throws IOException {
         String imageExtension = "";
         Business business = businessRepository.findBusinessById(businessId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -373,7 +372,6 @@ public class ProductController {
         }
 
         //finds correct image path
-        boolean freeImage = false;
         String imageDir = rootImageDir + "business_" + businessId + "/" + imageId;
         boolean pathExists = false;
         List<String> extensions = new ArrayList<>();
@@ -389,7 +387,7 @@ public class ProductController {
             }
         }
         File businessDir = new File(rootImageDir + "business_" + businessId);
-        File checkFile = new File(businessDir + "/" + imageId + imageExtension);
+        File checkFile = new File(String.format("%s/%s%s", businessDir, imageId, imageExtension));
         if (pathExists) {
             product.deleteProductImage(imageId);
             productRepository.save(product);

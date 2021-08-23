@@ -4,9 +4,9 @@
           <vs-row id="marketRow">
             <!-- Change vs-lg to 2 if you want 6 per row or 3 if you want 4 per row -->
             <vs-col id="marketCard" type="flex" vs-justify="center" vs-align="center" vs-lg="3" vs-sm="12" v-for="card in cardData" :key="card.id">
-              <div style="margin: 10px; width: 90%;" @click="openCardModal(card)">
+              <div id="bOpenModal" style="margin: 10px; width: 90%;" @click="openCardModal(card)">
                 <!-- Marketplace Card -->
-                <vs-card>
+                <vs-card class="listing-card">
                   <div>
                     <div v-if="showSection" class="section">{{displaySection(card.section)}}</div>
                     <div id="cardCreationDate">{{card.created}}</div>
@@ -83,17 +83,13 @@ export default {
       if (section === "ForSale") return "For Sale";
       return section;
     }
-    },
-
-
-
-
+  },
 }
 
 
 </script>
 
-<style>
+<style scoped>
 
 #card-modal-message-button {
   margin-left: 5px;
@@ -174,5 +170,9 @@ export default {
   box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
+.listing-card:hover {
+  filter: brightness(75%);
+  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+}
 
 </style>

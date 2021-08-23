@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
+import org.seng302.finders.ProductFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewProductRequest;
 import org.seng302.repositories.BusinessRepository;
@@ -51,6 +52,8 @@ class ProductControllerTest {
     private ProductRepository productRepository;
     @MockBean
     private FileService fileService;
+    @MockBean
+    private ProductFinder productFinder;
     @Autowired
     private ObjectMapper mapper;
 
@@ -73,8 +76,8 @@ class ProductControllerTest {
         business.createBusiness(user);
         business.setId(1L);
 
-        product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
-        product2 = new Product("07-4957066", 1, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
+        product1 = new Product("07-4957066", business, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
+        product2 = new Product("07-4957066", business, "Seedlings", "Buckwheat, Organic", "Bad Manufacturer", 1.26, new Date());
         image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
 
         //Mocking body of PUT request

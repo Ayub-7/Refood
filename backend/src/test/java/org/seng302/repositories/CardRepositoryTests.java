@@ -11,6 +11,10 @@ import org.seng302.models.requests.NewCardRequest;
 import org.seng302.models.MarketplaceSection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestConstructor;
 
@@ -117,8 +121,9 @@ class CardRepositoryTests {
      */
     @Test
     void findInventoryBySectionExpectsList() {
-        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.FORSALE);
-        assertThat(cardList.size()).isEqualTo(2);
+        Pageable mockPageable = PageRequest.of(0, 10, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "created").ignoreCase())));
+        Page<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.FORSALE, mockPageable);
+        assertThat(cardList.getTotalElements()).isEqualTo(2);
     }
 
     /**
@@ -129,8 +134,9 @@ class CardRepositoryTests {
      */
     @Test
     void findInventoryBySectionExpectsEmptyList() {
-        List<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED);
-        assertThat(cardList.size()).isEqualTo(0);
+        Pageable mockPageable = PageRequest.of(1, 10, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "created").ignoreCase())));
+        Page<Card> cardList = cardRepository.findAllBySection(MarketplaceSection.WANTED, mockPageable);
+        assertThat(cardList.getTotalElements()).isZero();
     }
 
     /**
@@ -140,10 +146,10 @@ class CardRepositoryTests {
      * deleted by deleteCardById(testCard.id)
      */
     @Test
-    public void deleteCardByIdExpectsEmptyList() {
+    void deleteCardByIdExpectsEmptyList() {
         cardRepository.deleteCardById(testCard1.getId());
         Card card1 = cardRepository.findCardById(testCard1.getId());
-        assertThat(card1).isEqualTo(null);
+        assertThat(card1).isNull();
     }
 
     /**

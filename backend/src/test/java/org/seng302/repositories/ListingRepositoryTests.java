@@ -8,13 +8,16 @@ import org.seng302.models.Address;
 import org.seng302.models.Listing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.security.NoSuchAlgorithmException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
 
 import org.seng302.repositories.InventoryRepository;
 import org.seng302.repositories.ListingRepository;
@@ -32,7 +35,11 @@ import java.util.List;
 
 @ContextConfiguration(classes = TestApplication.class)
 @DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ListingRepositoryTests {
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Autowired
     private ListingRepository listingRepository;
@@ -57,6 +64,13 @@ class ListingRepositoryTests {
 
     @BeforeEach
     void setUp() {
+        listingRepository.deleteAll();
+        listingRepository.flush();
+        inventoryRepository.deleteAll();
+        inventoryRepository.flush();
+        productRepository.deleteAll();
+        productRepository.flush();
+
         Calendar calendar = Calendar.getInstance();
         Date dateCreated = calendar.getTime();
         calendar.add(Calendar.YEAR, 2);
@@ -65,14 +79,18 @@ class ListingRepositoryTests {
         assertThat(inventoryRepository).isNotNull();
         assertThat(inventoryRepository).isNotNull();
 
-        Product testProd1 = new Product("77-9986231", 2, "Seedlings", "Buckwheat, Organic", "Nestle", 1.26, new Date());
-        Product testProd2 = new Product("77-5088639", 2, "Foam Cup", "6 Oz", "Edible Objects Ltd.",55.2, new Date());
+        Business business = new Business("Business Name", "Description here.", null, BusinessType.RETAIL_TRADE);
+        entityManager.persist(business);
+        entityManager.flush();
+
+        Product testProd1 = new Product("77-9986231", business, "Seedlings", "Buckwheat, Organic", "Nestle", 1.26, new Date());
+        Product testProd2 = new Product("77-5088639", business, "Foam Cup", "6 Oz", "Edible Objects Ltd.",55.2, new Date());
 
         productRepository.save(testProd1);
         productRepository.save(testProd2);
 
-        testInven1 = new Inventory("77-9986231", 2, 5, 2.0, 10.0, dateCreated,dateCloses, dateCloses, dateCloses);
-        testInven2 = new Inventory("77-5088639", 2, 7, 4.0, 28.0, dateCreated,dateCloses, dateCloses, dateCloses);
+        testInven1 = new Inventory("77-9986231", 1, 5, 2.0, 10.0, dateCreated,dateCloses, dateCloses, dateCloses);
+        testInven2 = new Inventory("77-5088639", 1, 7, 4.0, 28.0, dateCreated,dateCloses, dateCloses, dateCloses);
 
         inventoryRepository.save(testInven1);
         inventoryRepository.save(testInven2);

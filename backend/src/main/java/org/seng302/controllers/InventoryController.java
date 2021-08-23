@@ -5,6 +5,7 @@ import org.seng302.models.*;
 import org.seng302.models.requests.NewInventoryRequest;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
+import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class with endpoints for searching, adding, modifying, or deleting Inventory.
+ */
 @RestController
 public class InventoryController {
 
@@ -28,6 +32,9 @@ public class InventoryController {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ListingRepository listingRepository;
 
     /**
      * Get request mapping for getting business inventory by business id
@@ -55,6 +62,7 @@ public class InventoryController {
         }
 
         List<Inventory> inventoryItems = inventoryRepository.findInventoryByBusinessId(business.getId());
+        inventoryItems.removeIf(inventory -> inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).isEmpty());
         return ResponseEntity.status(HttpStatus.OK).body(inventoryItems);
     }
 

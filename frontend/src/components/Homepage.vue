@@ -21,6 +21,7 @@
             <!-- When each list item is clicked, redirects to the relevant page in the application -->
             <vs-button class="left-nav-item" id="bus-profile-btn" @click.native='goToProfile()'>Business Profile</vs-button>
             <vs-button class="left-nav-item" id="bus-catalogue-btn" @click.native='goToProductCatalogue()'>Product Catalogue</vs-button>
+            <vs-button class="left-nav-item" @click.native='goToSalesHistory()'>Sales History</vs-button>
           </div>
           </div>
           <div class="userinfo-container" v-else>
@@ -28,25 +29,64 @@
               <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()'>Profile</vs-button>
               <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
               <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()">My Cards</vs-button>
+              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'">Browse Listings</vs-button>
             </div>
           </div>
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container">
-          <h3>Watchlist:</h3>
+          <div id="watchlist-header-container">
+            <div style="display: flex;">
+              <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
+              <div class="watchlist-title">
+                Watchlist
+              </div>
+            </div>
+            <span style="margin: auto 0;">{{likes}}</span>
+          </div>
+          <vs-divider style="margin-top: -30px"></vs-divider>
+          <div v-for="(item, index) in likedItem" :key="item.id" >
+            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
+              <div id="likes-notification-container">
+                <vs-row v-if="item.likes != 0">
+                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                    <vs-tooltip text="View Listing">
+                      <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                    </vs-tooltip>
+                    <vs-tooltip text="Unlike">
+                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
+                    </vs-tooltip>
+                  </vs-col>
+                </vs-row>
+                <vs-row v-else>
+                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                    <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
+                  </vs-col>
+                </vs-row>
+                <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+              </div>
+            </vs-card>
+          </div>
         </div>
-
       </div>
+
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
         <main>
           <nav id="newsfeed-navbar">
-            <div class="name" style="text-align: center;">
-              News Feed
+            <div class="newsfeed-title">
+              <span style="display: inline-block; vertical-align: middle;">
+                <vs-icon icon="feed" />
+              </span>
+               News Feed
             </div>
           </nav>
-
-          <HomePageMessages v-if="getBusinessId() == null"></HomePageMessages>
+          <vs-divider style="padding: 0 1em;"/>
+          <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
         </main>
+
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
         <MarketplaceGrid @cardRemoved="getUserCards(userId)" :cardData="cards.slice((currentCardPage-1)*4, currentCardPage*4)" showSection></MarketplaceGrid>
@@ -65,12 +105,18 @@ import api from "../Api";
 import {mutations, store} from "../store"
 import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
+import ListingDetail from "./ListingDetail";
+import axios from "axios";
 
 const Homepage = {
   name: "Homepage",
-  components: {HomePageMessages, MarketplaceGrid},
+  components: {ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
+      unliked: false,
+      showListing: false,
+      likes: 0,
+      likedItem: [],
       userId: null,
       businesses: [],
       actingAsBusinessId: null,
@@ -79,10 +125,74 @@ const Homepage = {
       cards: [],
       currentCardPage: 1,
       user: null,
+      currencySymbol: "$",
     }
+  },
+  /**
+   * Sets the userId variable equal to the userId from the store when the component
+   * is first rendered, then gets the users details from the backend using the API
+   */
+  mounted() {
+    this.checkUserSession();
+    this.getLikes(this.userId);
   },
 
   methods: {
+    /**
+     * Sets display currency based on the user's home country.
+     * @param country country for which currency is going to be retrieved
+     */
+    setCurrency(country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+        .then(response => {
+          this.currencySymbol = response.data[0].currencies[0].symbol;
+        })
+        .catch(err => {
+          this.$log.debug(err);
+      });
+    },
+
+    /**
+     * open listing
+     */
+    viewListing: function (businessId, listingId) {
+      this.$router.push({name: "Listing", params: {businessId: businessId, listingId: listingId}})
+    },
+
+    /**
+     * unlike an item
+     */
+    unlike: function (id, index) {
+      this.likes -= 1;
+      this.likedItem.splice(index, 1)
+      api.removeLikeFromListing(id)
+      .then(() => {
+        this.$vs.notify({title: "Successfully unliked listing", color: "success"});
+      })
+      .catch((error) => {
+        if (error.response) {
+          this.$vs.notify({title: "Error unliking listing", color: "danger"});
+        }
+        this.$log.debug(error);
+      })
+
+    },
+    /**
+     * Retrieves all the cards that the user has liked.
+     */
+    getLikes: function(userId) {
+      api.getUserLikedListings(userId)
+        .then((res) => {
+          this.likedItem = res.data;
+          this.likes = res.data.length;
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving likes", color: "danger"});
+          }
+        })
+    },
+
     /**
      * Retrieves all the cards that the user has created.
      */
@@ -92,23 +202,23 @@ const Homepage = {
       });
       this.cards = [];
       api.getUserCards(id)
-          .then((res) => {
-            this.cards = res.data;
-            for(let i = 0; i < this.cards.length; i++){
-              if(!this.cards[i].user.homeAddress){
-                this.cards[i].user = this.user;
-              }
+        .then((res) => {
+          this.cards = res.data;
+          for(let i = 0; i < this.cards.length; i++){
+            if(!this.cards[i].user.homeAddress){
+              this.cards[i].user = this.user;
             }
-          })
-          .catch((error) => {
-            if (error.response) {
-              this.$vs.notify({title: "Error retrieving cards", color: "danger"});
-            }
-            this.$log.debug(error);
-          })
-          .finally(() => {
-            this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
-          });
+          }
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving cards", color: "danger"});
+          }
+          this.$log.debug(error);
+        })
+        .finally(() => {
+          this.$vs.loading.close(`.vs-popup > .con-vs-loading`);
+        });
     },
 
     /**
@@ -145,12 +255,12 @@ const Homepage = {
     openMarketModal: function() {
       this.showMarketModal = true;
       api.checkSession()
-          .then(() => {
-            this.getUserCards(this.user.id);
-          })
-          .catch((error) => {
-            this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
-          });
+        .then(() => {
+          this.getUserCards(this.user.id);
+        })
+        .catch((error) => {
+          this.$vs.notify({title:'Error getting session info', text:`${error}`, color:'danger'});
+        });
     },
 
     /**
@@ -232,33 +342,80 @@ const Homepage = {
       this.$router.push({path: `/businesses/${this.getBusinessId()}/products`});
     },
 
+    goToSalesHistory: function() {
+      this.$router.push({path: `/businesses/${this.getBusinessId()}/sales-history`});
+    },
+
     checkUserSession: function() {
       api.checkSession()
-          .then((response) => {
-            this.getUserDetails(response.data.id);
-          })
-          .catch((error) => {
-            this.$log.error("Error checking sessions: " + error);
-            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-          });
+        .then((response) => {
+          this.getUserDetails(response.data.id);
+        })
+        .catch((error) => {
+          this.$log.error("Error checking sessions: " + error);
+          this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
+        });
     }
   },
-
-  /**
-   * Sets the userId variable equal to the userId from the store when the component
-   * is first rendered, then gets the users details from the backend using the API
-   */
-  mounted: function () {
-    this.checkUserSession();
-  }
-
-
 }
 
 export default Homepage;
 </script>
 
 <style scoped>
+#message-notification-card {
+  min-height: 100px;
+}
+
+.con-vs-card >>> .vs-card--content {
+  margin-bottom: 4px;
+}
+
+#product-name {
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#product-closes {
+  font-size: 12px;
+}
+
+#view-icon {
+  font-size: 16px;
+  margin-left: -1px;
+  cursor: pointer;
+  transition: font-size 0.3s;
+}
+
+#view-unlike-icon {
+  font-size: 16px;
+  margin-left: -1px;
+  cursor: pointer;
+  transition: font-size 0.3s;
+}
+
+#view-icon:hover {
+  transition: font-size 0.3s;
+  font-size: 20px!important;
+}
+
+#like-icon:hover {
+  transition: font-size 0.3s;
+  font-size: 20px!important;
+}
+
+#like-icon {
+  font-size: 16px;
+  cursor: pointer;
+  transition: font-size 0.3s;
+}
+
+#unlike-icon {
+  font-size: 13px;
+  margin-left: 150px;
+  cursor: pointer
+}
 
 #market-card-modal >>> .vs-popup {
   width: 1200px;
@@ -275,31 +432,40 @@ export default Homepage;
 
 #container {
   display: grid;
-  grid-template-columns: 1fr 1fr 4fr 1fr;
+  grid-template-columns: 0.5fr 1fr 4fr 0.5fr;
   grid-template-rows: 1fr auto;
   grid-column-gap: 1em;
   margin: auto;
   padding: 0 2em;
 }
 
-
 /* Top Name Container */
 #name-container {
   grid-column: 2 / 4;
   grid-row: 1;
   text-align: center;
-  background-color: transparent;
+  background-color: white;
   padding: 15px 0 15px 0;
   border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
 }
 
 .name {
   font-size: 32px;
   padding: 0.5em 0;
   line-height: 1.2em;
+}
+
+#business-name {
+  font-size: 32px;
+  margin: auto;
+}
+
+.newsfeed-title {
+  font-size: 24px;
+  padding: 4px 0 0 0.5em;
 }
 
 /* Side-bar panel on left side */
@@ -316,7 +482,7 @@ export default Homepage;
 .sub-container {
   padding: 2em;
   border-radius: 4px;
-  box-shadow: 0 11px 35px 2px rgba(0, 0, 0, 0.14);
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
   background-color: #FFFFFF;
 }
 
@@ -329,11 +495,17 @@ export default Homepage;
   grid-row-gap: 2em;
 }
 
-#watchlist-container h3 {
-  font-weight: 400;
-  margin: 0 auto;
-  widows: 100%;
+#watchlist-header-container {
+  display: flex;
+  justify-content: space-between;
 }
+
+.watchlist-title {
+  font-size: 18px;
+  margin: auto auto auto 2px;
+  transition: 0.3s;
+}
+
 /* News feed styles. */
 main {
   grid-column: 3;
@@ -350,10 +522,7 @@ main {
   grid-row: 1;
   font-size: 18px;
   padding-top: 1em;
-  padding-bottom: 1em;
-  box-shadow: 0 0 35px 0 rgba(0, 0, 0, 0.14);
-  border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
+  padding-left: 4px;
 }
 
 /* left navigation panel styling */
@@ -369,6 +538,13 @@ main {
   letter-spacing: 1px;
 }
 
+@media screen and (max-width: 1200px) {
+  .watchlist-title {
+    transition: 0.3s;
+    font-size: 16px;
+    margin-left: 0;
+  }
+}
 
 /* For when the screen gets too narrow - mainly for mobile view */
 @media screen and (max-width: 700px) {
@@ -397,6 +573,12 @@ main {
 
   #newsfeed-navbar {
     align-content: center;
+  }
+
+  .watchlist-title {
+    font-size: 18px;
+    margin-left: 4px;
+    transition: 0.3s;
   }
 
 }

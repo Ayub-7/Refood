@@ -2,6 +2,7 @@ package org.seng302.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.hibernate.annotations.Formula;
 import org.seng302.models.requests.NewListingRequest;
 
 import javax.xml.bind.ValidationException;
@@ -31,6 +32,9 @@ public class Listing {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date closes;
 
+    @Formula("(select count(*) from listing_like l where l.listing_id = id)")
+    private int likes; // Will not appear as a column
+
     /**
      * Constructor a new Listing object. Id not included.
      * @param inventoryItem item that this Listing object will represent.
@@ -47,6 +51,7 @@ public class Listing {
         this.moreInfo = moreInfo;
         this.created = created;
         this.closes = closes;
+        this.likes = 0;
     }
 
 
@@ -69,11 +74,18 @@ public class Listing {
             this.moreInfo = newListingRequest.getMoreInfo();
             this.created = new Date();
             this.closes = newListingRequest.getCloses();
+            this.likes = 0;
         } else {
             throw new ValidationException("Listing request item is not valid!");
         }
     }
 
+    /**
+     * Checks if the new listing details are valid.
+     * @param inventoryItem the inventory item the listing is associated with.
+     * @param req the dto class that holds the details to be checked.
+     * @return true if all details are valid, false otherwise.
+     */
     private boolean validListingRequest(Inventory inventoryItem, NewListingRequest req) {
         Date today = Calendar.getInstance().getTime();
         if(inventoryItem == null){

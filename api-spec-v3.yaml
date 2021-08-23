@@ -15,7 +15,6 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 
 tags:
-  # User stories
   - name: 'U1: Registering and logging into an individual account'
   - name: 'U2: Cities, States/Regions, Countries'
     description: 'This story is implemented inside the client alone, and as such requires no associated API endpoints to be created'
@@ -43,6 +42,8 @@ tags:
   - name: 'UCM7: Keyword search'
   - name: 'UCM8: Contacting other marketplace users'
   - name: 'UCM9: Edit card'
+  - name: 'U29 : Browse/search sale listings'
+  - name: 'U31 : Purchases'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -288,15 +289,23 @@ paths:
             type: string
           required: true
           description: 'Criteria to search for businesses by business type'
+        - in: query
+          name: page
+          schema:
+            type: string
+          required: true
+          description: 'Search page number'
       responses:
         '200':
-          description: Request successful, a (possibly empty) list of businesses is returned
+          description: Request successful, a page object is returned with a (possibly empty) list of businesses as content, with up to ten results
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Business'
+                  $ref: '#/components/schemas/BusinessPage'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -891,6 +900,40 @@ paths:
               - ForSale
               - Wanted
               - Exchange
+
+        - name: pageNum
+          in: query
+          description: On frontend, 1 will be passed to start from first page.
+          required: true
+          schema:
+            type: integer
+        - name: resultsPerPage
+          in: query
+          description: Number of cards per page.
+          required: true
+          schema:
+            type: integer
+
+        - name: sortBy
+          in: query
+          description: Can sort by the following attributes; CREATED, TITLE, COUNTRY, and KEYWORDS.
+            If the parameter is not passed, the default sorting is CREATED.
+          required: false
+          schema:
+            type: string
+            enum:
+              - CREATED
+              - TITLE
+              - COUNTRY
+              - KEYWORDS
+
+
+        - name: reverse
+          in: query
+          description: False by default, but if true, the list will be sorted in descending order.
+          required: false
+          schema:
+            type: boolean
       security:
         - CookieAuth:
             - user
@@ -909,6 +952,105 @@ paths:
           $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+
+  '/listings/{listingId}/notify':
+    post:
+      tags:
+        - 'Listings / sales'
+        - 'U31 : Purchases'
+      summary: Notify a user about any changes of items they liked or purchased.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: listingId
+          schema:
+            type: integer
+          description: Id of the listing that has been updated
+          required: true
+          example: 54343
+      responses:
+        '201':
+          description: Successful notification
+        '401':
+          description: Cannot send a notification to a user when the sender is
+            not logged in.
+        '406':
+          description: Listing ID not found
+
+  '/users/{userId}/notifications':
+    get:
+      tags:
+        - 'Listings / sales'
+        - 'U31 : Purchases'
+      summary: User can retrieve all notifications related to listings they have received.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          description: Id of the user who is about to receive the notification
+          required: true
+          example: 111
+      responses:
+        '200':
+          description: Successful retrieval of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListOfNotifications'
+        '401':
+          description: Cannot send a notification to a user when the receiver is
+            not logged in.
+        '400':
+          description: Bad request
+        '406':
+          description: User ID not found
+
+
+  '/businesses/{businessId}/notifications':
+    get:
+      tags:
+        - 'Listings / sales'
+        - 'U31 : Purchases'
+      summary: Business can retrieve all notifications related to listings they have sold.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: businessId
+          schema:
+            type: integer
+          description: Id of the business who is about to receive the notification
+          required: true
+          example: 111
+      responses:
+        '200':
+          description: Successful retrieval of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListOfNotifications'
+        '401':
+          description: Cannot send a notification to a user when the receiver is
+            not logged in.
+        '400':
+          description: Bad request
+        '406':
+          description: Business ID not found
+
 
   '/cards/{id}':
     get:
@@ -1339,6 +1481,153 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
+  '/business/types':
+    get:
+      tags:
+        - 'Business Accounts'
+        - 'U29 : Browse/search sale listings'
+      summary: Retrieve all of the business type enums and return them as the string values.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Retrieves all business types in array of strings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessTypesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  '/businesses/listings':
+    post:
+      tags:
+        - 'Listing / sales'
+        - 'U29 : Browse/search sale listings'
+      summary: Search across all business listings with (optional) given parameters.
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: query
+          name: count
+          schema:
+            type: number
+          description: 'How many results per page to return'
+          example: '10'
+        - in: query
+          name: offset
+          schema:
+            type: number
+          description: 'How many pages to skip before returning the results'
+          example: '2'
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+          description: 'Which direction to sort by: asc, desc. Invalid directions default to asc'
+          example: 'desc'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessListingSearchRequest'
+      responses:
+        '200':
+          description: Retrieves a (potentially empty) paginated list of listings.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Listing'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  '/businesses/listings/{id}/like':
+    post:
+      tags:
+        - 'Listings / sales'
+        - 'U29 : Browse/search sale listings'
+      summary: Add a user like to a sale listing
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Id of the listing
+          required: true
+          example: 50
+      responses:
+        '201':
+          description: The listing was successfully liked
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+    delete:
+      tags:
+        - 'Listings / sales'
+        - 'U29 : Browse/search sale listings'
+      summary: Delete a user like on a listing
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Id of the listing
+          required: true
+          example: 50
+      responses:
+        '200':
+          description: The listing like was successfully removed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
+  '/users/{id}/likes':
+    get:
+      tags:
+        - 'Users'
+        - 'U29 : Browse/search sale listings'
+      summary: Retrieved all liked listings for a specific user
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Id of the user to obtain likes from
+          required: true
+          example: 3
+      responses:
+        '200':
+          description: A (potentially empty) list of liked listings was retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Listing'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
 components:
   securitySchemes:
@@ -1358,7 +1647,7 @@ components:
     AuthenticatedResponse:
       description: >
         Response returned to client when they have performed an action to gain authentication (registering or logging in).
-        This response includes a session token that the client can use in future API requests to authenticate itself. 
+        This response includes a session token that the client can use in future API requests to authenticate itself.
         This session token is set as a cookie with name 'JSESSIONID', and will need to be included in subsequent requests to the server.
       content:
         application/json:
@@ -1503,6 +1792,11 @@ components:
           format: date-time
           example: '2021-07-21T23:59:00Z'
           description: Date and time when the listing closes (defaults to expiry date of related inventory item)
+        likes:
+          type: number
+          format: integer
+          example: 10
+          description: The number of likes the listing has received (defaults to 0)
 
     InventoryItem:
       type: object
@@ -1588,10 +1882,10 @@ components:
           type: string
           example: 'WATT-420-BEANS'
           description: >
-            Developers can choose whether or not to make this a required field (i.e user 
-            specified vs. auto-generated). In the case that the team automatically 
-            generates the IDs, they should still allow this field to be present when 
-            creating (POST) or modifying (PUT) a product, and then simply ignore its 
+            Developers can choose whether or not to make this a required field (i.e user
+            specified vs. auto-generated). In the case that the team automatically
+            generates the IDs, they should still allow this field to be present when
+            creating (POST) or modifying (PUT) a product, and then simply ignore its
             value (i.e do not return a 400 code if it is present but not needed). An
             ID only needs to be unique within its catalogue, not system-wide.
         name:
@@ -1622,6 +1916,123 @@ components:
           description: List of images of a product (implemented in U16).
           items:
             $ref: '#/components/schemas/Image'
+
+    BusinessPage:
+      type: object
+      description: Business search page
+      properties:
+        content:
+          type: object
+          example: [
+            {
+              "name": "Grain n Simple",
+              "id": 5,
+              "administrators": [
+                {
+                  "id": 5,
+                  "firstName": "Shermy",
+                  "middleName": "Pearle",
+                  "lastName": "Layborn",
+                  "nickname": "artificial intelligence",
+                  "bio": "Intuitive client-server standardization",
+                  "email": "playborn4@amazon.com",
+                  "dateOfBirth": "2000-12-30",
+                  "phoneNumber": "+62 527 277 7359",
+                  "homeAddress": {
+                    "streetNumber": "5",
+                    "streetName": "Hagan Avenue",
+                    "suburb": null,
+                    "city": "Chengdong",
+                    "region": null,
+                    "country": "China",
+                    "postcode": null
+                  },
+                  "created": "2020-10-17 00:47:11",
+                  "role": "USER",
+                  "businessesAdministered": null
+                },
+                {
+                  "id": 9,
+                  "firstName": "Ruthe",
+                  "middleName": "Ogdan",
+                  "lastName": "Ruit",
+                  "nickname": "Open-architected",
+                  "bio": "Configurable coherent capacity",
+                  "email": "oruit8@reddit.com",
+                  "dateOfBirth": "1995-05-10",
+                  "phoneNumber": "+62 283 517 0351",
+                  "homeAddress": {
+                    "streetNumber": "9885",
+                    "streetName": "Oak Parkway",
+                    "suburb": null,
+                    "city": "Ambato",
+                    "region": null,
+                    "country": "Ecuador",
+                    "postcode": null
+                  },
+                  "created": "2020-09-24 18:01:34",
+                  "role": "USER",
+                  "businessesAdministered": null
+                },
+                {
+                  "id": 8,
+                  "firstName": "Elysee",
+                  "middleName": "Maurene",
+                  "lastName": "Took",
+                  "nickname": "benchmark",
+                  "bio": "Team-oriented interactive installation",
+                  "email": "mtook7@chron.com",
+                  "dateOfBirth": "1985-11-09",
+                  "phoneNumber": "+234 186 824 2303",
+                  "homeAddress": {
+                    "streetNumber": "5",
+                    "streetName": "Utah Terrace",
+                    "suburb": null,
+                    "city": "Huangfang",
+                    "region": null,
+                    "country": "China",
+                    "postcode": null
+                  },
+                  "created": "2020-10-31 22:39:42",
+                  "role": "USER",
+                  "businessesAdministered": null
+                }
+              ],
+              "primaryAdministratorId": 5,
+              "description": "Praesent blandit. Nam nulla.",
+              "address": {
+                "streetNumber": "302",
+                "streetName": "Forest Run Place",
+                "suburb": null,
+                "city": "Putinci",
+                "region": null,
+                "country": "Serbia",
+                "postcode": null
+              },
+              "businessType": "Retail Trade",
+              "created": "2020-05-22 20:21:22"
+            }
+          ]
+        pageable:
+          type: object
+          example: {
+            "sort": {
+              "sorted": false,
+              "unsorted": true,
+              "empty": true
+            },
+            "offset": 0,
+            "pageNumber": 0,
+            "pageSize": 10,
+            "unpaged": false,
+            "paged": true}
+        totalPages:
+          type: integer
+          example: 10
+        totalElements:
+          type: integer
+          example: 73
+
 
     Business:
       type: object
@@ -1660,6 +2071,23 @@ components:
             - Retail Trade
             - Charitable organisation
             - Non-profit organisation
+            - Administrative and Support services
+            - Agriculture, Forestry and Fishing
+            - Arts and Recreation Services
+            - Construction
+            - Education and Training
+            - Electricity, Gas, Water and Waste Services
+            - Financial and Insurance Services
+            - Health Care and Social Assistance
+            - Information Media and Telecommunication
+            - Manufacturing
+            - Mining
+            - Professional, Scientific and Technical Services
+            - Public Administration and Safety
+            - Rental, Hiring and Real Estate Services
+            - Transport, Postal and Warehousing
+            - Wholesale Trade
+            - Other Services
         created:
           type: string
           format: date-time
@@ -1811,3 +2239,126 @@ components:
           example: '2021-07-07 17:59:00'
           readOnly: true
           description: The time and date when the message was sent to the receiver
+    BusinessTypesResponse:
+      type: array
+      items:
+        type: string
+        enum:
+          - Accommodation and Food Services
+          - Retail Trade
+          - Charitable organisation
+          - Non-profit organisation
+          - Administrative and Support services
+          - Agriculture, Forestry and Fishing
+      example:
+        - Accommodation and Food Services
+        - Retail Trade
+        - Charitable organisation
+        - Non-profit organisation
+        - Administrative and Support services
+        - Agriculture, Forestry and Fishing
+      description: Get all business types
+    BusinessListingSearchRequest:
+      type: object
+      properties:
+        businessQuery:
+          type: string
+          description: 'Search for all, or part of the name of a business'
+          example: 'Dabshot'
+        productQuery:
+          type: string
+          description: 'Search for all, or part of the name of a seller'
+          example: 'Apples'
+        addressQuery:
+          type: string
+          description: 'Search for all, or part of the sellers address'
+          example: 'Christchurch'
+        sortBy:
+          type: string
+          description: 'Sort by a specific category'
+          example: 'price'
+        businessTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - Accommodation and Food Services
+              - Retail Trade
+              - Charitable organisation
+              - Non-profit organisation
+          description: "Search for one or more business type(s)"
+        minPrice:
+          type: number
+          format: double
+          description: 'Limit the results by setting a minimum price range'
+          example: '5.00'
+        maxPrice:
+          type: number
+          format: double
+          description: 'Limit the results by setting a maximum price range'
+          example: '25.00'
+        minClosingDate:
+          type: string
+          format: date
+          description: 'Limit the results by setting a minimum closing date'
+          example: '2021-09-09 12:00:00'
+        maxClosingDate:
+          type: string
+          format: date
+          description: 'Limit the results by setting a maximum closing date'
+          example: '2021-09-12 12:00:00'
+
+    ListingLike:
+      type: object
+      description: An entity representing a user liking a sale listing
+      required:
+        - user
+        - listing
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        listing:
+          $ref: '#/components/schemas/Listing'
+
+    ListingNotification:
+      type: object
+      description: An entity representing a notification associated with a listing
+      required:
+        - id
+        - user
+        - listing
+        - status
+      properties:
+        id:
+          type: number
+          description: Unique id of the notification
+          example: 5
+        user:
+          $ref: '#/components/schemas/User'
+        listing:
+          $ref: '#/components/schemas/Listing'
+        status:
+          type: string
+          description: The status of the notification
+          enum:
+            - Expired
+            - Bought
+        created:
+          type: string
+          format: date
+          description: The date the notification was created
+          readOnly: true
+
+    ListOfNotifications:
+      example: [{id: 43,
+                 userId: 50,
+                 listingId: 30,
+                 status: Expired,
+                 created: '2021-04-27'
+      },
+        {id: 50,
+         userId: 60,
+         listingId: 40,
+         status: Expired,
+         created: '2021-05-27'
+        }]

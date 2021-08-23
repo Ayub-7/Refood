@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7c0383c0-664d-43f9-b5e6-8f84302c8dbc",
+		"_postman_id": "82ac8e1c-cca3-47ee-8d0f-34b6098d39a0",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -247,11 +247,153 @@
 					"response": []
 				},
 				{
-					"name": "Search businesses",
+					"name": "Search businesses with type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body does not contain other types\", function () {",
+									"    pm.expect(pm.response.text()).to.not.include(\"Accommodation and Food Services\");",
+									"    pm.expect(pm.response.text()).to.not.include(\"Charitable organisation\");",
+									"    pm.expect(pm.response.text()).to.not.include(\"Non-profit organisation\");  ",
+									"     ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": "{{URL}}/businesses/search?query=&type=Retail Trade",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": ""
+								},
+								{
+									"key": "type",
+									"value": "Retail Trade"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search businesses with no type and query",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Dabshots\");",
+									"});",
+									"",
+									"var data = ",
+									"",
+									"",
+									"pm.test('Only one result is returned', function () {",
+									"    pm.expect(pm.response.json().length).to.equal(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/search?query=Dabshots&type=",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Dabshots"
+								},
+								{
+									"key": "type",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get business types",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Checks if correct status",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"//Checks if correct values are there",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Accommodation and Food Services\");",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Information Media and Telecommunication\");",
+									"});",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Electricity, Gas, Water and Waste Services\");",
+									"});",
+									"",
+									"pm.test(\"All business types are returned\", function () {",
+									"    pm.expect(pm.response.json().length).to.equal(21)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/types",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"types"
+							]
+						}
 					},
 					"response": []
 				}
@@ -387,6 +529,204 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Inventory Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/1/inventory",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"1",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listings",
+			"item": [
+				{
+					"name": "Retrieve Sale Listings",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sortBy\": \"businessType\",\r\n    \"minPrice\": 10.00,\r\n    \"maxPrice\": 20.00,\r\n    \"minClosingDate\": \"2021-09-01 06:00:00\",\r\n    \"maxClosingDate\": \"2021-09-30 23:59:59\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/listings?count=10&offset=0&sortDirection=asc",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings"
+							],
+							"query": [
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "sortDirection",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Listings by title or businesss",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings?page=10&count=10&query=dabshot",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "10"
+								},
+								{
+									"key": "count",
+									"value": "10"
+								},
+								{
+									"key": "query",
+									"value": "dabshot"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like Listing",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id/like",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete listing",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Listing Notification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/listings/:listingId/notify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"listings",
+								":listingId",
+								"notify"
+							],
+							"variable": [
+								{
+									"key": "listingId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Listing Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -399,13 +739,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/:id",
+							"raw": "{{URL}}/businesses/:id/products",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
 								"businesses",
-								":id"
+								":id",
+								"products"
 							],
 							"variable": [
 								{
@@ -577,7 +918,200 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Cards by Section",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/cards?section=ForSale&pageNum=1&resultsPerPage=3&reverse=true",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"cards"
+							],
+							"query": [
+								{
+									"key": "section",
+									"value": "ForSale"
+								},
+								{
+									"key": "pageNum",
+									"value": "1"
+								},
+								{
+									"key": "resultsPerPage",
+									"value": "3"
+								},
+								{
+									"key": "sortBy",
+									"value": "country",
+									"disabled": true
+								},
+								{
+									"key": "reverse",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Likes",
+			"item": [
+				{
+					"name": "Add New Like",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/listings/:id/like",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								"listings",
+								":id",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Liked Listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/likes",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"likes"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Listing Notification",
+			"item": [
+				{
+					"name": "Add Listing Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/listings/:listingId/notify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"listings",
+								":listingId",
+								"notify"
+							],
+							"variable": [
+								{
+									"key": "listingId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Listing Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:userId/notifications",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"notifications"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Business Listing Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/notifications",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"notifications"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								}
+							]
+						}
 					},
 					"response": []
 				}
@@ -607,7 +1141,8 @@
 	"variable": [
 		{
 			"key": "URL",
-			"value": "localhost:9499"
+			"value": "localhost:9499",
+			"type": "string"
 		}
 	]
 }

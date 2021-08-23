@@ -9,6 +9,7 @@ import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
+import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,6 +44,8 @@ class InventoryControllerTests {
     private ProductRepository productRepository;
     @MockBean
     private InventoryRepository inventoryRepository;
+    @MockBean
+    private ListingRepository listingRepository;
     @Autowired
     private ObjectMapper mapper;
 
@@ -72,7 +75,7 @@ class InventoryControllerTests {
         business.getAdministrators().add(adminUser);
 
 
-        product1 = new Product("07-4957066", 1, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
+        product1 = new Product("07-4957066", business, "Spoon", "Soup, Plastic", "Good Manufacturer", 14.69, new Date());
 
         Calendar afterCalendar = Calendar.getInstance();
         afterCalendar.set(2022, 1, 1);
