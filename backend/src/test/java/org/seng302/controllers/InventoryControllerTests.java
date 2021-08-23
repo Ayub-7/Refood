@@ -9,6 +9,7 @@ import org.seng302.TestApplication;
 import org.seng302.models.*;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.InventoryRepository;
+import org.seng302.repositories.ListingRepository;
 import org.seng302.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,6 +44,8 @@ class InventoryControllerTests {
     private ProductRepository productRepository;
     @MockBean
     private InventoryRepository inventoryRepository;
+    @MockBean
+    private ListingRepository listingRepository;
     @Autowired
     private ObjectMapper mapper;
 

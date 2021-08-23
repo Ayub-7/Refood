@@ -236,7 +236,6 @@ public class ListingController {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(id);
-        Inventory inventory = listing.getInventoryItem();
         for (ListingLike like: userLikes) {
             User user = like.getUser();
             ListingNotification oldNotification = listingNotificationRepository.findListingNotificationsByUserIdAndListing(user.getId(), listing);
@@ -252,10 +251,6 @@ public class ListingController {
             }
         }
         listingRepository.delete(listing);
-        if (inventory.getQuantity() == 0 && listingRepository.findListingsByInventoryItem(inventory).size() == 1) {
-            inventoryRepository.delete(inventory);
-            return ResponseEntity.status(HttpStatus.OK).body("Listing and Inventory Item Deleted");
-        }
         return ResponseEntity.status(HttpStatus.OK).body("Listing Deleted");
     }
 }

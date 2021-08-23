@@ -515,7 +515,7 @@ class ListingControllerTest {
         List<Listing> listings = new ArrayList<>();
         listings.add(listing1);
         Mockito.when(listingRepository.findListingsByInventoryItem(inventory)).thenReturn(listings);
-        mvc.perform(delete("/businesses/listings/1")).andExpect(status().isOk()).andExpect(content().string("Listing and Inventory Item Deleted"));
+        mvc.perform(delete("/businesses/listings/1")).andExpect(status().isOk()).andExpect(content().string("Listing Deleted"));
     }
 //    @Test
 //    @WithMockUser
