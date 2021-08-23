@@ -873,6 +873,10 @@ beforeEach(() => {
         return Promise.resolve({data:{}, status: 200});
     });
 
+    api.getBusinessTypes = jest.fn(() => {
+        return Promise.resolve({status: 200});
+    });
+
 
     wrapper.vm.filterListings = jest.fn();
 });

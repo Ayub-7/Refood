@@ -335,7 +335,6 @@ const Search = {
             this.totalPages = response.data.totalPages;
             this.searchIndexMin = response.data.number * 10 + 1;
             this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
-            console.log(this.users)
             this.$vs.loading.close();
           })
           .catch((error) => {
@@ -373,7 +372,6 @@ const Search = {
             this.businesses = this.businesses.filter(x => typeof(x) == "object");
             this.searchIndexMin = response.data.number*10+1;
             this.searchIndexMax = this.searchIndexMin + response.data.size - 1;
-            console.log(this.businesses);
             this.$vs.loading.close();
           })
           .catch((error) => {
@@ -397,15 +395,20 @@ const Search = {
      * */
     getBusinessTypes: function() {
       api.getBusinessTypes()
-          .then((response) => {
-            this.businessTypes = response.data
-          }).catch((err) => {
-        if(err.response.status === 401) {
-          this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
-        }
-        else {
-          this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
-        }
+        .then((response) => {
+          this.availableBusinessTypes = response.data
+        }).catch((err) => {
+          if (err.response) {
+            if(err.response.status === 401) {
+              this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
+            }
+            else {
+              this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+            }
+          }
+          else {
+            this.$vs.notify({title:'Error', text:`${err}`, color:'danger'});
+          }
       });
     },
 
