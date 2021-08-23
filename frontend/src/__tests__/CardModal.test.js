@@ -386,7 +386,7 @@ describe('Messaging', () => {
     });
 });
 
-describe('Messaging returns', () => {
+describe('Messaging returns', async () => {
     test('When a modified card is saved, User is notified, card closes and delete event', () => {
         api.modifyCard = jest.fn(() => {
             return Promise.resolve({status: 201, data: {messageId: 1}});
@@ -396,42 +396,42 @@ describe('Messaging returns', () => {
         });
         wrapper.vm.keywordList = ["key1", "key2"]
 
-        wrapper.vm.saveCardEdit();
+        await wrapper.vm.saveCardEdit();
 
         expect(wrapper.vm.$vs.notify).toBeCalled();
         expect(wrapper.vm.showing).toBeFalsy();
         expect(wrapper.vm.keywords).toBe('key1 key2 ');
     });
 
-    test('When a modified card is not saved (400), User is notified', () => {
+    test('When a modified card is not saved (400), User is notified', async () => {
         api.modifyCard = jest.fn(() => {
             return Promise.reject({response: { status: 400}});
         });
 
-        wrapper.vm.saveCardEdit();
+        await wrapper.vm.saveCardEdit();
 
         expect(wrapper.vm.$vs.notify).toBeCalled();
         expect(wrapper.vm.keywords).toBe('');
     });
 
 
-    test('When a modified card is not saved (401/403), User is notified', () => {
+    test('When a modified card is not saved (401/403), User is notified', async () => {
         api.modifyCard = jest.fn(() => {
             return Promise.reject({response: {message: "Bad request", status: 403}});
         });
 
-        wrapper.vm.saveCardEdit();
+        await wrapper.vm.saveCardEdit();
 
         expect(wrapper.vm.$vs.notify).toBeCalled();
         expect(wrapper.vm.keywords).toBe('');
     });
 
-    test('When a modified card is not saved with an unspecified error (500), User is notified', () => {
+    test('When a modified card is not saved with an unspecified error (500), User is notified', async () => {
         api.modifyCard = jest.fn(() => {
             return Promise.reject({response: {status: 500}});
         });
 
-        wrapper.vm.saveCardEdit();
+        await wrapper.vm.saveCardEdit();
 
         expect(wrapper.vm.$vs.notify).toBeCalled();
     });
