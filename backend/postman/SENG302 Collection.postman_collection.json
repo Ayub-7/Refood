@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "59a89ad6-cc14-43b8-a9fb-d16ec02c9720",
+		"_postman_id": "8d308419-9ed5-443e-b240-ad264e37ed7e",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1133,6 +1133,36 @@
 								{
 									"key": "id",
 									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Update Notification Status",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/notifications/:notificationId",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"notifications",
+								":notificationId"
+							],
+							"variable": [
+								{
+									"key": "notificationId",
+									"value": "READ",
+									"description": "Enums: UNREAD, READ, IMPORTANT"
 								}
 							]
 						}
