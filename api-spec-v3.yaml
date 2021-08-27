@@ -44,6 +44,7 @@ tags:
   - name: 'UCM9: Edit card'
   - name: 'U29 : Browse/search sale listings'
   - name: 'U31 : Purchases'
+  - name: 'U32 : Managing my feed'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -55,6 +56,8 @@ tags:
     description: 'Grouping of endpoints related to business inventories'
   - name: 'Listings / sales'
     description: 'Grouping of endpoints related to listings of items and the sales of these listings'
+  - name: 'Notifications'
+    description: 'Grouping of endpoints related to user notifications regarding listings'
   - name: 'Cards / community marketplace'
     description: 'Grouping of endpoints related to the community marketplace, and the cards the are created for it'
   - name: 'Keywords'
@@ -956,7 +959,7 @@ paths:
   '/listings/{listingId}/notify':
     post:
       tags:
-        - 'Listings / sales'
+        - 'Notifications'
         - 'U31 : Purchases'
       summary: Notify a user about any changes of items they liked or purchased.
       security:
@@ -983,7 +986,7 @@ paths:
   '/users/{userId}/notifications':
     get:
       tags:
-        - 'Listings / sales'
+        - 'Notifications'
         - 'U31 : Purchases'
       summary: User can retrieve all notifications related to listings they have received.
       security:
@@ -1051,6 +1054,34 @@ paths:
         '406':
           description: Business ID not found
 
+  '/notifications/{notificationId}':
+    delete:
+      tags:
+        - 'U32 : Managing my feed'
+        - 'Notifications'
+      summary: 'Delete a notification for a user'
+      parameters:
+        - name: notificationId
+          in: path
+          description: Id of the notification to delete
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Request successful, notification is deleted.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to delete a notification that does not belong to them AND the user is not a GAA'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
   '/cards/{id}':
     get:
@@ -1506,7 +1537,7 @@ paths:
   '/businesses/listings':
     post:
       tags:
-        - 'Listing / sales'
+        - 'Listings / sales'
         - 'U29 : Browse/search sale listings'
       summary: Search across all business listings with (optional) given parameters.
       security:
@@ -1924,94 +1955,94 @@ components:
         content:
           type: object
           example: [
+          {
+            "name": "Grain n Simple",
+            "id": 5,
+            "administrators": [
             {
-              "name": "Grain n Simple",
               "id": 5,
-              "administrators": [
-                {
-                  "id": 5,
-                  "firstName": "Shermy",
-                  "middleName": "Pearle",
-                  "lastName": "Layborn",
-                  "nickname": "artificial intelligence",
-                  "bio": "Intuitive client-server standardization",
-                  "email": "playborn4@amazon.com",
-                  "dateOfBirth": "2000-12-30",
-                  "phoneNumber": "+62 527 277 7359",
-                  "homeAddress": {
-                    "streetNumber": "5",
-                    "streetName": "Hagan Avenue",
-                    "suburb": null,
-                    "city": "Chengdong",
-                    "region": null,
-                    "country": "China",
-                    "postcode": null
-                  },
-                  "created": "2020-10-17 00:47:11",
-                  "role": "USER",
-                  "businessesAdministered": null
-                },
-                {
-                  "id": 9,
-                  "firstName": "Ruthe",
-                  "middleName": "Ogdan",
-                  "lastName": "Ruit",
-                  "nickname": "Open-architected",
-                  "bio": "Configurable coherent capacity",
-                  "email": "oruit8@reddit.com",
-                  "dateOfBirth": "1995-05-10",
-                  "phoneNumber": "+62 283 517 0351",
-                  "homeAddress": {
-                    "streetNumber": "9885",
-                    "streetName": "Oak Parkway",
-                    "suburb": null,
-                    "city": "Ambato",
-                    "region": null,
-                    "country": "Ecuador",
-                    "postcode": null
-                  },
-                  "created": "2020-09-24 18:01:34",
-                  "role": "USER",
-                  "businessesAdministered": null
-                },
-                {
-                  "id": 8,
-                  "firstName": "Elysee",
-                  "middleName": "Maurene",
-                  "lastName": "Took",
-                  "nickname": "benchmark",
-                  "bio": "Team-oriented interactive installation",
-                  "email": "mtook7@chron.com",
-                  "dateOfBirth": "1985-11-09",
-                  "phoneNumber": "+234 186 824 2303",
-                  "homeAddress": {
-                    "streetNumber": "5",
-                    "streetName": "Utah Terrace",
-                    "suburb": null,
-                    "city": "Huangfang",
-                    "region": null,
-                    "country": "China",
-                    "postcode": null
-                  },
-                  "created": "2020-10-31 22:39:42",
-                  "role": "USER",
-                  "businessesAdministered": null
-                }
-              ],
-              "primaryAdministratorId": 5,
-              "description": "Praesent blandit. Nam nulla.",
-              "address": {
-                "streetNumber": "302",
-                "streetName": "Forest Run Place",
+              "firstName": "Shermy",
+              "middleName": "Pearle",
+              "lastName": "Layborn",
+              "nickname": "artificial intelligence",
+              "bio": "Intuitive client-server standardization",
+              "email": "playborn4@amazon.com",
+              "dateOfBirth": "2000-12-30",
+              "phoneNumber": "+62 527 277 7359",
+              "homeAddress": {
+                "streetNumber": "5",
+                "streetName": "Hagan Avenue",
                 "suburb": null,
-                "city": "Putinci",
+                "city": "Chengdong",
                 "region": null,
-                "country": "Serbia",
+                "country": "China",
                 "postcode": null
               },
-              "businessType": "Retail Trade",
-              "created": "2020-05-22 20:21:22"
+              "created": "2020-10-17 00:47:11",
+              "role": "USER",
+              "businessesAdministered": null
+            },
+            {
+              "id": 9,
+              "firstName": "Ruthe",
+              "middleName": "Ogdan",
+              "lastName": "Ruit",
+              "nickname": "Open-architected",
+              "bio": "Configurable coherent capacity",
+              "email": "oruit8@reddit.com",
+              "dateOfBirth": "1995-05-10",
+              "phoneNumber": "+62 283 517 0351",
+              "homeAddress": {
+                "streetNumber": "9885",
+                "streetName": "Oak Parkway",
+                "suburb": null,
+                "city": "Ambato",
+                "region": null,
+                "country": "Ecuador",
+                "postcode": null
+              },
+              "created": "2020-09-24 18:01:34",
+              "role": "USER",
+              "businessesAdministered": null
+            },
+            {
+              "id": 8,
+              "firstName": "Elysee",
+              "middleName": "Maurene",
+              "lastName": "Took",
+              "nickname": "benchmark",
+              "bio": "Team-oriented interactive installation",
+              "email": "mtook7@chron.com",
+              "dateOfBirth": "1985-11-09",
+              "phoneNumber": "+234 186 824 2303",
+              "homeAddress": {
+                "streetNumber": "5",
+                "streetName": "Utah Terrace",
+                "suburb": null,
+                "city": "Huangfang",
+                "region": null,
+                "country": "China",
+                "postcode": null
+              },
+              "created": "2020-10-31 22:39:42",
+              "role": "USER",
+              "businessesAdministered": null
             }
+            ],
+            "primaryAdministratorId": 5,
+            "description": "Praesent blandit. Nam nulla.",
+            "address": {
+              "streetNumber": "302",
+              "streetName": "Forest Run Place",
+              "suburb": null,
+              "city": "Putinci",
+              "region": null,
+              "country": "Serbia",
+              "postcode": null
+            },
+            "businessType": "Retail Trade",
+            "created": "2020-05-22 20:21:22"
+          }
           ]
         pageable:
           type: object
@@ -2355,10 +2386,10 @@ components:
                  listingId: 30,
                  status: Expired,
                  created: '2021-04-27'
-      },
-        {id: 50,
-         userId: 60,
-         listingId: 40,
-         status: Expired,
-         created: '2021-05-27'
-        }]
+                },
+                {id: 50,
+                 userId: 60,
+                 listingId: 40,
+                 status: Expired,
+                 created: '2021-05-27'
+                }]
