@@ -1086,7 +1086,7 @@ paths:
       tags:
         - 'U32 : Managing my feed'
         - 'Notifications'
-      summary: Update the status of a user's notification
+      summary: Update the view status of a user's notification
       parameters:
         - name: notificationId
           in: path
@@ -1108,9 +1108,9 @@ paths:
               required:
                 - status
               properties:
-                status:
+                viewStatus:
                   type: string
-                  description: The new status to change the notification to
+                  description: The new viewing status to change the notification to
                   example: "READ"
       responses:
         '200':
@@ -2415,6 +2415,8 @@ components:
           enum:
             - Expired
             - Bought
+        viewStatus:
+          $ref: '#/components/schemas/ViewStatus'
         created:
           type: string
           format: date
@@ -2438,11 +2440,15 @@ components:
     NotificationStatus:
       type: string
       enum:
-        - Bought,
-        - Expired,
-        - Deleted,
-        - Liked,
-        - Unliked,
-        - Unread,
-        - Read,
+        - Bought
+        - Expired
+        - Deleted
+        - Liked
+        - Unliked
+
+    ViewStatus:
+      type: string
+      enum:
+        - Unread
+        - Read
         - Important

@@ -1149,6 +1149,15 @@
 					"request": {
 						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"viewStatus\": \"READ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{URL}}/notifications/:notificationId",
 							"host": [
@@ -1161,8 +1170,7 @@
 							"variable": [
 								{
 									"key": "notificationId",
-									"value": "READ",
-									"description": "Enums: UNREAD, READ, IMPORTANT"
+									"value": "1"
 								}
 							]
 						}
