@@ -95,6 +95,7 @@
       <!-- NEW LIKED LISTING NOTIFICATIONS -->
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
         <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
+        <vs-button color="danger" class="sub-header" @click.stop.prevent="deleteNotification(item.id)" icon="close"></vs-button>
         <div style="display: flex">
           <div class="lln-description">
             <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
@@ -180,6 +181,29 @@ export default {
         .catch((error) => {
           this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
+        });
+    },
+
+    /**
+     * Calls the delete endpoint in the backend, removing the relevant listing notification
+     * @param notificationId the unique id of the listingNotification to be deleted
+     */
+    deleteNotification: function(notificationId) {
+      api.deleteListingNotification(notificationId)
+        .then(() => {
+          this.$vs.notify({
+            title: `Listing Notification Deleted`,
+            color: 'success'
+          });
+          this.getListingNotifications();
+          this.$emit("getLikes", this.currentUserId);
+        })
+        .catch((error) => {
+          this.$vs.notify({
+            title: 'Failed to delete the listing notification',
+            color: 'danger'
+          });
+          this.$log.debug("Error Status:", error);
         });
     },
 

@@ -111,4 +111,19 @@ public class ListingNotificationController {
     List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationByBusinessId(businessId);
     return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
   }
+
+  @DeleteMapping("/notifications/{notificationId}")
+  public ResponseEntity<String> deleteListingNotification(@PathVariable("notificationId") long id, HttpSession session) {
+    ListingNotification notification = listingNotificationRepository.findListingNotificationById(id);
+    if (notification == null) {
+      return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+    }
+    User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+    User user = notification.getUser();
+    if (currentUser.getId() != user.getId()) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+    listingNotificationRepository.delete(notification);
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
 }

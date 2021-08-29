@@ -493,4 +493,12 @@ export default {
      */
     getBusinessListingNotifications: (businessId) =>
         instance.get(`/businesses/${businessId}/notifications`, {withCredentials: true}),
+
+    /**
+     * Deletes listing notification
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteListingNotification: (listingId) =>
+        instance.delete(`/notifications/${listingId}`, {withCredentials: true}),
 }
