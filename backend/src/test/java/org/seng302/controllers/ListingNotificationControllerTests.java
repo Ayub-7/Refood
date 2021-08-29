@@ -97,6 +97,7 @@ class ListingNotificationControllerTests {
         boughtListingRepository.save(boughtListing1);
         boughtListingRepository.save(boughtListing2);
         notification = new ListingNotification(user, boughtListing1, NotificationStatus.BOUGHT);
+        notification.setId(1);
         notification2 = new ListingNotification(user, business, boughtListing2, NotificationStatus.BOUGHT);
 
         notificationList = new ArrayList<>();
@@ -210,4 +211,16 @@ class ListingNotificationControllerTests {
         mvc.perform(get("/businesses/{businessId}/notifications", business.getId()))
                 .andExpect(status().isOk());
     }
+
+
+    //
+    // PUT - Notification View Status
+    //
+    @Test
+    void testPutNotificationViewStatus_notLoggedIn_returnUnauthorized() throws Exception {
+        mvc.perform(get("/notifications/{notificationId}", notification.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+
 }
