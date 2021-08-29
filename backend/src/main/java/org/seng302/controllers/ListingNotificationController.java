@@ -133,7 +133,7 @@ public class ListingNotificationController {
         }
 
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        if (user.getId() != notification.getUser().getId() && Role.isGlobalApplicationAdmin(user.getRole())) {
+        if (user.getId() != notification.getUser().getId() && !Role.isGlobalApplicationAdmin(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
