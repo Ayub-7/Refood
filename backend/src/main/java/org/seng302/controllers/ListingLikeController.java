@@ -122,7 +122,9 @@ public class ListingLikeController {
 
         //Remove old liked notification
         ListingNotification oldNotification = listingNotificationRepository.findListingNotificationsByUserIdAndListing(sessionUser.getId(), listing);
-        listingNotificationRepository.delete(oldNotification);
+        if (oldNotification != null) {
+            listingNotificationRepository.delete(oldNotification);
+        }
 
         //Add new liked notification
         ListingNotification notification = new ListingNotification(sessionUser, listing, NotificationStatus.UNLIKED);

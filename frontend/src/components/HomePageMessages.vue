@@ -68,6 +68,7 @@
       <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
+          <vs-button color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
         </div>
         <h3>{{ item.boughtListing.product.name }}</h3>
         <h5>{{ item.boughtListing.product.business.name }}</h5>
@@ -86,6 +87,7 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+          <vs-button color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
         </div>
         <div class="lln-description">
           <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
@@ -94,8 +96,10 @@
 
       <!-- NEW LIKED LISTING NOTIFICATIONS -->
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
-        <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-        <vs-button color="danger" class="sub-header" @click.stop.prevent="deleteNotification(item.id)" icon="close"></vs-button>
+        <div class="pln-top-row">
+          <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
+          <vs-button color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+        </div>
         <div style="display: flex">
           <div class="lln-description">
             <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
@@ -107,7 +111,6 @@
         </div>
       </vs-card>
     </div>
-
   </div>
 </template>
 
@@ -139,6 +142,12 @@ export default {
       messages: [],
       listingNotifications: [],
       feedItems: [],
+    }
+  },
+
+  watch: {
+    likes() {
+      this.getListingNotifications();
     }
   },
 

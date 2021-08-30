@@ -112,6 +112,12 @@ public class ListingNotificationController {
     return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
   }
 
+  /**
+   * Endpoint for deleting a listing notification given the notifications id
+   * @param id
+   * @param session
+   * @return
+   */
   @DeleteMapping("/notifications/{notificationId}")
   public ResponseEntity<String> deleteListingNotification(@PathVariable("notificationId") long id, HttpSession session) {
     ListingNotification notification = listingNotificationRepository.findListingNotificationById(id);
