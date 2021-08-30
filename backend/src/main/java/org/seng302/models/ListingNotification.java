@@ -38,6 +38,13 @@ public class ListingNotification {
     private Date created;
 
     /**
+     * viewStatus enum
+     */
+    public enum ViewStatus {
+        READ, UNREAD, IMPORTANT;
+    }
+
+    /**
      * Basic constructor.
      * @param user the user receiving the notification.
      * @param boughtListing the listing being notified about.
@@ -65,10 +72,11 @@ public class ListingNotification {
         this.created = new Date();
     }
 
-    public ListingNotification(User user, Listing listing, NotificationStatus status) {
+    public ListingNotification(User user, Listing listing, NotificationStatus status, ViewStatus viewStatus) {
         this.user = user;
         this.listing = listing;
         this.status = status;
+        viewStatus = ViewStatus.UNREAD;
         this.created = new Date();
     }
 
