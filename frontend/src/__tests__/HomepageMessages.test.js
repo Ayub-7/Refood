@@ -97,6 +97,7 @@ let listingNotifications = [
         price: 20.5,
         quantity: 10,
         sold: "2021-08-17 12:00:00",
+        viewStatus: "Unread",
         product: {
             name: "Garlic",
             business: {
@@ -116,6 +117,7 @@ let listingNotifications = [
         id: 2,
         status: "Liked",
         created: "2021-08-17 10:03:43",
+        viewStatus: "Unread",
         listing: {
             inventoryItem: {
                 product: {
@@ -138,6 +140,8 @@ api.deleteMessage = jest.fn(() => {
 api.getListingNotifications = jest.fn( () => {
    return Promise.resolve({status: 200, data: listingNotifications});
 });
+
+api.updateListingNotificationViewStatus = jest.fn().mockResolvedValue({status: 200});
 
 beforeEach(() => {
     wrapper = mount(HomepageMessages, {
@@ -222,6 +226,11 @@ describe('Listing notification methods tests', () => {
         };
 
         expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
+    });
+
+    test("Notification updates to read", async () => {
+        await wrapper.vm.markAsRead(listingNotifications[0]);
+        expect(listingNotifications[0].viewStatus).toBe("Read");
     });
 });
 

@@ -493,4 +493,12 @@ export default {
      */
     getBusinessListingNotifications: (businessId) =>
         instance.get(`/businesses/${businessId}/notifications`, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a listing notification.
+     * @param notificationId the unique id of the notification
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
 }
