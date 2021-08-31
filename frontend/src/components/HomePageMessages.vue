@@ -279,8 +279,8 @@ export default {
             this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
           });
       }
-
     },
+
     /**
      * Check the message contents
      * Simply check a blank message is not sent and the message is under the maximum character limit
