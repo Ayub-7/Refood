@@ -53,6 +53,7 @@ class ListingNotificationControllerTests {
     private InventoryRepository inventoryRepository;
 
     private User user;
+    private User otherUser;
     private Business business;
     private Product product1;
     private Product product2;
@@ -62,6 +63,7 @@ class ListingNotificationControllerTests {
     private BoughtListing boughtListing2;
     private ListingNotification notification;
     private ListingNotification notification2;
+    private ListingNotification notification3;
     private List<ListingNotification> notificationList;
 
     @BeforeEach
@@ -69,6 +71,10 @@ class ListingNotificationControllerTests {
         user = new User("Rayna", "YEP", "Dalgety", "Universal", "", "rdalgety3@ocn.ne.jp", "2006-03-30", "+7 684 622 5902", null, "ATQWJM");
         user.setId(1L);
         userRepository.save(user);
+
+        otherUser = new User("Rayna", "YEP", "Dalgety", "Universal", "", "dalgety3@ocn.ne.jp", "2006-03-30", "+7 684 622 5902", null, "ATQWJM");
+        otherUser.setId(2L);
+        userRepository.save(otherUser);
 
         Address address = new Address("39", "Ilam Rd", "Christchurch", "Canterbury", "New Zealand", "8041");
 
@@ -98,6 +104,7 @@ class ListingNotificationControllerTests {
         boughtListingRepository.save(boughtListing2);
         notification = new ListingNotification(user, boughtListing1, NotificationStatus.BOUGHT);
         notification2 = new ListingNotification(user, business, boughtListing2, NotificationStatus.BOUGHT);
+        notification3 = new ListingNotification(otherUser, business, boughtListing2, NotificationStatus.LIKED);
 
         notificationList = new ArrayList<>();
         notificationList.add(notification);
@@ -208,6 +215,74 @@ class ListingNotificationControllerTests {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(listingNotificationRepository.findListingNotificationByBusinessId(business.getId())).thenReturn(notificationList);
         mvc.perform(get("/businesses/{businessId}/notifications", business.getId()))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests attempted deletion of a non-existent liked listing notification, should return Not Acceptable status
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testDeleteNonExistentListingNotification_returnNotAcceptable() throws Exception {
+        Mockito.when(listingNotificationRepository.findListingNotificationById(1)).thenReturn(null);
+        mvc.perform(delete("/notifications/{notificationId}", 1))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    /**
+     * Tests attempted deletion of a liked listing notification that doesn't relate to the current user
+     * should return Forbidden status
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testDeleteListingNotificationBelongingToAnotherUser_returnForbidden() throws Exception {
+        Mockito.when(listingNotificationRepository.findListingNotificationById(3)).thenReturn(notification3);
+        mvc.perform(delete("/notifications/{notificationId}", 3)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Tests successful deletion of a users liked listing notification
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testDeleteLikedListingNotification_returnOk() throws Exception {
+        notification2.setStatus(NotificationStatus.LIKED);
+        Mockito.when(listingNotificationRepository.findListingNotificationById(2)).thenReturn(notification2);
+        mvc.perform(delete("/notifications/{notificationId}", 2)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests successful deletion of a users unliked listing notification
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testDeleteUnlikedListingNotification_returnOk() throws Exception {
+        notification2.setStatus(NotificationStatus.UNLIKED);
+        Mockito.when(listingNotificationRepository.findListingNotificationById(2)).thenReturn(notification2);
+        mvc.perform(delete("/notifications/{notificationId}", 2)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests successful deletion of a users purchased listing notification
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testDeletePurchasedListingNotification_returnOk() throws Exception {
+        notification2.setStatus(NotificationStatus.BOUGHT);
+        Mockito.when(listingNotificationRepository.findListingNotificationById(2)).thenReturn(notification2);
+        mvc.perform(delete("/notifications/{notificationId}", 2)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
     }
 }

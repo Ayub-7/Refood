@@ -126,6 +126,85 @@ let listingNotifications = [
                 }
             }
         }
+    },
+    {
+        id: 4,
+        status: "Unliked",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
+    {
+        id: 5,
+        boughtListing: {name: "bought listing",
+            buyer: 10,
+            product: {
+                name: "Garlic",
+                business: {
+                    name: "Dabshots",
+                    address: {
+                        streetNumber: "88",
+                        streetName: "Ilam Road",
+                        suburb: "Ilam",
+                        city: "Christchurch",
+                        region: "Canterbury",
+                        country: "New Zealand"
+                    },
+                }
+            }
+        },
+        status: "Bought",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
+    {
+        id: 6,
+        boughtListing: {name: "bought listing",
+            buyer: 83,
+            product: {
+                name: "Garlic",
+                business: {
+                    name: "Dabshots",
+                    address: {
+                        streetNumber: "88",
+                        streetName: "Ilam Road",
+                        suburb: "Ilam",
+                        city: "Christchurch",
+                        region: "Canterbury",
+                        country: "New Zealand"
+                    },
+                }
+            }
+        },
+        status: "Bought",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
     }
 ];
 
@@ -137,6 +216,10 @@ api.deleteMessage = jest.fn(() => {
 
 api.getListingNotifications = jest.fn( () => {
    return Promise.resolve({status: 200, data: listingNotifications});
+});
+
+api.deleteListingNotification = jest.fn(() => {
+    return Promise.resolve({status: 200});
 });
 
 beforeEach(() => {
@@ -242,4 +325,26 @@ describe('Listing notification functionality tests', () => {
         await button.trigger('click');
         expect(wrapper.vm.$router.push).toBeCalled();
     });
+
+    test("Delete listing notification buttons call delete notification function", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+        let button = wrapper.get("#delete-liked-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(api.deleteListingNotification).toBeCalled();
+
+        button = wrapper.get("#delete-liked-purchased-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(api.deleteListingNotification).toBeCalled();
+
+        button = wrapper.get("#delete-purchased-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(api.deleteListingNotification).toBeCalled();
+    })
 });
