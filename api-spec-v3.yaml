@@ -2452,3 +2452,26 @@ components:
         - Unread
         - Read
         - Important
+
+    wishlist:
+      type: object
+      description: An entity represnting a users wishlisted business
+      required:
+        - id
+        - userId
+        - businessId
+        - mutedStatus
+      properties:
+        id:
+          type: integer
+          description: Unique id of the notification
+          example: 5
+        userId:
+          type: integer
+          description: Id relating to the user
+        businessId:
+          type: integer
+          description: Id of the wishlisted business
+        muted:
+          type: boolean
+          description: Boolean describing whether the notifications for the wishlisted business are muted
