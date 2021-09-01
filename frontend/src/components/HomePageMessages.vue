@@ -17,10 +17,10 @@
         </div>
 
         <div class="message-detail-container message">
-        <vs-icon icon="question_answer" class="msg-icon"></vs-icon>
-        <div id="message-detail-message">
-          {{currentMessage.description}}
-        </div>
+          <vs-icon icon="question_answer" class="msg-icon"></vs-icon>
+          <div id="message-detail-message">
+            {{currentMessage.description}}
+          </div>
         </div>
 
         <vs-divider></vs-divider>
@@ -31,8 +31,8 @@
               {{currentMessage.sent}}
             </div>
           </div>
-        <vs-button id="reply-btn" class="card-modal-message-button" v-if="messaging===false" @click="messaging=true">Reply</vs-button>
-        <vs-button class="card-modal-message-button"  @click="messaging=false; message = ''; errors=[];" v-else>Cancel</vs-button>
+          <vs-button id="reply-btn" class="card-modal-message-button" v-if="messaging===false" @click="messaging=true">Reply</vs-button>
+          <vs-button class="card-modal-message-button"  @click="messaging=false; message = ''; errors=[];" v-else>Cancel</vs-button>
         </div>
         <transition name="slide" v-if="showTransition">
           <div id="card-modal-message" v-if="messaging">
@@ -87,7 +87,12 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-          <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          <div v-if="undoClick === true">
+            <vs-button color="danger" class="lln-delete-button delete-button">hi</vs-button>
+          </div>
+          <div v-else>
+            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          </div>
         </div>
         <div class="lln-description">
           <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
@@ -98,7 +103,13 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
         <div class="pln-top-row">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-          <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          <div v-if="undoClick === true">
+            {{undoCount}}
+            <vs-icon icon="undo" @click="undo"></vs-icon>
+          </div>
+          <div v-else>
+            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          </div>
         </div>
         <div style="display: flex">
           <div class="lln-description">
@@ -129,6 +140,8 @@ export default {
 
   data() {
     return {
+      undoClick: false,
+      undoCount: 10,
       messaging: false,
       showing: false,
       message: '',
@@ -158,6 +171,19 @@ export default {
   },
 
   methods: {
+    undo: function () {
+      console.log("yo")
+      var timer = setInterval(() => {
+        if(this.undoCount <= 0){
+          this.undoCount = "Finished";
+          clearInterval(timer)
+          console.log(this.undoCount)
+        } else {
+          console.log(this.undoCount)
+        }
+        this.undoCount -= 1;
+      }, 1000);
+    },
 
     /**
      * Combines the different news feed item types into a single list.
@@ -175,44 +201,46 @@ export default {
      */
     getMessages: function() {
       api.getMessages(this.currentUserId)
-        .then((response) => {
-          this.messages = response.data;
-          for (let message of this.messages) {
-            this.users[message.sender.id] = message.sender;
-          }
+          .then((response) => {
+            this.messages = response.data;
+            for (let message of this.messages) {
+              this.users[message.sender.id] = message.sender;
+            }
 
-          this.messages = this.messages.map(message => {
-            // Map the sent date to a new created attribute - to be used for sorting.
-            message.created = message.sent;
-            return message;
+            this.messages = this.messages.map(message => {
+              // Map the sent date to a new created attribute - to be used for sorting.
+              message.created = message.sent;
+              return message;
+            });
+          })
+          .catch((error) => {
+            this.$log.error("Error getting messages: " + error);
+            this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
           });
-        })
-        .catch((error) => {
-          this.$log.error("Error getting messages: " + error);
-          this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
-        });
     },
 
     /**
      * Calls the delete endpoint in the backend, removing the relevant listing notification
      * @param notificationId the unique id of the listingNotification to be deleted
      */
-    deleteNotification: function(notificationId) {
-      api.deleteListingNotification(notificationId)
-        .then(() => {
-          this.$vs.notify({
-            title: `Listing Notification Deleted`,
-            color: 'success'
-          });
-          this.getListingNotifications();
-        })
-        .catch((error) => {
-          this.$vs.notify({
-            title: 'Failed to delete the listing notification',
-            color: 'danger'
-          });
-          this.$log.debug("Error Status:", error);
-        });
+    deleteNotification: function() {
+      console.log(this.undoClick)
+      this.undoClick = true
+      // api.deleteListingNotification(notificationId)
+      //   .then(() => {
+      //     this.$vs.notify({
+      //       title: `Listing Notification Deleted`,
+      //       color: 'success'
+      //     });
+      //     this.getListingNotifications();
+      //   })
+      //   .catch((error) => {
+      //     this.$vs.notify({
+      //       title: 'Failed to delete the listing notification',
+      //       color: 'danger'
+      //     });
+      //     this.$log.debug("Error Status:", error);
+      //   });
     },
 
     /**
@@ -221,21 +249,21 @@ export default {
      */
     deleteMessage: function(messageId) {
       api.deleteMessage(messageId)
-        .then((response) => {
-          this.$vs.notify({
-            title: `Message Deleted`,
-            text: response.data.sender.firstName +" "+response.data.sender.lastName+ ": "+ response.data.description,
-            color: 'success'
+          .then((response) => {
+            this.$vs.notify({
+              title: `Message Deleted`,
+              text: response.data.sender.firstName +" "+response.data.sender.lastName+ ": "+ response.data.description,
+              color: 'success'
+            });
+            this.getMessages();
+          })
+          .catch((error) => {
+            this.$vs.notify({
+              title: 'Failed to delete the message',
+              color: 'danger'
+            });
+            this.$log.debug("Error Status:", error);
           });
-          this.getMessages();
-        })
-        .catch((error) => {
-          this.$vs.notify({
-            title: 'Failed to delete the message',
-            color: 'danger'
-          });
-          this.$log.debug("Error Status:", error);
-        });
     },
 
     /**
@@ -243,18 +271,18 @@ export default {
      */
     getListingNotifications: function() {
       api.getListingNotifications(store.loggedInUserId)
-        .then((res) => {
-          this.listingNotifications = res.data;
-          this.combineFeedMessages();
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          if (error && error.response) {
-            this.$vs.notify({title: `Error ${error.response}`,
-                              text: "There was a problem getting your newsfeed.",
-                              color: "danger"});
-          }
-        });
+          .then((res) => {
+            this.listingNotifications = res.data;
+            this.combineFeedMessages();
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            if (error && error.response) {
+              this.$vs.notify({title: `Error ${error.response}`,
+                text: "There was a problem getting your newsfeed.",
+                color: "danger"});
+            }
+          });
     },
 
     /**
@@ -273,16 +301,16 @@ export default {
           senderId = originalMessage.sender;
         }
         api.postMessage(senderId, originalMessage.card.id, message)
-          .then(() => {
-            this.$vs.notify({title: 'Reply Sent!', color: 'success'});
-            //reset the message after success
-            this.message = "";
-            this.errors = [];
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
-          });
+            .then(() => {
+              this.$vs.notify({title: 'Reply Sent!', color: 'success'});
+              //reset the message after success
+              this.message = "";
+              this.errors = [];
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+              this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
+            });
       }
 
     },
