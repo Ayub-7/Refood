@@ -87,7 +87,12 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-          <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          <div v-if="undoClick === true">
+            <vs-button color="danger" class="lln-delete-button delete-button">hi</vs-button>
+          </div>
+          <div v-else>
+            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          </div>
         </div>
         <div class="lln-description">
           <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
@@ -98,7 +103,13 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
         <div class="pln-top-row">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-          <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          <div v-if="undoClick === true">
+            {{undoCount}}
+            <vs-icon icon="undo" @click="undo"></vs-icon>
+          </div>
+          <div v-else>
+            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          </div>
         </div>
         <div style="display: flex">
           <div class="lln-description">
@@ -129,6 +140,8 @@ export default {
 
   data() {
     return {
+      undoClick: false,
+      undoCount: 10,
       messaging: false,
       showing: false,
       message: '',
@@ -158,6 +171,19 @@ export default {
   },
 
   methods: {
+    undo: function () {
+      console.log("yo")
+      var timer = setInterval(() => {
+        if(this.undoCount <= 0){
+          this.undoCount = "Finished";
+          clearInterval(timer)
+          console.log(this.undoCount)
+        } else {
+          console.log(this.undoCount)
+        }
+        this.undoCount -= 1;
+      }, 1000);
+    },
 
     /**
      * Combines the different news feed item types into a single list.
@@ -197,22 +223,24 @@ export default {
      * Calls the delete endpoint in the backend, removing the relevant listing notification
      * @param notificationId the unique id of the listingNotification to be deleted
      */
-    deleteNotification: function(notificationId) {
-      api.deleteListingNotification(notificationId)
-        .then(() => {
-          this.$vs.notify({
-            title: `Listing Notification Deleted`,
-            color: 'success'
-          });
-          this.getListingNotifications();
-        })
-        .catch((error) => {
-          this.$vs.notify({
-            title: 'Failed to delete the listing notification',
-            color: 'danger'
-          });
-          this.$log.debug("Error Status:", error);
-        });
+    deleteNotification: function() {
+      console.log(this.undoClick)
+      this.undoClick = true
+      // api.deleteListingNotification(notificationId)
+      //   .then(() => {
+      //     this.$vs.notify({
+      //       title: `Listing Notification Deleted`,
+      //       color: 'success'
+      //     });
+      //     this.getListingNotifications();
+      //   })
+      //   .catch((error) => {
+      //     this.$vs.notify({
+      //       title: 'Failed to delete the listing notification',
+      //       color: 'danger'
+      //     });
+      //     this.$log.debug("Error Status:", error);
+      //   });
     },
 
     /**
