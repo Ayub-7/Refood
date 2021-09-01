@@ -3,6 +3,7 @@
     <div id="header-container">
       <vs-icon icon="summarize" size="32px"></vs-icon>
       <div id="title">Sales Report</div>
+      <div id="title-business" v-if="this.business != null"> - {{this.business.name}}</div>
     </div>
     <vs-divider/>
 
@@ -17,8 +18,10 @@
         <vs-button class="options-button" type="border">1 Year</vs-button>
         <vs-button class="options-button" type="border">All</vs-button>
         <div class="options-header" style="font-size: 14px">Custom</div>
-        <vs-input type="date" size="small" class="date-input" label="Start" style="grid-row: 6"></vs-input>
-        <vs-input type="date" size="small" class="date-input" label="End" style="grid-row: 6"></vs-input>
+        <vs-input class="date-input" v-model="dateStart" label="Start" :danger="(errors.includes('past-min-date'))"
+                  danger-text="Date can not be in the future or after the end date" type="date" style="grid-row: 6"/>
+        <vs-input class="date-input" v-model="dateEnd" label="End" :danger="(errors.includes('past-min-date'))"
+                  danger-text="Date can not be in the future or after the end date" type="date" style="grid-row: 6"/>
 
         <vs-divider style="grid-column: 1/3;"/>
         <div class="options-header">Granularity</div>
@@ -28,7 +31,11 @@
         <vs-button class="options-button" type="border">All</vs-button>
       </vs-card>
 
-      <vs-card id="summary-container">
+      <!-- for each in month list
+      AVG SALE VALUE - should we keep naming consistent?
+      -->
+      <vs-card id="summary-container" v-for="summary in summaries" :key="summary.id" >
+
         <div class="row-summary-container">
           <h2 class="summary-header">January 2020</h2>
           <div class="summary-subheader">NUMBER OF SALES</div>
@@ -48,57 +55,57 @@
       <div id="stats-container">
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">{{this.currency + getAverageSale()}}</h2>
+          <h2 style="padding-left: 12px">{{currency + averageSale}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
           </div>
-          <div class="sub-header" style="padding-left: 12px;">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Price Per Item</div>
-          <h2 style="padding-left: 12px">{{this.currency}}20.69</h2>
+          <h2 style="padding-left: 12px">{{currency + averagePricePerItem}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="green" icon="arrow_drop_up" class="stat-change-icon"/>
             <div>12.34% from last year</div>
           </div>
-          <div class="sub-header" style="padding-left: 12px;">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
+          <div class="stat-subheader">Average Items Per Sale</div>
+          <h2 style="padding-left: 12px">{{currency + averageItemsPerSale}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
           </div>
-          <div class="sub-header" style="padding-left: 12px;">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
+          <div class="stat-subheader">Total Sale Value</div>
+          <h2 style="padding-left: 12px">{{currency + totalSaleValue}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
           </div>
-          <div class="sub-header" style="padding-left: 12px;">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
+          <div class="stat-subheader">Total Items Sold</div>
+          <h2 style="padding-left: 12px">{{totalItems}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
           </div>
-          <div class="sub-header" style="padding-left: 12px;">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
+          <div class="stat-subheader">Total Sales</div>
+          <h2 style="padding-left: 12px">{{totalSales}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
           </div>
-          <div class="sub-header" style="padding-left: 12px;">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
       </div>
     </div>
@@ -108,6 +115,7 @@
 <script>
 import api from "../Api";
 import axios from "axios";
+const moment = require('moment');
 
 export default {
   name: "BusinessSalesReport",
@@ -116,14 +124,32 @@ export default {
     return {
       currency: "$",
       businessId: '',
-      salesHistory: []
+      business: [],
+      salesHistory: [],
+      averageSale: 0,
+      averagePricePerItem: 0,
+      averageItemsPerSale: 0,
+      totalSaleValue: 0,
+      totalItems: 0,
+      totalSales: 0,
+      dateStart: null,
+      dateEnd: null,
+      summaries: [],
+      errors: []
     }
   },
+
 
   mounted: function() {
     this.businessId = this.$route.params.id;
     this.getSalesHistory();
+    this.getBusiness();
     this.getSession();
+
+    let currentDate = new Date();
+    //we gotta set date to a string or the bloody thing complains
+    this.dateStart = "Jan 01, " + currentDate.getFullYear();
+    this.dateEnd = "Dec 31, " + currentDate.getFullYear();
   },
 
   methods: {
@@ -134,11 +160,20 @@ export default {
       api.getBusinessListingNotifications(this.businessId)
           .then((res) => {
             this.salesHistory = res.data;
-            console.log(res.data)
+
+            console.log(this.salesHistory);
+
+            //only once we have obtained the data, calculate the variables
+            this.calculateReport();
+            this.calculateMonthlySaleSummaries();
           })
           .catch(err => {
             console.log(err)
           });
+    },
+
+    formatDate: function(date) {
+      return moment(new Date(date)).format('MMM DD, YYYY');
     },
 
     /**
@@ -154,17 +189,30 @@ export default {
           });
     },
 
-    getAverageSale: function() {
-      let totalPrice = 0;
-      if(this.salesHistory) {
-        for(let i=0;i<this.salesHistory.length;i++) {
-          totalPrice += this.salesHistory[i].boughtListing.price;
-        }
-      }
-      return Number(totalPrice / this.salesHistory.length).toFixed(2);
+    /**
+     * Get the business name to populate the title
+     * TODO: do we use this OR store.businessname?
+     */
+    getBusiness: function () {
+      api.getBusinessFromId(this.$route.params.id)
+          .then((res) => {
+            this.business = res.data;
+          })
+          .catch((error) => {
+            if (error) {
+              if (error.response.status === 406) {
+                this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})
+              }
+            }
+            this.$log.error(`ERROR trying to obtain business info from Id: ${error}`);
+          });
     },
 
-    getAveragePricePerItem: function() {
+    /**
+     * calculates all the variables at once
+     * much more efficient than having a loop for every parameter...
+     */
+    calculateReport: function() {
       let totalPrice = 0;
       let totalQuantity = 0;
       if(this.salesHistory) {
@@ -173,9 +221,58 @@ export default {
           totalQuantity += this.salesHistory[i].boughtListing.quantity;
         }
       }
-      return Number(totalPrice / totalQuantity).toFixed(2);
+      console.log(this.salesHistory)
+
+      this.averageSale = Number(totalPrice/this.salesHistory.length).toFixed(2);
+      this.averagePricePerItem = Number(totalPrice / totalQuantity).toFixed(2);
+      this.averageItemsPerSale = Number(totalQuantity / this.salesHistory.length).toFixed(2);
+      this.totalSaleValue = Number(totalPrice).toFixed(2);
+      this.totalItems = Number(totalQuantity).toFixed(2);
+      this.totalSales = this.salesHistory.length;
     },
 
+    calculateSummary: function(salesHistory) {
+      let summary= {};
+      let totalPrice = 0;
+      let totalQuantity = 0;
+      if(salesHistory) {
+        for(let i=0;i<salesHistory.length;i++) {
+          totalPrice += salesHistory[i].boughtListing.price;
+          totalQuantity += salesHistory[i].boughtListing.quantity;
+        }
+      }
+      console.log(salesHistory)
+
+      summary.averageSale = Number(totalPrice/salesHistory.length).toFixed(2);
+      summary.averagePricePerItem = Number(totalPrice / totalQuantity).toFixed(2);
+      summary.averageItemsPerSale = Number(totalQuantity / salesHistory.length).toFixed(2);
+      summary.totalSaleValue = Number(totalPrice).toFixed(2);
+      summary.totalItems = Number(totalQuantity).toFixed(2);
+      summary.totalSales = salesHistory.length;
+
+      return summary;
+    },
+
+    setDatePeriod: function() {
+      return this.salesHistory.filter(function (d) {
+        return d >= this.dateStart && d <= this.dateEnd;
+      });
+    },
+
+
+    calculateMonthlySaleSummaries: function() {
+      for (let i=0;i<12;i++) {
+        let start = new Date(i+'-01-'+this.dateStart.getFullYear())
+        let end = new Date(i+1+'-01-'+this.dateStart.getFullYear())
+
+        let monthlyHistory = this.salesHistory.filter(function (salesItem) {
+          return salesItem >= start && salesItem <= end;
+         });
+        let summary = this.calculateSummary(monthlyHistory);
+        this.summaries.push(summary);
+      }
+      console.log(this.summaries);
+    },
     /**
      * Sets display currency based on the user's home country.
      */
@@ -209,7 +306,15 @@ export default {
 
 #title {
   font-size: 30px;
-  margin: auto auto auto 4px;
+  margin-top: 4px;
+  margin-right: 8px;
+}
+#title-business {
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 4px;
+  margin-left: 0px;
+  margin-right: auto;
 }
 
 #content-container {
