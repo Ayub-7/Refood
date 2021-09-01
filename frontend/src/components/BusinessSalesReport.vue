@@ -37,9 +37,9 @@
           <div>3</div>
 
           <div class="summary-subheader">TOTAL SALE VALUE</div>
-          <div>$5202.92</div>
+          <div>{{this.currency}}5202.92</div>
           <div class="summary-subheader">AVG SALE VALUE</div>
-          <div>$58.92</div>
+          <div>{{this.currency}}58.92</div>
         </div>
 
 <!--          <vs-divider style="grid-column: 1/5;"/>-->
@@ -48,7 +48,7 @@
       <div id="stats-container">
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{this.currency + getAverageSale()}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
@@ -57,7 +57,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Price Per Item</div>
-          <h2 style="padding-left: 12px">$20.69</h2>
+          <h2 style="padding-left: 12px">{{this.currency}}20.69</h2>
           <div class="sub-header stat-change">
             <vs-icon color="green" icon="arrow_drop_up" class="stat-change-icon"/>
             <div>12.34% from last year</div>
@@ -66,7 +66,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
@@ -75,7 +75,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
@@ -84,7 +84,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
@@ -93,7 +93,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{this.currency}}56.45</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>12.34% from last year</div>
@@ -106,8 +106,89 @@
 </template>
 
 <script>
+import api from "../Api";
+import axios from "axios";
+
 export default {
-  name: "BusinessSalesReport"
+  name: "BusinessSalesReport",
+
+  data: function() {
+    return {
+      currency: "$",
+      businessId: '',
+      salesHistory: []
+    }
+  },
+
+  mounted: function() {
+    this.businessId = this.$route.params.id;
+    this.getSalesHistory();
+    this.getSession();
+  },
+
+  methods: {
+    /**
+     * Calls get sales history
+     */
+    getSalesHistory: function () {
+      api.getBusinessListingNotifications(this.businessId)
+          .then((res) => {
+            this.salesHistory = res.data;
+            console.log(res.data)
+          })
+          .catch(err => {
+            console.log(err)
+          });
+    },
+
+    /**
+     * Calls get session endpoint to get user country, if successful calls setCurrency ()
+     */
+    getSession: function() {
+      api.checkSession()
+          .then((response) => {
+            this.setCurrency(response.data.homeAddress.country)
+          })
+          .catch(err => {
+            this.$log.debug(err);
+          });
+    },
+
+    getAverageSale: function() {
+      let totalPrice = 0;
+      if(this.salesHistory) {
+        for(let i=0;i<this.salesHistory.length;i++) {
+          totalPrice += this.salesHistory[i].boughtListing.price;
+        }
+      }
+      return Number(totalPrice / this.salesHistory.length).toFixed(2);
+    },
+
+    getAveragePricePerItem: function() {
+      let totalPrice = 0;
+      let totalQuantity = 0;
+      if(this.salesHistory) {
+        for(let i=0;i<this.salesHistory.length;i++) {
+          totalPrice += this.salesHistory[i].boughtListing.price;
+          totalQuantity += this.salesHistory[i].boughtListing.quantity;
+        }
+      }
+      return Number(totalPrice / totalQuantity).toFixed(2);
+    },
+
+    /**
+     * Sets display currency based on the user's home country.
+     */
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then(response => {
+            this.currency = response.data[0].currencies[0].symbol;
+          })
+          .catch(err => {
+            this.$log.debug(err);
+          });
+    },
+  },
 }
 </script>
 
