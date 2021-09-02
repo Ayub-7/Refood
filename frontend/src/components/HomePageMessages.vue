@@ -56,7 +56,13 @@
         <div @click="openDetailedModal(item)">
           <div style="display: flex; justify-content: space-between">
             <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
-            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
+            <div v-if="undoClick === true">
+              {{undoCount}}
+              <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
+            </div>
+            <div v-else>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, true); undoClick=true" icon="close"></vs-button>
+            </div>
           </div>
           <div id="message-notification-container">
             <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
@@ -68,7 +74,13 @@
       <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-          <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          <div v-if="undoClick === true">
+            {{undoCount}}
+            <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
+          </div>
+          <div v-else>
+            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false); undoClick=true"></vs-button>
+          </div>
         </div>
         <h3>{{ item.boughtListing.product.name }}</h3>
         <h5>{{ item.boughtListing.product.business.name }}</h5>
@@ -88,10 +100,11 @@
         <div class="pln-top-row">
           <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
           <div v-if="undoClick === true">
-            <vs-button color="danger" class="lln-delete-button delete-button">hi</vs-button>
+            {{undoCount}}
+            <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
           </div>
           <div v-else>
-            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false); undoClick=true"></vs-button>
           </div>
         </div>
         <div class="lln-description">
@@ -105,10 +118,10 @@
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
           <div v-if="undoClick === true">
             {{undoCount}}
-            <vs-icon icon="undo" @click="undo"></vs-icon>
+            <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
           </div>
           <div v-else>
-            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false); undoClick=true"></vs-button>
           </div>
         </div>
         <div style="display: flex">
@@ -140,6 +153,7 @@ export default {
 
   data() {
     return {
+      undoDelete: false,
       undoClick: false,
       undoCount: 10,
       messaging: false,
@@ -171,15 +185,22 @@ export default {
   },
 
   methods: {
-    undo: function () {
-      console.log("yo")
-      var timer = setInterval(() => {
+    undo: function (id, isMessage) {
+      let timer = setInterval(() => {
         if(this.undoCount <= 0){
-          this.undoCount = "Finished";
           clearInterval(timer)
-          console.log(this.undoCount)
-        } else {
-          console.log(this.undoCount)
+          if(isMessage===true) {
+            this.deleteMessage(id)
+          } else {
+            this.deleteNotification(id)
+          }
+          return;
+        } else if(this.undoDelete===true) {
+          this.undoClick = false
+          this.undoDelete = false
+          this.undoCount = 10
+          clearInterval(timer)
+          return;
         }
         this.undoCount -= 1;
       }, 1000);
@@ -223,24 +244,22 @@ export default {
      * Calls the delete endpoint in the backend, removing the relevant listing notification
      * @param notificationId the unique id of the listingNotification to be deleted
      */
-    deleteNotification: function() {
-      console.log(this.undoClick)
-      this.undoClick = true
-      // api.deleteListingNotification(notificationId)
-      //   .then(() => {
-      //     this.$vs.notify({
-      //       title: `Listing Notification Deleted`,
-      //       color: 'success'
-      //     });
-      //     this.getListingNotifications();
-      //   })
-      //   .catch((error) => {
-      //     this.$vs.notify({
-      //       title: 'Failed to delete the listing notification',
-      //       color: 'danger'
-      //     });
-      //     this.$log.debug("Error Status:", error);
-      //   });
+    deleteNotification: function(notificationId) {
+      api.deleteListingNotification(notificationId)
+        .then(() => {
+          this.$vs.notify({
+            title: `Listing Notification Deleted`,
+            color: 'success'
+          });
+          this.getListingNotifications();
+        })
+        .catch((error) => {
+          this.$vs.notify({
+            title: 'Failed to delete the listing notification',
+            color: 'danger'
+          });
+          this.$log.debug("Error Status:", error);
+        });
     },
 
     /**
