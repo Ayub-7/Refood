@@ -110,7 +110,7 @@ import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
-import BusinessSalesReport from "@/components/BusinessSalesReport";
+import BusinessSalesReport from "./BusinessSalesReport";
 
 const Homepage = {
   name: "Homepage",
