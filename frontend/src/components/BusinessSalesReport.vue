@@ -1,5 +1,5 @@
 <template>
-  <vs-card id="container">
+  <vs-card id="report-container">
     <div id="header-container">
       <vs-icon icon="summarize" size="32px"></vs-icon>
       <div id="title">Sales Report</div>
@@ -9,7 +9,12 @@
     <div id="content-container">
       <!-- FILTER/GRANULARITY PICKER -->
       <vs-card id="options-container">
-        <div class="options-header">Period</div>
+        <div class="options-header" style="display: flex; justify-content: center">
+          <span style="padding-right: 4px">Period</span>
+          <vs-tooltip text="Adjusts the length of time of each statistic">
+            <vs-icon icon="info" size="14px"/>
+          </vs-tooltip>
+        </div>
         <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-d'}, 'options-button']"
                    type="border"
                    style="grid-column: 1;"
@@ -54,7 +59,7 @@
 
         <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
 
-        <div class="options-header">Granularity</div>
+        <div class="options-header">Summary Interval</div>
         <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
                    type="border"
                    style="grid-column: 1;"
@@ -82,6 +87,8 @@
       </vs-card>
 
       <vs-card id="summary-container">
+        <h3>Summary</h3>
+        <vs-divider style="margin-top: 4px"/>
         <div class="row-summary-container">
           <h2 class="summary-header">January 2020</h2>
           <div class="summary-subheader">NUMBER OF SALES</div>
@@ -192,9 +199,9 @@ export default {
 
 <style scoped>
 
-#container {
+#report-container {
   background-color: white;
-  width: 75%;
+  width: 100%;
   margin: 1em auto;
 }
 
