@@ -34,19 +34,9 @@
       <!-- for each in month list
       AVG SALE VALUE - should we keep naming consistent?
       -->
-      <vs-card id="summary-container" v-for="summary in summaries" :key="summary.id" >
-
+      <vs-card id="summary-container" v-for="summary in summaries" :key="summary.id" v-bind:summary="summary">
         <div class="row-summary-container">
-          <h2 class="summary-header">January 2020</h2>
-          <div class="summary-subheader">NUMBER OF SALES</div>
-          <div>1106</div>
-          <div class="summary-subheader">AVG ITEMS PER SALE</div>
-          <div>3</div>
-
-          <div class="summary-subheader">TOTAL SALE VALUE</div>
-          <div>{{this.currency}}5202.92</div>
-          <div class="summary-subheader">AVG SALE VALUE</div>
-          <div>{{this.currency}}58.92</div>
+          <h2 class="summary-header">{{summary.title}}</h2>
         </div>
 
 <!--          <vs-divider style="grid-column: 1/5;"/>-->
@@ -134,7 +124,32 @@ export default {
       totalSales: 0,
       dateStart: null,
       dateEnd: null,
-      summaries: [],
+      summaries: [
+         {
+          title: "January 2020",
+          averageSale: 0.00,
+          averagePricePerItem: 58.92,
+          averageItemsPerSale: 3,
+          totalSaleValue: 5202.92,
+          totalSales: 1106
+        },
+        {
+          title: "February 2020",
+          averageSale: 0.00,
+          averagePricePerItem: 58.92,
+          averageItemsPerSale: 3,
+          totalSaleValue: 5202.92,
+          totalSales: 1106
+        },
+        {
+          title: "March 2020",
+          averageSale: 0.00,
+          averagePricePerItem: 58.92,
+          averageItemsPerSale: 3,
+          totalSaleValue: 5202.92,
+          totalSales: 1106
+        }
+      ],
       errors: []
     }
   },
@@ -165,7 +180,6 @@ export default {
 
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
-            this.calculateMonthlySaleSummaries();
           })
           .catch(err => {
             console.log(err)
@@ -231,6 +245,9 @@ export default {
       this.totalSales = this.salesHistory.length;
     },
 
+    /**
+     * calculates the summary object given a list of sales in that period
+     */
     calculateSummary: function(salesHistory) {
       let summary= {};
       let totalPrice = 0;
@@ -255,48 +272,6 @@ export default {
       summary.totalSales = salesHistory.length;
 
       return summary;
-    },
-
-    setDatePeriod: function() {
-      return this.salesHistory.filter(function (d) {
-        return d >= this.dateStart && d <= this.dateEnd;
-      });
-    },
-
-    calculateMonthlySaleSummaries: function() {
-      //get the date from
-      let monthIndex = moment(this.dateStart);
-
-      //negative months?
-      //get the number of months between start and end, then round to nearest month.
-      let monthsBetween = moment(this.dateEnd).diff(moment(this.dateStart), 'M', true).toFixed(0);
-
-      for (let i=0;i<monthsBetween;i++) {
-        let monthlyHistory = this.salesHistory.filter(function (salesItem) {
-          let itemDate = new Date(salesItem.created);
-          console.log("itemDate");
-          console.log(itemDate);
-          console.log("monthIndex.toDate()");
-          console.log(monthIndex.toDate());
-          console.log(moment(monthIndex).add(1, 'M').toDate());
-
-          if (itemDate >= monthIndex.toDate() && itemDate <= moment(monthIndex).add(1, 'M').toDate()) {
-            console.log(salesItem);
-            return (salesItem)
-          }
-         });
-
-        if (monthlyHistory.length >0) {
-          console.log("monthlyHistory "+i);
-          console.log(monthlyHistory);
-        }
-
-        let summary = this.calculateSummary(monthlyHistory);
-        this.summaries.push(summary);
-
-        //increment the number of months
-        monthIndex = moment(monthIndex).add(1, 'M').toDate();
-      }
     },
 
     /**
@@ -380,9 +355,11 @@ export default {
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
   /*border: black 1px solid;*/
-  max-width: 600px;
+  max-width: 200px;
+  max-height: 490px;
   margin: 0 2em;
   overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 
 #summary-container >>> .vs-card--content {
