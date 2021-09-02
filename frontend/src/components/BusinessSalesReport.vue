@@ -235,17 +235,21 @@ export default {
       let summary= {};
       let totalPrice = 0;
       let totalQuantity = 0;
-      if(salesHistory) {
+      if(salesHistory.length > 0) {
         for(let i=0;i<salesHistory.length;i++) {
           totalPrice += salesHistory[i].boughtListing.price;
           totalQuantity += salesHistory[i].boughtListing.quantity;
         }
-      }
-      console.log(salesHistory)
+        summary.averageSale = Number(totalPrice/salesHistory.length).toFixed(2);
+        summary.averagePricePerItem = Number(totalPrice / totalQuantity).toFixed(2);
+        summary.averageItemsPerSale = Number(totalQuantity / salesHistory.length).toFixed(2);
 
-      summary.averageSale = Number(totalPrice/salesHistory.length).toFixed(2);
-      summary.averagePricePerItem = Number(totalPrice / totalQuantity).toFixed(2);
-      summary.averageItemsPerSale = Number(totalQuantity / salesHistory.length).toFixed(2);
+      } else {
+        summary.averageSale = Number(0).toFixed(2);
+        summary.averagePricePerItem = Number(0).toFixed(2);
+        summary.averageItemsPerSale = Number(0).toFixed(2);
+      }
+
       summary.totalSaleValue = Number(totalPrice).toFixed(2);
       summary.totalItems = Number(totalQuantity).toFixed(2);
       summary.totalSales = salesHistory.length;
@@ -259,20 +263,42 @@ export default {
       });
     },
 
-
     calculateMonthlySaleSummaries: function() {
-      for (let i=0;i<12;i++) {
-        let start = new Date(i+'-01-'+this.dateStart.getFullYear())
-        let end = new Date(i+1+'-01-'+this.dateStart.getFullYear())
+      //get the date from
+      let monthIndex = moment(this.dateStart);
 
+      //negative months?
+      //get the number of months between start and end, then round to nearest month.
+      let monthsBetween = moment(this.dateEnd).diff(moment(this.dateStart), 'M', true).toFixed(0);
+
+      for (let i=0;i<monthsBetween;i++) {
         let monthlyHistory = this.salesHistory.filter(function (salesItem) {
-          return salesItem >= start && salesItem <= end;
+          let itemDate = new Date(salesItem.created);
+          console.log("itemDate");
+          console.log(itemDate);
+          console.log("monthIndex.toDate()");
+          console.log(monthIndex.toDate());
+          console.log(moment(monthIndex).add(1, 'M').toDate());
+
+          if (itemDate >= monthIndex.toDate() && itemDate <= moment(monthIndex).add(1, 'M').toDate()) {
+            console.log(salesItem);
+            return (salesItem)
+          }
          });
+
+        if (monthlyHistory.length >0) {
+          console.log("monthlyHistory "+i);
+          console.log(monthlyHistory);
+        }
+
         let summary = this.calculateSummary(monthlyHistory);
         this.summaries.push(summary);
+
+        //increment the number of months
+        monthIndex = moment(monthIndex).add(1, 'M').toDate();
       }
-      console.log(this.summaries);
     },
+
     /**
      * Sets display currency based on the user's home country.
      */
