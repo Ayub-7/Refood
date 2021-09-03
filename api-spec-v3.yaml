@@ -1082,6 +1082,47 @@ paths:
           description: 'Forbidden: Returned when a user tries to delete a notification that does not belong to them AND the user is not a GAA'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+    put:
+      tags:
+        - 'U32 : Managing my feed'
+        - 'Notifications'
+      summary: Update the view status of a user's notification
+      parameters:
+        - name: notificationId
+          in: path
+          description: Id of the notification to update
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                viewStatus:
+                  type: string
+                  description: The new viewing status to change the notification to
+                  example: "READ"
+      responses:
+        '200':
+          description: Update successful, notification status was updated
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to update a notification that does not belong to them AND the user is not a GAA'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
   '/cards/{id}':
     get:
@@ -2374,6 +2415,8 @@ components:
           enum:
             - Expired
             - Bought
+        viewStatus:
+          $ref: '#/components/schemas/ViewStatus'
         created:
           type: string
           format: date
@@ -2393,3 +2436,19 @@ components:
                  status: Expired,
                  created: '2021-05-27'
                 }]
+
+    NotificationStatus:
+      type: string
+      enum:
+        - Bought
+        - Expired
+        - Deleted
+        - Liked
+        - Unliked
+
+    ViewStatus:
+      type: string
+      enum:
+        - Unread
+        - Read
+        - Important
