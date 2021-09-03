@@ -172,6 +172,32 @@ export default {
     },
 
     /**
+     * Marks a listing notification as important
+     * @param notification the notification object to update.
+     */
+    markAsImportant: function(notification) {
+      if (notification.viewStatus != "Important") {
+        api.updateListingNotificationViewStatus(notification.id, "Important")
+            .then((res) => {
+              this.$log.debug(res);
+              notification.viewStatus = "Important";
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+            });
+      } else {
+        api.updateListingNotificationViewStatus(notification.id, "Important")
+            .then((res) => {
+              this.$log.debug(res);
+              notification.viewStatus = "Read";
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+            });
+      }
+    },
+
+    /**
      * Combines the different news feed item types into a single list.
      * Sorts the list by newest messages first.
      */
