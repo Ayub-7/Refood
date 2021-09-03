@@ -495,6 +495,14 @@ export default {
         instance.get(`/businesses/${businessId}/notifications`, {withCredentials: true}),
 
     /**
+     * Deletes listing notification
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteListingNotification: (listingId) =>
+        instance.delete(`/notifications/${listingId}`, {withCredentials: true}),
+
+    /**
      * Updates the view status of a listing notification.
      * @param notificationId the unique id of the notification
      * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,

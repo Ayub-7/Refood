@@ -178,7 +178,7 @@ const Homepage = {
 
     },
     /**
-     * Retrieves all the cards that the user has liked.
+     * Retrieves all the listings that the user has liked.
      */
     getLikes: function(userId) {
       api.getUserLikedListings(userId)

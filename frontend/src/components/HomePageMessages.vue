@@ -50,7 +50,7 @@
     </vs-popup>
 
     <!-- === NEWSFEED ITEMS === -->
-    <div v-for="item in feedItems" :key="item.fid">
+    <div v-for="item in feedItems" :key="item.id">
       <!-- CARD MESSAGE -->
       <vs-card v-if="item.card" id="message-notification-card" class="notification-card" actionable>
         <div @click="openDetailedModal(item)">
@@ -75,6 +75,7 @@
             <div v-else>
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
+            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           </div>
           <h3>{{ item.boughtListing.product.name }}</h3>
           <h5>{{ item.boughtListing.product.business.name }}</h5>
@@ -101,6 +102,7 @@
             <div v-else>
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
+            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           </div>
           <div class="lln-description">
             <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
@@ -118,6 +120,7 @@
           <div v-else>
             <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
           </div>
+          <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           <div style="display: flex">
             <div class="lln-description">
               <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
@@ -130,7 +133,6 @@
         </vs-card>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -162,6 +164,12 @@ export default {
       messages: [],
       listingNotifications: [],
       feedItems: [],
+    }
+  },
+
+  watch: {
+    likes() {
+      this.getListingNotifications();
     }
   },
 
@@ -259,6 +267,28 @@ export default {
     },
 
     /**
+     * Calls the delete endpoint in the backend, removing the relevant listing notification
+     * @param notificationId the unique id of the listingNotification to be deleted
+     */
+    deleteNotification: function(notificationId) {
+      api.deleteListingNotification(notificationId)
+        .then(() => {
+          this.$vs.notify({
+            title: `Listing Notification Deleted`,
+            color: 'success'
+          });
+          this.getListingNotifications();
+        })
+        .catch((error) => {
+          this.$vs.notify({
+            title: 'Failed to delete the listing notification',
+            color: 'danger'
+          });
+          this.$log.debug("Error Status:", error);
+        });
+    },
+
+    /**
      * Calls the backend to delete a given message's id.
      * @param messageId the unique id of the message to be deleted.
      */
@@ -287,9 +317,7 @@ export default {
     getListingNotifications: function() {
       api.getListingNotifications(store.loggedInUserId)
         .then((res) => {
-          //.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
           this.listingNotifications = res.data;
-          console.log(this.listingNotifications)
           this.combineFeedMessages();
         })
         .catch((error) => {
