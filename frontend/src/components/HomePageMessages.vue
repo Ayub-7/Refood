@@ -69,6 +69,12 @@
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'notification-card', 'bought-listing-notification']">
           <div class="pln-top-row">
             <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
+            <div v-if="item.viewStatus == 'Important'">
+              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
+            <div v-else>
+              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
           </div>
           <h3>{{ item.boughtListing.product.name }}</h3>
           <h5>{{ item.boughtListing.product.business.name }}</h5>
@@ -89,6 +95,12 @@
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <div class="pln-top-row">
             <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+            <div v-if="item.viewStatus == 'Important'">
+              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
+            <div v-else>
+              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
           </div>
           <div class="lln-description">
             <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
@@ -101,10 +113,10 @@
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
           <div v-if="item.viewStatus == 'Important'">
-            <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item)"></vs-button>
+            <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
           </div>
           <div v-else>
-            <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item)"></vs-button>
+            <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
           </div>
           <div style="display: flex">
             <div class="lln-description">
@@ -157,7 +169,6 @@ export default {
     this.currentUserId = store.loggedInUserId;
     this.getMessages();
     this.getListingNotifications();
-    this.feedItems.sort((a) => (a.viewStatus === 'Important') ? 1 : -1)
   },
 
   methods: {
@@ -195,7 +206,7 @@ export default {
               this.$log.debug(error);
             });
       } else {
-        api.updateListingNotificationViewStatus(notification.id, "Important")
+        api.updateListingNotificationViewStatus(notification.id, "Read")
             .then((res) => {
               this.$log.debug(res);
               notification.viewStatus = "Read";
@@ -221,6 +232,7 @@ export default {
       this.feedItems.sort(function(a, b) {
         return new Date(b.created) - new Date(a.created);
       });
+    this.feedItems.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
     },
 
     /**
@@ -275,7 +287,9 @@ export default {
     getListingNotifications: function() {
       api.getListingNotifications(store.loggedInUserId)
         .then((res) => {
+          //.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
           this.listingNotifications = res.data;
+          console.log(this.listingNotifications)
           this.combineFeedMessages();
         })
         .catch((error) => {
