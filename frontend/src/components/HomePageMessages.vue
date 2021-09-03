@@ -100,6 +100,12 @@
       <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
+          <div v-if="item.viewStatus == 'Important'">
+            <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item)"></vs-button>
+          </div>
+          <div v-else>
+            <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item)"></vs-button>
+          </div>
           <div style="display: flex">
             <div class="lln-description">
               <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
@@ -151,6 +157,7 @@ export default {
     this.currentUserId = store.loggedInUserId;
     this.getMessages();
     this.getListingNotifications();
+    this.feedItems.sort((a) => (a.viewStatus === 'Important') ? 1 : -1)
   },
 
   methods: {
@@ -176,11 +183,13 @@ export default {
      * @param notification the notification object to update.
      */
     markAsImportant: function(notification) {
+
       if (notification.viewStatus != "Important") {
         api.updateListingNotificationViewStatus(notification.id, "Important")
             .then((res) => {
               this.$log.debug(res);
               notification.viewStatus = "Important";
+              console.log("Important");
             })
             .catch((error) => {
               this.$log.debug(error);
@@ -190,6 +199,7 @@ export default {
             .then((res) => {
               this.$log.debug(res);
               notification.viewStatus = "Read";
+              console.log("Unimportant");
             })
             .catch((error) => {
               this.$log.debug(error);
