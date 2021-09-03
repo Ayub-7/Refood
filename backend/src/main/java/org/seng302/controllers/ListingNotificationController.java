@@ -143,10 +143,6 @@ public class ListingNotificationController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    List<ListingNotification> listingNotifications = listingNotificationRepository.findListingNotificationByBusinessId(businessId);
-    return ResponseEntity.status(HttpStatus.OK).body(listingNotifications);
-  }
-
   /**
    * Endpoint for deleting a listing notification given the notifications id
    * @param id
