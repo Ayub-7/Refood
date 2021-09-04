@@ -56,12 +56,13 @@
         <div @click="openDetailedModal(item)">
           <div style="display: flex; justify-content: space-between">
             <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
-            <div v-if="undoClick === true">
+            <div v-if="undoClick === true && undoId === item.id">
               {{undoCount}}
               <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
             </div>
             <div v-else>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, true); undoClick=true" icon="close"></vs-button>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, true);
+              undoClick=true; undoId=item.id" icon="close"></vs-button>
             </div>
           </div>
           <div id="message-notification-container">
@@ -74,12 +75,13 @@
       <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-          <div v-if="undoClick === true">
+          <div v-if="undoClick === true && undoId === item.id">
             {{undoCount}}
             <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
           </div>
           <div v-else>
-            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false); undoClick=true"></vs-button>
+            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true; undoId=item.id"></vs-button>
           </div>
         </div>
         <h3>{{ item.boughtListing.product.name }}</h3>
@@ -99,12 +101,13 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
         <div class="pln-top-row">
           <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-          <div v-if="undoClick === true">
+          <div v-if="undoClick === true && undoId === item.id">
             {{undoCount}}
             <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
           </div>
           <div v-else>
-            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false); undoClick=true"></vs-button>
+            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true; undoId=item.id"></vs-button>
           </div>
         </div>
         <div class="lln-description">
@@ -116,12 +119,13 @@
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
         <div class="pln-top-row">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-          <div v-if="undoClick === true">
+          <div v-if="undoClick === true && undoId === item.id">
             {{undoCount}}
             <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
           </div>
           <div v-else>
-            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false); undoClick=true"></vs-button>
+            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true; undoId=item.id"></vs-button>
           </div>
         </div>
         <div style="display: flex">
@@ -153,6 +157,7 @@ export default {
 
   data() {
     return {
+      undoId: null,
       undoDelete: false,
       undoClick: false,
       undoCount: 10,
@@ -191,8 +196,14 @@ export default {
           clearInterval(timer)
           if(isMessage===true) {
             this.deleteMessage(id)
+            this.undoCount = 10
+            this.undoClick = false
+            this.undoDelete = false
           } else {
             this.deleteNotification(id)
+            this.undoCount = 10
+            this.undoClick = false
+            this.undoDelete = false
           }
           return;
         } else if(this.undoDelete===true) {
