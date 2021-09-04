@@ -6,6 +6,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource
 public interface WishlistItemRepository extends JpaRepository<WishlistItem, Long> {
-
-
+    WishlistItem findWishlistItemById(long id);
 }
