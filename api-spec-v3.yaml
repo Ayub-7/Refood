@@ -1733,6 +1733,41 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
+  '/users/{id}/wishlist':
+    get:
+      tags:
+        - 'U33: Wishlist business'
+        - 'Wishlist'
+      summary: Get a user's wishlist
+      parameters:
+        - name: id
+          in: path
+          description: The id of the user for whom to get wishlist.
+          required: true
+          schema:
+            type: integer
+            example: 100
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Request successful, a (possibly empty) list of wishlist items is returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Wishlist'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
 components:
   securitySchemes:
     CookieAuth:
