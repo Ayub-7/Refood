@@ -110,7 +110,8 @@ let listingNotifications = [
                     country: "New Zealand"
                 },
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 2,
@@ -125,7 +126,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 4,
@@ -140,7 +142,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 5,
@@ -172,7 +175,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 6,
@@ -204,7 +208,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     }
 ];
 
@@ -219,6 +224,10 @@ api.getListingNotifications = jest.fn( () => {
 });
 
 api.deleteListingNotification = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+
+api.updateListingNotificationViewStatus = jest.fn(() => {
     return Promise.resolve({status: 200});
 });
 
@@ -329,22 +338,37 @@ describe('Listing notification functionality tests', () => {
     test("Delete listing notification buttons call delete notification function", async () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.currentUserId = 83;
-        let button = wrapper.get("#delete-liked-listing-notification-button");
+
+        let button = wrapper.get("#delete-purchased-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
         expect(api.deleteListingNotification).toBeCalled();
+    })
 
-        button = wrapper.get("#delete-liked-purchased-listing-notification-button");
+    test("Toggle listing notification as important", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+
+        let button = wrapper.get("#important-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
-
-        button = wrapper.get("#delete-purchased-listing-notification-button");
+        expect(api.updateListingNotificationViewStatus).toBeCalled();
+        button = wrapper.get("#important-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
+        expect(api.updateListingNotificationViewStatus).toBeCalled();
+    })
+
+    test("Marking as read", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+
+        let boughtNotif = wrapper.get(".liked-listing-container");
+        expect(boughtNotif).toBeTruthy();
+        await boughtNotif.trigger('mouseenter');
+        expect(api.updateListingNotificationViewStatus).toBeCalled();
     })
 });
