@@ -2453,7 +2453,7 @@ components:
         - Read
         - Important
 
-    wishlist:
+    wishlistItem:
       type: object
       description: An entity represnting a users wishlisted business
       required:
