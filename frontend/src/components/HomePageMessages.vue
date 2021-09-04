@@ -58,7 +58,7 @@
             <div style="display: flex; justify-content: space-between">
               <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
               <div>
-                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, true);
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, true);
               undoClick=true" icon="close"></vs-button>
               </div>
             </div>
