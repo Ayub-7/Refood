@@ -53,88 +53,120 @@
     <div v-for="item in feedItems" :key="item.id">
       <!-- CARD MESSAGE -->
       <vs-card v-if="item.card" id="message-notification-card" class="notification-card" actionable>
-        <div @click="openDetailedModal(item)">
-          <div style="display: flex; justify-content: space-between">
-            <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
-            <div v-if="undoClick === true && undoId === item.id">
-              {{undoCount}}
-              <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
+        <div v-if="!undoId.includes(item.id)">
+          <div @click="openDetailedModal(item)">
+            <div style="display: flex; justify-content: space-between">
+              <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
+              <div>
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, true);
+              undoClick=true" icon="close"></vs-button>
+              </div>
             </div>
-            <div v-else>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, true);
-              undoClick=true; undoId=item.id" icon="close"></vs-button>
+            <div id="message-notification-container">
+              <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
             </div>
           </div>
-          <div id="message-notification-container">
-            <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
+        </div>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
           </div>
         </div>
       </vs-card>
 
       <!-- USER BOUGHT LISTING NOTIFICATION -->
       <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
-        <div class="pln-top-row">
-          <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-          <div v-if="undoClick === true && undoId === item.id">
-            {{undoCount}}
-            <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
+        <div v-if="!undoId.includes(item.id)">
+          <div class="pln-top-row">
+            <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
+            <div>
+              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
+            </div>
           </div>
-          <div v-else>
-            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
-            undoClick=true; undoId=item.id"></vs-button>
+          <h3>{{ item.boughtListing.product.name }}</h3>
+          <h5>{{ item.boughtListing.product.business.name }}</h5>
+          <div class="pln-bottom-row">
+            <h4>
+              {{ currency }}
+              {{ item.boughtListing.price }}
+            </h4>
+            <div>
+              Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
+            </div>
           </div>
         </div>
-        <h3>{{ item.boughtListing.product.name }}</h3>
-        <h5>{{ item.boughtListing.product.business.name }}</h5>
-        <div class="pln-bottom-row">
-          <h4>
-            {{ currency }}
-            {{ item.boughtListing.price }}
-          </h4>
-          <div>
-            Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
           </div>
         </div>
       </vs-card>
 
       <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
-        <div class="pln-top-row">
-          <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-          <div v-if="undoClick === true && undoId === item.id">
-            {{undoCount}}
-            <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
+        <div v-if="!undoId.includes(item.id)">
+          <div class="pln-top-row">
+            <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+            <div>
+              <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
+            </div>
           </div>
-          <div v-else>
-            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
-            undoClick=true; undoId=item.id"></vs-button>
+          <div class="lln-description">
+            <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
           </div>
         </div>
-        <div class="lln-description">
-          <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
+          </div>
         </div>
       </vs-card>
 
       <!-- NEW LIKED LISTING NOTIFICATIONS -->
       <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
-        <div class="pln-top-row">
-          <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-          <div v-if="undoClick === true && undoId === item.id">
-            {{undoCount}}
-            <vs-icon icon="undo" @click="undoDelete=true"></vs-icon>
+        <div v-if="!undoId.includes(item.id)">
+          <div class="pln-top-row">
+            <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
+            <div>
+              <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
+            </div>
           </div>
-          <div v-else>
-            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false);
-            undoClick=true; undoId=item.id"></vs-button>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+              <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+            </div>
           </div>
         </div>
-        <div style="display: flex">
-          <div class="lln-description">
-            <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
-            <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
-          </div>
-          <div class="lln-button-group">
-            <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
           </div>
         </div>
       </vs-card>
@@ -157,7 +189,7 @@ export default {
 
   data() {
     return {
-      undoId: null,
+      undoId: [],
       undoDelete: false,
       undoClick: false,
       undoCount: 10,
@@ -190,7 +222,25 @@ export default {
   },
 
   methods: {
+    /**
+     * removes Id from undoId list
+     * @param ID of notification
+     **/
+    removeId: function (id) {
+      for (let i = this.undoId.length - 1; i >= 0; i--) {
+        if (this.undoId[i] === id) {
+          this.undoId.splice(i, 1);
+        }
+      }
+    },
+
+    /**
+     * function to delete a notification and handle undo countdown
+     * @param ID of notification
+     * @param bool to see if message notification or not
+     **/
     undo: function (id, isMessage) {
+      this.undoId.push(id)
       let timer = setInterval(() => {
         if(this.undoCount <= 0){
           clearInterval(timer)
