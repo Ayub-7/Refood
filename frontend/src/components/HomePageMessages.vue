@@ -261,6 +261,7 @@ export default {
           this.undoCount = 10
           clearInterval(timer)
         }
+
         this.undoCount -= 1;
       }, 1000);
     },
