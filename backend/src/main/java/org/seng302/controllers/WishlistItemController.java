@@ -60,7 +60,7 @@ public class WishlistItemController {
         WishlistItem wishlistItem = wishlistItemRepository.findWishlistItemById(id);
         if (wishlistItem == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        } else if (wishlistItem.getUserId() != user.getId() && user.getRole() != Role.USER) {
+        } else if (wishlistItem.getUserId() != user.getId() && user.getRole() == Role.USER) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } else {
             wishlistItemRepository.delete(wishlistItem);
