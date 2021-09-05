@@ -2,6 +2,7 @@ package org.seng302.repositories;
 
 import org.seng302.models.Listing;
 import org.seng302.models.ListingNotification;
+import org.seng302.models.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -23,5 +24,10 @@ public interface ListingNotificationRepository extends JpaRepository<ListingNoti
 
     List<ListingNotification> findListingNotificationsByListing(Listing listing);
 
+    /**
+     * Get listingNotification by it's ID
+     * @param id listing notification's ID
+     * @return Listing Notification
+     */
     ListingNotification findListingNotificationById(long id);
 }

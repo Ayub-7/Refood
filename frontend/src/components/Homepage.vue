@@ -34,7 +34,7 @@
           </div>
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
-        <div id="watchlist-container" class="sub-container">
+        <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
           <div id="watchlist-header-container">
             <div style="display: flex;">
               <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
@@ -74,18 +74,21 @@
       </div>
 
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
-        <main>
-          <nav id="newsfeed-navbar">
-            <div class="newsfeed-title">
-              <span style="display: inline-block; vertical-align: middle;">
-                <vs-icon icon="feed" />
-              </span>
-               News Feed
-            </div>
-          </nav>
-          <vs-divider style="padding: 0 1em;"/>
-          <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
-        </main>
+      <main v-if="getBusinessId() == null">
+        <nav id="newsfeed-navbar">
+          <div class="newsfeed-title">
+            <span style="display: inline-block; vertical-align: middle;">
+              <vs-icon icon="feed" />
+            </span>
+             News Feed
+          </div>
+        </nav>
+        <vs-divider style="padding: 0 1em;"/>
+        <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
+      </main>
+
+      <BusinessSalesReport v-else class="business-main"/>
+
 
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
@@ -107,10 +110,11 @@ import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
+import BusinessSalesReport from "./BusinessSalesReport";
 
 const Homepage = {
   name: "Homepage",
-  components: {ListingDetail, HomePageMessages, MarketplaceGrid},
+  components: {BusinessSalesReport, ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       unliked: false,
@@ -178,7 +182,7 @@ const Homepage = {
 
     },
     /**
-     * Retrieves all the cards that the user has liked.
+     * Retrieves all the listings that the user has liked.
      */
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
@@ -523,6 +527,15 @@ main {
   font-size: 18px;
   padding-top: 1em;
   padding-left: 4px;
+}
+
+.business-main {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.business-main >>> .vs-card--content {
+  width: 100%;
 }
 
 /* left navigation panel styling */

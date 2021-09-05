@@ -52,7 +52,6 @@ import ListingDetail from "@/components/ListingDetail";
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
 import { updateSessionOnRouterChange } from './utilities/UpdateSession';
-import BusinessSalesReport from "@/components/BusinessSalesReport";
 
 
 Vue.config.productionTip = false;
@@ -89,7 +88,6 @@ const routes = [
   {path: '/businesses/:id', name: 'Business', component: Business},
   {path: '/businesses/:id/sales-history', name: 'BusinessSalesHistory', component: BusinessSalesHistory},
   {path: '/businesses/:businessId/listings/:listingId', name: 'Listing', component: ListingDetail},
-  {path: '/businesses/:id/sales-report', name: 'BusinessSalesReport', component: BusinessSalesReport},
   {
     path: '*',
     name: 'catchAll',
