@@ -17,10 +17,10 @@
       <!-- ====== LISTINGS OPTIONS MENU ===== -->
       <div id="view-switch">
         <vs-tooltip text="Grid View">
-          <vs-button icon="grid_view" type="border" @click="displaytype = true" style="border: none; padding: 12px;"></vs-button>
+          <vs-button icon="grid_view" type="border" @click="tableView = true" style="border: none; padding: 12px;"></vs-button>
         </vs-tooltip>
         <vs-tooltip text="List View">
-          <vs-button icon="view_list" type="border" @click="displaytype = false" style="border: none;"></vs-button>
+          <vs-button icon="view_list" type="border" @click="tableView = false" style="border: none;"></vs-button>
         </vs-tooltip>
       </div>
     </div>
@@ -205,7 +205,7 @@ export default {
     margin: auto auto 0 auto;
   }
 
-  .table-image {
+  .table-image >>> img {
     min-width: 75px;
     max-width: 75px;
     height: 75px;
@@ -234,7 +234,7 @@ export default {
     margin: 0.5em 1em;
   }
 
-  .image {
+  .image >>> img {
     height: 150px;
     object-fit: cover;
 

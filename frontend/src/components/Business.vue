@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div v-if="fromSearch" class="return-button">
       <vs-button @click="returnToSearch()" title="Go Back">Return To Search</vs-button>
     </div>
@@ -16,6 +15,12 @@
       </div>
 
       <div id="business-container">
+        <div class="sub-container">
+          <vs-button :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
+            {{ inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
+          </vs-button>
+        </div>
+
         <div id="description" class="sub-container">
           <div class="sub-header">Description</div>
           {{ business.description }}
@@ -40,7 +45,7 @@
 
       <main>
         <!-- Sub Navigation Bar -->
-        <vs-tabs id="business-navbar">
+        <vs-tabs id="business-navbar" alignment="fixed">
           <vs-tab class="business-nav-item" label="Listings">
             <BusinessListings :business-id="business.id" :country="user.homeAddress.country"/>
           </vs-tab>
@@ -71,11 +76,36 @@ const Business = {
       fromSearch: sessionStorage.getItem("businessesCache"),
       business: null,
       adminList: null,
-      user: null
+      user: null,
+
+      inWishlist: false, // i.e. is it in the user's wishlist.
     };
   },
 
   methods: {
+    /**
+     * Adds or removes the current business from the user's wishlist.
+     */
+    toggleWishlist: function() {
+      if (!this.inWishlist) {
+        this.inWishlist = true;
+        this.$vs.notify({title: "Added to Wishlist",
+                        text: `${this.business.name} was added to your wishlist`,
+                        color: "success",
+                        icon: "add"});
+      }
+      else {
+        this.inWishlist = false;
+        this.$vs.notify({title: "Removed from Wishlist",
+                        text: `${this.business.name} was removed from your wishlist`,
+                        color: "success",
+                        icon: "remove"});
+      }
+    },
+
+    /**
+     * Retrieves the business information including the administrators.
+     */
     getBusiness: function () {
       api.getBusinessFromId(this.$route.params.id)
           .then((res) => {
@@ -92,6 +122,10 @@ const Business = {
           });
     },
 
+    /**
+     * Retrieves the current active user's information.
+     * @param userId the id of the currently logged in user.
+     */
     getUserInfo: function (userId) {
       api.getUserFromID(userId)
         .then((response) => {
@@ -109,14 +143,24 @@ const Business = {
 
     },
 
+    /**
+     * Returns the user back to the search page.
+     */
     returnToSearch: function() {
       this.$router.push({path: '/search'})
     },
 
+    /**
+     * Returns the user back to the listing page.
+     */
     returnToListing: function() {
       this.$router.push({path: `/businesses/${this.business.id}/listings/${this.fromListing}`})
     },
 
+    /**
+     * Checks the current user's session.
+     * When successful, retrieve the user's information, and the business information.
+     */
     checkUserSession: function() {
       api.checkSession()
         .then((response) => {
@@ -128,7 +172,6 @@ const Business = {
           this.$log.error("Error checking sessions: " + error);
         });
     }
-
   },
 
   mounted() {
@@ -188,6 +231,7 @@ export default Business;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto) repeat(1, 1fr);
   grid-row-gap: 1em;
+  margin-top: 1em;
 }
 
 .sub-container {
