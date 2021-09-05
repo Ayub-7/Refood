@@ -326,25 +326,39 @@ describe('Listing notification functionality tests', () => {
         expect(wrapper.vm.$router.push).toBeCalled();
     });
 
-    test("Delete listing notification buttons call delete notification function", async () => {
+    test("Delete listing notification buttons call undo function which deletes notification", async () => {
+        const deleteUndo = jest.spyOn(wrapper.vm, 'undo')
         await wrapper.vm.$nextTick();
         wrapper.vm.currentUserId = 83;
         let button = wrapper.get("#delete-liked-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
 
         button = wrapper.get("#delete-liked-purchased-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
 
         button = wrapper.get("#delete-purchased-listing-notification-button");
-        expect(button).toBeTruthy();
+        expect(deleteUndo).toBeTruthy();
+
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
     })
 });

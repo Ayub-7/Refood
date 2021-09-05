@@ -236,8 +236,8 @@ export default {
 
     /**
      * function to delete a notification and handle undo countdown
-     * @param ID of notification
-     * @param bool to see if message notification or not
+     * @param id
+     * @param isMessage
      **/
     undo: function (id, isMessage) {
       this.undoId.push(id)
@@ -255,13 +255,13 @@ export default {
             this.undoClick = false
             this.undoDelete = false
           }
-          return;
+          // return;
         } else if(this.undoDelete===true) {
           this.undoClick = false
           this.undoDelete = false
           this.undoCount = 10
           clearInterval(timer)
-          return;
+          // return;
         }
         this.undoCount -= 1;
       }, 1000);
