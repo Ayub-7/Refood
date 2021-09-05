@@ -236,8 +236,8 @@ export default {
 
     /**
      * function to delete a notification and handle undo countdown
-     * @param ID of notification
-     * @param bool to see if message notification or not
+     * @param id
+     * @param isMessage
      **/
     undo: function (id, isMessage) {
       this.undoId.push(id)
@@ -255,13 +255,11 @@ export default {
             this.undoClick = false
             this.undoDelete = false
           }
-          return;
         } else if(this.undoDelete===true) {
           this.undoClick = false
           this.undoDelete = false
           this.undoCount = 10
           clearInterval(timer)
-          return;
         }
         this.undoCount -= 1;
       }, 1000);
@@ -307,20 +305,20 @@ export default {
      */
     deleteNotification: function(notificationId) {
       api.deleteListingNotification(notificationId)
-        .then(() => {
-          this.$vs.notify({
-            title: `Listing Notification Deleted`,
-            color: 'success'
+          .then(() => {
+            this.$vs.notify({
+              title: `Listing Notification Deleted`,
+              color: 'success'
+            });
+            this.getListingNotifications();
+          })
+          .catch((error) => {
+            this.$vs.notify({
+              title: 'Failed to delete the listing notification',
+              color: 'danger'
+            });
+            this.$log.debug("Error Status:", error);
           });
-          this.getListingNotifications();
-        })
-        .catch((error) => {
-          this.$vs.notify({
-            title: 'Failed to delete the listing notification',
-            color: 'danger'
-          });
-          this.$log.debug("Error Status:", error);
-        });
     },
 
     /**

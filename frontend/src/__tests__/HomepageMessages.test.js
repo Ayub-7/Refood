@@ -121,7 +121,7 @@ let listingNotifications = [
                 product: {
                     name: "Pastry",
                     business: {
-                      id: 1
+                        id: 1
                     },
                 }
             }
@@ -215,7 +215,7 @@ api.deleteMessage = jest.fn(() => {
 });
 
 api.getListingNotifications = jest.fn( () => {
-   return Promise.resolve({status: 200, data: listingNotifications});
+    return Promise.resolve({status: 200, data: listingNotifications});
 });
 
 api.deleteListingNotification = jest.fn(() => {
@@ -288,11 +288,11 @@ describe('Message validation', () => {
 });
 
 describe('Listing notification methods tests', () => {
-   test('City and country address string is returned', () => {
-     let address = {city: "Christchurch", country: "New Zealand"};
+    test('City and country address string is returned', () => {
+        let address = {city: "Christchurch", country: "New Zealand"};
 
-     expect(wrapper.vm.createAddressString(address)).toBe("Christchurch, New Zealand");
-   });
+        expect(wrapper.vm.createAddressString(address)).toBe("Christchurch, New Zealand");
+    });
 
     test('Full address string is returned', () => {
         let address = {
@@ -326,25 +326,39 @@ describe('Listing notification functionality tests', () => {
         expect(wrapper.vm.$router.push).toBeCalled();
     });
 
-    test("Delete listing notification buttons call delete notification function", async () => {
+    test("Delete listing notification buttons call undo function which deletes notification", async () => {
+        const deleteUndo = jest.spyOn(wrapper.vm, 'undo')
         await wrapper.vm.$nextTick();
         wrapper.vm.currentUserId = 83;
         let button = wrapper.get("#delete-liked-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
 
         button = wrapper.get("#delete-liked-purchased-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
 
         button = wrapper.get("#delete-purchased-listing-notification-button");
-        expect(button).toBeTruthy();
+        expect(deleteUndo).toBeTruthy();
+
 
         await button.trigger('click');
-        expect(api.deleteListingNotification).toBeCalled();
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
     })
 });
