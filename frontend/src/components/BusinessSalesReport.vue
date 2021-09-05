@@ -34,13 +34,20 @@
       <!-- for each in month list
       AVG SALE VALUE - should we keep naming consistent?
       -->
-      <vs-card id="summary-container" v-for="summary in summaries" :key="summary.id" v-bind:summary="summary">
+      <div id="summary-container">
         <div class="row-summary-container">
-          <h2 class="summary-header">{{summary.title}}</h2>
-        </div>
+          <h2 class="summary-header">January 2020</h2>
+          <div class="summary-subheader">NUMBER OF SALES</div>
+          <div>1106</div>
+          <div class="summary-subheader">AVG ITEMS PER SALE</div>
+          <div>3</div>
 
-<!--          <vs-divider style="grid-column: 1/5;"/>-->
-      </vs-card>
+          <div class="summary-subheader">TOTAL SALE VALUE</div>
+          <div>{{this.currency}}5202.92</div>
+          <div class="summary-subheader">AVG SALE VALUE</div>
+          <div>{{this.currency}}58.92</div>
+        </div>
+      </div>
 
       <div id="stats-container">
         <div class="stat-box">
@@ -126,6 +133,7 @@ export default {
       dateEnd: null,
       summaries: [
          {
+           id: 0,
           title: "January 2020",
           averageSale: 0.00,
           averagePricePerItem: 58.92,
@@ -134,6 +142,7 @@ export default {
           totalSales: 1106
         },
         {
+          id: 1,
           title: "February 2020",
           averageSale: 0.00,
           averagePricePerItem: 58.92,
@@ -142,6 +151,7 @@ export default {
           totalSales: 1106
         },
         {
+          id: 2,
           title: "March 2020",
           averageSale: 0.00,
           averagePricePerItem: 58.92,
@@ -352,14 +362,13 @@ export default {
   margin: auto;
 }
 
+
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
   /*border: black 1px solid;*/
-  max-width: 200px;
-  max-height: 490px;
+  max-width: 600px;
   margin: 0 2em;
   overflow-y: scroll;
-  scroll-behavior: smooth;
 }
 
 #summary-container >>> .vs-card--content {
