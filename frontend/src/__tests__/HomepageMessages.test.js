@@ -308,11 +308,6 @@ describe('Listing notification methods tests', () => {
 
     expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
   });
-
-  test("Notification updates to read", async () => {
-    await wrapper.vm.markAsRead(listingNotifications[0]);
-    expect(listingNotifications[0].viewStatus).toBe("Read");
-  });
 });
 
 describe('Listing notification functionality tests', () => {
