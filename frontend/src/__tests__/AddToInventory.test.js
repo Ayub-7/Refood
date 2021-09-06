@@ -172,8 +172,8 @@ describe('Component', () => {
         wrapper.vm.invenForm.totalPrice = 88.93;
         wrapper.vm.invenForm.manufactureDate = '2020-01-27';
         wrapper.vm.invenForm.sellBy = null;
-        wrapper.vm.invenForm.bestBefore = "2021-12-27";
-        wrapper.vm.invenForm.listExpiry = "2021-12-27";
+        wrapper.vm.invenForm.bestBefore = "2022-08-27";
+        wrapper.vm.invenForm.listExpiry = "2022-08-27";
         wrapper.vm.addNewInv = true;
         await wrapper.vm.addInventory();
         expect(wrapper.vm.addNewInv).toBeFalsy();

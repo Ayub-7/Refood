@@ -53,7 +53,7 @@ class ListingNotificationControllerTests {
     private InventoryRepository inventoryRepository;
 
     private User user;
-    private User anotherUser;
+    private User otherUser;
     private Business business;
     private Product product1;
     private Product product2;
@@ -63,6 +63,7 @@ class ListingNotificationControllerTests {
     private BoughtListing boughtListing2;
     private ListingNotification notification;
     private ListingNotification notification2;
+    private ListingNotification notification3;
     private List<ListingNotification> notificationList;
 
     @BeforeEach
@@ -71,8 +72,9 @@ class ListingNotificationControllerTests {
         user.setId(1L);
         userRepository.save(user);
 
-        anotherUser = new User("John", null, "Doo", "", "", "rdalgety3@ocn.ne.jp", "2006-03-30", "+7 684 622 5902", null, "ATQWJM");
-        anotherUser.setId(25L);
+        otherUser = new User("Rayna", "YEP", "Dalgety", "Universal", "", "dalgety3@ocn.ne.jp", "2006-03-30", "+7 684 622 5902", null, "ATQWJM");
+        otherUser.setId(2L);
+        userRepository.save(otherUser);
 
         Address address = new Address("39", "Ilam Rd", "Christchurch", "Canterbury", "New Zealand", "8041");
 
@@ -104,6 +106,7 @@ class ListingNotificationControllerTests {
         notification.setUser(user);
         notification.setId(1);
         notification2 = new ListingNotification(user, business, boughtListing2, NotificationStatus.BOUGHT);
+        notification3 = new ListingNotification(otherUser, business, boughtListing2, NotificationStatus.LIKED);
 
         notificationList = new ArrayList<>();
         notificationList.add(notification);
@@ -196,66 +199,71 @@ class ListingNotificationControllerTests {
                 .andExpect(status().isOk());
     }
 
-
-    //
-    // PUT - Notification View Status
-    //
-    @Test
-    void testPutNotificationViewStatus_notLoggedIn_returnUnauthorized() throws Exception {
-        mvc.perform(put("/notifications/{notificationId}", notification.getId()))
-                .andExpect(status().isUnauthorized());
-    }
-
+    /**
+     * Tests attempted deletion of a non-existent liked listing notification, should return Not Acceptable status
+     * @throws Exception
+     */
     @Test
     @WithMockUser
-    void testPutNotificationViewStatus_invalidViewStatusInput_returnBadRequest() throws Exception {
-        mvc.perform(put("/notifications/{notificationId}", notification.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"viewStatus\": \"Donda\"}"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser
-    void testPutNotificationViewStatus_notUserAndNotDgaa_returnForbidden() throws Exception {
-        Mockito.when(listingNotificationRepository.findListingNotificationById(notification.getId())).thenReturn(notification);
-        mvc.perform(put("/notifications/{notificationId}", notification.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"viewStatus\": \"Read\"}")
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @WithMockUser
-    void testPutNotificationViewStatus_noNotificationWithId_returnNotAcceptable() throws Exception {
-        Mockito.when(listingNotificationRepository.findListingNotificationById(notification.getId())).thenReturn(null);
-        mvc.perform(put("/notifications/{notificationId}", notification.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"viewStatus\": \"Read\"}"))
+    void testDeleteNonExistentListingNotification_returnNotAcceptable() throws Exception {
+        Mockito.when(listingNotificationRepository.findListingNotificationById(1)).thenReturn(null);
+        mvc.perform(delete("/notifications/{notificationId}", 1))
                 .andExpect(status().isNotAcceptable());
     }
 
+    /**
+     * Tests attempted deletion of a liked listing notification that doesn't relate to the current user
+     * should return Forbidden status
+     * @throws Exception
+     */
     @Test
     @WithMockUser
-    void testPutNotificationViewStatus_validRequest_returnOk() throws Exception {
-        Mockito.when(listingNotificationRepository.findListingNotificationById(notification.getId())).thenReturn(notification);
-        mvc.perform(put("/notifications/{notificationId}", notification.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"viewStatus\": \"Read\"}")
+    void testDeleteListingNotificationBelongingToAnotherUser_returnForbidden() throws Exception {
+        Mockito.when(listingNotificationRepository.findListingNotificationById(3)).thenReturn(notification3);
+        mvc.perform(delete("/notifications/{notificationId}", 3)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isForbidden());
+    }
+
+    /**
+     * Tests successful deletion of a users liked listing notification
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testDeleteLikedListingNotification_returnOk() throws Exception {
+        notification2.setStatus(NotificationStatus.LIKED);
+        Mockito.when(listingNotificationRepository.findListingNotificationById(2)).thenReturn(notification2);
+        mvc.perform(delete("/notifications/{notificationId}", 2)
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
     }
 
+    /**
+     * Tests successful deletion of a users unliked listing notification
+     * @throws Exception
+     */
     @Test
     @WithMockUser
-    void testPutNotificationViewStatus_asGaa_returnOk() throws Exception {
-        Mockito.when(listingNotificationRepository.findListingNotificationById(notification.getId())).thenReturn(notification);
-        anotherUser.setRole(Role.GAA);
-        mvc.perform(put("/notifications/{notificationId}", notification.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"viewStatus\": \"Read\"}")
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+    void testDeleteUnlikedListingNotification_returnOk() throws Exception {
+        notification2.setStatus(NotificationStatus.UNLIKED);
+        Mockito.when(listingNotificationRepository.findListingNotificationById(2)).thenReturn(notification2);
+        mvc.perform(delete("/notifications/{notificationId}", 2)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests successful deletion of a users purchased listing notification
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser
+    void testDeletePurchasedListingNotification_returnOk() throws Exception {
+        notification2.setStatus(NotificationStatus.BOUGHT);
+        Mockito.when(listingNotificationRepository.findListingNotificationById(2)).thenReturn(notification2);
+        mvc.perform(delete("/notifications/{notificationId}", 2)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
     }
 }
