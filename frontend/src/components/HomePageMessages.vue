@@ -303,7 +303,7 @@ export default {
     undo: function (id, isMessage) {
       this.undoId.push(id)
       let timer = setInterval(() => {
-        if(this.undoCount <= 0){
+        if(this.undoCount <= 0 || this.$route.path !== "/home") {
           clearInterval(timer)
           if(isMessage===true) {
             this.deleteMessage(id)
