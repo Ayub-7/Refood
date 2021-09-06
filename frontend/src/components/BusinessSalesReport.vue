@@ -171,7 +171,7 @@
 <script>
 import api from "../Api";
 import axios from "axios";
-import {store} from "@/store";
+import {store} from "../store";
 const moment = require('moment');
 
 export default {
@@ -225,11 +225,6 @@ export default {
     this.getSession();
 
     this.getSalesHistory();
-    this.calculateReport();
-
-    this.handleIcon();
-
-    console.log(store);
 
     let currentDate = new Date();
     //we gotta set date to a string or the bloody thing complains
@@ -255,7 +250,9 @@ export default {
     },
 
     /**
-     * calculates the percentage increase from last year
+     * Calculates the percentage increase from last year
+     * If last year had no sales, return 100% increase
+     *
      * @param thisyear The current year's figure
      * @param lastyear The previous year's figure
      */
@@ -267,16 +264,6 @@ export default {
     },
 
     /**
-     * Handles icon arrow up or down
-     */
-    handleIcon() {
-      // accessing the link tag
-      const favicon = document.getElementById("iconAverageSale");
-      favicon.icon = "arrow_drop_up";
-      favicon.color = "green";
-
-    },
-    /**
      * Calls getBusinessListingNotifications to populate the page's sales history
      */
     getSalesHistory: function () {
@@ -284,13 +271,11 @@ export default {
           .then((res) => {
             this.salesHistory = res.data;
 
-            console.log(this.salesHistory);
-
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
           })
           .catch(err => {
-            console.log(err)
+            this.$log.debug(err);
           });
     },
 
@@ -304,7 +289,6 @@ export default {
     getSession: function() {
       api.checkSession()
           .then((response) => {
-            console.log(response.data);
             this.setCurrency(response.data.homeAddress.country)
           })
           .catch(err => {
@@ -320,14 +304,18 @@ export default {
         this.actingAsBusinessId = store.actingAsBusinessId;
 
         this.getSalesHistory();
-        this.calculateReport();
       }
 
       return store.actingAsBusinessName;
     },
 
     /**
-     * Populates the
+     * calculateReport
+     * Populates the report data metrics
+     * First separates the salesHistory into the selected period and that same period from the year before
+     * Then it calculates the summary report from both
+     *
+     * Later these are used in the business metrics and % increases from last year
      */
     calculateReport: function() {
       let start = moment(new Date(this.dateStart));
@@ -337,9 +325,6 @@ export default {
       start = start.subtract(1,'year');
       end = end.subtract(1,'year');
       let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
-
-
-      //this.salesHistory.filter()
 
       this.currentYearReport = this.calculateSummary(currentYearSalesHistory, "Current Period's Report");
       this.lastYearReport = this.calculateSummary(lastYearSalesHistory, "Last period's Report");
