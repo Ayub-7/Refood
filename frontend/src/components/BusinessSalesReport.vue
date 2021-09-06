@@ -3,7 +3,7 @@
     <div id="header-container">
       <vs-icon icon="summarize" size="32px"></vs-icon>
       <div id="title">Sales Report</div>
-      <div id="title-business" v-if="this.business != null"> - {{this.business.name}}</div>
+      <div id="title-business"> - {{getBusinessName()}}</div>
     </div>
     <vs-divider/>
 
@@ -222,10 +222,8 @@ export default {
 
 
   mounted: function() {
-    this.getActingAsBusinessId();
-
     this.getSession();
-    this.getBusiness();
+
     this.getSalesHistory();
     this.calculateReport();
 
@@ -313,29 +311,19 @@ export default {
             this.$log.debug(err);
           });
     },
-
-    getActingAsBusinessId() {
-      this.actingAsBusinessId = store.actingAsBusinessId;
-      return this.actingAsBusinessId;
-    },
-
     /**
-     * Get the business name to populate the title
-     * TODO: do we use this OR store.businessname?
+     * return the name of the business currently administering
+     * also, sets the accting as business id to update the sales report
      */
-    getBusiness: function () {
-      api.getBusinessFromId(this.actingAsBusinessId)
-          .then((res) => {
-            this.business = res.data;
-          })
-          .catch((error) => {
-            if (error) {
-              if (error.response.status === 406) {
-                this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})
-              }
-            }
-            this.$log.error(`ERROR trying to obtain business info from Id: ${error}`);
-          });
+    getBusinessName: function() {
+      if (store.actingAsBusinessId !== this.actingAsBusinessId) {
+        this.actingAsBusinessId = store.actingAsBusinessId;
+
+        this.getSalesHistory();
+        this.calculateReport();
+      }
+
+      return store.actingAsBusinessName;
     },
 
     /**
