@@ -29,6 +29,8 @@ public class Notification {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
+    private Boolean read;
+
     /**
      * Empty constructor for JPA use.
      */
@@ -42,6 +44,7 @@ public class Notification {
         this.displayPeriodEnd = displayPeriodEnd;
         this.status = NotificationStatus.EXPIRED;
         this.created = new Date();
+        this.read = false;
     }
 
     /***

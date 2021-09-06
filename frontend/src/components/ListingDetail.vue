@@ -67,7 +67,7 @@
 import api from "../Api";
 import ReImage from "../components/ReImage.vue";
 import axios from "axios";
-import { store } from "../store";
+import {store} from "../store";
 export default {
   components: {
     ReImage
@@ -212,6 +212,10 @@ export default {
           })
           .catch((err) => {
             throw new Error(`Error trying to like listing ${listingId}: ${err}`);
+          })
+      api.getNotifications(store.loggedInUserId)
+          .then((response) => {
+            console.log(response);
           })
     },
     /**
