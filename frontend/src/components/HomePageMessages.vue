@@ -53,23 +53,41 @@
     <div v-for="item in feedItems" :key="item.fid">
       <!-- CARD MESSAGE -->
       <vs-card v-if="item.card" id="message-notification-card" class="notification-card" actionable>
-        <div @click="openDetailedModal(item)">
-          <div style="display: flex; justify-content: space-between">
-            <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
-            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
+        <div v-if="!undoId.includes(item.id)">
+          <div @click="openDetailedModal(item)">
+            <div style="display: flex; justify-content: space-between">
+              <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
+              <div>
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, true);
+              undoClick=true" icon="close"></vs-button>
+              </div>
+            </div>
+            <div id="message-notification-container">
+              <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
+            </div>
           </div>
-          <div id="message-notification-container">
-            <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
+        </div>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
           </div>
         </div>
       </vs-card>
 
       <!-- USER BOUGHT LISTING NOTIFICATION -->
-      <div v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId" @mouseenter="markAsRead(item)" class="bought-listing-container">
-        <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'notification-card', 'bought-listing-notification']">
+      <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
+        <div v-if="!undoId.includes(item.id)">
           <div class="pln-top-row">
             <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+            <div>
+              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
+            </div>
           </div>
           <h3>{{ item.boughtListing.product.name }}</h3>
           <h5>{{ item.boughtListing.product.business.name }}</h5>
@@ -82,9 +100,18 @@
               Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
             </div>
           </div>
-        </vs-card>
-      </div>
-
+        </div>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
+          </div>
+        </div>
+      </vs-card>
       <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
       <div v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
@@ -97,12 +124,40 @@
           </div>
         </vs-card>
       </div>
+      <vs-card class="liked-listing-notification notification-card" v-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
+        <div v-if="!undoId.includes(item.id)">
+          <div class="pln-top-row">
+            <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+            <div>
+              <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
+            </div>
+          </div>
+          <div class="lln-description">
+            <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
+          </div>
+        </div>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
+          </div>
+        </div>
+      </vs-card>
 
-      <!-- NEW LIKED LISTING NOTIFICATIONS -->
-      <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
-        <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
-          <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-          <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+      <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
+        <div v-if="!undoId.includes(item.id)">
+          <div class="pln-top-row">
+            <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
+            <div>
+              <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
+            </div>
+          </div>
           <div style="display: flex">
             <div class="lln-description">
               <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
@@ -112,8 +167,18 @@
               <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
             </div>
           </div>
-        </vs-card>
-      </div>
+        </div>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+            </div>
+          </div>
+        </div>
+      </vs-card>
     </div>
   </div>
 </template>
@@ -133,6 +198,10 @@ export default {
 
   data() {
     return {
+      undoId: [],
+      undoDelete: false,
+      undoClick: false,
+      undoCount: 10,
       messaging: false,
       showing: false,
       message: '',
@@ -177,6 +246,49 @@ export default {
             this.$log.debug(error);
           });
       }
+    },
+    /**
+     * removes Id from undoId list
+     * @param ID of notification
+     **/
+    removeId: function (id) {
+      for (let i = this.undoId.length - 1; i >= 0; i--) {
+        if (this.undoId[i] === id) {
+          this.undoId.splice(i, 1);
+        }
+      }
+    },
+
+    /**
+     * function to delete a notification and handle undo countdown
+     * @param id
+     * @param isMessage
+     **/
+    undo: function (id, isMessage) {
+      this.undoId.push(id)
+      let timer = setInterval(() => {
+        if(this.undoCount <= 0 || this.$route.path !== "/home") {
+          clearInterval(timer)
+          if(isMessage===true) {
+            this.deleteMessage(id)
+            this.undoCount = 10
+            this.undoClick = false
+            this.undoDelete = false
+          } else {
+            this.deleteNotification(id)
+            this.undoCount = 10
+            this.undoClick = false
+            this.undoDelete = false
+          }
+        } else if(this.undoDelete===true) {
+          this.undoClick = false
+          this.undoDelete = false
+          this.undoCount = 10
+          clearInterval(timer)
+        }
+
+        this.undoCount -= 1;
+      }, 1000);
     },
 
     /**
@@ -268,18 +380,18 @@ export default {
      */
     getListingNotifications: function() {
       api.getListingNotifications(store.loggedInUserId)
-        .then((res) => {
-          this.listingNotifications = res.data;
-          this.combineFeedMessages();
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          if (error && error.response) {
-            this.$vs.notify({title: `Error ${error.response}`,
-                              text: "There was a problem getting your newsfeed.",
-                              color: "danger"});
-          }
-        });
+          .then((res) => {
+            this.listingNotifications = res.data;
+            this.combineFeedMessages();
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            if (error && error.response) {
+              this.$vs.notify({title: `Error ${error.response}`,
+                text: "There was a problem getting your newsfeed.",
+                color: "danger"});
+            }
+          });
     },
 
     /**
