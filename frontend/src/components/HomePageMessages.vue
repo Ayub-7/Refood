@@ -85,8 +85,10 @@
           <div v-if="!undoId.includes(item.id)">
             <div class="pln-top-row">
               <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
-            </div>
+              <div>
+                <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
+              </div>            </div>
             <h3>{{ item.boughtListing.product.name }}</h3>
             <h5>{{ item.boughtListing.product.business.name }}</h5>
             <div class="pln-bottom-row">
