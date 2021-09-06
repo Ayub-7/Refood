@@ -69,13 +69,6 @@
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'notification-card', 'bought-listing-notification']">
           <div class="pln-top-row">
             <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-            <div v-if="item.viewStatus == 'Important'">
-              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-            </div>
-            <div v-else>
-              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-            </div>
-            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           </div>
           <h3>{{ item.boughtListing.product.name }}</h3>
           <h5>{{ item.boughtListing.product.business.name }}</h5>
@@ -88,14 +81,7 @@
               Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
             </div>
           </div>
-        </vs-card>
-      </div>
-
-      <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
-      <div v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId" @mouseenter="markAsRead(item)" class="liked-listing-container">
-        <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
-          <div class="pln-top-row">
-            <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+          <div class="lln-button-group">
             <div v-if="item.viewStatus == 'Important'">
               <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
@@ -104,8 +90,26 @@
             </div>
             <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           </div>
+        </vs-card>
+      </div>
+
+      <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
+      <div v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId" @mouseenter="markAsRead(item)" class="liked-listing-container">
+        <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
+          <div class="pln-top-row">
+            <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+          </div>
           <div class="lln-description">
             <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
+          </div>
+          <div class="lln-button-group">
+            <div v-if="item.viewStatus == 'Important'">
+              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
+            <div v-else>
+              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
+            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           </div>
         </vs-card>
       </div>
@@ -114,20 +118,20 @@
       <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
-          <div v-if="item.viewStatus == 'Important'">
-            <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-          </div>
-          <div v-else>
-            <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-          </div>
-          <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           <div style="display: flex">
             <div class="lln-description">
               <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
               <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
             </div>
             <div class="lln-button-group">
+              <div v-if="item.viewStatus == 'Important'">
+                <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <div v-else>
+                <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
               <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
             </div>
           </div>
         </vs-card>
