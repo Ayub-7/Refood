@@ -113,8 +113,8 @@
           <div class="stat-subheader">Average Sale</div>
           <h2 style="padding-left: 12px">{{currency + currentYearReport.averageSale}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
-            <div>12.34% from last year</div>
+            <vs-icon id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <div>{{increaseFromLastYear(currentYearReport.averageSale, lastYearReport.averageSale)}}% from last year</div>
           </div>
           <div class="sub-header stat-date"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
@@ -123,7 +123,7 @@
           <h2 style="padding-left: 12px">{{currency + currentYearReport.averagePricePerItem}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.averagePricePerItem, lastYearReport.averagePricePerItem)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
@@ -132,7 +132,7 @@
           <h2 style="padding-left: 12px">{{currency + currentYearReport.averageItemsPerSale}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale)}}% from last year</div>
           </div>
           <div class="sub-header stat-date"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
@@ -141,7 +141,7 @@
           <h2 style="padding-left: 12px">{{currency + currentYearReport.totalSaleValue}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.totalSaleValue, lastYearReport.totalSaleValue)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
@@ -150,7 +150,7 @@
           <h2 style="padding-left: 12px">{{currentYearReport.totalItems}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.totalItems, lastYearReport.totalItems)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
@@ -159,7 +159,7 @@
           <h2 style="padding-left: 12px">{{currentYearReport.totalSales}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.totalSales, lastYearReport.totalSales)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
@@ -189,6 +189,7 @@ export default {
       dateStart: null,
       dateEnd: null,
       currentYearReport: {},
+      lastYearReport: {},
       summaries: [
          {
           title: "January 2020",
@@ -228,6 +229,8 @@ export default {
     this.getSalesHistory();
     this.calculateReport();
 
+    this.handleIcon();
+
     console.log(store);
 
     let currentDate = new Date();
@@ -254,11 +257,31 @@ export default {
     },
 
     /**
-     * Calls get sales history
+     * calculates the percentage increase from last year
+     * @param thisyear The current year's figure
+     * @param lastyear The previous year's figure
+     */
+    increaseFromLastYear(thisYear, lastYear) {
+      if (lastYear === 0) {
+        return 100;
+      }
+      return (thisYear - lastYear) / lastYear;
+    },
+
+    /**
+     * Handles icon arrow up or down
+     */
+    handleIcon() {
+      // accessing the link tag
+      const favicon = document.getElementById("iconAverageSale");
+      favicon.icon = "arrow_drop_up";
+      favicon.color = "green";
+
+    },
+    /**
+     * Calls getBusinessListingNotifications to populate the page's sales history
      */
     getSalesHistory: function () {
-      console.log("this.actingAsBusinessId");
-      console.log(this.actingAsBusinessId);
       api.getBusinessListingNotifications(this.actingAsBusinessId)
           .then((res) => {
             this.salesHistory = res.data;
@@ -316,21 +339,22 @@ export default {
     },
 
     /**
-     * calculates all the variables at once
-     * much more efficient than having a loop for every parameter...
-     *
+     * Populates the
      */
     calculateReport: function() {
-      //let start = moment(this.dateStart);
-      //let start = new Date(this.dateEnd)
+      let start = moment(new Date(this.dateStart));
+      let end = moment(new Date(this.dateEnd));
+      let currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
 
-      //let monthlyHistory = this.salesHistory.filter(sale => sale.length > 6 && sale.length < 3);
+      start = start.subtract(1,'year');
+      end = end.subtract(1,'year');
+      let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
 
 
       //this.salesHistory.filter()
 
-      this.currentYearReport = this.calculateSummary(this.salesHistory, "Current Period's Report");
-      this.lastYearReport = this.calculateSummary(this.salesHistory, "Last period's Report");
+      this.currentYearReport = this.calculateSummary(currentYearSalesHistory, "Current Period's Report");
+      this.lastYearReport = this.calculateSummary(lastYearSalesHistory, "Last period's Report");
     },
 
     /**
