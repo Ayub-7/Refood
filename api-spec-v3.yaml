@@ -45,6 +45,7 @@ tags:
   - name: 'U29 : Browse/search sale listings'
   - name: 'U31 : Purchases'
   - name: 'U32 : Managing my feed'
+  - name: 'U33 : Wishlist Business'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -1082,6 +1083,47 @@ paths:
           description: 'Forbidden: Returned when a user tries to delete a notification that does not belong to them AND the user is not a GAA'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+    put:
+      tags:
+        - 'U32 : Managing my feed'
+        - 'Notifications'
+      summary: Update the view status of a user's notification
+      parameters:
+        - name: notificationId
+          in: path
+          description: Id of the notification to update
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                viewStatus:
+                  type: string
+                  description: The new viewing status to change the notification to
+                  example: "READ"
+      responses:
+        '200':
+          description: Update successful, notification status was updated
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to update a notification that does not belong to them AND the user is not a GAA'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
   '/cards/{id}':
     get:
@@ -1595,6 +1637,8 @@ paths:
       parameters:
         - in: path
           name: id
+          schema:
+            type: integer
           description: Id of the listing
           required: true
           example: 50
@@ -1617,6 +1661,8 @@ paths:
       parameters:
         - in: path
           name: id
+          schema:
+            type: integer
           description: Id of the listing
           required: true
           example: 50
@@ -1641,6 +1687,8 @@ paths:
       parameters:
         - in: path
           name: id
+          schema:
+            type: integer
           description: Id of the user to obtain likes from
           required: true
           example: 3
@@ -1655,8 +1703,31 @@ paths:
                   $ref: '#/components/schemas/Listing'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
+  '/businesses/{id}/wishlist':
+    post:
+      tags:
+        - 'U33 : Wishlist Business'
+      summary: Add business to user wishlist
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: Id of the business to wishlist
+          required: true
+          example: 3
+      responses:
+        '201':
+          description: Business has been successfully added to the users wishlist
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
@@ -2374,6 +2445,8 @@ components:
           enum:
             - Expired
             - Bought
+        viewStatus:
+          $ref: '#/components/schemas/ViewStatus'
         created:
           type: string
           format: date
@@ -2393,3 +2466,42 @@ components:
                  status: Expired,
                  created: '2021-05-27'
                 }]
+
+    NotificationStatus:
+      type: string
+      enum:
+        - Bought
+        - Expired
+        - Deleted
+        - Liked
+        - Unliked
+
+    ViewStatus:
+      type: string
+      enum:
+        - Unread
+        - Read
+        - Important
+
+    wishlistItem:
+      type: object
+      description: An entity represnting a users wishlisted business
+      required:
+        - id
+        - userId
+        - businessId
+        - mutedStatus
+      properties:
+        id:
+          type: integer
+          description: Unique id of the notification
+          example: 5
+        userId:
+          type: integer
+          description: Id relating to the user
+        businessId:
+          type: integer
+          description: Id of the wishlisted business
+        muted:
+          type: boolean
+          description: Boolean describing whether the notifications for the wishlisted business are muted

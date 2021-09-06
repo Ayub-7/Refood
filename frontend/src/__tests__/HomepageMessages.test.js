@@ -26,65 +26,65 @@ let $vs = {
 }
 
 let oneMessage = [{
-    "id": 3,
-    "sender": {
-        "id": 8186,
-        "firstName": "Tricia",
-        "middleName": "Xenos",
-        "lastName": "Vergo",
-        "nickname": "fault-tolerant",
-        "bio": "In eleifend quam a odio.",
-        "email": "xvergo4l@vkontakte.ru",
-        "dateOfBirth": "1977-11-24",
-        "phoneNumber": "+31 637 443 9610",
-        "homeAddress": {
-            "streetNumber": null,
-            "streetName": null,
-            "suburb": null,
-            "city": null,
-            "region": null,
-            "country": "Poland",
-            "postcode": null
-        },
-        "created": "2020-03-05 04:37:27",
-        "role": "USER",
-        "businessesAdministered": null
+  "id": 3,
+  "sender": {
+    "id": 8186,
+    "firstName": "Tricia",
+    "middleName": "Xenos",
+    "lastName": "Vergo",
+    "nickname": "fault-tolerant",
+    "bio": "In eleifend quam a odio.",
+    "email": "xvergo4l@vkontakte.ru",
+    "dateOfBirth": "1977-11-24",
+    "phoneNumber": "+31 637 443 9610",
+    "homeAddress": {
+      "streetNumber": null,
+      "streetName": null,
+      "suburb": null,
+      "city": null,
+      "region": null,
+      "country": "Poland",
+      "postcode": null
     },
-    "card": {
-        "id": 6134,
-        "user": 8186,
-        "title": "7up Diet, 355 Ml",
-        "description": "Ut at dolor quis odio consequat varius.",
-        "created": "2021-07-13 01:01:38",
-        "displayPeriodEnd": "2021-08-03 01:01:38",
-        "keywords": "sapien iaculis",
-        "section": "ForSale"
+    "created": "2020-03-05 04:37:27",
+    "role": "USER",
+    "businessesAdministered": null
+  },
+  "card": {
+    "id": 6134,
+    "user": 8186,
+    "title": "7up Diet, 355 Ml",
+    "description": "Ut at dolor quis odio consequat varius.",
+    "created": "2021-07-13 01:01:38",
+    "displayPeriodEnd": "2021-08-03 01:01:38",
+    "keywords": "sapien iaculis",
+    "section": "ForSale"
+  },
+  "receiver": {
+    "id": 83,
+    "firstName": "Allegra",
+    "middleName": "Jaquith",
+    "lastName": "King",
+    "nickname": "Visionary",
+    "bio": "In eleifend quam a odio. In hac habitasse platea dictumst.",
+    "email": "jking1q@printfriendly.com",
+    "dateOfBirth": "1983-07-29",
+    "phoneNumber": "+380 600 119 0770",
+    "homeAddress": {
+      "streetNumber": "33005",
+      "streetName": "Cascade",
+      "suburb": null,
+      "city": "Xingou",
+      "region": null,
+      "country": "China",
+      "postcode": null
     },
-    "receiver": {
-        "id": 83,
-        "firstName": "Allegra",
-        "middleName": "Jaquith",
-        "lastName": "King",
-        "nickname": "Visionary",
-        "bio": "In eleifend quam a odio. In hac habitasse platea dictumst.",
-        "email": "jking1q@printfriendly.com",
-        "dateOfBirth": "1983-07-29",
-        "phoneNumber": "+380 600 119 0770",
-        "homeAddress": {
-            "streetNumber": "33005",
-            "streetName": "Cascade",
-            "suburb": null,
-            "city": "Xingou",
-            "region": null,
-            "country": "China",
-            "postcode": null
-        },
-        "created": "2020-05-30 04:08:45",
-        "role": "USER",
-        "businessesAdministered": null
-    },
-    "description": "asdsaddas",
-    "sent": "2021-07-23 13:09:52"
+    "created": "2020-05-30 04:08:45",
+    "role": "USER",
+    "businessesAdministered": null
+  },
+  "description": "asdsaddas",
+  "sent": "2021-07-23 13:09:52"
 }];
 
 let listingNotifications = [
@@ -121,7 +121,7 @@ let listingNotifications = [
                 product: {
                     name: "Pastry",
                     business: {
-                        id: 1
+                      id: 1
                     },
                 }
             }
@@ -222,6 +222,8 @@ api.deleteListingNotification = jest.fn(() => {
     return Promise.resolve({status: 200});
 });
 
+api.updateListingNotificationViewStatus = jest.fn().mockResolvedValue({status: 200});
+
 beforeEach(() => {
     wrapper = mount(HomepageMessages, {
         mocks: {$route, $log, $vs, $router},
@@ -288,11 +290,11 @@ describe('Message validation', () => {
 });
 
 describe('Listing notification methods tests', () => {
-    test('City and country address string is returned', () => {
-        let address = {city: "Christchurch", country: "New Zealand"};
+   test('City and country address string is returned', () => {
+     let address = {city: "Christchurch", country: "New Zealand"};
 
-        expect(wrapper.vm.createAddressString(address)).toBe("Christchurch, New Zealand");
-    });
+     expect(wrapper.vm.createAddressString(address)).toBe("Christchurch, New Zealand");
+   });
 
     test('Full address string is returned', () => {
         let address = {
@@ -304,8 +306,13 @@ describe('Listing notification methods tests', () => {
             country: "New Zealand"
         };
 
-        expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
-    });
+    expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
+  });
+
+  test("Notification updates to read", async () => {
+    await wrapper.vm.markAsRead(listingNotifications[0]);
+    expect(listingNotifications[0].viewStatus).toBe("Read");
+  });
 });
 
 describe('Listing notification functionality tests', () => {
@@ -354,11 +361,24 @@ describe('Listing notification functionality tests', () => {
         expect(deleteUndo).toBeTruthy();
 
 
-        await button.trigger('click');
-        expect(deleteUndo).toBeCalled();
-        // expect undo modal to open i.e undoClick is true
-        expect(wrapper.vm.undoClick).toBe(true);
-        // time undo is visible should be 10secs
-        expect(wrapper.vm.undoCount).toBe(10);
-    })
+    await button.trigger('click');
+    expect(api.deleteListingNotification).toBeCalled();
+  });
+
+  test("Bought listings are shown", () => {
+    expect(wrapper.find(".bought-listing-notification-card")).toBeTruthy();
+  });
+
+  test("Liked listings notifications are shown", () => {
+    expect(wrapper.find(".liked-listing-notification")).toBeTruthy();
+  });
+
+  test("Liked listing view button redirects to listing page on click", async () => {
+    await wrapper.vm.$nextTick();
+    let button = wrapper.find("#view-listing-button");
+    expect(button).toBeTruthy();
+
+    await button.trigger('click');
+    expect(wrapper.vm.$router.push).toBeCalled();
+  });
 });

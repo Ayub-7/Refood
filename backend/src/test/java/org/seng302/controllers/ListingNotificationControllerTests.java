@@ -7,12 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.models.*;
-import org.seng302.models.requests.ListingNotificationRequest;
+import org.seng302.models.requests.UpdateNotificationViewStatusRequest;
 import org.seng302.repositories.*;
-import org.seng302.controllers.ListingLikeController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -103,6 +103,8 @@ class ListingNotificationControllerTests {
         boughtListingRepository.save(boughtListing1);
         boughtListingRepository.save(boughtListing2);
         notification = new ListingNotification(user, boughtListing1, NotificationStatus.BOUGHT);
+        notification.setUser(user);
+        notification.setId(1);
         notification2 = new ListingNotification(user, business, boughtListing2, NotificationStatus.BOUGHT);
         notification3 = new ListingNotification(otherUser, business, boughtListing2, NotificationStatus.LIKED);
 
@@ -154,20 +156,11 @@ class ListingNotificationControllerTests {
     //
     // GET - Listing Notification
     //
-
-    /**
-     * Tests not logged in user, should return Unauthorized
-     * @throws Exception
-     */
     @Test
     void testNoAuthGetUserListingNotifications() throws Exception {
         mvc.perform(get("/users/{userId}/notifications", user.getId())).andExpect(status().isUnauthorized());
     }
 
-    /**
-     * Tests unsuccessful retrieval of all listing notifications due to invalid userId
-     * @throws Exception
-     */
     @Test
     @WithMockUser
     void testGetUserNotifications_invalidUserId_returnNotAcceptable() throws Exception {
@@ -178,10 +171,6 @@ class ListingNotificationControllerTests {
                 .andExpect(status().isNotAcceptable());
     }
 
-    /**
-     * Tests successful retrieval of all user's listing notifications
-     * @throws Exception
-     */
     @Test
     @WithMockUser
     void testGetUserNotifications_successfulRetrieval_returnOk() throws Exception {
@@ -192,10 +181,6 @@ class ListingNotificationControllerTests {
                 .andExpect(status().isOk());
     }
 
-    /**
-     * Tests unsuccessful retrieval of all listing notifications due to invalid businessId
-     * @throws Exception
-     */
     @Test
     @WithMockUser
     void testGetBusinessNotifications_invalidBusinessId_returnNotAcceptable() throws Exception {
@@ -205,10 +190,6 @@ class ListingNotificationControllerTests {
                 .andExpect(status().isNotAcceptable());
     }
 
-    /**
-     * Tests successful retrieval of all business' listing notifications
-     * @throws Exception
-     */
     @Test
     @WithMockUser
     void testGetBusinessNotifications_successfulRetrieval_returnOk() throws Exception {
