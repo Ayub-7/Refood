@@ -50,7 +50,7 @@
     </vs-popup>
 
     <!-- === NEWSFEED ITEMS === -->
-    <div v-for="item in feedItems" :key="item.id">
+    <div v-for="item in feedItems" :key="item.fid">
       <!-- CARD MESSAGE -->
       <vs-card v-if="item.card" id="message-notification-card" class="notification-card" actionable>
         <div @click="openDetailedModal(item)">
@@ -65,51 +65,55 @@
       </vs-card>
 
       <!-- USER BOUGHT LISTING NOTIFICATION -->
-      <vs-card class="notification-card bought-listing-notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId">
-        <div class="pln-top-row">
-          <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-          <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
-        </div>
-        <h3>{{ item.boughtListing.product.name }}</h3>
-        <h5>{{ item.boughtListing.product.business.name }}</h5>
-        <div class="pln-bottom-row">
-          <h4>
-            {{ currency }}
-            {{ item.boughtListing.price }}
-          </h4>
-          <div>
-            Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
+      <div v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId" @mouseenter="markAsRead(item)" class="bought-listing-container">
+        <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'notification-card', 'bought-listing-notification']">
+          <div class="pln-top-row">
+            <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
+            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
           </div>
-        </div>
-      </vs-card>
+          <h3>{{ item.boughtListing.product.name }}</h3>
+          <h5>{{ item.boughtListing.product.business.name }}</h5>
+          <div class="pln-bottom-row">
+            <h4>
+              {{ currency }}
+              {{ item.boughtListing.price }}
+            </h4>
+            <div>
+              Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
+            </div>
+          </div>
+        </vs-card>
+      </div>
 
       <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
-      <vs-card class="liked-listing-notification notification-card" v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
-        <div class="pln-top-row">
-          <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-          <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
-        </div>
-        <div class="lln-description">
-          <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
-        </div>
-      </vs-card>
+      <div v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId" @mouseenter="markAsRead(item)" class="liked-listing-container">
+        <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
+          <div class="pln-top-row">
+            <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
+            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+          </div>
+          <div class="lln-description">
+            <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
+          </div>
+        </vs-card>
+      </div>
 
       <!-- NEW LIKED LISTING NOTIFICATIONS -->
-      <vs-card class="liked-listing-notification notification-card" v-else-if="item.listing">
-        <div class="pln-top-row">
+      <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
+        <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
           <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
-        </div>
-        <div style="display: flex">
-          <div class="lln-description">
-            <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
-            <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+              <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
+            </div>
           </div>
-          <div class="lln-button-group">
-            <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
-          </div>
-        </div>
-      </vs-card>
+        </vs-card>
+      </div>
     </div>
   </div>
 </template>
@@ -158,6 +162,22 @@ export default {
   },
 
   methods: {
+    /**
+     * Marks a listing notification as read.
+     * @param notification the notification object to update.
+     */
+    markAsRead: function(notification) {
+      if (notification.viewStatus === "Unread") {
+        api.updateListingNotificationViewStatus(notification.id, "Read")
+          .then((res) => {
+            this.$log.debug(res);
+            notification.viewStatus = "Read";
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          });
+      }
+    },
 
     /**
      * Combines the different news feed item types into a single list.
@@ -165,6 +185,11 @@ export default {
      */
     combineFeedMessages: function() {
       this.feedItems = this.messages.concat(this.listingNotifications);
+      // Set a overall unique id for each feed item. Prevent any overlapping ids which may cause update errors.
+      this.feedItems = this.feedItems.map((item, index) => {
+        item.fid = index;
+        return item;
+      });
       this.feedItems.sort(function(a, b) {
         return new Date(b.created) - new Date(a.created);
       });
@@ -284,8 +309,8 @@ export default {
             this.$vs.notify({title: 'Error sending message', text: `${error}`, color: 'danger'});
           });
       }
-
     },
+
     /**
      * Check the message contents
      * Simply check a blank message is not sent and the message is under the maximum character limit
@@ -439,6 +464,9 @@ export default {
 }
 
 /* === PURCHASE LISTING NOTIFICATION === */
+.unread-notification {
+  box-shadow: 0 0 4px red!important;
+}
 
 .pln-top-row {
   display: flex;
