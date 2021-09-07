@@ -86,9 +86,10 @@
             <div class="pln-top-row">
               <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
               <div>
-                <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
+                <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
             undoClick=true"></vs-button>
-              </div>            </div>
+              </div>
+            </div>
             <h3>{{ item.boughtListing.product.name }}</h3>
             <h5>{{ item.boughtListing.product.business.name }}</h5>
             <div class="pln-bottom-row">
@@ -117,53 +118,42 @@
       <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
       <div v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
-          <div class="pln-top-row">
-            <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
-          </div>
-          <div class="lln-description">
-            <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
-          </div>
-        </vs-card>
-      </div>
-      <!-- NEW LIKED LISTING NOTIFICATIONS -->
-      <vs-card class="liked-listing-notification notification-card" v-if="item.boughtListing && item.boughtListing.buyer !== currentUserId">
-        <div v-if="!undoId.includes(item.id)">
-          <div class="pln-top-row">
-            <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-            <div>
+          <div v-if="!undoId.includes(item.id)">
+            <div class="pln-top-row">
+              <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
               <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, false);
             undoClick=true"></vs-button>
             </div>
-          </div>
-          <div class="lln-description">
-            <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
-          </div>
-        </div>
-        <div v-else>
-          <div style="display: flex">
             <div class="lln-description">
-              <span><strong>Notification has been deleted</strong>.</span>
-            </div>
-            <div class="lln-button-group">
-              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+              <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
             </div>
           </div>
-        </div>
-      </vs-card>
+          <div v-else>
+            <div style="display: flex">
+              <div class="lln-description">
+                <span><strong>Notification has been deleted</strong>.</span>
+              </div>
+              <div class="lln-button-group">
+                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.id)"></vs-icon>
+              </div>
+            </div>
+          </div>
+        </vs-card>
+      </div>
+
+      <!-- NEW LIKED LISTING NOTIFICATIONS -->
       <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <div v-if="!undoId.includes(item.id)">
-            <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>            <div>
-            <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false);
-            undoClick=true"></vs-button>
-          </div>
+            <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
             <div style="display: flex">
               <div class="lln-description">
                 <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
                 <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
               </div>
               <div class="lln-button-group">
+                <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, false);
+            undoClick=true"></vs-button>
                 <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
               </div>
             </div>

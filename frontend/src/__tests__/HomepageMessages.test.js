@@ -355,9 +355,6 @@ describe('Listing notification functionality tests', () => {
         button = wrapper.get("#delete-purchased-listing-notification-button");
         expect(deleteUndo).toBeTruthy();
 
-
-    await button.trigger('click');
-    expect(api.deleteListingNotification).toBeCalled();
   });
 
   test("Bought listings are shown", () => {
