@@ -258,8 +258,42 @@ export default {
      * @param period string of the selected granularity.
      */
     onGranularityChange: function(period) {
+      if (period === 'w') {
+        //filter weeks
+        this.granularityWeeks()
+        console.log(period)
+      } else if (period === 'm') {
+        //filter month
+        this.granularityMonths()
+        console.log(period)
+      } else if (period === 'y') {
+        //filter year
+        this.granularityYears()
+        console.log(period)
+      }
       this.activeGranularityButton = period; // Changes the granularity button to be selected and disabled.
 
+    },
+
+    /**
+     * filter weeks granularity
+     */
+    granularityWeeks: function () {
+      console.log("weeks");
+    },
+
+    /**
+     * filter weeks granularity
+     */
+    granularityMonths: function () {
+      console.log("months");
+    },
+
+    /**
+     * filter weeks granularity
+     */
+    granularityYears: function () {
+      console.log("years");
     },
 
     /**
