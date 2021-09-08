@@ -91,15 +91,27 @@
 
       <vs-card id="summary-container">
         <h3>Summary</h3>
-        <div id="summary-list" v-for="(summary, index) in summaries" :key="index" >
-          <vs-divider style="margin-top: 4px"/>
+        <vs-divider style="margin-top: 4px"/>
+        <div v-if="activeGranularityButton==='all'">
+          <div class="row-summary-container">
+            <h2 class="summary-header">{{currentYearReport.title}}</h2>
+            <div class="summary-subheader">NUMBER OF SALES</div>
+            <div>{{currentYearReport.totalSales}}</div>
+            <div class="summary-subheader">AVG ITEMS PER SALE</div>
+            <div>{{currency + currentYearReport.averagePricePerItem}}</div>
+            <div class="summary-subheader">TOTAL SALE VALUE</div>
+            <div>{{currency + currentYearReport.totalSaleValue}}</div>
+            <div class="summary-subheader">AVG SALE VALUE</div>
+            <div>{{currency + currentYearReport.averageSale}}</div>
+          </div>
+        </div>
+        <div v-else id="summary-list" v-for="(summary, index) in summaries" :key="index" >
           <div class="row-summary-container">
             <h2 class="summary-header">{{ summary.title }}</h2>
             <div class="summary-subheader">NUMBER OF SALES</div>
             <div>{{ summary.totalSales }}</div>
             <div class="summary-subheader">AVG ITEMS PER SALE</div>
             <div>{{ summary.averageItemsPerSale }}</div>
-
             <div class="summary-subheader">TOTAL SALE VALUE</div>
             <div>{{currency + summary.totalSaleValue}}</div>
             <div class="summary-subheader">AVG SALE VALUE</div>
@@ -181,7 +193,7 @@ export default {
     return {
       // Used to determine which setting is currently selected - prevents re-clicking, and highlights the active button.
       activePeriodButton: "",
-      activeGranularityButton: "",
+      activeGranularityButton: "all",
       currency: "$",
       actingAsBusinessId: '',
       business: [],
@@ -247,6 +259,7 @@ export default {
      */
     onGranularityChange: function(period) {
       this.activeGranularityButton = period; // Changes the granularity button to be selected and disabled.
+
     },
 
     /**
