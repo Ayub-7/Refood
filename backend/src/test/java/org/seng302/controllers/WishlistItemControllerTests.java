@@ -18,9 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ContextConfiguration(classes = TestApplication.class)
@@ -35,11 +36,14 @@ class WishlistItemControllerTests {
     private WishlistItemRepository wishlistItemRepository;
     @MockBean
     private BusinessRepository businessRepository;
+    @MockBean
+    private UserRepository userRepository;
 
     private User user;
     private User otherUser;
     private Business business;
     private WishlistItem wishlistItem;
+    private List<WishlistItem> wishlistItemList;
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException {
@@ -50,7 +54,41 @@ class WishlistItemControllerTests {
         otherUser.setId(2);
         business = new Business("testBusiness", "test description", addr, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
         wishlistItem = new WishlistItem(user.getId(), business.getId());
+
+        wishlistItemList = new ArrayList<>();
+        wishlistItemList.add(wishlistItem);
     }
+
+    //
+    // GET - Listing Notification
+    //
+    @Test
+    void testNoAuthGetWishlistBusinesses() throws Exception {
+        mockMvc.perform(get("/users/{id}/wishlist", 1)).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserWishListBusinesses_invalidUserId_returnNotAcceptable() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
+        Mockito.when(wishlistItemRepository.findWishlistItemsByUserId(user.getId())).thenReturn(wishlistItemList);
+        mockMvc.perform(get("/users/{id}/wishlist", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetUserWishListBusinesses_successfulRetrieval_returnOk() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        Mockito.when(wishlistItemRepository.findWishlistItemsByUserId(user.getId())).thenReturn(wishlistItemList);
+        mockMvc.perform(get("/users/{id}/wishlist", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+
+    // POST tests
 
     @Test
     @WithMockUser
