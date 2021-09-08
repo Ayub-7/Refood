@@ -60,4 +60,15 @@ class WishlistItemRepositoryTests {
     void findAllWishListItemsSuccessful() {
         assertThat(wishlistItemRepository.findAll()).isEqualTo((wishlistItemList));
     }
+
+    @Test
+    void findWishListItemsByUserIdSuccessful() {
+        assertThat(wishlistItemRepository.findWishlistItemsByUserId(Long.valueOf(1))).isEqualTo((wishlistItemList));
+    }
+
+    @Test
+    void findWishListItemsByUserIdItemIsNull() {
+        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemsByUserId(2);
+        assertThat(notFound.size()).isEqualTo(0);
+    }
 }
