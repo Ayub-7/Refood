@@ -82,8 +82,8 @@
                       <vs-tooltip text="View Listing">
                         <vs-icon icon="visibility" class="msg-icon" @click="viewListing(business.inventoryItem.product.business.id, business.id)"></vs-icon>
                       </vs-tooltip>
-                      <vs-tooltip text="Unlike">
-                        <vs-icon icon="favorite" class="msg-icon" color="red" @click="unlike(business.id, index); business.likes = 0"></vs-icon>
+                      <vs-tooltip text="Remove from wishlist">
+                        <vs-icon icon="star" class="msg-icon" color="red" @click="removeFromWishlist(business.wishlistId, index); business.likes = 0"></vs-icon>
                       </vs-tooltip>
                     </vs-col>
                   </vs-row>
@@ -189,6 +189,22 @@ const Homepage = {
     },
 
     /**
+     * Call api function to remove business from user's wishlist
+     */
+    removeFromWishlist: function (wishlistItemId) {
+      api.removeBusinessFromWishlist(wishlistItemId)
+              .then(() => {
+                this.$vs.notify({title: "Successfully  removed business from wishlist", color: "success"});
+              })
+              .catch((error) => {
+                if (error.response) {
+                  this.$vs.notify({title: "Error removing business", color: "danger"});
+                }
+                this.$log.debug(error);
+              })
+    },
+
+    /**
      * open listing
      */
     viewListing: function (businessId, listingId) {
@@ -211,8 +227,8 @@ const Homepage = {
         }
         this.$log.debug(error);
       })
-
     },
+
     /**
      * Retrieves all the listings that the user has liked.
      */

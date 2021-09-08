@@ -501,4 +501,20 @@ export default {
      */
     deleteListingNotification: (listingId) =>
         instance.delete(`/notifications/${listingId}`, {withCredentials: true}),
+
+    /**
+     * Adds business to user's wishlist, creating a wishlistItem object
+     * @param businessId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    addBusinessToWishlist: (businessId) =>
+        instance.post(`/businesses/${businessId}/wishlist`, {}, {withCredentials: true}),
+
+    /**
+     * Removes business from user's wishlist by removing the relevant wishlistItem object
+     * @param wishlistItemId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    removeBusinessFromWishlist: (wishlistItemId) =>
+        instance.delete(`/wishlist/${wishlistItemId}`, {withCredentials: true}),
 }
