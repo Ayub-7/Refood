@@ -1,20 +1,17 @@
 package org.seng302.controllers;
 
-import org.seng302.models.Business;
-import org.seng302.models.Role;
-import org.seng302.models.User;
-import org.seng302.models.WishlistItem;
+import org.seng302.models.*;
+import org.seng302.repositories.*;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * Controlled class containing restful api calls regarding users and their wish listed businesses.
@@ -27,6 +24,31 @@ public class WishlistItemController {
 
     @Autowired
     BusinessRepository businessRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    /**
+     * GET request called to get the businesses on a users wishlist. Error response returned when user is not
+     * logged in
+     * @param session logged in users session
+     * @param id Users id
+     * @return ResponseEntity with relevant http status
+     */
+    @GetMapping("/users/{id}/wishlist")
+    public ResponseEntity<List<WishlistItem>> getWishlistBusiness(@PathVariable long id, HttpSession session) {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        User user = userRepository.findUserById(id);
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        List<WishlistItem> wishlistItems = wishlistItemRepository.findWishlistItemsByUserId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(wishlistItems);
+    }
 
     /**
      * Post request called when a user attempts to add a business to their wishlist. Error response returned when attempting
