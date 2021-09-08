@@ -470,6 +470,15 @@ export default {
         instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 
     /**
+     * Retrieves and returns a list of LISTINGS that the user has liked.
+     * @param id unique identifier of the user.
+     * @param session current active user session.
+     * @return 401 if unauthorized, 406 if the user does not exist.
+     * 200 otherwise, may return an empty list (because the user has nothing in their item watchlist).
+     */
+    getUserItemWatchlist: (id) => instance.get(`/users/${id}/watchlist`, {withCredentials: true}),
+
+    /**
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
