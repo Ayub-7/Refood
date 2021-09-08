@@ -39,36 +39,66 @@
             <div style="display: flex;">
               <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
               <div class="watchlist-title">
-                Watchlist
+                <vs-tab @click="watchlist=true">Watchlist</vs-tab>
+                <vs-tab @click="watchlist=false">Wishlist</vs-tab>
               </div>
             </div>
-            <span style="margin: auto 0;">{{likes}}</span>
           </div>
           <vs-divider style="margin-top: -30px"></vs-divider>
-          <div v-for="(item, index) in likedItem" :key="item.id" >
-            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
-              <div id="likes-notification-container">
-                <vs-row v-if="item.likes != 0">
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-tooltip text="View Listing">
-                      <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    </vs-tooltip>
-                    <vs-tooltip text="Unlike">
-                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
-                    </vs-tooltip>
-                  </vs-col>
-                </vs-row>
-                <vs-row v-else>
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
-                  </vs-col>
-                </vs-row>
-                <div id="product-name">{{item.inventoryItem.product.name}}</div>
-                <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
-                <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
-              </div>
-            </vs-card>
+          <div v-if="watchlist">
+            <div v-for="(item, index) in likedItem" :key="item.id" >
+              <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
+                <div id="likes-notification-container">
+                  <vs-row v-if="item.likes != 0">
+                    <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                      <vs-tooltip text="View Listing">
+                        <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                      </vs-tooltip>
+                      <vs-tooltip text="Unlike">
+                        <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
+                      </vs-tooltip>
+                    </vs-col>
+                  </vs-row>
+                  <vs-row v-else>
+                    <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                      <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                      <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
+                    </vs-col>
+                  </vs-row>
+                  <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                  <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                  <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+                </div>
+              </vs-card>
+            </div>
+          </div>
+          <!--Todo implement wishlist cards-->
+          <div v-if="!watchlist">
+            <div v-for="business in wishlist" :key="business.id" >
+              <vs-card style="margin-top: -40px"  actionable>
+                <div>
+                  <vs-row v-if="business.likes != 0">
+                    <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                      <vs-tooltip text="View Listing">
+                        <vs-icon icon="visibility" class="msg-icon" @click="viewListing(business.inventoryItem.product.business.id, business.id)"></vs-icon>
+                      </vs-tooltip>
+                      <vs-tooltip text="Unlike">
+                        <vs-icon icon="favorite" class="msg-icon" color="red" @click="unlike(business.id, index); business.likes = 0"></vs-icon>
+                      </vs-tooltip>
+                    </vs-col>
+                  </vs-row>
+                  <vs-row v-else>
+                    <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                      <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
+                      <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
+                    </vs-col>
+                  </vs-row>
+                  <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                  <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                  <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+                </div>
+              </vs-card>
+            </div>
           </div>
         </div>
       </div>
@@ -130,6 +160,8 @@ const Homepage = {
       currentCardPage: 1,
       user: null,
       currencySymbol: "$",
+      watchlist: true,
+      wishlist: [],
     }
   },
   /**
