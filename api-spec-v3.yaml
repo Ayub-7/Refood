@@ -1639,6 +1639,8 @@ paths:
       parameters:
         - in: path
           name: id
+          schema:
+            type: integer
           description: Id of the listing
           required: true
           example: 50
@@ -1661,6 +1663,8 @@ paths:
       parameters:
         - in: path
           name: id
+          schema:
+            type: integer
           description: Id of the listing
           required: true
           example: 50
@@ -1685,6 +1689,8 @@ paths:
       parameters:
         - in: path
           name: id
+          schema:
+            type: integer
           description: Id of the user to obtain likes from
           required: true
           example: 3
@@ -1699,8 +1705,31 @@ paths:
                   $ref: '#/components/schemas/Listing'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
+  '/businesses/{id}/wishlist':
+    post:
+      tags:
+        - 'U33 : Wishlist Business'
+      summary: Add business to user wishlist
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: Id of the business to wishlist
+          required: true
+          example: 3
+      responses:
+        '201':
+          description: Business has been successfully added to the users wishlist
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
