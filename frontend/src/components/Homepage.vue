@@ -26,10 +26,10 @@
           </div>
           <div class="userinfo-container" v-else>
             <div id="userinfo-content">
-              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()'>Profile</vs-button>
-              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
-              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()">My Cards</vs-button>
-              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'">Browse Listings</vs-button>
+              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()' icon="account_box">Profile</vs-button>
+              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" icon="store">Marketplace</vs-button>
+              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()" icon="style">My Cards</vs-button>
+              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'" icon="search">Browse Listings</vs-button>
             </div>
           </div>
         </div>
