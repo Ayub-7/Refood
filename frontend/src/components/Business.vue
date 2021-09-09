@@ -16,7 +16,7 @@
 
       <div id="business-container">
         <div class="sub-container">
-          <vs-button :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
+          <vs-button id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
             {{ inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
           </vs-button>
         </div>
@@ -79,6 +79,7 @@ const Business = {
       user: null,
 
       inWishlist: false, // i.e. is it in the user's wishlist.
+      wishlistId: null,
     };
   },
 
@@ -88,19 +89,61 @@ const Business = {
      */
     toggleWishlist: function() {
       if (!this.inWishlist) {
-        this.inWishlist = true;
-        this.$vs.notify({title: "Added to Wishlist",
-                        text: `${this.business.name} was added to your wishlist`,
-                        color: "success",
-                        icon: "add"});
+        api.addBusinessToWishlist(this.business.id)
+          .then(() => {
+            this.inWishlist = true;
+            this.$vs.notify({title: "Added to Wishlist",
+              text: `${this.business.name} was added to your wishlist`,
+              color: "success",
+              icon: "add"});
+            this.getUserWishlist(); // Refresh the wishlistId
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.$vs.notify({title: "Error Adding to Wishlist",
+              text: `${this.business.name} could not be added to your wishlist. Please try again`,
+              color: "danger",
+              icon: "error"});
+          });
+
       }
       else {
-        this.inWishlist = false;
-        this.$vs.notify({title: "Removed from Wishlist",
-                        text: `${this.business.name} was removed from your wishlist`,
-                        color: "success",
-                        icon: "remove"});
+        api.removeBusinessToWishlist(this.wishlistId)
+          .then(() => {
+            this.inWishlist = false;
+            this.$vs.notify({title: "Removed from Wishlist",
+              text: `${this.business.name} was removed from your wishlist`,
+              color: "success",
+              icon: "remove"});
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.$vs.notify({title: "Error Removing from Wishlist",
+              text: `${this.business.name} could not be removed to your wishlist. Please try again`,
+              color: "danger",
+              icon: "error"});
+          })
       }
+    },
+
+    /**
+     * Retrieves the user's wishlist.
+     * Checks if the current business is wishlisted by the user, and adjusts display accordingly.
+     */
+    getUserWishlist: function() {
+      api.getUserBusinessWishlist(this.user.id)
+        .then((res) => {
+          for (let i = 0; i < res.data.length; i++) {
+            if (this.business.id === res.data[i].businessId) {
+              this.wishlistId = res.data[i].id;
+              this.inWishlist = true;
+              break;
+            }
+          }
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+        });
     },
 
     /**
@@ -130,6 +173,7 @@ const Business = {
       api.getUserFromID(userId)
         .then((response) => {
           this.user = response.data;
+          this.getUserWishlist();
         })
         .catch((err) => {
           if (err) {
