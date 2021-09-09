@@ -226,7 +226,7 @@ export default {
       activeGranularityButton: "all",
       currency: "$",
       actingAsBusinessId: '',
-      currentYearSalesHistory: {},
+      currentYearSalesHistory: [],
       business: [],
       salesHistory: [],
       dateStart: null,
@@ -288,6 +288,25 @@ export default {
      */
     granularityWeeks: function () {
       this.currentYearReport.title = "Weeks"
+      let startDate = moment(new Date(this.dateStart))
+      let endDate = moment(new Date(this.dateEnd))
+      let summary = []
+      while (startDate < endDate) {
+        console.log(startDate.toDate())
+        console.log(endDate.toDate())
+        //remember to loop over individual weeks
+        for (let i = 0; i < this.currentYearSalesHistory.length; i++) {
+          if (moment(this.currentYearSalesHistory[i].created).isBetween(startDate, endDate)) {
+            console.log("hi")
+            summary.push(this.calculateSummary(this.currentYearSalesHistory[i], startDate))
+          }
+        }
+        startDate = startDate.add(7, 'days');
+      }
+      console.log(startDate<endDate)
+      console.log(startDate.toDate())
+      console.log(endDate.toDate())
+      console.log(summary)
       //current date  = today
       //summary = {}
       //while current date < end date {
@@ -346,7 +365,6 @@ export default {
       api.getBusinessListingNotifications(this.actingAsBusinessId)
           .then((res) => {
             this.salesHistory = res.data;
-            console.log(this.salesHistory)
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
           })
@@ -416,7 +434,8 @@ export default {
       let totalPrice = 0;
       let totalQuantity = 0;
       summary.title = title
-      if(salesHistory.length > 0) {
+      console.log(salesHistory === null)
+      if(salesHistory === null) {
         for(let i=0;i<salesHistory.length;i++) {
           totalPrice += salesHistory[i].boughtListing.price;
           totalQuantity += salesHistory[i].boughtListing.quantity;
