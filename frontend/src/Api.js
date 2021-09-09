@@ -518,4 +518,27 @@ export default {
      * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
      */
     updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+  /**
+   * Retrieves the user's business wishlist
+   * @param userId id of the user
+   * @returns {Promise<AxiosResponse<any>>} 400 if there was a problem with the data supplied,
+   * 401 if unauthed, 406 if the user does not exist, 200 otherwise.
+   */
+  getUserBusinessWishlist: (userId) => instance.get(`/users/${userId}/wishlist`, {withCredentials: true}),
+
+  /**
+   * Adds business to the user's wishlist.
+   * @param businessId id of the business.
+   * @returns {Promise<AxiosResponse<any>>} 401 if not logged in, 406 if business id is not valid, 201 otherwise.
+   */
+    addBusinessToWishlist: (businessId) => instance.post(`/businesses/${businessId}/wishlist`, {}, {withCredentials: true}),
+
+  /**
+   * Removes a business from the user's wishlist.
+   * @param businessId id of the business.
+   * @returns {Promise<AxiosResponse<any>>} 401 if not logged in, 406 if business id is not valid, 200 otherwise.
+   */
+    removeBusinessToWishlist: (wishlistId) => instance.delete(`/wishlist/${wishlistId}`,  {withCredentials: true}),
+
 }
