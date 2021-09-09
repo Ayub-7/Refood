@@ -10,7 +10,6 @@
         <div id="catalogue-options">
           <vs-input class="search-input" type="search" v-on:keyup.enter="filterListings" placeholder="Enter a listing..." name="searchbarUser" v-model="productQuery" style="width: 400px; font-size: 24px" size="medium"/>
           <vs-button class="header-button" id="main-search-btn" @click="filterListings">Search</vs-button>
-
         </div>
 
         <vs-divider style="padding: 4px;"></vs-divider>
