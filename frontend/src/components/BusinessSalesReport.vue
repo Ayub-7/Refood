@@ -129,7 +129,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Items Per Sale</div>
-          <h2 style="padding-left: 12px">{{currency + currentYearReport.averageItemsPerSale}}</h2>
+          <h2 style="padding-left: 12px">{{currentYearReport.averageItemsPerSale}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>{{increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale)}}% from last year</div>
