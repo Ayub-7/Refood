@@ -470,15 +470,6 @@ export default {
         instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 
     /**
-     * Retrieves and returns a list of BUSINESSES that the user has wishlisted.
-     * @param id unique identifier of the user.
-     * @param session current active user session.
-     * @return 401 if unauthorized, 406 if the user does not exist.
-     * 200 otherwise, may return an empty list (because the user has nothing in their item wishlist).
-     */
-    getUsersWishlistedBusinesses: (id) => instance.get(`/users/${id}/wishlist`, {withCredentials: true}),
-
-    /**
      * Query search results that uses searchQuery function
      * @returns {Promise<AxiosResponse<any>>}
      */
@@ -518,6 +509,15 @@ export default {
      * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
      */
     updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Retrieves and returns a list of BUSINESSES that the user has wishlisted.
+     * @param id unique identifier of the user.
+     * @param session current active user session.
+     * @return 401 if unauthorized, 406 if the user does not exist.
+     * 200 otherwise, may return an empty list (because the user has nothing in their item wishlist).
+     */
+    getUsersWishlistedBusinesses: (userId) => instance.get(`/users/${userId}/wishlist`, {withCredentials: true}),
 
     /**
      * Adds business to user's wishlist, creating a wishlistItem object
