@@ -135,6 +135,10 @@ api.removeLikeFromListing = jest.fn(() => {
     return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
 
+api.getUsersWishlistedBusinesses = jest.fn(() => {
+    return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
+
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
 getUserName.mockImplementation(() =>  {
     return 'Rayna';
