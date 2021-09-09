@@ -470,13 +470,13 @@ export default {
         instance.delete(`/businesses/listings/${id}/like`, {withCredentials: true}),
 
     /**
-     * Retrieves and returns a list of LISTINGS that the user has liked.
+     * Retrieves and returns a list of BUSINESSES that the user has wishlisted.
      * @param id unique identifier of the user.
      * @param session current active user session.
      * @return 401 if unauthorized, 406 if the user does not exist.
-     * 200 otherwise, may return an empty list (because the user has nothing in their item watchlist).
+     * 200 otherwise, may return an empty list (because the user has nothing in their item wishlist).
      */
-    getUserItemWatchlist: (id) => instance.get(`/users/${id}/watchlist`, {withCredentials: true}),
+    getUsersWishlistedBusinesses: (id) => instance.get(`/users/${id}/wishlist`, {withCredentials: true}),
 
     /**
      * Query search results that uses searchQuery function
