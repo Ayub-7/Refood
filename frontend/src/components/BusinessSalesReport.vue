@@ -92,6 +92,7 @@
       <vs-card id="summary-container">
         <h3>Summary</h3>
         <vs-divider style="margin-top: 4px"/>
+        <!-- === FULL SUMMARY === -->
         <div v-if="activeGranularityButton==='all'">
           <div class="row-summary-container">
             <h2 class="summary-header">{{currentYearReport.title}}</h2>
@@ -105,17 +106,46 @@
             <div>{{currency + currentYearReport.averageSale}}</div>
           </div>
         </div>
-        <div v-else id="summary-list" v-for="(summary, index) in summaries" :key="index" >
+        <!-- === WEEKLY SUMMARY === -->
+        <div v-else-if="activeGranularityButton==='w'">
           <div class="row-summary-container">
-            <h2 class="summary-header">{{ summary.title }}</h2>
+            <h2 class="summary-header">{{currentYearReport.title}}</h2>
             <div class="summary-subheader">NUMBER OF SALES</div>
-            <div>{{ summary.totalSales }}</div>
+            <div>{{currentYearReport.totalSales}}</div>
             <div class="summary-subheader">AVG ITEMS PER SALE</div>
-            <div>{{ summary.averageItemsPerSale }}</div>
+            <div>{{currency + currentYearReport.averagePricePerItem}}</div>
             <div class="summary-subheader">TOTAL SALE VALUE</div>
-            <div>{{currency + summary.totalSaleValue}}</div>
+            <div>{{currency + currentYearReport.totalSaleValue}}</div>
             <div class="summary-subheader">AVG SALE VALUE</div>
-            <div>{{currency + summary.averagePricePerItem}}</div>
+            <div>{{currency + currentYearReport.averageSale}}</div>
+          </div>
+        </div>
+        <!-- === MONTHLY SUMMARY === -->
+        <div v-else-if="activeGranularityButton==='m'">
+          <div class="row-summary-container">
+            <h2 class="summary-header">{{currentYearReport.title}}</h2>
+            <div class="summary-subheader">NUMBER OF SALES</div>
+            <div>{{currentYearReport.totalSales}}</div>
+            <div class="summary-subheader">AVG ITEMS PER SALE</div>
+            <div>{{currency + currentYearReport.averagePricePerItem}}</div>
+            <div class="summary-subheader">TOTAL SALE VALUE</div>
+            <div>{{currency + currentYearReport.totalSaleValue}}</div>
+            <div class="summary-subheader">AVG SALE VALUE</div>
+            <div>{{currency + currentYearReport.averageSale}}</div>
+          </div>
+        </div>
+        <!-- === YEARLY SUMMARY === -->
+        <div v-else-if="activeGranularityButton==='y'">
+          <div class="row-summary-container">
+            <h2 class="summary-header">{{currentYearReport.title}}</h2>
+            <div class="summary-subheader">NUMBER OF SALES</div>
+            <div>{{currentYearReport.totalSales}}</div>
+            <div class="summary-subheader">AVG ITEMS PER SALE</div>
+            <div>{{currency + currentYearReport.averagePricePerItem}}</div>
+            <div class="summary-subheader">TOTAL SALE VALUE</div>
+            <div>{{currency + currentYearReport.totalSaleValue}}</div>
+            <div class="summary-subheader">AVG SALE VALUE</div>
+            <div>{{currency + currentYearReport.averageSale}}</div>
           </div>
         </div>
       </vs-card>
@@ -141,7 +171,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Items Per Sale</div>
-          <h2 style="padding-left: 12px">{{currency + currentYearReport.averageItemsPerSale}}</h2>
+          <h2 style="padding-left: 12px">{{currentYearReport.averageItemsPerSale}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
             <div>{{increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale)}}% from last year</div>
@@ -196,38 +226,16 @@ export default {
       activeGranularityButton: "all",
       currency: "$",
       actingAsBusinessId: '',
+      currentYearSalesHistory: {},
       business: [],
       salesHistory: [],
       dateStart: null,
       dateEnd: null,
       currentYearReport: {},
       lastYearReport: {},
-      summaries: [
-         {
-          title: "January 2020",
-          averageSale: 100.00,
-          averagePricePerItem: 58.92,
-          averageItemsPerSale: 3,
-          totalSaleValue: 5202.92,
-          totalSales: 1106
-        },
-        {
-          title: "February 2020",
-          averageSale: 100.00,
-          averagePricePerItem: 58.92,
-          averageItemsPerSale: 3,
-          totalSaleValue: 5202.92,
-          totalSales: 1106
-        },
-        {
-          title: "March 2020",
-          averageSale: 100.00,
-          averagePricePerItem: 58.92,
-          averageItemsPerSale: 3,
-          totalSaleValue: 5202.92,
-          totalSales: 1106
-        }
-      ],
+      filteredWeeks: {},
+      filteredMonths: {},
+      filteredYears: {},
       errors: []
     }
   },
@@ -279,13 +287,27 @@ export default {
      * filter weeks granularity
      */
     granularityWeeks: function () {
-      console.log("weeks");
+      this.currentYearReport.title = "Weeks"
+      //current date  = today
+      //summary = {}
+      //while current date < end date {
+      //  if (sale is in between current and current+7) {
+      //    summary.push(calculateSummary(sale, "current - current + 7"))
+      //  current+7
+      console.log(this.currentYearReport);
     },
 
     /**
      * filter weeks granularity
      */
     granularityMonths: function () {
+      this.currentYearReport.title = "Months"
+      //current date  = today
+      //summary = {}
+      //while current date < end date {
+      //  if (sale is in between current and current+1Month) {
+      //    summary.push(calculateSummary(sale, "current - current + 1Month"))
+      //  current+1Month
       console.log("months");
     },
 
@@ -293,6 +315,13 @@ export default {
      * filter weeks granularity
      */
     granularityYears: function () {
+      this.currentYearReport.title = "Years"
+      //current date  = today
+      //summary = {}
+      //while current date < end date {
+      //  if (sale is in between current and current+year) {
+      //    summary.push(calculateSummary(sale, "current - current + year"))
+      //  current+year
       console.log("years");
     },
 
@@ -317,7 +346,7 @@ export default {
       api.getBusinessListingNotifications(this.actingAsBusinessId)
           .then((res) => {
             this.salesHistory = res.data;
-
+            console.log(this.salesHistory)
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
           })
@@ -367,13 +396,13 @@ export default {
     calculateReport: function() {
       let start = moment(new Date(this.dateStart));
       let end = moment(new Date(this.dateEnd));
-      let currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
+      this.currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
 
       start = start.subtract(1,'year');
       end = end.subtract(1,'year');
       let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
-
-      this.currentYearReport = this.calculateSummary(currentYearSalesHistory, "Current Period's Report");
+      console.log(this.currentYearSalesHistory)
+      this.currentYearReport = this.calculateSummary(this.currentYearSalesHistory, "Current Period's Report");
       this.lastYearReport = this.calculateSummary(lastYearSalesHistory, "Last period's Report");
     },
 

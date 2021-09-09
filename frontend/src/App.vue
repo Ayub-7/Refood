@@ -62,12 +62,6 @@
           <vs-navbar-item index="3-2">
             <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/inventory`}">Inventory</router-link>
           </vs-navbar-item>
-          <vs-navbar-item index="3-3">
-            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/sales-report`}">sales-report</router-link>
-          </vs-navbar-item>
-          <vs-navbar-item index="3-3">
-            <router-link @click.native="refreshCachedItems" :to="{path: `/businesses/${getActingAsBusinessId()}/sales-history`}">sales-history</router-link>
-          </vs-navbar-item>
         </div>
         <div class="userDetail" v-if="getLoggedInUser() != null">
           <CardNotifications></CardNotifications>
