@@ -1,7 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Homepage from '../components/Homepage.vue';
 import Vuesax from 'vuesax';
-import HomepageMessages from "../components/HomePageMessages.vue";
 
 import api from '../Api';
 

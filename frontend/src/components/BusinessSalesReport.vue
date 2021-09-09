@@ -3,6 +3,7 @@
     <div id="header-container">
       <vs-icon icon="summarize" size="32px"></vs-icon>
       <div id="title">Sales Report</div>
+      <div id="title-business"> - {{getBusinessName()}}</div>
     </div>
     <vs-divider/>
 
@@ -52,9 +53,11 @@
           All
         </vs-button>
         <div class="options-header" style="font-size: 14px">Custom</div>
-        <vs-input type="date" size="small" class="date-input" label="Start" style="grid-column: 1"/>
+        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start" :danger="(errors.includes('past-min-date'))"
+                  danger-text="Date can not be in the future or after the end date"/>
         <p style="margin: auto auto 0">-</p>
-        <vs-input type="date" size="small" class="date-input" label="End" style="grid-column: 3"/>
+        <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End" :danger="(errors.includes('past-min-date'))"
+                  danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
         <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
 
         <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
@@ -88,75 +91,77 @@
 
       <vs-card id="summary-container">
         <h3>Summary</h3>
-        <vs-divider style="margin-top: 4px"/>
-        <div class="row-summary-container">
-          <h2 class="summary-header">January 2020</h2>
-          <div class="summary-subheader">NUMBER OF SALES</div>
-          <div>1106</div>
-          <div class="summary-subheader">AVG ITEMS PER SALE</div>
-          <div>3</div>
+        <div id="summary-list" v-for="(summary, index) in summaries" :key="index" >
+          <vs-divider style="margin-top: 4px"/>
+          <div class="row-summary-container">
+            <h2 class="summary-header">{{ summary.title }}</h2>
+            <div class="summary-subheader">NUMBER OF SALES</div>
+            <div>{{ summary.totalSales }}</div>
+            <div class="summary-subheader">AVG ITEMS PER SALE</div>
+            <div>{{ summary.averageItemsPerSale }}</div>
 
-          <div class="summary-subheader">TOTAL SALE VALUE</div>
-          <div>$5202.92</div>
-          <div class="summary-subheader">AVG SALE VALUE</div>
-          <div>$58.92</div>
+            <div class="summary-subheader">TOTAL SALE VALUE</div>
+            <div>{{currency + summary.totalSaleValue}}</div>
+            <div class="summary-subheader">AVG SALE VALUE</div>
+            <div>{{currency + summary.averagePricePerItem}}</div>
+          </div>
         </div>
       </vs-card>
 
       <div id="stats-container">
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{currency + currentYearReport.averageSale}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
-            <div>12.34% from last year</div>
+            <vs-icon id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <div>{{increaseFromLastYear(currentYearReport.averageSale, lastYearReport.averageSale)}}% from last year</div>
           </div>
-          <div class="sub-header stat-date">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header stat-date"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Price Per Item</div>
-          <h2 style="padding-left: 12px">$20.69</h2>
+          <h2 style="padding-left: 12px">{{currency + currentYearReport.averagePricePerItem}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.averagePricePerItem, lastYearReport.averagePricePerItem)}}% from last year</div>
           </div>
-          <div class="sub-header stat-date">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Average Items Per Sale</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{currentYearReport.averageItemsPerSale}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale)}}% from last year</div>
           </div>
-          <div class="sub-header stat-date">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header stat-date"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Total Sale Value</div>
-          <h2 style="padding-left: 12px">$564545.45</h2>
+          <h2 style="padding-left: 12px">{{currency + currentYearReport.totalSaleValue}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.totalSaleValue, lastYearReport.totalSaleValue)}}% from last year</div>
           </div>
-          <div class="sub-header stat-date">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Total Items Sold</div>
-          <h2 style="padding-left: 12px">696</h2>
+          <h2 style="padding-left: 12px">{{currentYearReport.totalItems}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.totalItems, lastYearReport.totalItems)}}% from last year</div>
           </div>
-          <div class="sub-header stat-date">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
         <div class="stat-box">
           <div class="stat-subheader">Total Sales</div>
-          <h2 style="padding-left: 12px">$56.45</h2>
+          <h2 style="padding-left: 12px">{{currentYearReport.totalSales}}</h2>
           <div class="sub-header stat-change">
             <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
-            <div>12.34% from last year</div>
+            <div>{{increaseFromLastYear(currentYearReport.totalSales, lastYearReport.totalSales)}}% from last year</div>
           </div>
-          <div class="sub-header stat-date">Jan 1 2020 - Dec 31 2020</div>
+          <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
         </div>
       </div>
     </div>
@@ -164,6 +169,11 @@
 </template>
 
 <script>
+import api from "../Api";
+import axios from "axios";
+import {store} from "../store";
+const moment = require('moment');
+
 export default {
   name: "BusinessSalesReport",
 
@@ -172,11 +182,57 @@ export default {
       // Used to determine which setting is currently selected - prevents re-clicking, and highlights the active button.
       activePeriodButton: "",
       activeGranularityButton: "",
+      currency: "$",
+      actingAsBusinessId: '',
+      business: [],
+      salesHistory: [],
+      dateStart: null,
+      dateEnd: null,
+      currentYearReport: {},
+      lastYearReport: {},
+      summaries: [
+         {
+          title: "January 2020",
+          averageSale: 100.00,
+          averagePricePerItem: 58.92,
+          averageItemsPerSale: 3,
+          totalSaleValue: 5202.92,
+          totalSales: 1106
+        },
+        {
+          title: "February 2020",
+          averageSale: 100.00,
+          averagePricePerItem: 58.92,
+          averageItemsPerSale: 3,
+          totalSaleValue: 5202.92,
+          totalSales: 1106
+        },
+        {
+          title: "March 2020",
+          averageSale: 100.00,
+          averagePricePerItem: 58.92,
+          averageItemsPerSale: 3,
+          totalSaleValue: 5202.92,
+          totalSales: 1106
+        }
+      ],
+      errors: []
     }
   },
 
-  methods: {
 
+  mounted: function() {
+    this.getSession();
+
+    this.getSalesHistory();
+
+    let currentDate = new Date();
+    //we gotta set date to a string or the bloody thing complains
+    this.dateStart = "Jan 01, " + currentDate.getFullYear();
+    this.dateEnd = "Dec 31, " + currentDate.getFullYear();
+  },
+
+  methods: {
     /**
      * Something happens when this function is called. (todo: do something here).
      * @param period string of the selected period.
@@ -191,9 +247,135 @@ export default {
      */
     onGranularityChange: function(period) {
       this.activeGranularityButton = period; // Changes the granularity button to be selected and disabled.
-    }
-  }
+    },
 
+    /**
+     * Calculates the percentage increase from last year
+     * If last year had no sales, return 100% increase
+     *
+     * @param thisyear The current year's figure
+     * @param lastyear The previous year's figure
+     */
+    increaseFromLastYear(thisYear, lastYear) {
+      if (lastYear === 0) {
+        return 100;
+      }
+      return (thisYear - lastYear) / lastYear;
+    },
+
+    /**
+     * Calls getBusinessListingNotifications to populate the page's sales history
+     */
+    getSalesHistory: function () {
+      api.getBusinessListingNotifications(this.actingAsBusinessId)
+          .then((res) => {
+            this.salesHistory = res.data;
+
+            //only once we have obtained the data, calculate the variables
+            this.calculateReport();
+          })
+          .catch(err => {
+            this.$log.debug(err);
+          });
+    },
+
+    formatDate: function(date) {
+      return moment(new Date(date)).format('MMM DD, YYYY');
+    },
+
+    /**
+     * Calls get session endpoint to get user country, if successful calls setCurrency ()
+     */
+    getSession: function() {
+      api.checkSession()
+          .then((response) => {
+            this.setCurrency(response.data.homeAddress.country)
+          })
+          .catch(err => {
+            this.$log.debug(err);
+          });
+    },
+    /**
+     * return the name of the business currently administering
+     * also, sets the accting as business id to update the sales report
+     */
+    getBusinessName: function() {
+      if (store.actingAsBusinessId !== this.actingAsBusinessId) {
+        this.actingAsBusinessId = store.actingAsBusinessId;
+
+        this.getSalesHistory();
+      }
+
+      return store.actingAsBusinessName;
+    },
+
+    /**
+     * calculateReport
+     * Populates the report data metrics
+     * First separates the salesHistory into the selected period and that same period from the year before
+     * Then it calculates the summary report from both
+     *
+     * Later these are used in the business metrics and % increases from last year
+     */
+    calculateReport: function() {
+      let start = moment(new Date(this.dateStart));
+      let end = moment(new Date(this.dateEnd));
+      let currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
+
+      start = start.subtract(1,'year');
+      end = end.subtract(1,'year');
+      let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
+
+      this.currentYearReport = this.calculateSummary(currentYearSalesHistory, "Current Period's Report");
+      this.lastYearReport = this.calculateSummary(lastYearSalesHistory, "Last period's Report");
+    },
+
+    /**
+     * calculates the summary object given a list of sales in that period
+     * @param salesHistory List of sales in the given period. ie All the sales in january
+     * @param title Title of the summary ie "January 2020"
+     */
+    calculateSummary: function(salesHistory, title) {
+      let summary= {};
+      let totalPrice = 0;
+      let totalQuantity = 0;
+      summary.title = title
+      if(salesHistory.length > 0) {
+        for(let i=0;i<salesHistory.length;i++) {
+          totalPrice += salesHistory[i].boughtListing.price;
+          totalQuantity += salesHistory[i].boughtListing.quantity;
+        }
+        summary.averageSale = Number(totalPrice/salesHistory.length).toFixed(2);
+        summary.averagePricePerItem = Number(totalPrice / totalQuantity).toFixed(2);
+        summary.averageItemsPerSale = Number(totalQuantity / salesHistory.length).toFixed(2);
+        summary.totalSaleValue = Number(totalPrice).toFixed(2);
+        summary.totalItems = Number(totalQuantity).toFixed(2);
+        summary.totalSales = salesHistory.length;
+
+      } else {
+        summary.averageSale = 0.00;
+        summary.averagePricePerItem = 0.00;
+        summary.averageItemsPerSale = 0;
+        summary.totalSaleValue = 0.00;
+        summary.totalItems = 0.00;
+        summary.totalSales = 0;
+      }
+      return summary;
+    },
+
+    /**
+     * Sets display currency based on the user's home country.
+     */
+    setCurrency: function (country) {
+      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+          .then(response => {
+            this.currency = response.data[0].currencies[0].symbol;
+          })
+          .catch(err => {
+            this.$log.debug(err);
+          });
+    },
+  },
 }
 </script>
 
@@ -214,7 +396,15 @@ export default {
 
 #title {
   font-size: 30px;
-  margin: auto auto auto 4px;
+  margin-top: 4px;
+  margin-right: 8px;
+}
+#title-business {
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 4px;
+  margin-left: 0px;
+  margin-right: auto;
 }
 
 #content-container {
@@ -264,7 +454,9 @@ export default {
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
   overflow-y: scroll;
-  height: 685px;
+}
+
+#summary-container >>> .vs-card--content {
 }
 
 .row-summary-container {

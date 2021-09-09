@@ -27,8 +27,8 @@
           <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
           <p vs-justify="left"><b>Price:</b> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
           <p><b>Quantity:</b> {{listing.quantity}}</p>
-          <p><b>Closes:</b> {{listing.created}}</p>
-          <p><b>Created:</b> {{listing.closes}}</p>
+          <p><b>Created:</b> {{listing.created}}</p>
+          <p><b>Closes:</b> {{listing.closes}}</p>
           <p id="listing-moreInfo">{{listing.moreInfo}}</p>
           <p><b>Likes:</b> {{listing.likes}}</p>
           <div class="">
