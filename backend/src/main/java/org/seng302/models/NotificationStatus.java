@@ -11,7 +11,8 @@ public enum NotificationStatus {
     BOUGHT("Bought"),
     DELETED("Deleted"),
     LIKED("Liked"),
-    UNLIKED("Unliked");
+    UNLIKED("Unliked"),
+    WISHLIST("Wishlist");
 
     private final String label;
 
