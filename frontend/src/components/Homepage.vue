@@ -584,6 +584,7 @@ main {
 .business-main {
   grid-column: 3;
   grid-row: 2;
+  margin-top: 1em;
 }
 
 .business-main >>> .vs-card--content {

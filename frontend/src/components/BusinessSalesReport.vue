@@ -160,7 +160,7 @@
         </div>
       </div>
     </div>
-  </vs-card>
+  </div>
 </template>
 
 <script>
@@ -449,9 +449,6 @@ export default {
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
   overflow-y: scroll;
-}
-
-#summary-container >>> .vs-card--content {
 }
 
 .row-summary-container {

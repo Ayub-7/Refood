@@ -83,7 +83,7 @@
       </vs-card>
 
     </div>
-  </vs-card>
+  </div>
 </template>
 
 <script>
