@@ -84,7 +84,7 @@
       </vs-card>
       <template>
         <div>
-          <apexchart width="500" type="bar" :options="options" :series="series"></apexchart>
+          <apexchart width="500" height="450" type="bar" :options="options" :series="series"></apexchart>
         </div>
       </template>
 
@@ -144,15 +144,19 @@ export default {
       errors: [],
       options: {
         chart: {
-          id: 'vuechart-example'
+          id: 'sales-graph-report'
         },
         xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+          'September', 'October', 'November', 'December']
+        },
+        dataLabels: {
+          enabled: false,
         }
       },
       series: [{
-        name: 'series-1',
-        data: [30, 40, 45, 50, 49, 60, 70, 91]
+        name: 'Number of sales',
+        data: [30, 40, 20, 50, 49, 10, 70, 40, 55, 57, 53, 44]
       }],
     }
   },
