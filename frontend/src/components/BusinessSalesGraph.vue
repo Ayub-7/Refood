@@ -80,7 +80,14 @@
                    @click="onGranularityChange('all')">
           All
         </vs-button>
+
       </vs-card>
+      <template>
+        <div>
+          <apexchart width="500" type="bar" :options="options" :series="series"></apexchart>
+        </div>
+      </template>
+
 
     </div>
   </div>
@@ -91,6 +98,7 @@ import api from "../Api";
 import moment from "moment";
 import {store} from "../store";
 import axios from "axios";
+
 
 export default {
   name: "BusinessSalesGraph",
@@ -133,7 +141,19 @@ export default {
           totalSales: 1106
         }
       ],
-      errors: []
+      errors: [],
+      options: {
+        chart: {
+          id: 'vuechart-example'
+        },
+        xaxis: {
+          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+        }
+      },
+      series: [{
+        name: 'series-1',
+        data: [30, 40, 45, 50, 49, 60, 70, 91]
+      }],
     }
   },
 
