@@ -9,7 +9,6 @@
         <vs-dropdown-menu>
 
           <vs-dropdown-group vs-label="Notifications" id="cardList" v-if="notifications.length > 0">
-            <vs-button @click="markAsRead">Mark all as read</vs-button>
             <div class="dropdown-item" v-for="notification in notifications" :key="notification.cardId">
                 <div class="dropdown-item-name">
 
@@ -129,18 +128,10 @@ export default {
        */
       getNotifications() {
         api.getNotifications(store.loggedInUserId)
-            .then((response) => {
-              mutations.setNotifications(response.data);
-            })
+        .then((response) => {
+            mutations.setNotifications(response.data);
+        })
       },
-
-      markAsRead() {
-        console.log("markAsRead() frontend")
-        api.markNotificationAsRead(store.loggedInUserId)
-            .then((response) => {
-              mutations.setNotifications(response.data);
-            })
-      }
     },
 
   computed: {
