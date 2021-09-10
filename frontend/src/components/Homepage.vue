@@ -22,6 +22,8 @@
             <vs-button class="left-nav-item" id="bus-profile-btn" @click.native='goToProfile()'>Business Profile</vs-button>
             <vs-button class="left-nav-item" id="bus-catalogue-btn" @click.native='goToProductCatalogue()'>Product Catalogue</vs-button>
             <vs-button class="left-nav-item" @click.native='goToSalesHistory()'>Sales History</vs-button>
+            <vs-button icon="leaderboard" class="left-nav-item" id="bus-sales-graph" v-if="!graphMode" @click="graphMode = !graphMode">Graph</vs-button>
+            <vs-button icon="summarize" class="left-nav-item" id="bus-sales-report" v-else @click="graphMode = !graphMode">Data</vs-button>
           </div>
           </div>
           <div class="userinfo-container" v-else>
@@ -87,6 +89,7 @@
         <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
       </main>
 
+      <BusinessSalesGraph v-else-if="graphMode" class="business-main" />
       <BusinessSalesReport v-else class="business-main"/>
 
 
@@ -111,10 +114,11 @@ import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
 import BusinessSalesReport from "./BusinessSalesReport";
+import BusinessSalesGraph from "./BusinessSalesGraph";
 
 const Homepage = {
   name: "Homepage",
-  components: {BusinessSalesReport, ListingDetail, HomePageMessages, MarketplaceGrid},
+  components: {BusinessSalesReport, BusinessSalesGraph, ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       unliked: false,
@@ -130,6 +134,7 @@ const Homepage = {
       currentCardPage: 1,
       user: null,
       currencySymbol: "$",
+      graphMode: true,
     }
   },
   /**
