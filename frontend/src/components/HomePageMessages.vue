@@ -149,7 +149,7 @@
             <div style="display: flex">
               <div class="lln-description">
                 <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
-                <span v-if="item.status === 'Wishlist'"><strong>{{ item.listing.inventoryItem.business.name }}</strong> has just listed <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+                <span v-if="item.status === 'Wishlist'"><strong>{{ item.listing.inventoryItem.product.business.name }}</strong> has just listed <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
                 <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
               </div>
               <div class="lln-button-group">
