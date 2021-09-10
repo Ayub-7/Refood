@@ -1,12 +1,5 @@
 <template>
-  <vs-card id="report-container">
-    <div id="header-container">
-      <vs-icon icon="leaderboard" size="32px"></vs-icon>
-      <div id="title">Sales Report Graph</div>
-      <div id="title-business"> - {{getBusinessName()}}</div>
-    </div>
-    <vs-divider/>
-
+  <div id="report-container">
     <div id="content-container">
       <!-- FILTER/GRANULARITY PICKER -->
       <vs-card id="options-container">
@@ -309,26 +302,6 @@ export default {
   background-color: white;
   width: 100%;
   margin: 1em auto;
-}
-
-#header-container {
-  display: flex;
-  margin: auto;
-  padding-bottom: 0.5em;
-  padding-top: 1em;
-}
-
-#title {
-  font-size: 30px;
-  margin-top: 4px;
-  margin-right: 8px;
-}
-#title-business {
-  font-size: 30px;
-  font-weight: bold;
-  margin-top: 4px;
-  margin-left: 0px;
-  margin-right: auto;
 }
 
 #content-container {
