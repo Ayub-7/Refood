@@ -66,7 +66,6 @@ Frontend / GUI
 - Vuejs
 - Vue-Router
 - Vuesax 3 UI component framework
-- Apexcharts.js
 
 Backend / server
 - Spring Boot (JPA, Security, REST)
