@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.ValidationException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -177,38 +176,7 @@ public class CardController {
         if (currentUser.getId() != userId) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        List<Notification> notificationsRaw = notificationRepository.findNotificationsByUserId(userId);
-        List<Notification> notifications = new ArrayList<>();
-        notificationsRaw.forEach(notification -> {
-            if (notification.getRead() == false) {
-                notifications.add(notification);
-            }
-        });
-        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
-    }
-
-    /**
-     * PUT endpoint for marking notifications as 'read'
-     * @param userId the ID of the notification
-     * @return code 200 if works and the notification
-     */
-    @PutMapping("/users/{userId}/cards/notifications/read")
-    public ResponseEntity<String> markNotificationAsRead (@PathVariable Long userId, HttpSession session) throws JsonProcessingException {
-        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        if (currentUser.getId() != userId) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        List<Notification> notificationsRaw = notificationRepository.findNotificationsByUserId(userId);
-        List<Notification> notifications = new ArrayList<>();
-        System.out.println("Put notifications read");
-        notificationsRaw.forEach(notification -> {
-            System.out.println(notification.getId());
-            System.out.println(notification.getRead());
-            if (notification.getRead() == false) {
-                notification.setRead(true);
-            }
-            notifications.add(notification);
-        });
+        List<Notification> notifications = notificationRepository.findNotificationsByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(notifications));
     }
 

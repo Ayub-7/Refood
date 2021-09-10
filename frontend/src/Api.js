@@ -362,13 +362,6 @@ export default {
      */
     getNotifications: (userId) => instance.get(`/users/${userId}/cards/notifications`, {withCredentials: true}),
 
-    /**
-     * Changes a notification's 'read' status to true
-     * @param userId ID of user whose notifications we want to mark as read
-     * @returns 200 if successful
-     */
-    markNotificationAsRead: (userId) => instance.put(`/users/${userId}/cards/notifications/read`, {}, {withCredentials: true}),
-
 
     /**
      * Deletes a message with ID
