@@ -141,7 +141,7 @@
         </vs-card>
       </div>
 
-      <!-- NEW LIKED LISTING NOTIFICATIONS -->
+      <!-- NEW LIKED & WISHLIST LISTING NOTIFICATIONS -->
       <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <div v-if="!undoId.includes(item.id)">
@@ -149,6 +149,7 @@
             <div style="display: flex">
               <div class="lln-description">
                 <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+                <span v-if="item.status === 'Wishlist'"><strong>{{ item.listing.inventoryItem.business.name }}</strong> has just listed <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
                 <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
               </div>
               <div class="lln-button-group">
