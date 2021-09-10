@@ -2552,6 +2552,12 @@ components:
         - Read
         - Important
 
+    MutedStatus:
+      type: string
+      enum:
+        - Unmuted
+        - Muted
+
     Wishlist:
       type: object
       description: An entity represnting a users wishlisted business
