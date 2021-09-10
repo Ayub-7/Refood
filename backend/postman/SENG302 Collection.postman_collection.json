@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "23c18550-8d45-42f3-adb5-63fa4c8dcfb1",
+		"_postman_id": "33c7f077-1522-43ee-b1f2-2593acfe79ea",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -561,14 +561,20 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/1/inventory",
+							"raw": "{{URL}}/businesses/:id/inventory",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
 								"businesses",
-								"1",
+								":id",
 								"inventory"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
 							]
 						}
 					},
@@ -742,6 +748,40 @@
 								"businesses",
 								"listings",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new listing",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"inventoryItemId\": 101,\r\n  \"quantity\": 3,\r\n  \"price\": 17.99,\r\n  \"moreInfo\": \"Seller may be willing to consider near offers\",\r\n  \"closes\": \"2021-07-21T23:59:00Z\",\r\n  \"likes\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/listings",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"listings"
 							],
 							"variable": [
 								{
@@ -1224,6 +1264,56 @@
 							"variable": [
 								{
 									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user's wishlisted businesses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add business to user's wishlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "businessId",
 									"value": "1"
 								}
 							]
