@@ -106,46 +106,21 @@
             <div>{{currency + currentYearReport.averageSale}}</div>
           </div>
         </div>
-        <!-- === WEEKLY SUMMARY === -->
-        <div v-else-if="activeGranularityButton==='w'">
-          <div class="row-summary-container">
-            <h2 class="summary-header">{{currentYearReport.title}}</h2>
-            <div class="summary-subheader">NUMBER OF SALES</div>
-            <div>{{currentYearReport.totalSales}}</div>
-            <div class="summary-subheader">AVG ITEMS PER SALE</div>
-            <div>{{currency + currentYearReport.averagePricePerItem}}</div>
-            <div class="summary-subheader">TOTAL SALE VALUE</div>
-            <div>{{currency + currentYearReport.totalSaleValue}}</div>
-            <div class="summary-subheader">AVG SALE VALUE</div>
-            <div>{{currency + currentYearReport.averageSale}}</div>
-          </div>
-        </div>
-        <!-- === MONTHLY SUMMARY === -->
-        <div v-else-if="activeGranularityButton==='m'">
-          <div class="row-summary-container">
-            <h2 class="summary-header">{{currentYearReport.title}}</h2>
-            <div class="summary-subheader">NUMBER OF SALES</div>
-            <div>{{currentYearReport.totalSales}}</div>
-            <div class="summary-subheader">AVG ITEMS PER SALE</div>
-            <div>{{currency + currentYearReport.averagePricePerItem}}</div>
-            <div class="summary-subheader">TOTAL SALE VALUE</div>
-            <div>{{currency + currentYearReport.totalSaleValue}}</div>
-            <div class="summary-subheader">AVG SALE VALUE</div>
-            <div>{{currency + currentYearReport.averageSale}}</div>
-          </div>
-        </div>
-        <!-- === YEARLY SUMMARY === -->
-        <div v-else-if="activeGranularityButton==='y'">
-          <div class="row-summary-container">
-            <h2 class="summary-header">{{currentYearReport.title}}</h2>
-            <div class="summary-subheader">NUMBER OF SALES</div>
-            <div>{{currentYearReport.totalSales}}</div>
-            <div class="summary-subheader">AVG ITEMS PER SALE</div>
-            <div>{{currency + currentYearReport.averagePricePerItem}}</div>
-            <div class="summary-subheader">TOTAL SALE VALUE</div>
-            <div>{{currency + currentYearReport.totalSaleValue}}</div>
-            <div class="summary-subheader">AVG SALE VALUE</div>
-            <div>{{currency + currentYearReport.averageSale}}</div>
+        <!-- === GRANULARITY SUMMARY === -->
+        <div v-else>
+          <div  id="summary-list" v-for="(summary, index) in reportGranularity" :key="index" >
+            <div class="row-summary-container">
+              <h2 class="summary-header">{{summary.title}}</h2>
+              <div class="summary-subheader">NUMBER OF SALES</div>
+              <div>{{summary.totalSales}}</div>
+              <div class="summary-subheader">AVG ITEMS PER SALE</div>
+              <div>{{currency + summary.averagePricePerItem}}</div>
+              <div class="summary-subheader">TOTAL SALE VALUE</div>
+              <div>{{currency + summary.totalSaleValue}}</div>
+              <div class="summary-subheader">AVG SALE VALUE</div>
+              <div>{{currency + summary.averageSale}}</div>
+            </div>
+            <vs-divider style="margin-top: 4px"/>
           </div>
         </div>
       </vs-card>
@@ -231,12 +206,10 @@ export default {
       salesHistory: [],
       dateStart: null,
       dateEnd: null,
-      dateWeek: null,
+      dateGranularity: null,
       currentYearReport: {},
       lastYearReport: {},
-      filteredWeeks: {},
-      filteredMonths: {},
-      filteredYears: {},
+      reportGranularity: null,
       errors: []
     }
   },
@@ -250,7 +223,6 @@ export default {
     let currentDate = new Date();
     //we gotta set date to a string or the bloody thing complains
     this.dateStart = "Jan 01, " + currentDate.getFullYear();
-    this.dateWeek = "Jan 07, " + currentDate.getFullYear();
     this.dateEnd = "Dec 31, " + currentDate.getFullYear();
 
   },
@@ -269,84 +241,51 @@ export default {
      * @param period string of the selected granularity.
      */
     onGranularityChange: function(period) {
+      let intervalDate = moment(new Date(this.dateStart))
       if (period === 'w') {
         //filter weeks
-        this.granularityWeeks()
-        console.log(period)
+        this.dateGranularity =  intervalDate.add(7, 'days');
+        this.granularity(this.dateGranularity, 7, 'days')
       } else if (period === 'm') {
         //filter month
-        this.granularityMonths()
-        console.log(period)
+        this.dateGranularity =  intervalDate.add(1, 'months')
+        this.granularity(this.dateGranularity, 1, 'months')
       } else if (period === 'y') {
         //filter year
-        this.granularityYears()
-        console.log(period)
+        this.dateGranularity =  intervalDate.add(1, 'years')
+        this.granularity(this.dateGranularity, 1, 'years')
       }
       this.activeGranularityButton = period; // Changes the granularity button to be selected and disabled.
-
     },
 
     /**
      * filter weeks granularity
      */
-    granularityWeeks: function () {
-      this.currentYearReport.title = "Weeks"
+    granularity: function (intervalDate, amount, unit) {
       let startDate = moment(new Date(this.dateStart))
       let endDate = moment(new Date(this.dateEnd))
-      let weekDate = moment(new Date(this.dateWeek))
       let summary = []
       let finalSummary = []
-      let pushCount = 0
-      // console.log(startDate.toDate(), weekDate.toDate())
       while (startDate < endDate) {
-        //remember to jump between individual weeks and fix why lenght is undefined
         for (const sale of this.currentYearSalesHistory) {
-          console.log(moment(sale.created).isBetween(startDate, weekDate))
-          if (moment(sale.created).isBetween(startDate, weekDate)) {
-            console.log(sale)
+          if (moment(sale.created).isBetween(startDate, intervalDate)) {
             summary.push(sale)
           }
         }
         if (summary.length >= 1) {
-          pushCount += 1
-          finalSummary.push(this.calculateSummary(summary, startDate.toDate()))
+          if (unit==='months') {
+            finalSummary.push(this.calculateSummary(summary, startDate.format('MMMM')))
+          } else if (unit==='days') {
+            finalSummary.push(this.calculateSummary(summary, startDate.format('MMM DD')))
+          } else {
+            finalSummary.push(this.calculateSummary(summary, startDate.format('YYYY')))
+          }
           summary = []
         }
-        console.log(startDate.toDate(), weekDate.toDate())
-        startDate = startDate.add(7, 'days');
-        weekDate = weekDate.add(7, 'days');
+        startDate = startDate.add(amount, unit);
+        intervalDate = intervalDate.add(amount, unit);
       }
-      console.log(finalSummary)
-      console.log(pushCount)
-      console.log(summary)
-    },
-
-    /**
-     * filter weeks granularity
-     */
-    granularityMonths: function () {
-      this.currentYearReport.title = "Months"
-      //current date  = today
-      //summary = {}
-      //while current date < end date {
-      //  if (sale is in between current and current+1Month) {
-      //    summary.push(calculateSummary(sale, "current - current + 1Month"))
-      //  current+1Month
-      console.log("months");
-    },
-
-    /**
-     * filter weeks granularity
-     */
-    granularityYears: function () {
-      this.currentYearReport.title = "Years"
-      //current date  = today
-      //summary = {}
-      //while current date < end date {
-      //  if (sale is in between current and current+year) {
-      //    summary.push(calculateSummary(sale, "current - current + year"))
-      //  current+year
-      console.log("years");
+      this.reportGranularity = finalSummary
     },
 
     /**
@@ -420,11 +359,9 @@ export default {
       let start = moment(new Date(this.dateStart));
       let end = moment(new Date(this.dateEnd));
       this.currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
-
       start = start.subtract(1,'year');
       end = end.subtract(1,'year');
       let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
-      console.log(this.currentYearSalesHistory)
       this.currentYearReport = this.calculateSummary(this.currentYearSalesHistory, "Current Period's Report");
       this.lastYearReport = this.calculateSummary(lastYearSalesHistory, "Last period's Report");
     },
@@ -439,8 +376,6 @@ export default {
       let totalPrice = 0;
       let totalQuantity = 0;
       summary.title = title
-      console.log(salesHistory)
-      console.log(salesHistory.length)
       if(salesHistory.length > 0) {
         for(let i=0;i<salesHistory.length;i++) {
           totalPrice += salesHistory[i].boughtListing.price;
