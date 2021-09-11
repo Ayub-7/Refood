@@ -226,11 +226,12 @@ export default {
       activeGranularityButton: "all",
       currency: "$",
       actingAsBusinessId: '',
-      currentYearSalesHistory: [],
+      currentYearSalesHistory: {},
       business: [],
       salesHistory: [],
       dateStart: null,
       dateEnd: null,
+      dateWeek: null,
       currentYearReport: {},
       lastYearReport: {},
       filteredWeeks: {},
@@ -249,7 +250,9 @@ export default {
     let currentDate = new Date();
     //we gotta set date to a string or the bloody thing complains
     this.dateStart = "Jan 01, " + currentDate.getFullYear();
+    this.dateWeek = "Jan 07, " + currentDate.getFullYear();
     this.dateEnd = "Dec 31, " + currentDate.getFullYear();
+
   },
 
   methods: {
@@ -290,30 +293,32 @@ export default {
       this.currentYearReport.title = "Weeks"
       let startDate = moment(new Date(this.dateStart))
       let endDate = moment(new Date(this.dateEnd))
+      let weekDate = moment(new Date(this.dateWeek))
       let summary = []
+      let finalSummary = []
+      let pushCount = 0
+      // console.log(startDate.toDate(), weekDate.toDate())
       while (startDate < endDate) {
-        console.log(startDate.toDate())
-        console.log(endDate.toDate())
-        //remember to loop over individual weeks
-        for (let i = 0; i < this.currentYearSalesHistory.length; i++) {
-          if (moment(this.currentYearSalesHistory[i].created).isBetween(startDate, endDate)) {
-            console.log("hi")
-            summary.push(this.calculateSummary(this.currentYearSalesHistory[i], startDate))
+        //remember to jump between individual weeks and fix why lenght is undefined
+        for (const sale of this.currentYearSalesHistory) {
+          console.log(moment(sale.created).isBetween(startDate, weekDate))
+          if (moment(sale.created).isBetween(startDate, weekDate)) {
+            console.log(sale)
+            summary.push(sale)
           }
         }
+        if (summary.length >= 1) {
+          pushCount += 1
+          finalSummary.push(this.calculateSummary(summary, startDate.toDate()))
+          summary = []
+        }
+        console.log(startDate.toDate(), weekDate.toDate())
         startDate = startDate.add(7, 'days');
+        weekDate = weekDate.add(7, 'days');
       }
-      console.log(startDate<endDate)
-      console.log(startDate.toDate())
-      console.log(endDate.toDate())
+      console.log(finalSummary)
+      console.log(pushCount)
       console.log(summary)
-      //current date  = today
-      //summary = {}
-      //while current date < end date {
-      //  if (sale is in between current and current+7) {
-      //    summary.push(calculateSummary(sale, "current - current + 7"))
-      //  current+7
-      console.log(this.currentYearReport);
     },
 
     /**
@@ -434,8 +439,9 @@ export default {
       let totalPrice = 0;
       let totalQuantity = 0;
       summary.title = title
-      console.log(salesHistory === null)
-      if(salesHistory === null) {
+      console.log(salesHistory)
+      console.log(salesHistory.length)
+      if(salesHistory.length > 0) {
         for(let i=0;i<salesHistory.length;i++) {
           totalPrice += salesHistory[i].boughtListing.price;
           totalQuantity += salesHistory[i].boughtListing.quantity;
