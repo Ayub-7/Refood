@@ -59,7 +59,7 @@ public class ProductFinder {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         formatter.format(new Date(System.currentTimeMillis()));
         Specification<Listing> specification = nameContains(terms.get(0)).and((root, criteriaQuery, criteriaBuilder)
-                -> criteriaBuilder.lessThan(root.get("created"), formatter.toString()));
+                -> criteriaBuilder.greaterThan(root.get("closes"), new Date()));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }

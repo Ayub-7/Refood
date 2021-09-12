@@ -59,7 +59,7 @@ public class ListingFinder {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         formatter.format(new Date(System.currentTimeMillis()));
         Specification<Listing> newSpec = sellerContains(nextTerm).and((root, criteriaQuery, criteriaBuilder)
-                -> criteriaBuilder.lessThan(root.get("created"), formatter.toString()));
+                -> criteriaBuilder.greaterThan(root.get("closes"), new Date()));
         if (predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {

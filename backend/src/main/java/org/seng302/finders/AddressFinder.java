@@ -78,10 +78,10 @@ public class AddressFinder {
      * @return Specification with full query of the next term
      */
     private Specification<Listing> checkFields(Specification<Listing> currentSpecification, String nextTerm, Logic predicate) {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        formatter.format(new Date(System.currentTimeMillis()));
+//        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        formatter.format(new Date(System.currentTimeMillis()));
         Specification<Listing> newSpec = buildQuery(nextTerm).and((root, criteriaQuery, criteriaBuilder)
-                -> criteriaBuilder.lessThan(root.get("created"), formatter.toString()));
+                -> criteriaBuilder.greaterThan(root.get("closes"), new Date()));
 
         if(predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
