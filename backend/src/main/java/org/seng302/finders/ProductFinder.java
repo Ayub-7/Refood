@@ -56,10 +56,8 @@ public class ProductFinder {
      */
     private Specification<Listing> buildProductSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        formatter.format(new Date(System.currentTimeMillis()));
         Specification<Listing> specification = nameContains(terms.get(0)).and((root, criteriaQuery, criteriaBuilder)
-                -> criteriaBuilder.greaterThan(root.get("closes"), new Date()));
+                -> criteriaBuilder.greaterThan(root.get("closes"), new Date(System.currentTimeMillis())));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }

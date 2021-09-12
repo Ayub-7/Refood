@@ -56,10 +56,8 @@ public class ListingFinder {
      * @return Specification<Listing> object
      */
     private Specification<Listing> checkFields(Specification<Listing> currentSpecification, String nextTerm, Logic predicate) {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        formatter.format(new Date(System.currentTimeMillis()));
         Specification<Listing> newSpec = sellerContains(nextTerm).and((root, criteriaQuery, criteriaBuilder)
-                -> criteriaBuilder.greaterThan(root.get("closes"), new Date()));
+                -> criteriaBuilder.greaterThan(root.get("closes"), new Date(System.currentTimeMillis())));
         if (predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {

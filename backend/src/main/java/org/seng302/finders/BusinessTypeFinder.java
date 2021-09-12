@@ -48,9 +48,7 @@ public class BusinessTypeFinder {
      */
     public Specification<Listing> findListingByBizType(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        formatter.format(new Date(System.currentTimeMillis()));
         return businessTypeSpec(terms.get(0)).and((root, criteriaQuery, criteriaBuilder)
-                -> criteriaBuilder.greaterThan(root.get("closes"), new Date()));
+                -> criteriaBuilder.greaterThan(root.get("closes"), new Date(System.currentTimeMillis())));
     }
 }
