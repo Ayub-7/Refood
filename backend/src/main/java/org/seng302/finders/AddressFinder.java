@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 @Component
@@ -75,7 +78,10 @@ public class AddressFinder {
      * @return Specification with full query of the next term
      */
     private Specification<Listing> checkFields(Specification<Listing> currentSpecification, String nextTerm, Logic predicate) {
-        Specification<Listing> newSpec = buildQuery(nextTerm);
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.format(new Date(System.currentTimeMillis()));
+        Specification<Listing> newSpec = buildQuery(nextTerm).and((root, criteriaQuery, criteriaBuilder)
+                -> criteriaBuilder.lessThan(root.get("created"), formatter.toString()));
 
         if(predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);

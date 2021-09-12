@@ -5,7 +5,10 @@ import org.seng302.models.Listing;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 @Component
@@ -53,7 +56,10 @@ public class ProductFinder {
      */
     private Specification<Listing> buildProductSpec(String query) {
         ArrayList<String> terms = searchQueryKeywords(query);
-        Specification<Listing> specification = nameContains(terms.get(0));
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.format(new Date(System.currentTimeMillis()));
+        Specification<Listing> specification = nameContains(terms.get(0)).and((root, criteriaQuery, criteriaBuilder)
+                -> criteriaBuilder.lessThan(root.get("created"), formatter.toString()));
         for (String term : terms) {
             specification = getNextSpecification(specification, term, terms);
         }

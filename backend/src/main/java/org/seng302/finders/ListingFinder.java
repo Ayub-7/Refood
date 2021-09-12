@@ -3,7 +3,11 @@ package org.seng302.finders;
 import org.seng302.models.Listing;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 @Component
@@ -52,7 +56,10 @@ public class ListingFinder {
      * @return Specification<Listing> object
      */
     private Specification<Listing> checkFields(Specification<Listing> currentSpecification, String nextTerm, Logic predicate) {
-        Specification<Listing> newSpec = sellerContains(nextTerm);
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.format(new Date(System.currentTimeMillis()));
+        Specification<Listing> newSpec = sellerContains(nextTerm).and((root, criteriaQuery, criteriaBuilder)
+                -> criteriaBuilder.lessThan(root.get("created"), formatter.toString()));
         if (predicate.equals(Logic.AND)) {
             currentSpecification = currentSpecification.and(newSpec);
         } else if (predicate.equals(Logic.OR)) {
