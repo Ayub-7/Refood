@@ -1761,6 +1761,46 @@ paths:
           description: "Forbidden: Returned when a user tries to delete a wishlist item that they are not the owner of AND the user is not a D/GAA"
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+    put:
+      tags:
+        - 'U33: Wishlist business'
+        - 'Wishlist'
+      summary: Update a wishlist mute status
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: Wishlist entity ID
+          schema:
+            type: integer
+          required: true
+          example: 5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                mutedStatus:
+                  type: string
+                  description: The new muted status to change the business wishlist item to
+                  example: "MUTED"
+      responses:
+        '200':
+          description: Wishlist item mute status updated successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: "Forbidden: Returned when a user tries to delete a wishlist item that they are not the owner of AND the user is not a D/GAA"
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
 
   '/users/{id}/wishlist':
     get:
@@ -1831,6 +1871,7 @@ components:
           schema:
             type: string
             example: JSESSIONID=abcde12345; Path=/; HttpOnly
+
 
 
 
