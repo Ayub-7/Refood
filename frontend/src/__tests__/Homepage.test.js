@@ -72,7 +72,7 @@ const mockListing =
             "price": 15.5,
             "moreInfo": "Contact us for more information.",
             "created": "2021-02-01 23:00:00",
-            "closes": "2021-09-08 00:00:00",
+            "closes": "2021-12-12 00:00:00",
             "likes": 1
         }
     ]
