@@ -55,10 +55,9 @@
       <div v-if="item.card" class="liked-listing-container" @mouseenter="markAsRead(item)">
       <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
         <div @click="openDetailedModal(item)">
-          <div style="display: flex; justify-content: space-between">
             <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
-            </div>
-          <div id="message-notification-container">
+          <div style="display: flex; justify-content: space-between">
+          <div class="lln-description">
             <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
           </div>
           <div class="lln-button-group">
@@ -68,7 +67,8 @@
             <div v-else style="margin-right: 10px;">
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
-            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
+            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close" style="margin-top: 5px;"></vs-button>
+          </div>
           </div>
         </div>
       </vs-card>
@@ -305,6 +305,7 @@ export default {
             message.created = message.sent;
             return message;
           });
+          this.combineFeedMessages();
         })
         .catch((error) => {
           this.$log.error("Error getting messages: " + error);
