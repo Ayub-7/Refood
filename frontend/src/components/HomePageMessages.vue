@@ -50,19 +50,29 @@
     </vs-popup>
 
     <!-- === NEWSFEED ITEMS === -->
-    <div v-for="item in feedItems" :key="item.id">
+    <div v-for="item in feedItems" :key="item.id" >
       <!-- CARD MESSAGE -->
-      <vs-card v-if="item.card" id="message-notification-card" class="notification-card" actionable>
+      <div v-if="item.card" class="liked-listing-container" @mouseenter="markAsRead(item)">
+      <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
         <div @click="openDetailedModal(item)">
           <div style="display: flex; justify-content: space-between">
             <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
-            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
-          </div>
+            <div class="lln-button-group">
+              <div v-if="item.viewStatus == 'Important'">
+                <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <div v-else>
+                <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
+            </div>
+            </div>
           <div id="message-notification-container">
             <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
           </div>
         </div>
       </vs-card>
+      </div>
 
       <!-- USER BOUGHT LISTING NOTIFICATION -->
       <div v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId" @mouseenter="markAsRead(item)" class="bought-listing-container">
@@ -206,7 +216,6 @@ export default {
      * @param notification the notification object to update.
      */
     markAsImportant: function(notification) {
-
       if (notification.viewStatus != "Important") {
         api.updateListingNotificationViewStatus(notification.id, "Important")
             .then((res) => {
