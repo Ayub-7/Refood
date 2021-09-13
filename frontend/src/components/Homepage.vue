@@ -189,8 +189,10 @@ const Homepage = {
         .then((res) => {
           let temp = [];
           for (let i = 0; i < res.data.length; i++) {
-            if (new Date(res.data[i]["closes"]).getTime() < new Date().getTime()) {
+            if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
               temp.push(res.data[i]);
+            } else {
+              api.removeLikeFromListing(res.data[i]["id"]);
             }
           }
           this.likedItem = temp;
