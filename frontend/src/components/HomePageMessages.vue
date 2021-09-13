@@ -57,18 +57,18 @@
         <div @click="openDetailedModal(item)">
           <div style="display: flex; justify-content: space-between">
             <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
-            <div class="lln-button-group">
-              <div v-if="item.viewStatus == 'Important'">
-                <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-              </div>
-              <div v-else>
-                <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-              </div>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
-            </div>
             </div>
           <div id="message-notification-container">
             <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
+          </div>
+          <div class="lln-button-group">
+            <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
+              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
+            <div v-else style="margin-right: 10px;">
+              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            </div>
+            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close"></vs-button>
           </div>
         </div>
       </vs-card>
@@ -200,14 +200,25 @@ export default {
      */
     markAsRead: function(notification) {
       if (notification.viewStatus === "Unread") {
-        api.updateListingNotificationViewStatus(notification.id, "Read")
-          .then((res) => {
-            this.$log.debug(res);
-            notification.viewStatus = "Read";
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          });
+        if (notification.card) {
+          api.updateMessageViewStatus(notification.id, "Read")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Read";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        } else {
+          api.updateListingNotificationViewStatus(notification.id, "Read")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Read";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        }
       }
     },
 
@@ -217,25 +228,47 @@ export default {
      */
     markAsImportant: function(notification) {
       if (notification.viewStatus != "Important") {
-        api.updateListingNotificationViewStatus(notification.id, "Important")
-            .then((res) => {
-              this.$log.debug(res);
-              notification.viewStatus = "Important";
-              console.log("Important");
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-            });
+        if (notification.card) {
+          api.updateMessageViewStatus(notification.id, "Important")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Important";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        } else {
+          api.updateListingNotificationViewStatus(notification.id, "Important")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Important";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        }
+
       } else {
-        api.updateListingNotificationViewStatus(notification.id, "Read")
-            .then((res) => {
-              this.$log.debug(res);
-              notification.viewStatus = "Read";
-              console.log("Unimportant");
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-            });
+        if (notification.card) {
+          api.updateMessageViewStatus(notification.id, "Read")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Read";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        } else {
+          api.updateListingNotificationViewStatus(notification.id, "Read")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Read";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        }
+
       }
     },
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewMessageRequest;
+import org.seng302.models.requests.UpdateNotificationViewStatusRequest;
 import org.seng302.repositories.MessageRepository;
 import org.seng302.repositories.UserRepository;
 import org.seng302.repositories.CardRepository;
@@ -153,4 +154,34 @@ public class MessageController {
         messageRepository.deleteMessageById(messageId);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(message));
     }
+
+    /**
+     * Updates the view status of a listing notification.
+     * @param notificationId unique id of the notification.
+     * @param request dto holding the new view status.
+     * @param session current user login session.
+     * @return 400 if request value is invalid (handled by spring), 401 if unauthorized (spring sec),
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    @PutMapping("/messages/{messageId}")
+    public ResponseEntity<String> updateListingNotificationViewStatus(@PathVariable long messageId,
+                                                                      @RequestBody UpdateNotificationViewStatusRequest request,
+                                                                      HttpSession session) {
+        Message message = messageRepository.findMessageById(messageId);
+
+        if (message == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (user.getId() != message.getReceiver().getId() && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        message.setViewStatus(request.getViewStatus());
+        messageRepository.save(message);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
+ 

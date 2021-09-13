@@ -509,4 +509,14 @@ export default {
      * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
      */
     updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a message notification.
+     * @param messageId the unique id of the message
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the message does not belong to the current user, 406 if the message id does not exist.
+     */
+    updateMessageViewStatus: (messageId, status) => instance.put(`/messages/${messageId}`, {viewStatus: status}, {withCredentials: true}),
+
+
 }
