@@ -35,15 +35,11 @@
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
-          <div id="watchlist-header-container">
-            <div style="display: flex;">
-              <div class="watchlist-title">
-                <vs-tabs>
-                  <vs-tab @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
-                  <vs-tab @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
-                </vs-tabs>
-              </div>
-            </div>
+          <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
+            <vs-tabs>
+              <vs-tab @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
+              <vs-tab @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
+            </vs-tabs>
           </div>
           <div v-if="watchlist">
             <div v-if="likedItem.size < 1" style="margin-top: -40px">
@@ -53,56 +49,47 @@
             </div>
             <div v-else>
               <div v-for="(item, index) in likedItem" :key="item.id" >
-                <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
-                  <div id="likes-notification-container">
+                <vs-card style="margin-top: -10px" id="message-notification-card" actionable>
+                  <div  id="likes-notification-container">
                     <vs-row v-if="item.likes != 0">
-                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                        <vs-tooltip text="View Listing">
-                          <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                        </vs-tooltip>
+                      <vs-col vs-type="flex" vs-align="center">
                         <vs-tooltip text="Unlike">
                           <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
                         </vs-tooltip>
+                        <div @click="viewListing(item.inventoryItem.product.business.id, item.id)" style="width: 100%; color: white;">
+                          p
+                        </div>
                       </vs-col>
                     </vs-row>
                     <vs-row v-else>
                       <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                        <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                        <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
+                        <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" @click="unlike(item.id, index)"></vs-icon>
                       </vs-col>
                     </vs-row>
-                    <div id="product-name">{{item.inventoryItem.product.name}}</div>
-                    <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
-                    <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
-                  </div>
+                    <div @click="viewListing(item.inventoryItem.product.business.id, item.id)">
+                      <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                      <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                      <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+                    </div>
+                    </div>
                 </vs-card>
               </div>
             </div>
           </div>
-          <!--Todo implement wishlist cards-->
           <div v-if="!watchlist">
-            <div v-for="business in wishlist" :key="business.id" >
-              <vs-card style="margin-top: -40px"  actionable>
+            <div v-for="wish in wishlist" :key="wish.id" >
+              <vs-card style="margin-top: -10px"  actionable>
                 <div>
-                  <vs-row v-if="business.likes != 0">
+                  <vs-row>
                     <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                      <vs-tooltip text="View Listing">
-                        <vs-icon icon="visibility" class="msg-icon" @click="viewListing(business.inventoryItem.product.business.id, business.id)"></vs-icon>
-                      </vs-tooltip>
                       <vs-tooltip text="Remove from wishlist">
-                        <vs-icon icon="star" class="msg-icon" color="red" @click="removeFromWishlist(business.wishlistId, index); business.likes = 0"></vs-icon>
+                        <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" ></vs-icon>
                       </vs-tooltip>
+                      <div @click="viewBusiness(wish.businessId)" style="width: 100%; color: white;">
+                        p
+                      </div>
                     </vs-col>
                   </vs-row>
-                  <vs-row v-else>
-                    <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                      <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                      <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
-                    </vs-col>
-                  </vs-row>
-                  <div id="product-name">{{item.inventoryItem.product.name}}</div>
-                  <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
-                  <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
                 </div>
               </vs-card>
             </div>
@@ -226,6 +213,13 @@ const Homepage = {
                 }
                 this.$log.debug(error);
               })
+    },
+
+    /**
+     * Go to business profile
+     */
+    viewBusiness: function (businessId) {
+      this.$router.push({name: "Business", params: {id: businessId}})
     },
 
     /**
@@ -464,6 +458,10 @@ export default Homepage;
   transition: font-size 0.3s;
 }
 
+#wishlist-icon {
+  font-size: 16px;
+}
+
 #view-unlike-icon {
   font-size: 16px;
   margin-left: -1px;
@@ -663,7 +661,7 @@ main {
   .watchlist-title {
     font-size: 18px;
     margin-left: 4px;
-    transition: 0.3s;
+    transition: 0.1s;
   }
 
 }
