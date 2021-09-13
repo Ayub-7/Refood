@@ -63,19 +63,19 @@
         <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
 
         <div class="options-header">Summary Interval</div>
-        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
+        <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
                    type="border"
                    style="grid-column: 1;"
                    @click="onGranularityChange('w')">
           Week
         </vs-button>
-        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
+        <vs-button id="month-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
                    type="border"
                    style="grid-column: 3;"
                    @click="onGranularityChange('m')">
           Month
         </vs-button>
-        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
+        <vs-button id="year-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
                    type="border"
                    style="grid-column: 1;"
                    @click="onGranularityChange('y')">
@@ -259,7 +259,10 @@ export default {
     },
 
     /**
-     * filter weeks granularity
+     * filter granularity
+     * @param intervalDate: the granularity date to filter by
+     * @param amount
+     * @param unit: selected granularity
      */
     granularity: function (intervalDate, amount, unit) {
       let startDate = moment(new Date(this.dateStart))
