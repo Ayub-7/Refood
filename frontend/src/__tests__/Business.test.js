@@ -84,10 +84,10 @@ const $log = {
 api.checkSession = jest.fn().mockResolvedValue({data: {id: 1}});
 api.getBusinessFromId = jest.fn().mockResolvedValue({data: mockBusiness});
 api.getUserFromID = jest.fn().mockResolvedValue({data: mockAdmin});
-api.getUserBusinessWishlist = jest.fn().mockImplementation(() => {
+api.getUsersWishlistedBusinesses = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 200, data: wishlist});
 });
-api.removeBusinessToWishlist = jest.fn().mockImplementation(() => {
+api.removeBusinessFromWishlist = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 200});
 });
 api.addBusinessToWishlist = jest.fn().mockImplementation(() => {

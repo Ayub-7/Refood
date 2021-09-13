@@ -22,8 +22,9 @@ public class WishlistItem {
     @Column(name = "user_id")
     private long userId;
 
-    @Column(name = "business_id")
-    private long businessId;
+    @OneToOne
+    @JoinColumn(name = "business_id", referencedColumnName="id", nullable = false)
+    private Business business;
 
     private boolean muted;
 
@@ -35,11 +36,11 @@ public class WishlistItem {
     /**
      * Basic constructor to wishlist a new business given a user id and business id.
      * @param userId the entity that is following the business.
-     * @param businessId the entity that is being followed by the user.
+     * @param business the entity that is being followed by the user.
      */
-    public WishlistItem(Long userId, Long businessId) {
+    public WishlistItem(Long userId, Business business) {
         this.userId = userId;
-        this.businessId = businessId;
+        this.business = business;
         this.muted = false;
     }
 

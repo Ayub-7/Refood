@@ -53,7 +53,7 @@ class WishlistItemControllerTests {
         user.setId(1);
         otherUser.setId(2);
         business = new Business("testBusiness", "test description", addr, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-        wishlistItem = new WishlistItem(user.getId(), business.getId());
+        wishlistItem = new WishlistItem(user.getId(), business);
 
         wishlistItemList = new ArrayList<>();
         wishlistItemList.add(wishlistItem);

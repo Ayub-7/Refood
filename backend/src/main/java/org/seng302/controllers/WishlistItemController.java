@@ -1,12 +1,12 @@
 package org.seng302.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.seng302.models.*;
 import org.seng302.repositories.*;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,7 +65,7 @@ public class WishlistItemController {
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        WishlistItem wishlistItem = new WishlistItem(userId, businessId);
+        WishlistItem wishlistItem = new WishlistItem(userId, business);
         wishlistItemRepository.save(wishlistItem);
         return ResponseEntity.status(HttpStatus.CREATED).body("Business added to wishlist");
     }
