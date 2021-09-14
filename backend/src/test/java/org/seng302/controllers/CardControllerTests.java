@@ -17,6 +17,7 @@ import org.seng302.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -566,6 +567,67 @@ class CardControllerTests {
         cardController.updateExpiredCards();
 
         Mockito.verify(cardRepository, Mockito.never()).delete(Mockito.any(Card.class));
+    }
+
+
+
+    @Test
+    void testPutNotificationViewStatus_notLoggedIn_returnUnauthorized() throws Exception {
+        mvc.perform(put("/cards/notifications/{notificationId}", card.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_invalidViewStatusInput_returnBadRequest() throws Exception {
+        mvc.perform(put("/cards/notifications/{notificationId}", card.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Donda\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_notUserAndNotDgaa_returnForbidden() throws Exception {
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(notification);
+        mvc.perform(put("/cards/notifications/{notificationId}", card.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_noNotificationWithId_returnNotAcceptable() throws Exception {
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(null);
+        mvc.perform(put("/cards/notifications/{notificationId}", card.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}"))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_validRequest_returnOk() throws Exception {
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(notification);
+        mvc.perform(put("/cards/notifications/{notificationId}", card.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_asGaa_returnOk() throws Exception {
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(notification);
+        anotherUser.setRole(Role.GAA);
+        mvc.perform(put("/cards/notifications/{notificationId}", card.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isOk());
     }
 
 
