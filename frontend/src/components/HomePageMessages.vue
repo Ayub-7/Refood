@@ -48,34 +48,22 @@
       </div>
 
     </vs-popup>
-<!--    <div class="dropdown-item" v-for="notification in notifications" :key="notification.cardId">-->
-<!--      <div class="dropdown-item-name">-->
-
-        <!-- If card is expired -->
-
-
-        <!-- If card is deleted -->
-
-
-
-<!--      </div>-->
-<!--    </div>-->
     <!-- === NEWSFEED ITEMS === -->
     <div v-for="item in feedItems" :key="item.id" >
 <!--      Marketplace card notifications-->
       <div v-if="item.displayPeriodEnd" class="liked-listing-container" @mouseenter="markAsRead(item)">
         <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <div class="card-container" v-if="item.status === 'Expired'">
-            <p class="sub-header">MARKETPLACE - {{item.title}}</p>
+            <p class="sub-header">MARKETPLACE - {{item.created}}</p>
             <div style="display: flex; justify-content: space-between">
             <div class="lln-description">
               Your marketplace card {{item.title}} has expired
-              <div id="buttons">
+              <div id="buttons" style="margin-top: 5px; text-align: left;">
                 <vs-button class="notificationButtons" @click="extendCard(item.cardId, item.title)">Extend</vs-button>
                 <vs-button class="notificationButtons" @click="deleteCard(item.cardId, item.title)">Delete card</vs-button>
               </div>
             </div>
-            <div class="lln-button-group">
+            <div class="lln-button-group" style="margin-top: 24px;">
               <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
                 <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
               </div>
@@ -88,14 +76,10 @@
           </div>
 
           <div class="card-container" v-else-if="item.status == 'Deleted'">
-            <p class="sub-header">MARKETPLACE - {{item.title}}</p>
+            <p class="sub-header">MARKETPLACE - {{item.created}}</p>
             <div style="display: flex; justify-content: space-between">
               <div class="lln-description">
                 Your marketplace card {{item.title}} has been removed
-                <div class="buttons">
-                  <vs-button class="notificationButtons" @click="extendCard(item.cardId, item.title)">Extend</vs-button>
-                  <vs-button class="notificationButtons" @click="deleteCard(item.cardId, item.title)">Delete card</vs-button>
-                </div>
               </div>
               <div class="lln-button-group">
                 <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
@@ -252,8 +236,8 @@ export default {
   mounted() {
     this.currentUserId = store.loggedInUserId;
     this.getMessages();
-    this.getListingNotifications();
     this.getNotifications();
+    this.getListingNotifications();
   },
 
   methods: {
@@ -350,6 +334,7 @@ export default {
         return new Date(b.created) - new Date(a.created);
       });
     this.feedItems.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
+      console.log(this.feedItems);
     },
 
     /**
@@ -571,7 +556,7 @@ export default {
       api.getNotifications(this.currentUserId)
           .then((response) => {
             this.notifications = response.data;
-            console.log(this.notifications);
+            this.combineFeedMessages();
           })
     },
 
