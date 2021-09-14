@@ -44,6 +44,7 @@ tags:
   - name: 'UCM9: Edit card'
   - name: 'U29 : Browse/search sale listings'
   - name: 'U31 : Purchases'
+  - name: 'U32 : Managing my feed'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -55,6 +56,8 @@ tags:
     description: 'Grouping of endpoints related to business inventories'
   - name: 'Listings / sales'
     description: 'Grouping of endpoints related to listings of items and the sales of these listings'
+  - name: 'Notifications'
+    description: 'Grouping of endpoints related to user notifications regarding listings'
   - name: 'Cards / community marketplace'
     description: 'Grouping of endpoints related to the community marketplace, and the cards the are created for it'
   - name: 'Keywords'
@@ -956,7 +959,7 @@ paths:
   '/listings/{listingId}/notify':
     post:
       tags:
-        - 'Listings / sales'
+        - 'Notifications'
         - 'U31 : Purchases'
       summary: Notify a user about any changes of items they liked or purchased.
       security:
@@ -983,7 +986,7 @@ paths:
   '/users/{userId}/notifications':
     get:
       tags:
-        - 'Listings / sales'
+        - 'Notifications'
         - 'U31 : Purchases'
       summary: User can retrieve all notifications related to listings they have received.
       security:
@@ -1006,7 +1009,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ListOfNotifications'
+                  $ref: '#/components/schemas/ListOfNotificationsUser'
         '401':
           description: Cannot send a notification to a user when the receiver is
             not logged in.
@@ -1042,7 +1045,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ListOfNotifications'
+                  $ref: '#/components/schemas/ListOfNotificationsBusiness'
         '401':
           description: Cannot send a notification to a user when the receiver is
             not logged in.
@@ -1051,6 +1054,75 @@ paths:
         '406':
           description: Business ID not found
 
+  '/notifications/{notificationId}':
+    delete:
+      tags:
+        - 'U32 : Managing my feed'
+        - 'Notifications'
+      summary: 'Delete a notification for a user'
+      parameters:
+        - name: notificationId
+          in: path
+          description: Id of the notification to delete
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Request successful, notification is deleted.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to delete a notification that does not belong to them AND the user is not a GAA'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+    put:
+      tags:
+        - 'U32 : Managing my feed'
+        - 'Notifications'
+      summary: Update the view status of a user's notification
+      parameters:
+        - name: notificationId
+          in: path
+          description: Id of the notification to update
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                viewStatus:
+                  type: string
+                  description: The new viewing status to change the notification to
+                  example: "READ"
+      responses:
+        '200':
+          description: Update successful, notification status was updated
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to update a notification that does not belong to them AND the user is not a GAA'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
   '/cards/{id}':
     get:
@@ -1506,7 +1578,7 @@ paths:
   '/businesses/listings':
     post:
       tags:
-        - 'Listing / sales'
+        - 'Listings / sales'
         - 'U29 : Browse/search sale listings'
       summary: Search across all business listings with (optional) given parameters.
       security:
@@ -2343,13 +2415,31 @@ components:
           enum:
             - Expired
             - Bought
+        viewStatus:
+          $ref: '#/components/schemas/ViewStatus'
         created:
           type: string
           format: date
           description: The date the notification was created
           readOnly: true
 
-    ListOfNotifications:
+    ListOfNotificationsUser:
+      example: [{id: 43,
+                 userId: 50,
+                 listingId: 30,
+                 status: Expired,
+                 viewStatus: Read,
+                 created: '2021-04-27'
+      },
+        {id: 50,
+         userId: 60,
+         listingId: 40,
+         status: Expired,
+         viewStatus: Read,
+         created: '2021-05-27'
+        }]
+
+    ListOfNotificationsBusiness:
       example: [{id: 43,
                  userId: 50,
                  listingId: 30,
@@ -2362,3 +2452,19 @@ components:
          status: Expired,
          created: '2021-05-27'
         }]
+
+    NotificationStatus:
+      type: string
+      enum:
+        - Bought
+        - Expired
+        - Deleted
+        - Liked
+        - Unliked
+
+    ViewStatus:
+      type: string
+      enum:
+        - Unread
+        - Read
+        - Important

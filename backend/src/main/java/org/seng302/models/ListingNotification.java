@@ -34,6 +34,9 @@ public class ListingNotification {
     @Enumerated(EnumType.STRING)
     private NotificationStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private ViewStatus viewStatus;
+
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date created;
 
@@ -43,10 +46,12 @@ public class ListingNotification {
      * @param boughtListing the listing being notified about.
      * @param status the listing status.
      */
+
     public ListingNotification(User user, BoughtListing boughtListing, NotificationStatus status) {
         this.user = user;
         this.boughtListing = boughtListing;
         this.status = status;
+        this.viewStatus = ViewStatus.UNREAD;
         this.created = new Date();
     }
 
@@ -62,6 +67,7 @@ public class ListingNotification {
         this.business = business;
         this.boughtListing = boughtListing;
         this.status = status;
+        this.viewStatus = ViewStatus.UNREAD;
         this.created = new Date();
     }
 
@@ -69,6 +75,7 @@ public class ListingNotification {
         this.user = user;
         this.listing = listing;
         this.status = status;
+        this.viewStatus = ViewStatus.UNREAD;
         this.created = new Date();
     }
 
