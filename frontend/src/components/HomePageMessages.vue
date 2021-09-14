@@ -255,6 +255,15 @@ export default {
               })
               .catch((error) => {
                 this.$log.debug(error);
+              }); notification.displayPeriodEnd
+        } else if (notification.displayPeriodEnd) {
+          api.updateNotificationViewStatus(notification.id, "Read")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Read";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
               });
         } else {
           api.updateListingNotificationViewStatus(notification.id, "Read")
@@ -284,7 +293,17 @@ export default {
               .catch((error) => {
                 this.$log.debug(error);
               });
-        } else {
+        } else if (notification.displayPeriodEnd) {
+          api.updateNotificationViewStatus(notification.id, "Important")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Important";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        }
+        else {
           api.updateListingNotificationViewStatus(notification.id, "Important")
               .then((res) => {
                 this.$log.debug(res);
@@ -294,7 +313,6 @@ export default {
                 this.$log.debug(error);
               });
         }
-
       } else {
         if (notification.card) {
           api.updateMessageViewStatus(notification.id, "Read")
@@ -305,7 +323,17 @@ export default {
               .catch((error) => {
                 this.$log.debug(error);
               });
-        } else {
+        } else if(notification.displayPeriodEnd) {
+          api.updateNotificationViewStatus(notification.id, "Read")
+              .then((res) => {
+                this.$log.debug(res);
+                notification.viewStatus = "Read";
+              })
+              .catch((error) => {
+                this.$log.debug(error);
+              });
+        }
+        else {
           api.updateListingNotificationViewStatus(notification.id, "Read")
               .then((res) => {
                 this.$log.debug(res);
