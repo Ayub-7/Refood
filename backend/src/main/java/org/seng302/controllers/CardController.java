@@ -11,6 +11,7 @@ import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.NotificationRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -190,11 +191,12 @@ public class CardController {
      *
      *
      */
-//    @Scheduled(fixedDelay = 60000, initialDelay = 0)
+    @Scheduled(fixedDelay = 60000, initialDelay = 0)
     public void updateExpiredCards() {
         logger.info("Checking for expired cards");
         Date date = new Date();
         List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
+        System.out.println(expiredCards);
         for (Card card: expiredCards) {
             Notification exists = notificationRepository.findNotificationByCardId(card.getId());
             if (exists == null) {

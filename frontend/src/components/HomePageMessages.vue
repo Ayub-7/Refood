@@ -48,9 +48,70 @@
       </div>
 
     </vs-popup>
+<!--    <div class="dropdown-item" v-for="notification in notifications" :key="notification.cardId">-->
+<!--      <div class="dropdown-item-name">-->
 
+        <!-- If card is expired -->
+
+
+        <!-- If card is deleted -->
+
+
+
+<!--      </div>-->
+<!--    </div>-->
     <!-- === NEWSFEED ITEMS === -->
     <div v-for="item in feedItems" :key="item.id" >
+<!--      Marketplace card notifications-->
+      <div v-if="item.displayPeriodEnd" class="liked-listing-container" @mouseenter="markAsRead(item)">
+        <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
+          <div class="card-container" v-if="item.status === 'Expired'">
+            <p class="sub-header">MARKETPLACE - {{item.title}}</p>
+            <div style="display: flex; justify-content: space-between">
+            <div class="lln-description">
+              Your marketplace card {{item.title}} has expired
+              <div id="buttons">
+                <vs-button class="notificationButtons" @click="extendCard(item.cardId, item.title)">Extend</vs-button>
+                <vs-button class="notificationButtons" @click="deleteCard(item.cardId, item.title)">Delete card</vs-button>
+              </div>
+            </div>
+            <div class="lln-button-group">
+              <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
+                <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <div v-else style="margin-right: 10px;">
+                <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteNotification(item.id)" icon="close" style="margin-top: 5px;"></vs-button>
+            </div>
+          </div>
+          </div>
+
+          <div class="card-container" v-else-if="item.status == 'Deleted'">
+            <p class="sub-header">MARKETPLACE - {{item.title}}</p>
+            <div style="display: flex; justify-content: space-between">
+              <div class="lln-description">
+                Your marketplace card {{item.title}} has been removed
+                <div class="buttons">
+                  <vs-button class="notificationButtons" @click="extendCard(item.cardId, item.title)">Extend</vs-button>
+                  <vs-button class="notificationButtons" @click="deleteCard(item.cardId, item.title)">Delete card</vs-button>
+                </div>
+              </div>
+              <div class="lln-button-group">
+                <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
+                  <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <div v-else style="margin-right: 10px;">
+                  <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteNotification(item.id)" icon="close" style="margin-top: 5px;"></vs-button>
+              </div>
+            </div>
+          </div>
+        </vs-card>
+      </div>
+
+
       <!-- CARD MESSAGE -->
       <div v-if="item.card" class="liked-listing-container" @mouseenter="markAsRead(item)">
       <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
@@ -177,6 +238,7 @@ export default {
 
       messages: [],
       listingNotifications: [],
+      notifications: [],
       feedItems: [],
     }
   },
@@ -191,6 +253,7 @@ export default {
     this.currentUserId = store.loggedInUserId;
     this.getMessages();
     this.getListingNotifications();
+    this.getNotifications();
   },
 
   methods: {
@@ -277,7 +340,7 @@ export default {
      * Sorts the list by newest messages first.
      */
     combineFeedMessages: function() {
-      this.feedItems = this.messages.concat(this.listingNotifications);
+      this.feedItems = this.messages.concat(this.listingNotifications.concat(this.notifications));
       // Set a overall unique id for each feed item. Prevent any overlapping ids which may cause update errors.
       this.feedItems = this.feedItems.map((item, index) => {
         item.fid = index;
@@ -459,7 +522,58 @@ export default {
      */
     goToListing: function(listing) {
       this.$router.push(`/businesses/${listing.inventoryItem.product.business.id}/listings/${listing.id}`);
-    }
+    },
+
+    /**
+     * Check if the listing has been bought by the user
+     */
+    validPurchaseNotification(notification) {
+      if (notification.status === 'Bought' && this.currentUserId !== notification.boughtListing.buyer) {
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * Calls api method to extend card display period
+     * @param cardId card that is going to extended
+     * @param title card title for notification
+     */
+    extendCard(cardId, title) {
+      api.extendCardDisplayPeriod(cardId)
+          .then(() => {
+            this.getNotifications();
+            this.$vs.notify({title:'Card Extended', text:`Card ${title} was extended`, color:'success'});
+          }).catch(() => {
+        this.$vs.notify({title:'Error', text:`Card ${title} could not be extended due to an error`, color:'danger'});
+      })
+    },
+
+    /**
+     * Calls api method to delete card
+     * @param cardId card that is going to deleted
+     * @param title card title for notification
+     */
+    deleteCard(cardId, title) {
+      api.deleteCard(cardId)
+          .then(() => {
+            this.getNotifications();
+            this.$vs.notify({title:'Card Deleted', text:`Card ${title} was deleted`, color:'success'});
+          }).catch(() => {
+        this.$vs.notify({title:'Error', text:`Card ${title} could not be deleted due to an error`, color:'danger'});
+      })
+    },
+
+    /**
+     * Calls api method to get notifications
+     */
+    getNotifications() {
+      api.getNotifications(this.currentUserId)
+          .then((response) => {
+            this.notifications = response.data;
+            console.log(this.notifications);
+          })
+    },
 
   },
   computed: {
