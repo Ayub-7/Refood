@@ -70,7 +70,7 @@
               <div v-else style="margin-right: 10px;">
                 <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
               </div>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteNotification(item.id)" icon="close" style="margin-top: 5px;"></vs-button>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteCard(item.cardId, item.title)" icon="close" style="margin-top: 5px;"></vs-button>
             </div>
           </div>
           </div>
@@ -88,7 +88,7 @@
                 <div v-else style="margin-right: 10px;">
                   <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
                 </div>
-                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteNotification(item.id)" icon="close" style="margin-top: 5px;"></vs-button>
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteCard(item.cardId, item.title)" icon="close" style="margin-top: 5px;"></vs-button>
               </div>
             </div>
           </div>
