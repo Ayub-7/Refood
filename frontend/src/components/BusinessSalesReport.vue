@@ -99,7 +99,7 @@
             <div class="summary-subheader">NUMBER OF SALES</div>
             <div>{{currentYearReport.totalSales}}</div>
             <div class="summary-subheader">AVG ITEMS PER SALE</div>
-            <div>{{currentYearReport.averagePricePerItem}}</div>
+            <div>{{currentYearReport.averageItemsPerSale}}</div>
             <div class="summary-subheader">TOTAL SALE VALUE</div>
             <div>{{currency + currentYearReport.totalSaleValue}}</div>
             <div class="summary-subheader">AVG SALE VALUE</div>
@@ -114,7 +114,7 @@
               <div class="summary-subheader">NUMBER OF SALES</div>
               <div>{{summary.totalSales}}</div>
               <div class="summary-subheader">AVG ITEMS PER SALE</div>
-              <div>{{summary.averagePricePerItem}}</div>
+              <div>{{summary.averageItemsPerSale}}</div>
               <div class="summary-subheader">TOTAL SALE VALUE</div>
               <div>{{currency + summary.totalSaleValue}}</div>
               <div class="summary-subheader">AVG SALE VALUE</div>
