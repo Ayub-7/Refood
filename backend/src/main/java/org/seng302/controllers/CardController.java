@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.models.*;
 import org.seng302.models.requests.NewCardRequest;
+import org.seng302.models.requests.UpdateNotificationViewStatusRequest;
 import org.seng302.models.responses.CardIdResponse;
 import org.seng302.repositories.CardRepository;
 import org.seng302.repositories.NotificationRepository;
@@ -379,6 +380,35 @@ public class CardController {
 
         editedCard.setId(cardId);
         cardRepository.save(editedCard);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Updates the view status of a marketplace card notification.
+     * @param notificationId unique id of the notification.
+     * @param request dto holding the new view status.
+     * @param session current user login session.
+     * @return 400 if request value is invalid (handled by spring), 401 if unauthorized (spring sec),
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    @PutMapping("/cards/notifications/{notificationId}")
+    public ResponseEntity<String> updateListingNotificationViewStatus(@PathVariable long notificationId,
+                                                                      @RequestBody UpdateNotificationViewStatusRequest request,
+                                                                      HttpSession session) {
+        Notification notification = notificationRepository.findNotificationByCardId(notificationId);
+
+        if (notification == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (user.getId() != notification.getUserId() && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        notification.setViewStatus(request.getViewStatus());
+        notificationRepository.save(notification);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
