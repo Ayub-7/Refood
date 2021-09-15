@@ -146,7 +146,7 @@ public class ListingNotificationController {
   /**
    * Endpoint for deleting a listing notification given the notifications id
    *
-   * @param id if of the notification
+   * @param id id of the notification
    * @param session current user login session.
    * @return 200 if successful, 400 if request value is invalid (handled by spring), 401 if unauthorized (spring sec),
    *     403 if the notification does not belong to the current user, 406 if the notification id does not exist.
