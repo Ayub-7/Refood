@@ -46,6 +46,7 @@
                     v-model="closes"
                     :danger="newListingErrors.closes.error"
                     :danger-text="newListingErrors.closes.message"
+                    :min="minimumDate"
                     label="Close Date"></vs-input>
         </div>
         <div id="listing-moreInfo">
@@ -175,10 +176,12 @@ export default {
 
       showFullProduct: false,
       selectedProduct: null,
+      minimumDate: new Date().toISOString().split('T')[0] + "T23:59",
     }
   },
 
   mounted() {
+    console.log(this.minimumDate)
     this.getSession();
     this.getBusinessInventory();
     this.getProducts(this.$route.params.id);
@@ -255,6 +258,7 @@ export default {
      * Checks if the new list form is valid, then creates a new listing to be sent to backend if true.
      */
     createNewListing: function() {
+      console.log(this.closes)
       if (this.validateNewListing()) {
         if (this.errors.length === 0) {
           api.createListing(store.actingAsBusinessId, this.invItem.id, this.listingQuantity, this.price, this.moreInfo, this.closes)

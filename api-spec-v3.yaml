@@ -2593,6 +2593,12 @@ components:
         - Read
         - Important
 
+    MutedStatus:
+      type: string
+      enum:
+        - Unmuted
+        - Muted
+
     Wishlist:
       type: object
       description: An entity represnting a users wishlisted business
@@ -2600,7 +2606,6 @@ components:
         - id
         - userId
         - businessId
-        - mutedStatus
       properties:
         id:
           type: integer
@@ -2612,6 +2617,6 @@ components:
         businessId:
           type: integer
           description: Id of the wishlisted business
-        muted:
-          type: boolean
-          description: Boolean describing whether the notifications for the wishlisted business are muted
+        mutedStatus:
+          type: MutedStatus
+          description: MutedStatus describing whether the notifications for the wishlisted business are muted

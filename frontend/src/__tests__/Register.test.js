@@ -101,7 +101,6 @@ describe('Register error checking', () => {
         wrapper.vm.nickname = '';
         wrapper.vm.bio = '';
         wrapper.vm.phonenumber = '027254871';
-        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors).toStrictEqual(['thisisnotaemail.com'])
@@ -120,7 +119,6 @@ describe('Register error checking', () => {
         let info = "some info";
         wrapper.vm.bio = info.repeat(10); // 90 characters.
         wrapper.vm.phonenumber = '027254871';
-        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
         expect(wrapper.vm.errors).toStrictEqual([wrapper.vm.bio])
@@ -138,7 +136,6 @@ describe('Register error checking', () => {
         wrapper.vm.nickname = '';
         let info = "some info";
         wrapper.vm.phonenumber = '027254871';
-        wrapper.vm.validAge = jest.fn().mockResolvedValue(true);
         await wrapper.vm.createUserInfo();
         expect(wrapper.vm.errors.length).toBe(0);
     })
@@ -158,20 +155,3 @@ describe('Method Checking', () => {
     });
 });
 
-describe('Checking age validity', () => {
-    test("Test empty date of birth", () => {
-        expect(wrapper.vm.validAge("")).toBe(false);
-    });
-
-    test("Test successful age older than 13", () => {
-        expect(wrapper.vm.validAge("1990-01-01")).toBe(true);
-    });
-
-    test("Test unsuccessful age younger than 13", () => {
-        expect(wrapper.vm.validAge("2020-01-01")).toBe(false);
-    });
-
-    test("Test date of birth of now to be invalid", () => {
-        expect(wrapper.vm.validAge(Date.now().toString())).toBe(false);
-    });
-});

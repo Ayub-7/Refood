@@ -27,37 +27,48 @@ class WishlistItemRepositoryTests {
 
     private WishlistItem wishlistItem1;
     private WishlistItem wishlistItem2;
-    private List<WishlistItem> wishlistItemList;
+    private WishlistItem wishlistItem3;
+    private List<WishlistItem> wishlistItemListUser;
+    private List<WishlistItem> wishlistItemsBusiness;
+    private List<WishlistItem> wishlistItemsAll;
 
     @BeforeEach
     void setUp() throws NoSuchAlgorithmException {
         wishlistItemRepository.deleteAll();
         wishlistItemRepository.flush();
-        wishlistItemList = new ArrayList<>();
+        wishlistItemListUser = new ArrayList<>();
+        wishlistItemsBusiness = new ArrayList<>();
+        wishlistItemsAll = new ArrayList<>();
         assertThat(wishlistItemRepository).isNotNull();
         wishlistItem1 = new WishlistItem(Long.valueOf(1), Long.valueOf(2));
         wishlistItem2 = new WishlistItem(Long.valueOf(1), Long.valueOf(1));
-        System.out.println(wishlistItem1);
+        wishlistItem3 = new WishlistItem(Long.valueOf(2), Long.valueOf(1));
         wishlistItemRepository.save(wishlistItem1);
         wishlistItemRepository.save(wishlistItem2);
-        wishlistItemList.add(wishlistItem1);
-        wishlistItemList.add(wishlistItem2);
+        wishlistItemRepository.save(wishlistItem3);
+        wishlistItemListUser.add(wishlistItem1);
+        wishlistItemListUser.add(wishlistItem2);
+        wishlistItemsBusiness.add(wishlistItem2);
+        wishlistItemsBusiness.add(wishlistItem3);
+        wishlistItemsAll.add(wishlistItem1);
+        wishlistItemsAll.add(wishlistItem2);
+        wishlistItemsAll.add(wishlistItem3);
     }
 
     @Test
     void findWishListItemsByUserIdSuccessful() {
-        assertThat(wishlistItemRepository.findWishlistItemsByUserId(Long.valueOf(1))).isEqualTo((wishlistItemList));
+        assertThat(wishlistItemRepository.findWishlistItemsByUserId(Long.valueOf(1))).isEqualTo((wishlistItemListUser));
     }
 
     @Test
     void findWishListItemsByUserIdItemIsNull() {
-        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemsByUserId(2);
+        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemsByUserId(3);
         assertThat(notFound.size()).isEqualTo(0);
     }
 
     @Test
     void findSingleWishlistItemByIdSuccessful() {
-        WishlistItem found = wishlistItemRepository.findWishlistItemById(3);
+        WishlistItem found = wishlistItemRepository.findWishlistItemById(4);
         assertThat(wishlistItem1).isEqualTo(found);
     }
 
@@ -69,7 +80,18 @@ class WishlistItemRepositoryTests {
 
     @Test
     void findAllWishListItemsSuccessful() {
-        assertThat(wishlistItemRepository.findAll()).isEqualTo((wishlistItemList));
+        assertThat(wishlistItemRepository.findAll()).isEqualTo((wishlistItemsAll));
+    }
+
+    @Test
+    void findWishListItemsByBusinessIdSuccessful() {
+        assertThat(wishlistItemRepository.findWishlistItemByBusinessId(Long.valueOf(1))).isEqualTo((wishlistItemsBusiness));
+    }
+
+    @Test
+    void findWishListItemsByBusinessIdItemIsNull() {
+        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemByBusinessId(10);
+        assertThat(notFound.size()).isEqualTo(0);
     }
 
 
