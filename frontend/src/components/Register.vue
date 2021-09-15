@@ -68,7 +68,7 @@
                     danger-text="Enter date of birth"
                     :success="(dateofbirth.length!==0)"
                     min="1900-01-01"
-                    max=""
+                    :max="maxAllowedDoB"
                     label="Date of birth *"/>
         </div>
         <div id="password-info">
@@ -198,7 +198,6 @@ const Register = {
   mounted() {
     this.maxAllowedDoB.setFullYear(this.maxAllowedDoB.getFullYear()-13);
     this.maxAllowedDoB = this.maxAllowedDoB.toISOString().split('T')[0];
-    document.getElementsByName("dateofbirth")[0].setAttribute('max', this.maxAllowedDoB);
   },
   methods:{
     /**
@@ -232,7 +231,7 @@ const Register = {
       if (this.confirm_password.length === 0 || this.password !== this.confirm_password) {
         this.errors.push(this.confirm_password);
       }
-      if (this.dateofbirth.length === 0 || !this.validAge(this.dateofbirth)) {
+      if (this.dateofbirth.length === 0) {
         this.errors.push(this.dateofbirth);
       }
 
@@ -255,19 +254,6 @@ const Register = {
         }
       }
     },
-
-
-    /**
-     * from https://stackoverflow.com/questions/14231381/to-check-if-age-is-not-less-than-13-years-in-javascript
-     * @param birthDateString string of date inputted by user
-     * @returns {Boolean} True if user is 13 and above false if below
-     */
-
-    validAge: function(birthDateString) {
-      let years = new Date(new Date() - new Date(birthDateString)).getFullYear() - 1970;
-      return (years >= 13);
-    },
-
 
 
     /**
