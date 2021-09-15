@@ -7,7 +7,6 @@ import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,9 +75,12 @@ public class WishlistItemController {
      * @param mutedStatusRequest muted status JSON body to update the wishlist item to
      * @param id id of the wishlist item
      * @param session user's logged in session
-     * @return 200 if successful, 401 if not logged in, 403 if user tries to delete a wishlist item that they are not
-     *         the owner of AND the user is not a D/GAA, 406 if requested route does exist (so not a 404) but some part
-     *         of the request is not acceptable, for example trying to access a resource by an ID that does not exist
+     * @return 200 if successful,
+     *         400 if request is bad (JSON body is bad, ID is bad or session is bad),
+     *         401 if not logged in,
+     *         403 if user tries to delete a wishlist item that they are not the owner of AND the user is not a D/GAA,
+     *         406 if requested route does exist (so not a 404) but some part of the request is not acceptable,
+     *             for example trying to access a resource by an ID that does not exist
      */
     @PutMapping("/wishlist/{id}")
     public ResponseEntity<String> wishlistMutedStatusUpdate(@RequestBody MutedStatusRequest mutedStatusRequest, @PathVariable long id, HttpSession session) {
