@@ -513,12 +513,6 @@ export default {
       return this.showing || !this.messaging;
     }
   },
-  beforeDestroy () {
-    clearInterval(this.polling)
-  },
-  created () {
-    this.pollData()
-  }
 }
 </script>
 
