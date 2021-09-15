@@ -367,6 +367,10 @@ export default {
         });
     },
 
+    /**
+     * removes notification from feedItems
+     * @param fid
+     */
     spliceMessage(fid) {
       for (let i = this.feedItems.length - 1; i >= 0; i--) {
         if (this.feedItems[i].fid === fid) {
