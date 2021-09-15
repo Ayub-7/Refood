@@ -187,14 +187,44 @@ const Homepage = {
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
         .then((res) => {
-          this.likedItem = res.data;
-          this.likes = res.data.length;
+          let temp = [];
+          for (let i = 0; i < res.data.length; i++) {
+            if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
+              temp.push(res.data[i]);
+            } else {
+              api.removeLikeFromListing(res.data[i]["id"]);
+            }
+          }
+          this.likedItem = temp;
+          this.likes = temp.length;
         })
         .catch((error) => {
           if (error.response) {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
-        })
+        });
+
+      setInterval(() => {
+        api.getUserLikedListings(userId)
+            .then((res) => {
+              let temp = [];
+              for (let i = 0; i < res.data.length; i++) {
+                if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
+                  temp.push(res.data[i]);
+                } else {
+                  api.removeLikeFromListing(res.data[i]["id"]);
+                }
+              }
+              this.likedItem = temp;
+              this.likes = temp.length;
+            })
+            .catch((error) => {
+              if (error.response) {
+                this.$vs.notify({title: "Error retrieving likes", color: "danger"});
+              }
+            })
+      }, 100);
+
     },
 
     /**
@@ -453,7 +483,7 @@ export default Homepage;
   border-radius: 4px;
   margin: 8px 0 0 0;
 
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
 }
 
 .name {
@@ -486,7 +516,7 @@ export default Homepage;
 .sub-container {
   padding: 2em;
   border-radius: 4px;
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
   background-color: #FFFFFF;
 }
 
