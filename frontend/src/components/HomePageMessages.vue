@@ -362,7 +362,6 @@ export default {
         return new Date(b.created) - new Date(a.created);
       });
     this.feedItems.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
-      console.log(this.feedItems);
     },
 
     /**
@@ -585,7 +584,13 @@ export default {
           .then((response) => {
             this.notifications = response.data;
             this.combineFeedMessages();
-          })
+          }).catch((error) => {
+          this.$vs.notify({
+          title: 'Failed to get notifications',
+          color: 'danger'
+        });
+        this.$log.debug("Error Status:", error);
+      });
     },
 
   },
