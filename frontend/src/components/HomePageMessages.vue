@@ -141,7 +141,7 @@
         </vs-card>
       </div>
 
-      <!-- NEW LIKED LISTING NOTIFICATIONS -->
+      <!-- NEW LIKED & WISHLIST LISTING NOTIFICATIONS -->
       <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <div v-if="!undoId.includes(item.id)">
@@ -149,6 +149,7 @@
             <div style="display: flex">
               <div class="lln-description">
                 <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+                <span v-if="item.status === 'Wishlist'"><strong>{{ item.listing.inventoryItem.product.business.name }}</strong> has just listed <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
                 <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
               </div>
               <div class="lln-button-group">
@@ -303,22 +304,41 @@ export default {
      */
     getMessages: function() {
       api.getMessages(this.currentUserId)
-        .then((response) => {
-          this.messages = response.data;
-          for (let message of this.messages) {
-            this.users[message.sender.id] = message.sender;
-          }
+          .then((response) => {
+            this.messages = response.data;
+            for (let message of this.messages) {
+              this.users[message.sender.id] = message.sender;
+            }
 
-          this.messages = this.messages.map(message => {
-            // Map the sent date to a new created attribute - to be used for sorting.
-            message.created = message.sent;
-            return message;
+            this.messages = this.messages.map(message => {
+              // Map the sent date to a new created attribute - to be used for sorting.
+              message.created = message.sent;
+              return message;
+            });
+          })
+          .catch((error) => {
+            this.$log.error("Error getting messages: " + error);
+            this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
           });
-        })
-        .catch((error) => {
-          this.$log.error("Error getting messages: " + error);
-          this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
-        });
+      this.polling = setInterval(() => {
+        api.getMessages(this.currentUserId)
+            .then((response) => {
+              this.messages = response.data;
+              for (let message of this.messages) {
+                this.users[message.sender.id] = message.sender;
+              }
+
+              this.messages = this.messages.map(message => {
+                // Map the sent date to a new created attribute - to be used for sorting.
+                message.created = message.sent;
+                return message;
+              });
+            })
+            .catch((error) => {
+              this.$log.error("Error getting messages: " + error);
+              this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
+            });
+      }, 3000)
     },
 
     /**
@@ -383,6 +403,21 @@ export default {
                 color: "danger"});
             }
           });
+      this.polling = setInterval(() => {
+        api.getListingNotifications(store.loggedInUserId)
+            .then((res) => {
+              this.listingNotifications = res.data;
+              this.combineFeedMessages();
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+              if (error && error.response) {
+                this.$vs.notify({title: `Error ${error.response}`,
+                  text: "There was a problem getting your newsfeed.",
+                  color: "danger"});
+              }
+            });
+      }, 3000)
     },
 
     /**
@@ -477,7 +512,7 @@ export default {
     showTransition: function() {
       return this.showing || !this.messaging;
     }
-  }
+  },
 }
 </script>
 
