@@ -203,6 +203,28 @@ const Homepage = {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
         })
+
+      setInterval(() => {
+        api.getUserLikedListings(userId)
+            .then((res) => {
+              let temp = [];
+              for (let i = 0; i < res.data.length; i++) {
+                if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
+                  temp.push(res.data[i]);
+                } else {
+                  api.removeLikeFromListing(res.data[i]["id"]);
+                }
+              }
+              this.likedItem = temp;
+              this.likes = temp.length;
+            })
+            .catch((error) => {
+              if (error.response) {
+                this.$vs.notify({title: "Error retrieving likes", color: "danger"});
+              }
+            })
+      }, 100)
+
     },
 
     /**

@@ -74,7 +74,54 @@ const mockListing =
             "created": "2021-02-01 23:00:00",
             "closes": "2021-12-12 00:00:00",
             "likes": 1
-        }
+        },
+        // {
+        //     "id": 5,
+        //     "inventoryItem": {
+        //         "id": 2,
+        //         "product": {
+        //             "id": "W04GP5EC0B1798680",
+        //             "business": {
+        //                 "name": "Dabshots",
+        //                 "id": 1,
+        //                 "administrators": [],
+        //                 "primaryAdministratorId": null,
+        //                 "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+        //                 "address": {
+        //                     "streetNumber": "0",
+        //                     "streetName": "Vernon Place",
+        //                     "suburb": null,
+        //                     "city": "Sarpang",
+        //                     "region": null,
+        //                     "country": "Bhutan",
+        //                     "postcode": null
+        //                 },
+        //                 "businessType": "Charitable organisation",
+        //                 "created": "2020-05-18 09:06:11"
+        //             },
+        //             "name": "Compound - Mocha",
+        //             "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
+        //             "manufacturer": "Nestle",
+        //             "recommendedRetailPrice": 88.93,
+        //             "created": "2021-01-11 07:54:46",
+        //             "images": [],
+        //             "primaryImagePath": null
+        //         },
+        //         "quantity": 7,
+        //         "pricePerItem": 3.0,
+        //         "totalPrice": 80.0,
+        //         "manufactured": "2020-01-26",
+        //         "sellBy": null,
+        //         "bestBefore": "2021-08-27",
+        //         "expires": "2021-08-27"
+        //     },
+        //     "quantity": 1,
+        //     "price": 15.5,
+        //     "moreInfo": "Contact us for more information.",
+        //     "created": "2021-02-01 23:00:00",
+        //     "closes": new Date().toISOString().split("T")[0] + " " + new Date().setTime(new Date().getTime()+6000).toISOString().split("T")[1].split(".")[0],
+        //     "likes": 1
+        // }
     ]
 
 const mockBusiness =
@@ -281,4 +328,13 @@ describe("Tests for wishlist functionality", ()=> {
         await wrapper.vm.unlike(4);
         expect(wrapper.vm.likes).toBe(0);
     });
+
+    test("Closed listing disappears from liked listings", async () => {
+        expect(wrapper.vm.likes).toBe(1);
+        wrapper.vm.likedItem[0]["closes"] = new Date().toISOString().split("T")[0] + " " + new Date().toISOString().split("T")[1].split(".")[0]
+        setTimeout(function(){
+            expect(wrapper.vm.likes).toBe(0);
+        }, 1000);
+    });
+
 });
