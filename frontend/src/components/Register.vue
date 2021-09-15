@@ -53,7 +53,7 @@
           <vs-input type="tel"
                     class="form-control"
                     label="Phone number"
-                    :danger="phonenumber.length>0 && errors.includes(phonenumber)"
+                    :danger="phonenumber.length > 0 && errors.includes(phonenumber)"
                     danger-text="Invalid phone number."
                     :success="validPhoneNum(phonenumber)"
                     name="phonenumber"
@@ -67,6 +67,8 @@
                     :danger="errors.includes(dateofbirth)"
                     danger-text="Enter date of birth"
                     :success="(dateofbirth.length!==0)"
+                    min="1900-01-01"
+                    max=""
                     label="Date of birth *"/>
         </div>
         <div id="password-info">
@@ -82,7 +84,7 @@
           <vs-input type="password"
                     class="form-control"
                     label="Password *"
-                    :danger="errors.includes(password)"
+                    :danger="password.length > 0 || errors.includes(password)"
                     danger-text="Your password does not meet the requirements."
                     :success="validPassword(password)"
                     name="password (Required)"
@@ -181,6 +183,7 @@ const Register = {
       city: "",
       region: "",
       country: "",
+      maxAllowedDoB: new Date(),
 
       suggestCities: false,
       suggestedCities: [],
@@ -191,6 +194,11 @@ const Register = {
 
 
     };
+  },
+  mounted() {
+    this.maxAllowedDoB.setFullYear(this.maxAllowedDoB.getFullYear()-13);
+    this.maxAllowedDoB = this.maxAllowedDoB.toISOString().split('T')[0];
+    document.getElementsByName("dateofbirth")[0].setAttribute('max', this.maxAllowedDoB);
   },
   methods:{
     /**
