@@ -2,6 +2,9 @@ package org.seng302.models;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Muted status of a notification
+ */
 public enum MutedStatus {
     UNMUTED("Unmuted"),
     MUTED("Muted");

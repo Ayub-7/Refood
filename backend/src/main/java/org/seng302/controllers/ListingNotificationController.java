@@ -145,12 +145,15 @@ public class ListingNotificationController {
 
   /**
    * Endpoint for deleting a listing notification given the notifications id
-   * @param id
-   * @param session
-   * @return
+   *
+   * @param id if of the notification
+   * @param session current user login session.
+   * @return 200 if successful, 400 if request value is invalid (handled by spring), 401 if unauthorized (spring sec),
+   *     403 if the notification does not belong to the current user, 406 if the notification id does not exist.
    */
   @DeleteMapping("/notifications/{notificationId}")
-  public ResponseEntity<String> deleteListingNotification(@PathVariable("notificationId") long id, HttpSession session) {
+  public ResponseEntity<String> deleteListingNotification(
+      @PathVariable("notificationId") long id, HttpSession session) {
     ListingNotification notification = listingNotificationRepository.findListingNotificationById(id);
     if (notification == null) {
       return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
