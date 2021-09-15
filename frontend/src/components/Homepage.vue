@@ -202,7 +202,7 @@ const Homepage = {
           if (error.response) {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
-        })
+        });
 
       setInterval(() => {
         api.getUserLikedListings(userId)
@@ -223,7 +223,7 @@ const Homepage = {
                 this.$vs.notify({title: "Error retrieving likes", color: "danger"});
               }
             })
-      }, 100)
+      }, 100);
 
     },
 
