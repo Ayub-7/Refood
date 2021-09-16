@@ -1,11 +1,6 @@
 <template>
-  <vs-card id="report-container">
-    <div id="header-container">
-      <vs-icon icon="summarize" size="32px"></vs-icon>
-      <div id="title">Sales Report</div>
-      <div id="title-business"> - {{getBusinessName()}}</div>
-    </div>
-    <vs-divider/>
+  <div id="report-container">
+
 
     <div id="content-container">
       <!-- FILTER/GRANULARITY PICKER -->
@@ -182,7 +177,7 @@
         </div>
       </div>
     </div>
-  </vs-card>
+  </div>
 </template>
 
 <script>
@@ -493,9 +488,6 @@ export default {
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
   overflow-y: scroll;
-}
-
-#summary-container >>> .vs-card--content {
 }
 
 .row-summary-container {

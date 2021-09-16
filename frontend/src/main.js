@@ -52,7 +52,10 @@ import ListingDetail from "@/components/ListingDetail";
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
 import { updateSessionOnRouterChange } from './utilities/UpdateSession';
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
 
+Vue.component('apexchart', VueApexCharts)
 
 Vue.config.productionTip = false;
 

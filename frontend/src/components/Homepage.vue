@@ -87,7 +87,35 @@
         <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
       </main>
 
-      <BusinessSalesReport v-else class="business-main"/>
+      <div v-else-if="graphMode" class="business-main" >
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="leaderboard" size="32px"></vs-icon>
+            <div class="title">Sales Report Graph</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode">Data</vs-button>
+          </div>
+          <vs-divider/>
+          <!--
+          <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
+          -->
+
+          <BusinessSalesGraph :salesDatay='series' :salesDatax='options' />
+        </vs-card>
+      </div>
+      <div v-else class="business-main">
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="summarize" size="32px"></vs-icon>
+            <div class="title">Sales Report</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
+          </div>
+          <vs-divider/>
+          <BusinessSalesReport />
+        </vs-card>
+      </div>
+
 
 
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
@@ -111,10 +139,11 @@ import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
 import BusinessSalesReport from "./BusinessSalesReport";
+import BusinessSalesGraph from "./BusinessSalesGraph";
 
 const Homepage = {
   name: "Homepage",
-  components: {BusinessSalesReport, ListingDetail, HomePageMessages, MarketplaceGrid},
+  components: {BusinessSalesReport, BusinessSalesGraph, ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       unliked: false,
@@ -130,6 +159,23 @@ const Homepage = {
       currentCardPage: 1,
       user: null,
       currencySymbol: "$",
+      graphMode: true,
+      series: [{
+        name: 'Number of sales',
+        data: [30, 40, 20, 50, 49, 10, 70, 40, 55, 57, 53, 44]
+      }],
+      options: {
+        chart: {
+          id: 'sales-graph-report'
+        },
+        xaxis: {
+          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+        },
+        dataLabels: {
+          enabled: false,
+        }
+      },
     }
   },
   /**
@@ -405,6 +451,17 @@ export default Homepage;
   margin-bottom: 4px;
 }
 
+.toggle-button {
+  width: 150px;
+}
+
+.header-container {
+  display: flex;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 1em;
+}
+
 #product-name {
   text-align: left;
   font-size: 12px;
@@ -497,6 +554,21 @@ export default Homepage;
   margin: auto;
 }
 
+
+
+.title {
+  font-size: 30px;
+  margin-top: 4px;
+  margin-right: 8px;
+}
+.title-business {
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 4px;
+  margin-left: 0;
+  margin-right: auto;
+}
+
 .newsfeed-title {
   font-size: 24px;
   padding: 4px 0 0 0.5em;
@@ -562,6 +634,7 @@ main {
 .business-main {
   grid-column: 3;
   grid-row: 2;
+  margin-top: 1em;
 }
 
 .business-main >>> .vs-card--content {
