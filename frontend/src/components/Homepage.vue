@@ -93,6 +93,7 @@
             <vs-icon icon="leaderboard" size="32px"></vs-icon>
             <div class="title">Sales Report Graph</div>
             <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="leaderboard" class="toggle-button" id="toggle-sales">See Total Sales</vs-button>
             <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode">Data</vs-button>
           </div>
           <vs-divider/>
@@ -460,6 +461,10 @@ export default Homepage;
   margin: auto;
   padding-bottom: 0.5em;
   padding-top: 1em;
+}
+
+#toggle-sales {
+  margin-right: 10px;
 }
 
 #product-name {
