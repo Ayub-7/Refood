@@ -58,19 +58,19 @@
         <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
 
         <div class="options-header">Summary Interval</div>
-        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
+        <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
                    type="border"
                    style="grid-column: 1;"
                    @click="onGranularityChange('w')">
           Week
         </vs-button>
-        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
+        <vs-button id="month-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
                    type="border"
                    style="grid-column: 3;"
                    @click="onGranularityChange('m')">
           Month
         </vs-button>
-        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
+        <vs-button id="year-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
                    type="border"
                    style="grid-column: 1;"
                    @click="onGranularityChange('y')">
@@ -86,19 +86,36 @@
 
       <vs-card id="summary-container">
         <h3>Summary</h3>
-        <div id="summary-list" v-for="(summary, index) in summaries" :key="index" >
-          <vs-divider style="margin-top: 4px"/>
+        <vs-divider style="margin-top: 4px"/>
+        <!-- === FULL SUMMARY === -->
+        <div v-if="activeGranularityButton==='all'">
           <div class="row-summary-container">
-            <h2 class="summary-header">{{ summary.title }}</h2>
+            <h2 class="summary-header">{{currentYearReport.title}}</h2>
             <div class="summary-subheader">NUMBER OF SALES</div>
-            <div>{{ summary.totalSales }}</div>
+            <div>{{currentYearReport.totalSales}}</div>
             <div class="summary-subheader">AVG ITEMS PER SALE</div>
-            <div>{{ summary.averageItemsPerSale }}</div>
-
+            <div>{{currentYearReport.averageItemsPerSale}}</div>
             <div class="summary-subheader">TOTAL SALE VALUE</div>
-            <div>{{currency + summary.totalSaleValue}}</div>
+            <div>{{currency + currentYearReport.totalSaleValue}}</div>
             <div class="summary-subheader">AVG SALE VALUE</div>
-            <div>{{currency + summary.averagePricePerItem}}</div>
+            <div>{{currency + currentYearReport.averageSale}}</div>
+          </div>
+        </div>
+        <!-- === GRANULARITY SUMMARY === -->
+        <div v-else>
+          <div  id="summary-list" v-for="(summary, index) in reportGranularity" :key="index" >
+            <div class="row-summary-container">
+              <h2 class="summary-header">{{summary.title}}</h2>
+              <div class="summary-subheader">NUMBER OF SALES</div>
+              <div>{{summary.totalSales}}</div>
+              <div class="summary-subheader">AVG ITEMS PER SALE</div>
+              <div>{{summary.averageItemsPerSale}}</div>
+              <div class="summary-subheader">TOTAL SALE VALUE</div>
+              <div>{{currency + summary.totalSaleValue}}</div>
+              <div class="summary-subheader">AVG SALE VALUE</div>
+              <div>{{currency + summary.averageSale}}</div>
+            </div>
+            <vs-divider style="margin-top: 4px"/>
           </div>
         </div>
       </vs-card>
@@ -176,41 +193,18 @@ export default {
     return {
       // Used to determine which setting is currently selected - prevents re-clicking, and highlights the active button.
       activePeriodButton: "",
-      activeGranularityButton: "",
+      activeGranularityButton: "all",
       currency: "$",
       actingAsBusinessId: '',
+      currentYearSalesHistory: {},
       business: [],
       salesHistory: [],
       dateStart: null,
       dateEnd: null,
+      dateGranularity: null,
       currentYearReport: {},
       lastYearReport: {},
-      summaries: [
-         {
-          title: "January 2020",
-          averageSale: 100.00,
-          averagePricePerItem: 58.92,
-          averageItemsPerSale: 3,
-          totalSaleValue: 5202.92,
-          totalSales: 1106
-        },
-        {
-          title: "February 2020",
-          averageSale: 100.00,
-          averagePricePerItem: 58.92,
-          averageItemsPerSale: 3,
-          totalSaleValue: 5202.92,
-          totalSales: 1106
-        },
-        {
-          title: "March 2020",
-          averageSale: 100.00,
-          averagePricePerItem: 58.92,
-          averageItemsPerSale: 3,
-          totalSaleValue: 5202.92,
-          totalSales: 1106
-        }
-      ],
+      reportGranularity: null,
       errors: []
     }
   },
@@ -225,6 +219,7 @@ export default {
     //we gotta set date to a string or the bloody thing complains
     this.dateStart = "Jan 01, " + currentDate.getFullYear();
     this.dateEnd = "Dec 31, " + currentDate.getFullYear();
+
   },
 
   methods: {
@@ -241,7 +236,54 @@ export default {
      * @param period string of the selected granularity.
      */
     onGranularityChange: function(period) {
+      let intervalDate = moment(new Date(this.dateStart))
+      if (period === 'w') {
+        //filter weeks
+        this.dateGranularity =  intervalDate.add(7, 'days');
+        this.granularity(this.dateGranularity, 7, 'days')
+      } else if (period === 'm') {
+        //filter month
+        this.dateGranularity =  intervalDate.add(1, 'months')
+        this.granularity(this.dateGranularity, 1, 'months')
+      } else if (period === 'y') {
+        //filter year
+        this.dateGranularity =  intervalDate.add(1, 'years')
+        this.granularity(this.dateGranularity, 1, 'years')
+      }
       this.activeGranularityButton = period; // Changes the granularity button to be selected and disabled.
+    },
+
+    /**
+     * filter granularity
+     * @param intervalDate: the granularity date to filter by
+     * @param amount
+     * @param unit: selected granularity
+     */
+    granularity: function (intervalDate, amount, unit) {
+      let startDate = moment(new Date(this.dateStart))
+      let endDate = moment(new Date(this.dateEnd))
+      let summary = []
+      let finalSummary = []
+      while (startDate < endDate) {
+        for (const sale of this.currentYearSalesHistory) {
+          if (moment(sale.created).isBetween(startDate, intervalDate)) {
+            summary.push(sale)
+          }
+        }
+        if (summary.length >= 1) {
+          if (unit==='months') {
+            finalSummary.push(this.calculateSummary(summary, startDate.format('MMMM')))
+          } else if (unit==='days') {
+            finalSummary.push(this.calculateSummary(summary, startDate.format('MMM DD')))
+          } else {
+            finalSummary.push(this.calculateSummary(summary, startDate.format('YYYY')))
+          }
+          summary = []
+        }
+        startDate = startDate.add(amount, unit);
+        intervalDate = intervalDate.add(amount, unit);
+      }
+      this.reportGranularity = finalSummary
     },
 
     /**
@@ -265,7 +307,6 @@ export default {
       api.getBusinessListingNotifications(this.actingAsBusinessId)
           .then((res) => {
             this.salesHistory = res.data;
-
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
           })
@@ -315,13 +356,11 @@ export default {
     calculateReport: function() {
       let start = moment(new Date(this.dateStart));
       let end = moment(new Date(this.dateEnd));
-      let currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
-
+      this.currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
       start = start.subtract(1,'year');
       end = end.subtract(1,'year');
       let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
-
-      this.currentYearReport = this.calculateSummary(currentYearSalesHistory, "Current Period's Report");
+      this.currentYearReport = this.calculateSummary(this.currentYearSalesHistory, "Current Period's Report");
       this.lastYearReport = this.calculateSummary(lastYearSalesHistory, "Last period's Report");
     },
 

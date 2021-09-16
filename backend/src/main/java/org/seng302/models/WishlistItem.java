@@ -25,7 +25,7 @@ public class WishlistItem {
     @Column(name = "business_id")
     private long businessId;
 
-    private boolean muted;
+    private MutedStatus mutedStatus;
 
     /**
      * Empty constructor for JPA use
@@ -40,7 +40,7 @@ public class WishlistItem {
     public WishlistItem(Long userId, Long businessId) {
         this.userId = userId;
         this.businessId = businessId;
-        this.muted = false;
+        this.mutedStatus = MutedStatus.UNMUTED;
     }
 
     /**
@@ -48,7 +48,7 @@ public class WishlistItem {
      * followed business
      */
     public void muteBusiness() {
-        this.muted = true;
+        this.mutedStatus = MutedStatus.MUTED;
     }
 
     /**
@@ -56,6 +56,6 @@ public class WishlistItem {
      * followed business
      */
     public void unmuteBusiness() {
-        this.muted = false;
+        this.mutedStatus = MutedStatus.UNMUTED;
     }
 }

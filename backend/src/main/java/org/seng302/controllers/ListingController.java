@@ -45,6 +45,8 @@ public class ListingController {
     @Autowired
     private BusinessRepository businessRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ListingRepository listingRepository;
@@ -63,6 +65,9 @@ public class ListingController {
 
     @Autowired
     private ListingNotificationRepository listingNotificationRepository;
+
+    @Autowired
+    private WishlistItemRepository wishlistItemRepository;
 
     @Autowired
     private ProductFinder productFinder;
@@ -214,12 +219,29 @@ public class ListingController {
                     Listing newListing = new Listing(inventory, request);
                     inventoryRepository.updateInventoryQuantity(inventory.getQuantity() - request.getQuantity(), request.getInventoryItemId());
                     listingRepository.save(newListing);
+                    List<WishlistItem> wishlists = wishlistItemRepository.findWishlistItemByBusinessId(id);
+                    sendWishlistNotifications(wishlists, newListing); // creates listing notifications for wishlists just found
                     return ResponseEntity.status(HttpStatus.CREATED).build();
                 } catch (ValidationException e) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
             }
         }
+    }
+
+
+    /**
+     * Supporting function for POST business listings endpoint. Creates notifications for all users that wishlisted the
+     * business when the business posts a new listing
+     * @param wishlists list of wishlistItems for each user that's wishlisted the business
+     * @param listing listing object that business has listed and users will be getting a notification for
+     */
+    public void sendWishlistNotifications(List<WishlistItem> wishlists, Listing listing) {
+        wishlists.forEach(wishlistItem -> {
+            User user = userRepository.findUserById(wishlistItem.getUserId());
+            ListingNotification listingNotification = new ListingNotification(user, listing, NotificationStatus.WISHLIST);
+            listingNotificationRepository.save(listingNotification);
+        });
     }
 
     /**

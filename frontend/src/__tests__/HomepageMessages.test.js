@@ -205,7 +205,22 @@ let listingNotifications = [
                 }
             }
         }
-    }
+    },
+    {
+        id: 7,
+        status: "Wishlist",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
 ];
 
 api.getMessages = jest.fn().mockResolvedValue({data: oneMessage});
