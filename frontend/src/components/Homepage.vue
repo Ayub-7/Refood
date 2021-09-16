@@ -96,7 +96,11 @@
             <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode">Data</vs-button>
           </div>
           <vs-divider/>
-          <BusinessSalesGraph />
+          <!--
+          <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
+          -->
+
+          <BusinessSalesGraph :salesDatay='series' :salesDatax='options' />
         </vs-card>
       </div>
       <div v-else class="business-main">
@@ -156,6 +160,22 @@ const Homepage = {
       user: null,
       currencySymbol: "$",
       graphMode: true,
+      series: [{
+        name: 'Number of sales',
+        data: [30, 40, 20, 50, 49, 10, 70, 40, 55, 57, 53, 44]
+      }],
+      options: {
+        chart: {
+          id: 'sales-graph-report'
+        },
+        xaxis: {
+          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+        },
+        dataLabels: {
+          enabled: false,
+        }
+      },
     }
   },
   /**
