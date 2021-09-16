@@ -309,11 +309,9 @@ export default {
      * Calls getBusinessListingNotifications to populate the page's sales history
      */
     getSalesHistory: function () {
-      console.log(this.actingAsBusinessId)
       api.getBusinessSales(this.actingAsBusinessId)
           .then((res) => {
             this.salesHistory = res.data;
-            console.log(this.salesHistory)
 
             //only once we have obtained the data, calculate the variables
             this.calculateReport();

@@ -66,7 +66,6 @@ export default {
       api.getBusinessSales(this.businessId)
         .then((res) => {
           this.soldListings = res.data;
-          console.log(this.soldListings);
         })
         .catch(err => {
           console.log(err)
