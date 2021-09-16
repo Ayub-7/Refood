@@ -109,6 +109,17 @@ let mockCard = {
     section: "Wanted"
 }
 
+const wishlist = {
+    business: {
+        name: "Dabshots",
+        businessType: "Retail trade",
+        id: 1
+    },
+    id: 1,
+    muted: false,
+    userId: 1
+}
+
 jest.mock("../Api.js", () => jest.fn);
 api.getUserFromID = jest.fn(() => {
   return Promise.resolve({data: mockUser, status: 200});
@@ -136,6 +147,10 @@ api.removeLikeFromListing = jest.fn(() => {
 })
 
 api.getUsersWishlistedBusinesses = jest.fn(() => {
+    return Promise.resolve({data: wishlist, status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
+
+api.removeBusinessFromWishlist = jest.fn(() => {
     return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
 });
 
@@ -279,10 +294,30 @@ describe("Tests for functionality", ()=> {
    });
 });
 
-describe("Tests for wishlist functionality", ()=> {
+describe("Tests for watchlist functionality", ()=> {
     test("Unlike listing successfully", async () => {
         expect(wrapper.vm.likes).toBe(1);
         await wrapper.vm.unlike(4);
         expect(wrapper.vm.likes).toBe(0);
+    });
+});
+
+describe("Tests for business watchlist functionality", ()=> {
+    test("Clicking star button calls the remove business from watchlist function", async () => {
+        wrapper.vm.watchlist = false;
+        const star = wrapper.find("#like-icon");
+        star.trigger('click');
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('Clicking on the watchlist tab displays watchlist', () => {
+        const tab = wrapper.find("#watchlist-tab");
+        tab.trigger('click');
+        expect(wrapper.vm.watchlist).toBeTruthy();
+    });
+
+    test('After completing the remove business from wishlist method, get wishlist is called', async () => {
+        await wrapper.vm.removeFromWishlist(1);
+        expect(api.getUsersWishlistedBusinesses).toBeCalled();
     });
 });

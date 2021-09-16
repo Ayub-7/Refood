@@ -37,8 +37,8 @@
         <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
           <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
             <vs-tabs>
-              <vs-tab @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
-              <vs-tab @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
+              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
+              <vs-tab id="wishlist-tab" @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
             </vs-tabs>
           </div>
           <div v-if="watchlist">
@@ -84,14 +84,14 @@
                     <vs-row>
                       <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
                         <vs-tooltip text="Remove from wishlist">
-                          <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" ></vs-icon>
+                          <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" @click="removeFromWishlist(wish.id)"></vs-icon>
                         </vs-tooltip>
                         <div @click="viewBusiness(wish.business.id)" style="width: 100%; color: white;">
                           p
                         </div>
                       </vs-col>
                     </vs-row>
-                    <div @click="viewBusiness(wish.business.id)">
+                    <div @click="viewBusiness(wish.business.id)" id="business-card">
                       <div id="business-title">{{wish.business.name}}</div>
                       <div id="business-type">{{wish.business.businessType}}</div>
                     </div>
@@ -199,7 +199,6 @@ const Homepage = {
       api.getUsersWishlistedBusinesses(userId)
         .then((res) => {
           this.wishlist = res.data;
-          console.log(this.wishlist);
         })
         .catch((error) => {
           if (error.response) {
@@ -214,6 +213,7 @@ const Homepage = {
     removeFromWishlist: function (wishlistItemId) {
       api.removeBusinessFromWishlist(wishlistItemId)
               .then(() => {
+                this.getWishlist(this.userId);
                 this.$vs.notify({title: "Successfully  removed business from wishlist", color: "success"});
               })
               .catch((error) => {
@@ -228,7 +228,6 @@ const Homepage = {
      * Go to business profile
      */
     viewBusiness: function (businessId) {
-      console.log(businessId);
       this.$router.push({name: "Business", params: {id: businessId}})
     },
 
