@@ -304,9 +304,10 @@ export default {
      * Calls getBusinessListingNotifications to populate the page's sales history
      */
     getSalesHistory: function () {
-      api.getBusinessListingNotifications(this.actingAsBusinessId)
+      api.getBusinessSales(this.actingAsBusinessId)
           .then((res) => {
             this.salesHistory = res.data;
+
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
           })
@@ -376,8 +377,8 @@ export default {
       summary.title = title
       if(salesHistory.length > 0) {
         for(let i=0;i<salesHistory.length;i++) {
-          totalPrice += salesHistory[i].boughtListing.price;
-          totalQuantity += salesHistory[i].boughtListing.quantity;
+          totalPrice += salesHistory[i].price;
+          totalQuantity += salesHistory[i].quantity;
         }
         summary.averageSale = Number(totalPrice/salesHistory.length).toFixed(2);
         summary.averagePricePerItem = Number(totalPrice / totalQuantity).toFixed(2);

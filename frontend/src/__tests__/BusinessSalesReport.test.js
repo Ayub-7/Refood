@@ -28,61 +28,82 @@ let $log = {
 let salesHistory = [
     {
         "id": 1,
-        "business": "Skinder",
-        "boughtListing": {
-            "id": 1,
-            "buyer": 1,
-            "sold": "2021-09-06 14:04:32",
-            "listed": "2021-04-28 17:31:58",
-            "likes": 0,
-            "quantity": 35,
-            "listingId": 7042,
-            "price": 2131.8
+        "buyer": 3,
+        "product": {
+            "id": "W04GP5EC0B1798680",
+            "business": {
+                "name": "Dabshots",
+                "id": 1,
+                "administrators": [],
+                "primaryAdministratorId": null,
+                "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+                "address": {
+                    "streetNumber": "0",
+                    "streetName": "Vernon Place",
+                    "suburb": null,
+                    "city": "Sarpang",
+                    "region": null,
+                    "country": "Bhutan",
+                    "postcode": null
+                },
+                "businessType": "Charitable organisation",
+                "created": "2020-05-18 09:06:11"
+            },
+            "name": "Compound - Mocha",
+            "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
+            "manufacturer": "Nestle",
+            "recommendedRetailPrice": 88.93,
+            "created": "2021-01-11 07:54:46",
+            "images": [],
+            "primaryImagePath": null
         },
-        "listing": null,
-        "status": "Bought",
-        "viewStatus": "Unread",
-        "created": "2021-09-06 14:04:38"
+        "sold": "2021-09-16 13:05:28",
+        "listed": "2021-02-03 11:00:00",
+        "likes": 0,
+        "quantity": 2,
+        "listingId": 5,
+        "price": 5.99
     },
     {
         "id": 2,
-        "user": 1,
-        "business": "Skinder",
-        "boughtListing": {
-            "id": 2,
-            "buyer": 1,
-            "sold": "2021-09-06 14:04:38",
-            "listed": "2021-03-24 09:57:11",
-            "likes": 0,
-            "quantity": 1,
-            "listingId": 5797,
-            "price": 20.4
+        "buyer": 3,
+        "product": {
+            "id": "W04GP5EC0B1798680",
+            "business": {
+                "name": "Dabshots",
+                "id": 1,
+                "administrators": [],
+                "primaryAdministratorId": null,
+                "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+                "address": {
+                    "streetNumber": "0",
+                    "streetName": "Vernon Place",
+                    "suburb": null,
+                    "city": "Sarpang",
+                    "region": null,
+                    "country": "Bhutan",
+                    "postcode": null
+                },
+                "businessType": "Charitable organisation",
+                "created": "2020-05-18 09:06:11"
+            },
+            "name": "Compound - Mocha",
+            "description": "vel ipsum praesent blandit lacinia erat vestibulum sed magna at nunc",
+            "manufacturer": "Nestle",
+            "recommendedRetailPrice": 88.93,
+            "created": "2021-01-11 07:54:46",
+            "images": [],
+            "primaryImagePath": null
         },
-        "listing": null,
-        "status": "Bought",
-        "viewStatus": "Unread",
-        "created": "2021-09-06 14:04:38"
-    },
-    {
-        "id": 3,
-        "user": 1,
-        "business": "Skinder",
-        "boughtListing": {
-            "id": 3,
-            "buyer": 1,
-            "sold": "2021-09-13 14:04:42",
-            "listed": "2021-05-08 22:29:19",
-            "likes": 0,
-            "quantity": 5,
-            "listingId": 2976,
-            "price": 146.6
-        },
-        "listing": null,
-        "status": "Bought",
-        "viewStatus": "Unread",
-        "created": "2021-09-13 14:04:42"
-    },
-]
+        "sold": "2021-09-16 13:05:37",
+        "listed": "2021-02-02 11:00:00",
+        "likes": 0,
+        "quantity": 1,
+        "listingId": 4,
+        "price": 15.5
+    }
+];
+
 describe('User acting as tests', () => {
     beforeEach(() => {
         wrapper = shallowMount(BusinessSalesReport, {
@@ -115,7 +136,7 @@ describe('User acting as tests', () => {
 
 
     test('When getBusinessListingNotifications returns true, salesHistory is set', async () => {
-        api.getBusinessListingNotifications = jest.fn(() => {
+        api.getBusinessSales = jest.fn(() => {
             return Promise.resolve({status: 201, data: salesHistory});
         });
         wrapper.vm.calculateReport = jest.fn();
@@ -127,41 +148,41 @@ describe('User acting as tests', () => {
     });
 
     test('When calculateSummary, business metrics are calculated correctly', async () => {
-        let correctSummaryResult = {"averageItemsPerSale": "13.67", "averagePricePerItem": "56.07", "averageSale": "766.27", "title": "Title", "totalItems": "41.00", "totalSaleValue": "2298.80", "totalSales": 3};
         let results = wrapper.vm.calculateSummary(salesHistory, "Title");
-        expect(results).toStrictEqual(correctSummaryResult);
+        expect(results).toStrictEqual(
+            {"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "Title", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}
+        );
     });
 
     test('When view summary with week granularity selected, summary is displayed correctly', async () => {
        wrapper.vm.currentYearSalesHistory = salesHistory
        let startDate = moment(new Date(wrapper.vm.dateStart))
        let intervalDate = startDate.add(7, 'days');
-       let correctSummaryGranularity = [{"title":"Sep 03","averageSale":"1076.10","averagePricePerItem":"59.78","averageItemsPerSale":"18.00","totalSaleValue":"2152.20","totalItems":"36.00","totalSales":2},
-           {"title":"Sep 10","averageSale":"146.60","averagePricePerItem":"29.32","averageItemsPerSale":"5.00","totalSaleValue":"146.60","totalItems":"5.00","totalSales":1}]
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 7, 'days')
-        expect(wrapper.vm.reportGranularity).toStrictEqual(correctSummaryGranularity);
+        expect(wrapper.vm.reportGranularity).toStrictEqual(
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "Sep 10", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+        );
     });
 
     test('When view summary with month granularity selected, summary is displayed correctly', async () => {
         wrapper.vm.currentYearSalesHistory = salesHistory
         let startDate = moment(new Date(wrapper.vm.dateStart))
         let intervalDate = startDate.add(1, 'months');
-        let correctSummaryGranularity = [{"title":"September","averageSale":"766.27","averagePricePerItem":"56.07","averageItemsPerSale":"13.67",
-            "totalSaleValue":"2298.80","totalItems":"41.00","totalSales":3}]
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 1, 'months')
-        expect(wrapper.vm.reportGranularity).toStrictEqual(correctSummaryGranularity);
+        expect(wrapper.vm.reportGranularity).toStrictEqual(
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "September", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+        );
     });
 
     test('When view summary with year granularity selected, summary is displayed correctly', async () => {
         wrapper.vm.currentYearSalesHistory = salesHistory
         let startDate = moment(new Date(wrapper.vm.dateStart))
         let intervalDate = startDate.add(1, 'years');
-        let correctSummaryGranularity = [{"title":"2021","averageSale":"766.27","averagePricePerItem":"56.07",
-            "averageItemsPerSale":"13.67","totalSaleValue":"2298.80","totalItems":"41.00","totalSales":3}]
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 1, 'years')
-        expect(wrapper.vm.reportGranularity).toStrictEqual(correctSummaryGranularity);
+        expect(wrapper.vm.reportGranularity).toStrictEqual([{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "2021", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+        );
     });
 });

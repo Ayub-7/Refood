@@ -541,4 +541,10 @@ export default {
    */
     removeBusinessToWishlist: (wishlistId) => instance.delete(`/wishlist/${wishlistId}`,  {withCredentials: true}),
 
+    /**
+     * Returns a list of all the business' sales.
+     * @param businessId
+     * @return {Promise<AxiosResponse<any>>}
+     */
+    getBusinessSales: (businessId) => instance.get(`/businesses/${businessId}/sales`, {withCredentials: true}),
 }
