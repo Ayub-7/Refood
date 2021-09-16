@@ -42,12 +42,7 @@
             </vs-tabs>
           </div>
           <div v-if="watchlist">
-            <div v-if="likedItem.size < 1" style="margin-top: -40px">
-              <em>
-                Lis
-              </em>
-            </div>
-            <div v-else>
+            <div v-if="likedItem.length > 0" style="margin-top: -40px">
               <div v-for="(item, index) in likedItem" :key="item.id" >
                 <vs-card style="margin-top: -10px" id="message-notification-card" actionable>
                   <div  id="likes-notification-container">
@@ -71,28 +66,42 @@
                       <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
                       <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
                     </div>
-                    </div>
+                  </div>
                 </vs-card>
               </div>
             </div>
+            <div v-else>
+              <em style="font-size: 12px;">
+                You currently have no liked listings
+              </em>
+            </div>
           </div>
           <div v-if="!watchlist">
-            <div v-for="wish in wishlist" :key="wish.id" >
-              <vs-card style="margin-top: -10px"  actionable>
-                <div>
-                  <vs-row>
-                    <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                      <vs-tooltip text="Remove from wishlist">
-                        <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" ></vs-icon>
-                      </vs-tooltip>
-                      <div @click="viewBusiness(wish.businessId)" style="width: 100%; color: white;">
-                        p
-                      </div>
-                    </vs-col>
-                  </vs-row>
-                </div>
-              </vs-card>
+            <div v-if="wishlist.length > 0">
+              <div v-for="wish in wishlist" :key="wish.id" >
+                <vs-card style="margin-top: -10px"  actionable>
+                  <div>
+                    <vs-row>
+                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                        <vs-tooltip text="Remove from wishlist">
+                          <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" ></vs-icon>
+                        </vs-tooltip>
+                        <div @click="viewBusiness(wish.business.id)" style="width: 100%; color: white;">
+                          p
+                        </div>
+                      </vs-col>
+                    </vs-row>
+                    <div @click="viewBusiness(wish.business.id)">
+                      <div id="business-title">{{wish.business.name}}</div>
+                      <div id="business-type">{{wish.business.businessType}}</div>
+                    </div>
+                  </div>
+                </vs-card>
+              </div>
             </div>
+            <em v-else style="font-size: 12px">
+              You currently have no wishlisted businesses
+            </em>
           </div>
         </div>
       </div>
@@ -219,6 +228,7 @@ const Homepage = {
      * Go to business profile
      */
     viewBusiness: function (businessId) {
+      console.log(businessId);
       this.$router.push({name: "Business", params: {id: businessId}})
     },
 
@@ -442,6 +452,12 @@ export default Homepage;
 }
 
 #product-name {
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#business-title {
   text-align: left;
   font-size: 12px;
   font-weight: bold;
