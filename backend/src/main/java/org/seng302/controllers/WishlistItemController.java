@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,14 +30,17 @@ public class WishlistItemController {
     private UserRepository userRepository;
 
     /**
-     * GET request called to get the businesses on a users wishlist. Error response returned when user is not
-     * logged in
+     * GET request called to get the businesses on a users wishlist. Can retrieve all or just unmuted businesses.
+     * Error response returned when user is not logged in
      * @param session logged in users session
      * @param id Users id
+     * @param unmutedOnly only returns wishlistItems that are Unmuted (ie no muted businesses)
      * @return ResponseEntity with relevant http status
      */
     @GetMapping("/users/{id}/wishlist")
-    public ResponseEntity<List<WishlistItem>> getWishlistBusiness(@PathVariable long id, HttpSession session) {
+    public ResponseEntity<List<WishlistItem>> getWishlistBusiness(@PathVariable long id,
+                                                                  @RequestParam("unmutedOnly") boolean unmutedOnly,
+                                                                  HttpSession session) {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         User user = userRepository.findUserById(id);
 
@@ -47,7 +51,17 @@ public class WishlistItemController {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         List<WishlistItem> wishlistItems = wishlistItemRepository.findWishlistItemsByUserId(id);
-        return ResponseEntity.status(HttpStatus.OK).body(wishlistItems);
+        if (unmutedOnly) {
+            return ResponseEntity.status(HttpStatus.OK).body(wishlistItems);
+        } else {
+            List<WishlistItem> wishlistItemsNotMuted = new ArrayList<>();
+            wishlistItems.forEach(wishlistItem -> {
+                if (wishlistItem.getMutedStatus() == MutedStatus.UNMUTED) {
+                    wishlistItemsNotMuted.add(wishlistItem);
+                }
+            });
+            return ResponseEntity.status(HttpStatus.OK).body(wishlistItemsNotMuted);
+        }
     }
 
     /**
