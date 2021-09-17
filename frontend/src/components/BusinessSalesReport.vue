@@ -189,6 +189,13 @@ const moment = require('moment');
 export default {
   name: "BusinessSalesReport",
 
+  props: {
+    businessId: {
+      type: Number,
+      default: store.actingAsBusinessId,
+    }
+  },
+
   data: function() {
     return {
       // Used to determine which setting is currently selected - prevents re-clicking, and highlights the active button.
@@ -219,7 +226,6 @@ export default {
     //we gotta set date to a string or the bloody thing complains
     this.dateStart = "Jan 01, " + currentDate.getFullYear();
     this.dateEnd = "Dec 31, " + currentDate.getFullYear();
-
   },
 
   methods: {
@@ -283,6 +289,7 @@ export default {
         startDate = startDate.add(amount, unit);
         intervalDate = intervalDate.add(amount, unit);
       }
+
       this.reportGranularity = finalSummary
     },
 
@@ -304,10 +311,9 @@ export default {
      * Calls getBusinessListingNotifications to populate the page's sales history
      */
     getSalesHistory: function () {
-      api.getBusinessSales(this.actingAsBusinessId)
+      api.getBusinessSales(this.businessId)
           .then((res) => {
             this.salesHistory = res.data;
-
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
           })

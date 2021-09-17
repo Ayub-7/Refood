@@ -1,12 +1,68 @@
 <template>
-  <apexchart width="100%" height="100%" type="bar" :options="salesDatax" :series="salesDatay"></apexchart>
+  <apexchart id="sales-graph-report" width="100%" height="100%" type="bar" :options="options" :series="series"></apexchart>
 </template>
 
 <script>
+import api from "../Api";
 
 export default {
   name: "BusinessSalesGraph",
-  props: ['salesDatay', 'salesDatax'],
+  props: ['businessId'],
+
+  data: function() {
+    return {
+      series: [{
+        name: 'Number of sales',
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      }],
+
+      options: {
+        chart: {
+          id: 'sales-graph-report',
+        },
+        xaxis: {
+          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+        },
+        colors: ["#1F74FF"],
+        dataLabels: {
+          enabled: false,
+        }
+      },
+    }
+  },
+
+  methods: {
+    getData: function() {
+      api.getBusinessSales(this.businessId)
+        .then((res) => {
+          this.separateDataIntoMonths(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    separateDataIntoMonths: function(data) {
+      let result = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      data.sort((a, b) => a.sold > b.sold ? 1 : a.sold < b.sold ? -1 : 0);
+
+      for (let listing of data) {
+        let soldDate = new Date(listing.sold);
+        result[soldDate.getMonth()]++;
+      }
+
+      this.series = [{ // Reassign entire variable to make chart properly update and animations to play.
+        name: 'Number of sales',
+        data: result,
+      }]
+    },
+  },
+
+  mounted: function() {
+    this.getData();
+  },
+
 }
 </script>
 
