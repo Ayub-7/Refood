@@ -12,7 +12,6 @@ export default {
   data: function() {
     return {
       series: [{
-        name: 'Number of sales',
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       }],
 
@@ -36,26 +35,52 @@ export default {
     getData: function() {
       api.getBusinessSales(this.businessId)
         .then((res) => {
-          this.separateDataIntoMonths(res.data);
+          this.displaySalesData(res.data);
         })
         .catch((error) => {
-          console.log(error);
+          this.$log.error(error);
         });
     },
 
-    separateDataIntoMonths: function(data) {
+    /**
+     * Calculate and displays sales data.
+     * Currently displays data by month - regardless of year.
+     * @param data bought listings sales data
+     */
+    displaySalesData: function(data) {
       let result = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      data.sort((a, b) => a.sold > b.sold ? 1 : a.sold < b.sold ? -1 : 0);
-
       for (let listing of data) {
         let soldDate = new Date(listing.sold);
-        result[soldDate.getMonth()]++;
+        result[soldDate.getMonth()] += +listing.price.toFixed(2);
       }
 
       this.series = [{ // Reassign entire variable to make chart properly update and animations to play.
-        name: 'Number of sales',
+        name: 'Total Value',
         data: result,
-      }]
+      }];
+
+
+      this.options = {
+        title: {
+          text: "Monthly Total Sales for 2021",
+          style: {
+            fontSize: "18px",
+            fontWeight: "bold",
+            fontFamily: "Ubuntu, sans-serif",
+          }
+        },
+        yaxis: {
+          decimalsInFloat: 2,
+          labels: {
+            formatter: (val) => '$' + val,
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: (val) => '$' + val.toFixed(2),
+          }
+        },
+      };
     },
   },
 
