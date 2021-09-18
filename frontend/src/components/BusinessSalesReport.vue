@@ -48,12 +48,12 @@
           All
         </vs-button>
         <div class="options-header" style="font-size: 14px">Custom</div>
-        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start" :danger="(errors.includes('past-min-date'))"
+        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="pickedStart" label="Start" :danger="(errors.includes('past-min-date'))"
                   danger-text="Date can not be in the future or after the end date"/>
         <p style="margin: auto auto 0">-</p>
-        <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End" :danger="(errors.includes('past-min-date'))"
+        <vs-input type="date" size="small" class="date-input" v-model="pickedEnd" label="End" :danger="(errors.includes('past-min-date'))"
                   danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
-        <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
+        <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;" @click="onPeriodChange('custom')">Go</vs-button>
 
         <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
 
@@ -201,6 +201,8 @@ export default {
       salesHistory: [],
       dateStart: null,
       dateEnd: null,
+      pickedStart: null,
+      pickedEnd: null,
       dateGranularity: null,
       currentYearReport: {},
       lastYearReport: {},
@@ -216,9 +218,6 @@ export default {
     this.getSalesHistory();
 
     let currentDate = new Date();
-    //we gotta set date to a string or the bloody thing complains
-
-
     this.dateEnd = currentDate
 
 
@@ -231,7 +230,6 @@ export default {
      */
     onPeriodChange: function(period) {
       this.activePeriodButton = period;// Changes the period button to be selected and disabled.
-
       switch (period) {
         case '1-d':
           this.updatePeriod(1 ,'day');
@@ -247,23 +245,34 @@ export default {
           break;
         case '1-y':
           this.updatePeriod(1 ,'year');
-          break; 
+          break;
+        case 'custom':
+          this.dateStart = this.pickedStart;
+          this.dateEnd = this.pickedEnd;
+          break;
         case 'all':
           this.dateStart = this.getEarliestDate();
-          this.calculateReport();
-          this.onGranularityChange(this.activeGranularityButton);
-
       }
+
+      this.updateSummary();
     },
 
 
     /**
-     * updates period by altering dateStart then recalculating summary
+     * updates period by altering dateStart
      * @param timeValue value of time to subtract from current time
      * @param unit unit of time to subtract from current time (days, months, etc.)
      */
     updatePeriod: function(timeValue, unit) {
+      this.dateEnd = new Date();
       this.dateStart = moment(new Date()).subtract(timeValue, unit);
+    },
+    
+
+    /**
+     * Recomputes summary, used when date start and end changes
+     */
+    updateSummary: function() {
       this.calculateReport();
       this.onGranularityChange(this.activeGranularityButton);
     },
@@ -282,7 +291,6 @@ export default {
       }
       return min;
     },
-
 
     
     /**
@@ -574,6 +582,7 @@ export default {
 
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
+  height: 475px;
   overflow-y: scroll;
 }
 

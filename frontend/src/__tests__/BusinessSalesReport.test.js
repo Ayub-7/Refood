@@ -104,7 +104,7 @@ let salesHistory = [
     }
 ];
 
-describe('User acting as tests', () => {
+describe('Sales report tests', () => {
     beforeEach(() => {
         wrapper = shallowMount(BusinessSalesReport, {
             propsData: {},
@@ -161,7 +161,7 @@ describe('User acting as tests', () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 7, 'days')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
-            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep ${new Date().getDate()}`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep 16 21`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 
@@ -172,7 +172,7 @@ describe('User acting as tests', () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 1, 'months')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
-            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "September", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "September 21", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 
@@ -185,4 +185,50 @@ describe('User acting as tests', () => {
         expect(wrapper.vm.reportGranularity).toStrictEqual([{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "2021", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
+
+
+    test('Get earliest date returns earliest', () => {
+        let date = wrapper.vm.getEarliestDate();
+        expect(date).toEqual(wrapper.vm.currentYearSalesHistory[0].sold)
+    })
+
+    
+    test('Get latest date returns latest', () => {
+        let date = wrapper.vm.getLatestDate();
+        expect(date).toEqual(wrapper.vm.currentYearSalesHistory[1].sold)
+    })
+
+    test('onPeriodChange by day correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('1-d');
+        let dayBefore = new Date();
+        dayBefore.setDate(dayBefore.getDate() - 1); 
+        expect(wrapper.vm.dateStart.date()).toEqual(dayBefore.getDate());
+    })
+
+    test('onPeriodChange by month correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('1-m');
+        let monthBefore = new Date();
+        monthBefore.setMonth(monthBefore.getMonth() - 1);
+        expect(wrapper.vm.dateStart.month()).toEqual(monthBefore.getMonth());
+    })
+
+    test('onPeriodChange by year correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('1-y');
+        let yearBefore = new Date();
+        yearBefore.setYear(yearBefore.getFullYear() - 1);
+        expect(wrapper.vm.dateStart.year()).toEqual(yearBefore.getFullYear());
+    })
+
+    test('onPeriodChange by all correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('all');
+        expect(wrapper.vm.dateStart).toEqual(wrapper.vm.currentYearSalesHistory[0].sold);
+    })
+
+    test('onPeriodChange by custom correctly alters start date and end date', () => {
+        wrapper.vm.pickedStart = new Date('11/03/2021');
+        wrapper.vm.pickedEnd = new Date('11/09/2021')
+        wrapper.vm.onPeriodChange('custom');
+        expect(wrapper.vm.dateStart).toEqual(wrapper.vm.pickedStart);
+        expect(wrapper.vm.dateEnd).toEqual(wrapper.vm.pickedEnd);
+    })
 });
