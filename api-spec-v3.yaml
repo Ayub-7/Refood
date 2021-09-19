@@ -46,6 +46,7 @@ tags:
   - name: 'U31 : Purchases'
   - name: 'U32 : Managing my feed'
   - name: 'U33: Wishlist business'
+  - name: 'U41 : Sales Report'
   # Entities
   - name: 'Users'
     description: 'Grouping of endpoints related to the User entity'
@@ -1836,6 +1837,38 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+          
+  '/businesses/{id}/sales':
+    get:
+      tags:
+        - 'Listings / sales'
+        - 'U41 : Sales Report'
+      summary: Retrieve all businesses' bought listings
+      security:
+        - CookieAuth:
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - in: path
+          name: id
+          description: id of business
+          required: true
+          example: 3
+      responses:
+        '200':
+          description: A (potentially empty) list of bought listings was retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoughtListing'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
 
 components:
   securitySchemes:
@@ -2620,3 +2653,43 @@ components:
         mutedStatus:
           type: MutedStatus
           description: MutedStatus describing whether the notifications for the wishlisted business are muted
+        
+    BoughtListing:
+      type: object
+      description: Entity for bought listing from business
+      properties:
+        id:
+          type: number
+          example: 5
+        likes:
+          type: number
+          description: total number of likes for the listing that was bought
+          example: 11
+        listed:
+          type: string
+          format: date
+          description: date of when listing was created
+          example: '2021-09-12 12:00:00'
+        listingId:
+          type: number
+          description: id of listing that was bought
+          example: 324
+        price:
+          type: number
+          description: price of the listing that was bought
+          example: 20.5
+        quantity:
+          type: number
+          description: quantity of products from bought listing
+          example: 10
+        sold:
+          type: string
+          format: date
+          description: date that listing was bought
+          example: '2021-09-12 12:00:00'
+        buyer:
+          allOf:
+            - $ref: '#/components/schemas/User'
+        product:
+          allOf:
+            - $ref: '#/components/schemas/Product'
