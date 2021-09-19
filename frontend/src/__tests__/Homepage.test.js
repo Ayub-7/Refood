@@ -182,6 +182,7 @@ let $vs = {
 };
 
 beforeEach(() => {
+    console.log(90)
     wrapper = shallowMount(Homepage, {
         propsData: {},
         mocks: {$router, $log, $vs},
@@ -193,7 +194,7 @@ beforeEach(() => {
                 userId: mockUser.id,
                 business: mockBusiness,
                 actingAsBusinessId: null,
-
+                wishlist: wishlist,
             }
         }
     });
@@ -201,6 +202,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    console.log(9)
     wrapper.destroy();
 });
 
@@ -303,19 +305,6 @@ describe("Tests for watchlist functionality", ()=> {
 });
 
 describe("Tests for business watchlist functionality", ()=> {
-    test("Clicking star button calls the remove business from watchlist function", async () => {
-        wrapper.vm.watchlist = false;
-        const star = wrapper.find("#like-icon");
-        star.trigger('click');
-        expect(wrapper.vm.$vs.notify).toBeCalled();
-    });
-
-    test('Clicking on the watchlist tab displays watchlist', () => {
-        const tab = wrapper.find("#watchlist-tab");
-        tab.trigger('click');
-        expect(wrapper.vm.watchlist).toBeTruthy();
-    });
-
     test('After completing the remove business from wishlist method, get wishlist is called', async () => {
         await wrapper.vm.removeFromWishlist(1);
         expect(api.getUsersWishlistedBusinesses).toBeCalled();
