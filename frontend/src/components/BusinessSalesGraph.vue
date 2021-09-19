@@ -7,7 +7,15 @@ import api from "../Api";
 
 export default {
   name: "BusinessSalesGraph",
-  props: ['businessId'],
+  props: {
+    businessId: {
+      type: Number,
+    },
+    currencySymbol: {
+      type: String,
+      default: "$",
+    }
+  },
 
   data: function() {
     return {
@@ -91,7 +99,7 @@ export default {
         yaxis: {
           decimalsInFloat: 2,
           labels: {
-            formatter: (val) => '$' + val,
+            formatter: (val) => this.currencySymbol + val,
             style: {
               fontSize: "12px",
             }
@@ -109,7 +117,7 @@ export default {
         },
         tooltip: {
           y: {
-            formatter: (val) => '$' + val.toFixed(2),
+            formatter: (val) => this.currencySymbol + val.toFixed(2),
           },
           x: {
             format: "MMMM yyyy"

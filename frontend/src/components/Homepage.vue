@@ -99,7 +99,7 @@
           <!--
           <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
           -->
-          <BusinessSalesGraph :businessId="actingAsBusinessId" />
+          <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
         </vs-card>
       </div>
       <div v-else class="business-main">
@@ -302,6 +302,7 @@ const Homepage = {
             mutations.setUserName(response.data.firstName + " " + response.data.lastName);
             mutations.setUserCountry(response.data.homeAddress.country);
             mutations.setUserBusinesses(this.businesses);
+            this.setCurrency(response.data.homeAddress.country);
           }).catch((err) => {
         if (err.response.status === 401) {
           this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
