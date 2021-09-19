@@ -58,26 +58,13 @@ export default {
      */
     displaySalesData: function(data) {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
-      let yearlyData = {};
-      for (let listing of data) {
-        let soldDate = new Date(listing.sold);
-        if (yearlyData[soldDate.getFullYear()] == null) {
-          yearlyData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        }
-        yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += +listing.price.toFixed(2);
-      }
+      let yearlyData = this.totalMonthlyRevenue(data);
 
       let allData = [];
       for (let year of Object.entries(yearlyData)) allData = allData.concat(year[1]); // Flatten object into array.
 
       // Generates the x-axis labels of each month, for each year.
-      const baseMonthCategories = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
-        'Sep', 'Oct', 'Nov', 'Dec'];
-      const numOfYears = Object.keys(yearlyData).length;
-      let yearlyMonthCategories = [];
-      for (let i = 0; i < numOfYears; i++) {
-        yearlyMonthCategories = yearlyMonthCategories.concat(baseMonthCategories.map(month => month + ` ${Object.keys(yearlyData)[i]}`));
-      }
+      let yearlyMonthCategories = this.generateMonthLabels(Object.keys(yearlyData));
 
       // Removes months with no sales up to the first month of sales.
       let i = 0;
@@ -130,6 +117,45 @@ export default {
         },
       };
     },
+
+    /**
+     * Categorises and sums up data, splitting each bought listing into it's respective year and month.
+     * @param data the bought listing data (i.e. the sold listings).
+     * @return object where each key is a year, and the value is an array of size 12, each index representing a month,
+     * and the value at each index representing the total revenue/value of listings sold.
+     */
+    totalMonthlyRevenue: function(data) {
+      let yearlyData = {};
+        for (let listing of data) {
+          let soldDate = new Date(listing.sold);
+          if (yearlyData[soldDate.getFullYear()] == null) {
+            yearlyData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+          }
+          yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += +listing.price.toFixed(2);
+        }
+      return yearlyData;
+    },
+
+
+    /**
+     * Generates an array of strings containing each month for every given year.
+     * Used to generate the x-axis labels.
+     * @param years an array of years to generate labels for.
+     * @returns {*[]} an array of every month of each year; e.g. 'Apr 2021', 'May 2021'...
+     */
+    generateMonthLabels: function(years) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+        'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const numOfYears = years.length;
+      let yearlyMonthCategories = [];
+      for (let i = 0; i < numOfYears; i++) {
+        yearlyMonthCategories = yearlyMonthCategories.concat(months.map(month => month + ` ${years[i]}`));
+      }
+
+      return yearlyMonthCategories;
+    }
+
   },
 
   mounted: function() {
