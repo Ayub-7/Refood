@@ -93,9 +93,9 @@ class ListingControllerTest {
         business.getAdministrators().add(adminUser);
 
         // Adding business to all users' wishlists
-        WishlistItem wishlistItem1 = new WishlistItem(1L, 1L);
-        WishlistItem wishlistItem2 = new WishlistItem(2L, 1L);
-        WishlistItem wishlistItem3 = new WishlistItem(3L, 1L);
+        WishlistItem wishlistItem1 = new WishlistItem(1L, business);
+        WishlistItem wishlistItem2 = new WishlistItem(2L, business);
+        WishlistItem wishlistItem3 = new WishlistItem(3L, business);
         wishlistItems = new ArrayList<>();
         wishlistItems.add(wishlistItem1);
         wishlistItems.add(wishlistItem2);
@@ -183,7 +183,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, DGAAUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -201,7 +201,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -223,7 +223,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -235,7 +235,7 @@ class ListingControllerTest {
     void testPostWithBadInventory() throws Exception {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -247,7 +247,7 @@ class ListingControllerTest {
     void testPostWithBadBusiness() throws Exception {
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -263,7 +263,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -278,7 +278,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -295,7 +295,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -309,7 +309,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -326,7 +326,7 @@ class ListingControllerTest {
         Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
         Mockito.when(productRepository.findProductByIdAndBusinessId(null, business.getId())).thenReturn(product1);
         Mockito.when(inventoryRepository.findInventoryById(inventory1.getId())).thenReturn(inventory1);
-        Mockito.when(wishlistItemRepository.findWishlistItemByBusinessId(business.getId())).thenReturn(wishlistItems);
+        Mockito.when(wishlistItemRepository.findWishlistItemByBusiness(business)).thenReturn(wishlistItems);
         mvc.perform(post("/businesses/{id}/listings", business.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser)
                 .contentType(MediaType.APPLICATION_JSON)
