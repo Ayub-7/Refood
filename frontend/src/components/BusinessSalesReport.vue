@@ -189,6 +189,13 @@ const moment = require('moment');
 export default {
   name: "BusinessSalesReport",
 
+  props: {
+    businessId: {
+      type: Number,
+      default: store.actingAsBusinessId,
+    }
+  },
+
   data: function() {
     return {
       // Used to determine which setting is currently selected - prevents re-clicking, and highlights the active button.
@@ -376,6 +383,7 @@ export default {
             intervalDate = intervalDate.add(amount, unit);
         }
       }
+
       this.reportGranularity = finalSummary
     },
 
