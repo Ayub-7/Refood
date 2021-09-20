@@ -66,8 +66,8 @@ class WishlistItemControllerTests {
         dgaa.setId(3);
         gaa.setId(4);
         business = new Business("testBusiness", "test description", addr, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
-        wishlistItem = new WishlistItem(user.getId(), business.getId());
-        badWishlistItem = new WishlistItem(5L, business.getId());
+        wishlistItem = new WishlistItem(user.getId(), business);
+        badWishlistItem = new WishlistItem(5L, business);
 
         wishlistItemList = new ArrayList<>();
         wishlistItemList.add(wishlistItem);

@@ -26,49 +26,82 @@
           </div>
           <div class="userinfo-container" v-else>
             <div id="userinfo-content">
-              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()'>Profile</vs-button>
-              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
-              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()">My Cards</vs-button>
-              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'">Browse Listings</vs-button>
+              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()' icon="account_box">Profile</vs-button>
+              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" icon="store">Marketplace</vs-button>
+              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()" icon="style">My Cards</vs-button>
+              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'" icon="search">Browse Listings</vs-button>
             </div>
           </div>
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
-          <div id="watchlist-header-container">
-            <div style="display: flex;">
-              <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
-              <div class="watchlist-title">
-                Watchlist
+          <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
+            <vs-tabs>
+              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
+              <vs-tab id="wishlist-tab" @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
+            </vs-tabs>
+          </div>
+          <div v-if="watchlist">
+            <div v-if="likedItem.length > 0" style="margin-top: -40px">
+              <div v-for="(item, index) in likedItem" :key="item.id" >
+                <vs-card style="margin-top: -10px" id="message-notification-card" actionable>
+                  <div  id="likes-notification-container">
+                    <vs-row v-if="item.likes != 0">
+                      <vs-col vs-type="flex" vs-align="center">
+                        <vs-tooltip text="Unlike">
+                          <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
+                        </vs-tooltip>
+                        <div @click="viewListing(item.inventoryItem.product.business.id, item.id)" style="width: 100%; color: white;">
+                          p
+                        </div>
+                      </vs-col>
+                    </vs-row>
+                    <vs-row v-else>
+                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                        <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" @click="unlike(item.id, index)"></vs-icon>
+                      </vs-col>
+                    </vs-row>
+                    <div @click="viewListing(item.inventoryItem.product.business.id, item.id)">
+                      <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                      <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                      <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+                    </div>
+                  </div>
+                </vs-card>
               </div>
             </div>
-            <span style="margin: auto 0;">{{likes}}</span>
+            <div v-else>
+              <em style="font-size: 12px;">
+                You currently have no liked listings
+              </em>
+            </div>
           </div>
-          <vs-divider style="margin-top: -30px"></vs-divider>
-          <div v-for="(item, index) in likedItem" :key="item.id" >
-            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
-              <div id="likes-notification-container">
-                <vs-row v-if="item.likes != 0">
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-tooltip text="View Listing">
-                      <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    </vs-tooltip>
-                    <vs-tooltip text="Unlike">
-                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
-                    </vs-tooltip>
-                  </vs-col>
-                </vs-row>
-                <vs-row v-else>
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
-                  </vs-col>
-                </vs-row>
-                <div id="product-name">{{item.inventoryItem.product.name}}</div>
-                <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
-                <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+          <div v-if="!watchlist">
+            <div v-if="wishlist.length > 0">
+              <div v-for="wish in wishlist" :key="wish.id" >
+                <vs-card style="margin-top: -10px"  actionable>
+                  <div>
+                    <vs-row>
+                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                        <vs-tooltip text="Remove from wishlist">
+                          <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" @click="removeFromWishlist(wish.id)"></vs-icon>
+                        </vs-tooltip>
+                        <div @click="viewBusiness(wish.business.id)" style="width: 100%; color: white;">
+                          p
+                        </div>
+                      </vs-col>
+                    </vs-row>
+                    <div @click="viewBusiness(wish.business.id)" id="business-card">
+                      <div id="business-title">{{wish.business.name}}</div>
+                      <div id="business-type">{{wish.business.businessType}}</div>
+                    </div>
+                  </div>
+                </vs-card>
               </div>
-            </vs-card>
+            </div>
+            <em v-else style="font-size: 12px">
+              You currently have no wishlisted businesses
+            </em>
           </div>
         </div>
       </div>
@@ -87,35 +120,7 @@
         <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
       </main>
 
-      <div v-else-if="graphMode" class="business-main" >
-        <vs-card>
-          <div class="header-container">
-            <vs-icon icon="leaderboard" size="32px"></vs-icon>
-            <div class="title">Sales Report Graph</div>
-            <div class="title-business"> - {{getBusinessName()}}</div>
-            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode">Data</vs-button>
-          </div>
-          <vs-divider/>
-          <!--
-          <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
-          -->
-
-          <BusinessSalesGraph :salesDatay='series' :salesDatax='options' />
-        </vs-card>
-      </div>
-      <div v-else class="business-main">
-        <vs-card>
-          <div class="header-container">
-            <vs-icon icon="summarize" size="32px"></vs-icon>
-            <div class="title">Sales Report</div>
-            <div class="title-business"> - {{getBusinessName()}}</div>
-            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
-          </div>
-          <vs-divider/>
-          <BusinessSalesReport />
-        </vs-card>
-      </div>
-
+      <BusinessSalesReport v-else class="business-main"/>
 
 
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
@@ -139,11 +144,10 @@ import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
 import BusinessSalesReport from "./BusinessSalesReport";
-import BusinessSalesGraph from "./BusinessSalesGraph";
 
 const Homepage = {
   name: "Homepage",
-  components: {BusinessSalesReport, BusinessSalesGraph, ListingDetail, HomePageMessages, MarketplaceGrid},
+  components: {BusinessSalesReport, ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       unliked: false,
@@ -159,23 +163,8 @@ const Homepage = {
       currentCardPage: 1,
       user: null,
       currencySymbol: "$",
-      graphMode: true,
-      series: [{
-        name: 'Number of sales',
-        data: [30, 40, 20, 50, 49, 10, 70, 40, 55, 57, 53, 44]
-      }],
-      options: {
-        chart: {
-          id: 'sales-graph-report'
-        },
-        xaxis: {
-          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-            'September', 'October', 'November', 'December']
-        },
-        dataLabels: {
-          enabled: false,
-        }
-      },
+      watchlist: true,
+      wishlist: [],
     }
   },
   /**
@@ -185,6 +174,7 @@ const Homepage = {
   mounted() {
     this.checkUserSession();
     this.getLikes(this.userId);
+    this.getWishlist(this.userId);
   },
 
   methods: {
@@ -200,6 +190,45 @@ const Homepage = {
         .catch(err => {
           this.$log.debug(err);
       });
+    },
+
+    /**
+     * Call the api function and retrieve wishlisted businesses
+     */
+    getWishlist: function (userId) {
+      api.getUsersWishlistedBusinesses(userId)
+        .then((res) => {
+          this.wishlist = res.data;
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving wishlist", color: "danger"});
+          }
+        })
+    },
+
+    /**
+     * Call api function to remove business from user's wishlist
+     */
+    removeFromWishlist: function (wishlistItemId) {
+      api.removeBusinessFromWishlist(wishlistItemId)
+              .then(() => {
+                this.getWishlist(this.userId);
+                this.$vs.notify({title: "Successfully  removed business from wishlist", color: "success"});
+              })
+              .catch((error) => {
+                if (error.response) {
+                  this.$vs.notify({title: "Error removing business", color: "danger"});
+                }
+                this.$log.debug(error);
+              })
+    },
+
+    /**
+     * Go to business profile
+     */
+    viewBusiness: function (businessId) {
+      this.$router.push({name: "Business", params: {id: businessId}})
     },
 
     /**
@@ -225,52 +254,22 @@ const Homepage = {
         }
         this.$log.debug(error);
       })
-
     },
+
     /**
      * Retrieves all the listings that the user has liked.
      */
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
         .then((res) => {
-          let temp = [];
-          for (let i = 0; i < res.data.length; i++) {
-            if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
-              temp.push(res.data[i]);
-            } else {
-              api.removeLikeFromListing(res.data[i]["id"]);
-            }
-          }
-          this.likedItem = temp;
-          this.likes = temp.length;
+          this.likedItem = res.data;
+          this.likes = res.data.length;
         })
         .catch((error) => {
           if (error.response) {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
-        });
-
-      setInterval(() => {
-        api.getUserLikedListings(userId)
-            .then((res) => {
-              let temp = [];
-              for (let i = 0; i < res.data.length; i++) {
-                if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
-                  temp.push(res.data[i]);
-                } else {
-                  api.removeLikeFromListing(res.data[i]["id"]);
-                }
-              }
-              this.likedItem = temp;
-              this.likes = temp.length;
-            })
-            .catch((error) => {
-              if (error.response) {
-                this.$vs.notify({title: "Error retrieving likes", color: "danger"});
-              }
-            })
-      }, 100);
-
+        })
     },
 
     /**
@@ -451,18 +450,13 @@ export default Homepage;
   margin-bottom: 4px;
 }
 
-.toggle-button {
-  width: 150px;
-}
-
-.header-container {
-  display: flex;
-  margin: auto;
-  padding-bottom: 0.5em;
-  padding-top: 1em;
-}
-
 #product-name {
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#business-title {
   text-align: left;
   font-size: 12px;
   font-weight: bold;
@@ -477,6 +471,10 @@ export default Homepage;
   margin-left: -1px;
   cursor: pointer;
   transition: font-size 0.3s;
+}
+
+#wishlist-icon {
+  font-size: 16px;
 }
 
 #view-unlike-icon {
@@ -523,7 +521,7 @@ export default Homepage;
 
 #container {
   display: grid;
-  grid-template-columns: 0.5fr 1fr 4fr 0.5fr;
+  grid-template-columns: 0.6fr 1.8fr 4fr 0.6fr;
   grid-template-rows: 1fr auto;
   grid-column-gap: 1em;
   margin: auto;
@@ -540,7 +538,7 @@ export default Homepage;
   border-radius: 4px;
   margin: 8px 0 0 0;
 
-  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
 }
 
 .name {
@@ -552,21 +550,6 @@ export default Homepage;
 #business-name {
   font-size: 32px;
   margin: auto;
-}
-
-
-
-.title {
-  font-size: 30px;
-  margin-top: 4px;
-  margin-right: 8px;
-}
-.title-business {
-  font-size: 30px;
-  font-weight: bold;
-  margin-top: 4px;
-  margin-left: 0;
-  margin-right: auto;
 }
 
 .newsfeed-title {
@@ -588,7 +571,7 @@ export default Homepage;
 .sub-container {
   padding: 2em;
   border-radius: 4px;
-  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
+  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
   background-color: #FFFFFF;
 }
 
@@ -634,7 +617,6 @@ main {
 .business-main {
   grid-column: 3;
   grid-row: 2;
-  margin-top: 1em;
 }
 
 .business-main >>> .vs-card--content {
@@ -694,7 +676,7 @@ main {
   .watchlist-title {
     font-size: 18px;
     margin-left: 4px;
-    transition: 0.3s;
+    transition: 0.1s;
   }
 
 }
