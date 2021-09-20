@@ -155,13 +155,13 @@ describe('User acting as tests', () => {
     });
 
     test('When view summary with week granularity selected, summary is displayed correctly', async () => {
-       wrapper.vm.currentYearSalesHistory = salesHistory
-       let startDate = moment(new Date(wrapper.vm.dateStart))
-       let intervalDate = startDate.add(7, 'days');
+        wrapper.vm.currentYearSalesHistory = salesHistory
+        let startDate = moment(new Date(wrapper.vm.dateStart))
+        let intervalDate = startDate.add(7, 'days');
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 7, 'days')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
-            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "Sep 10", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep 17`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 
