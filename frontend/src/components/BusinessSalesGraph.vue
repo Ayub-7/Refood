@@ -1,5 +1,27 @@
 <template>
-  <apexchart id="sales-graph-report" width="100%" height="100%" type="bar" :options="options" :series="series"></apexchart>
+  <div style="height: 400px">
+    <div v-if="toggleSales">
+      <vs-button  class="toggle-button" id="toggle-sales" @click="toggleSales = !toggleSales; getTotalSales()">
+        <vs-icon style="float: left; margin-right: 10px">
+          shopping_bag
+        </vs-icon>
+        <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
+          See Total Sales
+        </p>
+      </vs-button>
+    </div>
+    <div v-else>
+      <vs-button style="display: block;" class="toggle-button" id="toggle-sales-value" @click="toggleSales = !toggleSales; getTotalRevenue()">
+        <vs-icon style="float: left; margin-right: 10px">
+          price_change
+        </vs-icon>
+        <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
+          See Total Value
+        </p>
+      </vs-button>
+    </div>
+    <apexchart id="sales-graph-report" width="100%" height="80%" type="bar" :options="options" :series="series"></apexchart>
+  </div>
 </template>
 
 <script>
@@ -19,6 +41,8 @@ export default {
 
   data: function() {
     return {
+      toggleSales: true,
+      boughtListings: [],
       series: [{
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       }],
@@ -47,12 +71,40 @@ export default {
 
   methods: {
     /**
+     * retrieve total sales
+     */
+    getTotalSales: function () {
+      let yearlyDataSales = this.totalMonthlySales(this.boughtListings);
+      let yearlySales =  this.displaySalesData(yearlyDataSales);
+      this.series = [{
+        name: 'Total Sales',
+        data: yearlySales,
+      }];
+    },
+
+    /**
+     * retrieve total Revenue
+     */
+    getTotalRevenue: function () {
+      // Categorises and sums up data, splitting each bought listing into it's respective year and month.
+      let yearlyData = this.totalMonthlyRevenue(this.boughtListings);
+      let yearlyRevenue = this.displaySalesData(yearlyData);
+
+      this.series = [{
+        name: 'Total Value',
+        data: yearlyRevenue,
+      }];
+
+    },
+
+    /**
      * Retrieve's the business' bought listing data.
      */
     getSalesData: function() {
       api.getBusinessSales(this.businessId)
         .then((res) => {
-          this.displaySalesData(res.data);
+          this.boughtListings = res.data;
+          this.getTotalRevenue();
         })
         .catch((error) => {
           this.$log.error(error);
@@ -64,10 +116,7 @@ export default {
      * Currently creates and displays total monthly sales data.
      * @param data bought listings sales data
      */
-    displaySalesData: function(data) {
-      // Categorises and sums up data, splitting each bought listing into it's respective year and month.
-      let yearlyData = this.totalMonthlyRevenue(data);
-
+    displaySalesData: function(yearlyData) {
       let allData = [];
       for (let year of Object.entries(yearlyData)) allData = allData.concat(year[1]); // Flatten object into array.
 
@@ -87,10 +136,6 @@ export default {
 
       // Updates the plot options and inputs.
       // Reassigning entire variable allows chart to properly update and play animations.
-      this.series = [{
-        name: 'Total Value',
-        data: allData,
-      }];
 
       this.options = {
         title: {
@@ -117,13 +162,20 @@ export default {
         },
         tooltip: {
           y: {
-            formatter: (val) => this.currencySymbol + val.toFixed(2),
+            formatter: (val) => {
+              if (this.toggleSales) {
+                return this.currencySymbol + val.toFixed(2);
+              } else {
+                return val;
+              }
+            }
           },
           x: {
             format: "MMMM yyyy"
           }
         },
       };
+      return allData;
     },
 
     /**
@@ -141,6 +193,24 @@ export default {
           }
           yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += +listing.price.toFixed(2);
         }
+      return yearlyData;
+    },
+
+    /**
+     * Categorises and sums up data, splitting each bought listing into it's respective year and month.
+     * @param data the bought listing data (i.e. the sold listings).
+     * @return object where each key is a year, and the value is an array of size 12, each index representing a month,
+     * and the value at each index representing the total revenue/value of listings sold.
+     */
+    totalMonthlySales: function(data) {
+      let yearlyData = {};
+      for (let listing of data) {
+        let soldDate = new Date(listing.sold);
+        if (yearlyData[soldDate.getFullYear()] == null) {
+          yearlyData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        }
+        yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += 1;
+      }
       return yearlyData;
     },
 
@@ -174,5 +244,12 @@ export default {
 </script>
 
 <style scoped>
+
+.toggle-button {
+  /*margin-right: 10px;*/
+  margin-left: 5px;
+  margin-bottom: 7px;
+  padding-right: 30px;
+}
 
 </style>
