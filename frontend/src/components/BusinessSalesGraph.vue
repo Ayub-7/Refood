@@ -66,13 +66,19 @@ export default {
      */
     displaySalesData: function(data) {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
-      let yearlyData = this.totalMonthlyRevenue(data);
+      let yearlyData = this.totalWeeklyRevenue(data);
+
+      // let today = new Date("2021-07-15");
+      // let daynum = today.getDay();
+      // let monday = today.setDate(today.getDate()-daynum+1);
+
 
       let allData = [];
       for (let year of Object.entries(yearlyData)) allData = allData.concat(year[1]); // Flatten object into array.
 
-      // Generates the x-axis labels of each month, for each year.
-      let yearlyMonthCategories = this.generateMonthLabels(Object.keys(yearlyData));
+      // // Generates the x-axis labels of each month, for each year.
+      // let yearlyMonthCategories = this.generateMonthLabels(Object.keys(yearlyData)); //For Monthly Revenue
+      let yearlyMonthCategories = Object.keys(yearlyData);
 
       // Removes months with no sales up to the first month of sales.
       let i = 0;
@@ -106,7 +112,7 @@ export default {
           }
         },
         xaxis: {
-          type: "datetime",
+          type: "category",
           categories: yearlyMonthCategories,
           labels: {
             datetimeFormatter: {
@@ -144,6 +150,41 @@ export default {
       return yearlyData;
     },
 
+    /**
+     * NOT WORKING YET, TODO: FIX THIS!
+     * @param data
+     * @returns {{}}
+     */
+    totalWeeklyRevenue: function(data) {
+      let weeklyData = {};
+      for (let listing of data) {
+        let soldDate = new Date(listing.sold);
+        if (weeklyData[soldDate.getFullYear()] == null) {
+          weeklyData[soldDate.getFullYear()] = new Array(52);
+        }
+        var oneJan = new Date(soldDate.getFullYear(),0,1);
+        var numberOfDays = Math.floor((soldDate - oneJan) / (24 * 60 * 60 * 1000));
+        var result = Math.ceil(( soldDate.getDay() + 1 + numberOfDays) / 7);
+        if (isNaN(weeklyData[soldDate.getFullYear()][result])) {
+          weeklyData[soldDate.getFullYear()][result] = +listing.price.toFixed(2);
+        } else {
+          weeklyData[soldDate.getFullYear()][result] += +listing.price.toFixed(2);
+        }
+      }
+      console.log(weeklyData)
+      return weeklyData;
+    },
+    totalYearlyRevenue: function(data) {
+      let yearlyData = {};
+      for (let listing of data) {
+        let soldDate = new Date(listing.sold);
+        if (yearlyData[soldDate.getFullYear()] == null) {
+          yearlyData[soldDate.getFullYear()] = 0;
+        }
+        yearlyData[soldDate.getFullYear()] += +listing.price.toFixed(2);
+      }
+      return yearlyData;
+    },
 
     /**
      * Generates an array of strings containing each month for every given year.
