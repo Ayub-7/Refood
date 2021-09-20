@@ -231,4 +231,45 @@ describe('Sales report tests', () => {
         expect(wrapper.vm.dateStart).toEqual(wrapper.vm.pickedStart);
         expect(wrapper.vm.dateEnd).toEqual(wrapper.vm.pickedEnd);
     })
+
+
+    test('validateDates with startDate before endDate returns correct error', () => {
+        wrapper.vm.validateDates('2021-11-11 07:54:46', '2020-01-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('end-before-begin');
+    });
+
+    
+    test('validateDates with no startDate returns correct error', () => {
+        wrapper.vm.validateDates(null, '2020-01-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('no-start');
+    });
+
+    test('validateDates with no endDate returns correct error', () => {
+        wrapper.vm.validateDates('2021-11-11 07:54:46', null);
+        expect(wrapper.vm.errors).toContain('no-end');
+    });
+
+    test('validateDates with startDate before 1970 returns correct error', () => {
+        wrapper.vm.validateDates('1969-11-11 07:54:46', '2010-11-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('bad-start-date');
+    });
+
+    test('validateDates with endDate before 1970 returns correct error', () => {
+        wrapper.vm.validateDates('1969-11-11 07:54:46', '1969-11-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('bad-end-date');
+    });
+
+    test('validateDates with startDate after today returns correct error', () => {
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        wrapper.vm.validateDates(tomorrow, tomorrow);
+        expect(wrapper.vm.errors).toContain('bad-start-date');
+    });
+
+    test('validateDates with endDate after today returns correct error', () => {
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        wrapper.vm.validateDates(tomorrow, tomorrow);
+        expect(wrapper.vm.errors).toContain('bad-end-date');
+    });
 });

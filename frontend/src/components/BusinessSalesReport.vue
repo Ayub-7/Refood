@@ -48,11 +48,10 @@
           All
         </vs-button>
         <div class="options-header" style="font-size: 14px">Custom</div>
-        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="pickedStart" label="Start" :danger="(errors.includes('past-min-date'))"
-                  danger-text="Date can not be in the future or after the end date"/>
-        <p style="margin: auto auto 0">-</p>
-        <vs-input type="date" size="small" class="date-input" v-model="pickedEnd" label="End" :danger="(errors.includes('past-min-date'))"
-                  danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
+        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="pickedStart" label="Start" :danger="checkErrors('start')"
+                  :danger-text="getError('start')"/>
+        <vs-input type="date" size="small" class="date-input" v-model="pickedEnd" label="End" :danger="checkErrors('end')"
+                  :danger-text="getError('end')" style="grid-column: 3"/>
         <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;" @click="onPeriodChange('custom')">Go</vs-button>
 
         <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
@@ -229,6 +228,7 @@ export default {
      * @param period string of the selected period.
      */
     onPeriodChange: function(period) {
+      this.errors = [];
       this.activePeriodButton = period;// Changes the period button to be selected and disabled.
       switch (period) {
         case '1-d':
@@ -247,14 +247,84 @@ export default {
           this.updatePeriod(1 ,'year');
           break;
         case 'custom':
-          this.dateStart = this.pickedStart;
-          this.dateEnd = this.pickedEnd;
+          if(this.validateDates(this.pickedStart, this.pickedEnd)) {
+            this.dateStart = this.pickedStart;
+            this.dateEnd = this.pickedEnd;
+          }
           break;
         case 'all':
+          this.dateEnd = new Date();
           this.dateStart = this.getEarliestDate();
       }
 
       this.updateSummary();
+    },
+
+
+    /**
+     * Checks dates and if date is incorrect pushes error
+     * @param startDate start date from input field
+     * @param endDate end date from input field
+     * @returns boolean, true is valid dates, false if invalid
+     */
+    validateDates: function(startDate, endDate) {
+      if(startDate == null) {
+        this.errors.push('no-start');
+      }
+      if (endDate == null) {
+        this.errors.push('no-end');
+      }
+      if (moment(endDate).isBefore(moment(startDate))) {
+        this.errors.push('end-before-begin');
+      }
+      if (moment(endDate).isBefore(moment('1970')) || moment(endDate).isAfter(moment(new Date()))) {
+        this.errors.push('bad-end-date');
+      } 
+      if (moment(startDate).isBefore(moment('1970')) || moment(startDate).isAfter(moment(new Date()))) {
+        this.errors.push('bad-start-date');
+      }
+
+      if(this.errors.length > 0) {
+        return false;
+      }
+
+      return true;
+
+    },
+
+    /**
+     * Checks if error contains type
+     * @param type either start or end, this will be used to filter errors to see if it contains relevant errors
+     * @returns boolean, true if contains type, false otherwise
+     */
+    checkErrors: function(type) {
+      return this.errors.filter(error => error.includes(type)).length > 0
+    },
+
+    
+    /**
+     * Returns appropriate error message depending on what is in errors
+     * @param type either start or end, this will be used to show errors for start or end
+     * @returns string containing appropriate error message
+     */
+    getError: function(type) {
+      if (type == 'start') {
+        if (this.errors.includes('no-start')) {
+          return 'No start date'
+        } else if (this.errors.includes('bad-start-date')) {
+          return 'Start date must be before tomorrow and after 1970'
+        }
+      }
+
+      if(type == 'end') {
+        if (this.errors.includes('no-end')) {
+          return 'No end date'
+        } else if (this.errors.includes('bad-end-date')) {
+          return 'End date must be before tomorrow and after 1970'
+        } else if (this.errors.includes('end-before-begin')) {
+          return 'End date must be after start date'
+        }
+      }
     },
 
 
@@ -578,7 +648,9 @@ export default {
 .date-input {
   width: 136px;
   margin: auto;
+  height: 100px;
 }
+
 
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
