@@ -93,9 +93,9 @@ class ListingControllerTest {
         business.getAdministrators().add(adminUser);
 
         // Adding business to all users' wishlists
-        WishlistItem wishlistItem1 = new WishlistItem(1L, 1L);
-        WishlistItem wishlistItem2 = new WishlistItem(2L, 1L);
-        WishlistItem wishlistItem3 = new WishlistItem(3L, 1L);
+        WishlistItem wishlistItem1 = new WishlistItem(1L, business);
+        WishlistItem wishlistItem2 = new WishlistItem(2L, business);
+        WishlistItem wishlistItem3 = new WishlistItem(3L, business);
         wishlistItems = new ArrayList<>();
         wishlistItems.add(wishlistItem1);
         wishlistItems.add(wishlistItem2);
