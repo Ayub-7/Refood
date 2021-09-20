@@ -456,6 +456,7 @@ export default Homepage;
   font-size: 12px;
 }
 
+
 #view-icon {
   font-size: 16px;
   margin-left: -1px;
