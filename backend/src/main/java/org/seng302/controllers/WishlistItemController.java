@@ -1,5 +1,6 @@
 package org.seng302.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.seng302.models.*;
 import org.seng302.models.requests.MutedStatusRequest;
 import org.seng302.repositories.*;
@@ -65,7 +66,7 @@ public class WishlistItemController {
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        WishlistItem wishlistItem = new WishlistItem(userId, businessId);
+        WishlistItem wishlistItem = new WishlistItem(userId, business);
         wishlistItemRepository.save(wishlistItem);
         return ResponseEntity.status(HttpStatus.CREATED).body("Business added to wishlist");
     }

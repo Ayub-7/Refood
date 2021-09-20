@@ -156,6 +156,17 @@ let mockCard = {
     section: "Wanted"
 }
 
+const wishlist = {
+    business: {
+        name: "Dabshots",
+        businessType: "Retail trade",
+        id: 1
+    },
+    id: 1,
+    muted: false,
+    userId: 1
+}
+
 jest.mock("../Api.js", () => jest.fn);
 api.getUserFromID = jest.fn(() => {
   return Promise.resolve({data: mockUser, status: 200});
@@ -181,6 +192,14 @@ api.getUserLikedListings = jest.fn(() => {
 api.removeLikeFromListing = jest.fn(() => {
     return Promise.resolve({data: mockListing, status: 200}).catch({response: {message: "Bad request", status: 400}});
 })
+
+api.getUsersWishlistedBusinesses = jest.fn(() => {
+    return Promise.resolve({data: wishlist, status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
+
+api.removeBusinessFromWishlist = jest.fn(() => {
+    return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
 
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
 getUserName.mockImplementation(() =>  {
@@ -210,6 +229,7 @@ let $vs = {
 };
 
 beforeEach(() => {
+    console.log(90)
     wrapper = shallowMount(Homepage, {
         propsData: {},
         mocks: {$router, $log, $vs},
@@ -221,7 +241,7 @@ beforeEach(() => {
                 userId: mockUser.id,
                 business: mockBusiness,
                 actingAsBusinessId: null,
-
+                wishlist: wishlist,
             }
         }
     });
@@ -229,6 +249,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    console.log(9)
     wrapper.destroy();
 });
 
@@ -322,7 +343,7 @@ describe("Tests for functionality", ()=> {
    });
 });
 
-describe("Tests for wishlist functionality", ()=> {
+describe("Tests for watchlist functionality", ()=> {
     test("Unlike listing successfully", async () => {
         expect(wrapper.vm.likes).toBe(1);
         await wrapper.vm.unlike(4);
@@ -337,4 +358,11 @@ describe("Tests for wishlist functionality", ()=> {
         }, 1000);
     });
 
+});
+
+describe("Tests for business watchlist functionality", ()=> {
+    test('After completing the remove business from wishlist method, get wishlist is called', async () => {
+        await wrapper.vm.removeFromWishlist(1);
+        expect(api.getUsersWishlistedBusinesses).toBeCalled();
+    });
 });

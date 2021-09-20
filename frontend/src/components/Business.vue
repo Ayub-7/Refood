@@ -108,7 +108,7 @@ const Business = {
 
       }
       else {
-        api.removeBusinessToWishlist(this.wishlistId)
+        api.removeBusinessFromWishlist(this.wishlistId)
           .then(() => {
             this.inWishlist = false;
             this.$vs.notify({title: "Removed from Wishlist",
@@ -131,10 +131,10 @@ const Business = {
      * Checks if the current business is wishlisted by the user, and adjusts display accordingly.
      */
     getUserWishlist: function() {
-      api.getUserBusinessWishlist(this.user.id)
+      api.getUsersWishlistedBusinesses(this.user.id)
         .then((res) => {
           for (let i = 0; i < res.data.length; i++) {
-            if (this.business.id === res.data[i].businessId) {
+            if (this.business.id === res.data[i].business.id) {
               this.wishlistId = res.data[i].id;
               this.inWishlist = true;
               break;
