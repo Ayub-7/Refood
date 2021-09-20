@@ -349,7 +349,7 @@ describe("Tests for watchlist functionality", ()=> {
         await wrapper.vm.unlike(4);
         expect(wrapper.vm.likes).toBe(0);
     });
-
+/*
     test("Closed listing disappears from liked listings", async () => {
         expect(wrapper.vm.likes).toBe(1);
         wrapper.vm.likedItem[0]["closes"] = new Date().toISOString().split("T")[0] + " " + new Date().toISOString().split("T")[1].split(".")[0]
@@ -357,7 +357,7 @@ describe("Tests for watchlist functionality", ()=> {
             expect(wrapper.vm.likes).toBe(0);
         }, 1000);
     });
-
+*/
 });
 
 describe("Tests for business watchlist functionality", ()=> {
