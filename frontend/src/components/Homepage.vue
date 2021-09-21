@@ -77,6 +77,16 @@
             </div>
           </div>
           <div v-if="!watchlist">
+            <vs-row style="margin-top: -40px; margin-bottom: 20px;" vs-type="flex" vs-justify="right">
+              <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'" style="margin-right: 30px">
+                <vs-button @click="toggleMuteAll" v-if="allMuted == true" color="purple">
+                  <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+                <vs-button v-else @click="toggleMuteAll" color="purple">
+                  <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+              </vs-tooltip>
+            </vs-row>
             <div v-if="wishlist.length > 0">
               <div v-for="wish in wishlist" :key="wish.id" >
                 <vs-card style="margin-top: -10px"  actionable>
@@ -106,7 +116,7 @@
         </div>
       </div>
 
-        <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
+      <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
       <main v-if="getBusinessId() == null">
         <nav id="newsfeed-navbar">
           <div class="newsfeed-title">
@@ -211,6 +221,7 @@ const Homepage = {
           enabled: false,
         }
       },
+      allMuted: false,
     }
   },
   /**
@@ -236,6 +247,31 @@ const Homepage = {
         .catch(err => {
           this.$log.debug(err);
       });
+    },
+
+    /**
+     * Calls the api endpoint, updating the mute status of all the wishlist items
+     */
+    toggleMuteAll: function () {
+      if (this.allMuted) {
+        for (let wish of this.wishlist) {
+          api.updateWishlistMuteStatus(wish.id, "Muted")
+            .catch(() => {
+              this.$vs.notify({title: "Error unmuting wishlist", color: "danger"});
+            });
+        }
+        this.$vs.notify({title: "Wishlist successfully unmuted", color: "success"});
+        this.allMuted = false;
+      } else {
+        for (let wish of this.wishlist) {
+          api.updateWishlistMuteStatus(wish.id, "Unmuted")
+            .catch(() => {
+              this.$vs.notify({title: "Error muting wishlist", color: "danger"});
+            })
+        }
+        this.$vs.notify({title: "Wishlist successfully muted", color: "success"});
+        this.allMuted = true;
+      }
     },
 
     /**
@@ -309,11 +345,11 @@ const Homepage = {
       api.getUserLikedListings(userId)
         .then((res) => {
           let temp = [];
-          for (let i = 0; i < res.data.length; i++) {
-            if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
-              temp.push(res.data[i]);
+          for (let data of res.data) {
+            if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+              temp.push(data);
             } else {
-              api.removeLikeFromListing(res.data[i]["id"]);
+              api.removeLikeFromListing(data["id"]);
             }
           }
           this.likedItem = temp;
@@ -329,11 +365,11 @@ const Homepage = {
         api.getUserLikedListings(userId)
             .then((res) => {
               let temp = [];
-              for (let i = 0; i < res.data.length; i++) {
-                if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
-                  temp.push(res.data[i]);
+              for (let data of res.data) {
+                if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+                  temp.push(data);
                 } else {
-                  api.removeLikeFromListing(res.data[i]["id"]);
+                  api.removeLikeFromListing(data["id"]);
                 }
               }
               this.likedItem = temp;
@@ -359,9 +395,9 @@ const Homepage = {
       api.getUserCards(id)
         .then((res) => {
           this.cards = res.data;
-          for(let i = 0; i < this.cards.length; i++){
-            if(!this.cards[i].user.homeAddress){
-              this.cards[i].user = this.user;
+          for(let card of this.cards){
+            if(!card.user.homeAddress){
+              card.user = this.user;
             }
           }
         })

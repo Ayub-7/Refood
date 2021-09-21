@@ -528,6 +528,15 @@ export default {
         instance.post(`/businesses/${businessId}/wishlist`, {}, {withCredentials: true}),
 
     /**
+     * Updates whether the wishlisted business is muted or not
+     * @param wishlistId id of the wishlist relationship object
+     * @param mutedStatus true or false, muted or not
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    updateWishlistMuteStatus: (wishlistId, mutedStatus) =>
+        instance.put(`/wishlist/${wishlistId}`, {mutedStatus: mutedStatus}, {withCredentials: true}),
+
+    /**
      * Removes business from user's wishlist by removing the relevant wishlistItem object
      * @param wishlistItemId
      * @returns {Promise<AxiosResponse<any>>}
