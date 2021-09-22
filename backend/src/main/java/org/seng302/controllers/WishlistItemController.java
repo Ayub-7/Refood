@@ -47,6 +47,9 @@ public class WishlistItemController {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         List<WishlistItem> wishlistItems = wishlistItemRepository.findWishlistItemsByUserId(id);
+        for (WishlistItem wish:wishlistItems) {
+            wish.getBusiness().setAdministrators(null);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(wishlistItems);
     }
 
@@ -65,6 +68,7 @@ public class WishlistItemController {
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
+        System.out.println(business);
         WishlistItem wishlistItem = new WishlistItem(userId, business);
         wishlistItemRepository.save(wishlistItem);
         return ResponseEntity.status(HttpStatus.CREATED).body("Business added to wishlist");
