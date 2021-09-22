@@ -7,7 +7,7 @@
     <vs-divider/>
 
     <vs-table
-        :data="notifications"
+        :data="soldListings"
         noDataText="Your listings will be displayed here once you have sold at least one product."
         stripe>
       <template slot="thead">
@@ -21,13 +21,13 @@
       </template>
       <template slot-scope="{data}">
         <vs-tr v-for="(listing, index) in data" :key="index">
-          <vs-td class="listing-image-column"><ReImage :image-path="listing.boughtListing.product.primaryImagePath" class="listing-image"/></vs-td>
-          <vs-td>{{listing.boughtListing.product.name}}</vs-td>
-          <vs-td>{{listing.created}}</vs-td>
-          <vs-td>{{listing.boughtListing.sold}}</vs-td>
-          <vs-td>{{listing.boughtListing.quantity}}</vs-td>
-          <vs-td>{{listing.boughtListing.product.recommendedRetailPrice}}</vs-td>
-          <vs-td>{{listing.boughtListing.likes}}</vs-td>
+          <vs-td class="listing-image-column"><ReImage :image-path="listing.product.primaryImagePath" class="listing-image"/></vs-td>
+          <vs-td>{{listing.product.name}}</vs-td>
+          <vs-td>{{listing.sold}}</vs-td>
+          <vs-td>{{listing.product.created}}</vs-td>
+          <vs-td>{{listing.quantity}}</vs-td>
+          <vs-td>{{listing.product.recommendedRetailPrice}}</vs-td>
+          <vs-td>{{listing.likes}}</vs-td>
         </vs-tr>
 
       </template>
@@ -46,10 +46,9 @@ export default {
 
   data: function() {
     return {
-
       currency: "$",
       businessId: '',
-      notifications: []
+      soldListings: []
     }
   },
 
@@ -64,9 +63,9 @@ export default {
      * Calls get sales history
      */
     getSalesHistory: function () {
-      api.getBusinessListingNotifications(this.businessId)
+      api.getBusinessSales(this.businessId)
         .then((res) => {
-          this.notifications = res.data;
+          this.soldListings = res.data;
         })
         .catch(err => {
           console.log(err)

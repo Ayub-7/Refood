@@ -210,7 +210,22 @@ let listingNotifications = [
             }
         },
         viewStatus: "Unread"
-    }
+    },
+    {
+        id: 7,
+        status: "Wishlist",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
 ];
 
 api.getMessages = jest.fn().mockResolvedValue({data: oneMessage});
@@ -335,16 +350,43 @@ describe('Listing notification functionality tests', () => {
         expect(wrapper.vm.$router.push).toBeCalled();
     });
 
+    test("Delete listing notification buttons call undo function which deletes notification", async () => {
+        const deleteUndo = jest.spyOn(wrapper.vm, 'undo')
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+        let button = wrapper.get("#delete-liked-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
+
+        button = wrapper.get("#delete-liked-purchased-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
+
+        button = wrapper.get("#delete-purchased-listing-notification-button");
+        expect(deleteUndo).toBeTruthy();
+
+    });
+
     test("Delete listing notification buttons call delete notification function", async () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.currentUserId = 83;
-
-        let button = wrapper.get("#delete-purchased-listing-notification-button");
+        let button = wrapper.get("#delete-liked-listing-notification-button");
         expect(button).toBeTruthy();
 
         await button.trigger('click');
         expect(api.deleteListingNotification).toBeCalled();
-    })
 
     test("Toggle listing notification as important", async () => {
         await wrapper.vm.$nextTick();

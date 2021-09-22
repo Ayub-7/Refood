@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8d308419-9ed5-443e-b240-ad264e37ed7e",
+		"_postman_id": "b7697e48-706d-4682-bcc3-b89901b590d4",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -37,10 +37,25 @@
 				{
 					"name": "Login (admin)",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"dgaa@refood.com\",\r\n    \"password\": \"dgaapassword123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": ""
+							"raw": "{{URL}}/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"login"
+							]
 						}
 					},
 					"response": []
@@ -396,6 +411,31 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Wishlist business",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:id/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -536,14 +576,20 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/1/inventory",
+							"raw": "{{URL}}/businesses/:id/inventory",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
 								"businesses",
-								"1",
+								":id",
 								"inventory"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
 							]
 						}
 					},
@@ -717,6 +763,40 @@
 								"businesses",
 								"listings",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new listing",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"inventoryItemId\": 101,\r\n  \"quantity\": 3,\r\n  \"price\": 17.99,\r\n  \"moreInfo\": \"Seller may be willing to consider near offers\",\r\n  \"closes\": \"2021-07-21T23:59:00Z\",\r\n  \"likes\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/listings",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"listings"
 							],
 							"variable": [
 								{
@@ -1170,6 +1250,118 @@
 							"variable": [
 								{
 									"key": "notificationId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wishlist",
+			"item": [
+				{
+					"name": "Remove business from wishlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/wishlist/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wishlist",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user's wishlisted businesses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add business to user's wishlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update MutedStatus",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"mutedStatus\": \"Muted\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/wishlist/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wishlist",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
 									"value": "1"
 								}
 							]

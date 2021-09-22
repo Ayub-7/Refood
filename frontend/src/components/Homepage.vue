@@ -34,7 +34,7 @@
           </div>
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
-        <div id="watchlist-container" class="sub-container">
+        <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
           <div id="watchlist-header-container">
             <div style="display: flex;">
               <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
@@ -74,18 +74,48 @@
       </div>
 
         <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
-        <main>
-          <nav id="newsfeed-navbar">
-            <div class="newsfeed-title">
-              <span style="display: inline-block; vertical-align: middle;">
-                <vs-icon icon="feed" />
-              </span>
-               News Feed
-            </div>
-          </nav>
-          <vs-divider style="padding: 0 1em;"/>
-          <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
-        </main>
+      <main v-if="getBusinessId() == null">
+        <nav id="newsfeed-navbar">
+          <div class="newsfeed-title">
+            <span style="display: inline-block; vertical-align: middle;">
+              <vs-icon icon="feed" />
+            </span>
+             News Feed
+          </div>
+        </nav>
+        <vs-divider style="padding: 0 1em;"/>
+        <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
+      </main>
+
+      <div v-else-if="graphMode" class="business-main" >
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="leaderboard" size="32px" style="margin: auto 0"></vs-icon>
+            <div class="title">Sales Report Graph</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Data</vs-button>
+          </div>
+          <vs-divider/>
+          <!--
+          <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
+          -->
+          <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
+        </vs-card>
+      </div>
+      <div v-else class="business-main">
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="summarize" size="32px" style="margin: auto 0"></vs-icon>
+            <div class="title">Sales Report</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
+          </div>
+          <vs-divider/>
+          <BusinessSalesReport :businessId="actingAsBusinessId" />
+        </vs-card>
+      </div>
+
+
 
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
@@ -107,10 +137,12 @@ import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
+import BusinessSalesReport from "./BusinessSalesReport";
+import BusinessSalesGraph from "./BusinessSalesGraph";
 
 const Homepage = {
   name: "Homepage",
-  components: {ListingDetail, HomePageMessages, MarketplaceGrid},
+  components: {BusinessSalesReport, BusinessSalesGraph, ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       unliked: false,
@@ -126,6 +158,7 @@ const Homepage = {
       currentCardPage: 1,
       user: null,
       currencySymbol: "$",
+      graphMode: true,
     }
   },
   /**
@@ -183,14 +216,44 @@ const Homepage = {
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
         .then((res) => {
-          this.likedItem = res.data;
-          this.likes = res.data.length;
+          let temp = [];
+          for (let i = 0; i < res.data.length; i++) {
+            if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
+              temp.push(res.data[i]);
+            } else {
+              api.removeLikeFromListing(res.data[i]["id"]);
+            }
+          }
+          this.likedItem = temp;
+          this.likes = temp.length;
         })
         .catch((error) => {
           if (error.response) {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
-        })
+        });
+
+      setInterval(() => {
+        api.getUserLikedListings(userId)
+            .then((res) => {
+              let temp = [];
+              for (let i = 0; i < res.data.length; i++) {
+                if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
+                  temp.push(res.data[i]);
+                } else {
+                  api.removeLikeFromListing(res.data[i]["id"]);
+                }
+              }
+              this.likedItem = temp;
+              this.likes = temp.length;
+            })
+            .catch((error) => {
+              if (error.response) {
+                this.$vs.notify({title: "Error retrieving likes", color: "danger"});
+              }
+            })
+      }, 100);
+
     },
 
     /**
@@ -239,6 +302,7 @@ const Homepage = {
             mutations.setUserName(response.data.firstName + " " + response.data.lastName);
             mutations.setUserCountry(response.data.homeAddress.country);
             mutations.setUserBusinesses(this.businesses);
+            this.setCurrency(response.data.homeAddress.country);
           }).catch((err) => {
         if (err.response.status === 401) {
           this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
@@ -371,6 +435,17 @@ export default Homepage;
   margin-bottom: 4px;
 }
 
+.toggle-button {
+  width: 150px;
+}
+
+.header-container {
+  display: flex;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 1em;
+}
+
 #product-name {
   text-align: left;
   font-size: 12px;
@@ -449,7 +524,7 @@ export default Homepage;
   border-radius: 4px;
   margin: 8px 0 0 0;
 
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
 }
 
 .name {
@@ -461,6 +536,16 @@ export default Homepage;
 #business-name {
   font-size: 32px;
   margin: auto;
+}
+
+.title {
+  font-size: 30px;
+  margin: auto 8px auto 4px;
+}
+.title-business {
+  font-size: 30px;
+  font-weight: bold;
+  margin: auto auto auto 0;
 }
 
 .newsfeed-title {
@@ -482,7 +567,7 @@ export default Homepage;
 .sub-container {
   padding: 2em;
   border-radius: 4px;
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
   background-color: #FFFFFF;
 }
 
@@ -523,6 +608,16 @@ main {
   font-size: 18px;
   padding-top: 1em;
   padding-left: 4px;
+}
+
+.business-main {
+  grid-column: 3;
+  grid-row: 2;
+  margin-top: 1em;
+}
+
+.business-main >>> .vs-card--content {
+  width: 100%;
 }
 
 /* left navigation panel styling */

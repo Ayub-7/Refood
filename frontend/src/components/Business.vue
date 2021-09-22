@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div v-if="fromSearch" class="return-button">
       <vs-button @click="returnToSearch()" title="Go Back">Return To Search</vs-button>
     </div>
@@ -16,6 +15,12 @@
       </div>
 
       <div id="business-container">
+        <div class="sub-container">
+          <vs-button id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
+            {{ inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
+          </vs-button>
+        </div>
+
         <div id="description" class="sub-container">
           <div class="sub-header">Description</div>
           {{ business.description }}
@@ -40,7 +45,7 @@
 
       <main>
         <!-- Sub Navigation Bar -->
-        <vs-tabs id="business-navbar">
+        <vs-tabs id="business-navbar" alignment="fixed">
           <vs-tab class="business-nav-item" label="Listings">
             <BusinessListings :business-id="business.id" :country="user.homeAddress.country"/>
           </vs-tab>
@@ -71,11 +76,79 @@ const Business = {
       fromSearch: sessionStorage.getItem("businessesCache"),
       business: null,
       adminList: null,
-      user: null
+      user: null,
+
+      inWishlist: false, // i.e. is it in the user's wishlist.
+      wishlistId: null,
     };
   },
 
   methods: {
+    /**
+     * Adds or removes the current business from the user's wishlist.
+     */
+    toggleWishlist: function() {
+      if (!this.inWishlist) {
+        api.addBusinessToWishlist(this.business.id)
+          .then(() => {
+            this.inWishlist = true;
+            this.$vs.notify({title: "Added to Wishlist",
+              text: `${this.business.name} was added to your wishlist`,
+              color: "success",
+              icon: "add"});
+            this.getUserWishlist(); // Refresh the wishlistId
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.$vs.notify({title: "Error Adding to Wishlist",
+              text: `${this.business.name} could not be added to your wishlist. Please try again`,
+              color: "danger",
+              icon: "error"});
+          });
+
+      }
+      else {
+        api.removeBusinessToWishlist(this.wishlistId)
+          .then(() => {
+            this.inWishlist = false;
+            this.$vs.notify({title: "Removed from Wishlist",
+              text: `${this.business.name} was removed from your wishlist`,
+              color: "success",
+              icon: "remove"});
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.$vs.notify({title: "Error Removing from Wishlist",
+              text: `${this.business.name} could not be removed to your wishlist. Please try again`,
+              color: "danger",
+              icon: "error"});
+          })
+      }
+    },
+
+    /**
+     * Retrieves the user's wishlist.
+     * Checks if the current business is wishlisted by the user, and adjusts display accordingly.
+     */
+    getUserWishlist: function() {
+      api.getUserBusinessWishlist(this.user.id)
+        .then((res) => {
+          for (let i = 0; i < res.data.length; i++) {
+            if (this.business.id === res.data[i].businessId) {
+              this.wishlistId = res.data[i].id;
+              this.inWishlist = true;
+              break;
+            }
+          }
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+        });
+    },
+
+    /**
+     * Retrieves the business information including the administrators.
+     */
     getBusiness: function () {
       api.getBusinessFromId(this.$route.params.id)
           .then((res) => {
@@ -92,10 +165,15 @@ const Business = {
           });
     },
 
+    /**
+     * Retrieves the current active user's information.
+     * @param userId the id of the currently logged in user.
+     */
     getUserInfo: function (userId) {
       api.getUserFromID(userId)
         .then((response) => {
           this.user = response.data;
+          this.getUserWishlist();
         })
         .catch((err) => {
           if (err) {
@@ -109,14 +187,24 @@ const Business = {
 
     },
 
+    /**
+     * Returns the user back to the search page.
+     */
     returnToSearch: function() {
       this.$router.push({path: '/search'})
     },
 
+    /**
+     * Returns the user back to the listing page.
+     */
     returnToListing: function() {
       this.$router.push({path: `/businesses/${this.business.id}/listings/${this.fromListing}`})
     },
 
+    /**
+     * Checks the current user's session.
+     * When successful, retrieve the user's information, and the business information.
+     */
     checkUserSession: function() {
       api.checkSession()
         .then((response) => {
@@ -128,7 +216,6 @@ const Business = {
           this.$log.error("Error checking sessions: " + error);
         });
     }
-
   },
 
   mounted() {
@@ -188,6 +275,7 @@ export default Business;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto) repeat(1, 1fr);
   grid-row-gap: 1em;
+  margin-top: 1em;
 }
 
 .sub-container {

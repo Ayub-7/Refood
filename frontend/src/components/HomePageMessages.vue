@@ -99,6 +99,7 @@
       <!-- CARD MESSAGE -->
       <div v-if="item.card" class="liked-listing-container" @mouseenter="markAsRead(item)">
       <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
+        <div v-if="!undoId.includes(item.fid)">
         <div @click="openDetailedModal(item)">
             <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
           <div style="display: flex; justify-content: space-between">
@@ -112,8 +113,23 @@
             <div v-else style="margin-right: 10px;">
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
-            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close" style="margin-top: 5px;"></vs-button>
+            <div>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true);
+              undoClick=true" icon="close"></vs-button>
+            </div>
+<!--            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close" style="margin-top: 5px;"></vs-button>-->
           </div>
+          </div>
+        </div>
+        </div>
+        <div v-else>
+          <div style="display: flex">
+            <div class="lln-description">
+              <span><strong>Notification has been deleted</strong>.</span>
+            </div>
+            <div class="lln-button-group">
+              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+            </div>
           </div>
         </div>
       </vs-card>
@@ -122,6 +138,7 @@
       <!-- USER BOUGHT LISTING NOTIFICATION -->
       <div v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId" @mouseenter="markAsRead(item)" class="bought-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'notification-card', 'bought-listing-notification']">
+          <div v-if="!undoId.includes(item.fid)">
           <div class="pln-top-row">
             <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
           </div>
@@ -143,7 +160,21 @@
             <div v-else>
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
-            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+            <div>
+              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false);
+            undoClick=true"></vs-button>
+            </div>
+          </div>
+          </div>
+          <div v-else>
+            <div style="display: flex">
+              <div class="lln-description">
+                <span><strong>Notification has been deleted</strong>.</span>
+              </div>
+              <div class="lln-button-group">
+                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+              </div>
+            </div>
           </div>
         </vs-card>
       </div>
@@ -151,6 +182,7 @@
       <!-- USER LIKED PURCHASED LISTING NOTIFICATIONS -->
       <div v-else-if="item.boughtListing && item.boughtListing.buyer !== currentUserId" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
+          <div v-if="!undoId.includes(item.fid)">
           <div class="pln-top-row">
             <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
           </div>
@@ -164,18 +196,32 @@
             <div v-else>
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
-            <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false);
+            undoClick=true"></vs-button>
+          </div>
+          </div>
+          <div v-else>
+            <div style="display: flex">
+              <div class="lln-description">
+                <span><strong>Notification has been deleted</strong>.</span>
+              </div>
+              <div class="lln-button-group">
+                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+              </div>
+            </div>
           </div>
         </vs-card>
       </div>
 
-      <!-- NEW LIKED LISTING NOTIFICATIONS -->
+      <!-- NEW LIKED & WISHLIST LISTING NOTIFICATIONS -->
       <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
+          <div v-if="!undoId.includes(item.fid)">
           <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
           <div style="display: flex">
             <div class="lln-description">
               <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
+              <span v-else-if="item.status === 'Wishlist'"><strong>{{ item.listing.inventoryItem.product.business.name }}</strong> has just listed <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
               <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
             </div>
             <div class="lln-button-group">
@@ -186,7 +232,19 @@
                 <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
               </div>
               <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
-              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click.stop.prevent="deleteNotification(item.id)"></vs-button>
+              <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false);
+            undoClick=true"></vs-button>
+            </div>
+          </div>
+          </div>
+          <div v-else>
+            <div style="display: flex">
+              <div class="lln-description">
+                <span><strong>Notification has been deleted</strong>.</span>
+              </div>
+              <div class="lln-button-group">
+                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+              </div>
             </div>
           </div>
         </vs-card>
@@ -210,6 +268,10 @@ export default {
 
   data() {
     return {
+      undoId: [],
+      undoDelete: false,
+      undoClick: false,
+      undoCount: 10,
       messaging: false,
       showing: false,
       message: '',
@@ -219,7 +281,7 @@ export default {
       currentMessage: null,
 
       currentUserId: null,
-
+      combCount: 0,
       messages: [],
       listingNotifications: [],
       notifications: [],
@@ -346,6 +408,50 @@ export default {
 
       }
     },
+    /**
+     * removes Id from undoId list
+     * @param id of notification
+     **/
+    removeId: function (id) {
+      for (let i = this.undoId.length - 1; i >= 0; i--) {
+        if (this.undoId[i] === id) {
+          this.undoId.splice(i, 1);
+        }
+      }
+    },
+
+    /**
+     * function to delete a notification and handle undo countdown
+     * @param id
+     * @param fid
+     * @param isMessage
+     **/
+    undo: function (id, fid, isMessage) {
+      this.undoId.push(fid)
+      let timer = setInterval(() => {
+        if(this.undoCount <= 0 || this.$route.path !== "/home") {
+          clearInterval(timer)
+          if(isMessage===true) {
+            this.deleteMessage(id, fid)
+            this.undoCount = 10
+            this.undoClick = false
+            this.undoDelete = false
+          } else {
+            this.deleteNotification(id, fid)
+            this.undoCount = 10
+            this.undoClick = false
+            this.undoDelete = false
+          }
+        } else if(this.undoDelete===true) {
+          this.undoClick = false
+          this.undoDelete = false
+          this.undoCount = 10
+          clearInterval(timer)
+        }
+
+        this.undoCount -= 1;
+      }, 1000);
+    },
 
     /**
      * Combines the different news feed item types into a single list.
@@ -364,16 +470,17 @@ export default {
     this.feedItems.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
     },
 
+
     /**
      * Calls the backend to retrieve all of the messages for the current user.
      */
     getMessages: function() {
       api.getMessages(this.currentUserId)
-        .then((response) => {
-          this.messages = response.data;
-          for (let message of this.messages) {
-            this.users[message.sender.id] = message.sender;
-          }
+          .then((response) => {
+            this.messages = response.data;
+            for (let message of this.messages) {
+              this.users[message.sender.id] = message.sender;
+            }
 
           this.messages = this.messages.map(message => {
             // Map the sent date to a new created attribute - to be used for sorting.
@@ -386,19 +493,40 @@ export default {
           this.$log.error("Error getting messages: " + error);
           this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
         });
+      this.polling = setInterval(() => {
+        api.getMessages(this.currentUserId)
+            .then((response) => {
+              this.messages = response.data;
+              for (let message of this.messages) {
+                this.users[message.sender.id] = message.sender;
+              }
+
+              this.messages = this.messages.map(message => {
+                // Map the sent date to a new created attribute - to be used for sorting.
+                message.created = message.sent;
+                return message;
+              });
+            })
+            .catch((error) => {
+              this.$log.error("Error getting messages: " + error);
+              this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
+            });
+      }, 3000)
     },
 
     /**
      * Calls the delete endpoint in the backend, removing the relevant listing notification
      * @param notificationId the unique id of the listingNotification to be deleted
+     * @param fid
      */
-    deleteNotification: function(notificationId) {
+    deleteNotification: function(notificationId, fid) {
       api.deleteListingNotification(notificationId)
         .then(() => {
           this.$vs.notify({
             title: `Listing Notification Deleted`,
             color: 'success'
           });
+          this.spliceMessage(fid)
           this.getListingNotifications();
         })
         .catch((error) => {
@@ -408,13 +536,46 @@ export default {
           });
           this.$log.debug("Error Status:", error);
         });
+      this.polling = setInterval(() => {
+        api.getMessages(this.currentUserId)
+            .then((response) => {
+              this.messages = response.data;
+              for (let message of this.messages) {
+                this.users[message.sender.id] = message.sender;
+              }
+
+              this.messages = this.messages.map(message => {
+                // Map the sent date to a new created attribute - to be used for sorting.
+                message.created = message.sent;
+                return message;
+              });
+            })
+            .catch((error) => {
+              this.$log.error("Error getting messages: " + error);
+              this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
+            });
+      }, 3000)
+    },
+
+    /**
+     * removes notification from feedItems
+     * @param fid
+     */
+    spliceMessage(fid) {
+      for (let i = this.feedItems.length - 1; i >= 0; i--) {
+        if (this.feedItems[i].fid === fid) {
+          this.feedItems.splice(i, 1);
+
+        }
+      }
     },
 
     /**
      * Calls the backend to delete a given message's id.
      * @param messageId the unique id of the message to be deleted.
+     * @param fid
      */
-    deleteMessage: function(messageId) {
+    deleteMessage: function(messageId, fid) {
       api.deleteMessage(messageId)
         .then((response) => {
           this.$vs.notify({
@@ -422,6 +583,7 @@ export default {
             text: response.data.sender.firstName +" "+response.data.sender.lastName+ ": "+ response.data.description,
             color: 'success'
           });
+          this.spliceMessage(fid)
           this.getMessages();
         })
         .catch((error) => {
@@ -438,18 +600,37 @@ export default {
      */
     getListingNotifications: function() {
       api.getListingNotifications(store.loggedInUserId)
-        .then((res) => {
-          this.listingNotifications = res.data;
-          this.combineFeedMessages();
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          if (error && error.response) {
-            this.$vs.notify({title: `Error ${error.response}`,
-                              text: "There was a problem getting your newsfeed.",
-                              color: "danger"});
-          }
-        });
+          .then((res) => {
+            this.listingNotifications = res.data;
+            if (this.combCount === 0) {
+              this.combCount += 1
+              this.combineFeedMessages();
+            } else {
+              this.combCount += 1
+            }
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            if (error && error.response) {
+              this.$vs.notify({title: `Error ${error.response}`,
+                text: "There was a problem getting your newsfeed.",
+                color: "danger"});
+            }
+          });
+      this.polling = setInterval(() => {
+        api.getListingNotifications(store.loggedInUserId)
+            .then((res) => {
+              this.listingNotifications = res.data;
+            })
+            .catch((error) => {
+              this.$log.debug(error);
+              if (error && error.response) {
+                this.$vs.notify({title: `Error ${error.response}`,
+                  text: "There was a problem getting your newsfeed.",
+                  color: "danger"});
+              }
+            });
+      }, 3000)
     },
 
     /**

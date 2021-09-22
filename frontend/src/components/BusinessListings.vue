@@ -17,10 +17,10 @@
       <!-- ====== LISTINGS OPTIONS MENU ===== -->
       <div id="view-switch">
         <vs-tooltip text="Grid View">
-          <vs-button icon="grid_view" type="border" @click="displaytype = true" style="border: none; padding: 12px;"></vs-button>
+          <vs-button icon="grid_view" type="border" @click="tableView = false" style="border: none; padding: 12px;"></vs-button>
         </vs-tooltip>
         <vs-tooltip text="List View">
-          <vs-button icon="view_list" type="border" @click="displaytype = false" style="border: none;"></vs-button>
+          <vs-button icon="view_list" type="border" @click="tableView = true" style="border: none;"></vs-button>
         </vs-tooltip>
       </div>
     </div>
@@ -28,10 +28,15 @@
 
     <!-- ===== GRID VIEW ===== -->
     <div v-if="!tableView" id="grid-view">
-      <vs-card class="listing-card" v-for="listing in listings" :key="listing.id" :fixed-height="true">
+      <vs-card class="listing-card"
+               v-for="listing in listings"
+               :key="listing.id"
+               :fixed-height="true">
 
-        <div slot="media">
-          <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath"></ReImage>
+        <div slot="media"
+             style="cursor: pointer;"
+             @click="goToListingPage(listing.id)">
+          <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath" style="border-radius: 4px;"></ReImage>
         </div>
         <div style="margin: 2px 4px; font-size: 14px; font-weight: bold">{{ listing.productName }}</div>
         <div style="font-size: 14px; padding-left: 4px; margin: auto 0;">
@@ -63,19 +68,21 @@
           <vs-th sort-key="quantity"> Qty </vs-th>
           <vs-th sort-key="closes"> Closes </vs-th>
           <vs-th sort-key="created"> Listed </vs-th>
-          <vs-th style="border-radius: 0 8px 0 0"> Additional Info </vs-th>
+          <vs-th> Additional Info </vs-th>
+          <vs-th style="border-radius: 0 8px 0 0"></vs-th>
         </template>
         <template slot-scope="{data}">
           <vs-tr v-for="listing in data" :key="listing.id">
             <vs-td>
               <ReImage :imagePath="listing.inventoryItem.product.primaryImagePath" class="table-image"/>
             </vs-td>
-            <vs-td>{{ listing.productName }}</vs-td>
+            <vs-td >{{ listing.productName }}</vs-td>
             <vs-td>{{ currencySymbol }}{{ listing.price }}</vs-td>
             <vs-td>{{ listing.quantity }}x</vs-td>
             <vs-td>{{ listing.closes }}</vs-td>
             <vs-td>{{ listing.created }}</vs-td>
             <vs-td>{{ listing.moreInfo }}</vs-td>
+            <vs-td><vs-button @click="goToListingPage(listing.id)">View</vs-button></vs-td>
           </vs-tr>
         </template>
       </vs-table>
@@ -113,6 +120,13 @@ export default {
   },
 
   methods: {
+    /**
+     * Redirects browser to full detail listing page.
+     */
+    goToListingPage: function(listingId) {
+      this.$router.push(`/businesses/${this.businessId}/listings/${listingId}`);
+    },
+
     /**
      * Retrieves the sale listings of this business.
      */
@@ -205,7 +219,7 @@ export default {
     margin: auto auto 0 auto;
   }
 
-  .table-image {
+  .table-image >>> img {
     min-width: 75px;
     max-width: 75px;
     height: 75px;
@@ -234,7 +248,7 @@ export default {
     margin: 0.5em 1em;
   }
 
-  .image {
+  .image >>> img {
     height: 150px;
     object-fit: cover;
 
