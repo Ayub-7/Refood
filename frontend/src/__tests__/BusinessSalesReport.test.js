@@ -128,6 +128,7 @@ describe('Sales report tests', () => {
             push: jest.fn()
         }
 
+
     });
 
     afterEach(() => {
@@ -225,9 +226,15 @@ describe('Sales report tests', () => {
     })
 
     test('onPeriodChange by custom correctly alters start date and end date', () => {
-        wrapper.vm.pickedStart = new Date('11/03/2021');
-        wrapper.vm.pickedEnd = new Date('11/09/2021')
+        wrapper.vm.pickedStart = '2020-01-11 07:54:46';
+        wrapper.vm.pickedEnd = '2021-11-11 07:54:46';
+        
+        //Have to mock
+        wrapper.vm.validateDates = jest.fn().mockReturnValueOnce(true);
+
         wrapper.vm.onPeriodChange('custom');
+
+        wrapper.vm.errors = [];
         expect(wrapper.vm.dateStart).toEqual(wrapper.vm.pickedStart);
         expect(wrapper.vm.dateEnd).toEqual(wrapper.vm.pickedEnd);
     })
