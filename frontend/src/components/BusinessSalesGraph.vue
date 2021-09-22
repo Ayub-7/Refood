@@ -200,7 +200,6 @@ export default {
       } else if (type.toLowerCase() === "week") {
         this.activeGranularityButton = "w";
         barFormat = "datetime";
-        labelFormat = "dd-MMM";
         processedData = this.totalWeeklyRevenue(data);
         // Flatten object into array.
         for (let year of Object.entries(processedData)) {
@@ -213,7 +212,6 @@ export default {
       else if (type.toLowerCase() === "day") {
         this.activeGranularityButton = "d";
         barFormat = "datetime";
-        labelFormat = "dd-MMM";
         processedData = this.totalDailyRevenue(data);
         categories = this.generateDayLabels(processedData);
 

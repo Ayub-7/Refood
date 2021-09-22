@@ -96,9 +96,6 @@
             <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Data</vs-button>
           </div>
           <vs-divider/>
-          <!--
-          <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
-          -->
           <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
         </vs-card>
       </div>
