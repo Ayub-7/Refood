@@ -23,14 +23,14 @@
       <!-- Listing details (closing date, business, etc) -->
       <vs-col vs-w="6" vs-sm="12" vs-xs="12" id="listing-info-area">
         <div id="listing-info-container">
-          <div id="business-name"><b>Business:</b> {{listing.inventoryItem.product.business.name}}</div>
+          <div id="business-name"><strong>Business:</b> {{listing.inventoryItem.product.business.name}}</div>
           <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
-          <p vs-justify="left"><b>Price:</b> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
-          <p><b>Quantity:</b> {{listing.quantity}}</p>
-          <p><b>Closes:</b> {{listing.created}}</p>
-          <p><b>Created:</b> {{listing.closes}}</p>
+          <p vs-justify="left"><strong>Price:</b> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
+          <p><strong>Quantity:</b> {{listing.quantity}}</p>
+          <p><strong>Closes:</b> {{listing.created}}</p>
+          <p><strong>Created:</b> {{listing.closes}}</p>
           <p id="listing-moreInfo">{{listing.moreInfo}}</p>
-          <p><b>Likes:</b> {{listing.likes}}</p>
+          <p><strong>Likes:</b> {{listing.likes}}</p>
           <div class="">
             <vs-button v-if="!likedListingsIds.includes(listing.id)" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">Like listing</vs-button>
             <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">Unlike listing</vs-button>
@@ -47,11 +47,11 @@
       <vs-col vs-w="12">
         <div id="product-info-area">
           <p id="listing-name">{{listing.inventoryItem.product.name}}</p>
-          <p><b>Manufacturer:</b> {{listing.inventoryItem.product.manufacturer}} </p>
-          <p v-if="listing.inventoryItem.manufactured"><b>Manufactured:</b> {{listing.inventoryItem.manufactured}}</p>
-          <p v-if="listing.inventoryItem.sellBy"><b>Sell By:</b> {{listing.inventoryItem.sellBy}}</p>
-          <p v-if="listing.inventoryItem.bestBefore"><b>Best Before:</b> {{listing.inventoryItem.bestBefore}}</p>
-          <p v-if="listing.inventoryItem.expires"><b>Expires:</b> {{listing.inventoryItem.expires}}</p>
+          <p><strong>Manufacturer:</b> {{listing.inventoryItem.product.manufacturer}} </p>
+          <p v-if="listing.inventoryItem.manufactured"><strong>Manufactured:</b> {{listing.inventoryItem.manufactured}}</p>
+          <p v-if="listing.inventoryItem.sellBy"><strong>Sell By:</b> {{listing.inventoryItem.sellBy}}</p>
+          <p v-if="listing.inventoryItem.bestBefore"><strong>Best Before:</b> {{listing.inventoryItem.bestBefore}}</p>
+          <p v-if="listing.inventoryItem.expires"><strong>Expires:</b> {{listing.inventoryItem.expires}}</p>
           <p>{{listing.inventoryItem.product.description}}</p>
         </div>
       </vs-col>

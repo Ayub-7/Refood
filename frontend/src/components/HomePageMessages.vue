@@ -255,7 +255,7 @@ export default {
               })
               .catch((error) => {
                 this.$log.debug(error);
-              }); notification.displayPeriodEnd
+              });
         } else if (notification.displayPeriodEnd) {
           api.updateNotificationViewStatus(notification.id, "Read")
               .then((res) => {
