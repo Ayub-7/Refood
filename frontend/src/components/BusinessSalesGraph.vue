@@ -282,9 +282,10 @@ export default {
     },
 
     /**
-     * NOT WORKING YET, TODO: FIX THIS!
-     * @param data
-     * @returns {{}}
+     * Categorises and sums up data, splitting each bought listing into it's respective year and week.
+     * @param data the bought listing data (i.e. the sold listings).
+     * @return object where each key is a year, and the value is an array of size 52, each index representing a week,
+     * and the value at each index representing the total revenue/value of listings sold.
      */
     totalWeeklyRevenue: function(data) {
       let weeklyData = {};
@@ -309,7 +310,12 @@ export default {
       return weeklyData;
 
     },
-
+    /**
+     * Categorises and sums up data, splitting each bought listing into it's respective year.
+     * @param data the bought listing data (i.e. the sold listings).
+     * @return object where each key is a year, and the value is an array of size 1,
+     * which contains the sales of that year.
+     */
     totalYearlyRevenue: function(data) {
       let processedData = {};
       for (let listing of data) {
@@ -321,7 +327,12 @@ export default {
       }
       return processedData;
     },
-
+    /**
+     * Categorises and sums up data, splitting each bought listing into it's respective year and day.
+     * @param data the bought listing data (i.e. the sold listings).
+     * @return object where each key is a year, and the value is an array of size 365, each index representing a day,
+     * and the value at each index representing the total revenue/value of listings sold.
+     */
     totalDailyRevenue: function(data) {
       let processedData = {};
       for (let listing of data) {
@@ -356,6 +367,11 @@ export default {
       return yearlyMonthCategories;
     },
 
+    /**
+     * Helper function that generates x-axis labels to represent weeks
+     * @param data series used to populate the graph
+     * @returns {[]} an array of x-axis labels
+     */
     generateWeekLabels: function(data) {
         let labels = [];
 
@@ -364,7 +380,11 @@ export default {
         }
         return labels;
     },
-
+    /**
+     * Helper function that generates x-axis labels to represent days
+     * @param data series used to populate the graph
+     * @returns {[]} an array of x-axis labels
+     */
     generateDayLabels: function(processedData) {
       return Object.entries(processedData).map(day => day[0]);
     }
