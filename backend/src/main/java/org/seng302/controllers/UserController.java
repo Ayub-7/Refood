@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Image;
-import org.seng302.models.Product;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -363,7 +362,7 @@ public class UserController {
         productRepository.save(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    },
+    }
 
     // -- ADMIN REQUESTS
 
