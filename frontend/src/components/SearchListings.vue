@@ -265,6 +265,27 @@ const SearchListings = {
     },
 
     /**
+     * Helper function to reduce duplication
+     **/
+    filterListingsHelper: function(biz) {
+      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, biz, this.minPrice, this.maxPrice,
+          this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
+          .then((response) => {
+            this.listings = response.data.content
+            this.totalPages = response.data.totalPages;
+          })
+          .catch(err => {
+            if(err.response.status === 400) { // Catch 400 Bad Request
+              this.$vs.notify({title:'Error', text:'Some filters are invalid', color:'danger'});
+
+            }
+            else { // Catch anything else.
+              this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+            }
+          });
+    },
+
+    /**
      * Searches all listings in the ReFood database, applies the filters
      * that the user has filled in, along with the chosen sort
      * */
@@ -274,37 +295,9 @@ const SearchListings = {
       }
       if(this.checkForm()){
         if (this.selectedTypes.length === 0) {
-          api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
-              this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
-              .then((response) => {
-                this.listings = response.data.content
-                this.totalPages = response.data.totalPages;
-              })
-              .catch(err => {
-                if(err.response.status === 400) { // Catch 400 Bad Request
-                  this.$vs.notify({title:'Error', text:'Some filters are invalid', color:'danger'});
-
-                }
-                else { // Catch anything else.
-                  this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
-                }
-              });
+          this.filterListingsHelper(this.businessTypes);
         } else {
-          api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
-              this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
-              .then((response) => {
-                this.listings = response.data.content
-                this.totalPages = response.data.totalPages;
-              })
-              .catch(err => {
-                if(err.response.status === 400) { // Catch 400 Bad Request
-                  this.$vs.notify({title:'Error', text:'Some filters are invalid', color:'danger'});
-
-                }
-                else { // Catch anything else.
-                  this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
-                }
-              });
+          this.filterListingsHelper(this.selectedTypes);
         }
 
       }
