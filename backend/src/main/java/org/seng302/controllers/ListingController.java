@@ -238,9 +238,11 @@ public class ListingController {
      */
     public void sendWishlistNotifications(List<WishlistItem> wishlists, Listing listing) {
         wishlists.forEach(wishlistItem -> {
-            User user = userRepository.findUserById(wishlistItem.getUserId());
-            ListingNotification listingNotification = new ListingNotification(user, listing, NotificationStatus.WISHLIST);
-            listingNotificationRepository.save(listingNotification);
+            if (wishlistItem.getMutedStatus() == MutedStatus.UNMUTED) {
+                User user = userRepository.findUserById(wishlistItem.getUserId());
+                ListingNotification listingNotification = new ListingNotification(user, listing, NotificationStatus.WISHLIST);
+                listingNotificationRepository.save(listingNotification);
+            }
         });
     }
 

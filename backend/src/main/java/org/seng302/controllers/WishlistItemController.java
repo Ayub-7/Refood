@@ -1,6 +1,5 @@
 package org.seng302.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.seng302.models.*;
 import org.seng302.models.requests.MutedStatusRequest;
 import org.seng302.repositories.*;
@@ -97,9 +96,9 @@ public class WishlistItemController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (mutedStatus == MutedStatus.MUTED) {
-            wishlist.muteBusiness();
-        } else {
             wishlist.unmuteBusiness();
+        } else {
+            wishlist.muteBusiness();
         }
         wishlistItemRepository.save(wishlist);
         return ResponseEntity.status(HttpStatus.OK).body("Wishlist muted status changed to " + mutedStatus.toString());
