@@ -41,7 +41,7 @@
         </vs-button>
       </div>
       <div id="custom-period-container">
-        <div class="options-header" style="font-size: 14px">Custom</div>
+        <div class="options-header">Custom</div>
         <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start"
                   danger-text="Date can not be in the future or after the end date"/>
         <p style="margin: auto auto 0">-</p>
@@ -54,7 +54,8 @@
         <div class="options-header">Summary Interval</div>
         <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'd'}, 'options-button']"
                    type="border"
-                   style="grid-column: 1;">
+                   style="grid-column: 1;"
+                   @click="getSalesData('day')">
           Day
         </vs-button>
         <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
@@ -130,14 +131,31 @@ export default {
     /**
      * Retrieve's the business' bought listing data.
      */
-    getSalesData: function(type) {
+    getSalesData: function() {
       api.getBusinessSales(this.businessId)
         .then((res) => {
+          let type = this.getNextFinestGranularity(res.data);
           this.displaySalesData(res.data, type);
         })
         .catch((error) => {
           this.$log.error(error);
         });
+    },
+
+    getNextFinestGranularity: function(data) {
+      if (data.length > 0) {
+        let sorted = data.sort((a,b) => new Date(b.sold) - new Date(a.sold));
+        let min = sorted[0];
+        let max = sorted[sorted.length-1];
+        let diff = (new Date(min.sold) - new Date(max.sold)) / (1000*60*60*24);
+
+        if (diff < 7) return "day";
+        if (diff < 30) return "week";
+        if (diff < 365) return "month";
+        else return "year";
+      }
+
+      return "month";
     },
 
     /**
@@ -152,6 +170,7 @@ export default {
       let categories = [];
       let barFormat = "category";
       let labelFormat = "dd-MMM";
+
       if (type.toLowerCase() === "year") {
         this.activeGranularityButton = "y";
         processedData = this.totalYearlyRevenue(data);
@@ -178,7 +197,7 @@ export default {
           }
           i++;
         }
-      } else {
+      } else if (type.toLowerCase() === "week") {
         this.activeGranularityButton = "w";
         barFormat = "datetime";
         labelFormat = "dd-MMM";
@@ -190,6 +209,18 @@ export default {
         }
         // Generates the x-axis labels of each month, for each year.
         categories = this.generateWeekLabels(processedData);
+      }
+      else if (type.toLowerCase() === "day") {
+        this.activeGranularityButton = "d";
+        barFormat = "datetime";
+        labelFormat = "dd-MMM";
+        processedData = this.totalDailyRevenue(data);
+        categories = this.generateDayLabels(processedData);
+
+        for (let day of Object.entries(processedData)) {
+          allData.push(day[1]);
+        }
+
       }
       // Updates the plot options and inputs.
       // Reassigning entire variable allows chart to properly update and play animations.
@@ -259,14 +290,16 @@ export default {
       let weeklyData = {};
       for (let listing of data) {
         let soldDate = new Date(listing.sold);
-        if (weeklyData[soldDate.getFullYear()] == null) {
-          weeklyData[soldDate.getFullYear()] = {};
-        }
 
         let dayNum = soldDate.getDay();
         let dateCopy = soldDate;
         dateCopy.setDate(soldDate.getDate() - dayNum + 1);
         let mondayString = dateCopy.getFullYear() + "-" + (dateCopy.getMonth() + 1) + "-" + dateCopy.getDate();
+
+        if (weeklyData[dateCopy.getFullYear()] == null) {
+          weeklyData[dateCopy.getFullYear()] = {};
+        }
+
         if (weeklyData[soldDate.getFullYear()][mondayString] == null) {
           weeklyData[soldDate.getFullYear()][mondayString] = 0;
         }
@@ -274,6 +307,7 @@ export default {
       }
 
       return weeklyData;
+
     },
 
     totalYearlyRevenue: function(data) {
@@ -285,6 +319,21 @@ export default {
         }
         processedData[soldDate.getFullYear()] += +listing.price.toFixed(2);
       }
+      return processedData;
+    },
+
+    totalDailyRevenue: function(data) {
+      let processedData = {};
+      for (let listing of data) {
+        let soldDate = new Date(listing.sold);
+        let soldString = soldDate.getFullYear() + "-" + (soldDate.getMonth() + 1) + "-" + soldDate.getDate();
+
+        if (processedData[soldString] == null) {
+          processedData[soldString] = 0;
+        }
+        processedData[soldString] += +listing.price.toFixed(2);
+      }
+
       return processedData;
     },
 
@@ -316,12 +365,13 @@ export default {
         return labels;
     },
 
-
-
+    generateDayLabels: function(processedData) {
+      return Object.entries(processedData).map(day => day[0]);
+    }
   },
 
   mounted: function() {
-    this.getSalesData("month");
+    this.getSalesData();
   },
 
 }
