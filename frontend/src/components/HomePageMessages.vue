@@ -53,6 +53,7 @@
 <!--      Marketplace card notifications-->
       <div v-if="item.displayPeriodEnd" class="liked-listing-container" @mouseenter="markAsRead(item)">
         <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
+          <div v-if="!undoId.includes(item.fid)">
           <div class="card-container" v-if="item.status === 'Expired'">
             <p class="sub-header">MARKETPLACE - {{item.created}}</p>
             <div style="display: flex; justify-content: space-between">
@@ -88,7 +89,21 @@
                 <div v-else style="margin-right: 10px;">
                   <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
                 </div>
-                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteCard(item.cardId, item.title)" icon="close" style="margin-top: 5px;"></vs-button>
+                <div>
+                  <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true);
+              undoClick=true" icon="close"></vs-button>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div v-else>
+            <div style="display: flex">
+              <div class="lln-description">
+                <span><strong>Notification has been deleted</strong>.</span>
+              </div>
+              <div class="lln-button-group">
+                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
               </div>
             </div>
           </div>
