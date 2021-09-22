@@ -9,6 +9,7 @@ import org.seng302.utilities.Encrypter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +51,11 @@ public class User implements Serializable {
     @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
     private List<Business> businessesAdministered;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Image> images;
+
+    private String primaryImagePath;
+
 
     protected User() {}
 
@@ -79,6 +85,8 @@ public class User implements Serializable {
         this.password = Encrypter.hashString(password);
         this.created = new Date();
         this.role = Role.USER;
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
     }
 
     /**
@@ -97,6 +105,8 @@ public class User implements Serializable {
         this.phoneNumber = req.getPhoneNumber();
         this.homeAddress = req.getHomeAddress();
         this.password = req.getPassword();
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
         newRegistration();
     }
 
@@ -117,6 +127,8 @@ public class User implements Serializable {
         this.role = role;
         this.created = new Date();
         this.password = Encrypter.hashString(password);
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
     }
 
     /**
