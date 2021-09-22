@@ -107,14 +107,14 @@ class WishlistItemControllerTests {
     @Test
     @WithMockUser
     void testSuccessfulWishlistMute() throws Exception {
-        MutedStatusRequest mutedStatusRequest = new MutedStatusRequest(MutedStatus.MUTED);
+        MutedStatusRequest mutedStatusRequest = new MutedStatusRequest(MutedStatus.UNMUTED);
         Mockito.when(wishlistItemRepository.findWishlistItemById(wishlistItem.getId())).thenReturn(wishlistItem);
         mockMvc.perform(put("/wishlist/{id}", wishlistItem.getId())
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(mutedStatusRequest))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
-        Assertions.assertEquals(wishlistItem.getMutedStatus(), mutedStatusRequest.getMutedStatus());
+        Assertions.assertEquals(wishlistItem.getMutedStatus(), MutedStatus.MUTED);
     }
 
     @Test
@@ -127,33 +127,33 @@ class WishlistItemControllerTests {
                 .content(mapper.writeValueAsString(mutedStatusRequest))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
-        Assertions.assertEquals(wishlistItem.getMutedStatus(), mutedStatusRequest.getMutedStatus());
+        Assertions.assertEquals(wishlistItem.getMutedStatus(), MutedStatus.UNMUTED);
     }
 
     @Test
     @WithMockUser
     void testSuccessfulDGAAWishlistMute() throws Exception {
-        MutedStatusRequest mutedStatusRequest = new MutedStatusRequest(MutedStatus.MUTED);
+        MutedStatusRequest mutedStatusRequest = new MutedStatusRequest(MutedStatus.UNMUTED);
         Mockito.when(wishlistItemRepository.findWishlistItemById(wishlistItem.getId())).thenReturn(wishlistItem);
         mockMvc.perform(put("/wishlist/{id}", wishlistItem.getId())
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(mutedStatusRequest))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, dgaa))
                 .andExpect(status().isOk());
-        Assertions.assertEquals(wishlistItem.getMutedStatus(), mutedStatusRequest.getMutedStatus());
+        Assertions.assertEquals(wishlistItem.getMutedStatus(), MutedStatus.MUTED);
     }
 
     @Test
     @WithMockUser
     void testSuccessfulGAAWishlistMute() throws Exception {
-        MutedStatusRequest mutedStatusRequest = new MutedStatusRequest(MutedStatus.MUTED);
+        MutedStatusRequest mutedStatusRequest = new MutedStatusRequest(MutedStatus.UNMUTED);
         Mockito.when(wishlistItemRepository.findWishlistItemById(wishlistItem.getId())).thenReturn(wishlistItem);
         mockMvc.perform(put("/wishlist/{id}", wishlistItem.getId())
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(mutedStatusRequest))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
                 .andExpect(status().isOk());
-        Assertions.assertEquals(wishlistItem.getMutedStatus(), mutedStatusRequest.getMutedStatus());
+        Assertions.assertEquals(wishlistItem.getMutedStatus(), MutedStatus.MUTED);
     }
 
     @Test
