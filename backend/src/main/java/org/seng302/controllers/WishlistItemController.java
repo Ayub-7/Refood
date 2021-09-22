@@ -6,6 +6,7 @@ import org.seng302.repositories.*;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,8 @@ public class WishlistItemController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        List<WishlistItem> wishlistItems = wishlistItemRepository.findWishlistItemsByUserId(id);
+        Sort sort = Sort.by(Sort.Order.asc("business.name").ignoreCase());
+        List<WishlistItem> wishlistItems = wishlistItemRepository.findWishlistItemsByUserId(id, sort);
         for (WishlistItem wish:wishlistItems) {
             wish.getBusiness().setAdministrators(null);
         }
@@ -68,7 +70,6 @@ public class WishlistItemController {
         if (business == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        System.out.println(business);
         WishlistItem wishlistItem = new WishlistItem(userId, business);
         wishlistItemRepository.save(wishlistItem);
         return ResponseEntity.status(HttpStatus.CREATED).body("Business added to wishlist");
