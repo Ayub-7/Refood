@@ -247,11 +247,6 @@ const Homepage = {
               this.likedItem = temp;
               this.likes = temp.length;
             })
-            .catch((error) => {
-              if (error.response) {
-                this.$vs.notify({title: "Error retrieving likes", color: "danger"});
-              }
-            })
       }, 100);
 
     },
