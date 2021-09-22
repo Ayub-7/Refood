@@ -140,4 +140,16 @@ public class User implements Serializable {
         this.role = Role.USER;
     }
 
+    /**
+     * Adds a new image to the product entity.
+     * @param image the image object to add.
+     */
+    public void addProductImage(Image image) {
+        this.images.add(image);
+    }
+
+    public void setPrimaryImage(String path) {
+        this.primaryImagePath = path;
+    }
+
 }
