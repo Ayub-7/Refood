@@ -349,4 +349,71 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(sales));
     }
 
+
+    /**
+     * Updates business
+     * @param id id of the business
+     * @param session Http session to get user session
+     * @return Response entity,
+     *         200 if successfully update
+     *         400 Error with given data
+     *         401 Missing auth token
+     *         403 if trying to modify business that isn't yours
+     *         406 if trying to access business that doesn't exist
+     */
+    @PutMapping("/businesses/{id}/modify")
+    public ResponseEntity<String> modifyBusiness(@RequestBody NewBusinessRequest request, @PathVariable long id, HttpSession session) {
+        Business business = businessRepository.findBusinessById(id);
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if(checkBusinessRequest(request)) { // If valid -> description < 140 & name < 30
+            if (business == null) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            }
+            if(business.getPrimaryAdministrator().getId() != currentUser.getId()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            business = updateBusiness(request, business);
+
+            businessRepository.save(business);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+
+    }
+
+
+    /**
+     * Updates business object to contain new data from request, used in modify business.
+     * @param businessRequest request containing new business information
+     * @param business the business that is going to be updated
+     * @return updated business object
+     */
+    private Business updateBusiness(NewBusinessRequest businessRequest, Business business) {
+        business.setBusinessType(businessRequest.getBusinessType());
+        business.setAddress(businessRequest.getAddress());
+        business.setName(businessRequest.getName());
+        business.setDescription(businessRequest.getDescription());
+
+        return business;
+    }
+
+
+    /**
+     * Checks request and ensures name and description is valid
+     * @param businessRequest request containing new business infomation
+     * @return True if valid, false otherwise
+     */
+    private boolean checkBusinessRequest(NewBusinessRequest businessRequest) {
+        return businessRequest.getName().length() <= 30 && businessRequest.getDescription().length() <= 140;
+    }
+
+
+
+
 }
