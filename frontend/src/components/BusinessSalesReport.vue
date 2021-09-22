@@ -428,7 +428,7 @@ export default {
         while(currYear <= latestYear) {
           // Grab sales from current year and calculate summary from sales from the actual year
           summary = this.currentYearSalesHistory.filter(sale => moment(sale.sold).year() == currYear)
-          finalSummary.push(this.calculateSummary(summary, startDate.format('YYYY')))
+          finalSummary.push(this.calculateSummary(summary, String(currYear)))
 
           currYear += 1;
         }
