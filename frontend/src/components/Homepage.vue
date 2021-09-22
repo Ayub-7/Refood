@@ -78,14 +78,16 @@
           </div>
           <div v-if="!watchlist">
             <vs-row style="margin-top: -40px; margin-bottom: 20px;" vs-type="flex" vs-justify="right">
-              <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'" style="margin-right: 30px">
-                <vs-button @click="toggleMuteAll" v-if="allMuted == true" color="purple">
-                  <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
-                </vs-button>
-                <vs-button v-else @click="toggleMuteAll" color="purple">
-                  <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
-                </vs-button>
-              </vs-tooltip>
+              <div v-if="wishlist.length > 0">
+                <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'" style="margin-right: 30px">
+                  <vs-button @click="toggleMuteAll" v-if="allMuted == true" color="purple">
+                    <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
+                  </vs-button>
+                  <vs-button v-else @click="toggleMuteAll" color="purple">
+                    <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
+                  </vs-button>
+                </vs-tooltip>
+              </div>
             </vs-row>
             <div v-if="wishlist.length > 0">
               <div v-for="wish in wishlist" :key="wish.id" >
@@ -232,6 +234,7 @@ const Homepage = {
     this.checkUserSession();
     this.getLikes(this.userId);
     this.getWishlist(this.userId);
+    this.calculateAllMuted();
   },
 
   methods: {
@@ -247,6 +250,22 @@ const Homepage = {
         .catch(err => {
           this.$log.debug(err);
       });
+    },
+
+    /**
+     * Calculate whether allMuted is true or not
+     */
+    calculateAllMuted: function () {
+       this.allMuted = true;
+       if (this.wishlist.isEmpty()) {
+         this.allMuted = false;
+       } else {
+         for (let wish of this.wishlist) {
+           if (wish === "Unmuted") {
+             this.allMuted = false;
+           }
+         }
+       }
     },
 
     /**
@@ -296,6 +315,7 @@ const Homepage = {
       api.removeBusinessFromWishlist(wishlistItemId)
               .then(() => {
                 this.getWishlist(this.userId);
+                this.calculateAllMuted();
                 this.$vs.notify({title: "Successfully  removed business from wishlist", color: "success"});
               })
               .catch((error) => {
