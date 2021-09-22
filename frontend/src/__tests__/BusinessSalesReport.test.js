@@ -104,7 +104,7 @@ let salesHistory = [
     }
 ];
 
-describe('User acting as tests', () => {
+describe('Sales report tests', () => {
     beforeEach(() => {
         wrapper = shallowMount(BusinessSalesReport, {
             propsData: {},
@@ -127,6 +127,7 @@ describe('User acting as tests', () => {
         $router = {
             push: jest.fn()
         }
+
 
     });
 
@@ -161,7 +162,7 @@ describe('User acting as tests', () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 7, 'days')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
-            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep 17`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep 16 21`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 
@@ -172,7 +173,7 @@ describe('User acting as tests', () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 1, 'months')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
-            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "September", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "September 21", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 
@@ -184,5 +185,98 @@ describe('User acting as tests', () => {
         wrapper.vm.granularity(intervalDate, 1, 'years')
         expect(wrapper.vm.reportGranularity).toStrictEqual([{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "2021", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
+    });
+
+
+    test('Get earliest date returns earliest', () => {
+        let date = wrapper.vm.getEarliestDate();
+        expect(date).toEqual(wrapper.vm.currentYearSalesHistory[0].sold)
+    })
+
+    
+    test('Get latest date returns latest', () => {
+        let date = wrapper.vm.getLatestDate();
+        expect(date).toEqual(wrapper.vm.currentYearSalesHistory[1].sold)
+    })
+
+    test('onPeriodChange by day correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('1-d');
+        let dayBefore = new Date();
+        dayBefore.setDate(dayBefore.getDate() - 1); 
+        expect(wrapper.vm.dateStart.date()).toEqual(dayBefore.getDate());
+    })
+
+    test('onPeriodChange by month correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('1-m');
+        let monthBefore = new Date();
+        monthBefore.setMonth(monthBefore.getMonth() - 1);
+        expect(wrapper.vm.dateStart.month()).toEqual(monthBefore.getMonth());
+    })
+
+    test('onPeriodChange by year correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('1-y');
+        let yearBefore = new Date();
+        yearBefore.setYear(yearBefore.getFullYear() - 1);
+        expect(wrapper.vm.dateStart.year()).toEqual(yearBefore.getFullYear());
+    })
+
+    test('onPeriodChange by all correctly alters start date', () => {
+        wrapper.vm.onPeriodChange('all');
+        expect(wrapper.vm.dateStart).toEqual(wrapper.vm.currentYearSalesHistory[0].sold);
+    })
+
+    test('onPeriodChange by custom correctly alters start date and end date', () => {
+        wrapper.vm.pickedStart = '2020-01-11 07:54:46';
+        wrapper.vm.pickedEnd = '2021-11-11 07:54:46';
+        
+        //Have to mock
+        wrapper.vm.validateDates = jest.fn().mockReturnValueOnce(true);
+
+        wrapper.vm.onPeriodChange('custom');
+
+        wrapper.vm.errors = [];
+        expect(wrapper.vm.dateStart).toEqual(wrapper.vm.pickedStart);
+        expect(wrapper.vm.dateEnd).toEqual(wrapper.vm.pickedEnd);
+    })
+
+
+    test('validateDates with startDate before endDate returns correct error', () => {
+        wrapper.vm.validateDates('2021-11-11 07:54:46', '2020-01-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('end-before-begin');
+    });
+
+    
+    test('validateDates with no startDate returns correct error', () => {
+        wrapper.vm.validateDates(null, '2020-01-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('no-start');
+    });
+
+    test('validateDates with no endDate returns correct error', () => {
+        wrapper.vm.validateDates('2021-11-11 07:54:46', null);
+        expect(wrapper.vm.errors).toContain('no-end');
+    });
+
+    test('validateDates with startDate before 1970 returns correct error', () => {
+        wrapper.vm.validateDates('1969-11-11 07:54:46', '2010-11-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('bad-start-date');
+    });
+
+    test('validateDates with endDate before 1970 returns correct error', () => {
+        wrapper.vm.validateDates('1969-11-11 07:54:46', '1969-11-11 07:54:46');
+        expect(wrapper.vm.errors).toContain('bad-end-date');
+    });
+
+    test('validateDates with startDate after today returns correct error', () => {
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        wrapper.vm.validateDates(tomorrow, tomorrow);
+        expect(wrapper.vm.errors).toContain('bad-start-date');
+    });
+
+    test('validateDates with endDate after today returns correct error', () => {
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        wrapper.vm.validateDates(tomorrow, tomorrow);
+        expect(wrapper.vm.errors).toContain('bad-end-date');
     });
 });
