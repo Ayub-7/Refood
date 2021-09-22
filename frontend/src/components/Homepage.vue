@@ -257,11 +257,11 @@ const Homepage = {
      */
     calculateAllMuted: function () {
        this.allMuted = true;
-       if (this.wishlist.isEmpty()) {
+       if (this.wishlist.length === 0) {
          this.allMuted = false;
        } else {
          for (let wish of this.wishlist) {
-           if (wish === "Unmuted") {
+           if (wish.muted === false) {
              this.allMuted = false;
            }
          }
