@@ -78,7 +78,8 @@ export default {
 
       // // Generates the x-axis labels of each month, for each year.
       // let yearlyMonthCategories = this.generateMonthLabels(Object.keys(yearlyData)); //For Monthly Revenue
-      let yearlyMonthCategories = Object.keys(yearlyData);
+      // let yearlyMonthCategories = Object.keys(yearlyData);
+      let yearlyMonthCategories = this.generateWeekLabels(yearlyData);
 
       // Removes months with no sales up to the first month of sales.
       let i = 0;
@@ -160,20 +161,27 @@ export default {
       for (let listing of data) {
         let soldDate = new Date(listing.sold);
         if (weeklyData[soldDate.getFullYear()] == null) {
-          weeklyData[soldDate.getFullYear()] = new Array(52);
+          weeklyData[soldDate.getFullYear()] = {};
         }
-        var oneJan = new Date(soldDate.getFullYear(),0,1);
-        var numberOfDays = Math.floor((soldDate - oneJan) / (24 * 60 * 60 * 1000));
-        var result = Math.ceil(( soldDate.getDay() + 1 + numberOfDays) / 7);
-        if (isNaN(weeklyData[soldDate.getFullYear()][result])) {
-          weeklyData[soldDate.getFullYear()][result] = +listing.price.toFixed(2);
-        } else {
-          weeklyData[soldDate.getFullYear()][result] += +listing.price.toFixed(2);
+
+        let dayNum = soldDate.getDay();
+        let dateCopy = soldDate;
+        dateCopy.setDate(soldDate.getDate() - dayNum + 1);
+        let mondayString = (dateCopy.getMonth() + 1) + "-" + dateCopy.getDate();
+        // let oneJan = new Date(soldDate.getFullYear(),0,1);
+        // let numberOfDays = Math.floor((soldDate - oneJan) / (24 * 60 * 60 * 1000));
+        // let result = Math.ceil(( soldDate.getDay() + 1 + numberOfDays) / 7);
+
+        if (weeklyData[soldDate.getFullYear()][mondayString] == null) {
+          weeklyData[soldDate.getFullYear()][mondayString] = 0;
         }
+        weeklyData[soldDate.getFullYear()][mondayString] += +listing.price.toFixed(2);
       }
+
       console.log(weeklyData)
       return weeklyData;
     },
+
     totalYearlyRevenue: function(data) {
       let yearlyData = {};
       for (let listing of data) {
@@ -203,7 +211,18 @@ export default {
       }
 
       return yearlyMonthCategories;
-    }
+    },
+
+    generateWeekLabels: function(data) {
+        let labels = [];
+
+        for (let year of Object.keys(data)) {
+          labels = labels.concat(Object.keys(data[year]));
+        }
+        return labels;
+    },
+
+
 
   },
 
