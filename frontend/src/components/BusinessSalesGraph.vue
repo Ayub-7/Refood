@@ -1,79 +1,83 @@
 <template>
   <div>
     <vs-card id="options-container">
-      <div class="options-header" style="display: flex; justify-content: center">
-        <span style="padding-right: 4px">Period</span>
-        <vs-tooltip text="Adjusts the length of time of each statistic">
-          <vs-icon icon="info" size="14px"/>
-        </vs-tooltip>
+      <div id="period-change-container">
+        <div class="options-header" style="display: flex; justify-content: center">
+          <span style="padding-right: 4px">Period</span>
+          <vs-tooltip text="Adjusts the length of time of each statistic">
+            <vs-icon icon="info" size="14px"/>
+          </vs-tooltip>
+        </div>
+        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-d'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 1;"
+                   @click="onPeriodChange('1-d')">
+          1 Day
+        </vs-button>
+        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-w'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 3;">
+          1 Week
+        </vs-button>
+        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-m'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 1;">
+          1 Month
+        </vs-button>
+        <vs-button v-bind:class="[{'active-button': activePeriodButton === '6-m'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 3;">
+          6 Months
+        </vs-button>
+        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-y'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 1;">
+          1 Year
+        </vs-button>
+        <vs-button v-bind:class="[{'active-button': activePeriodButton === 'all'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 3;">
+          All
+        </vs-button>
       </div>
-      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-d'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 1;"
-                 @click="onPeriodChange('1-d')">
-        1 Day
-      </vs-button>
-      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-w'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 3;">
-        1 Week
-      </vs-button>
-      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-m'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 1;">
-        1 Month
-      </vs-button>
-      <vs-button v-bind:class="[{'active-button': activePeriodButton === '6-m'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 3;">
-        6 Months
-      </vs-button>
-      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-y'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 1;">
-        1 Year
-      </vs-button>
-      <vs-button v-bind:class="[{'active-button': activePeriodButton === 'all'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 3;">
-        All
-      </vs-button>
-      <div class="options-header" style="font-size: 14px">Custom</div>
-      <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start"
-                danger-text="Date can not be in the future or after the end date"/>
-      <p style="margin: auto auto 0">-</p>
-      <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End"
-                danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
-      <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
+      <div id="custom-period-container">
+        <div class="options-header" style="font-size: 14px">Custom</div>
+        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start"
+                  danger-text="Date can not be in the future or after the end date"/>
+        <p style="margin: auto auto 0">-</p>
+        <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End"
+                  danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
+        <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
 
-      <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
-
-      <div class="options-header">Summary Interval</div>
-      <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'day'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 3;">
-        Day
-      </vs-button>
-      <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 1;"
-                 @click="getSalesData('week')">
-        Week
-      </vs-button>
-      <vs-button id="month-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 3;"
-                 @click="getSalesData('month')">
-        Month
-      </vs-button>
-      <vs-button id="year-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
-                 type="border"
-                 style="grid-column: 1;"
-                 @click="getSalesData('year')">
-        Year
-      </vs-button>
+      </div>
+      <div id="granularity-container">
+        <div class="options-header">Summary Interval</div>
+        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'd'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 1;">
+          Day
+        </vs-button>
+        <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 3;"
+                   @click="getSalesData('week')">
+          Week
+        </vs-button>
+        <vs-button id="month-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 1;"
+                   @click="getSalesData('month')">
+          Month
+        </vs-button>
+        <vs-button id="year-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
+                   type="border"
+                   style="grid-column: 3;"
+                   @click="getSalesData('year')">
+          Year
+        </vs-button>
+      </div>
     </vs-card>
-    <apexchart id="sales-graph-report" width="100%" height="100%" type="bar" :options="options" :series="series"></apexchart>
+    <apexchart id="sales-graph-report" width="100%" height="90%" type="bar" :options="options" :series="series"></apexchart>
   </div>
 </template>
 
@@ -94,6 +98,8 @@ export default {
 
   data: function() {
     return {
+      activeGranularityButton: "m",
+
       series: [{
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       }],
@@ -147,12 +153,14 @@ export default {
       let barFormat = "category";
       let labelFormat = "dd-MMM";
       if (type.toLowerCase() === "year") {
+        this.activeGranularityButton = "y";
         processedData = this.totalYearlyRevenue(data);
         // Flatten object into array.
         for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
         // Generates the x-axis labels of each month, for each year.
         categories = Object.keys(processedData);
       } else if (type.toLowerCase() === "month") {
+        this.activeGranularityButton = "m";
         barFormat = "datetime";
         labelFormat = "MMMM yyyy";
         processedData = this.totalMonthlyRevenue(data);
@@ -171,6 +179,7 @@ export default {
           i++;
         }
       } else {
+        this.activeGranularityButton = "w";
         barFormat = "datetime";
         labelFormat = "dd-MMM";
         processedData = this.totalWeeklyRevenue(data);
@@ -319,5 +328,45 @@ export default {
 </script>
 
 <style scoped>
+/* === OPTIONS CONTAINER === */
+#options-container {
+  width: 100%;
+  height: fit-content;
+}
+
+#options-container >>> .vs-card--content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 1em 2px;
+  padding-bottom: 16px;
+}
+
+#period-change-container, #custom-period-container, #granularity-container {
+  display: grid;
+  grid-row-gap: 1em;
+}
+
+.options-header {
+  grid-column: 1/4;
+  text-align: center;
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.options-button {
+  width: 100px;
+  margin: auto;
+}
+
+.active-button {
+  background-color: rgb(31,116,255)!important;
+  color: white;
+  pointer-events: none;
+}
+
+.date-input {
+  width: 136px;
+  margin: auto;
+}
 
 </style>
