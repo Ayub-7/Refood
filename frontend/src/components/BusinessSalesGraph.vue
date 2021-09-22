@@ -74,23 +74,26 @@ export default {
 
 
       let allData = [];
-      for (let year of Object.entries(yearlyData)) allData = allData.concat(year[1]); // Flatten object into array.
-
+      for (let year of Object.entries(yearlyData)) {
+        let entries = Object.entries(year[1]).map(week => week[1]);
+        allData = allData.concat(entries);
+      } // Flatten object into array.
+      // console.log(allData);
       // // Generates the x-axis labels of each month, for each year.
       // let yearlyMonthCategories = this.generateMonthLabels(Object.keys(yearlyData)); //For Monthly Revenue
       // let yearlyMonthCategories = Object.keys(yearlyData);
       let yearlyMonthCategories = this.generateWeekLabels(yearlyData);
 
       // Removes months with no sales up to the first month of sales.
-      let i = 0;
-      while (i < allData.length) {
-        if (allData[i] > 0) {
-          allData = allData.slice(i);
-          yearlyMonthCategories = yearlyMonthCategories.slice(i);
-          break;
-        }
-        i++;
-      }
+      // let i = 0;
+      // while (i < allData.length) {
+      //   if (allData[i] > 0) {
+      //     allData = allData.slice(i);
+      //     yearlyMonthCategories = yearlyMonthCategories.slice(i);
+      //     break;
+      //   }
+      //   i++;
+      // }
 
       // Updates the plot options and inputs.
       // Reassigning entire variable allows chart to properly update and play animations.
@@ -113,7 +116,7 @@ export default {
           }
         },
         xaxis: {
-          type: "category",
+          type: "datetime",
           categories: yearlyMonthCategories,
           labels: {
             datetimeFormatter: {
@@ -127,7 +130,7 @@ export default {
             formatter: (val) => this.currencySymbol + val.toFixed(2),
           },
           x: {
-            format: "MMMM yyyy"
+            format: "dd-MMM"
           }
         },
       };
@@ -167,7 +170,7 @@ export default {
         let dayNum = soldDate.getDay();
         let dateCopy = soldDate;
         dateCopy.setDate(soldDate.getDate() - dayNum + 1);
-        let mondayString = (dateCopy.getMonth() + 1) + "-" + dateCopy.getDate();
+        let mondayString = dateCopy.getFullYear() + "-" + (dateCopy.getMonth() + 1) + "-" + dateCopy.getDate();
         // let oneJan = new Date(soldDate.getFullYear(),0,1);
         // let numberOfDays = Math.floor((soldDate - oneJan) / (24 * 60 * 60 * 1000));
         // let result = Math.ceil(( soldDate.getDay() + 1 + numberOfDays) / 7);
@@ -178,7 +181,6 @@ export default {
         weeklyData[soldDate.getFullYear()][mondayString] += +listing.price.toFixed(2);
       }
 
-      console.log(weeklyData)
       return weeklyData;
     },
 
