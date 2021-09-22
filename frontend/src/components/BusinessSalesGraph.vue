@@ -1,5 +1,80 @@
 <template>
-  <apexchart id="sales-graph-report" width="100%" height="100%" type="bar" :options="options" :series="series"></apexchart>
+  <div>
+    <vs-card id="options-container">
+      <div class="options-header" style="display: flex; justify-content: center">
+        <span style="padding-right: 4px">Period</span>
+        <vs-tooltip text="Adjusts the length of time of each statistic">
+          <vs-icon icon="info" size="14px"/>
+        </vs-tooltip>
+      </div>
+      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-d'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 1;"
+                 @click="onPeriodChange('1-d')">
+        1 Day
+      </vs-button>
+      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-w'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 3;">
+        1 Week
+      </vs-button>
+      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-m'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 1;">
+        1 Month
+      </vs-button>
+      <vs-button v-bind:class="[{'active-button': activePeriodButton === '6-m'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 3;">
+        6 Months
+      </vs-button>
+      <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-y'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 1;">
+        1 Year
+      </vs-button>
+      <vs-button v-bind:class="[{'active-button': activePeriodButton === 'all'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 3;">
+        All
+      </vs-button>
+      <div class="options-header" style="font-size: 14px">Custom</div>
+      <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start"
+                danger-text="Date can not be in the future or after the end date"/>
+      <p style="margin: auto auto 0">-</p>
+      <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End"
+                danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
+      <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
+
+      <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
+
+      <div class="options-header">Summary Interval</div>
+      <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'day'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 3;">
+        Day
+      </vs-button>
+      <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 1;"
+                 @click="getSalesData('week')">
+        Week
+      </vs-button>
+      <vs-button id="month-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 3;"
+                 @click="getSalesData('month')">
+        Month
+      </vs-button>
+      <vs-button id="year-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
+                 type="border"
+                 style="grid-column: 1;"
+                 @click="getSalesData('year')">
+        Year
+      </vs-button>
+    </vs-card>
+    <apexchart id="sales-graph-report" width="100%" height="100%" type="bar" :options="options" :series="series"></apexchart>
+  </div>
 </template>
 
 <script>
@@ -49,10 +124,10 @@ export default {
     /**
      * Retrieve's the business' bought listing data.
      */
-    getSalesData: function() {
+    getSalesData: function(type) {
       api.getBusinessSales(this.businessId)
         .then((res) => {
-          this.displaySalesData(res.data);
+          this.displaySalesData(res.data, type);
         })
         .catch((error) => {
           this.$log.error(error);
@@ -64,37 +139,49 @@ export default {
      * Currently creates and displays total monthly sales data.
      * @param data bought listings sales data
      */
-    displaySalesData: function(data) {
+    displaySalesData: function(data, type) {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
-      let yearlyData = this.totalWeeklyRevenue(data);
-
-      // let today = new Date("2021-07-15");
-      // let daynum = today.getDay();
-      // let monday = today.setDate(today.getDate()-daynum+1);
-
-
+      let processedData;
       let allData = [];
-      for (let year of Object.entries(yearlyData)) {
-        let entries = Object.entries(year[1]).map(week => week[1]);
-        allData = allData.concat(entries);
-      } // Flatten object into array.
-      // console.log(allData);
-      // // Generates the x-axis labels of each month, for each year.
-      // let yearlyMonthCategories = this.generateMonthLabels(Object.keys(yearlyData)); //For Monthly Revenue
-      // let yearlyMonthCategories = Object.keys(yearlyData);
-      let yearlyMonthCategories = this.generateWeekLabels(yearlyData);
-
-      // Removes months with no sales up to the first month of sales.
-      // let i = 0;
-      // while (i < allData.length) {
-      //   if (allData[i] > 0) {
-      //     allData = allData.slice(i);
-      //     yearlyMonthCategories = yearlyMonthCategories.slice(i);
-      //     break;
-      //   }
-      //   i++;
-      // }
-
+      let categories = [];
+      let barFormat = "category";
+      let labelFormat = "dd-MMM";
+      if (type.toLowerCase() === "year") {
+        processedData = this.totalYearlyRevenue(data);
+        // Flatten object into array.
+        for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
+        // Generates the x-axis labels of each month, for each year.
+        categories = Object.keys(processedData);
+      } else if (type.toLowerCase() === "month") {
+        barFormat = "datetime";
+        labelFormat = "MMMM yyyy";
+        processedData = this.totalMonthlyRevenue(data);
+        // Flatten object into array.
+        for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
+        // Generates the x-axis labels of each month, for each year.
+        categories = this.generateMonthLabels(Object.keys(processedData)); //For Monthly Revenue
+        // Removes months with no sales up to the first month of sales.
+        let i = 0;
+        while (i < allData.length) {
+          if (allData[i] > 0) {
+            allData = allData.slice(i);
+            categories = categories.slice(i);
+            break;
+          }
+          i++;
+        }
+      } else {
+        barFormat = "datetime";
+        labelFormat = "dd-MMM";
+        processedData = this.totalWeeklyRevenue(data);
+        // Flatten object into array.
+        for (let year of Object.entries(processedData)) {
+          let entries = Object.entries(year[1]).map(week => week[1]);
+          allData = allData.concat(entries);
+        }
+        // Generates the x-axis labels of each month, for each year.
+        categories = this.generateWeekLabels(processedData);
+      }
       // Updates the plot options and inputs.
       // Reassigning entire variable allows chart to properly update and play animations.
       this.series = [{
@@ -116,8 +203,8 @@ export default {
           }
         },
         xaxis: {
-          type: "datetime",
-          categories: yearlyMonthCategories,
+          type: barFormat,
+          categories: categories,
           labels: {
             datetimeFormatter: {
               year: 'yyyy',
@@ -130,7 +217,7 @@ export default {
             formatter: (val) => this.currencySymbol + val.toFixed(2),
           },
           x: {
-            format: "dd-MMM"
+            format: labelFormat
           }
         },
       };
@@ -143,15 +230,15 @@ export default {
      * and the value at each index representing the total revenue/value of listings sold.
      */
     totalMonthlyRevenue: function(data) {
-      let yearlyData = {};
+      let processedData = {};
         for (let listing of data) {
           let soldDate = new Date(listing.sold);
-          if (yearlyData[soldDate.getFullYear()] == null) {
-            yearlyData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+          if (processedData[soldDate.getFullYear()] == null) {
+            processedData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
           }
-          yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += +listing.price.toFixed(2);
+          processedData[soldDate.getFullYear()][soldDate.getMonth()] += +listing.price.toFixed(2);
         }
-      return yearlyData;
+      return processedData;
     },
 
     /**
@@ -171,10 +258,6 @@ export default {
         let dateCopy = soldDate;
         dateCopy.setDate(soldDate.getDate() - dayNum + 1);
         let mondayString = dateCopy.getFullYear() + "-" + (dateCopy.getMonth() + 1) + "-" + dateCopy.getDate();
-        // let oneJan = new Date(soldDate.getFullYear(),0,1);
-        // let numberOfDays = Math.floor((soldDate - oneJan) / (24 * 60 * 60 * 1000));
-        // let result = Math.ceil(( soldDate.getDay() + 1 + numberOfDays) / 7);
-
         if (weeklyData[soldDate.getFullYear()][mondayString] == null) {
           weeklyData[soldDate.getFullYear()][mondayString] = 0;
         }
@@ -185,15 +268,15 @@ export default {
     },
 
     totalYearlyRevenue: function(data) {
-      let yearlyData = {};
+      let processedData = {};
       for (let listing of data) {
         let soldDate = new Date(listing.sold);
-        if (yearlyData[soldDate.getFullYear()] == null) {
-          yearlyData[soldDate.getFullYear()] = 0;
+        if (processedData[soldDate.getFullYear()] == null) {
+          processedData[soldDate.getFullYear()] = 0;
         }
-        yearlyData[soldDate.getFullYear()] += +listing.price.toFixed(2);
+        processedData[soldDate.getFullYear()] += +listing.price.toFixed(2);
       }
-      return yearlyData;
+      return processedData;
     },
 
     /**
@@ -229,7 +312,7 @@ export default {
   },
 
   mounted: function() {
-    this.getSalesData();
+    this.getSalesData("month");
   },
 
 }
