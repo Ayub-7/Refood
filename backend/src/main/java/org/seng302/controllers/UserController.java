@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.UserFinder;
-import org.seng302.models.Role;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,6 +31,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,6 +61,9 @@ public class UserController {
 
 //    @Autowired
     private UserFinder userFinder;
+
+    @Value("${media.image.user.directory}")
+    String rootImageDir;
 
     @Autowired
     public UserController(UserRepository userRepository, UserFinder userFinder) {
@@ -275,6 +281,62 @@ public class UserController {
         Specification<User> matches = userFinder.findUsers(query);
         Page<User> users = userRepository.findAll(matches, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
+    }
+
+    // -- IMAGE REQUESTS
+
+    /**
+     * Sets the primary image for a user from a previously saved image.
+     * @param id unique identifier of the user that the image is relating to.
+     * @param imageId a multipart image of the file
+     * @return ResponseEntity with the appropriate status codes - 200, 401, 403, 406.
+     */
+    @PutMapping("/users/{id}/images/{imageId}/makeprimary")
+    public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long id, @PathVariable String imageId, HttpSession session) {
+        User user = userRepository.findUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        User userSession = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (userSession == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if( userSession.getId() != user.getId() && !Role.isGlobalApplicationAdmin(userSession.getRole())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        boolean validImage = false;
+        if (user != null) {
+            for (Image image: user.getImages()) {
+                if (imageId.equals(image.getId())) {
+                    validImage = true;
+                    break;
+                }
+            }
+        }
+        if (user == null || !validImage) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        String imageDir = rootImageDir + "/user_" + id + "/" + imageId;
+        String extension = "";
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext: extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                extension = ext;
+                break;
+            }
+        }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            user.setPrimaryImage(String.format("user_%d\\%s%s", id, imageId, extension));
+        } else {
+            user.setPrimaryImage(String.format("user_%d/%s%s", id, imageId, extension));
+        }
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     // -- ADMIN REQUESTS
