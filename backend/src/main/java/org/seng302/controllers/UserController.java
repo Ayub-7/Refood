@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.finders.UserFinder;
+import org.seng302.models.Image;
+import org.seng302.models.Product;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -29,8 +32,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -277,6 +283,84 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
     }
 
+    /**
+     * Uploads image to relevant user profile, setting the image as primary if it is the first image.
+     * @param id Id of the user the image is added to
+     * @param image Multipart image of file
+     * @param session Current user session
+     * @return ResponseEntity with the appropriate status codes - 201, 400, 403, 406.
+     * @throws InvalidImageExtensionException custom exception when file extension is not valid
+     * @throws IOException Thrown when file reading or writing fails
+     */
+    @PostMapping("/users/{id}/images")
+    public ResponseEntity<String> addUserImage(@PathVariable Long id, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws InvalidImageExtensionException, IOException {
+        User user = userRepository.findUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (currentUser != user) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String imageExtension;
+
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
+        }
+        try { // Throw error if the file is not an image.
+            imageExtension = Image.getContentTypeExtension(Objects.requireNonNull(image.getContentType()));
+        }
+        catch (InvalidImageExtensionException exception) {
+            throw new InvalidImageExtensionException(exception.getMessage());
+        }
+
+        // Check if business' own folder directory exists - make directory if false.
+        File businessDir = new File(String.format("%sbusiness_%d", rootImageDir, businessId));
+        if (businessDir.mkdirs()) {
+            logger.info(String.format("Image of business directory did not exist - new directory created of %s", businessDir.getPath()));
+        }
+
+        String id = "";
+        boolean freeImage = false;
+        int count = 0;
+
+        while (!freeImage) {
+            id = String.valueOf(count);
+            File checkFile1 = new File(String.format("%s/%s.jpg", businessDir, id));
+            File checkFile2 = new File(String.format("%s/%s.png", businessDir, id));
+            File checkFile3 = new File(String.format("%s/%s.gif", businessDir, id));
+            if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
+                count++;
+            }
+            else {
+                freeImage = true;
+            }
+        }
+
+        File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
+        File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        System.out.println(file.getAbsolutePath());
+        fileService.uploadImage(file, image.getBytes());
+        fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
+        String imageName = image.getOriginalFilename();
+        // Save into DB.
+        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
+        product.addProductImage(newImage);
+        if (product.getPrimaryImagePath() == null) {
+            if (System.getProperty("os.name").startsWith("windows")) {
+                product.setPrimaryImage(String.format("business_%d\\%s%s", businessId, id, imageExtension));
+            } else {
+                product.setPrimaryImage(String.format("business_%d/%s%s", businessId, id, imageExtension));
+            }
+        }
+        productRepository.save(product);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    },
+
     // -- ADMIN REQUESTS
 
     /**
@@ -314,5 +398,4 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
-
 }
