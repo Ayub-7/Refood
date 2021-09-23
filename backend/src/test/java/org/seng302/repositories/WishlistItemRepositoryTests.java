@@ -29,11 +29,10 @@ class WishlistItemRepositoryTests {
     private WishlistItem wishlistItem1;
     private WishlistItem wishlistItem2;
     private WishlistItem wishlistItem3;
-
     private List<WishlistItem> wishlistItemListUser;
     private List<WishlistItem> wishlistItemsBusiness;
     private List<WishlistItem> wishlistItemsAll;
-
+    private List<WishlistItem> wishlistItemList;
     private Business business1;
     private Business business2;
 
@@ -41,20 +40,19 @@ class WishlistItemRepositoryTests {
     void setUp() throws NoSuchAlgorithmException {
         wishlistItemRepository.deleteAll();
         wishlistItemRepository.flush();
+        wishlistItemListUser = new ArrayList<>();
+        wishlistItemsBusiness = new ArrayList<>();
+        wishlistItemsAll = new ArrayList<>();
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         business1 = new Business("testBusiness", "test description", addr, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
         business2 = new Business("testBusiness", "test description", addr, BusinessType.RETAIL_TRADE);
         businessRepository.save(business1);
         businessRepository.save(business2);
-
-        wishlistItemListUser = new ArrayList<>();
-        wishlistItemsBusiness = new ArrayList<>();
-        wishlistItemsAll = new ArrayList<>();
-
+        wishlistItemList = new ArrayList<>();
         assertThat(wishlistItemRepository).isNotNull();
-        wishlistItem1 = new WishlistItem(Long.valueOf(1), business1);
-        wishlistItem2 = new WishlistItem(Long.valueOf(1), business2);
-        wishlistItem3 = new WishlistItem(Long.valueOf(1), business2);
+        wishlistItem3 = new WishlistItem(Long.valueOf(2), business1);
+        wishlistItem1 = new WishlistItem(Long.valueOf(1), business2);
+        wishlistItem2 = new WishlistItem(Long.valueOf(1), business1);
         System.out.println(wishlistItem1);
         wishlistItemRepository.save(wishlistItem1);
         wishlistItemRepository.save(wishlistItem2);
@@ -66,23 +64,25 @@ class WishlistItemRepositoryTests {
         wishlistItemsAll.add(wishlistItem1);
         wishlistItemsAll.add(wishlistItem2);
         wishlistItemsAll.add(wishlistItem3);
+        wishlistItemList.add(wishlistItem1);
+        wishlistItemList.add(wishlistItem2);
     }
 
     @Test
     void findWishListItemsByUserIdSuccessful() {
-        assertThat(wishlistItemRepository.findWishlistItemsByUserId(Long.valueOf(1))).isEqualTo((wishlistItemListUser));
+        assertThat(wishlistItemRepository.findWishlistItemsByUserId(Long.valueOf(1))).isEqualTo((wishlistItemList));
     }
 
     @Test
     void findWishListItemsByUserIdItemIsNull() {
-        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemsByUserId(3);
-        assertThat(notFound.size()).isEqualTo(0);
+        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemsByUserId(5);
+        assertThat(notFound.size()).isZero();
     }
 
     @Test
     void findSingleWishlistItemByIdSuccessful() {
-        WishlistItem found = wishlistItemRepository.findWishlistItemById(4);
-        assertThat(wishlistItem1).isEqualTo(found);
+        WishlistItem found = wishlistItemRepository.findWishlistItemById(7);
+        assertThat(found).isEqualTo(wishlistItem1);
     }
 
     @Test
@@ -98,14 +98,15 @@ class WishlistItemRepositoryTests {
 
     @Test
     void findWishListItemsByBusinessIdSuccessful() {
-        assertThat(wishlistItemRepository.findWishlistItemByBusinessId(Long.valueOf(1))).isEqualTo((wishlistItemsBusiness));
+        assertThat(wishlistItemRepository.findWishlistItemByBusiness(business1)).isEqualTo((wishlistItemsBusiness));
     }
 
     @Test
-    void findWishListItemsByBusinessIdItemIsNull() {
-        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemByBusinessId(10);
+    void findWishListItemsByBusinessItemIsNull() {
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        Business fakeBusiness = new Business("fakeBusiness", "fake description", addr, BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+        businessRepository.save(fakeBusiness);
+        List<WishlistItem> notFound = wishlistItemRepository.findWishlistItemByBusiness(fakeBusiness);
         assertThat(notFound.size()).isEqualTo(0);
     }
-
-
 }

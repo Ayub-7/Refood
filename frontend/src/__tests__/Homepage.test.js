@@ -156,7 +156,7 @@ let mockCard = {
     section: "Wanted"
 }
 
-const wishlist = {
+const wishlist = [{
     business: {
         name: "Dabshots",
         businessType: "Retail trade",
@@ -165,7 +165,7 @@ const wishlist = {
     id: 1,
     muted: false,
     userId: 1
-}
+},];
 
 jest.mock("../Api.js", () => jest.fn);
 api.getUserFromID = jest.fn(() => {
@@ -201,6 +201,10 @@ api.removeBusinessFromWishlist = jest.fn(() => {
     return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
 });
 
+api.updateWishlistMuteStatus = jest.fn(() => {
+    return Promise.resolve({status: 200}).catch({response: {message: "Bad request", status: 400}});
+});
+
 const getUserName = jest.spyOn(Homepage.methods, 'getUserName');
 getUserName.mockImplementation(() =>  {
     return 'Rayna';
@@ -229,7 +233,6 @@ let $vs = {
 };
 
 beforeEach(() => {
-    console.log(90)
     wrapper = shallowMount(Homepage, {
         propsData: {},
         mocks: {$router, $log, $vs},
@@ -249,7 +252,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    console.log(9)
     wrapper.destroy();
 });
 
@@ -365,4 +367,16 @@ describe("Tests for business watchlist functionality", ()=> {
         await wrapper.vm.removeFromWishlist(1);
         expect(api.getUsersWishlistedBusinesses).toBeCalled();
     });
+
+    test('Mute wishlist function changes mute status when unmuted', () => {
+        expect(wrapper.vm.allMuted).toBeFalsy();
+        wrapper.vm.toggleMuteAll();
+        expect(wrapper.vm.allMuted).toBeTruthy();
+    })
+
+    test('Mute wishlist function unmutes wishlist when previously muted', () => {
+        wrapper.vm.allMuted = true;
+        wrapper.vm.toggleMuteAll();
+        expect(wrapper.vm.allMuted).toBeFalsy();
+    })
 });

@@ -1,18 +1,17 @@
 package org.seng302.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.seng302.models.*;
 import org.seng302.models.requests.MutedStatusRequest;
 import org.seng302.repositories.*;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,17 +30,14 @@ public class WishlistItemController {
     private UserRepository userRepository;
 
     /**
-     * GET request called to get the businesses on a users wishlist. Can retrieve all or just unmuted businesses.
-     * Error response returned when user is not logged in
+     * GET request called to get the businesses on a users wishlist. Error response returned when user is not
+     * logged in
      * @param session logged in users session
      * @param id Users id
-     * @param unmutedOnly only returns wishlistItems that are Unmuted (ie no muted businesses)
      * @return ResponseEntity with relevant http status
      */
     @GetMapping("/users/{id}/wishlist")
-    public ResponseEntity<List<WishlistItem>> getWishlistBusiness(@PathVariable long id,
-                                                                  @RequestParam("unmutedOnly") boolean unmutedOnly,
-                                                                  HttpSession session) {
+    public ResponseEntity<List<WishlistItem>> getWishlistBusiness(@PathVariable long id, HttpSession session) {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         User user = userRepository.findUserById(id);
 
@@ -51,18 +47,12 @@ public class WishlistItemController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        List<WishlistItem> wishlistItems = wishlistItemRepository.findWishlistItemsByUserId(id);
-        if (unmutedOnly) {
-            return ResponseEntity.status(HttpStatus.OK).body(wishlistItems);
-        } else {
-            List<WishlistItem> wishlistItemsNotMuted = new ArrayList<>();
-            wishlistItems.forEach(wishlistItem -> {
-                if (wishlistItem.getMutedStatus() == MutedStatus.UNMUTED) {
-                    wishlistItemsNotMuted.add(wishlistItem);
-                }
-            });
-            return ResponseEntity.status(HttpStatus.OK).body(wishlistItemsNotMuted);
+        Sort sort = Sort.by(Sort.Order.asc("business.name").ignoreCase());
+        List<WishlistItem> wishlistItems = wishlistItemRepository.findWishlistItemsByUserId(id, sort);
+        for (WishlistItem wish:wishlistItems) {
+            wish.getBusiness().setAdministrators(null);
         }
+        return ResponseEntity.status(HttpStatus.OK).body(wishlistItems);
     }
 
     /**
@@ -111,9 +101,9 @@ public class WishlistItemController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         if (mutedStatus == MutedStatus.MUTED) {
-            wishlist.muteBusiness();
-        } else {
             wishlist.unmuteBusiness();
+        } else {
+            wishlist.muteBusiness();
         }
         wishlistItemRepository.save(wishlist);
         return ResponseEntity.status(HttpStatus.OK).body("Wishlist muted status changed to " + mutedStatus.toString());

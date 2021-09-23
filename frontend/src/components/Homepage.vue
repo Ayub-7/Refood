@@ -77,6 +77,18 @@
             </div>
           </div>
           <div v-if="!watchlist">
+            <vs-row style="margin-top: -40px; margin-bottom: 20px;" vs-type="flex" vs-justify="right">
+              <div v-if="wishlist.length > 0">
+                <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'" style="margin-right: 30px">
+                  <vs-button @click="toggleMuteAll" v-if="allMuted == true" color="purple">
+                    <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
+                  </vs-button>
+                  <vs-button v-else @click="toggleMuteAll" color="purple">
+                    <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
+                  </vs-button>
+                </vs-tooltip>
+              </div>
+            </vs-row>
             <div v-if="wishlist.length > 0">
               <div v-for="wish in wishlist" :key="wish.id" >
                 <vs-card style="margin-top: -10px"  actionable>
@@ -106,7 +118,7 @@
         </div>
       </div>
 
-        <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
+      <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
       <main v-if="getBusinessId() == null">
         <nav id="newsfeed-navbar">
           <div class="newsfeed-title">
@@ -120,7 +132,35 @@
         <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
       </main>
 
-      <BusinessSalesReport v-else class="business-main"/>
+      <div v-else-if="graphMode" class="business-main" >
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="leaderboard" size="32px"></vs-icon>
+            <div class="title">Sales Report Graph</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode">Data</vs-button>
+          </div>
+          <vs-divider/>
+          <!--
+          <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
+          -->
+
+          <BusinessSalesGraph :salesDatay='series' :salesDatax='options' />
+        </vs-card>
+      </div>
+      <div v-else class="business-main">
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="summarize" size="32px"></vs-icon>
+            <div class="title">Sales Report</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
+          </div>
+          <vs-divider/>
+          <BusinessSalesReport />
+        </vs-card>
+      </div>
+
 
 
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
@@ -144,10 +184,11 @@ import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
 import BusinessSalesReport from "./BusinessSalesReport";
+import BusinessSalesGraph from "./BusinessSalesGraph";
 
 const Homepage = {
   name: "Homepage",
-  components: {BusinessSalesReport, ListingDetail, HomePageMessages, MarketplaceGrid},
+  components: {BusinessSalesReport, BusinessSalesGraph, ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       unliked: false,
@@ -165,6 +206,24 @@ const Homepage = {
       currencySymbol: "$",
       watchlist: true,
       wishlist: [],
+      graphMode: true,
+      series: [{
+        name: 'Number of sales',
+        data: [30, 40, 20, 50, 49, 10, 70, 40, 55, 57, 53, 44]
+      }],
+      options: {
+        chart: {
+          id: 'sales-graph-report'
+        },
+        xaxis: {
+          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+        },
+        dataLabels: {
+          enabled: false,
+        }
+      },
+      allMuted: false,
     }
   },
   /**
@@ -175,6 +234,7 @@ const Homepage = {
     this.checkUserSession();
     this.getLikes(this.userId);
     this.getWishlist(this.userId);
+    this.calculateAllMuted();
   },
 
   methods: {
@@ -190,6 +250,47 @@ const Homepage = {
         .catch(err => {
           this.$log.debug(err);
       });
+    },
+
+    /**
+     * Calculate whether allMuted is true or not
+     */
+    calculateAllMuted: function () {
+       this.allMuted = true;
+       if (this.wishlist.length === 0) {
+         this.allMuted = false;
+       } else {
+         for (let wish of this.wishlist) {
+           if (wish.muted === false) {
+             this.allMuted = false;
+           }
+         }
+       }
+    },
+
+    /**
+     * Calls the api endpoint, updating the mute status of all the wishlist items
+     */
+    toggleMuteAll: function () {
+      if (this.allMuted) {
+        for (let wish of this.wishlist) {
+          api.updateWishlistMuteStatus(wish.id, "Muted")
+            .catch(() => {
+              this.$vs.notify({title: "Error unmuting wishlist", color: "danger"});
+            });
+        }
+        this.$vs.notify({title: "Wishlist successfully unmuted", color: "success"});
+        this.allMuted = false;
+      } else {
+        for (let wish of this.wishlist) {
+          api.updateWishlistMuteStatus(wish.id, "Unmuted")
+            .catch(() => {
+              this.$vs.notify({title: "Error muting wishlist", color: "danger"});
+            })
+        }
+        this.$vs.notify({title: "Wishlist successfully muted", color: "success"});
+        this.allMuted = true;
+      }
     },
 
     /**
@@ -214,6 +315,7 @@ const Homepage = {
       api.removeBusinessFromWishlist(wishlistItemId)
               .then(() => {
                 this.getWishlist(this.userId);
+                this.calculateAllMuted();
                 this.$vs.notify({title: "Successfully  removed business from wishlist", color: "success"});
               })
               .catch((error) => {
@@ -262,14 +364,44 @@ const Homepage = {
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
         .then((res) => {
-          this.likedItem = res.data;
-          this.likes = res.data.length;
+          let temp = [];
+          for (let data of res.data) {
+            if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+              temp.push(data);
+            } else {
+              api.removeLikeFromListing(data["id"]);
+            }
+          }
+          this.likedItem = temp;
+          this.likes = temp.length;
         })
         .catch((error) => {
           if (error.response) {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
-        })
+        });
+
+      setInterval(() => {
+        api.getUserLikedListings(userId)
+            .then((res) => {
+              let temp = [];
+              for (let data of res.data) {
+                if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+                  temp.push(data);
+                } else {
+                  api.removeLikeFromListing(data["id"]);
+                }
+              }
+              this.likedItem = temp;
+              this.likes = temp.length;
+            })
+            .catch((error) => {
+              if (error.response) {
+                this.$vs.notify({title: "Error retrieving likes", color: "danger"});
+              }
+            })
+      }, 100);
+
     },
 
     /**
@@ -283,9 +415,9 @@ const Homepage = {
       api.getUserCards(id)
         .then((res) => {
           this.cards = res.data;
-          for(let i = 0; i < this.cards.length; i++){
-            if(!this.cards[i].user.homeAddress){
-              this.cards[i].user = this.user;
+          for(let card of this.cards){
+            if(!card.user.homeAddress){
+              card.user = this.user;
             }
           }
         })
@@ -450,6 +582,17 @@ export default Homepage;
   margin-bottom: 4px;
 }
 
+.toggle-button {
+  width: 150px;
+}
+
+.header-container {
+  display: flex;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 1em;
+}
+
 #product-name {
   text-align: left;
   font-size: 12px;
@@ -538,7 +681,7 @@ export default Homepage;
   border-radius: 4px;
   margin: 8px 0 0 0;
 
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
 }
 
 .name {
@@ -550,6 +693,21 @@ export default Homepage;
 #business-name {
   font-size: 32px;
   margin: auto;
+}
+
+
+
+.title {
+  font-size: 30px;
+  margin-top: 4px;
+  margin-right: 8px;
+}
+.title-business {
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 4px;
+  margin-left: 0;
+  margin-right: auto;
 }
 
 .newsfeed-title {
@@ -571,7 +729,7 @@ export default Homepage;
 .sub-container {
   padding: 2em;
   border-radius: 4px;
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
   background-color: #FFFFFF;
 }
 
@@ -617,6 +775,7 @@ main {
 .business-main {
   grid-column: 3;
   grid-row: 2;
+  margin-top: 1em;
 }
 
 .business-main >>> .vs-card--content {

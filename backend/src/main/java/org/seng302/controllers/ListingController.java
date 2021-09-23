@@ -219,7 +219,7 @@ public class ListingController {
                     Listing newListing = new Listing(inventory, request);
                     inventoryRepository.updateInventoryQuantity(inventory.getQuantity() - request.getQuantity(), request.getInventoryItemId());
                     listingRepository.save(newListing);
-                    List<WishlistItem> wishlists = wishlistItemRepository.findWishlistItemByBusinessId(id);
+                    List<WishlistItem> wishlists = wishlistItemRepository.findWishlistItemByBusiness(business);
                     sendWishlistNotifications(wishlists, newListing); // creates listing notifications for wishlists just found
                     return ResponseEntity.status(HttpStatus.CREATED).build();
                 } catch (ValidationException e) {
@@ -238,9 +238,11 @@ public class ListingController {
      */
     public void sendWishlistNotifications(List<WishlistItem> wishlists, Listing listing) {
         wishlists.forEach(wishlistItem -> {
-            User user = userRepository.findUserById(wishlistItem.getUserId());
-            ListingNotification listingNotification = new ListingNotification(user, listing, NotificationStatus.WISHLIST);
-            listingNotificationRepository.save(listingNotification);
+            if (wishlistItem.getMutedStatus() == MutedStatus.UNMUTED) {
+                User user = userRepository.findUserById(wishlistItem.getUserId());
+                ListingNotification listingNotification = new ListingNotification(user, listing, NotificationStatus.WISHLIST);
+                listingNotificationRepository.save(listingNotification);
+            }
         });
     }
 

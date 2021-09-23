@@ -40,8 +40,8 @@ public class WishlistItem {
      */
     public WishlistItem(Long userId, Business business) {
         this.userId = userId;
-        this.business = business;
         this.mutedStatus = MutedStatus.UNMUTED;
+        this.business = business;
     }
 
     /**

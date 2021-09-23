@@ -162,9 +162,6 @@ describe('User acting as tests', () => {
         wrapper.vm.granularity(intervalDate, 7, 'days')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
             [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "Sep 17", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
-
-            //Sep 17 instead of the current date
-            //[{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep ${new Date().getDate()}`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 
