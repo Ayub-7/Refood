@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.seng302.models.requests.NewUserRequest;
+import org.seng302.models.requests.UserRequest;
 import org.seng302.utilities.Encrypter;
 
 import javax.persistence.*;
@@ -86,7 +87,7 @@ public class User implements Serializable {
      * @param req NewUserRequest object containing inputted registration data.
      * @throws NoSuchAlgorithmException if hashing fails.
      */
-    public User(NewUserRequest req) throws NoSuchAlgorithmException {
+    public User(UserRequest req) throws NoSuchAlgorithmException {
         this.firstName = req.getFirstName();
         this.middleName = req.getMiddleName();
         this.lastName = req.getLastName();

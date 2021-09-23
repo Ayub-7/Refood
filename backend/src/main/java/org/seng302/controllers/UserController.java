@@ -10,6 +10,7 @@ import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.requests.ModifyUserRequest;
 import org.seng302.models.requests.NewUserRequest;
+import org.seng302.models.requests.UserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
@@ -54,10 +55,8 @@ public class UserController {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
-//    @Autowired
     private UserRepository userRepository;
 
-//    @Autowired
     private UserFinder userFinder;
 
     @Autowired
@@ -123,7 +122,7 @@ public class UserController {
 
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException {
+    public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
 
         User user = userRepository.findUserById(Long.parseLong(id));
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
@@ -197,7 +196,7 @@ public class UserController {
      * @param user The user to check the validity of
      * @return list of errors with the new registration request - if there is any.
      */
-    public List<String> registrationUserCheck(NewUserRequest user) throws ParseException {
+    public List<String> registrationUserCheck(UserRequest user) throws ParseException {
         List<String> errors = new ArrayList<>();
 
         if (user.getFirstName() == null || (user.getFirstName() != null && user.getFirstName().length() == 0)) {

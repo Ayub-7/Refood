@@ -6,8 +6,7 @@ import org.seng302.models.Address;
 /**
  * DTO class that holds a modified user info.
  */
-@Data
-public class ModifyUserRequest {
+public class ModifyUserRequest extends UserRequest {
     private String firstName;
     private String middleName;
     private String lastName;
@@ -21,15 +20,6 @@ public class ModifyUserRequest {
     private String password;
 
     public ModifyUserRequest(String firstName, String middleName, String lastName, String nickname, String bio, String email, String dateOfBirth, String phoneNumber, Address homeAddress, String password) {
-        this.firstName = firstName;
-        this.middleName = middleName;
-        this.lastName = lastName;
-        this.nickname = nickname;
-        this.bio = bio;
-        this.email = email;
-        this.dateOfBirth = dateOfBirth;
-        this.phoneNumber = phoneNumber;
-        this.homeAddress = homeAddress;
-        this.password = password;
+        super(firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password);
     }
 }
