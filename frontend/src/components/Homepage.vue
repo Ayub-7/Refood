@@ -346,7 +346,6 @@ const Homepage = {
         .then((res) => {
           this.wishlist = res.data;
           this.calculateAllMuted();
-          console.log(this.wishlist)
 
         })
         .catch((error) => {
