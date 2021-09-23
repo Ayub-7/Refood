@@ -98,9 +98,16 @@
                         <vs-tooltip text="Remove from wishlist">
                           <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" @click="removeFromWishlist(wish.id)"></vs-icon>
                         </vs-tooltip>
-                        <div @click="viewBusiness(wish.business.id)" style="width: 100%; color: white;">
+                        <div @click="viewBusiness(wish.business.id)" style="width: 90%; color: white;">
                           p
                         </div>
+                        <vs-tooltip v-if="!isMuted(wish.mutedStatus)" text="Mute this business">
+                          <vs-icon icon="notifications" class="msg-icon" color="grey" @click="toggleMuteBusiness(wish)"></vs-icon>
+                        </vs-tooltip>
+                        <vs-tooltip v-if="isMuted(wish.mutedStatus)" text="Unmute this business">
+                          <vs-icon icon="notifications_off" class="msg-icon" color="grey" @click="toggleMuteBusiness(wish)"></vs-icon>
+                        </vs-tooltip>
+
                       </vs-col>
                     </vs-row>
                     <div @click="viewBusiness(wish.business.id)" id="business-card">
@@ -260,6 +267,7 @@ const Homepage = {
        if (this.wishlist.length === 0) {
          this.allMuted = false;
        } else {
+         //initally set muted to true
          for (let wish of this.wishlist) {
            if (wish.muted === false) {
              this.allMuted = false;
@@ -269,26 +277,68 @@ const Homepage = {
     },
 
     /**
+     * Checks whether a business has been muted or not
+     * @param muteStatus
+     * @return Boolean whether muteStatus is equal the string "Muted" or not
+     */
+    isMuted: function (muteStatus) {
+      return muteStatus === "Muted";
+    },
+
+    /**
+     * Mutes a single wishlisted business
+     * Do not ask me why this works :/
+     * @param wishlistedBusinessItem the business to toggle mute on
+     */
+    toggleMuteBusiness: function (wishlistedBusinessItem) {
+      console.log(wishlistedBusinessItem)
+      if (wishlistedBusinessItem.mutedStatus === "Muted") {
+        api.updateWishlistMuteStatus(wishlistedBusinessItem.id, "Muted")
+            .then(() => {
+              this.getWishlist(this.userId);
+              this.$vs.notify({title: "Business successfully unmuted", color: "success"});
+            })
+            .catch(() => {
+              this.$vs.notify({title: "Error muting business", color: "danger"});
+            });
+      }
+
+      if (wishlistedBusinessItem.mutedStatus === "Unmuted") {
+        api.updateWishlistMuteStatus(wishlistedBusinessItem.id, "Unmuted")
+            .then(() => {
+              this.getWishlist(this.userId);
+              this.$vs.notify({title: "Business successfully unmuted", color: "success"});
+            })
+            .catch(() => {
+              this.$vs.notify({title: "Error unmuting business", color: "danger"});
+            });
+      }
+    },
+
+
+    /**
      * Calls the api endpoint, updating the mute status of all the wishlist items
      */
     toggleMuteAll: function () {
       if (this.allMuted) {
         for (let wish of this.wishlist) {
           api.updateWishlistMuteStatus(wish.id, "Muted")
-            .catch(() => {
+              .catch(() => {
               this.$vs.notify({title: "Error unmuting wishlist", color: "danger"});
             });
         }
-        this.$vs.notify({title: "Wishlist successfully unmuted", color: "success"});
+        this.getWishlist(this.userId);
+        this.$vs.notify({title: "All businesses successfully unmuted", color: "success"});
         this.allMuted = false;
       } else {
         for (let wish of this.wishlist) {
           api.updateWishlistMuteStatus(wish.id, "Unmuted")
-            .catch(() => {
+              .catch(() => {
               this.$vs.notify({title: "Error muting wishlist", color: "danger"});
             })
         }
-        this.$vs.notify({title: "Wishlist successfully muted", color: "success"});
+        this.getWishlist(this.userId);
+        this.$vs.notify({title: "All businesses successfully unmuted", color: "success"});
         this.allMuted = true;
       }
     },
@@ -300,6 +350,7 @@ const Homepage = {
       api.getUsersWishlistedBusinesses(userId)
         .then((res) => {
           this.wishlist = res.data;
+          this.calculateAllMuted();
         })
         .catch((error) => {
           if (error.response) {
