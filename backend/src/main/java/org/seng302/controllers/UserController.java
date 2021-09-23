@@ -14,6 +14,7 @@ import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -64,6 +65,10 @@ public class UserController {
 
 //    @Autowired
     private UserFinder userFinder;
+
+    @Autowired
+    private FileService fileService;
+
 
     @Value("${media.image.user.directory}")
     String rootImageDir;
@@ -303,7 +308,7 @@ public class UserController {
         }
 
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        if (currentUser != user) {
+        if (currentUser.getId() != id) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -320,20 +325,20 @@ public class UserController {
         }
 
         // Check if business' own folder directory exists - make directory if false.
-        File businessDir = new File(String.format("%sbusiness_%d", rootImageDir, businessId));
-        if (businessDir.mkdirs()) {
-            logger.info(String.format("Image of business directory did not exist - new directory created of %s", businessDir.getPath()));
+        File userDir = new File(String.format("%suser_%d", rootImageDir, id));
+        if (userDir.mkdirs()) {
+            logger.info(String.format("Image of user directory did not exist - new directory created of %s", userDir.getPath()));
         }
 
-        String id = "";
+        String imageId = "";
         boolean freeImage = false;
         int count = 0;
 
         while (!freeImage) {
-            id = String.valueOf(count);
-            File checkFile1 = new File(String.format("%s/%s.jpg", businessDir, id));
-            File checkFile2 = new File(String.format("%s/%s.png", businessDir, id));
-            File checkFile3 = new File(String.format("%s/%s.gif", businessDir, id));
+            imageId = String.valueOf(count);
+            File checkFile1 = new File(String.format("%s/%s.jpg", userDir, imageId));
+            File checkFile2 = new File(String.format("%s/%s.png", userDir, imageId));
+            File checkFile3 = new File(String.format("%s/%s.gif", userDir, imageId));
             if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
                 count++;
             }
@@ -342,24 +347,18 @@ public class UserController {
             }
         }
 
-        File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
-        File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
+        File file = new File(String.format("%s/%s%s", userDir, imageId, imageExtension));
+        File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", userDir, imageId, imageExtension));
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
         System.out.println(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
         // Save into DB.
-        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
-        product.addProductImage(newImage);
-        if (product.getPrimaryImagePath() == null) {
-            if (System.getProperty("os.name").startsWith("windows")) {
-                product.setPrimaryImage(String.format("business_%d\\%s%s", businessId, id, imageExtension));
-            } else {
-                product.setPrimaryImage(String.format("business_%d/%s%s", businessId, id, imageExtension));
-            }
-        }
-        productRepository.save(product);
+        Image newImage = new Image(imageName, imageId, file.toString(), thumbnailFile.toString());
+        user.addUserImage(newImage);
+        user.updatePrimaryImage(id, imageId, imageExtension);
+        userRepository.save(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
