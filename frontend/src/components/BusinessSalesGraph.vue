@@ -1,106 +1,108 @@
 <template>
   <div>
-    <vs-card id="options-container">
-      <div id="period-change-container">
-        <div class="options-header" style="display: flex; justify-content: center">
-          <span style="padding-right: 4px">Period</span>
-          <vs-tooltip text="Adjusts the length of time of each statistic">
-            <vs-icon icon="info" size="14px"/>
-          </vs-tooltip>
-        </div>
-        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-d'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 1;"
-                   @click="onPeriodChange('1-d')">
-          1 Day
-        </vs-button>
-        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-w'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 3;">
-          1 Week
-        </vs-button>
-        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-m'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 1;">
-          1 Month
-        </vs-button>
-        <vs-button v-bind:class="[{'active-button': activePeriodButton === '6-m'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 3;">
-          6 Months
-        </vs-button>
-        <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-y'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 1;">
-          1 Year
-        </vs-button>
-        <vs-button v-bind:class="[{'active-button': activePeriodButton === 'all'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 3;">
-          All
-        </vs-button>
-      </div>
-      <div id="custom-period-container">
-        <div class="options-header">Custom</div>
-        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start"
-                  danger-text="Date can not be in the future or after the end date"/>
-        <p style="margin: auto auto 0">-</p>
-        <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End"
-                  danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
-        <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
+    <div>
+      <vs-card id="options-container">
+<!--        <div id="period-change-container">-->
+<!--          <div class="options-header" style="display: flex; justify-content: center">-->
+<!--            <span style="padding-right: 4px">Period</span>-->
+<!--            <vs-tooltip text="Adjusts the length of time of each statistic">-->
+<!--              <vs-icon icon="info" size="14px"/>-->
+<!--            </vs-tooltip>-->
+<!--          </div>-->
+<!--          <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-d'}, 'options-button']"-->
+<!--                     type="border"-->
+<!--                     style="grid-column: 1;"-->
+<!--                     @click="onPeriodChange('1-d')">-->
+<!--            1 Day-->
+<!--          </vs-button>-->
+<!--          <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-w'}, 'options-button']"-->
+<!--                     type="border"-->
+<!--                     style="grid-column: 3;">-->
+<!--            1 Week-->
+<!--          </vs-button>-->
+<!--          <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-m'}, 'options-button']"-->
+<!--                     type="border"-->
+<!--                     style="grid-column: 1;">-->
+<!--            1 Month-->
+<!--          </vs-button>-->
+<!--          <vs-button v-bind:class="[{'active-button': activePeriodButton === '6-m'}, 'options-button']"-->
+<!--                     type="border"-->
+<!--                     style="grid-column: 3;">-->
+<!--            6 Months-->
+<!--          </vs-button>-->
+<!--          <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-y'}, 'options-button']"-->
+<!--                     type="border"-->
+<!--                     style="grid-column: 1;">-->
+<!--            1 Year-->
+<!--          </vs-button>-->
+<!--          <vs-button v-bind:class="[{'active-button': activePeriodButton === 'all'}, 'options-button']"-->
+<!--                     type="border"-->
+<!--                     style="grid-column: 3;">-->
+<!--            All-->
+<!--          </vs-button>-->
+<!--        </div>-->
+<!--        <div id="custom-period-container">-->
+<!--          <div class="options-header">Custom</div>-->
+<!--          <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start"-->
+<!--                    danger-text="Date can not be in the future or after the end date"/>-->
+<!--          <p style="margin: auto auto 0">-</p>-->
+<!--          <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End"-->
+<!--                    danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>-->
+<!--          <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>-->
 
-      </div>
-      <div id="granularity-container">
-        <div class="options-header">Summary Interval</div>
-        <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'd'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 1;"
-                   @click="getSalesData('day')">
-          Day
-        </vs-button>
-        <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 3;"
-                   @click="getSalesData('week')">
-          Week
-        </vs-button>
-        <vs-button id="month-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 1;"
-                   @click="getSalesData('month')">
-          Month
-        </vs-button>
-        <vs-button id="year-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
-                   type="border"
-                   style="grid-column: 3;"
-                   @click="getSalesData('year')">
-          Year
-        </vs-button>
-      </div>
-    </vs-card>
-  </div>
-  <div style="height: 400px">
-    <div v-if="toggleSales">
-      <vs-button  class="toggle-button" id="toggle-sales" @click="toggleSales = !toggleSales; getTotalSales()">
-        <vs-icon style="float: left; margin-right: 10px">
-          shopping_bag
-        </vs-icon>
-        <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
-          See Total Sales
-        </p>
-      </vs-button>
+<!--        </div>-->
+        <div id="granularity-container">
+          <div class="options-header">Summary Interval</div>
+          <vs-button v-bind:class="[{'active-button': activeGranularityButton === 'd'}, 'options-button']"
+                     type="border"
+                     style="grid-column: 1;"
+                     @click="changeGranularity('day')">
+            Day
+          </vs-button>
+          <vs-button id="week-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'w'}, 'options-button']"
+                     type="border"
+                     style="grid-column: 3;"
+                     @click="changeGranularity('week')">
+            Week
+          </vs-button>
+          <vs-button id="month-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'm'}, 'options-button']"
+                     type="border"
+                     style="grid-column: 1;"
+                     @click="changeGranularity('month')">
+            Month
+          </vs-button>
+          <vs-button id="year-granularity" v-bind:class="[{'active-button': activeGranularityButton === 'y'}, 'options-button']"
+                     type="border"
+                     style="grid-column: 3;"
+                     @click="changeGranularity('year')">
+            Year
+          </vs-button>
+        </div>
+      </vs-card>
     </div>
-    <div v-else>
-      <vs-button style="display: block;" class="toggle-button" id="toggle-sales-value" @click="toggleSales = !toggleSales; getTotalRevenue()">
-        <vs-icon style="float: left; margin-right: 10px">
-          price_change
-        </vs-icon>
-        <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
-          See Total Value
-        </p>
-      </vs-button>
+    <div style="height: 400px">
+      <div v-if="toggleSales">
+        <vs-button  class="toggle-button" id="toggle-sales" @click="toggleSales = !toggleSales; getTotalSales()">
+          <vs-icon style="float: left; margin-right: 10px">
+            shopping_bag
+          </vs-icon>
+          <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
+            See Total Sales
+          </p>
+        </vs-button>
+      </div>
+      <div v-else>
+        <vs-button style="display: block;" class="toggle-button" id="toggle-sales-value" @click="toggleSales = !toggleSales; getTotalRevenue()">
+          <vs-icon style="float: left; margin-right: 10px">
+            price_change
+          </vs-icon>
+          <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
+            See Total Value
+          </p>
+        </vs-button>
+      </div>
+      <apexchart id="sales-graph-report" width="100%" height="80%" type="bar" :options="options" :series="series"></apexchart>
     </div>
-    <apexchart id="sales-graph-report" width="100%" height="80%" type="bar" :options="options" :series="series"></apexchart>
   </div>
 </template>
 
@@ -122,6 +124,7 @@ export default {
   data: function() {
     return {
       activeGranularityButton: "m",
+      granularity: "",
 
       toggleSales: true,
       boughtListings: [],
@@ -152,29 +155,39 @@ export default {
   },
 
   methods: {
+    changeGranularity: function(newGranularity) {
+      this.granularity = newGranularity;
+
+      if (this.toggleSales) {
+        this.getTotalRevenue();
+      }
+      else {
+        this.getTotalSales();
+      }
+    },
+
     /**
      * retrieve total sales
      */
     getTotalSales: function () {
-      let yearlyDataSales = this.totalMonthlySales(this.boughtListings);
-      let yearlySales =  this.displaySalesData(yearlyDataSales);
+      // let yearlyDataSales = this.totalMonthlySales(this.boughtListings);
+      let salesData =  this.displaySalesData(this.boughtListings);
       this.series = [{
         name: 'Total Sales',
-        data: yearlySales,
+        data: salesData,
       }];
     },
 
     /**
      * retrieve total Revenue
      */
-    getTotalRevenue: function () {
+    getTotalRevenue: function() {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
-      let yearlyData = this.totalMonthlyRevenue(this.boughtListings);
-      let yearlyRevenue = this.displaySalesData(yearlyData);
+      let data = this.displaySalesData(this.boughtListings);
 
       this.series = [{
         name: 'Total Value',
-        data: yearlyRevenue,
+        data: data,
       }];
 
     },
@@ -185,10 +198,9 @@ export default {
     getSalesData: function() {
       api.getBusinessSales(this.businessId)
         .then((res) => {
-          let type = this.getNextFinestGranularity(res.data);
-          this.displaySalesData(res.data, type);
-          // this.boughtListings = res.data;
-          // this.getTotalRevenue();
+          this.granularity = this.getNextFinestGranularity(res.data);
+          this.boughtListings = res.data;
+          this.getTotalRevenue();
         })
         .catch((error) => {
           this.$log.error(error);
@@ -215,8 +227,10 @@ export default {
      * Calculate and displays sales data.
      * Currently creates and displays total monthly sales data.
      * @param data bought listings sales data
+     * @param type granularity type
+     * @param infoType type of information to return - either sales count or sales value.
      */
-    displaySalesData: function(data, type) {
+    displaySalesData: function(data) {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
       let processedData;
       let allData = [];
@@ -224,14 +238,14 @@ export default {
       let barFormat = "category";
       let labelFormat = "dd-MMM";
 
-      if (type.toLowerCase() === "year") {
+      if (this.granularity.toLowerCase() === "year") {
         this.activeGranularityButton = "y";
         processedData = this.totalYearlyRevenue(data);
         // Flatten object into array.
         for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
         // Generates the x-axis labels of each month, for each year.
         categories = Object.keys(processedData);
-      } else if (type.toLowerCase() === "month") {
+      } else if (this.granularity.toLowerCase() === "month") {
         this.activeGranularityButton = "m";
         barFormat = "datetime";
         labelFormat = "MMMM yyyy";
@@ -250,7 +264,7 @@ export default {
           }
           i++;
         }
-      } else if (type.toLowerCase() === "week") {
+      } else if (this.granularity.toLowerCase() === "week") {
         this.activeGranularityButton = "w";
         barFormat = "datetime";
         processedData = this.totalWeeklyRevenue(data);
@@ -262,7 +276,7 @@ export default {
         // Generates the x-axis labels of each month, for each year.
         categories = this.generateWeekLabels(processedData);
       }
-      else if (type.toLowerCase() === "day") {
+      else if (this.granularity.toLowerCase() === "day") {
         this.activeGranularityButton = "d";
         barFormat = "datetime";
         processedData = this.totalDailyRevenue(data);
@@ -275,11 +289,6 @@ export default {
       }
       // Updates the plot options and inputs.
       // Reassigning entire variable allows chart to properly update and play animations.
-      this.series = [{
-        name: 'Total Value',
-        data: allData,
-      }];
-
       this.options = {
         title: {
           text: "Monthly Total Sales",
@@ -318,7 +327,7 @@ export default {
           }
         },
       };
-      // return allData;
+      return allData;
     },
 
     /**
@@ -334,7 +343,12 @@ export default {
           if (processedData[soldDate.getFullYear()] == null) {
             processedData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
           }
-          processedData[soldDate.getFullYear()][soldDate.getMonth()] += +listing.price.toFixed(2);
+          if (!this.toggleSales) {
+            processedData[soldDate.getFullYear()][soldDate.getMonth()]++;
+          }
+          else {
+            processedData[soldDate.getFullYear()][soldDate.getMonth()] += +listing.price.toFixed(2);
+          }
         }
       return processedData;
     },
@@ -362,7 +376,14 @@ export default {
         if (weeklyData[soldDate.getFullYear()][mondayString] == null) {
           weeklyData[soldDate.getFullYear()][mondayString] = 0;
         }
-        weeklyData[soldDate.getFullYear()][mondayString] += +listing.price.toFixed(2);
+
+        if (!this.toggleSales) {
+          weeklyData[soldDate.getFullYear()][mondayString]++;
+        }
+        else {
+          weeklyData[soldDate.getFullYear()][mondayString] += +listing.price.toFixed(2);
+        }
+
       }
 
       return weeklyData;
@@ -381,7 +402,13 @@ export default {
         if (processedData[soldDate.getFullYear()] == null) {
           processedData[soldDate.getFullYear()] = 0;
         }
-        processedData[soldDate.getFullYear()] += +listing.price.toFixed(2);
+        if (!this.toggleSales) {
+          processedData[soldDate.getFullYear()]++;
+        }
+        else {
+          processedData[soldDate.getFullYear()] += +listing.price.toFixed(2);
+        }
+
       }
       return processedData;
     },
@@ -400,7 +427,13 @@ export default {
         if (processedData[soldString] == null) {
           processedData[soldString] = 0;
         }
-        processedData[soldString] += +listing.price.toFixed(2);
+        if (!this.toggleSales) {
+          processedData[soldString]++;
+        }
+        else {
+          processedData[soldString] += +listing.price.toFixed(2);
+        }
+
       }
 
       return processedData;
@@ -411,17 +444,17 @@ export default {
      * @return object where each key is a year, and the value is an array of size 12, each index representing a month,
      * and the value at each index representing the total revenue/value of listings sold.
      */
-    totalMonthlySales: function(data) {
-      let yearlyData = {};
-      for (let listing of data) {
-        let soldDate = new Date(listing.sold);
-        if (yearlyData[soldDate.getFullYear()] == null) {
-          yearlyData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        }
-        yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += 1;
-      }
-      return yearlyData;
-    },
+    // totalMonthlySales: function(data) {
+    //   let yearlyData = {};
+    //   for (let listing of data) {
+    //     let soldDate = new Date(listing.sold);
+    //     if (yearlyData[soldDate.getFullYear()] == null) {
+    //       yearlyData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    //     }
+    //     yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += 1;
+    //   }
+    //   return yearlyData;
+    // },
 
 
     /**
@@ -467,7 +500,7 @@ export default {
   },
 
   mounted: function() {
-    this.getSalesData();
+      this.getSalesData();
   },
 
 }
