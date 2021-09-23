@@ -143,15 +143,21 @@ public class UserController {
         else {
             List<String> registrationErrors = registrationUserCheck(reqBody);
             if (registrationErrors.isEmpty()) { // No errors found.
-                User modifiedUser = new User(reqBody);
-                userRepository.save(modifiedUser);
+                user.setFirstName(reqBody.getFirstName());
+                user.setLastName(reqBody.getLastName());
+                user.setMiddleName(reqBody.getMiddleName());
+                user.setNickname(reqBody.getNickname());
+                user.setBio(reqBody.getBio());
+                user.setEmail(reqBody.getEmail());
+                user.setDateOfBirth(reqBody.getDateOfBirth());
+                user.setPhoneNumber(reqBody.getPhoneNumber());
+                user.setFirstName(reqBody.getFirstName());
+                user.setHomeAddress(reqBody.getHomeAddress());
+                user.setPassword(Encrypter.hashString(reqBody.getPassword()));
+                userRepository.save(user);
 
-                Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
-                SecurityContextHolder.getContext().setAuthentication(auth);
-
-                UserIdResponse res = new UserIdResponse(modifiedUser);
+                UserIdResponse res = new UserIdResponse(user);
                 String jsonString = mapper.writeValueAsString(res);
-
                 return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
             }
             else {
