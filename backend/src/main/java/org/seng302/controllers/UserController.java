@@ -82,6 +82,11 @@ public class UserController {
         }
     }
 
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> modifyUser(@PathVariable String id) throws JsonProcessingException {
+        return null;
+    }
+
     /**
      * Login POST method. Checks if user exists and provided details are correct and authenticates if true.
      * @param loginRequest a login request containing the email and password.
