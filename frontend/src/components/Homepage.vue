@@ -263,18 +263,14 @@ const Homepage = {
      * Calculate whether allMuted is true or not
      */
     calculateAllMuted: function () {
-       this.allMuted = true;
-       if (this.wishlist.length === 0) {
-         this.allMuted = false;
-       } else {
-         //initally set muted to true
-         for (let wish of this.wishlist) {
-           if (wish.muted === false) {
-             this.allMuted = false;
-           }
-         }
-       }
+      this.allMuted = true;
+
+      for (let wishlistedBusiness of this.wishlist) {
+        if(wishlistedBusiness.mutedStatus === "Unmuted")
+          this.allMuted = false;
+      }
     },
+
 
     /**
      * Checks whether a business has been muted or not
@@ -291,7 +287,6 @@ const Homepage = {
      * @param wishlistedBusinessItem the business to toggle mute on
      */
     toggleMuteBusiness: function (wishlistedBusinessItem) {
-      console.log(wishlistedBusinessItem)
       if (wishlistedBusinessItem.mutedStatus === "Muted") {
         api.updateWishlistMuteStatus(wishlistedBusinessItem.id, "Muted")
             .then(() => {
@@ -351,6 +346,8 @@ const Homepage = {
         .then((res) => {
           this.wishlist = res.data;
           this.calculateAllMuted();
+          console.log(this.wishlist)
+
         })
         .catch((error) => {
           if (error.response) {
