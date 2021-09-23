@@ -50,6 +50,10 @@ public class Business implements Serializable {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Image> images;
+    private String primaryImagePath;
+
     protected Business() {}
 
     /**
@@ -64,6 +68,9 @@ public class Business implements Serializable {
         this.description = description;
         this.address = address;
         this.businessType = businessType;
+
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
     }
 
     /**
@@ -75,6 +82,9 @@ public class Business implements Serializable {
         this.administrators.add(owner);
         this.primaryAdministrator = owner;
         this.created = new Date();
+
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
     }
 
     /**
@@ -84,5 +94,17 @@ public class Business implements Serializable {
     public List<Long> collectAdministratorIds() {
         return this.getAdministrators().stream().map(User::getId).collect(Collectors.toList());
     }
+
+    /**
+     * Adds a new image to the business entity
+     * @param image image object to add
+     */
+    public void addBusinessImage(Image image) { this.images.add(image); }
+
+    /**
+     * Sets the primary image to the image specified by the path
+     * @param path the path to the wanted primary image
+     */
+    public void setPrimaryImage(String path) { this.primaryImagePath = path; }
 
 }
