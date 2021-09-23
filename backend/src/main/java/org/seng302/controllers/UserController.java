@@ -8,6 +8,7 @@ import org.seng302.finders.UserFinder;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
+import org.seng302.models.requests.ModifyUserRequest;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
@@ -82,11 +83,6 @@ public class UserController {
         }
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<String> modifyUser(@PathVariable String id) throws JsonProcessingException {
-        return null;
-    }
-
     /**
      * Login POST method. Checks if user exists and provided details are correct and authenticates if true.
      * @param loginRequest a login request containing the email and password.
@@ -125,6 +121,46 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
    }
 
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException {
+
+        User user = userRepository.findUserById(Long.parseLong(id));
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        else if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        else if (reqBody == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        else if (userRepository.findUserByEmail(reqBody.getEmail()) != null &&
+                !currentUser.getEmail().equals(reqBody.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        else {
+            List<String> registrationErrors = registrationUserCheck(reqBody);
+            if (registrationErrors.isEmpty()) { // No errors found.
+                User modifiedUser = new User(reqBody);
+                userRepository.save(modifiedUser);
+
+                Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_USER"));
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
+                UserIdResponse res = new UserIdResponse(modifiedUser);
+                String jsonString = mapper.writeValueAsString(res);
+
+                return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
+            }
+            else {
+                logger.error("Invalid registration.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errors with registration details: " + registrationErrors);
+            }
+        }
+    }
 
     /**
      * This method inserts a new user into the user repository
