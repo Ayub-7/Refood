@@ -528,4 +528,28 @@ class UserControllerTests {
         UserIdResponse response = new UserIdResponse(user);
         assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
     }
+
+    @Test
+    void testModifyUser_NotLoggedIn() throws Exception {
+        Address minAddress = new Address(null, null, null, null, "Canada", null);
+        NewUserRequest minUserRequest = new NewUserRequest("John", null, "Smith", null,
+                null, "johnsmith99@gmail.com", "1999-04-27", null, minAddress, "1337-H%nt3r2");
+        mockMvc.perform(post("/users/{id}", 0)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(minUserRequest)))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    void testModifyUser_NonExistingUser() throws Exception {
+        Address minAddress = new Address(null, null, null, null, "Canada", null);
+        NewUserRequest minUserRequest = new NewUserRequest("John", null, "Smith", null,
+                null, "johnsmith99@gmail.com", "1999-04-27", null, minAddress, "1337-H%nt3r2");
+//        Mockito.when(userRepository.findUserById(3)).thenReturn(null);
+        mockMvc.perform(post("/users/{id}", 3)
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(minUserRequest)))
+                .andExpect(status().isNotAcceptable());
+    }
 }

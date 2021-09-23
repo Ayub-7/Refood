@@ -126,12 +126,11 @@ public class UserController {
 
         User user = userRepository.findUserById(Long.parseLong(id));
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
-        else if (currentUser == null) {
+        if (currentUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        else if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
         else if (reqBody == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
