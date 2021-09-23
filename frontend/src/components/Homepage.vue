@@ -255,7 +255,6 @@ const Homepage = {
      * Calculate whether allMuted is true or not
      */
     calculateAllMuted: function () {
-      console.log(this.wishlist)
       this.allMuted = true;
 
       for (let wishlistedBusiness of this.wishlist) {
