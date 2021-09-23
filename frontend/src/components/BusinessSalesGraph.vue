@@ -78,7 +78,29 @@
         </vs-button>
       </div>
     </vs-card>
-    <apexchart id="sales-graph-report" width="100%" height="90%" type="bar" :options="options" :series="series"></apexchart>
+  </div>
+  <div style="height: 400px">
+    <div v-if="toggleSales">
+      <vs-button  class="toggle-button" id="toggle-sales" @click="toggleSales = !toggleSales; getTotalSales()">
+        <vs-icon style="float: left; margin-right: 10px">
+          shopping_bag
+        </vs-icon>
+        <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
+          See Total Sales
+        </p>
+      </vs-button>
+    </div>
+    <div v-else>
+      <vs-button style="display: block;" class="toggle-button" id="toggle-sales-value" @click="toggleSales = !toggleSales; getTotalRevenue()">
+        <vs-icon style="float: left; margin-right: 10px">
+          price_change
+        </vs-icon>
+        <p style="white-space: nowrap; margin-top: 5px; margin-right:15px ">
+          See Total Value
+        </p>
+      </vs-button>
+    </div>
+    <apexchart id="sales-graph-report" width="100%" height="80%" type="bar" :options="options" :series="series"></apexchart>
   </div>
 </template>
 
@@ -101,6 +123,8 @@ export default {
     return {
       activeGranularityButton: "m",
 
+      toggleSales: true,
+      boughtListings: [],
       series: [{
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       }],
@@ -129,6 +153,33 @@ export default {
 
   methods: {
     /**
+     * retrieve total sales
+     */
+    getTotalSales: function () {
+      let yearlyDataSales = this.totalMonthlySales(this.boughtListings);
+      let yearlySales =  this.displaySalesData(yearlyDataSales);
+      this.series = [{
+        name: 'Total Sales',
+        data: yearlySales,
+      }];
+    },
+
+    /**
+     * retrieve total Revenue
+     */
+    getTotalRevenue: function () {
+      // Categorises and sums up data, splitting each bought listing into it's respective year and month.
+      let yearlyData = this.totalMonthlyRevenue(this.boughtListings);
+      let yearlyRevenue = this.displaySalesData(yearlyData);
+
+      this.series = [{
+        name: 'Total Value',
+        data: yearlyRevenue,
+      }];
+
+    },
+
+    /**
      * Retrieve's the business' bought listing data.
      */
     getSalesData: function() {
@@ -136,6 +187,8 @@ export default {
         .then((res) => {
           let type = this.getNextFinestGranularity(res.data);
           this.displaySalesData(res.data, type);
+          // this.boughtListings = res.data;
+          // this.getTotalRevenue();
         })
         .catch((error) => {
           this.$log.error(error);
@@ -252,13 +305,20 @@ export default {
         },
         tooltip: {
           y: {
-            formatter: (val) => this.currencySymbol + val.toFixed(2),
+            formatter: (val) => {
+              if (this.toggleSales) {
+                return this.currencySymbol + val.toFixed(2);
+              } else {
+                return val;
+              }
+            }
           },
           x: {
             format: labelFormat
           }
         },
       };
+      // return allData;
     },
 
     /**
@@ -345,6 +405,24 @@ export default {
 
       return processedData;
     },
+    /**
+     * Categorises and sums up data, splitting each bought listing into it's respective year and month.
+     * @param data the bought listing data (i.e. the sold listings).
+     * @return object where each key is a year, and the value is an array of size 12, each index representing a month,
+     * and the value at each index representing the total revenue/value of listings sold.
+     */
+    totalMonthlySales: function(data) {
+      let yearlyData = {};
+      for (let listing of data) {
+        let soldDate = new Date(listing.sold);
+        if (yearlyData[soldDate.getFullYear()] == null) {
+          yearlyData[soldDate.getFullYear()] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        }
+        yearlyData[soldDate.getFullYear()][soldDate.getMonth()] += 1;
+      }
+      return yearlyData;
+    },
+
 
     /**
      * Generates an array of strings containing each month for every given year.
@@ -435,6 +513,13 @@ export default {
 .date-input {
   width: 136px;
   margin: auto;
+}
+
+.toggle-button {
+  /*margin-right: 10px;*/
+  margin-left: 5px;
+  margin-bottom: 7px;
+  padding-right: 30px;
 }
 
 </style>
