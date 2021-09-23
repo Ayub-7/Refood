@@ -234,7 +234,6 @@ const Homepage = {
     this.checkUserSession();
     this.getLikes(this.userId);
     this.getWishlist(this.userId);
-    this.calculateAllMuted();
   },
 
   methods: {
@@ -300,6 +299,7 @@ const Homepage = {
       api.getUsersWishlistedBusinesses(userId)
         .then((res) => {
           this.wishlist = res.data;
+          this.calculateAllMuted();
         })
         .catch((error) => {
           if (error.response) {
