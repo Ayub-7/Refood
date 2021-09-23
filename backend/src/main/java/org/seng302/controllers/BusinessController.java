@@ -375,9 +375,7 @@ public class BusinessController {
             }
 
             business = updateBusiness(request, business);
-
             businessRepository.save(business);
-
             return ResponseEntity.status(HttpStatus.OK).build();
 
         } else {
@@ -406,11 +404,32 @@ public class BusinessController {
 
     /**
      * Checks request and ensures name and description is valid
-     * @param businessRequest request containing new business infomation
+     * @param businessRequest request containing new business information
      * @return True if valid, false otherwise
      */
     private boolean checkBusinessRequest(NewBusinessRequest businessRequest) {
-        return businessRequest.getName().length() <= 30 && businessRequest.getDescription().length() <= 140;
+        int nameLength = businessRequest.getName().length();
+        int descriptionLength = businessRequest.getDescription().length();
+        String country = businessRequest.getAddress().getCountry();
+
+        if(businessRequest.getBusinessType() == null) {
+            return false;
+        }
+
+        //https://www.quora.com/Which-country-has-the-longest-name 🥴
+        if(country == null || country.length() < 1 || country.length() > 74) {
+            return false;
+        }
+        if(nameLength > 30 || nameLength < 1 || businessRequest.getName() == null) {
+            return false;
+        }
+        if(descriptionLength > 140) {
+            return false;
+        }
+
+        return true;
+
+
     }
 
 
