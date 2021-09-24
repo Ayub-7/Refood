@@ -370,7 +370,9 @@ public class BusinessController {
             if (business == null) {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
             }
-            if(business.getPrimaryAdministrator().getId() != currentUser.getId()) {
+
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 

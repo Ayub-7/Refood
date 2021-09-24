@@ -516,7 +516,7 @@ class BusinessControllerTests {
 
     @Test
     @WithMockUser
-    void modifyBusiness_notPrimaryAdmin_returns403() throws Exception {
+    void modifyBusiness_notPrimaryAdmin_returns200() throws Exception {
         NewBusinessRequest testBusiness = new NewBusinessRequest("Business", "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
 
         Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
@@ -524,7 +524,7 @@ class BusinessControllerTests {
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(testBusiness))
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
     }
 
     @Test
