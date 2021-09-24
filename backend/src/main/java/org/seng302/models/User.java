@@ -51,7 +51,7 @@ public class User implements Serializable {
     @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
     private List<Business> businessesAdministered;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Image> images;
 
     private String primaryImagePath;
@@ -144,7 +144,7 @@ public class User implements Serializable {
      * Adds a new image to the product entity.
      * @param image the image object to add.
      */
-    public void addProductImage(Image image) {
+    public void addUserImage(Image image) {
         this.images.add(image);
     }
 

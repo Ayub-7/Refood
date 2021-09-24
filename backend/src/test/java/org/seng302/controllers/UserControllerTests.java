@@ -56,7 +56,7 @@ class UserControllerTests {
     @Autowired
     private ObjectMapper mapper;
 
-    User user;
+    private User user;
     List<User> users;
     private Image image1;
 
@@ -66,8 +66,10 @@ class UserControllerTests {
         image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
 
         user = new User("John", "Smith", addr, "johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
-        user.addProductImage(image1);
+        user.addUserImage(image1);
         user.setId(1L);
+        userRepository.save(user);
+
 
         users = new ArrayList<User>();
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
@@ -547,7 +549,6 @@ class UserControllerTests {
     }
 
     // User image tests
-
     @Test
     @WithMockUser(roles="USER")
     void testBadImageIdSetUserImage() throws Exception {
@@ -572,6 +573,7 @@ class UserControllerTests {
     @WithMockUser(roles="USER")
     void testForbiddenSetUserImage() throws Exception {
         //forbidden user
+        user.addUserImage(image1);
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User forbidden = new User("test", "user", addr, "test@gmail.com", "password", Role.USER);
         mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
@@ -595,6 +597,7 @@ class UserControllerTests {
 //        byte[] bytes = FileCopyUtils.copyToByteArray(data);
 //        MockMultipartFile image = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
         // Business owner
+        user.addUserImage(image1);
         mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
@@ -603,7 +606,7 @@ class UserControllerTests {
     @Test
     @WithMockUser(roles="USER")
     void testSetProductImageDgaaSuccessful() throws Exception {
-
+        user.addUserImage(image1);
         // DGAA not owner of business
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User gaa = new User("test", "GAA", addr, "test@tester.com", "password", Role.GAA);
