@@ -294,6 +294,7 @@ public class UserController {
     @PutMapping("/users/{id}/images/{imageId}/makeprimary")
     public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long id, @PathVariable String imageId, HttpSession session) {
         User user = userRepository.findUserById(id);
+        System.out.println(user);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }

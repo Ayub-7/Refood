@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Address;
+import org.seng302.models.Image;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -25,11 +26,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,11 +58,17 @@ class UserControllerTests {
 
     User user;
     List<User> users;
+    private Image image1;
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+
         user = new User("John", "Smith", addr, "johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
+        user.addProductImage(image1);
+        user.setId(1L);
+
         users = new ArrayList<User>();
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user1 = new User("John", "Hector", "Smith", "Jonny",
@@ -69,9 +80,15 @@ class UserControllerTests {
         User user3 = new User("Oliver", "Alfred", "Smith", "Ollie",
                 "Likes long walks on the beach", "ollie69@gmail.com",
                 "1969-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+
         users.add(user1);
         users.add(user2);
         users.add(user3);
+
+
+
+
+
     }
 
     @Test
@@ -527,5 +544,71 @@ class UserControllerTests {
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
         UserIdResponse response = new UserIdResponse(user);
         assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
+    }
+
+    // User image tests
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testBadImageIdSetUserImage() throws Exception {
+        // Wrong image id
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(put("/users/{id}/images/100/makeprimary", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testBadUserIdSetUserImage() throws Exception {
+        //wrong user id
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(put("/users/50/images/{imageId}/makeprimary", image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testForbiddenSetUserImage() throws Exception {
+        //forbidden user
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User forbidden = new User("test", "user", addr, "test@gmail.com", "password", Role.USER);
+        mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbidden))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void noAuthSetImage() throws Exception {
+    // no authentication
+    mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId()))
+            .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testSetProductImageSuccessful() throws Exception {
+//        File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
+//        assertThat(data).exists();
+//        byte[] bytes = FileCopyUtils.copyToByteArray(data);
+//        MockMultipartFile image = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
+        // Business owner
+        mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testSetProductImageDgaaSuccessful() throws Exception {
+
+        // DGAA not owner of business
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User gaa = new User("test", "GAA", addr, "test@tester.com", "password", Role.GAA);
+        mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
+                .andExpect(status().isOk());
     }
 }
