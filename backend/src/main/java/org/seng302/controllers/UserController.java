@@ -129,9 +129,6 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        else if (reqBody == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
         else if (userRepository.findUserByEmail(reqBody.getEmail()) != null &&
                 !currentUser.getEmail().equals(reqBody.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -157,8 +154,8 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(jsonString);
             }
             else {
-                logger.error("Invalid registration.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errors with registration details: " + registrationErrors);
+                logger.error("Invalid user modification.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errors with modifying the user's details: " + registrationErrors);
             }
         }
     }
