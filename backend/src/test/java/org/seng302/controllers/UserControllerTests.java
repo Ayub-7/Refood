@@ -567,7 +567,7 @@ class UserControllerTests {
         User user1 = new User("John", "Hector", "Smith", "Jonny",
                 "Likes long walks on the beach", "johnsmith99@gmail.com",
                 "1999-04-27", "+64 3 555 0129", minAddress, "1337-H%nt3r2");
-        Mockito.when(userRepository.findUserById(0)).thenReturn(null);
+        Mockito.when(userRepository.findUserById(0)).thenReturn(user1);
         mockMvc.perform(put("/users/{id}", 0)
                 .contentType("application/json")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user1))
