@@ -235,11 +235,8 @@ export default {
     },
 
     /**
-     * Calculate and displays sales data.
-     * Currently creates and displays total monthly sales data.
+     * Displays sales data.
      * @param data bought listings sales data
-     * @param type granularity type
-     * @param infoType type of information to return - either sales count or sales value.
      */
     displaySalesData: function(data) {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
