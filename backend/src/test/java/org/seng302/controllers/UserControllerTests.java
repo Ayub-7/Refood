@@ -534,7 +534,7 @@ class UserControllerTests {
         Address minAddress = new Address(null, null, null, null, "Canada", null);
         NewUserRequest minUserRequest = new NewUserRequest("John", null, "Smith", null,
                 null, "johnsmith99@gmail.com", "1999-04-27", null, minAddress, "1337-H%nt3r2");
-        mockMvc.perform(post("/users/{id}", 0)
+        mockMvc.perform(put("/users/{id}", 0)
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(minUserRequest)))
                 .andExpect(status().isUnauthorized());
@@ -542,14 +542,58 @@ class UserControllerTests {
 
 
     @Test
+    @WithMockUser(username="johnsmith99@gmail.com", password="1337-H%nt3r2", roles="USER")
     void testModifyUser_NonExistingUser() throws Exception {
         Address minAddress = new Address(null, null, null, null, "Canada", null);
         NewUserRequest minUserRequest = new NewUserRequest("John", null, "Smith", null,
                 null, "johnsmith99@gmail.com", "1999-04-27", null, minAddress, "1337-H%nt3r2");
-//        Mockito.when(userRepository.findUserById(3)).thenReturn(null);
-        mockMvc.perform(post("/users/{id}", 3)
+        User user1 = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", minAddress, "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserById(0)).thenReturn(null);
+        mockMvc.perform(put("/users/{id}", 0)
                 .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user1)
                 .content(mapper.writeValueAsString(minUserRequest)))
                 .andExpect(status().isNotAcceptable());
     }
+
+    @Test
+    @WithMockUser(username="johnsmith99@gmail.com", password="1337-H%nt3r2", roles="USER")
+    void testModifyUser_undefinedReqBody() throws Exception {
+        Address minAddress = new Address(null, null, null, null, "Canada", null);
+        NewUserRequest minUserRequest = new NewUserRequest("John", null, "Smith", null,
+                null, "johnsmith99@gmail.com", "1999-04-27", null, minAddress, "1337-H%nt3r2");
+        User user1 = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", minAddress, "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserById(0)).thenReturn(null);
+        mockMvc.perform(put("/users/{id}", 0)
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user1))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockUser(username="omar@mail.com", password="1337-H%nt3r2", roles="USER")
+    void testModifyUser_ConflictingEmails() throws Exception {
+        Address minAddress = new Address(null, null, null, null, "Canada", null);
+        NewUserRequest minUserRequest = new NewUserRequest("John", null, "Smith", null,
+                null, "johnsmith99@gmail.com", "1999-04-27", null, minAddress, "1337-H%nt3r2");
+        User user1 = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "johnsmith99@gmail.com",
+                "1999-04-27", "+64 3 555 0129", minAddress, "1337-H%nt3r2");
+        User user2 = new User("John", "Hector", "Smith", "Jonny",
+                "Likes long walks on the beach", "omar@mail.com",
+                "1999-04-27", "+64 3 555 0129", minAddress, "1337-H%nt3r2");
+        Mockito.when(userRepository.findUserById(0)).thenReturn(user2);
+        Mockito.when(userRepository.findUserByEmail("johnsmith99@gmail.com")).thenReturn(user1);
+        mockMvc.perform(put("/users/{id}", 0)
+                .contentType("application/json")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user2)
+                .content(mapper.writeValueAsString(minUserRequest)))
+                .andExpect(status().isConflict());
+    }
+
 }

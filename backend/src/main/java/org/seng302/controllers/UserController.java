@@ -157,7 +157,7 @@ public class UserController {
 
                 UserIdResponse res = new UserIdResponse(user);
                 String jsonString = mapper.writeValueAsString(res);
-                return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(jsonString);
+                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(jsonString);
             }
             else {
                 logger.error("Invalid registration.");
