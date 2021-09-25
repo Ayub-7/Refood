@@ -278,7 +278,8 @@ export default {
           }
           i++;
         }
-      } else if (this.granularity.toLowerCase() === "week") {
+      }
+      else if (this.granularity.toLowerCase() === "week") {
         this.title = "Weekly ";
         this.activeGranularityButton = "w";
         barFormat = "datetime";
@@ -292,7 +293,8 @@ export default {
 
         // Generates the x-axis labels of each month, for each year.
         categories = this.generateWeekLabels(processedData);
-      } else if (this.granularity.toLowerCase() === "day") {
+      }
+      else if (this.granularity.toLowerCase() === "day") {
         this.title = "Daily ";
         this.activeGranularityButton = "d";
         barFormat = "datetime";
@@ -302,7 +304,6 @@ export default {
         for (let day of Object.entries(processedData)) {
           allData.push(day[1]);
         }
-
       }
 
       //Updates the graph title accordingly
@@ -337,9 +338,10 @@ export default {
           type: barFormat,
           categories: categories,
           labels: {
+            datetimeUTC: false,
             datetimeFormatter: {
               year: 'yyyy',
-              month: "MMM",
+              month: "MMM"
             },
           }
         },
