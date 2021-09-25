@@ -533,8 +533,8 @@ class ListingControllerTest {
     @Test
     void testFilterWishlist_withMuted_filtersFromList() throws Exception {
         List<WishlistItem> wishlists = new ArrayList<>();
-        WishlistItem unmuted = new WishlistItem(user.getId(), business.getId());
-        WishlistItem muted = new WishlistItem(adminUser.getId(), business.getId());
+        WishlistItem unmuted = new WishlistItem(user.getId(), business);
+        WishlistItem muted = new WishlistItem(adminUser.getId(), business);
         muted.muteBusiness();
         wishlists.add(unmuted);
         wishlists.add(muted);
@@ -549,8 +549,8 @@ class ListingControllerTest {
     @Test
     void testFilterWishlist_withoutMuted_notFilterFromList() throws Exception {
         List<WishlistItem> wishlists = new ArrayList<>();
-        WishlistItem unmutedA = new WishlistItem(user.getId(), business.getId());
-        WishlistItem unmutedB = new WishlistItem(adminUser.getId(), business.getId());
+        WishlistItem unmutedA = new WishlistItem(user.getId(), business);
+        WishlistItem unmutedB = new WishlistItem(adminUser.getId(), business);
         wishlists.add(unmutedA);
         wishlists.add(unmutedB);
 
@@ -572,8 +572,8 @@ class ListingControllerTest {
     @Test
     void testFilterWishlist_allMuted_returnsEmptyList() throws Exception {
         List<WishlistItem> wishlists = new ArrayList<>();
-        WishlistItem mutedA = new WishlistItem(user.getId(), business.getId());
-        WishlistItem mutedB = new WishlistItem(adminUser.getId(), business.getId());
+        WishlistItem mutedA = new WishlistItem(user.getId(), business);
+        WishlistItem mutedB = new WishlistItem(adminUser.getId(), business);
         mutedA.muteBusiness();
         mutedB.muteBusiness();
         wishlists.add(mutedA);
