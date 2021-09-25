@@ -308,7 +308,7 @@ public class UserController {
         }
 
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        if (currentUser.getId() != id) {
+        if (currentUser.getId() != id && currentUser.getRole() == Role.USER) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
