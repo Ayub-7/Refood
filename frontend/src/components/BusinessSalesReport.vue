@@ -420,8 +420,6 @@ export default {
       let endDate = moment(new Date(this.dateEnd))
       let summary = []
       let finalSummary = []
-      console.log(startDate.toDate())
-      console.log(intervalDate.toDate())
       let currYear = moment(startDate).year();
       let latestYear = moment(this.getLatestDate()).year();
 
@@ -459,9 +457,6 @@ export default {
             } else {
               intervalDate = startDate.clone().endOf('isoWeek');
               startDate = startDate.startOf('isoWeek');
-              console.log(startDate.toDate())
-              console.log(intervalDate.toDate())
-
             }
           }
       }
