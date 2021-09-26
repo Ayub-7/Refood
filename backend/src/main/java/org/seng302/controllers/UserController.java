@@ -306,14 +306,11 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         if (currentUser.getId() != id && currentUser.getRole() == Role.USER) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
         String imageExtension;
-
         if (image.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
         }
@@ -323,17 +320,14 @@ public class UserController {
         catch (InvalidImageExtensionException exception) {
             throw new InvalidImageExtensionException(exception.getMessage());
         }
-
         // Check if business' own folder directory exists - make directory if false.
         File userDir = new File(String.format("%suser_%d", rootImageDir, id));
         if (userDir.mkdirs()) {
             logger.info(String.format("Image of user directory did not exist - new directory created of %s", userDir.getPath()));
         }
-
         String imageId = "";
         boolean freeImage = false;
         int count = 0;
-
         while (!freeImage) {
             imageId = String.valueOf(count);
             File checkFile1 = new File(String.format("%s/%s.jpg", userDir, imageId));
@@ -346,7 +340,6 @@ public class UserController {
                 freeImage = true;
             }
         }
-
         File file = new File(String.format("%s/%s%s", userDir, imageId, imageExtension));
         File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", userDir, imageId, imageExtension));
         logger.info(String.format("Working Directory = %s", System.getProperty("user.dir")));
@@ -359,7 +352,6 @@ public class UserController {
         user.addUserImage(newImage);
         user.updatePrimaryImage(id, imageId, imageExtension);
         userRepository.save(user);
-
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -375,7 +367,6 @@ public class UserController {
         if (userRepository.findUserById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         userRepository.updateUserRole(id, Role.GAA);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -390,12 +381,10 @@ public class UserController {
         if (userRepository.findUserById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         User self = (User) session.getAttribute("user");
         if (self != null && self.getId() == id) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-
         userRepository.updateUserRole(id, Role.USER);
         return ResponseEntity.status(HttpStatus.OK).build();
 
