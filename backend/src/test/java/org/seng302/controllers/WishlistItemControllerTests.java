@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -86,6 +87,7 @@ class WishlistItemControllerTests {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
         Mockito.when(wishlistItemRepository.findWishlistItemsByUserId(user.getId())).thenReturn(wishlistItemList);
         mockMvc.perform(get("/users/{id}/wishlist", user.getId())
+                .param("unmutedOnly", "true")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isNotAcceptable());
     }
@@ -96,6 +98,7 @@ class WishlistItemControllerTests {
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         Mockito.when(wishlistItemRepository.findWishlistItemsByUserId(user.getId())).thenReturn(wishlistItemList);
         mockMvc.perform(get("/users/{id}/wishlist", user.getId())
+                .param("unmutedOnly", "true")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
     }

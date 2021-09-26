@@ -77,18 +77,16 @@
             </div>
           </div>
           <div v-if="!watchlist">
-            <vs-row style="margin-top: -40px; margin-bottom: 20px;" vs-type="flex" vs-justify="right">
-              <div v-if="wishlist.length > 0">
-                <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'" style="margin-right: 30px">
-                  <vs-button @click="toggleMuteAll" v-if="allMuted == true" color="purple">
-                    <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
-                  </vs-button>
-                  <vs-button v-else @click="toggleMuteAll" color="purple">
-                    <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
-                  </vs-button>
-                </vs-tooltip>
-              </div>
-            </vs-row>
+            <div v-if="wishlist.length > 0">
+              <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'">
+                <vs-button id="mute-all-btn" @click="toggleMuteAll" v-if="allMuted == true" style="width: 100%; margin-bottom: 20px" color="grey">
+                  <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+                <vs-button v-else class="mute-all-btn" @click="toggleMuteAll" style="width: 100%; margin-bottom: 20px" color="grey">
+                  <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+              </vs-tooltip>
+            </div>
             <div v-if="wishlist.length > 0">
               <div v-for="wish in wishlist" :key="wish.id" >
                 <vs-card style="margin-top: -10px"  actionable>
@@ -98,9 +96,16 @@
                         <vs-tooltip text="Remove from wishlist">
                           <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" @click="removeFromWishlist(wish.id)"></vs-icon>
                         </vs-tooltip>
-                        <div @click="viewBusiness(wish.business.id)" style="width: 100%; color: white;">
+                        <div @click="viewBusiness(wish.business.id)" style="width: 90%; color: white;">
                           p
                         </div>
+                        <vs-tooltip v-if="!isMuted(wish.mutedStatus)" text="Mute this business">
+                          <vs-icon icon="notifications" class="msg-icon" color="grey" @click="toggleMuteBusiness(wish)"></vs-icon>
+                        </vs-tooltip>
+                        <vs-tooltip v-if="isMuted(wish.mutedStatus)" text="Unmute this business">
+                          <vs-icon icon="notifications_off" class="msg-icon" color="grey" @click="toggleMuteBusiness(wish)"></vs-icon>
+                        </vs-tooltip>
+
                       </vs-col>
                     </vs-row>
                     <div @click="viewBusiness(wish.business.id)" id="business-card">
@@ -251,6 +256,10 @@ const Homepage = {
 
     /**
      * Calculate whether allMuted is true or not
+     * This function sets the Mute All button to either mute or unmute
+     * It is called every time a Wishlisted Business is added or removed and during page load
+     * If all Wishlisted Business' are manually/individually muted, set the button to 'Unmute All'
+     * If any single Wishlisted Business is unmuted, set the button to "Mute All'
      */
     calculateAllMuted: function () {
       this.allMuted = true;
@@ -261,39 +270,71 @@ const Homepage = {
       }
     },
 
+
+    /**
+     * Checks whether a business has been muted or not
+     * @param muteStatus
+     * @return Boolean whether muteStatus is equal the string "Muted" or not
+     */
+    isMuted: function (muteStatus) {
+      return muteStatus === "Muted";
+    },
+
+    /**
+     * Mutes a single wishlisted business
+     * To updateWishlistMuteStatus, the current mutedStatus needs to be called.
+     * Ie if we were to unmute a currently muted wishlisted business, we must send the status 'Muted' as a parameter
+     * @param wishlistedBusinessItem the business to toggle mute on
+     */
+    toggleMuteBusiness: function (wishlistedBusinessItem) {
+      api.updateWishlistMuteStatus(wishlistedBusinessItem.id, wishlistedBusinessItem.mutedStatus)
+          .then(() => {
+            this.getWishlist(this.userId);
+            this.$vs.notify({title: "Business successfully unmuted", color: "success"});
+          })
+          .catch(() => {
+            this.$vs.notify({title: "Error muting business", color: "danger"});
+          });
+
+    },
+
+
     /**
      * Calls the api endpoint, updating the mute status of all the wishlist items
      */
-    toggleMuteAll: function () {
-      if (this.allMuted) {
-        for (let wish of this.wishlist) {
-          api.updateWishlistMuteStatus(wish.id, "Muted")
-            .catch(() => {
-              this.$vs.notify({title: "Error unmuting wishlist", color: "danger"});
-            });
-        }
-        this.$vs.notify({title: "Wishlist successfully unmuted", color: "success"});
-        this.allMuted = false;
-      } else {
-        for (let wish of this.wishlist) {
-          api.updateWishlistMuteStatus(wish.id, "Unmuted")
-            .catch(() => {
-              this.$vs.notify({title: "Error muting wishlist", color: "danger"});
-            })
-        }
-        this.$vs.notify({title: "Wishlist successfully muted", color: "success"});
+    toggleMuteAll: async function () {
+      //toggle the 'Mute All' button
+      let muteStatus;
+      if (!this.allMuted) {
         this.allMuted = true;
+        muteStatus = "Unmuted";
+      } else {
+        muteStatus = "Muted";
+        this.allMuted = false;
       }
+
+      //Set the mute/unmute state for every business in the wishlist
+      for (let wish of this.wishlist) {
+        api.updateWishlistMuteStatus(wish.id, muteStatus)
+            .catch(() => {
+              this.$vs.notify({title: "Error updating wishlist mute/unmute", color: "danger"});
+            });
+      }
+      await this.getWishlist(this.userId);
+      this.$vs.notify({title: "All businesses successfully muted/unmuted", color: "success"});
+
     },
 
     /**
      * Call the api function and retrieve wishlisted businesses
+     * @param userId ID of user who is currently logged in
      */
     getWishlist: function (userId) {
       api.getUsersWishlistedBusinesses(userId)
         .then((res) => {
           this.wishlist = res.data;
           this.calculateAllMuted();
+
         })
         .catch((error) => {
           if (error.response) {
@@ -304,6 +345,7 @@ const Homepage = {
 
     /**
      * Call api function to remove business from user's wishlist
+     * @param wishlistItemId ID of the business that the user 'Wishlisted'
      */
     removeFromWishlist: function (wishlistItemId) {
       api.removeBusinessFromWishlist(wishlistItemId)
@@ -322,20 +364,25 @@ const Homepage = {
 
     /**
      * Go to business profile
+     * @param businessId Id of the business in 'Wishlisted Businesses'
      */
     viewBusiness: function (businessId) {
       this.$router.push({name: "Business", params: {id: businessId}})
     },
 
     /**
-     * open listing
+     * Open listing
+     * @param businessId ID of the business owning the selected listing
+     * @param listingId The selected listing's ID
      */
     viewListing: function (businessId, listingId) {
       this.$router.push({name: "Listing", params: {businessId: businessId, listingId: listingId}})
     },
 
     /**
-     * unlike an item
+     * Unlike an item
+     * @param id ID of user who is currently logged in
+     * @param index Location of the Listing in,this.likedItem, that the user unliked
      */
     unlike: function (id, index) {
       this.likes -= 1;
@@ -354,6 +401,7 @@ const Homepage = {
 
     /**
      * Retrieves all the listings that the user has liked.
+     * @param userId ID of user who is currently logged in
      */
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
@@ -400,6 +448,7 @@ const Homepage = {
 
     /**
      * Retrieves all the cards that the user has created.
+     * @param id ID of user who is currently logged in
      */
     getUserCards: function(id) {
       this.$vs.loading({
@@ -431,7 +480,7 @@ const Homepage = {
      * Also sets the users details in store.js, so the users session can be maintained
      * as they navigate throughout the applications and 'act' as a business
      *
-     * @param userId ID of user who is currently viewing page.
+     * @param userId ID of user who is currently logged in
      */
     getUserDetails: function(userId) {
       api.getUserFromID(userId)
@@ -480,7 +529,7 @@ const Homepage = {
      * Sends an api request to get a business object from a business Id
      * Sets this components business variable to this object
      *
-     * @param id business id
+     * @param id business' id
      */
     getBusiness: function(id) {
       api.getBusinessFromId(id)
@@ -508,6 +557,7 @@ const Homepage = {
 
     /**
      * Gets the name of the business the user is acting as from the store
+     * @return business the user is acting as
      */
     getBusinessName: function() {
       return store.actingAsBusinessName;
@@ -515,6 +565,7 @@ const Homepage = {
 
     /**
      * Gets the username of the logged in user from the store
+     * @return Username of the logged in user
      */
     getUserName: function() {
       return store.userName;
@@ -523,6 +574,7 @@ const Homepage = {
     /**
      * Gets the logged in users id from the store, and assigns this components
      * userId variable equal to it.
+     * @return Id of the logged in user
      */
     getLoggedInUserId: function() {
       this.userId = store.loggedInUserId;
@@ -827,6 +879,5 @@ main {
     margin-left: 4px;
     transition: 0.1s;
   }
-
 }
 </style>
