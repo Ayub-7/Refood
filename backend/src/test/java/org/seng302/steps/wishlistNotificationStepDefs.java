@@ -73,7 +73,7 @@ public class wishlistNotificationStepDefs {
         testBusiness = new Business("Morticians", "Death is Just Around the Corner :)", businessAddress, BusinessType.HEALTH_CARE_AND_SOCIAL_ASSISTANCE);
         product = new Product("666", testBusiness, "Dead Body", "This is a dead body", "The Addams Family", 69.69, new Date());
         inventoryItem = new Inventory("666", 1L, 4, 69.69, 219.99, beforeDate, laterDate, laterDate, laterDate);
-        wishlistItem2 = new WishlistItem(testUser2.getId(), testBusiness.getId());
+        wishlistItem2 = new WishlistItem(testUser2.getId(), testBusiness);
         session = Mockito.mock(HttpSession.class);
         businessRepository = Mockito.mock(BusinessRepository.class);
         wishlistItemController = Mockito.mock(WishlistItemController.class);

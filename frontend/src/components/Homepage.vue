@@ -26,54 +26,98 @@
           </div>
           <div class="userinfo-container" v-else>
             <div id="userinfo-content">
-              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()'>Profile</vs-button>
-              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
-              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()">My Cards</vs-button>
-              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'">Browse Listings</vs-button>
+              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()' icon="account_box">Profile</vs-button>
+              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" icon="store">Marketplace</vs-button>
+              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()" icon="style">My Cards</vs-button>
+              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'" icon="search">Browse Listings</vs-button>
             </div>
           </div>
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
-          <div id="watchlist-header-container">
-            <div style="display: flex;">
-              <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
-              <div class="watchlist-title">
-                Watchlist
+          <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
+            <vs-tabs>
+              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
+              <vs-tab id="wishlist-tab" @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
+            </vs-tabs>
+          </div>
+          <div v-if="watchlist">
+            <div v-if="likedItem.length > 0" style="margin-top: -40px">
+              <div v-for="(item, index) in likedItem" :key="item.id" >
+                <vs-card style="margin-top: -10px" id="message-notification-card" actionable>
+                  <div  id="likes-notification-container">
+                    <vs-row v-if="item.likes != 0">
+                      <vs-col vs-type="flex" vs-align="center">
+                        <vs-tooltip text="Unlike">
+                          <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
+                        </vs-tooltip>
+                        <div @click="viewListing(item.inventoryItem.product.business.id, item.id)" style="width: 100%; color: white;">
+                          p
+                        </div>
+                      </vs-col>
+                    </vs-row>
+                    <vs-row v-else>
+                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                        <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" @click="unlike(item.id, index)"></vs-icon>
+                      </vs-col>
+                    </vs-row>
+                    <div @click="viewListing(item.inventoryItem.product.business.id, item.id)">
+                      <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                      <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                      <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+                    </div>
+                  </div>
+                </vs-card>
               </div>
             </div>
-            <span style="margin: auto 0;">{{likes}}</span>
+            <div v-else>
+              <em style="font-size: 12px;">
+                You currently have no liked listings
+              </em>
+            </div>
           </div>
-          <vs-divider style="margin-top: -30px"></vs-divider>
-          <div v-for="(item, index) in likedItem" :key="item.id" >
-            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
-              <div id="likes-notification-container">
-                <vs-row v-if="item.likes != 0">
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-tooltip text="View Listing">
-                      <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    </vs-tooltip>
-                    <vs-tooltip text="Unlike">
-                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
-                    </vs-tooltip>
-                  </vs-col>
-                </vs-row>
-                <vs-row v-else>
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
-                  </vs-col>
-                </vs-row>
-                <div id="product-name">{{item.inventoryItem.product.name}}</div>
-                <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
-                <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+          <div v-if="!watchlist">
+            <vs-row style="margin-top: -40px; margin-bottom: 20px;" vs-type="flex" vs-justify="right">
+              <div v-if="wishlist.length > 0">
+                <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'" style="margin-right: 30px">
+                  <vs-button @click="toggleMuteAll" v-if="allMuted == true" color="purple">
+                    <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
+                  </vs-button>
+                  <vs-button v-else @click="toggleMuteAll" color="purple">
+                    <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
+                  </vs-button>
+                </vs-tooltip>
               </div>
-            </vs-card>
+            </vs-row>
+            <div v-if="wishlist.length > 0">
+              <div v-for="wish in wishlist" :key="wish.id" >
+                <vs-card style="margin-top: -10px"  actionable>
+                  <div>
+                    <vs-row>
+                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                        <vs-tooltip text="Remove from wishlist">
+                          <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" @click="removeFromWishlist(wish.id)"></vs-icon>
+                        </vs-tooltip>
+                        <div @click="viewBusiness(wish.business.id)" style="width: 100%; color: white;">
+                          p
+                        </div>
+                      </vs-col>
+                    </vs-row>
+                    <div @click="viewBusiness(wish.business.id)" id="business-card">
+                      <div id="business-title">{{wish.business.name}}</div>
+                      <div id="business-type">{{wish.business.businessType}}</div>
+                    </div>
+                  </div>
+                </vs-card>
+              </div>
+            </div>
+            <em v-else style="font-size: 12px">
+              You currently have no wishlisted businesses
+            </em>
           </div>
         </div>
       </div>
 
-        <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
       <main v-if="getBusinessId() == null">
         <nav id="newsfeed-navbar">
           <div class="newsfeed-title">
@@ -155,7 +199,26 @@ const Homepage = {
       currentCardPage: 1,
       user: null,
       currencySymbol: "$",
+      watchlist: true,
+      wishlist: [],
       graphMode: true,
+      series: [{
+        name: 'Number of sales',
+        data: [30, 40, 20, 50, 49, 10, 70, 40, 55, 57, 53, 44]
+      }],
+      options: {
+        chart: {
+          id: 'sales-graph-report'
+        },
+        xaxis: {
+          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+        },
+        dataLabels: {
+          enabled: false,
+        }
+      },
+      allMuted: false,
     }
   },
   /**
@@ -165,6 +228,7 @@ const Homepage = {
   mounted() {
     this.checkUserSession();
     this.getLikes(this.userId);
+    this.getWishlist(this.userId);
   },
 
   methods: {
@@ -180,6 +244,84 @@ const Homepage = {
         .catch(err => {
           this.$log.debug(err);
       });
+    },
+
+    /**
+     * Calculate whether allMuted is true or not
+     */
+    calculateAllMuted: function () {
+      this.allMuted = true;
+
+      for (let wishlistedBusiness of this.wishlist) {
+        if(wishlistedBusiness.mutedStatus === "Unmuted")
+          this.allMuted = false;
+      }
+    },
+
+    /**
+     * Calls the api endpoint, updating the mute status of all the wishlist items
+     */
+    toggleMuteAll: function () {
+      if (this.allMuted) {
+        for (let wish of this.wishlist) {
+          api.updateWishlistMuteStatus(wish.id, "Muted")
+            .catch(() => {
+              this.$vs.notify({title: "Error unmuting wishlist", color: "danger"});
+            });
+        }
+        this.$vs.notify({title: "Wishlist successfully unmuted", color: "success"});
+        this.allMuted = false;
+      } else {
+        for (let wish of this.wishlist) {
+          api.updateWishlistMuteStatus(wish.id, "Unmuted")
+            .catch(() => {
+              this.$vs.notify({title: "Error muting wishlist", color: "danger"});
+            })
+        }
+        this.$vs.notify({title: "Wishlist successfully muted", color: "success"});
+        this.allMuted = true;
+      }
+    },
+
+    /**
+     * Call the api function and retrieve wishlisted businesses
+     */
+    getWishlist: function (userId) {
+      api.getUsersWishlistedBusinesses(userId)
+        .then((res) => {
+          this.wishlist = res.data;
+          this.calculateAllMuted();
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving wishlist", color: "danger"});
+          }
+        })
+    },
+
+    /**
+     * Call api function to remove business from user's wishlist
+     */
+    removeFromWishlist: function (wishlistItemId) {
+      api.removeBusinessFromWishlist(wishlistItemId)
+              .then(() => {
+                this.getWishlist(this.userId);
+                this.calculateAllMuted();
+                this.$vs.notify({title: "Successfully  removed business from wishlist", color: "success"});
+              })
+              .catch((error) => {
+                if (error.response) {
+                  this.$vs.notify({title: "Error removing business", color: "danger"});
+                }
+                this.$log.debug(error);
+              })
+    },
+
+    /**
+     * Go to business profile
+     */
+    viewBusiness: function (businessId) {
+      this.$router.push({name: "Business", params: {id: businessId}})
     },
 
     /**
@@ -205,8 +347,8 @@ const Homepage = {
         }
         this.$log.debug(error);
       })
-
     },
+
     /**
      * Retrieves all the listings that the user has liked.
      */
@@ -214,11 +356,11 @@ const Homepage = {
       api.getUserLikedListings(userId)
         .then((res) => {
           let temp = [];
-          for (let i = 0; i < res.data.length; i++) {
-            if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
-              temp.push(res.data[i]);
+          for (let data of res.data) {
+            if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+              temp.push(data);
             } else {
-              api.removeLikeFromListing(res.data[i]["id"]);
+              api.removeLikeFromListing(data["id"]);
             }
           }
           this.likedItem = temp;
@@ -234,11 +376,11 @@ const Homepage = {
         api.getUserLikedListings(userId)
             .then((res) => {
               let temp = [];
-              for (let i = 0; i < res.data.length; i++) {
-                if (new Date(res.data[i]["closes"]).getTime() > new Date().getTime()) {
-                  temp.push(res.data[i]);
+              for (let data of res.data) {
+                if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+                  temp.push(data);
                 } else {
-                  api.removeLikeFromListing(res.data[i]["id"]);
+                  api.removeLikeFromListing(data["id"]);
                 }
               }
               this.likedItem = temp;
@@ -259,9 +401,9 @@ const Homepage = {
       api.getUserCards(id)
         .then((res) => {
           this.cards = res.data;
-          for(let i = 0; i < this.cards.length; i++){
-            if(!this.cards[i].user.homeAddress){
-              this.cards[i].user = this.user;
+          for(let card of this.cards){
+            if(!card.user.homeAddress){
+              card.user = this.user;
             }
           }
         })
@@ -444,6 +586,12 @@ export default Homepage;
   font-weight: bold;
 }
 
+#business-title {
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+}
+
 #product-closes {
   font-size: 12px;
 }
@@ -454,6 +602,10 @@ export default Homepage;
   margin-left: -1px;
   cursor: pointer;
   transition: font-size 0.3s;
+}
+
+#wishlist-icon {
+  font-size: 16px;
 }
 
 #view-unlike-icon {
@@ -500,7 +652,7 @@ export default Homepage;
 
 #container {
   display: grid;
-  grid-template-columns: 0.5fr 1fr 4fr 0.5fr;
+  grid-template-columns: 0.6fr 1.8fr 4fr 0.6fr;
   grid-template-rows: 1fr auto;
   grid-column-gap: 1em;
   margin: auto;
@@ -666,7 +818,7 @@ main {
   .watchlist-title {
     font-size: 18px;
     margin-left: 4px;
-    transition: 0.3s;
+    transition: 0.1s;
   }
 
 }

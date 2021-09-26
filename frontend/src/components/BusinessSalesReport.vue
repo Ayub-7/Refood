@@ -48,12 +48,11 @@
           All
         </vs-button>
         <div class="options-header" style="font-size: 14px">Custom</div>
-        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start" :danger="(errors.includes('past-min-date'))"
-                  danger-text="Date can not be in the future or after the end date"/>
-        <p style="margin: auto auto 0">-</p>
-        <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End" :danger="(errors.includes('past-min-date'))"
-                  danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
-        <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
+        <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="pickedStart" label="Start" :danger="checkErrors('start')"
+                  :danger-text="getError('start')"/>
+        <vs-input type="date" size="small" class="date-input" v-model="pickedEnd" label="End" :danger="checkErrors('end')"
+                  :danger-text="getError('end')" style="grid-column: 3"/>
+        <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;" @click="onPeriodChange('custom')">Go</vs-button>
 
         <vs-divider style="grid-column: 1/4; margin: 0 auto;"/>
 
@@ -208,6 +207,8 @@ export default {
       salesHistory: [],
       dateStart: null,
       dateEnd: null,
+      pickedStart: null,
+      pickedEnd: null,
       dateGranularity: null,
       currentYearReport: {},
       lastYearReport: {},
@@ -223,19 +224,168 @@ export default {
     this.getSalesHistory();
 
     let currentDate = new Date();
-    //we gotta set date to a string or the bloody thing complains
-    this.dateStart = "Jan 01, " + currentDate.getFullYear();
-    this.dateEnd = "Dec 31, " + currentDate.getFullYear();
+    this.dateEnd = currentDate
+
+
   },
 
   methods: {
     /**
-     * Something happens when this function is called. (todo: do something here).
+     * Updates period of report, does this by recalculating the report with a different start date
      * @param period string of the selected period.
      */
     onPeriodChange: function(period) {
+      this.errors = [];
       this.activePeriodButton = period;// Changes the period button to be selected and disabled.
+      switch (period) {
+        case '1-d':
+          this.updatePeriod(1 ,'day');
+          break;
+        case '1-w':
+          this.updatePeriod(1 ,'week');
+          break; 
+        case '1-m':
+          this.updatePeriod(1 ,'month');
+          break; 
+        case '6-m':
+          this.updatePeriod(6 ,'month');
+          break;
+        case '1-y':
+          this.updatePeriod(1 ,'year');
+          break;
+        case 'custom':
+          if(this.validateDates(this.pickedStart, this.pickedEnd)) {
+            this.dateStart = this.pickedStart;
+            this.dateEnd = this.pickedEnd;
+          }
+          break;
+        case 'all':
+          this.dateEnd = new Date();
+          this.dateStart = this.getEarliestDate();
+      }
+
+      this.updateSummary();
     },
+
+
+    /**
+     * Checks dates and if date is incorrect pushes error
+     * @param startDate start date from input field
+     * @param endDate end date from input field
+     * @returns boolean, true is valid dates, false if invalid
+     */
+    validateDates: function(startDate, endDate) {
+      if(startDate == null) {
+        this.errors.push('no-start');
+      }
+      if (endDate == null) {
+        this.errors.push('no-end');
+      }
+      if (moment(endDate).isBefore(moment(startDate))) {
+        this.errors.push('end-before-begin');
+      }
+      if (moment(endDate).isBefore(moment('1970')) || moment(endDate).isAfter(moment(new Date()))) {
+        this.errors.push('bad-end-date');
+      } 
+      if (moment(startDate).isBefore(moment('1970')) || moment(startDate).isAfter(moment(new Date()))) {
+        this.errors.push('bad-start-date');
+      }
+
+      if(this.errors.length > 0) {
+        return false;
+      }
+
+      return true;
+
+    },
+
+    /**
+     * Checks if error contains type
+     * @param type either start or end, this will be used to filter errors to see if it contains relevant errors
+     * @returns boolean, true if contains type, false otherwise
+     */
+    checkErrors: function(type) {
+      return this.errors.filter(error => error.includes(type)).length > 0
+    },
+
+    
+    /**
+     * Returns appropriate error message depending on what is in errors
+     * @param type either start or end, this will be used to show errors for start or end
+     * @returns string containing appropriate error message
+     */
+    getError: function(type) {
+      if (type == 'start') {
+        if (this.errors.includes('no-start')) {
+          return 'No start date'
+        } else if (this.errors.includes('bad-start-date')) {
+          return 'Start date must be before tomorrow and after 1970'
+        }
+      }
+
+      if(type == 'end') {
+        if (this.errors.includes('no-end')) {
+          return 'No end date'
+        } else if (this.errors.includes('bad-end-date')) {
+          return 'End date must be before tomorrow and after 1970'
+        } else if (this.errors.includes('end-before-begin')) {
+          return 'End date must be after start date'
+        }
+      }
+    },
+
+
+    /**
+     * updates period by altering dateStart
+     * @param timeValue value of time to subtract from current time
+     * @param unit unit of time to subtract from current time (days, months, etc.)
+     */
+    updatePeriod: function(timeValue, unit) {
+      this.dateEnd = new Date();
+      this.dateStart = moment(new Date()).subtract(timeValue, unit);
+    },
+    
+
+    /**
+     * Recomputes summary, used when date start and end changes
+     */
+    updateSummary: function() {
+      this.calculateReport();
+      this.onGranularityChange(this.activeGranularityButton);
+    },
+
+    /**
+     * Helper method for getting earliest date from sales history, used with 'all' granularity as it 
+     * needs to know earliest date to get everything\
+     * @returns earliest date from sales history
+     */
+    getEarliestDate: function() {
+      let min = this.salesHistory[0].sold;
+      for (let sale of this.salesHistory) {
+        if (sale.sold < min) {
+          min = sale.sold;
+        }
+      }
+      return min;
+    },
+
+    
+    /**
+     * Helper method for getting latest date from sales history, used with 'year' granularity to figure out
+     * when to stop the report
+     * @returns latest date from sales history
+     */
+    getLatestDate: function() {
+      let max = this.salesHistory[0].sold;
+      for (let sale of this.salesHistory) {
+        if (sale.sold > max) {
+          max = sale.sold;
+        }
+      }
+      return max;
+    },
+
+
 
     /**
      * Something happens when this function is called. (todo: do something here).
@@ -270,24 +420,38 @@ export default {
       let endDate = moment(new Date(this.dateEnd))
       let summary = []
       let finalSummary = []
-      while (startDate < endDate) {
-        for (const sale of this.currentYearSalesHistory) {
-          if (moment(sale.created).isBetween(startDate, intervalDate)) {
-            summary.push(sale)
-          }
+      let currYear = moment(startDate).year();
+      let latestYear = moment(this.getLatestDate()).year();
+
+
+      if(unit == 'years') { // If unit is years, previous implementation was not working correctly with years
+        while(currYear <= latestYear) {
+          // Grab sales from current year and calculate summary from sales from the actual year
+          summary = this.currentYearSalesHistory.filter(sale => moment(sale.sold).year() == currYear)
+          finalSummary.push(this.calculateSummary(summary, String(currYear)))
+
+          currYear += 1;
         }
-        if (summary.length >= 1) {
-          if (unit==='months') {
-            finalSummary.push(this.calculateSummary(summary, startDate.format('MMMM')))
-          } else if (unit==='days') {
-            finalSummary.push(this.calculateSummary(summary, startDate.format('MMM DD')))
-          } else {
-            finalSummary.push(this.calculateSummary(summary, startDate.format('YYYY')))
-          }
-          summary = []
+
+
+      } else { // If unit is anything else
+          while (startDate < endDate) {
+            for (const sale of this.currentYearSalesHistory) {
+              if (moment(sale.sold).isBetween(startDate, intervalDate, 'seconds', '[]')) {
+                summary.push(sale)
+              }
+            }
+            if (summary.length >= 1) {
+              if (unit==='months') {
+                finalSummary.push(this.calculateSummary(summary, startDate.format('MMMM YY')))
+              } else if (unit==='days') {
+                finalSummary.push(this.calculateSummary(summary, startDate.format('MMM DD YY')))
+              }
+              summary = []
+            }
+            startDate = startDate.add(amount, unit);
+            intervalDate = intervalDate.add(amount, unit);
         }
-        startDate = startDate.add(amount, unit);
-        intervalDate = intervalDate.add(amount, unit);
       }
 
       this.reportGranularity = finalSummary
@@ -311,9 +475,11 @@ export default {
      * Calls getBusinessListingNotifications to populate the page's sales history
      */
     getSalesHistory: function () {
-      api.getBusinessSales(this.businessId)
+      api.getBusinessSales(store.actingAsBusinessId)
           .then((res) => {
-            this.salesHistory = res.data;
+            this.salesHistory = res.data
+            this.dateStart = this.getEarliestDate();
+
             //only once we have obtained the data, calculate the variables
             this.calculateReport();
           })
@@ -363,7 +529,7 @@ export default {
     calculateReport: function() {
       let start = moment(new Date(this.dateStart));
       let end = moment(new Date(this.dateEnd));
-      this.currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
+      this.currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale.sold).isBetween(start, end, 'days', '[]'));
       start = start.subtract(1,'year');
       end = end.subtract(1,'year');
       let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
@@ -490,10 +656,13 @@ export default {
 .date-input {
   width: 136px;
   margin: auto;
+  height: 100px;
 }
+
 
 /* MONTH/WEEK/YEAR REPORT CONTAINER */
 #summary-container {
+  height: 475px;
   overflow-y: scroll;
 }
 

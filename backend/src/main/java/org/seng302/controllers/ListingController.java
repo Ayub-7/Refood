@@ -201,7 +201,6 @@ public class ListingController {
     public ResponseEntity<String> createListing(@PathVariable long id, @RequestBody NewListingRequest request, HttpSession session) {
         Business business = businessRepository.findBusinessById(id);
         Inventory inventory = inventoryRepository.findInventoryById(request.getInventoryItemId());
-
         if (inventory == null) { //inventory item doesn't exist for business
             logger.debug(request.getInventoryItemId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -219,7 +218,7 @@ public class ListingController {
                     Listing newListing = new Listing(inventory, request);
                     inventoryRepository.updateInventoryQuantity(inventory.getQuantity() - request.getQuantity(), request.getInventoryItemId());
                     listingRepository.save(newListing);
-                    List<WishlistItem> wishlists = wishlistItemRepository.findWishlistItemByBusinessId(id);
+                    List<WishlistItem> wishlists = wishlistItemRepository.findWishlistItemByBusiness(business);
                     sendWishlistNotifications(wishlists, newListing); // creates listing notifications for wishlists just found
                     return ResponseEntity.status(HttpStatus.CREATED).build();
                 } catch (ValidationException e) {
@@ -237,11 +236,23 @@ public class ListingController {
      * @param listing listing object that business has listed and users will be getting a notification for
      */
     public void sendWishlistNotifications(List<WishlistItem> wishlists, Listing listing) {
-        wishlists.forEach(wishlistItem -> {
+        List<WishlistItem> unmutedWishLists = getUnmutedWishlist(wishlists); // Filter to only contain unmuted wishlist items
+        unmutedWishLists.forEach(wishlistItem -> {
             User user = userRepository.findUserById(wishlistItem.getUserId());
             ListingNotification listingNotification = new ListingNotification(user, listing, NotificationStatus.WISHLIST);
             listingNotificationRepository.save(listingNotification);
         });
+    }
+
+
+    /**
+     * Helper function for filtering wishlist to only contain users that have the item unmuted, used to send notifications to users that have
+     * the business unmuted when a listing is created
+     * @param wishlists list of wishlist items that is going to be filtered
+     * @return List of wishlist items that are not muted
+     */
+    public List<WishlistItem> getUnmutedWishlist(List<WishlistItem> wishlists) {
+        return wishlists.stream().filter(wishlistItem -> wishlistItem.getMutedStatus() == MutedStatus.UNMUTED).collect(Collectors.toList());
     }
 
     /**
