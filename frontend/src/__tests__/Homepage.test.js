@@ -441,13 +441,15 @@ describe("Tests for business watchlist functionality", ()=> {
     });
 
     test('Mute wishlist function changes mute status when unmuted', () => {
+        wrapper.vm.allMuted = false;
+        wrapper.vm.toggleMuteAll();
         expect(wrapper.vm.allMuted).toBeTruthy();
         wrapper.vm.toggleMuteAll();
         expect(wrapper.vm.allMuted).toBeFalsy();
     });
 
     test('Mute wishlist function unmutes wishlist when previously muted', () => {
-        wrapper.vm.allMuted = true;
+        expect(wrapper.vm.allMuted).toBeTruthy();
         wrapper.vm.toggleMuteAll();
         expect(wrapper.vm.allMuted).toBeFalsy();
     });

@@ -123,7 +123,6 @@
         </div>
       </div>
 
-      <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
       <main v-if="getBusinessId() == null">
         <nav id="newsfeed-navbar">
           <div class="newsfeed-title">
@@ -140,29 +139,28 @@
       <div v-else-if="graphMode" class="business-main" >
         <vs-card>
           <div class="header-container">
-            <vs-icon icon="leaderboard" size="32px"></vs-icon>
+            <vs-icon icon="leaderboard" size="32px" style="margin: auto 0"></vs-icon>
             <div class="title">Sales Report Graph</div>
             <div class="title-business"> - {{getBusinessName()}}</div>
-            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode">Data</vs-button>
+            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Data</vs-button>
           </div>
           <vs-divider/>
           <!--
           <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
           -->
-
-          <BusinessSalesGraph :salesDatay='series' :salesDatax='options' />
+          <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
         </vs-card>
       </div>
       <div v-else class="business-main">
         <vs-card>
           <div class="header-container">
-            <vs-icon icon="summarize" size="32px"></vs-icon>
+            <vs-icon icon="summarize" size="32px" style="margin: auto 0"></vs-icon>
             <div class="title">Sales Report</div>
             <div class="title-business"> - {{getBusinessName()}}</div>
             <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
           </div>
           <vs-divider/>
-          <BusinessSalesReport />
+          <BusinessSalesReport :businessId="actingAsBusinessId" />
         </vs-card>
       </div>
 
@@ -239,7 +237,6 @@ const Homepage = {
     this.checkUserSession();
     this.getLikes(this.userId);
     this.getWishlist(this.userId);
-    this.calculateAllMuted();
   },
 
   methods: {
@@ -496,6 +493,7 @@ const Homepage = {
             mutations.setUserName(response.data.firstName + " " + response.data.lastName);
             mutations.setUserCountry(response.data.homeAddress.country);
             mutations.setUserBusinesses(this.businesses);
+            this.setCurrency(response.data.homeAddress.country);
           }).catch((err) => {
         if (err.response.status === 401) {
           this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
@@ -744,19 +742,14 @@ export default Homepage;
   margin: auto;
 }
 
-
-
 .title {
   font-size: 30px;
-  margin-top: 4px;
-  margin-right: 8px;
+  margin: auto 8px auto 4px;
 }
 .title-business {
   font-size: 30px;
   font-weight: bold;
-  margin-top: 4px;
-  margin-left: 0;
-  margin-right: auto;
+  margin: auto auto auto 0;
 }
 
 .newsfeed-title {

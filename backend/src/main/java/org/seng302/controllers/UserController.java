@@ -4,15 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.finders.UserFinder;
+import org.seng302.models.Image;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
+import org.seng302.models.requests.ModifyUserRequest;
 import org.seng302.models.requests.NewUserRequest;
+import org.seng302.models.requests.UserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,8 +35,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,11 +62,16 @@ public class UserController {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
-//    @Autowired
     private UserRepository userRepository;
 
-//    @Autowired
     private UserFinder userFinder;
+
+    @Autowired
+    private FileService fileService;
+
+
+    @Value("${media.image.user.directory}")
+    String rootImageDir;
 
     @Autowired
     public UserController(UserRepository userRepository, UserFinder userFinder) {
@@ -120,6 +134,53 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
    }
 
+    /**
+     *
+     * @param reqBody ModifyUserRequest object which contains everything that needs to be changed.
+     * @param id The id of the user to be modified.
+     * @param session HttpSession object to help getting the session of the current user.
+     * @return 200 if the user is properly updated, 400 if the supplied data is bad, 409 if the user is attempted to
+     * change their email to an email that is already taken, 406 if the user id does not exist, and 401 if the user is
+     * not logged in.
+     */
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
+
+        User user = userRepository.findUserById(Long.parseLong(id));
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        else if (userRepository.findUserByEmail(reqBody.getEmail()) != null &&
+                !currentUser.getEmail().equals(reqBody.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        else {
+            List<String> registrationErrors = registrationUserCheck(reqBody);
+            if (registrationErrors.isEmpty()) { // No errors found.
+                user.setFirstName(reqBody.getFirstName());
+                user.setLastName(reqBody.getLastName());
+                user.setMiddleName(reqBody.getMiddleName());
+                user.setNickname(reqBody.getNickname());
+                user.setBio(reqBody.getBio());
+                user.setEmail(reqBody.getEmail());
+                user.setDateOfBirth(reqBody.getDateOfBirth());
+                user.setPhoneNumber(reqBody.getPhoneNumber());
+                user.setFirstName(reqBody.getFirstName());
+                user.setHomeAddress(reqBody.getHomeAddress());
+                user.setPassword(Encrypter.hashString(reqBody.getPassword()));
+                userRepository.save(user);
+
+                UserIdResponse res = new UserIdResponse(user);
+                String jsonString = mapper.writeValueAsString(res);
+                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(jsonString);
+            }
+            else {
+                logger.error("Invalid user modification.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errors with modifying the user's details: " + registrationErrors);
+            }
+        }
+    }
 
     /**
      * This method inserts a new user into the user repository
@@ -156,7 +217,7 @@ public class UserController {
      * @param user The user to check the validity of
      * @return list of errors with the new registration request - if there is any.
      */
-    public List<String> registrationUserCheck(NewUserRequest user) throws ParseException {
+    public List<String> registrationUserCheck(UserRequest user) throws ParseException {
         List<String> errors = new ArrayList<>();
 
         if (user.getFirstName() == null || (user.getFirstName() != null && user.getFirstName().length() == 0)) {
@@ -277,6 +338,70 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(users));
     }
 
+    /**
+     * Uploads image to relevant user profile, setting the image as primary if it is the first image.
+     * @param id Id of the user the image is added to
+     * @param image Multipart image of file
+     * @param session Current user session
+     * @return ResponseEntity with the appropriate status codes - 201, 400, 403, 406.
+     * @throws InvalidImageExtensionException custom exception when file extension is not valid
+     * @throws IOException Thrown when file reading or writing fails
+     */
+    @PostMapping("/users/{id}/images")
+    public ResponseEntity<String> addUserImage(@PathVariable Long id, @RequestPart(name="filename") MultipartFile image, HttpSession session) throws InvalidImageExtensionException, IOException {
+        User user = userRepository.findUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (currentUser.getId() != id && currentUser.getRole() == Role.USER) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        String imageExtension;
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
+        }
+        try { // Throw error if the file is not an image.
+            imageExtension = Image.getContentTypeExtension(Objects.requireNonNull(image.getContentType()));
+        }
+        catch (InvalidImageExtensionException exception) {
+            throw new InvalidImageExtensionException(exception.getMessage());
+        }
+        // Check if business' own folder directory exists - make directory if false.
+        File userDir = new File(String.format("%suser_%d", rootImageDir, id));
+        if (userDir.mkdirs()) {
+            logger.info(String.format("Image of user directory did not exist - new directory created of %s", userDir.getPath()));
+        }
+        String imageId = "";
+        boolean freeImage = false;
+        int count = 0;
+        while (!freeImage) {
+            imageId = String.valueOf(count);
+            File checkFile1 = new File(String.format("%s/%s.jpg", userDir, imageId));
+            File checkFile2 = new File(String.format("%s/%s.png", userDir, imageId));
+            File checkFile3 = new File(String.format("%s/%s.gif", userDir, imageId));
+            if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
+                count++;
+            }
+            else {
+                freeImage = true;
+            }
+        }
+        File file = new File(String.format("%s/%s%s", userDir, imageId, imageExtension));
+        File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", userDir, imageId, imageExtension));
+        logger.info(String.format("Working Directory = %s", System.getProperty("user.dir")));
+        logger.info(file.getAbsolutePath());
+        fileService.uploadImage(file, image.getBytes());
+        fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
+        String imageName = image.getOriginalFilename();
+        // Save into DB.
+        Image newImage = new Image(imageName, imageId, file.toString(), thumbnailFile.toString());
+        user.addUserImage(newImage);
+        user.updatePrimaryImage(id, imageId, imageExtension);
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     // -- ADMIN REQUESTS
 
     /**
@@ -289,7 +414,6 @@ public class UserController {
         if (userRepository.findUserById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         userRepository.updateUserRole(id, Role.GAA);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -304,15 +428,12 @@ public class UserController {
         if (userRepository.findUserById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-
         User self = (User) session.getAttribute("user");
         if (self != null && self.getId() == id) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-
         userRepository.updateUserRole(id, Role.USER);
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
-
 }

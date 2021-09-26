@@ -23,6 +23,7 @@ tags:
   - name: 'U5: Creating Business Accounts'
   - name: 'U6: Acting as Individual or Business'
     description: 'All necessary API endpoints are found in prior stories'
+  - name: 'U10: Modify Individuals'
   - name: 'U13: Home page'
     description: 'No endpoints required for this story specifically, but several will likely be used from prior and latter stories'
   - name: 'U15: Product Catalogue'
@@ -153,6 +154,89 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+    put:
+      tags:
+        - 'Users'
+        - 'U10: Modify Individuals'
+      summary: Modify details of a user account
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: Profile successfully modified
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+        '409':
+          description: Email address already in use
+
+  '/users/{id}/images':
+    post:
+      tags:
+        - 'U10: Modify Individuals'
+        - 'Catalogue / Products'
+      summary: Upload a new image to a user account
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to add the image for
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Image added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imageId:
+                    type: integer
+                    description: The ID of the image that has just been created
+                    example: 111
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to add an image for an account they do not administrate'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
@@ -425,6 +509,7 @@ paths:
           description: "Forbidden: Returned when the user making the request is not the primary administrator of the business AND is not a global application admin."
         '406':
           $ref: '#/components/responses/NotAcceptableError'
+
 
   '/businesses/{id}/products':
     get:
@@ -1837,7 +1922,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
-          
+
   '/businesses/{id}/sales':
     get:
       tags:
@@ -2169,94 +2254,94 @@ components:
         content:
           type: object
           example: [
+          {
+            "name": "Grain n Simple",
+            "id": 5,
+            "administrators": [
             {
-              "name": "Grain n Simple",
               "id": 5,
-              "administrators": [
-                {
-                  "id": 5,
-                  "firstName": "Shermy",
-                  "middleName": "Pearle",
-                  "lastName": "Layborn",
-                  "nickname": "artificial intelligence",
-                  "bio": "Intuitive client-server standardization",
-                  "email": "playborn4@amazon.com",
-                  "dateOfBirth": "2000-12-30",
-                  "phoneNumber": "+62 527 277 7359",
-                  "homeAddress": {
-                    "streetNumber": "5",
-                    "streetName": "Hagan Avenue",
-                    "suburb": null,
-                    "city": "Chengdong",
-                    "region": null,
-                    "country": "China",
-                    "postcode": null
-                  },
-                  "created": "2020-10-17 00:47:11",
-                  "role": "USER",
-                  "businessesAdministered": null
-                },
-                {
-                  "id": 9,
-                  "firstName": "Ruthe",
-                  "middleName": "Ogdan",
-                  "lastName": "Ruit",
-                  "nickname": "Open-architected",
-                  "bio": "Configurable coherent capacity",
-                  "email": "oruit8@reddit.com",
-                  "dateOfBirth": "1995-05-10",
-                  "phoneNumber": "+62 283 517 0351",
-                  "homeAddress": {
-                    "streetNumber": "9885",
-                    "streetName": "Oak Parkway",
-                    "suburb": null,
-                    "city": "Ambato",
-                    "region": null,
-                    "country": "Ecuador",
-                    "postcode": null
-                  },
-                  "created": "2020-09-24 18:01:34",
-                  "role": "USER",
-                  "businessesAdministered": null
-                },
-                {
-                  "id": 8,
-                  "firstName": "Elysee",
-                  "middleName": "Maurene",
-                  "lastName": "Took",
-                  "nickname": "benchmark",
-                  "bio": "Team-oriented interactive installation",
-                  "email": "mtook7@chron.com",
-                  "dateOfBirth": "1985-11-09",
-                  "phoneNumber": "+234 186 824 2303",
-                  "homeAddress": {
-                    "streetNumber": "5",
-                    "streetName": "Utah Terrace",
-                    "suburb": null,
-                    "city": "Huangfang",
-                    "region": null,
-                    "country": "China",
-                    "postcode": null
-                  },
-                  "created": "2020-10-31 22:39:42",
-                  "role": "USER",
-                  "businessesAdministered": null
-                }
-              ],
-              "primaryAdministratorId": 5,
-              "description": "Praesent blandit. Nam nulla.",
-              "address": {
-                "streetNumber": "302",
-                "streetName": "Forest Run Place",
+              "firstName": "Shermy",
+              "middleName": "Pearle",
+              "lastName": "Layborn",
+              "nickname": "artificial intelligence",
+              "bio": "Intuitive client-server standardization",
+              "email": "playborn4@amazon.com",
+              "dateOfBirth": "2000-12-30",
+              "phoneNumber": "+62 527 277 7359",
+              "homeAddress": {
+                "streetNumber": "5",
+                "streetName": "Hagan Avenue",
                 "suburb": null,
-                "city": "Putinci",
+                "city": "Chengdong",
                 "region": null,
-                "country": "Serbia",
+                "country": "China",
                 "postcode": null
               },
-              "businessType": "Retail Trade",
-              "created": "2020-05-22 20:21:22"
+              "created": "2020-10-17 00:47:11",
+              "role": "USER",
+              "businessesAdministered": null
+            },
+            {
+              "id": 9,
+              "firstName": "Ruthe",
+              "middleName": "Ogdan",
+              "lastName": "Ruit",
+              "nickname": "Open-architected",
+              "bio": "Configurable coherent capacity",
+              "email": "oruit8@reddit.com",
+              "dateOfBirth": "1995-05-10",
+              "phoneNumber": "+62 283 517 0351",
+              "homeAddress": {
+                "streetNumber": "9885",
+                "streetName": "Oak Parkway",
+                "suburb": null,
+                "city": "Ambato",
+                "region": null,
+                "country": "Ecuador",
+                "postcode": null
+              },
+              "created": "2020-09-24 18:01:34",
+              "role": "USER",
+              "businessesAdministered": null
+            },
+            {
+              "id": 8,
+              "firstName": "Elysee",
+              "middleName": "Maurene",
+              "lastName": "Took",
+              "nickname": "benchmark",
+              "bio": "Team-oriented interactive installation",
+              "email": "mtook7@chron.com",
+              "dateOfBirth": "1985-11-09",
+              "phoneNumber": "+234 186 824 2303",
+              "homeAddress": {
+                "streetNumber": "5",
+                "streetName": "Utah Terrace",
+                "suburb": null,
+                "city": "Huangfang",
+                "region": null,
+                "country": "China",
+                "postcode": null
+              },
+              "created": "2020-10-31 22:39:42",
+              "role": "USER",
+              "businessesAdministered": null
             }
+            ],
+            "primaryAdministratorId": 5,
+            "description": "Praesent blandit. Nam nulla.",
+            "address": {
+              "streetNumber": "302",
+              "streetName": "Forest Run Place",
+              "suburb": null,
+              "city": "Putinci",
+              "region": null,
+              "country": "Serbia",
+              "postcode": null
+            },
+            "businessType": "Retail Trade",
+            "created": "2020-05-22 20:21:22"
+          }
           ]
         pageable:
           type: object
@@ -2602,13 +2687,13 @@ components:
                  listingId: 30,
                  status: Expired,
                  created: '2021-04-27'
-      },
-        {id: 50,
-         userId: 60,
-         listingId: 40,
-         status: Expired,
-         created: '2021-05-27'
-        }]
+                },
+                {id: 50,
+                 userId: 60,
+                 listingId: 40,
+                 status: Expired,
+                 created: '2021-05-27'
+                }]
 
     NotificationStatus:
       type: string
@@ -2651,9 +2736,9 @@ components:
           type: integer
           description: Id of the wishlisted business
         mutedStatus:
-          type: MutedStatus
+          type: object
           description: MutedStatus describing whether the notifications for the wishlisted business are muted
-        
+
     BoughtListing:
       type: object
       description: Entity for bought listing from business

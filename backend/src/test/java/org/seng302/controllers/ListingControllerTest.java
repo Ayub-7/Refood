@@ -529,4 +529,61 @@ class ListingControllerTest {
         Mockito.when(listingRepository.findListingsByInventoryItem(inventory)).thenReturn(listings);
         mvc.perform(delete("/businesses/listings/1")).andExpect(status().isOk()).andExpect(content().string("Listing Deleted"));
     }
+
+    @Test
+    void testFilterWishlist_withMuted_filtersFromList() throws Exception {
+        List<WishlistItem> wishlists = new ArrayList<>();
+        WishlistItem unmuted = new WishlistItem(user.getId(), business);
+        WishlistItem muted = new WishlistItem(adminUser.getId(), business);
+        muted.muteBusiness();
+        wishlists.add(unmuted);
+        wishlists.add(muted);
+
+
+        List<WishlistItem> filtered = listingController.getUnmutedWishlist(wishlists);
+
+        assertThat(filtered.size()).isEqualTo(1);
+        assertThat(filtered.get(0)).isEqualTo(unmuted);
+    }
+
+    @Test
+    void testFilterWishlist_withoutMuted_notFilterFromList() throws Exception {
+        List<WishlistItem> wishlists = new ArrayList<>();
+        WishlistItem unmutedA = new WishlistItem(user.getId(), business);
+        WishlistItem unmutedB = new WishlistItem(adminUser.getId(), business);
+        wishlists.add(unmutedA);
+        wishlists.add(unmutedB);
+
+
+        List<WishlistItem> filtered = listingController.getUnmutedWishlist(wishlists);
+
+        assertThat(filtered.size()).isEqualTo(2);
+    }
+
+    @Test
+    void testFilterWishlist_emptyList_worksCorrectly() throws Exception {
+        List<WishlistItem> wishlists = new ArrayList<>();
+
+        List<WishlistItem> filtered = listingController.getUnmutedWishlist(wishlists);
+
+        assertThat(filtered.size()).isZero();
+    }
+
+    @Test
+    void testFilterWishlist_allMuted_returnsEmptyList() throws Exception {
+        List<WishlistItem> wishlists = new ArrayList<>();
+        WishlistItem mutedA = new WishlistItem(user.getId(), business);
+        WishlistItem mutedB = new WishlistItem(adminUser.getId(), business);
+        mutedA.muteBusiness();
+        mutedB.muteBusiness();
+        wishlists.add(mutedA);
+        wishlists.add(mutedB);
+
+
+        List<WishlistItem> filtered = listingController.getUnmutedWishlist(wishlists);
+
+        assertThat(filtered.size()).isZero();
+    }
+
+
 }
