@@ -259,6 +259,10 @@ const Homepage = {
 
     /**
      * Calculate whether allMuted is true or not
+     * This function sets the Mute All button to either mute or unmute
+     * It is called every time a Wishlisted Business is added or removed and during page load
+     * If all Wishlisted Business' are manually/individually muted, set the button to 'Unmute All'
+     * If any single Wishlisted Business is unmuted, set the button to "Mute All'
      */
     calculateAllMuted: function () {
       this.allMuted = true;
@@ -281,73 +285,47 @@ const Homepage = {
 
     /**
      * Mutes a single wishlisted business
-     * To updateWishlistMuteStatus, the current mutedStatus needs to be called. Ie if we were to unmute a currently
-     * muted wishlisted business, we must send the status 'Muted' as a parameter
+     * To updateWishlistMuteStatus, the current mutedStatus needs to be called.
+     * Ie if we were to unmute a currently muted wishlisted business, we must send the status 'Muted' as a parameter
      * @param wishlistedBusinessItem the business to toggle mute on
      */
     toggleMuteBusiness: function (wishlistedBusinessItem) {
-      if (wishlistedBusinessItem.mutedStatus === "Muted") {
-        api.updateWishlistMuteStatus(wishlistedBusinessItem.id, "Muted")
-            .then(() => {
-              this.getWishlist(this.userId);
-              this.$vs.notify({title: "Business successfully unmuted", color: "success"});
-            })
-            .catch(() => {
-              this.$vs.notify({title: "Error muting business", color: "danger"});
-            });
-      }
+      api.updateWishlistMuteStatus(wishlistedBusinessItem.id, wishlistedBusinessItem.mutedStatus)
+          .then(() => {
+            this.getWishlist(this.userId);
+            this.$vs.notify({title: "Business successfully unmuted", color: "success"});
+          })
+          .catch(() => {
+            this.$vs.notify({title: "Error muting business", color: "danger"});
+          });
 
-      if (wishlistedBusinessItem.mutedStatus === "Unmuted") {
-        api.updateWishlistMuteStatus(wishlistedBusinessItem.id, "Unmuted")
-            .then(() => {
-              this.getWishlist(this.userId);
-              this.$vs.notify({title: "Business successfully unmuted", color: "success"});
-            })
-            .catch(() => {
-              this.$vs.notify({title: "Error unmuting business", color: "danger"});
-            });
-      }
     },
 
 
     /**
      * Calls the api endpoint, updating the mute status of all the wishlist items
      */
-    toggleMuteAll: function () {
-      if (this.allMuted) {
-        for (let wish of this.wishlist.slice(0, -1)) {
-          api.updateWishlistMuteStatus(wish.id, "Muted")
-          .catch(() => {
-            this.$vs.notify({title: "Error unmuting wishlist", color: "danger"});
-          });
-        }
-        api.updateWishlistMuteStatus(this.wishlist[this.wishlist.length-1].id, "Muted")
-          .then(() => {
-            this.getWishlist(this.userId);
-          })
-          .catch(() => {
-            this.$vs.notify({title: "Error unmuting wishlist", color: "danger"});
-        });
-        this.$vs.notify({title: "All businesses successfully unmuted", color: "success"});
-        this.allMuted = false;
-      } else {
-        for (let wish of this.wishlist.slice(0, -1)) {
-          api.updateWishlistMuteStatus(wish.id, "Unmuted")
-              .catch(() => {
-              this.$vs.notify({title: "Error muting wishlist", color: "danger"});
-            });
-        }
-        api.updateWishlistMuteStatus(this.wishlist[this.wishlist.length-1].id, "Unmuted")
-          .then(() => {
-            this.getWishlist(this.userId);
-          })
-          .catch(() => {
-            this.$vs.notify({title: "Error muting wishlist", color: "danger"});
-        });
-
-        this.$vs.notify({title: "All businesses successfully muted", color: "success"});
+    toggleMuteAll: async function () {
+      //toggle the 'Mute All' button
+      let muteStatus;
+      if (!this.allMuted) {
         this.allMuted = true;
+        muteStatus = "Unmuted";
+      } else {
+        muteStatus = "Muted";
+        this.allMuted = false;
       }
+
+      //Set the mute/unmute state for every business in the wishlist
+      for (let wish of this.wishlist) {
+        api.updateWishlistMuteStatus(wish.id, muteStatus)
+            .catch(() => {
+              this.$vs.notify({title: "Error updating wishlist mute/unmute", color: "danger"});
+            });
+      }
+      await this.getWishlist(this.userId);
+      this.$vs.notify({title: "All businesses successfully muted/unmuted", color: "success"});
+
     },
 
     /**
