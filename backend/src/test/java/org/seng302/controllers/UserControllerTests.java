@@ -1,9 +1,8 @@
 package org.seng302.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +20,7 @@ import org.seng302.models.requests.LoginRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.models.requests.NewUserRequest;
 import org.seng302.repositories.UserRepository;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,6 +35,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +56,16 @@ class UserControllerTests {
     private UserFinder userFinder;
     @Autowired
     private ObjectMapper mapper;
+    @MockBean
+    private FileService fileService;
 
     private User user;
     List<User> users;
     private Image image1;
+    MockMultipartFile userImage;
 
     @BeforeEach
-    void setup() throws NoSuchAlgorithmException {
+    void setup() throws NoSuchAlgorithmException, IOException {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
 
@@ -86,11 +90,10 @@ class UserControllerTests {
         users.add(user1);
         users.add(user2);
         users.add(user3);
-
-
-
-
-
+        File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
+        assertThat(data).exists();
+        byte[] bytes = FileCopyUtils.copyToByteArray(data);
+        userImage = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
     }
 
     @Test
@@ -546,6 +549,78 @@ class UserControllerTests {
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
         UserIdResponse response = new UserIdResponse(user);
         assertThat(result.getResponse().getContentAsString()).isEqualTo(mapper.writeValueAsString(response));
+    }
+
+    @Test
+    void testNoAuthAddUserImage() throws Exception {
+        mockMvc.perform(multipart("/users/{id}/images", user.getId())
+                .file(userImage))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testSuccessfulAddUserImage() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(multipart("/users/{id}/images", user.getId())
+                .file(userImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isCreated());
+
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User gaaUser = new User("test", "GAA", addr, "fake@fakemail.com", "testpass", Role.GAA);
+
+        mockMvc.perform(multipart("/users/{id}/images", user.getId())
+                .file(userImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaaUser))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testBadPathFoUserImages() throws Exception {
+        // Non-existent user.
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(null);
+        mockMvc.perform(multipart("/users/{id}/images", user.getId())
+                .file(userImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testUnsuccessfulAddUserImageNoImageSupplied() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        MockMultipartFile noImageFile = new MockMultipartFile("filename", null, null, (byte[]) null);
+        mockMvc.perform(multipart("/users/{id}/images", user.getId())
+                .file(noImageFile)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testUnsuccessfulAddUserImageIncorrectFileType() throws Exception {
+        byte[] badTypeBytes = "Hello World".getBytes();
+        MockMultipartFile badTypeFile = new MockMultipartFile("filename", "", MediaType.TEXT_HTML_VALUE, badTypeBytes);
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(multipart("/users/{id}/images", user.getId())
+                .file(badTypeFile)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testUnsuccessfulAddUserImageForbidden() throws Exception {
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User anotherUser = new User("test", "user", addr, "fake@fakemail.com", "testpass", Role.USER);
+        anotherUser.setId(2);
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(multipart("/users/{id}/images", user.getId())
+                .file(userImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
+                .andExpect(status().isForbidden());
     }
 
     // User image tests

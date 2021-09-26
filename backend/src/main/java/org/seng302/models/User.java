@@ -148,6 +148,18 @@ public class User implements Serializable {
         this.images.add(image);
     }
 
+    public void updatePrimaryImage(long id, String imageId, String imageExtension) {
+        if (this.primaryImagePath == null) {
+            if (System.getProperty("os.name").startsWith("windows")) {
+                this.setPrimaryImage(String.format("business_%d\\%s%s", id, imageId, imageExtension));
+            } else {
+                this.setPrimaryImage(String.format("business_%d/%s%s", id, imageId, imageExtension));
+            }
+        }
+    }
+
+    public String getPrimaryImagePath() {return this.primaryImagePath;}
+
     public void setPrimaryImage(String path) {
         this.primaryImagePath = path;
     }
