@@ -10,7 +10,9 @@ import org.seng302.models.Image;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
+import org.seng302.models.requests.ModifyUserRequest;
 import org.seng302.models.requests.NewUserRequest;
+import org.seng302.models.requests.UserRequest;
 import org.seng302.models.responses.UserIdResponse;
 import org.seng302.repositories.UserRepository;
 import org.seng302.utilities.Encrypter;
@@ -60,10 +62,8 @@ public class UserController {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
-//    @Autowired
     private UserRepository userRepository;
 
-//    @Autowired
     private UserFinder userFinder;
 
     @Autowired
@@ -134,6 +134,53 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
    }
 
+    /**
+     *
+     * @param reqBody ModifyUserRequest object which contains everything that needs to be changed.
+     * @param id The id of the user to be modified.
+     * @param session HttpSession object to help getting the session of the current user.
+     * @return 200 if the user is properly updated, 400 if the supplied data is bad, 409 if the user is attempted to
+     * change their email to an email that is already taken, 406 if the user id does not exist, and 401 if the user is
+     * not logged in.
+     */
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
+
+        User user = userRepository.findUserById(Long.parseLong(id));
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        else if (userRepository.findUserByEmail(reqBody.getEmail()) != null &&
+                !currentUser.getEmail().equals(reqBody.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        else {
+            List<String> registrationErrors = registrationUserCheck(reqBody);
+            if (registrationErrors.isEmpty()) { // No errors found.
+                user.setFirstName(reqBody.getFirstName());
+                user.setLastName(reqBody.getLastName());
+                user.setMiddleName(reqBody.getMiddleName());
+                user.setNickname(reqBody.getNickname());
+                user.setBio(reqBody.getBio());
+                user.setEmail(reqBody.getEmail());
+                user.setDateOfBirth(reqBody.getDateOfBirth());
+                user.setPhoneNumber(reqBody.getPhoneNumber());
+                user.setFirstName(reqBody.getFirstName());
+                user.setHomeAddress(reqBody.getHomeAddress());
+                user.setPassword(Encrypter.hashString(reqBody.getPassword()));
+                userRepository.save(user);
+
+                UserIdResponse res = new UserIdResponse(user);
+                String jsonString = mapper.writeValueAsString(res);
+                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(jsonString);
+            }
+            else {
+                logger.error("Invalid user modification.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errors with modifying the user's details: " + registrationErrors);
+            }
+        }
+    }
 
     /**
      * This method inserts a new user into the user repository
@@ -170,7 +217,7 @@ public class UserController {
      * @param user The user to check the validity of
      * @return list of errors with the new registration request - if there is any.
      */
-    public List<String> registrationUserCheck(NewUserRequest user) throws ParseException {
+    public List<String> registrationUserCheck(UserRequest user) throws ParseException {
         List<String> errors = new ArrayList<>();
 
         if (user.getFirstName() == null || (user.getFirstName() != null && user.getFirstName().length() == 0)) {
