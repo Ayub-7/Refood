@@ -126,6 +126,8 @@ export default {
       activeGranularityButton: "m",
       granularity: "",
       title: "",
+      barFormat: "category",
+      labelFormat: "dd-MMM",
 
       toggleSales: true,
       boughtListings: [],
@@ -238,11 +240,76 @@ export default {
       let allData = [];
       this.title = "Yearly ";
       this.activeGranularityButton = "y";
+      this.barFormat = "category";
+      this.labelFormat = "dd-MMM";
       let processedData = this.totalYearlyRevenue(data);
 
       // Flatten object into array.
       for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
       return {'1': Object.keys(processedData),
+              '2': allData};
+    },
+
+
+    displayMonthlyData: function (data) {
+      this.title = "Monthly ";
+      this.activeGranularityButton = "m";
+      this.barFormat = "datetime";
+      this.labelFormat = "MMMM yyyy";
+      let processedData = this.totalMonthlyRevenue(data);
+      let allData = [];
+
+      // Flatten object into array.
+      for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
+
+      // Generates the x-axis labels of each month, for each year.
+      let categories = this.generateMonthLabels(Object.keys(processedData));
+
+      // Removes months with no sales up to the first month of sales.
+      let i = 0;
+      while (i < allData.length) {
+        if (allData[i] > 0) {
+          allData = allData.slice(i);
+          categories = categories.slice(i);
+          break;
+        }
+        i++;
+      }
+      return {'1': categories,
+              '2': allData};
+    },
+
+    displayWeeklyData: function (data) {
+      this.title = "Weekly ";
+      this.activeGranularityButton = "w";
+      this.barFormat = "datetime";
+      let processedData = this.totalWeeklyRevenue(data);
+      let allData = [];
+
+      // Flatten object into array.
+      for (let year of Object.entries(processedData)) {
+        let entries = Object.entries(year[1]).map(week => week[1]);
+        allData = allData.concat(entries);
+      }
+
+      return {'1': this.generateWeekLabels(processedData),
+              '2': allData};
+    },
+
+
+    displayDailyData: function (data) {
+
+      this.title = "Daily ";
+      this.activeGranularityButton = "d";
+      this.barFormat = "datetime";
+      let processedData = this.totalDailyRevenue(data);
+      let allData = [];
+
+      for (let day of Object.entries(processedData)) {
+        allData.push(day[1]);
+      }
+
+      return {'1': this.generateDayLabels(processedData),
               '2': allData};
     },
 
@@ -254,61 +321,20 @@ export default {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
       let allData = [];
       let categories = [];
-      let barFormat = "category";
-      let labelFormat = "dd-MMM";
-      let processedData;
       if (this.granularity.toLowerCase() === "year") {
         categories = this.displayYearlyData(data)['1'];
         allData = this.displayYearlyData(data)['2'];
       } else if (this.granularity.toLowerCase() === "month") {
-        this.title = "Monthly ";
-        this.activeGranularityButton = "m";
-        barFormat = "datetime";
-        labelFormat = "MMMM yyyy";
-        processedData = this.totalMonthlyRevenue(data);
-
-        // Flatten object into array.
-        for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
-
-        // Generates the x-axis labels of each month, for each year.
-        categories = this.generateMonthLabels(Object.keys(processedData));
-
-        // Removes months with no sales up to the first month of sales.
-        let i = 0;
-        while (i < allData.length) {
-          if (allData[i] > 0) {
-            allData = allData.slice(i);
-            categories = categories.slice(i);
-            break;
-          }
-          i++;
-        }
+        categories = this.displayMonthlyData(data)['1'];
+        allData = this.displayMonthlyData(data)['2'];
       }
       else if (this.granularity.toLowerCase() === "week") {
-        this.title = "Weekly ";
-        this.activeGranularityButton = "w";
-        barFormat = "datetime";
-        processedData = this.totalWeeklyRevenue(data);
-
-        // Flatten object into array.
-        for (let year of Object.entries(processedData)) {
-          let entries = Object.entries(year[1]).map(week => week[1]);
-          allData = allData.concat(entries);
-        }
-
-        // Generates the x-axis labels of each month, for each year.
-        categories = this.generateWeekLabels(processedData);
+        categories = this.displayWeeklyData(data)['1'];
+        allData = this.displayWeeklyData(data)['2'];
       }
       else if (this.granularity.toLowerCase() === "day") {
-        this.title = "Daily ";
-        this.activeGranularityButton = "d";
-        barFormat = "datetime";
-        processedData = this.totalDailyRevenue(data);
-        categories = this.generateDayLabels(processedData);
-
-        for (let day of Object.entries(processedData)) {
-          allData.push(day[1]);
-        }
+        categories = this.displayDailyData(data)['1'];
+        allData = this.displayDailyData(data)['2'];
       }
 
       //Updates the graph title accordingly
@@ -340,7 +366,7 @@ export default {
           }
         },
         xaxis: {
-          type: barFormat,
+          type: this.barFormat,
           categories: categories,
           labels: {
             datetimeUTC: false,
@@ -361,7 +387,7 @@ export default {
             }
           },
           x: {
-            format: labelFormat
+            format: this.labelFormat
           }
         },
       };
