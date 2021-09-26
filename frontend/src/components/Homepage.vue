@@ -77,18 +77,16 @@
             </div>
           </div>
           <div v-if="!watchlist">
-            <vs-row style="margin-top: -40px; margin-bottom: 20px;" vs-type="flex" vs-justify="right">
-              <div v-if="wishlist.length > 0">
-                <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'" style="margin-right: 30px">
-                  <vs-button @click="toggleMuteAll" v-if="allMuted == true" color="purple">
-                    <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
-                  </vs-button>
-                  <vs-button v-else @click="toggleMuteAll" color="purple">
-                    <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
-                  </vs-button>
-                </vs-tooltip>
-              </div>
-            </vs-row>
+            <div v-if="wishlist.length > 0">
+              <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'">
+                <vs-button id="mute-all-btn" @click="toggleMuteAll" v-if="allMuted == true" style="width: 100%; margin-bottom: 20px" color="grey">
+                  <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+                <vs-button v-else class="mute-all-btn" @click="toggleMuteAll" style="width: 100%; margin-bottom: 20px" color="grey">
+                  <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+              </vs-tooltip>
+            </div>
             <div v-if="wishlist.length > 0">
               <div v-for="wish in wishlist" :key="wish.id" >
                 <vs-card style="margin-top: -10px"  actionable>
@@ -283,7 +281,8 @@ const Homepage = {
 
     /**
      * Mutes a single wishlisted business
-     * Do not ask me why this works :/
+     * To updateWishlistMuteStatus, the current mutedStatus needs to be called. Ie if we were to unmute a currently
+     * muted wishlisted business, we must send the status 'Muted' as a parameter
      * @param wishlistedBusinessItem the business to toggle mute on
      */
     toggleMuteBusiness: function (wishlistedBusinessItem) {
@@ -353,6 +352,7 @@ const Homepage = {
 
     /**
      * Call the api function and retrieve wishlisted businesses
+     * @param userId ID of user who is currently logged in
      */
     getWishlist: function (userId) {
       api.getUsersWishlistedBusinesses(userId)
@@ -370,6 +370,7 @@ const Homepage = {
 
     /**
      * Call api function to remove business from user's wishlist
+     * @param wishlistItemId ID of the business that the user 'Wishlisted'
      */
     removeFromWishlist: function (wishlistItemId) {
       api.removeBusinessFromWishlist(wishlistItemId)
@@ -388,20 +389,25 @@ const Homepage = {
 
     /**
      * Go to business profile
+     * @param businessId Id of the business in 'Wishlisted Businesses'
      */
     viewBusiness: function (businessId) {
       this.$router.push({name: "Business", params: {id: businessId}})
     },
 
     /**
-     * open listing
+     * Open listing
+     * @param businessId ID of the business owning the selected listing
+     * @param listingId The selected listing's ID
      */
     viewListing: function (businessId, listingId) {
       this.$router.push({name: "Listing", params: {businessId: businessId, listingId: listingId}})
     },
 
     /**
-     * unlike an item
+     * Unlike an item
+     * @param id ID of user who is currently logged in
+     * @param index Location of the Listing in,this.likedItem, that the user unliked
      */
     unlike: function (id, index) {
       this.likes -= 1;
@@ -420,6 +426,7 @@ const Homepage = {
 
     /**
      * Retrieves all the listings that the user has liked.
+     * @param userId ID of user who is currently logged in
      */
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
@@ -466,6 +473,7 @@ const Homepage = {
 
     /**
      * Retrieves all the cards that the user has created.
+     * @param id ID of user who is currently logged in
      */
     getUserCards: function(id) {
       this.$vs.loading({
@@ -497,7 +505,7 @@ const Homepage = {
      * Also sets the users details in store.js, so the users session can be maintained
      * as they navigate throughout the applications and 'act' as a business
      *
-     * @param userId ID of user who is currently viewing page.
+     * @param userId ID of user who is currently logged in
      */
     getUserDetails: function(userId) {
       api.getUserFromID(userId)
@@ -545,7 +553,7 @@ const Homepage = {
      * Sends an api request to get a business object from a business Id
      * Sets this components business variable to this object
      *
-     * @param id business id
+     * @param id business' id
      */
     getBusiness: function(id) {
       api.getBusinessFromId(id)
@@ -573,6 +581,7 @@ const Homepage = {
 
     /**
      * Gets the name of the business the user is acting as from the store
+     * @return business the user is acting as
      */
     getBusinessName: function() {
       return store.actingAsBusinessName;
@@ -580,6 +589,7 @@ const Homepage = {
 
     /**
      * Gets the username of the logged in user from the store
+     * @return Username of the logged in user
      */
     getUserName: function() {
       return store.userName;
@@ -588,6 +598,7 @@ const Homepage = {
     /**
      * Gets the logged in users id from the store, and assigns this components
      * userId variable equal to it.
+     * @return Id of the logged in user
      */
     getLoggedInUserId: function() {
       this.userId = store.loggedInUserId;
@@ -897,6 +908,5 @@ main {
     margin-left: 4px;
     transition: 0.1s;
   }
-
 }
 </style>
