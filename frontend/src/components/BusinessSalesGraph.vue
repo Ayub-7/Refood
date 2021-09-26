@@ -236,6 +236,11 @@ export default {
       return "month";
     },
 
+    /**
+     * formats the data to suit displaying yearly data
+     * @param data bought listings sales data
+     * @return a json object with processed data and allData
+     */
     displayYearlyData: function(data) {
       let allData = [];
       this.title = "Yearly ";
@@ -251,6 +256,11 @@ export default {
     },
 
 
+    /**
+     * formats the data to suit displaying monthly data
+     * @param data bought listings sales data
+     * @return a json object with processed data and allData
+     */
     displayMonthlyData: function (data) {
       this.title = "Monthly ";
       this.activeGranularityButton = "m";
@@ -279,6 +289,11 @@ export default {
               '2': allData};
     },
 
+    /**
+     * formats the data to suit displaying weekly data
+     * @param data bought listings sales data
+     * @return a json object with processed data and allData
+     */
     displayWeeklyData: function (data) {
       this.title = "Weekly ";
       this.activeGranularityButton = "w";
@@ -297,8 +312,12 @@ export default {
     },
 
 
+    /**
+     * formats the data to suit displaying daily data
+     * @param data bought listings sales data
+     * @return a json object with processed data and allData
+     */
     displayDailyData: function (data) {
-
       this.title = "Daily ";
       this.activeGranularityButton = "d";
       this.barFormat = "datetime";
@@ -313,39 +332,11 @@ export default {
               '2': allData};
     },
 
+
     /**
-     * Displays sales data.
-     * @param data bought listings sales data
+     * Updates the plot options and inputs
      */
-    displaySalesData: function(data) {
-      // Categorises and sums up data, splitting each bought listing into it's respective year and month.
-      let allData = [];
-      let categories = [];
-      if (this.granularity.toLowerCase() === "year") {
-        categories = this.displayYearlyData(data)['1'];
-        allData = this.displayYearlyData(data)['2'];
-      } else if (this.granularity.toLowerCase() === "month") {
-        categories = this.displayMonthlyData(data)['1'];
-        allData = this.displayMonthlyData(data)['2'];
-      }
-      else if (this.granularity.toLowerCase() === "week") {
-        categories = this.displayWeeklyData(data)['1'];
-        allData = this.displayWeeklyData(data)['2'];
-      }
-      else if (this.granularity.toLowerCase() === "day") {
-        categories = this.displayDailyData(data)['1'];
-        allData = this.displayDailyData(data)['2'];
-      }
-
-      //Updates the graph title accordingly
-      if (!this.toggleSales) {
-        this.title += "Total Sales";
-      } else {
-        this.title += "Revenue";
-      }
-
-      // Updates the plot options and inputs.
-      // Reassigning entire variable allows chart to properly update and play animations.
+    graphOptionsUpdater: function (categories) {
       this.options = {
         title: {
           text: this.title,
@@ -391,6 +382,43 @@ export default {
           }
         },
       };
+    },
+
+    /**
+     * Displays sales data.
+     * @param data bought listings sales data
+     */
+    displaySalesData: function(data) {
+      // Categorises and sums up data, splitting each bought listing into it's respective year and month.
+      let allData = [];
+      let categories = [];
+      if (this.granularity.toLowerCase() === "year") {
+        categories = this.displayYearlyData(data)['1'];
+        allData = this.displayYearlyData(data)['2'];
+      } else if (this.granularity.toLowerCase() === "month") {
+        categories = this.displayMonthlyData(data)['1'];
+        allData = this.displayMonthlyData(data)['2'];
+      }
+      else if (this.granularity.toLowerCase() === "week") {
+        categories = this.displayWeeklyData(data)['1'];
+        allData = this.displayWeeklyData(data)['2'];
+      }
+      else if (this.granularity.toLowerCase() === "day") {
+        categories = this.displayDailyData(data)['1'];
+        allData = this.displayDailyData(data)['2'];
+      }
+
+      //Updates the graph title accordingly
+      if (!this.toggleSales) {
+        this.title += "Total Sales";
+      } else {
+        this.title += "Revenue";
+      }
+
+      // Updates the plot options and inputs.
+      // Reassigning entire variable allows chart to properly update and play animations.
+      this.graphOptionsUpdater(categories)
+
       return allData;
     },
 
