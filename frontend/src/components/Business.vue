@@ -52,6 +52,9 @@
           <vs-tab class="business-nav-item" label="Administrators">
             <BusinessAdministrators :admins="adminList" :pAdminId="business.primaryAdministratorId"/>
           </vs-tab>
+          <vs-tab class="business-nav-item" label="Images">
+            <BusinessImages :images="images"></BusinessImages>
+          </vs-tab>
         </vs-tabs>
       </main>
 
@@ -64,10 +67,11 @@
 import api from "../Api";
 import BusinessAdministrators from "./BusinessAdministrators";
 import BusinessListings from "./BusinessListings";
+import BusinessImages from "./BusinessImages";
 
 const Business = {
   name: "Business",
-  components: {BusinessListings, BusinessAdministrators},
+  components: {BusinessListings, BusinessAdministrators, BusinessImages},
 
   // App's initial state.
   data: function () {
@@ -80,6 +84,7 @@ const Business = {
 
       inWishlist: false, // i.e. is it in the user's wishlist.
       wishlistId: null,
+      images: Array
     };
   },
 
@@ -133,9 +138,9 @@ const Business = {
     getUserWishlist: function() {
       api.getUsersWishlistedBusinesses(this.user.id)
         .then((res) => {
-          for (let i = 0; i < res.data.length; i++) {
-            if (this.business.id === res.data[i].business.id) {
-              this.wishlistId = res.data[i].id;
+          for (let data of res.data) {
+            if (this.business.id === data.business.id) {
+              this.wishlistId = data.id;
               this.inWishlist = true;
               break;
             }
