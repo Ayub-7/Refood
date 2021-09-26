@@ -53,7 +53,7 @@
             <BusinessAdministrators :admins="adminList" :pAdminId="business.primaryAdministratorId"/>
           </vs-tab>
           <vs-tab class="business-nav-item" label="Images">
-            <BusinessImages :images="images"></BusinessImages>
+            <BusinessImages :images="images" :primaryImagePath="business.primaryImagePath" :business="business"></BusinessImages>
           </vs-tab>
         </vs-tabs>
       </main>
@@ -84,7 +84,7 @@ const Business = {
 
       inWishlist: false, // i.e. is it in the user's wishlist.
       wishlistId: null,
-      images: Array
+      images: null
     };
   },
 
@@ -159,6 +159,7 @@ const Business = {
           .then((res) => {
             this.business = res.data;
             this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
+            this.images = this.business.images;
           })
           .catch((error) => {
             if (error) {
