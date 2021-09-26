@@ -12,27 +12,31 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.finders.BusinessFinder;
-import org.seng302.models.Address;
-import org.seng302.models.Business;
-import org.seng302.models.BusinessType;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.repositories.BoughtListingRepository;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.ResourceUtils;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,14 +62,17 @@ class BusinessControllerTests {
     ObjectMapper mapper;
     @MockBean
     BusinessFinder businessFinder;
+    @MockBean
+    FileService fileService;
 
     User ownerUser;
     User adminUser;
     User user;
     Business business;
+    MockMultipartFile businessImage;
 
     @BeforeEach
-    public void setup() throws NoSuchAlgorithmException {
+    public void setup() throws NoSuchAlgorithmException, IOException {
         ownerUser = new User("Rayna", "YEP", "Dalgety", "Universal", "zero tolerance task-force" , "rdalgety3@ocn.ne.jp","2006-03-30","+7 684 622 5902",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ATQWJM");
         ownerUser.setId(1L);
         user = new User("Elwood", "YEP", "Altamirano", "Visionary", "mobile capacity", "ealtamirano8@phpbb.com","1927-02-28","+381 643 240 6530",new Address("32", "Little Fleur Trail", "Christchurch" ,"Canterbury", "New Zealand", "8080"),"ItqVNvM2JBA");
@@ -79,6 +86,11 @@ class BusinessControllerTests {
         business.createBusiness(ownerUser);
         business.getAdministrators().add(adminUser);
         assertThat(business.getAdministrators().size()).isEqualTo(2);
+
+        File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
+        assertThat(data).exists();
+        byte[] bytes = FileCopyUtils.copyToByteArray(data);
+        businessImage = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
     }
 
     @Test
@@ -376,7 +388,7 @@ class BusinessControllerTests {
         requestParams.add("type", "");
         requestParams.add("page", "0");
 
-        List<Business> businessList = new ArrayList<Business>();
+        List<Business> businessList = new ArrayList<>();
         businessList.add(business);
         Mockito.when(businessRepository.findAll()).thenReturn(businessList);
 
@@ -394,7 +406,7 @@ class BusinessControllerTests {
         requestParams.add("page", "0");
         requestParams.add("sortString", "countryDesc");
 
-        List<Business> businessList = new ArrayList<Business>();
+        List<Business> businessList = new ArrayList<>();
         businessList.add(business);
         Mockito.when(businessRepository.findAll()).thenReturn(businessList);
 
@@ -412,7 +424,7 @@ class BusinessControllerTests {
         requestParams.add("page", "0");
         requestParams.add("sortString", "badSortString");
 
-        List<Business> businessList = new ArrayList<Business>();
+        List<Business> businessList = new ArrayList<>();
         businessList.add(business);
 
         mvc.perform(get("/businesses/search")
@@ -455,7 +467,7 @@ class BusinessControllerTests {
 
 
     @Test
-    void getTypesMethod_GetsAllTypes() throws Exception {
+    void getTypesMethod_GetsAllTypes() {
         List<BusinessType> types = businessController.getAllTypes();
         Assertions.assertEquals(types.size(), BusinessType.values().length);
     }
@@ -507,4 +519,77 @@ class BusinessControllerTests {
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @WithMockUser
+    void successfulAddBusinessImage() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(businessImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isCreated());
+
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(businessImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isCreated());
+
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User gaaUser = new User("test", "GAA", addr, "fake@fakemail.com", "testpass", Role.GAA);
+
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(businessImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaaUser))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void noAuthAddBusinessImage() throws Exception {
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(businessImage)).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void forbiddenAddBusinessImage() throws Exception {
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(businessImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void badPathForBusinessImages() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(businessImage)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void noImageSuppliedBusinessImages() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        MockMultipartFile noImageFile = new MockMultipartFile("filename", null, null, (byte[]) null);
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(noImageFile)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void badFileTypeBusinessImages() throws Exception {
+        byte[] badTypeBytes = "Hello World".getBytes();
+        MockMultipartFile badTypeFile = new MockMultipartFile("filename", "", MediaType.TEXT_HTML_VALUE, badTypeBytes);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(multipart("/businesses/{businessId}/images", business.getId())
+                .file(badTypeFile)
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+    }
+
+
+
 }

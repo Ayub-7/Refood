@@ -62,7 +62,7 @@ public class BusinessController {
     @Autowired
     private FileService fileService;
 
-    @Value("$media.image.business_images.directory}")
+    @Value("${media.image.business_images.directory}")
     private String rootImageDir;
 
     /**
@@ -221,7 +221,7 @@ public class BusinessController {
 
     /**
      * Creates a sort object to be used by pageRequest to sort search results.
-     * @param sortString
+     * @param sortString string determining the sort type
      * @return Sort sortBy Sort specification
      * @throws ResponseStatusException
      */
@@ -419,8 +419,8 @@ public class BusinessController {
 
         File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
         File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        System.out.println(file.getAbsolutePath());
+        logger.info("Working Directory = " + System.getProperty("user.dir"));
+        logger.info(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
