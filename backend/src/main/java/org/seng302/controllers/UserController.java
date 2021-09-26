@@ -349,8 +349,8 @@ public class UserController {
 
         File file = new File(String.format("%s/%s%s", userDir, imageId, imageExtension));
         File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", userDir, imageId, imageExtension));
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        System.out.println(file.getAbsolutePath());
+        logger.info(String.format("Working Directory = %s", System.getProperty("user.dir")));
+        logger.info(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
