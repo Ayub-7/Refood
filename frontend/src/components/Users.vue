@@ -7,6 +7,7 @@
         <div class="sub-header" style="text-align: center"> Options </div>
         <vs-button class="options-card" id="option-view-cards" @click="openMarketModal()">Marketplace Cards</vs-button>
         <vs-button class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
+        <vs-button class="options-card" @click="openModifyModal(user)">Edit Profile</vs-button>
       </div>
 
       <div id="name-container">
@@ -99,6 +100,7 @@
         </button>
       </div>
     </Modal>
+    <ModifyUser ref="modifyUserModal" :user="user" />
 
   </div>
 </template>
@@ -110,12 +112,13 @@ import api from "../Api";
 import {store} from "../store";
 import MarketplaceGrid from '../components/MarketplaceGrid';
 import CardModal from "../components/CardModal";
+import ModifyUser from "../components/ModifyUser";
 const moment = require('moment');
 
 const Users = {
   name: "Profile",
   components: {
-    Modal, MarketplaceGrid, CardModal
+    ModifyUser, Modal, MarketplaceGrid, CardModal
   },
   data: function () {
     return {
@@ -132,6 +135,7 @@ const Users = {
       cards: [],
 
       displayOptions: false,
+      modifyModal: false,
     };
   },
 
@@ -179,6 +183,12 @@ const Users = {
     openMarketModal: function() {
       this.showMarketModal = true;
       this.getUserCards(this.user.id);
+    },
+
+    openModifyModal(user) {
+      this.modifyModal = true;
+      console.log(user);
+      this.$refs.modifyUserModal.open(user);
     },
 
     /**
