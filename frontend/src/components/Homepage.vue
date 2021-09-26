@@ -145,9 +145,6 @@
             <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Data</vs-button>
           </div>
           <vs-divider/>
-          <!--
-          <CardModal id="cardModal" ref="cardModal" v-show="selectedCard != null" @deleted="notifyOfDeletion" :selectedCard='selectedCard' />
-          -->
           <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
         </vs-card>
       </div>
@@ -437,11 +434,6 @@ const Homepage = {
               this.likedItem = temp;
               this.likes = temp.length;
             })
-            .catch((error) => {
-              if (error.response) {
-                this.$vs.notify({title: "Error retrieving likes", color: "danger"});
-              }
-            })
       }, 100);
 
     },
@@ -655,6 +647,7 @@ export default Homepage;
 #product-closes {
   font-size: 12px;
 }
+
 
 #view-icon {
   font-size: 16px;
