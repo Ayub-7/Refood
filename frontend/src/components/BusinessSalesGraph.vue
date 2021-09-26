@@ -234,27 +234,32 @@ export default {
       return "month";
     },
 
+    displayYearlyData: function(data) {
+      let allData = [];
+      this.title = "Yearly ";
+      this.activeGranularityButton = "y";
+      let processedData = this.totalYearlyRevenue(data);
+
+      // Flatten object into array.
+      for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
+      return {'1': Object.keys(processedData),
+              '2': allData};
+    },
+
     /**
      * Displays sales data.
      * @param data bought listings sales data
      */
     displaySalesData: function(data) {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
-      let processedData;
       let allData = [];
       let categories = [];
       let barFormat = "category";
       let labelFormat = "dd-MMM";
+      let processedData;
       if (this.granularity.toLowerCase() === "year") {
-        this.title = "Yearly ";
-        this.activeGranularityButton = "y";
-        processedData = this.totalYearlyRevenue(data);
-
-        // Flatten object into array.
-        for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
-
-        // Generates the x-axis labels of each month, for each year.
-        categories = Object.keys(processedData);
+        categories = this.displayYearlyData(data)['1'];
+        allData = this.displayYearlyData(data)['2'];
       } else if (this.granularity.toLowerCase() === "month") {
         this.title = "Monthly ";
         this.activeGranularityButton = "m";
