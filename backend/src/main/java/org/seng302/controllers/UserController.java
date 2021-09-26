@@ -120,7 +120,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
    }
 
-
+    /**
+     *
+     * @param reqBody ModifyUserRequest object which contains everything that needs to be changed.
+     * @param id The id of the user to be modified.
+     * @param session HttpSession object to help getting the session of the current user.
+     * @return 200 if the user is properly updated, 400 if the supplied data is bad, 409 if the user is attempted to
+     * change their email to an email that is already taken, 406 if the user id does not exist, and 401 if the user is
+     * not logged in.
+     */
     @PutMapping("/users/{id}")
     public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
 
