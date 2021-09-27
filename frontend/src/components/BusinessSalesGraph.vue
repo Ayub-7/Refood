@@ -17,27 +17,32 @@
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-w'}, 'options-button']"
                      type="border"
-                     style="grid-column: 3;">
+                     style="grid-column: 3;"
+                     @click="onPeriodChange('1-w')">
             1 Week
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-m'}, 'options-button']"
                      type="border"
-                     style="grid-column: 1;">
+                     style="grid-column: 1;"
+                     @click="onPeriodChange('1-m')">
             1 Month
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '6-m'}, 'options-button']"
                      type="border"
-                     style="grid-column: 3;">
+                     style="grid-column: 3;"
+                     @click="onPeriodChange('6-m')">
             6 Months
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-y'}, 'options-button']"
                      type="border"
-                     style="grid-column: 1;">
+                     style="grid-column: 1;"
+                     @click="onPeriodChange('1-y')">
             1 Year
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === 'all'}, 'options-button']"
                      type="border"
-                     style="grid-column: 3;">
+                     style="grid-column: 3;"
+                     @click="onPeriodChange('all')">
             All
           </vs-button>
         </div>
@@ -108,6 +113,8 @@
 
 <script>
 import api from "../Api";
+const moment = require('moment');
+
 
 export default {
   name: "BusinessSalesGraph",
@@ -123,8 +130,10 @@ export default {
 
   data: function() {
     return {
+      errors: [],
       activeGranularityButton: "m",
       granularity: "",
+      period: "",
       title: "",
       barFormat: "category",
       labelFormat: "dd-MMM",
@@ -195,7 +204,7 @@ export default {
 
       this.series = [{
         name: 'Total Value',
-        data: data,
+        data: data.slice(0, 10),
       }];
 
     },
@@ -274,7 +283,7 @@ export default {
 
       // Generates the x-axis labels of each month, for each year.
       let categories = this.generateMonthLabels(Object.keys(processedData));
-
+    
       // Removes months with no sales up to the first month of sales.
       let i = 0;
       while (i < allData.length) {
@@ -392,6 +401,7 @@ export default {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
       let allData = [];
       let categories = [];
+      data = data.filter(x => moment(x.sold).isBetween(start, end, 'seconds', '[]'))
       if (this.granularity.toLowerCase() === "year") {
         categories = this.displayYearlyData(data)['1'];
         allData = this.displayYearlyData(data)['2'];
@@ -571,7 +581,72 @@ export default {
      */
     generateDayLabels: function(processedData) {
       return Object.entries(processedData).map(day => day[0]);
-    }
+    },
+    
+    onPeriodChange: function(period) {
+      this.errors = [];
+      this.period = period;// Changes the period button to be selected and disabled.
+      switch (period) {
+        case '1-d':
+          this.displaySalesData(this.data);
+          break;
+        case '1-w':
+          this.updatePeriod(1 ,'week');
+          break; 
+        case '1-m':
+          this.updatePeriod(1 ,'month');
+          break; 
+        case '6-m':
+          this.updatePeriod(6 ,'month');
+          break;
+        case '1-y':
+          this.updatePeriod(1 ,'year');
+          break;
+        case 'custom':
+          if(this.validateDates(this.pickedStart, this.pickedEnd)) {
+            this.dateStart = this.pickedStart;
+            this.dateEnd = this.pickedEnd;
+          }
+          break;
+        case 'all':
+          this.dateEnd = new Date();
+          this.dateStart = this.getEarliestDate();
+      }
+
+      this.updateSummary();
+    },
+
+
+    /**
+     * Checks dates and if date is incorrect pushes error
+     * @param startDate start date from input field
+     * @param endDate end date from input field
+     * @returns boolean, true is valid dates, false if invalid
+     */
+    validateDates: function(startDate, endDate) {
+      if(startDate == null) {
+        this.errors.push('no-start');
+      }
+      if (endDate == null) {
+        this.errors.push('no-end');
+      }
+      if (moment(endDate).isBefore(moment(startDate))) {
+        this.errors.push('end-before-begin');
+      }
+      if (moment(endDate).isBefore(moment('1970')) || moment(endDate).isAfter(moment(new Date()))) {
+        this.errors.push('bad-end-date');
+      } 
+      if (moment(startDate).isBefore(moment('1970')) || moment(startDate).isAfter(moment(new Date()))) {
+        this.errors.push('bad-start-date');
+      }
+
+      if(this.errors.length > 0) {
+        return false;
+      }
+
+      return true;
+
+    },
   },
 
   mounted: function() {
