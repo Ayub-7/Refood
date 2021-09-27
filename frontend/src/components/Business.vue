@@ -8,12 +8,19 @@
     </div>
 
     <div id="container" v-if="this.business != null">
-      <!-- Left Side Business Information Panel -->
+      <!-- Top Component Title -->
       <div id="business-name-container">
+        <div v-if="business.primaryImagePath">
+          <ReImage :imagePath="business.primaryImagePath" class="title-image"></ReImage>
+        </div>
+        <div v-else>
+          <vs-icon icon="business" class="title-image">
+          </vs-icon>
+        </div>
         <div id="business-name"  >{{ business.name }}</div>
         <div id="business-type">{{ business.businessType }}</div>
       </div>
-
+      <!-- Left Side Business Information Panel -->
       <div id="business-container">
         <div class="sub-container">
           <vs-button id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
@@ -68,10 +75,11 @@ import api from "../Api";
 import BusinessAdministrators from "./BusinessAdministrators";
 import BusinessListings from "./BusinessListings";
 import BusinessImages from "./BusinessImages";
+import ReImage from "./ReImage";
 
 const Business = {
   name: "Business",
-  components: {BusinessListings, BusinessAdministrators, BusinessImages},
+  components: {BusinessListings, BusinessAdministrators, BusinessImages, ReImage},
 
   // App's initial state.
   data: function () {
@@ -253,6 +261,9 @@ export default Business;
   grid-column: 2 / 4;
   grid-row: 1;
 
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  grid-template-rows: auto auto;
   text-align: center;
   background-color: transparent;
   padding: 0.5em 0 0.5em 0;
@@ -265,13 +276,24 @@ export default Business;
 #business-name {
   font-size: 32px;
   padding: 0.5em 0 0.5em 0;
+  grid-column: 2;
 }
 
 #business-type {
   font-size: 16px;
   padding: 0 0 0.5em 0;
+  grid-column: 2;
 }
 
+.title-image {
+  height: 100px;
+  width: 200px;
+  object-fit: cover;
+  display: flex;
+  grid-column: 1;
+  grid-row: 1 / 3;
+  margin-left: auto;
+}
 /* === LEFT SIDE INFO PANEL === */
 #business-container {
   grid-column: 2;
