@@ -48,12 +48,12 @@
         </div>
         <div id="custom-period-container">
           <div class="options-header">Custom</div>
-          <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="dateStart" label="Start"
+          <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="pickedStart" label="Start"
                     danger-text="Date can not be in the future or after the end date"/>
           <p style="margin: auto auto 0">-</p>
-          <vs-input type="date" size="small" class="date-input" v-model="dateEnd" label="End"
+          <vs-input type="date" size="small" class="date-input" v-model="pickedEnd" label="End"
                     danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
-          <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;">Go</vs-button>
+          <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;" @click="onPeriodChange('custom')">Go</vs-button>
 
         </div>
         <div id="granularity-container">
@@ -133,10 +133,14 @@ export default {
       errors: [],
       activeGranularityButton: "m",
       granularity: "",
-      period: "",
+      activePeriodButton: "",
       title: "",
       barFormat: "category",
       labelFormat: "dd-MMM",
+      dateStart: null,
+      dateEnd: null,
+      pickedStart: null,
+      pickedEnd: null,
 
       toggleSales: true,
       boughtListings: [],
@@ -217,6 +221,7 @@ export default {
         .then((res) => {
           this.granularity = this.getNextFinestGranularity(res.data);
           this.boughtListings = res.data;
+          this.dateStart = this.getEarliestDate();
           this.getTotalRevenue();
         })
         .catch((error) => {
@@ -337,6 +342,7 @@ export default {
         allData.push(day[1]);
       }
 
+
       return {'1': this.generateDayLabels(processedData),
               '2': allData};
     },
@@ -398,10 +404,11 @@ export default {
      * @param data bought listings sales data
      */
     displaySalesData: function(data) {
-      // Categorises and sums up data, splitting each bought listing into it's respective year and month.
+      // Categorises and sums up data, splitting each bought listing into it's respective year and         this.updatePeriod(1 ,'week');month.
       let allData = [];
       let categories = [];
-      data = data.filter(x => moment(x.sold).isBetween(start, end, 'seconds', '[]'))
+
+      data = data.filter(x => moment(x.sold).isBetween(this.dateStart, this.dateEnd, 'seconds', '[]'))
       if (this.granularity.toLowerCase() === "year") {
         categories = this.displayYearlyData(data)['1'];
         allData = this.displayYearlyData(data)['2'];
@@ -522,6 +529,7 @@ export default {
      */
     totalDailyRevenue: function(data) {
       let processedData = {};
+
       for (let listing of data) {
         let soldDate = new Date(listing.sold);
         let soldString = soldDate.getFullYear() + "-" + (soldDate.getMonth() + 1) + "-" + soldDate.getDate();
@@ -537,7 +545,6 @@ export default {
         }
 
       }
-
       return processedData;
     },
 
@@ -585,17 +592,17 @@ export default {
     
     onPeriodChange: function(period) {
       this.errors = [];
-      this.period = period;// Changes the period button to be selected and disabled.
+      this.activePeriodButton = period;// Changes the period button to be selected and disabled.
       switch (period) {
         case '1-d':
-          this.displaySalesData(this.data);
+          this.updatePeriod(1 ,'day');
           break;
         case '1-w':
           this.updatePeriod(1 ,'week');
-          break; 
+          break;
         case '1-m':
           this.updatePeriod(1 ,'month');
-          break; 
+          break;
         case '6-m':
           this.updatePeriod(6 ,'month');
           break;
@@ -611,10 +618,26 @@ export default {
         case 'all':
           this.dateEnd = new Date();
           this.dateStart = this.getEarliestDate();
+          break;
       }
-
-      this.updateSummary();
+      if (this.toggleSales) {
+        this.getTotalRevenue();
+      }
+      else {
+        this.getTotalSales();
+      }
     },
+
+    /**
+     * updates period by altering dateStart
+     * @param timeValue value of time to subtract from current time
+     * @param unit unit of time to subtract from current time (days, months, etc.)
+     */
+    updatePeriod: function(timeValue, unit) {
+      this.dateEnd = new Date();
+      this.dateStart = moment(new Date()).subtract(timeValue, unit);
+    },
+
 
 
     /**
@@ -635,7 +658,7 @@ export default {
       }
       if (moment(endDate).isBefore(moment('1970')) || moment(endDate).isAfter(moment(new Date()))) {
         this.errors.push('bad-end-date');
-      } 
+      }
       if (moment(startDate).isBefore(moment('1970')) || moment(startDate).isAfter(moment(new Date()))) {
         this.errors.push('bad-start-date');
       }
@@ -647,9 +670,26 @@ export default {
       return true;
 
     },
+
+    /**
+     * Helper method for getting earliest date from sales history, used with 'all' granularity as it
+     * needs to know earliest date to get everything\
+     * @returns earliest date from sales history
+     */
+    getEarliestDate: function() {
+      let min = this.boughtListings[0].sold;
+      for (let sale of this.boughtListings) {
+        if (sale.sold < min) {
+          min = sale.sold;
+        }
+      }
+      return min;
+    },
   },
 
   mounted: function() {
+
+      this.dateEnd = new Date();
       this.getSalesData();
   },
 
