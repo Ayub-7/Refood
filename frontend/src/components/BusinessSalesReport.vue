@@ -243,10 +243,10 @@ export default {
           break;
         case '1-w':
           this.updatePeriod(1 ,'week');
-          break; 
+          break;
         case '1-m':
           this.updatePeriod(1 ,'month');
-          break; 
+          break;
         case '6-m':
           this.updatePeriod(6 ,'month');
           break;
@@ -286,7 +286,7 @@ export default {
       }
       if (moment(endDate).isBefore(moment('1970')) || moment(endDate).isAfter(moment(new Date()))) {
         this.errors.push('bad-end-date');
-      } 
+      }
       if (moment(startDate).isBefore(moment('1970')) || moment(startDate).isAfter(moment(new Date()))) {
         this.errors.push('bad-start-date');
       }
@@ -308,7 +308,7 @@ export default {
       return this.errors.filter(error => error.includes(type)).length > 0
     },
 
-    
+
     /**
      * Returns appropriate error message depending on what is in errors
      * @param type either start or end, this will be used to show errors for start or end
@@ -344,7 +344,7 @@ export default {
       this.dateEnd = new Date();
       this.dateStart = moment(new Date()).subtract(timeValue, unit);
     },
-    
+
 
     /**
      * Recomputes summary, used when date start and end changes
@@ -355,7 +355,7 @@ export default {
     },
 
     /**
-     * Helper method for getting earliest date from sales history, used with 'all' granularity as it 
+     * Helper method for getting earliest date from sales history, used with 'all' granularity as it
      * needs to know earliest date to get everything\
      * @returns earliest date from sales history
      */
@@ -369,7 +369,7 @@ export default {
       return min;
     },
 
-    
+
     /**
      * Helper method for getting latest date from sales history, used with 'year' granularity to figure out
      * when to stop the report
@@ -581,7 +581,7 @@ export default {
      * Sets display currency based on the user's home country.
      */
     setCurrency: function (country) {
-      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+      axios.get(`https://restcountries.com/v2/name/${country}`)
           .then(response => {
             this.currency = response.data[0].currencies[0].symbol;
           })
