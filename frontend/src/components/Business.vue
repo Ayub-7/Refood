@@ -10,8 +10,20 @@
     <div id="container" v-if="this.business != null">
       <!-- Top Component Title -->
       <div id="business-name-container">
-        <ReImage :imagePath="business.primaryImagePath" class="title-image" v-if="business.primaryImagePath"></ReImage>
-        <vs-avatar v-else icon="store" size="100px" name="avatar" class="title-image"></vs-avatar>
+        <vs-dropdown class="title-image" vs-trigger-click>
+          <ReImage :imagePath="business.primaryImagePath" class="title-image" v-if="business.primaryImagePath"></ReImage>
+          <vs-avatar v-else icon="store" size="100px" name="avatar" class="title-image"></vs-avatar>
+          <vs-dropdown-menu>
+            <vs-dropdown-item @click="openImageUpload" class="profileDropdown">
+              <vs-icon icon="add_box" style="margin: auto"></vs-icon>
+              <div style="font-size: 12px; margin: auto">Add New Primary Image</div>
+            </vs-dropdown-item>
+            <vs-dropdown-item class="profileDropdown">
+              <vs-icon icon="collections" style="margin: auto"></vs-icon>
+              <div style="font-size: 12px; margin: auto">Update With Existing</div>
+            </vs-dropdown-item>
+          </vs-dropdown-menu>
+        </vs-dropdown>
         <div id="business-name"  >{{ business.name }}</div>
         <div id="business-type">{{ business.businessType }}</div>
       </div>
@@ -61,6 +73,7 @@
       </main>
 
     </div>
+    <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
   </div>
 </template>
 
@@ -87,11 +100,48 @@ const Business = {
 
       inWishlist: false, // i.e. is it in the user's wishlist.
       wishlistId: null,
-      images: null
+      images: null,
+      profileImageDropdown: false
     };
   },
 
   methods: {
+    /**
+     * Trigger the file upload box to appear.
+     * Used for when the actions dropdown add image action or add image button is clicked.
+     */
+    openImageUpload: function() {
+      this.$refs.fileUpload.click();
+    },
+
+    /**
+     * Upload business image when image is uploaded on web page
+     * @param e Event object which contains file uploaded
+     */
+    uploadImage: function(e) {
+      //Setup FormData object to send in request
+      this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
+      for (let image of e.target.files) {
+        const fd = new FormData();
+        fd.append('filename', image, image.name);
+        api.postBusinessImage(this.business.id, fd)
+                .then(() => { //On success
+                  this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
+                  location.reload();
+                })
+                .catch((error) => { //On fail
+                  if (error.response.status === 400) {
+                    this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
+                  } else if (error.response.status === 500) {
+                    this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+                  }
+                })
+                .finally(() => {
+                  this.$vs.loading.close();
+                });
+      }
+    },
+
     /**
      * Adds or removes the current business from the user's wishlist.
      */
@@ -288,6 +338,10 @@ export default Business;
   grid-column: 1;
   grid-row: 1 / 3;
   margin-left: auto;
+}
+
+.profileDropdown >>> .vs-dropdown--item-link {
+  display: flex;
 }
 /* === LEFT SIDE INFO PANEL === */
 #business-container {
