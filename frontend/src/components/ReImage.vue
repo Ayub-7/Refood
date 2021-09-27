@@ -2,7 +2,7 @@
   <div>
     <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(this.imagePath))" alt="Product image"/>
     <img v-if="this.imagePath != null && !isDevelopment()" alt="Product Image" v-bind:src="getImgUrl(this.imagePath)"/>
-    <img v-if="!this.imagePath && isDevelopment()" src="ProductShoot.jpg" alt="Product image"/>
+    <img v-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Product image"/>
     <img v-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="Product image"/>
   </div>
 </template>
@@ -26,9 +26,9 @@ export default {
      **/
     getImgUrl(product) {
       if (product === true && process.env.NODE_ENV !== 'staging') {
-        return '/prod/ProductShoot.jpg';
+        return '/prod/placeholder.png';
       } else if (product === true) {
-        return '/test/ProductShoot.jpg';
+        return '/test/placeholder.png';
       } else if (this.imagePath != null && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'staging') {
         return '/prod/prod_images/' + this.imagePath.replace("/\\/g", "/");
       } else if (this.imagePath != null && process.env.NODE_ENV !== 'development') {
@@ -36,7 +36,7 @@ export default {
       } else if (this.imagePath != null) {
         return this.imagePath.replace(/\\/g, "/").replace("./src/main/resources/media/images/businesses/", "");
       } else {
-        return '../../public/ProductShoot.jpg';
+        return '../../public/placeholder.png';
       }
     },
 
