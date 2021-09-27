@@ -4,9 +4,9 @@
     <form>
       <div id="info-field">
         <div id="firstname">
-          <vs-input :danger="(errors.includes(firstname))"
+          <vs-input :danger="(errors.includes(userEditForm.firstname))"
                     danger-text="First Name must be between 2 and 20 letters."
-                    :success="(firstname.length >= 2 && firstname.length < 20)"
+                    :success="(userEditForm.firstname.length >= 2 && userEditForm.firstname.length < 20)"
                     class="form-control"
                     type="text"
                     label="First Name *"
@@ -16,15 +16,15 @@
           <vs-input type="text"
                     class="form-control"
                     label="Middle Name"
-                    :danger="middlename.length>20"
+                    :danger="userEditForm.middlename.length>20"
                     danger-text="Middle Name must be less than 20 characters"
-                    :success="middlename.length > 0 && middlename.length < 20"
+                    :success="userEditForm.middlename.length > 0 && userEditForm.middlename.length < 20"
                     v-model="userEditForm.middlename"/>
         </div>
         <div id="lastname">
-          <vs-input :danger="(errors.includes(lastname))"
+          <vs-input :danger="(errors.includes(userEditForm.lastname))"
                     danger-text="Last Name must be between 2 and 20 letters."
-                    :success="(lastname.length >= 2 && lastname.length < 20)"
+                    :success="(userEditForm.lastname.length >= 2 && userEditForm.lastname.length < 20)"
                     type="text"
                     class="form-control"
                     label="Last name *"
@@ -34,9 +34,9 @@
           <vs-input type="text"
                     class="form-control"
                     label="Nickname"
-                    :danger="nickname.length>20"
+                    :danger="userEditForm.nickname.length>20"
                     danger-text="Nickname must be less than 20 characters"
-                    :success="nickname.length > 0 && nickname.length < 20"
+                    :success="userEditForm.nickname.length > 0 && userEditForm.nickname.length < 20"
                     name="nickname"
                     v-model="userEditForm.nickname"/>
         </div>
@@ -44,18 +44,18 @@
           <vs-input type="email"
                     class="form-control"
                     label="Email *"
-                    :danger="errors.includes(email) && emailInUse"
+                    :danger="errors.includes(userEditForm.email) && emailInUse"
                     danger-text="Invalid email. (This email may already be in use)"
-                    :success="validEmail(email) && !emailInUse"
+                    :success="validEmail(userEditForm.email) && !emailInUse"
                     v-model="userEditForm.email"/>
         </div>
         <div id="phonenumber">
           <vs-input type="tel"
                     class="form-control"
                     label="Phone number"
-                    :danger="phonenumber.length > 0 && errors.includes(phonenumber)"
+                    :danger="userEditForm.phonenumber.length > 0 && errors.includes(userEditForm.phonenumber)"
                     danger-text="Invalid phone number."
-                    :success="validPhoneNum(phonenumber)"
+                    :success="validPhoneNum(userEditForm.phonenumber)"
                     name="phonenumber"
                     v-model="userEditForm.phonenumber"/>
         </div>
@@ -64,9 +64,9 @@
                     class="form-control"
                     name="dateofbirth"
                     v-model="userEditForm.dateofbirth"
-                    :danger="errors.includes(dateofbirth)"
+                    :danger="errors.includes(userEditForm.dateofbirth)"
                     danger-text="Enter date of birth"
-                    :success="(dateofbirth.length!==0)"
+                    :success="(userEditForm.dateofbirth.length!==0)"
                     min="1900-01-01"
                     :max="maxAllowedDoB"
                     label="Date of birth *"/>
@@ -84,9 +84,9 @@
           <vs-input type="password"
                     class="form-control"
                     label="Password *"
-                    :danger="password.length > 0 || errors.includes(password)"
+                    :danger="userEditForm.password.length > 0 || errors.includes(userEditForm.password)"
                     danger-text="Your password does not meet the requirements."
-                    :success="validPassword(password)"
+                    :success="validPassword(userEditForm.password)"
                     name="password (Required)"
                     v-model="userEditForm.password"/>
         </div>
@@ -96,7 +96,7 @@
                     label="Confirm Password *"
                     :danger="errors.includes(confirm_password)"
                     danger-text="Your password is invalid or do not match."
-                    :success="(confirm_password===password && confirm_password.length !== 0)"
+                    :success="(confirm_password===userEditForm.password && confirm_password.length !== 0)"
                     name="confirm_password (Required)"
                     v-model="confirm_password"/>
         </div>
