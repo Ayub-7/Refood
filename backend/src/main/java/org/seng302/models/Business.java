@@ -26,11 +26,11 @@ public class Business implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "BUSINESS_ADMINS",
                     joinColumns = @JoinColumn(name="BUSINESS_ID"),
                     inverseJoinColumns = @JoinColumn(name="USER_ID"))
-    private List<User> administrators = new ArrayList<>();
+    private Set<User> administrators = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="USER_ID")
@@ -50,8 +50,8 @@ public class Business implements Serializable {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Image> images;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Image> images;
     private String primaryImagePath;
 
     protected Business() {}
@@ -69,7 +69,7 @@ public class Business implements Serializable {
         this.address = address;
         this.businessType = businessType;
 
-        this.images = new ArrayList<>();
+        this.images = new HashSet<>();
         this.primaryImagePath = null;
     }
 
@@ -83,7 +83,7 @@ public class Business implements Serializable {
         this.primaryAdministrator = owner;
         this.created = new Date();
 
-        this.images = new ArrayList<>();
+        this.images = new HashSet<>();
         this.primaryImagePath = null;
     }
 

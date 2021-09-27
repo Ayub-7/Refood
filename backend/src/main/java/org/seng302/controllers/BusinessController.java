@@ -31,10 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -300,7 +297,7 @@ public class BusinessController {
         logger.debug("Removing businessesAdministered...");
         if (businesses != null) {
             for(Business business: businesses) {
-                List<User> admins = business.getAdministrators();
+                Set<User> admins = business.getAdministrators();
                 for(User admin: admins) {
                     admin.setBusinessesAdministered(null);
                 }
