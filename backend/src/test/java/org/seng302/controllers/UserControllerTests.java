@@ -648,6 +648,7 @@ class UserControllerTests {
     @WithMockUser(roles="USER")
     void testForbiddenSetUserImage() throws Exception {
         //forbidden user
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         user.addUserImage(image1);
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
         User forbidden = new User("test", "user", addr, "test@gmail.com", "password", Role.USER);
@@ -667,11 +668,7 @@ class UserControllerTests {
     @Test
     @WithMockUser(roles="USER")
     void testSetProductImageSuccessful() throws Exception {
-//        File data = ResourceUtils.getFile("src/test/resources/media/images/testlettuce.jpeg");
-//        assertThat(data).exists();
-//        byte[] bytes = FileCopyUtils.copyToByteArray(data);
-//        MockMultipartFile image = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
-        // Business owner
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         user.addUserImage(image1);
         mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
@@ -681,6 +678,7 @@ class UserControllerTests {
     @Test
     @WithMockUser(roles="USER")
     void testSetProductImageDgaaSuccessful() throws Exception {
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         user.addUserImage(image1);
         // DGAA not owner of business
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
