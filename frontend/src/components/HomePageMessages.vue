@@ -71,7 +71,7 @@
               <div v-else style="margin-right: 10px;">
                 <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
               </div>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteCard(item.cardId, item.title)" icon="close" style="margin-top: 5px;"></vs-button>
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, item.fid, false, true); undoClick=true"  icon="close" style="margin-top: 5px;"></vs-button>
             </div>
           </div>
           </div>
@@ -90,7 +90,7 @@
                   <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
                 </div>
                 <div>
-                  <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true);
+                  <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, false, true);
               undoClick=true" icon="close"></vs-button>
                 </div>
               </div>
@@ -111,6 +111,8 @@
       </div>
 
 
+
+
       <!-- CARD MESSAGE -->
       <div v-if="item.card" class="liked-listing-container" @mouseenter="markAsRead(item)">
       <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
@@ -129,7 +131,7 @@
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
             <div>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true);
+              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true, false);
               undoClick=true" icon="close"></vs-button>
             </div>
 <!--            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close" style="margin-top: 5px;"></vs-button>-->
@@ -176,7 +178,7 @@
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
             <div>
-              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false);
+              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
             undoClick=true"></vs-button>
             </div>
           </div>
@@ -211,7 +213,7 @@
             <div v-else>
               <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
             </div>
-            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false);
+            <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
             undoClick=true"></vs-button>
           </div>
           </div>
@@ -247,7 +249,7 @@
                 <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
               </div>
               <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
-              <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false);
+              <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
             undoClick=true"></vs-button>
             </div>
           </div>
@@ -441,13 +443,19 @@ export default {
      * @param fid
      * @param isMessage
      **/
-    undo: function (id, fid, isMessage) {
+    undo: function (id, fid, isMessage, isExpiry) {
       this.undoId.push(fid)
       let timer = setInterval(() => {
         if(this.undoCount <= 0 || this.$route.path !== "/home") {
           clearInterval(timer)
           if(isMessage===true) {
             this.deleteMessage(id, fid)
+            this.undoCount = 10
+            this.undoClick = false
+            this.undoDelete = false
+          } else if (isExpiry == true) {
+            console.log("sap")
+            this.deleteCard(id, fid)
             this.undoCount = 10
             this.undoClick = false
             this.undoDelete = false
@@ -751,6 +759,7 @@ export default {
      * @param title card title for notification
      */
     deleteCard(cardId, title) {
+      console.log("delete card")
       api.deleteCard(cardId)
           .then(() => {
             this.getNotifications();
