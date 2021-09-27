@@ -118,13 +118,13 @@ const Business = {
      * Upload business image when image is uploaded on web page
      * @param e Event object which contains file uploaded
      */
-    uploadImage: function(e) {
+    uploadImage: async function(e) {
       //Setup FormData object to send in request
       this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
       for (let image of e.target.files) {
         const fd = new FormData();
         fd.append('filename', image, image.name);
-        api.postBusinessImage(this.business.id, fd)
+        await api.postBusinessImage(this.business.id, fd)
                 .then((res) => { //On success
                   this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
                   let imageId = res.data.id;

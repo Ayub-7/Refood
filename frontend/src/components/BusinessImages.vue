@@ -5,8 +5,8 @@
         </vs-row>
         <!-- Image Card -->
         <div id="images-list">
-            <vs-card v-for="image in images" :key="image.id">
-                <ReImage :imagePath="image.filename" :isBusiness="true"></ReImage>
+            <vs-card v-for="image in images" :key="image.id" class="image-card">
+                <ReImage :imagePath="'business_'+business.id+'/'+/[^/]*$/.exec(image.fileName)[0]" :isBusiness="true" class="title-image"></ReImage>
             </vs-card>
         </div>
         <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
@@ -38,6 +38,10 @@ const BusinessImages = {
     data: function () {
         return {
         }
+    },
+
+    mounted() {
+        console.log(this.images);
     },
 
     methods: {
@@ -91,6 +95,22 @@ export default BusinessImages;
 #add-button {
     margin-right: 10%;
     margin-top: 15px;
+}
+.image-card {
+    margin: 100px;
+    max-width:100%;
+    height:auto;
+
+}
+.title-image {
+    height: 320px;
+    width: 450px;
+    object-fit: cover;
+    display: flex;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    margin-left: auto;
+
 }
 </style>
 
