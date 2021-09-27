@@ -31,6 +31,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -437,6 +440,79 @@ public class BusinessController {
         businessRepository.save(business);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+    /**
+     * PUT request for updating business image
+     * @param businessId id of business that is going to be updated
+     * @param imageId id of image that is going to be set to primary
+     * @param session session of user, used to check if user is admin
+     * @return 200 is updated, 401 no auth, 403 if not admin, 406 if image of business doesn't exist
+     */
+    @PutMapping("/businesses/{businessId}/images/{imageId}/makeprimary")
+    public ResponseEntity<String> changePrimaryImage(@PathVariable long businessId, @PathVariable String imageId, HttpSession session) {
+        Business business = businessRepository.findBusinessById(businessId);
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        //Check there is an image match
+        boolean validImage = business.getImages().stream().anyMatch(image -> imageId.equals(image.getId()));
+
+
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (business == null || !validImage) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        String extension = getExtension(businessId, imageId);
+        business = setBusinessImage(business, businessId, imageId, extension);
+        businessRepository.save(business);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Sets primary image of business to image path
+     * @param businessId id of business, used in path
+     * @param imageId id of image, used in image path
+     * @param business business object, used to update primary image
+     * @param extension extension of image, used in image path
+     * @return business with primary image updated
+     */
+    private Business setBusinessImage(Business business, long businessId, String imageId, String extension) {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, imageId, extension));
+        } else {
+            business.setPrimaryImage(String.format("business_%d/%s%s", businessId, imageId, extension));
+        }
+
+        return business;
+    }
+
+    /**
+     * Gets extension of image by finding file that matches path with extension
+     * @param businessId id of business used to find extension from image path
+     * @param imageId id of image used to find extension from image path
+     * @return Value of extension for image
+     */
+    private String getExtension(long businessId, String imageId) {
+        String imageDir = rootImageDir + "/business_" + businessId + "/" + imageId;
+        String extension = "";
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext : extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                extension = ext;
+                break;
+            }
+        }
+
+        return extension;
     }
 
 }
