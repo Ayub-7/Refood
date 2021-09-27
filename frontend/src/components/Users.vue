@@ -100,7 +100,6 @@
         </button>
       </div>
     </Modal>
-    <ModifyUser ref="modifyUserModal" :user="user" />
 
   </div>
 </template>
@@ -186,7 +185,7 @@ const Users = {
     },
 
     goToModifyUser() {
-      this.$router.push({path: `/users/${this.user.id}/modify`});
+      this.$router.push({path: `/user/${this.user.id}/editprofile`});
     },
 
     /**

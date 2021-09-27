@@ -158,8 +158,9 @@ import api from "@/Api";
 import axios from "axios";
 import {store} from "@/store";
 
-export default {
+const ModifyUser = {
   name: "ModifyUser",
+
   data: function() {
     return {
       user: null,
@@ -430,6 +431,7 @@ export default {
     },
   }
 }
+export default ModifyUser;
 </script>
 
 <style scoped>
