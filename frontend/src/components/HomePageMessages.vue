@@ -298,6 +298,7 @@ export default {
       this.feedItems.sort(function(a, b) {
         return new Date(b.created) - new Date(a.created);
       });
+      console.log(this.feedItems);
     },
 
 
