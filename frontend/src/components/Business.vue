@@ -12,7 +12,7 @@
       <div id="business-name-container">
         <vs-dropdown class="title-image" vs-trigger-click>
           <ReImage :imagePath="business.primaryImagePath" class="title-image" v-if="business.primaryImagePath"></ReImage>
-          <vs-avatar v-else icon="store" size="100px" name="avatar" class="title-image"></vs-avatar>
+          <vs-avatar v-else icon="store" color="#1F74FF" size="100px" name="avatar" class="title-image"></vs-avatar>
           <vs-dropdown-menu>
             <vs-dropdown-item @click="openImageUpload" class="profileDropdown">
               <vs-icon icon="add_box" style="margin: auto"></vs-icon>
