@@ -1,158 +1,156 @@
 <template>
-  <vs-popup class="card" :active.sync="modifying" title="Edit your ReFood Account">
-    <div>
-      <h3 class="card-header">Edit your ReFood Account</h3>
-      <form>
-        <div id="info-field">
-          <div id="firstname">
-            <vs-input :danger="(errors.includes(firstname))"
-                      danger-text="First Name must be between 2 and 20 letters."
-                      :success="(firstname.length >= 2 && firstname.length < 20)"
-                      class="form-control"
-                      type="text"
-                      label="First Name *"
-                      v-model="userEditForm.firstname"/>
-          </div>
-          <div id="middlename">
-            <vs-input type="text"
-                      class="form-control"
-                      label="Middle Name"
-                      :danger="middlename.length>20"
-                      danger-text="Middle Name must be less than 20 characters"
-                      :success="middlename.length > 0 && middlename.length < 20"
-                      v-model="userEditForm.middlename"/>
-          </div>
-          <div id="lastname">
-            <vs-input :danger="(errors.includes(lastname))"
-                      danger-text="Last Name must be between 2 and 20 letters."
-                      :success="(lastname.length >= 2 && lastname.length < 20)"
-                      type="text"
-                      class="form-control"
-                      label="Last name *"
-                      v-model="userEditForm.lastname"/>
-          </div>
-          <div id="nickname">
-            <vs-input type="text"
-                      class="form-control"
-                      label="Nickname"
-                      :danger="nickname.length>20"
-                      danger-text="Nickname must be less than 20 characters"
-                      :success="nickname.length > 0 && nickname.length < 20"
-                      name="nickname"
-                      v-model="userEditForm.nickname"/>
-          </div>
-          <div id="email">
-            <vs-input type="email"
-                      class="form-control"
-                      label="Email *"
-                      :danger="errors.includes(email) && emailInUse"
-                      danger-text="Invalid email. (This email may already be in use)"
-                      :success="validEmail(email) && !emailInUse"
-                      v-model="userEditForm.email"/>
-          </div>
-          <div id="phonenumber">
-            <vs-input type="tel"
-                      class="form-control"
-                      label="Phone number"
-                      :danger="phonenumber.length > 0 && errors.includes(phonenumber)"
-                      danger-text="Invalid phone number."
-                      :success="validPhoneNum(phonenumber)"
-                      name="phonenumber"
-                      v-model="userEditForm.phonenumber"/>
-          </div>
-          <div id="date-of-birth">
-            <vs-input type="date"
-                      class="form-control"
-                      name="dateofbirth"
-                      v-model="userEditForm.dateofbirth"
-                      :danger="errors.includes(dateofbirth)"
-                      danger-text="Enter date of birth"
-                      :success="(dateofbirth.length!==0)"
-                      min="1900-01-01"
-                      :max="maxAllowedDoB"
-                      label="Date of birth *"/>
-          </div>
-          <div id="password-info">
-            Password must be at least 8 characters long and must contain one of each of the following:
-            <ul>
-              <li>Uppercase letter</li>
-              <li>Lowercase letter</li>
-              <li>Number</li>
-              <li>Special Character</li>
-            </ul>
-          </div>
-          <div id="password">
-            <vs-input type="password"
-                      class="form-control"
-                      label="Password *"
-                      :danger="password.length > 0 || errors.includes(password)"
-                      danger-text="Your password does not meet the requirements."
-                      :success="validPassword(password)"
-                      name="password (Required)"
-                      v-model="userEditForm.password"/>
-          </div>
-          <div id="confirm-password">
-            <vs-input type="password"
-                      class="form-control"
-                      label="Confirm Password *"
-                      :danger="errors.includes(confirm_password)"
-                      danger-text="Your password is invalid or do not match."
-                      :success="(confirm_password===password && confirm_password.length !== 0)"
-                      name="confirm_password (Required)"
-                      v-model="confirm_password"/>
-          </div>
+  <div class="card">
+    <h3 class="card-header">Edit your ReFood Account</h3>
+    <form>
+      <div id="info-field">
+        <div id="firstname">
+          <vs-input :danger="(errors.includes(firstname))"
+                    danger-text="First Name must be between 2 and 20 letters."
+                    :success="(firstname.length >= 2 && firstname.length < 20)"
+                    class="form-control"
+                    type="text"
+                    label="First Name *"
+                    v-model="userEditForm.firstname"/>
         </div>
-        <!-- ADDRESS -->
-        <vs-divider style="grid-row: 2; grid-column: 1/3;"></vs-divider>
-        <div class="label-control">Address</div>
+        <div id="middlename">
+          <vs-input type="text"
+                    class="form-control"
+                    label="Middle Name"
+                    :danger="middlename.length>20"
+                    danger-text="Middle Name must be less than 20 characters"
+                    :success="middlename.length > 0 && middlename.length < 20"
+                    v-model="userEditForm.middlename"/>
+        </div>
+        <div id="lastname">
+          <vs-input :danger="(errors.includes(lastname))"
+                    danger-text="Last Name must be between 2 and 20 letters."
+                    :success="(lastname.length >= 2 && lastname.length < 20)"
+                    type="text"
+                    class="form-control"
+                    label="Last name *"
+                    v-model="userEditForm.lastname"/>
+        </div>
+        <div id="nickname">
+          <vs-input type="text"
+                    class="form-control"
+                    label="Nickname"
+                    :danger="nickname.length>20"
+                    danger-text="Nickname must be less than 20 characters"
+                    :success="nickname.length > 0 && nickname.length < 20"
+                    name="nickname"
+                    v-model="userEditForm.nickname"/>
+        </div>
+        <div id="email">
+          <vs-input type="email"
+                    class="form-control"
+                    label="Email *"
+                    :danger="errors.includes(email) && emailInUse"
+                    danger-text="Invalid email. (This email may already be in use)"
+                    :success="validEmail(email) && !emailInUse"
+                    v-model="userEditForm.email"/>
+        </div>
+        <div id="phonenumber">
+          <vs-input type="tel"
+                    class="form-control"
+                    label="Phone number"
+                    :danger="phonenumber.length > 0 && errors.includes(phonenumber)"
+                    danger-text="Invalid phone number."
+                    :success="validPhoneNum(phonenumber)"
+                    name="phonenumber"
+                    v-model="userEditForm.phonenumber"/>
+        </div>
+        <div id="date-of-birth">
+          <vs-input type="date"
+                    class="form-control"
+                    name="dateofbirth"
+                    v-model="userEditForm.dateofbirth"
+                    :danger="errors.includes(dateofbirth)"
+                    danger-text="Enter date of birth"
+                    :success="(dateofbirth.length!==0)"
+                    min="1900-01-01"
+                    :max="maxAllowedDoB"
+                    label="Date of birth *"/>
+        </div>
+        <div id="password-info">
+          Password must be at least 8 characters long and must contain one of each of the following:
+          <ul>
+            <li>Uppercase letter</li>
+            <li>Lowercase letter</li>
+            <li>Number</li>
+            <li>Special Character</li>
+          </ul>
+        </div>
+        <div id="password">
+          <vs-input type="password"
+                    class="form-control"
+                    label="Password *"
+                    :danger="password.length > 0 || errors.includes(password)"
+                    danger-text="Your password does not meet the requirements."
+                    :success="validPassword(password)"
+                    name="password (Required)"
+                    v-model="userEditForm.password"/>
+        </div>
+        <div id="confirm-password">
+          <vs-input type="password"
+                    class="form-control"
+                    label="Confirm Password *"
+                    :danger="errors.includes(confirm_password)"
+                    danger-text="Your password is invalid or do not match."
+                    :success="(confirm_password===password && confirm_password.length !== 0)"
+                    name="confirm_password (Required)"
+                    v-model="confirm_password"/>
+        </div>
+      </div>
+      <!-- ADDRESS -->
+      <vs-divider style="grid-row: 2; grid-column: 1/3;"></vs-divider>
+      <div class="label-control">Address</div>
 
-        <div id="address-field">
-          <div id="street-number">
-            <vs-input v-model="userEditForm.streetNumber" class="form-control" label="Street Number"></vs-input>
-          </div>
-          <div id="street-name">
-            <vs-input v-model="userEditForm.streetName" class="form-control" label="Street Name"></vs-input>
-          </div>
-          <div id="suburb">
-            <vs-input v-model="userEditForm.suburb" class="form-control" label="Suburb"></vs-input>
-          </div>
-
-          <div id="postcode">
-            <vs-input v-model="userEditForm.postcode" class="form-control" label="Postcode"></vs-input>
-          </div>
-          <div id="city">
-            <!-- If wanting to test/check suggested item tiles, remove blur. -->
-            <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="userEditForm.city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
-            <ul v-if="this.suggestCities" class="suggested-box">
-              <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
-            </ul>
-          </div>
-          <div id="region">
-            <vs-input v-model="userEditForm.region" class="form-control" label="Region"></vs-input>
-          </div>
-          <div id="country">
-            <vs-input autocomplete="none"
-                      @blur="suggestCountries = false;"
-                      :danger="this.errors.includes('country')"
-                      danger-text="Country required."
-                      :success="country.length > 0" @input="getCountriesFromPhoton()"
-                      v-model="userEditForm.country"
-                      class="form-control"
-                      label="Country *"></vs-input>
-            <ul v-if="this.suggestCountries" class="suggested-box">
-              <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
-            </ul>
-          </div>
+      <div id="address-field">
+        <div id="street-number">
+          <vs-input v-model="userEditForm.streetNumber" class="form-control" label="Street Number"></vs-input>
+        </div>
+        <div id="street-name">
+          <vs-input v-model="userEditForm.streetName" class="form-control" label="Street Name"></vs-input>
+        </div>
+        <div id="suburb">
+          <vs-input v-model="userEditForm.suburb" class="form-control" label="Suburb"></vs-input>
         </div>
 
-        <div id="bio">
-          <vs-textarea type="text" class="form-control text-areas" label="Bio" name="bio" v-model="userEditForm.bio"></vs-textarea>
+        <div id="postcode">
+          <vs-input v-model="userEditForm.postcode" class="form-control" label="Postcode"></vs-input>
         </div>
+        <div id="city">
+          <!-- If wanting to test/check suggested item tiles, remove blur. -->
+          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="userEditForm.city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
+          <ul v-if="this.suggestCities" class="suggested-box">
+            <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+          </ul>
+        </div>
+        <div id="region">
+          <vs-input v-model="userEditForm.region" class="form-control" label="Region"></vs-input>
+        </div>
+        <div id="country">
+          <vs-input autocomplete="none"
+                    @blur="suggestCountries = false;"
+                    :danger="this.errors.includes('country')"
+                    danger-text="Country required."
+                    :success="country.length > 0" @input="getCountriesFromPhoton()"
+                    v-model="userEditForm.country"
+                    class="form-control"
+                    label="Country *"></vs-input>
+          <ul v-if="this.suggestCountries" class="suggested-box">
+            <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+          </ul>
+        </div>
+      </div>
 
-        <vs-button class="modify-button" @click="checkForm(); editUserInfo()">Modify</vs-button>
-      </form>
-    </div>
-  </vs-popup>
+      <div id="bio">
+        <vs-textarea type="text" class="form-control text-areas" label="Bio" name="bio" v-model="userEditForm.bio"></vs-textarea>
+      </div>
+
+      <vs-button class="modify-button" @click="checkForm(); editUserInfo()">Modify</vs-button>
+    </form>
+  </div>
 </template>
 
 <script>
@@ -164,7 +162,6 @@ export default {
   name: "ModifyUser",
   data: function() {
     return {
-      modifying: false,
       user: null,
       userEditForm: {
         firstname: "",
@@ -202,14 +199,33 @@ export default {
   mounted() {
     this.maxAllowedDoB.setFullYear(this.maxAllowedDoB.getFullYear()-13);
     this.maxAllowedDoB = this.maxAllowedDoB.toISOString().split('T')[0];
+    this.checkUserSession();
   },
   methods: {
-    open: function(user) {
-      console.log("open function called");
-      this.modifying = true;
-      this.user = user;
-      this.setCurrentUser(this.user);
-      console.log(this.modifying);
+    checkUserSession: function() {
+      api.checkSession()
+          .then((response) => {
+            this.getUserInfo(response.data.id);
+          })
+          .catch((error) => {
+            this.$log.error("Error checking sessions: " + error);
+            this.$vs.notify({title:'Error', text:'ERROR trying to obtain user ingo from session.', color:'danger'});
+          });
+    },
+
+    getUserInfo: function(userId) {
+      api.getUserFromID(userId)
+          .then((response) => {
+            this.user = response.data;
+            this.setCurrentUser(this.user);
+          }).catch((err) => {
+            if (err.response.status === 401) {
+              this.$vs.notify({title: 'Unauthorized Action', text: 'You must login first.', color: 'danger'});
+              this.$router.push({name: 'LoginPage'});
+            } else {
+              throw new Error(`ERROR trying to obtain user info from Id: ${err}`);
+            }
+          })
     },
 
     setCurrentUser: function(user) {
