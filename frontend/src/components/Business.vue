@@ -354,6 +354,7 @@ export default Business;
   grid-column: 1;
   grid-row: 1 / 3;
   margin-left: auto;
+  justify-content: flex-end;
 }
 
 .profileDropdown >>> .vs-dropdown--item-link {
