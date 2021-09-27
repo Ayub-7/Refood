@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.seng302.models.requests.NewUserRequest;
+import org.seng302.models.requests.UserRequest;
 import org.seng302.utilities.Encrypter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +52,11 @@ public class User implements Serializable {
     @ManyToMany(mappedBy = "administrators", fetch = FetchType.EAGER)
     private List<Business> businessesAdministered;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Image> images;
+
+    private String primaryImagePath;
+
 
     protected User() {}
 
@@ -79,6 +86,8 @@ public class User implements Serializable {
         this.password = Encrypter.hashString(password);
         this.created = new Date();
         this.role = Role.USER;
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
     }
 
     /**
@@ -86,7 +95,7 @@ public class User implements Serializable {
      * @param req NewUserRequest object containing inputted registration data.
      * @throws NoSuchAlgorithmException if hashing fails.
      */
-    public User(NewUserRequest req) throws NoSuchAlgorithmException {
+    public User(UserRequest req) throws NoSuchAlgorithmException {
         this.firstName = req.getFirstName();
         this.middleName = req.getMiddleName();
         this.lastName = req.getLastName();
@@ -97,6 +106,8 @@ public class User implements Serializable {
         this.phoneNumber = req.getPhoneNumber();
         this.homeAddress = req.getHomeAddress();
         this.password = req.getPassword();
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
         newRegistration();
     }
 
@@ -117,6 +128,8 @@ public class User implements Serializable {
         this.role = role;
         this.created = new Date();
         this.password = Encrypter.hashString(password);
+        this.images = new ArrayList<>();
+        this.primaryImagePath = null;
     }
 
     /**
@@ -126,6 +139,30 @@ public class User implements Serializable {
         this.created = new Date();
         this.password = Encrypter.hashString(this.password);
         this.role = Role.USER;
+    }
+
+    /**
+     * Adds a new image to the product entity.
+     * @param image the image object to add.
+     */
+    public void addUserImage(Image image) {
+        this.images.add(image);
+    }
+
+    public void updatePrimaryImage(long id, String imageId, String imageExtension) {
+        if (this.primaryImagePath == null) {
+            if (System.getProperty("os.name").startsWith("windows")) {
+                this.setPrimaryImage(String.format("business_%d\\%s%s", id, imageId, imageExtension));
+            } else {
+                this.setPrimaryImage(String.format("business_%d/%s%s", id, imageId, imageExtension));
+            }
+        }
+    }
+
+    public String getPrimaryImagePath() {return this.primaryImagePath;}
+
+    public void setPrimaryImage(String path) {
+        this.primaryImagePath = path;
     }
 
 }
