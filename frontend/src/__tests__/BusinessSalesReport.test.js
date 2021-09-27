@@ -162,7 +162,7 @@ describe('Sales report tests', () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 7, 'days')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
-            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep 16 21`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": `Sep 13 - Sep 19 2021`, "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 
@@ -173,7 +173,7 @@ describe('Sales report tests', () => {
         await wrapper.vm.$nextTick();
         wrapper.vm.granularity(intervalDate, 1, 'months')
         expect(wrapper.vm.reportGranularity).toStrictEqual(
-            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "September 21", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
+            [{"averageItemsPerSale": "1.50", "averagePricePerItem": "7.16", "averageSale": "10.75", "title": "September 2021", "totalItems": "3.00", "totalSaleValue": "21.49", "totalSales": 2}]
         );
     });
 

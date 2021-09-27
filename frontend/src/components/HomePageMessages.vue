@@ -336,10 +336,6 @@ export default {
                 return message;
               });
             })
-            .catch((error) => {
-              this.$log.error("Error getting messages: " + error);
-              this.$vs.notify({title:`Could not get messages`, text: "There was an error getting messages", color:'danger'});
-            });
       }, 3000)
     },
 
@@ -432,14 +428,6 @@ export default {
             .then((res) => {
               this.listingNotifications = res.data;
             })
-            .catch((error) => {
-              this.$log.debug(error);
-              if (error && error.response) {
-                this.$vs.notify({title: `Error ${error.response}`,
-                  text: "There was a problem getting your newsfeed.",
-                  color: "danger"});
-              }
-            });
       }, 3000)
     },
 
