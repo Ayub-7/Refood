@@ -10,13 +10,8 @@
     <div id="container" v-if="this.business != null">
       <!-- Top Component Title -->
       <div id="business-name-container">
-        <div v-if="business.primaryImagePath">
-          <ReImage :imagePath="business.primaryImagePath" class="title-image"></ReImage>
-        </div>
-        <div v-else>
-          <vs-icon icon="business" class="title-image">
-          </vs-icon>
-        </div>
+        <ReImage :imagePath="business.primaryImagePath" class="title-image" v-if="business.primaryImagePath"></ReImage>
+        <vs-avatar v-else icon="store" size="100px" name="avatar" class="title-image"></vs-avatar>
         <div id="business-name"  >{{ business.name }}</div>
         <div id="business-type">{{ business.businessType }}</div>
       </div>
