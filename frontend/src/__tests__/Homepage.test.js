@@ -167,6 +167,78 @@ const wishlist = [{
     userId: 1
 },];
 
+const wishlist2 = [
+    {
+        "id": 4,
+        "userId": 1,
+        "business": {
+            "name": "Dabshots",
+            "id": 1,
+            "administrators": null,
+            "primaryAdministratorId": 1,
+            "description": "Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy.",
+            "address": {
+                "streetNumber": "0",
+                "streetName": "Vernon Place",
+                "suburb": null,
+                "city": "Sarpang",
+                "region": null,
+                "country": "Bhutan",
+                "postcode": null
+            },
+            "businessType": "Charitable organisation",
+            "created": "2020-05-18 09:06:11"
+        },
+        "mutedStatus": "Muted"
+    },
+    {
+        "id": 5,
+        "userId": 1,
+        "business": {
+            "name": "Layo",
+            "id": 2,
+            "administrators": null,
+            "primaryAdministratorId": 2,
+            "description": "Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.",
+            "address": {
+                "streetNumber": "95403",
+                "streetName": "Hanover Park",
+                "suburb": null,
+                "city": "El Guapinol",
+                "region": null,
+                "country": "Honduras",
+                "postcode": null
+            },
+            "businessType": "Accommodation and Food Services",
+            "created": "2020-08-25 10:22:19"
+        },
+        "mutedStatus": "Unmuted"
+    },
+    {
+        "id": 6,
+        "userId": 1,
+        "business": {
+            "name": "Skinder",
+            "id": 3,
+            "administrators": null,
+            "primaryAdministratorId": 3,
+            "description": "Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.",
+            "address": {
+                "streetNumber": "6794",
+                "streetName": "Jackson Way",
+                "suburb": null,
+                "city": "Xialaba",
+                "region": null,
+                "country": "China",
+                "postcode": null
+            },
+            "businessType": "Retail Trade",
+            "created": "2020-09-11 08:50:50"
+        },
+        "mutedStatus": "Unmuted"
+    }
+];
+
 jest.mock("../Api.js", () => jest.fn);
 api.getUserFromID = jest.fn(() => {
   return Promise.resolve({data: mockUser, status: 200});
@@ -351,7 +423,7 @@ describe("Tests for watchlist functionality", ()=> {
         await wrapper.vm.unlike(4);
         expect(wrapper.vm.likes).toBe(0);
     });
-
+/*
     test("Closed listing disappears from liked listings", async () => {
         expect(wrapper.vm.likes).toBe(1);
         wrapper.vm.likedItem[0]["closes"] = new Date().toISOString().split("T")[0] + " " + new Date().toISOString().split("T")[1].split(".")[0]
@@ -359,7 +431,7 @@ describe("Tests for watchlist functionality", ()=> {
             expect(wrapper.vm.likes).toBe(0);
         }, 1000);
     });
-
+*/
 });
 
 describe("Tests for business watchlist functionality", ()=> {
@@ -372,11 +444,38 @@ describe("Tests for business watchlist functionality", ()=> {
         wrapper.vm.allMuted = false;
         wrapper.vm.toggleMuteAll();
         expect(wrapper.vm.allMuted).toBeTruthy();
-    })
+        wrapper.vm.toggleMuteAll();
+        expect(wrapper.vm.allMuted).toBeFalsy();
+    });
 
     test('Mute wishlist function unmutes wishlist when previously muted', () => {
         expect(wrapper.vm.allMuted).toBeTruthy();
         wrapper.vm.toggleMuteAll();
         expect(wrapper.vm.allMuted).toBeFalsy();
-    })
+    });
+
+    test('When an item is muted, isMuted return true', () => {
+        let res = wrapper.vm.isMuted("Muted");
+        expect(res).toBeTruthy();
+    });
+
+    test('When an toggleMuteBusiness is called on an unmuted business, user is notified', () => {
+        wrapper.vm.getWishlist = jest.fn(() => {
+            return false;
+        });
+
+        wrapper.vm.toggleMuteBusiness(wishlist2[1]);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test('When an toggleMuteBusiness is called on a muted business, user is notified', () => {
+        wrapper.vm.getWishlist = jest.fn(() => {
+            return false;
+        });
+
+        wrapper.vm.toggleMuteBusiness(wishlist2[0]);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+
 });
