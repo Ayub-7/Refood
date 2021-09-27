@@ -395,11 +395,11 @@ export default {
       let intervalDate = moment(new Date(this.dateStart))
       if (period === 'w') {
         //filter weeks
-        this.dateGranularity =  intervalDate.add(7, 'days');
+        this.dateGranularity =  intervalDate.endOf('isoWeek')
         this.granularity(this.dateGranularity, 7, 'days')
       } else if (period === 'm') {
         //filter month
-        this.dateGranularity =  intervalDate.add(1, 'months')
+        this.dateGranularity =  intervalDate.endOf('month')
         this.granularity(this.dateGranularity, 1, 'months')
       } else if (period === 'y') {
         //filter year
@@ -443,15 +443,22 @@ export default {
             }
             if (summary.length >= 1) {
               if (unit==='months') {
-                finalSummary.push(this.calculateSummary(summary, startDate.format('MMMM YY')))
+                finalSummary.push(this.calculateSummary(summary, startDate.format('MMMM YYYY')))
               } else if (unit==='days') {
-                finalSummary.push(this.calculateSummary(summary, startDate.format('MMM DD YY')))
+                finalSummary.push(this.calculateSummary(summary, startDate.startOf('isoWeek').format('MMM DD') + " - " +
+                    startDate.endOf('isoWeek').format('MMM DD YYYY')))
               }
               summary = []
             }
             startDate = startDate.add(amount, unit);
-            intervalDate = intervalDate.add(amount, unit);
-        }
+            if (unit == 'months') {
+              intervalDate = startDate.clone().endOf('month');
+              startDate = startDate.startOf('month')
+            } else {
+              intervalDate = startDate.clone().endOf('isoWeek');
+              startDate = startDate.startOf('isoWeek');
+            }
+          }
       }
 
       this.reportGranularity = finalSummary

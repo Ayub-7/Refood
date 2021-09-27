@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.finders.BusinessFinder;
 import org.seng302.models.*;
 import org.seng302.models.responses.BusinessIdResponse;
@@ -13,7 +14,9 @@ import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.repositories.BoughtListingRepository;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,12 +25,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +58,12 @@ public class BusinessController {
 
     @Autowired
     private BusinessFinder businessFinder;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${media.image.business_images.directory}")
+    private String rootImageDir;
 
     /**
      * Get request mapping for getting business by id
@@ -208,7 +221,7 @@ public class BusinessController {
 
     /**
      * Creates a sort object to be used by pageRequest to sort search results.
-     * @param sortString
+     * @param sortString string determining the sort type
      * @return Sort sortBy Sort specification
      * @throws ResponseStatusException
      */
@@ -347,6 +360,83 @@ public class BusinessController {
 
         List<BoughtListing> sales = boughtListingRepository.findBoughtListingsByBusinessId(id);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(sales));
+    }
+
+    /**
+     * Receives and saves a new image pertaining to a business
+     * @param businessId business' Id
+     * @param image multipart image
+     * @param session user's session
+     * @return 201 if successful, 400 if bad request, 401 if not logged in, 403 if user doesn't have permission,
+     *         406 if path is invalid (bad business Id)
+     * @throws InvalidImageExtensionException when file writing fails
+     * @throws IOException other input/output exceptions (fileService)
+     */
+    @PostMapping("/businesses/{businessId}/images")
+    public ResponseEntity<String> addBusinessImage(@PathVariable long businessId,
+                                                   @RequestPart(name="filename") MultipartFile image,
+                                                   HttpSession session)
+            throws InvalidImageExtensionException, IOException {
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Business business = businessRepository.findBusinessById(businessId);
+        if (business == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        String imageExtension;
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied");
+        }
+        try {
+            imageExtension = Image.getContentTypeExtension(Objects.requireNonNull(image.getContentType()));
+        } catch (InvalidImageExtensionException exception) {
+            throw new InvalidImageExtensionException(exception.getMessage());
+        }
+
+        File businessDir = new File(String.format("%sbusiness_%d", rootImageDir, businessId));
+        if (businessDir.mkdirs()) {
+            logger.info(String.format("Image of business directory did not exist - new directory created of %s", businessDir.getPath()));
+        }
+
+        String id = "";
+        boolean freeImage = false;
+        int count = 0;
+
+        while (!freeImage) {
+            id = String.valueOf(count);
+            File checkFile1 = new File(String.format("%s/%s.jpg", businessDir, id));
+            File checkFile2 = new File(String.format("%s/%s.png", businessDir, id));
+            File checkFile3 = new File(String.format("%s/%s.gif", businessDir, id));
+            if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
+                count++;
+            }
+            else {
+                freeImage = true;
+            }
+        }
+
+        File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
+        File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
+        logger.info("Working Directory = " + System.getProperty("user.dir"));
+        logger.info(file.getAbsolutePath());
+        fileService.uploadImage(file, image.getBytes());
+        fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
+        String imageName = image.getOriginalFilename();
+        // Save into DB.
+        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
+        business.addBusinessImage(newImage);
+        if (business.getPrimaryImagePath() == null) {
+            if (System.getProperty("os.name").startsWith("windows")) {
+                business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, id, imageExtension));
+            } else {
+                business.setPrimaryImage(String.format("business_%d/%s%s", businessId, id, imageExtension));
+            }
+        }
+        businessRepository.save(business);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }
