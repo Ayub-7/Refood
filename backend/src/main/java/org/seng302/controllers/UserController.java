@@ -399,7 +399,7 @@ public class UserController {
         user.addUserImage(newImage);
         user.updatePrimaryImage(id, imageId, imageExtension);
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(newImage.getId()));
     }
 
     // -- ADMIN REQUESTS

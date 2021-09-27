@@ -120,11 +120,20 @@ export default {
     revokeUserAdmin: async(id) =>
         instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
 
+    // ------ USER IMAGES
+
+    /**
+     * Create a new business image
+     * @param id Business's id
+     * @param image Image to save
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    postBusinessImage: (id, image) => instance.post(`businesses/${id}/images`, image, {headers: {'Content-Type': 'multipart/form-data'}, withCredentials: true,}),
 
     // ------ BUSINESSES
 
     /**
-     * Create a new business by storin their data in the database
+     * Create a new business by storing their data in the database
      * @param name business name
      * @param description business description
      * @param address business address

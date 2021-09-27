@@ -11,10 +11,10 @@
       <!-- Top Component Title -->
       <div id="business-name-container">
         <vs-dropdown class="title-image" vs-trigger-click>
-          <ReImage :imagePath="business.primaryImagePath" class="title-image" v-if="business.primaryImagePath"></ReImage>
+          <ReImage :imagePath="business.primaryImagePath" :isBusiness="true" class="title-image" v-if="business.primaryImagePath"></ReImage>
           <vs-avatar v-else icon="store" color="#1F74FF" size="100px" name="avatar" class="title-image"></vs-avatar>
           <vs-dropdown-menu>
-            <vs-dropdown-item @click="openImageUpload" class="profileDropdown">
+            <vs-dropdown-item @click="updatePrimary=true; openImageUpload()" class="profileDropdown">
               <vs-icon icon="add_box" style="margin: auto"></vs-icon>
               <div style="font-size: 12px; margin: auto">Add New Primary Image</div>
             </vs-dropdown-item>
@@ -101,7 +101,7 @@ const Business = {
       inWishlist: false, // i.e. is it in the user's wishlist.
       wishlistId: null,
       images: null,
-      profileImageDropdown: false
+      updatePrimary: false,
     };
   },
 
@@ -125,9 +125,14 @@ const Business = {
         const fd = new FormData();
         fd.append('filename', image, image.name);
         api.postBusinessImage(this.business.id, fd)
-                .then(() => { //On success
+                .then((res) => { //On success
                   this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
-                  location.reload();
+                  let imageId = res.data.id;
+                  if (this.updatePrimary) {
+                    this.updatePrimaryImage(imageId);
+                  } else {
+                    location.reload();
+                  }
                 })
                 .catch((error) => { //On fail
                   if (error.response.status === 400) {
@@ -140,6 +145,17 @@ const Business = {
                   this.$vs.loading.close();
                 });
       }
+    },
+
+    /**
+     * Call api endpoint to update the primary image for the business.
+     */
+    updatePrimaryImage: function(imageId) {
+      //api.updatePrimaryImage(image);
+      console.log(imageId);
+      console.log(this.images);
+      console.log(this.business.primaryImagePath);
+      this.updatePrimary = false;
     },
 
     /**
