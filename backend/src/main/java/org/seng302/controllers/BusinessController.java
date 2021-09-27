@@ -405,7 +405,7 @@ public class BusinessController {
 
 
     /**
-     * Checks request and ensures name and description is valid
+     * Checks request and ensures request values are valid
      * @param businessRequest request containing new business information
      * @return True if valid, false otherwise
      */
