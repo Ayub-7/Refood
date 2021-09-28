@@ -120,7 +120,7 @@ export default {
     revokeUserAdmin: async(id) =>
         instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
 
-    // ------ USER IMAGES
+    // ------ BUSINESS IMAGES
 
     /**
      * Create a new business image

@@ -1,11 +1,24 @@
 <template>
 
   <div>
-    <div v-if="isBusiness" style="display: flex; overflow: hidden; justify-content: center">
+    <div v-if="isBusiness" class="businessImage" style="display: flex; overflow: hidden; justify-content: center; position: relative">
       <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/business_images/' + getImgUrl(this.imagePath))" alt="Business image"/>
       <img v-else-if="this.imagePath != null && !isDevelopment()" alt="Business Image" v-bind:src="getImgUrl(this.imagePath)"/>
       <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Business image"/>
       <img v-else-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="Business image"/>
+      <vs-dropdown class="edit-button" vs-trigger-click>
+        <vs-icon icon="edit" color="black" size="50px" name="avatar"></vs-icon>
+        <vs-dropdown-menu id="dropdown">
+          <vs-dropdown-item v-if="imagePath !== primaryImagePath" @click="emitUpdatePrimary" class="profileDropdown">
+            <vs-icon icon="collections" size="30px" style="margin: auto; grid-column: 0"></vs-icon>
+            <div style="font-size: 16px; margin: auto; grid-column: 1">Make Image Primary</div>
+          </vs-dropdown-item>
+          <vs-dropdown-item @click="emitDelete" class="profileDropdown">
+            <vs-icon icon="delete" size="30px" style="margin: auto"></vs-icon>
+            <div style="font-size: 16px; margin: auto">Delete Image</div>
+        </vs-dropdown-item>
+        </vs-dropdown-menu>
+      </vs-dropdown>
     </div>
     <div v-else>
       <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(this.imagePath))" alt="Product image"/>
@@ -28,6 +41,10 @@ export default {
     isBusiness: {
       type: Boolean,
       default: false,
+    },
+    primaryImagePath: {
+      type: String,
+      default: null
     }
   },
 
@@ -59,6 +76,51 @@ export default {
     isDevelopment() {
       return (process.env.NODE_ENV === 'development');
     },
+
+    /**
+     * Emit delete to parent component, so that the image is deleted
+     */
+    emitDelete: function() {
+      this.$emit('delete');
+    },
+
+    /**
+     * Emit to parent component updatePrimary, so that the image is set as the primary image.
+     */
+    emitUpdatePrimary: function() {
+      this.$emit("updatePrimary");
+    }
   },
 }
 </script>
+<style scoped>
+  .profileDropdown >>> .vs-dropdown--item-link {
+    display: flex;
+  }
+
+  .profileDropdown >>> .vs-dropdown--item-link {
+    transition: .1s ease;
+  }
+
+  .businessImage:hover .edit-button {
+    opacity: .8;
+  }
+
+  .edit-button {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .9s ease;
+    background-color: #008CBA;
+  }
+
+  #dropdown {
+    display: grid;
+    grid-template-columns: auto auto;
+  }
+</style>
