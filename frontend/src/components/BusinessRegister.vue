@@ -48,7 +48,7 @@
           <vs-input v-model="region" class="form-control" label="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label="Country *"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountries()" v-model="country" class="form-control" label="Country *"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -62,7 +62,6 @@
 
 <script>
 import api from "../Api";
-import axios from "axios"
 import {mutations, store} from "../store";
 import BusinessCommon from "./BusinessCommon";
 
@@ -155,25 +154,12 @@ const BusinessRegister = {
       }},
 
 
-    /**
-     * Retrieve a list of suggested cities using the photon open api.
-     */
-    getCitiesFromPhoton: function() {
-      if (this.city.length >= this.minNumberOfCharacters) {
-
-        this.suggestCities = true;
-        axios.get(`https://photon.komoot.io/api/?q=${this.city}&osm_tag=place:city&lang=en`)
-            .then( res => {
-              this.suggestedCities = res.data.features.map(location => location.properties.name);
-              this.suggestedCities = this.suggestedCities.filter(city => city != null);
-            })
-            .catch( error => {
-              console.log("Error with getting cities from photon." + error);
-            });
-      }
-      else {
-        this.suggestCities = false;
-      }
+    getCountries: function() {
+      let data = BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
+      this.suggestCountries = data['0'];
+      this.suggestedCountries = data['1'];
+      // console.log(data)
+      // console.log(this.suggestedCountries)
     },
 
     /**
@@ -183,26 +169,6 @@ const BusinessRegister = {
     setCity: function(selectedCity) {
       this.city = selectedCity;
       this.suggestCities = false;
-    },
-
-    /**
-     * Retrieve a list of suggested countries using the photon open api.
-     */
-    getCountriesFromPhoton: function() {
-      if (this.country.length >= this.minNumberOfCharacters) {
-
-        this.suggestCountries = true;
-        axios.get(`https://photon.komoot.io/api/?q=${this.country}&osm_tag=place:country&lang=en`)
-            .then( res => {
-              this.suggestedCountries = res.data.features.map(location => location.properties.country);
-            })
-            .catch( error => {
-              this.$log.error(error)
-            });
-      }
-      else {
-        this.suggestCountries = false;
-      }
     },
 
     /**

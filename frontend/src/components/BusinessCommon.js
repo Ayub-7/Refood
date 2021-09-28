@@ -1,4 +1,5 @@
 import {store} from "../store";
+import axios from "axios";
 
 export default {
 
@@ -48,5 +49,52 @@ export default {
         let enteredDate = store.userDateOfBirth;
         let years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
         return (years >= 16);
+    },
+
+    /**
+     * Retrieve a list of suggested cities using the photon open api.
+     */
+    getCitiesFromPhoton: function() {
+        if (this.city.length >= this.minNumberOfCharacters) {
+
+            this.suggestCities = true;
+            axios.get(`https://photon.komoot.io/api/?q=${this.city}&osm_tag=place:city&lang=en`)
+                .then( res => {
+                    this.suggestedCities = res.data.features.map(location => location.properties.name);
+                    this.suggestedCities = this.suggestedCities.filter(city => city != null);
+                })
+                .catch( error => {
+                    console.log("Error with getting cities from photon." + error);
+                });
+        }
+        else {
+            this.suggestCities = false;
+        }
+    },
+
+    /**
+     * Retrieve a list of suggested countries using the photon open api.
+     */
+    getCountriesFromPhoton: function(country, minNumOfChars) {
+        if (country >= minNumOfChars) {
+
+            let suggestedCountries = []
+            axios.get(`https://photon.komoot.io/api/?q=${country}&osm_tag=place:country&lang=en`)
+                .then( res => {
+                    suggestedCountries = res.data.features.map(location => location.properties.country);
+                    console.log("Bababooey")
+                    return {'0': false,
+                        '1': suggestedCountries};
+                })
+                .catch( error => {
+                    console.log("Bababooey")
+
+                    this.$log.error(error)
+                });
+        }
+        else {
+            return {'0': false,
+                    '1': []};
+        }
     },
 }
