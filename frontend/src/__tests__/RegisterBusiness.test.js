@@ -1,6 +1,5 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
-import BusinessCommon from '../components/BusinessCommon'
 import Vuesax from 'vuesax';
 import {store} from "../store";
 import api from "../Api";

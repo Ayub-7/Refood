@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <vs-button class="register-button" @click="checkForm()">Modify</vs-button>
+      <vs-button class="modify-button" @click="checkForm()">Modify</vs-button>
     </form>
   </div>
 </template>
@@ -214,7 +214,7 @@ export default {
   margin: auto auto 0.5em auto;
 }
 
-.register-button {
+.modify-button {
   margin: 1em auto;
   width: 150px;
 }
