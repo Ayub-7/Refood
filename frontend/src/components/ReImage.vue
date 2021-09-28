@@ -52,6 +52,28 @@ export default {
     }
   },
 
+  data: function() {
+    return {
+      pathStart: null
+    }
+  },
+
+  mounted() {
+    if (this.isBusiness) {
+      if (process.env.NODE_ENV === 'staging') {
+        this.pathStart = '/test/business_images/';
+      } else {
+        this.pathStart = '/prod/business_images/';
+      }
+    } else {
+      if (process.env.NODE_ENV === 'staging') {
+        this.pathStart = '/test/prod_images/';
+      } else {
+        this.pathStart = '/prod/prod_images/';
+      }
+    }
+  },
+
   methods: {
     /**
      * Retrieves the image url link for the given product.
@@ -64,9 +86,9 @@ export default {
       } else if (product === true) {
         return '/test/placeholder.png';
       } else if (this.imagePath != null && !this.isDevelopment() && process.env.NODE_ENV !== 'staging') {
-        return '/prod/prod_images/' + this.imagePath.replace("/\\/g", "/");
+        return this.pathStart + this.imagePath.replace("/\\/g", "/");
       } else if (this.imagePath != null && !this.isDevelopment()) {
-        return '/test/prod_images/' + this.imagePath.replace("/\\/g", "/");
+        return this.pathStart + this.imagePath.replace("/\\/g", "/");
       } else if (this.imagePath != null) {
         return this.imagePath.replace(/\\/g, "/").replace("./src/main/resources/media/images/businesses/", "");
       } else {
