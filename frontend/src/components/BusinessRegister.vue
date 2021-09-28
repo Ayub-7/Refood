@@ -39,7 +39,7 @@
         </div>
         <div id="city">
           <!-- If wanting to test/check suggested item tiles, remove blur. -->
-          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
+          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCities()" class="form-control" label="City"></vs-input>
           <ul v-if="this.suggestCities" class="suggested-box">
             <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -154,12 +154,17 @@ const BusinessRegister = {
       }},
 
 
-    getCountries: function() {
-      let data = BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
+    getCountries: async function() {
+      let data = await BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
       this.suggestCountries = data['0'];
       this.suggestedCountries = data['1'];
-      // console.log(data)
-      // console.log(this.suggestedCountries)
+    },
+
+    getCities: async function() {
+      let data = await BusinessCommon.getCitiesFromPhoton(this.city, this.minNumberOfCharacters);
+      console.log(data)
+      this.suggestCities = data['0'];
+      this.suggestedCities = data['1'];
     },
 
     /**

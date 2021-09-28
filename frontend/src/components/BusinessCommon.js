@@ -54,43 +54,42 @@ export default {
     /**
      * Retrieve a list of suggested cities using the photon open api.
      */
-    getCitiesFromPhoton: function() {
-        if (this.city.length >= this.minNumberOfCharacters) {
-
-            this.suggestCities = true;
-            axios.get(`https://photon.komoot.io/api/?q=${this.city}&osm_tag=place:city&lang=en`)
+    getCitiesFromPhoton: async function(city, minNumOfChars) {
+        if (city.length >= minNumOfChars) {
+            let suggestedCities = [];
+            await axios.get(`https://photon.komoot.io/api/?q=${city}&osm_tag=place:city&lang=en`)
                 .then( res => {
-                    this.suggestedCities = res.data.features.map(location => location.properties.name);
-                    this.suggestedCities = this.suggestedCities.filter(city => city != null);
+                    suggestedCities = res.data.features.map(location => location.properties.name);
+                    suggestedCities = suggestedCities.filter(city => city != null);
                 })
                 .catch( error => {
                     console.log("Error with getting cities from photon." + error);
                 });
+            return {'0': true,
+                    '1': suggestedCities};
         }
         else {
-            this.suggestCities = false;
+            return {'0': false,
+                    '1': []};
         }
     },
 
     /**
      * Retrieve a list of suggested countries using the photon open api.
      */
-    getCountriesFromPhoton: function(country, minNumOfChars) {
-        if (country >= minNumOfChars) {
-
+    getCountriesFromPhoton: async function(country, minNumOfChars) {
+        if (country.length >= minNumOfChars) {
             let suggestedCountries = []
-            axios.get(`https://photon.komoot.io/api/?q=${country}&osm_tag=place:country&lang=en`)
+            await axios.get(`https://photon.komoot.io/api/?q=${country}&osm_tag=place:country&lang=en`)
                 .then( res => {
                     suggestedCountries = res.data.features.map(location => location.properties.country);
-                    console.log("Bababooey")
-                    return {'0': false,
-                        '1': suggestedCountries};
                 })
                 .catch( error => {
-                    console.log("Bababooey")
 
                     this.$log.error(error)
                 });
+            return {'0': true,
+                    '1': suggestedCountries};
         }
         else {
             return {'0': false,
