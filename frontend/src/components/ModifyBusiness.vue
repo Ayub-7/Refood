@@ -53,12 +53,15 @@
         </div>
       </div>
 
-      <vs-button class="register-button">Register</vs-button>
+      <vs-button class="register-button" @click="checkForm()">Modify</vs-button>
     </form>
   </div>
 </template>
 
 <script>
+import api from "../Api";
+import {store} from "../store";
+// import BusinessCommon from "./BusinessCommon";
 export default {
   name: "ModifyBusiness",
   data: function () {
@@ -84,13 +87,65 @@ export default {
       suggestCountries: false,
       suggestedCountries: [],
       minNumberOfCharacters: 3,
-      user: null
+      business: null
     };
   },
   methods: {
 
-  }
+    checkForm: function() {
+      if (this.businessName.length === 0 && this.streetNumber.length === 0 &&
+          this.streetAddress.length === 0 && this.suburb.length === 0 &&
+          this.postcode.length === 0 && this.city.length === 0 &&
+          this.region.length === 0 && this.country.length === 0 &&
+          this.description.length === 0 && this.businessType === null) {
+        this.$vs.notify({title:'Cannot modify business', text:'Required fields are missing.', color:'danger'});
+      } else {
+        if (this.businessName.length === 0) {
+          this.businessName = this.business.name;
+        }
+        if (this.streetAddress.length === 0) {
+          this.streetAddress = this.business.address.streetName;
+        }
+        if (this.streetNumber.length === 0) {
+          this.streetNumber = this.business.address.streetNumber;
+        }
+        if (this.suburb.length === 0) {
+          this.suburb = this.business.address.suburb;
+        }
+        if (this.postcode.length === 0) {
+          this.postcode = this.business.address.postcode;
+        }
+        if (this.region.length === 0) {
+          this.region = this.business.address.region;
+        }
+        if (this.city.length === 0) {
+          this.city = this.business.address.city;
+        }
+        if (this.country.length === 0) {
+          this.country = this.business.address.country;
+        }
+        if (this.description.length === 0) {
+          this.description = this.business.description;
+        }
+        if (this.businessType === null) {
+          this.businessType = this.business.businessType;
+        }
+      }
+    },
 
+    getBusinessDetails: function() {
+
+    }
+  },
+  mounted: function () {
+    api.getBusinessFromId(store.actingAsBusinessId)
+        .then((res) => {
+          this.business = res.data;
+        })
+        .catch((error) => {
+          this.$log.error(error);
+        })
+  }
 }
 </script>
 
