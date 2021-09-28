@@ -92,7 +92,7 @@ const routes = [
   {path: '/businesses/:id', name: 'Business', component: Business},
   {path: '/businesses/:id/sales-history', name: 'BusinessSalesHistory', component: BusinessSalesHistory},
   {path: '/businesses/:businessId/listings/:listingId', name: 'Listing', component: ListingDetail},
-  {path: '/business/modify', name: 'ModifyBusiness', component: ModifyBusiness},
+  {path: '/businesses/:id/modify', name: 'ModifyBusiness', component: ModifyBusiness},
   {
     path: '*',
     name: 'catchAll',
