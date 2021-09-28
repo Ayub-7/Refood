@@ -614,7 +614,8 @@ class BusinessControllerTests {
         mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
                 .andExpect(status().isOk());
-        assertThat(business.getPrimaryImagePath().split("/")[1]).isEqualTo(image2.getId());
+        System.out.println(business.getPrimaryImagePath());
+        assertThat(business.getPrimaryImagePath()).isEqualTo("business_1\\" + image2.getId());
     }
 
     @Test
@@ -644,7 +645,7 @@ class BusinessControllerTests {
         mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
-        assertThat(business.getPrimaryImagePath().split("/")[1]).isEqualTo(image2.getId());
+        assertThat(business.getPrimaryImagePath()).isEqualTo("business_1\\"+image2.getId());
     }
 
     @Test
