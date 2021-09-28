@@ -15,7 +15,7 @@ export default {
     businessCheckForm: function(businessName, description, country, businessType) {
         let errors = [];
 
-        if (businessName.length === 0) {
+        if (businessName === undefined || businessName.length === 0) {
             errors.push('businessName');
         }
 
@@ -25,7 +25,7 @@ export default {
             }
         }
 
-        if (country.length === 0) {
+        if (country === undefined || country.length === 0) {
             errors.push('country');
         }
 
