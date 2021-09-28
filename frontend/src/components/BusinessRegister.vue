@@ -64,6 +64,7 @@
 import api from "../Api";
 import axios from "axios"
 import {mutations, store} from "../store";
+import BusinessCommon from "./BusinessCommon";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -98,31 +99,8 @@ const BusinessRegister = {
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * Pushes name of error into an array, and display notification have errors exist.
      */
-    checkForm: function() {
-      this.errors = [];
-
-      if (this.businessName.length === 0) {
-        this.errors.push('businessName');
-      }
-
-      if (this.description != null) {
-        if (this.description.length > 140) {
-          this.errors.push('description');
-        }
-      }
-
-      if (this.country.length === 0) {
-        this.errors.push('country');
-      }
-
-      if (!this.checkAge()){
-        this.errors.push('dob');
-      }
-
-      if (!this.businessType) {
-        this.errors.push('businessType');
-      }
-
+    checkForm: function () {
+      this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
       if (this.errors.length >= 1) {
         if(this.errors.includes("dob") && this.errors.length === 1){
           this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
@@ -136,10 +114,8 @@ const BusinessRegister = {
         } else {
           this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
         }
-
       }
     },
-
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
@@ -177,17 +153,6 @@ const BusinessRegister = {
             this.$log.debug("Error Status:", error)
           });
       }},
-
-    /**
-     * Returns the years since the user was born. No rounding is done in the function.
-     * @param enteredDate The user's birthdate
-     * @returns {boolean} Whether the user is old enough, 16, to register a business.
-     */
-    checkAge: function() {
-      let enteredDate = store.userDateOfBirth;
-      let years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
-      return (years >= 16);
-    },
 
 
     /**
