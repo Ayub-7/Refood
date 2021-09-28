@@ -92,6 +92,9 @@ export default {
   },
   methods: {
 
+    /**
+     * Method for checking the form is compliant for modifying businesses
+     */
     checkForm: function() {
       if (this.businessName.length === 0 && this.streetNumber.length === 0 &&
           this.streetAddress.length === 0 && this.suburb.length === 0 &&
@@ -133,17 +136,24 @@ export default {
       }
     },
 
+    /**
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest countries
+     */
     getCountries: async function() {
       let data = await BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
       this.suggestCountries = data['0'];
       this.suggestedCountries = data['1'];
     },
 
+    /**
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest cities
+     */
     getCities: async function() {
       let data = await BusinessCommon.getCitiesFromPhoton(this.city, this.minNumberOfCharacters);
       this.suggestCities = data['0'];
       this.suggestedCities = data['1'];
     },
+
     /**
      * Set the city as the new city.
      * @param selectedCity string to set as the new city.
@@ -152,6 +162,7 @@ export default {
       this.city = selectedCity;
       this.suggestCities = false;
     },
+
     /**
      * Set the country as the new country.
      * @param selectedCountry the country string to set as.

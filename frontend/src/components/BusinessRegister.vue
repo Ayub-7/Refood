@@ -153,13 +153,18 @@ const BusinessRegister = {
           });
       }},
 
-
+    /**
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest countries
+     */
     getCountries: async function() {
       let data = await BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
       this.suggestCountries = data['0'];
       this.suggestedCountries = data['1'];
     },
 
+    /**
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest cities
+     */
     getCities: async function() {
       let data = await BusinessCommon.getCitiesFromPhoton(this.city, this.minNumberOfCharacters);
       console.log(data)

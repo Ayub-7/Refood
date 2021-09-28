@@ -42,7 +42,6 @@ export default {
 
     /**
      * Returns the years since the user was born. No rounding is done in the function.
-     * @param enteredDate The user's birthdate
      * @returns {boolean} Whether the user is old enough, 16, to register a business.
      */
     checkAge: function() {
@@ -53,6 +52,9 @@ export default {
 
     /**
      * Retrieve a list of suggested cities using the photon open api.
+     * @param city input to be inferred from
+     * @param minNumOfChars minimum of characters
+     * @returns {Promise<{"0": boolean, "1": []}>} returns a JSON object with a boolean and a list of suggested cities
      */
     getCitiesFromPhoton: async function(city, minNumOfChars) {
         if (city.length >= minNumOfChars) {
@@ -76,6 +78,9 @@ export default {
 
     /**
      * Retrieve a list of suggested countries using the photon open api.
+     * @param country input to be inferred from
+     * @param minNumOfChars minimum of characters
+     * @returns {Promise<{"0": boolean, "1": []}>} returns a JSON object with a boolean and a list of suggested countries
      */
     getCountriesFromPhoton: async function(country, minNumOfChars) {
         if (country.length >= minNumOfChars) {
