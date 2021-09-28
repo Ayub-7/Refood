@@ -591,5 +591,326 @@ class BusinessControllerTests {
     }
 
 
+    @Test
+    void updateBusinessPrimaryImage_noAuth_returns401() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        business.setPrimaryImagePath(image1.getFileName());
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId()))
+                .andExpect(status().isUnauthorized());
+        assertThat(business.getPrimaryImagePath().split("/")[1]).isNotEqualTo(image2.getId());
+    }
 
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_validRequest_returns200() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isOk());
+        String primaryPath = business.getPrimaryImagePath();
+        assertThat(String.valueOf(primaryPath.charAt(primaryPath.length()-1))).isEqualTo(String.valueOf(image2.getId()));
+    }
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_notAdmin_returns403() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isForbidden());
+        assertThat(business.getPrimaryImagePath()).isNull();
+    }
+
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_dgaa_returns200() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        user.setRole(Role.DGAA);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+        String primaryPath = business.getPrimaryImagePath();
+        assertThat(String.valueOf(primaryPath.charAt(primaryPath.length()-1))).isEqualTo(String.valueOf(image2.getId()));
+    }
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_badImageId_returns406() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), "2")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isNotAcceptable());
+        assertThat(business.getPrimaryImagePath()).isNull();
+    }
+
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_badBusinessId_returns406() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isNotAcceptable());
+        assertThat(business.getPrimaryImagePath()).isNull();
+    }
+
+
+
+
+    @Test
+    void modifyBusiness_noAuth_returns401() throws Exception {
+        mvc.perform(put("/businesses/{id}/modify", business.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_notPrimaryAdmin_returns200() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Business", "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_noBusinessReturns406_returns403() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Business", "Some Description", business.getAddress(), BusinessType.ACCOMMODATION_AND_FOOD_SERVICES);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(null);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_validUpdate_updatesCorrectly() throws Exception {
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "New Zealand","39960-000");
+
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "Updated", a1, BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isOk());
+
+        Assertions.assertEquals(testBusiness.getName(), business.getName());
+        Assertions.assertEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertEquals(testBusiness.getAddress(), business.getAddress());
+        Assertions.assertEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_emptyName_returns400() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("", "Updated", business.getAddress(), BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+
+        Assertions.assertNotEquals(testBusiness.getName(), business.getName());
+        Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_longName_returns400() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Updated", business.getAddress(), BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+
+        Assertions.assertNotEquals(testBusiness.getName(), business.getName());
+        Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_maxNameLength_returns200() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Updated", business.getAddress(), BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isOk());
+
+        Assertions.assertEquals(testBusiness.getName(), business.getName());
+        Assertions.assertEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_maxDescription_returns200() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", business.getAddress(), BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isOk());
+
+        Assertions.assertEquals(testBusiness.getName(), business.getName());
+        Assertions.assertEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_longDescription_returns400() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", business.getAddress(), BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+
+        Assertions.assertNotEquals(testBusiness.getName(), business.getName());
+        Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_noBusinessType_returns400() throws Exception {
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "Updated", business.getAddress(), null);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+
+        Assertions.assertNotEquals(testBusiness.getName(), business.getName());
+        Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_noCountry_returns400() throws Exception {
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, null,"39960-000");
+
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "Updated", a1, BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+
+
+        Assertions.assertNotEquals(testBusiness.getName(), business.getName());
+        Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_emptyCountry_returns400() throws Exception {
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "","39960-000");
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "Updated", a1, BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+
+        Assertions.assertNotEquals(testBusiness.getName(), business.getName());
+        Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
+        Assertions.assertNotEquals(testBusiness.getAddress(), business.getAddress());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_maxCountryName_returns200() throws Exception {
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Al Jumahiriyah al Arabiyah al Libiyah ash Shabiyah al Ishtirakiyah al Uzma","39960-000");
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "Updated", a1, BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isOk());
+
+        Assertions.assertEquals(testBusiness.getName(), business.getName());
+        Assertions.assertEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertEquals(testBusiness.getBusinessType(), business.getBusinessType());
+        Assertions.assertEquals(testBusiness.getAddress(), business.getAddress());
+    }
+
+    @Test
+    @WithMockUser
+    void modifyBusiness_longCountryName_returns400() throws Exception {
+        Address a1 = new Address("1","Kropf Court","Jequitinhonha", null, "Al Jumahiriyah al Arabiyah al Libiyah ash Shabiyah al Ishtirakiyah al Uzmaa","39960-000");
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "Updated", a1, BusinessType.RETAIL_TRADE);
+
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(put("/businesses/{id}/modify", business.getId())
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(testBusiness))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+
+        Assertions.assertNotEquals(testBusiness.getName(), business.getName());
+        Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
+        Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
+        Assertions.assertNotEquals(testBusiness.getAddress(), business.getAddress());
+    }
 }

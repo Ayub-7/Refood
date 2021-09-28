@@ -31,6 +31,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -441,5 +444,172 @@ public class BusinessController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(newImage));
     }
+
+
+    /**
+     * PUT request for updating business image
+     * @param businessId id of business that is going to be updated
+     * @param imageId id of image that is going to be set to primary
+     * @param session session of user, used to check if user is admin
+     * @return 200 is updated, 401 no auth, 403 if not admin, 406 if image of business doesn't exist
+     */
+    @PutMapping("/businesses/{businessId}/images/{imageId}/makeprimary")
+    public ResponseEntity<String> changePrimaryImage(@PathVariable long businessId, @PathVariable String imageId, HttpSession session) {
+        Business business = businessRepository.findBusinessById(businessId);
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if (business == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        //Check there is an image match
+        boolean validImage = business.getImages().stream().anyMatch(image -> imageId.equals(image.getId()));
+
+        if(!validImage) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+
+        String extension = getExtension(businessId, imageId);
+        business = setBusinessImage(business, businessId, imageId, extension);
+        businessRepository.save(business);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Sets primary image of business to image path
+     * @param businessId id of business, used in path
+     * @param imageId id of image, used in image path
+     * @param business business object, used to update primary image
+     * @param extension extension of image, used in image path
+     * @return business with primary image updated
+     */
+    private Business setBusinessImage(Business business, long businessId, String imageId, String extension) {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, imageId, extension));
+        } else {
+            business.setPrimaryImage(String.format("business_%d/%s%s", businessId, imageId, extension));
+        }
+
+        return business;
+    }
+
+    /**
+     * Gets extension of image by finding file that matches path with extension
+     * @param businessId id of business used to find extension from image path
+     * @param imageId id of image used to find extension from image path
+     * @return Value of extension for image
+     */
+    private String getExtension(long businessId, String imageId) {
+        String imageDir = rootImageDir + "/business_" + businessId + "/" + imageId;
+        String extension = "";
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext : extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                extension = ext;
+                break;
+            }
+        }
+
+        return extension;
+    }
+
+
+    /**
+     * Updates business
+     * @param id id of the business
+     * @param session Http session to get user session
+     * @return Response entity,
+     *         200 if successfully update
+     *         400 Error with given data
+     *         401 Missing auth token
+     *         403 if trying to modify business that isn't yours
+     *         406 if trying to access business that doesn't exist
+     */
+    @PutMapping("/businesses/{id}/modify")
+    public ResponseEntity<String> modifyBusiness(@RequestBody NewBusinessRequest request, @PathVariable long id, HttpSession session) {
+        Business business = businessRepository.findBusinessById(id);
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if(checkBusinessRequest(request)) { // If valid -> description < 140 & name < 30
+            if (business == null) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            }
+
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            business = updateBusiness(request, business);
+            businessRepository.save(business);
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+
+    }
+
+
+    /**
+     * Updates business object to contain new data from request, used in modify business.
+     * @param businessRequest request containing new business information
+     * @param business the business that is going to be updated
+     * @return updated business object
+     */
+    private Business updateBusiness(NewBusinessRequest businessRequest, Business business) {
+        businessRequest.getAddress().setId(business.getAddress().getId());
+        business.setBusinessType(businessRequest.getBusinessType());
+        business.setAddress(businessRequest.getAddress());
+        business.setName(businessRequest.getName());
+        business.setDescription(businessRequest.getDescription());
+
+        return business;
+    }
+
+
+    /**
+     * Checks request and ensures request values are valid
+     * @param businessRequest request containing new business information
+     * @return True if valid, false otherwise
+     */
+    private boolean checkBusinessRequest(NewBusinessRequest businessRequest) {
+        int nameLength = businessRequest.getName().length();
+        int descriptionLength = businessRequest.getDescription().length();
+        String country = businessRequest.getAddress().getCountry();
+
+        if(businessRequest.getBusinessType() == null) {
+            return false;
+        }
+
+        //https://www.quora.com/Which-country-has-the-longest-name 🥴
+        if(country == null || country.length() < 1 || country.length() > 74) {
+            return false;
+        }
+        if(nameLength > 30 || nameLength < 1 || businessRequest.getName() == null) {
+            return false;
+        }
+        if(descriptionLength > 140) {
+            return false;
+        }
+
+        return true;
+
+
+    }
+
+
+
 
 }
