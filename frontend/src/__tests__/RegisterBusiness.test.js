@@ -129,10 +129,31 @@ describe('Business Register error checking', () => {
         registerBtn.trigger('click');
         expect(wrapper.vm.errors.length).toBe(3);
     })
+
+    test('Handles young users', () => {
+        wrapper.vm.businessName = 'bestBusiness';
+        wrapper.vm.businessType = 'Charitable Organisation';
+        const registerBtn = wrapper.find('.register-button')
+        registerBtn.trigger('click');
+        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    })
+
+
+    test('Handles long descriptions', () => {
+        wrapper.vm.businessName = 'bestBusiness';
+        wrapper.vm.businessType = 'Charitable Organisation';
+        wrapper.vm.store.userDateOfBirth = "1990-01-01"
+        wrapper.vm.description = 'EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE';
+        const registerBtn = wrapper.find('.register-button')
+        registerBtn.trigger('click');
+        expect(wrapper.vm.errors.includes("description")).toBe(true);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    })
 });
 
 describe('Business Register user age checking', () => {
-    test('Handles to young user', () => {
+    test('Handles too young user', () => {
         wrapper.vm.store.userDateOfBirth = "2010-01-01"
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
