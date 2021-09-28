@@ -37,16 +37,16 @@
         </div>
         <div id="city">
           <!-- If wanting to test/check suggested item tiles, remove blur. -->
-          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
+          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCities()" class="form-control" label="City"></vs-input>
           <ul v-if="this.suggestCities" class="suggested-box">
-            <li v-for="suggested in this.suggestedCities" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
+            <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
         </div>
         <div id="region">
           <vs-input v-model="region" class="form-control" label="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label="Country *"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountries()" v-model="country" class="form-control" label="Country *"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -61,7 +61,7 @@
 <script>
 import api from "../Api";
 import {store} from "../store";
-// import BusinessCommon from "./BusinessCommon";
+import BusinessCommon from "./BusinessCommon";
 export default {
   name: "ModifyBusiness",
   data: function () {
@@ -133,9 +133,33 @@ export default {
       }
     },
 
-    getBusinessDetails: function() {
+    getCountries: async function() {
+      let data = await BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
+      this.suggestCountries = data['0'];
+      this.suggestedCountries = data['1'];
+    },
 
-    }
+    getCities: async function() {
+      let data = await BusinessCommon.getCitiesFromPhoton(this.city, this.minNumberOfCharacters);
+      this.suggestCities = data['0'];
+      this.suggestedCities = data['1'];
+    },
+    /**
+     * Set the city as the new city.
+     * @param selectedCity string to set as the new city.
+     */
+    setCity: function(selectedCity) {
+      this.city = selectedCity;
+      this.suggestCities = false;
+    },
+    /**
+     * Set the country as the new country.
+     * @param selectedCountry the country string to set as.
+     */
+    setCountry: function(selectedCountry) {
+      this.country = selectedCountry;
+      this.suggestCountries = false;
+    },
   },
   mounted: function () {
     api.getBusinessFromId(store.actingAsBusinessId)
@@ -145,7 +169,7 @@ export default {
         .catch((error) => {
           this.$log.error(error);
         })
-  }
+  },
 }
 </script>
 
