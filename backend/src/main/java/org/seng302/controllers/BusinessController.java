@@ -455,16 +455,21 @@ public class BusinessController {
         Business business = businessRepository.findBusinessById(businessId);
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
 
+        if (business == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
         //Check there is an image match
         boolean validImage = business.getImages().stream().anyMatch(image -> imageId.equals(image.getId()));
 
+        if(!validImage) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
 
         if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        if (business == null || !validImage) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        }
+
 
         String extension = getExtension(businessId, imageId);
         business = setBusinessImage(business, businessId, imageId, extension);

@@ -591,5 +591,91 @@ class BusinessControllerTests {
     }
 
 
+    @Test
+    void updateBusinessPrimaryImage_noAuth_returns401() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        business.setPrimaryImagePath(image1.getFileName());
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId()))
+                .andExpect(status().isUnauthorized());
+        assertThat(business.getPrimaryImagePath().split("/")[1]).isNotEqualTo(image2.getId());
+    }
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_validRequest_returns200() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isOk());
+        assertThat(business.getPrimaryImagePath().split("/")[1]).isEqualTo(image2.getId());
+    }
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_notAdmin_returns403() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isForbidden());
+        assertThat(business.getPrimaryImagePath()).isNull();
+    }
+
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_dgaa_returns200() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        user.setRole(Role.DGAA);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image2.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+        assertThat(business.getPrimaryImagePath().split("/")[1]).isEqualTo(image2.getId());
+    }
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_badImageId_returns406() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(business);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), "2")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isNotAcceptable());
+        assertThat(business.getPrimaryImagePath()).isNull();
+    }
+
+
+    @Test
+    @WithMockUser
+    void updateBusinessPrimaryImage_badBusinessId_returns406() throws Exception {
+        Image image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+        Image image2 = new Image("new image", "1", "../../../resources/media.images/testlettuce2.jpeg", "");
+        business.addBusinessImage(image1);
+        business.addBusinessImage(image2);
+        Mockito.when(businessRepository.findBusinessById(business.getId())).thenReturn(null);
+        mvc.perform(put("/businesses/{businessId}/images/{imageId}/makeprimary", business.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isNotAcceptable());
+        assertThat(business.getPrimaryImagePath()).isNull();
+    }
+
+
 
 }
