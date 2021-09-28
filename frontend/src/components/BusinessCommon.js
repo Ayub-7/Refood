@@ -12,7 +12,7 @@ export default {
      * @returns Will return an empty list if there are no errors,
      * otherwise, will return the list of errors
      */
-    businessCheckForm: function(businessName, description, country, businessType, ) {
+    businessCheckForm: function(businessName, description, country, businessType) {
         let errors = [];
 
         if (businessName.length === 0) {

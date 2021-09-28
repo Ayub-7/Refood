@@ -1,5 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import Business from '../components/BusinessRegister';
+import BusinessCommon from '../components/BusinessCommon'
 import Vuesax from 'vuesax';
 import {store} from "../store";
 import api from "../Api";
@@ -53,7 +54,6 @@ const mockUser = {
 const $router = {
     push: jest.fn()
 }
-const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
 beforeEach(() => {
     wrapper = mount(Business, {
         propsData: {},
@@ -157,22 +157,26 @@ describe('Business registration method checking', () => {
 describe('Checking valid age to register a business', () => {
     test("Test empty date of birth", () => {
         wrapper.vm.store.userDateOfBirth = "";
-        expect(wrapper.vm.checkAge()).toBe(false);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(true);
     });
 
     test("Test successful age older than 16", () => {
         wrapper.vm.store.userDateOfBirth = "1980-01-01";
-        expect(wrapper.vm.checkAge()).toBe(true);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(false);
     });
 
     test("Test unsuccessful age younger than 16", () => {
         wrapper.vm.store.userDateOfBirth = "2020-01-01";
-        expect(wrapper.vm.checkAge("2020-01-01")).toBe(false);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(true);
     });
 
     test("Test date of birth of now to be invalid", () => {
         wrapper.vm.store.userDateOfBirth = Date.now().toString();
-        expect(wrapper.vm.checkAge()).toBe(false);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(true);
     });
 });
 
