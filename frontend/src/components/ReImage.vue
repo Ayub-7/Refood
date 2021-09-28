@@ -52,29 +52,31 @@ export default {
     }
   },
 
-  data: function() {
-    return {
-      pathStart: null
-    }
-  },
-
-  mounted() {
-    if (this.isBusiness) {
-      if (process.env.NODE_ENV === 'staging') {
-        this.pathStart = '/test/business_images/';
-      } else {
-        this.pathStart = '/prod/business_images/';
-      }
-    } else {
-      if (process.env.NODE_ENV === 'staging') {
-        this.pathStart = '/test/prod_images/';
-      } else {
-        this.pathStart = '/prod/prod_images/';
-      }
-    }
-  },
-
   methods: {
+    /**
+     * Return the string of the beginning of the image path.
+     * This differs depending on whether the application is running
+     * on the test or the production server, and whether the image
+     * is a business image, user image, or product image.
+     */
+    getPathStart() {
+      let pathStart;
+      if (this.isBusiness) {
+        if (process.env.NODE_ENV === 'staging') {
+          pathStart = '/test/business_images/';
+        } else {
+          pathStart = '/prod/business_images/';
+        }
+      } else {
+        if (process.env.NODE_ENV === 'staging') {
+          pathStart = '/test/prod_images/';
+        } else {
+          pathStart = '/prod/prod_images/';
+        }
+      }
+      return pathStart;
+    },
+
     /**
      * Retrieves the image url link for the given product.
      * @param product the product to retrieve the image for.
@@ -86,9 +88,9 @@ export default {
       } else if (product === true) {
         return '/test/placeholder.png';
       } else if (this.imagePath != null && !this.isDevelopment() && process.env.NODE_ENV !== 'staging') {
-        return this.pathStart + this.imagePath.replace("/\\/g", "/");
+        return this.getPathStart() + this.imagePath.replace("/\\/g", "/");
       } else if (this.imagePath != null && !this.isDevelopment()) {
-        return this.pathStart + this.imagePath.replace("/\\/g", "/");
+        return this.getPathStart() + this.imagePath.replace("/\\/g", "/");
       } else if (this.imagePath != null) {
         return this.imagePath.replace(/\\/g, "/").replace("./src/main/resources/media/images/businesses/", "");
       } else {
