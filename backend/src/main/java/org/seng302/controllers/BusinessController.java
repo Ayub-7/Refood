@@ -517,4 +517,93 @@ public class BusinessController {
         return extension;
     }
 
+
+    /**
+     * Updates business
+     * @param id id of the business
+     * @param session Http session to get user session
+     * @return Response entity,
+     *         200 if successfully update
+     *         400 Error with given data
+     *         401 Missing auth token
+     *         403 if trying to modify business that isn't yours
+     *         406 if trying to access business that doesn't exist
+     */
+    @PutMapping("/businesses/{id}/modify")
+    public ResponseEntity<String> modifyBusiness(@RequestBody NewBusinessRequest request, @PathVariable long id, HttpSession session) {
+        Business business = businessRepository.findBusinessById(id);
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if(checkBusinessRequest(request)) { // If valid -> description < 140 & name < 30
+            if (business == null) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            }
+
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            business = updateBusiness(request, business);
+            businessRepository.save(business);
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+
+    }
+
+
+    /**
+     * Updates business object to contain new data from request, used in modify business.
+     * @param businessRequest request containing new business information
+     * @param business the business that is going to be updated
+     * @return updated business object
+     */
+    private Business updateBusiness(NewBusinessRequest businessRequest, Business business) {
+        businessRequest.getAddress().setId(business.getAddress().getId());
+        business.setBusinessType(businessRequest.getBusinessType());
+        business.setAddress(businessRequest.getAddress());
+        business.setName(businessRequest.getName());
+        business.setDescription(businessRequest.getDescription());
+
+        return business;
+    }
+
+
+    /**
+     * Checks request and ensures request values are valid
+     * @param businessRequest request containing new business information
+     * @return True if valid, false otherwise
+     */
+    private boolean checkBusinessRequest(NewBusinessRequest businessRequest) {
+        int nameLength = businessRequest.getName().length();
+        int descriptionLength = businessRequest.getDescription().length();
+        String country = businessRequest.getAddress().getCountry();
+
+        if(businessRequest.getBusinessType() == null) {
+            return false;
+        }
+
+        //https://www.quora.com/Which-country-has-the-longest-name 🥴
+        if(country == null || country.length() < 1 || country.length() > 74) {
+            return false;
+        }
+        if(nameLength > 30 || nameLength < 1 || businessRequest.getName() == null) {
+            return false;
+        }
+        if(descriptionLength > 140) {
+            return false;
+        }
+
+        return true;
+
+
+    }
+
+
+
+
 }

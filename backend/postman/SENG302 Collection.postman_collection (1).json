@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "064a5d84-6a80-4099-9200-a3e6ba2dd186",
+		"_postman_id": "58c22a9e-b5a2-4d45-86d6-ad6c9f96dadb",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -206,8 +206,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Business",
@@ -233,6 +232,40 @@
 							],
 							"path": [
 								"businesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify Business",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Lumbridge General Store\",\r\n    \"description\": \"A one-stop shop for all your adventuring needs\",\r\n        \"address\": {\r\n        \"streetNumber\": \"3/24\",\r\n        \"streetName\": \"Ilam Road\",\r\n        \"suburb\": \"Upper Riccarton\",\r\n        \"city\": \"Christchurch\",\r\n        \"region\": \"Canterbury\",\r\n        \"country\": \"New Zealand\",\r\n        \"postcode\": \"90210\"\r\n    },\r\n    \"businessType\": \"Accommodation and Food Services\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/modify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"modify"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
 							]
 						}
 					},
