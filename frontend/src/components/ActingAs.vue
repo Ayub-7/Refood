@@ -24,7 +24,8 @@
           <vs-dropdown-group vs-label="Businesses" id="businessList">
             <vs-dropdown-item class="dropdown-item" v-for="business in getBusinesses()" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
               <div class="dropdown-item-name">{{business.name}} <span v-if="business.primaryAdministratorId === loggedInUserId">(P)</span></div>
-              <vs-avatar class="dropdown-item-avatar" icon="store" size="small"></vs-avatar>
+              <ReImage v-if="business.primaryThumbnailPath !== null" :imagePath="business.primaryThumbnailPath" :isBusiness="true" :isThumbnail="true" style="border: 1px solid #ddd; border-radius: 4px; padding: 5px;"></ReImage>
+              <vs-avatar v-else class="dropdown-item-avatar" icon="store" size="small"></vs-avatar>
             </vs-dropdown-item>
           </vs-dropdown-group>
         </vs-dropdown-menu>
@@ -37,9 +38,11 @@
 <script>
 import {store, mutations} from "../store";
 import api from "../Api";
+import ReImage from "./ReImage";
 
 const actingAs =  {
   name: "actingAs",
+  components: {ReImage},
   data: function () {
     return {
       loggedInUserId: null,

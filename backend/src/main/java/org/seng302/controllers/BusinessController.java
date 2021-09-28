@@ -422,16 +422,20 @@ public class BusinessController {
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
         String filename = "";
+        String thumbnailFilename = "";
         // Save into DB.
         if (System.getProperty("os.name").startsWith("windows")) {
             filename = (String.format("business_%d\\%s%s", businessId, id, imageExtension));
+            thumbnailFilename = (String.format("business_%d\\%s_thumbnail%s", businessId, id, imageExtension));
         } else {
             filename = (String.format("business_%d/%s%s", businessId, id, imageExtension));
+            thumbnailFilename = (String.format("business_%d/%s_thumbnail%s", businessId, id, imageExtension));
         }
         if (business.getPrimaryImagePath() == null) {
             business.setPrimaryImage(filename);
+            business.setPrimaryThumbnailPath(thumbnailFilename);
         }
-        Image newImage = new Image(imageName, id, filename, thumbnailFile.toString());
+        Image newImage = new Image(imageName, id, filename, thumbnailFilename);
         business.addBusinessImage(newImage);
         businessRepository.save(business);
 

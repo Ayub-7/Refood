@@ -53,6 +53,7 @@ public class Business implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Image> images;
     private String primaryImagePath;
+    private String primaryThumbnailPath;
 
     protected Business() {}
 
@@ -71,6 +72,7 @@ public class Business implements Serializable {
 
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
     }
 
     /**
@@ -85,6 +87,7 @@ public class Business implements Serializable {
 
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
     }
 
     /**
@@ -107,4 +110,11 @@ public class Business implements Serializable {
      */
     public void setPrimaryImage(String path) { this.primaryImagePath = path; }
 
+    /**
+     * Sets the path of the thumbnail of the primary image
+     * @param path The path to the image
+     */
+    public void setPrimaryThumbnailPath(String path) {
+        this.primaryThumbnailPath = path;
+    }
 }

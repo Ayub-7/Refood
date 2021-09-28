@@ -62,7 +62,6 @@ const BusinessImages = {
                 fd.append('filename', image, image.name);
                 await api.postBusinessImage(this.business.id, fd)
                     .then(() => { //On success
-                        this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
                         location.reload();
                     })
                     .catch((error) => { //On fail
@@ -74,6 +73,7 @@ const BusinessImages = {
                     })
                     .finally(() => {
                         this.$vs.loading.close();
+                        this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
                     });
             }
         },

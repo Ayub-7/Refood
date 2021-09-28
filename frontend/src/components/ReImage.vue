@@ -6,7 +6,7 @@
       <img v-else-if="this.imagePath != null && !isDevelopment()" alt="Business Image" v-bind:src="getImgUrl(this.imagePath)"/>
       <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Business image"/>
       <img v-else-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="Business image"/>
-      <vs-dropdown class="edit-button" vs-trigger-click>
+      <vs-dropdown v-if="!isThumbnail" class="edit-button" vs-trigger-click>
         <vs-icon icon="edit" color="black" size="50px" name="avatar"></vs-icon>
         <vs-dropdown-menu id="dropdown">
           <vs-dropdown-item v-if="imagePath !== primaryImagePath" @click="emitUpdatePrimary" class="profileDropdown">
@@ -45,6 +45,10 @@ export default {
     primaryImagePath: {
       type: String,
       default: null
+    },
+    isThumbnail: {
+      type: Boolean,
+      default: false
     }
   },
 
