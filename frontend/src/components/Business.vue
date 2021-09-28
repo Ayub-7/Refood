@@ -428,11 +428,13 @@ main {
 #business-navbar {
   grid-column: 2;
   grid-row: 1;
+  height: 98%;
 }
 
 .business-nav-item {
   padding: 0 1em;
   font-size: 14px;
+  height: 100%;
 }
 
 #business-navbar >>> .vs-tabs--li { /* Targets individual tab */

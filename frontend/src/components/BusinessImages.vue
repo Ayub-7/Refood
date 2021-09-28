@@ -4,11 +4,9 @@
             <vs-button icon="add_box" id="add-button" @click="openImageUpload" label="Upload Images">Upload Images</vs-button>
         </vs-row>
         <!-- Image Card -->
-        <div id="images-list">
-            <vs-card v-for="image in images" :key="image.id" class="image-card">
-                <ReImage :imagePath="'business_'+business.id+'/'+/[^/]*$/.exec(image.fileName)[0]" :isBusiness="true" class="title-image"></ReImage>
-            </vs-card>
-        </div>
+        <vs-card v-for="image in images" :key="image.id" id="images-list" style="padding: 0px">
+            <ReImage :imagePath="'business_'+business.id+'/'+/[^/]*$/.exec(image.fileName)[0]" :isBusiness="true" class="title-image"></ReImage>
+        </vs-card>
         <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
     </div>
 </template>
@@ -88,9 +86,14 @@ export default BusinessImages;
 </script>
 <style scoped>
 #images-list {
-    padding: 1em;
+    margin-left: auto;
+    margin-right: auto;
     display: flex;
+    width: 430px;
+    height: 320px;
+    justify-content: center;
     flex-wrap: wrap;
+    margin-top: 15px;
 }
 #add-button {
     margin-right: 10%;
@@ -98,19 +101,19 @@ export default BusinessImages;
 }
 .image-card {
     margin: 100px;
-    max-width:100%;
-    height:auto;
-
+    min-width: 200px;
+    padding: 4px;
 }
 .title-image {
     height: 320px;
-    width: 450px;
+    width: 430px;
     object-fit: cover;
     display: flex;
     grid-column: 1;
     grid-row: 1 / 3;
     margin-left: auto;
-
+    justify-content: center;
+    margin-bottom: 10px;
 }
 </style>
 

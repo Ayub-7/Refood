@@ -1,7 +1,7 @@
 <template>
 
   <div>
-    <div v-if="isBusiness" style="display: flex" class="business-image">
+    <div v-if="isBusiness" style="display: flex; overflow: hidden; justify-content: center">
       <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/business_images/' + getImgUrl(this.imagePath))" alt="Business image"/>
       <img v-else-if="this.imagePath != null && !isDevelopment()" alt="Business Image" v-bind:src="getImgUrl(this.imagePath)"/>
       <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Business image"/>
