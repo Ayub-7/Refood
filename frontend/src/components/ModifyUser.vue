@@ -4,9 +4,9 @@
     <form>
       <div id="info-field">
         <div id="firstname">
-          <vs-input :danger="(errors.includes(firstname))"
+          <vs-input :danger="(errors.includes(userEditForm.firstname))"
                     danger-text="First Name must be between 2 and 20 letters."
-                    :success="(firstname.length >= 2 && firstname.length < 20)"
+                    :success="(userEditForm.firstname.length >= 2 && userEditForm.firstname.length < 20)"
                     class="form-control"
                     type="text"
                     label="First Name *"
@@ -16,15 +16,15 @@
           <vs-input type="text"
                     class="form-control"
                     label="Middle Name"
-                    :danger="middlename.length>20"
+                    :danger="userEditForm.middlename.length>20"
                     danger-text="Middle Name must be less than 20 characters"
-                    :success="middlename.length > 0 && middlename.length < 20"
+                    :success="userEditForm.middlename.length > 0 && userEditForm.middlename.length < 20"
                     v-model="userEditForm.middlename"/>
         </div>
         <div id="lastname">
-          <vs-input :danger="(errors.includes(lastname))"
+          <vs-input :danger="(errors.includes(userEditForm.lastname))"
                     danger-text="Last Name must be between 2 and 20 letters."
-                    :success="(lastname.length >= 2 && lastname.length < 20)"
+                    :success="(userEditForm.lastname.length >= 2 && userEditForm.lastname.length < 20)"
                     type="text"
                     class="form-control"
                     label="Last name *"
@@ -34,9 +34,9 @@
           <vs-input type="text"
                     class="form-control"
                     label="Nickname"
-                    :danger="nickname.length>20"
+                    :danger="userEditForm.nickname.length>20"
                     danger-text="Nickname must be less than 20 characters"
-                    :success="nickname.length > 0 && nickname.length < 20"
+                    :success="userEditForm.nickname.length > 0 && userEditForm.nickname.length < 20"
                     name="nickname"
                     v-model="userEditForm.nickname"/>
         </div>
@@ -44,18 +44,18 @@
           <vs-input type="email"
                     class="form-control"
                     label="Email *"
-                    :danger="errors.includes(email) && emailInUse"
+                    :danger="errors.includes(userEditForm.email) && emailInUse"
                     danger-text="Invalid email. (This email may already be in use)"
-                    :success="validEmail(email) && !emailInUse"
+                    :success="validEmail(userEditForm.email) && !emailInUse"
                     v-model="userEditForm.email"/>
         </div>
         <div id="phonenumber">
           <vs-input type="tel"
                     class="form-control"
                     label="Phone number"
-                    :danger="phonenumber.length > 0 && errors.includes(phonenumber)"
+                    :danger="userEditForm.phonenumber.length > 0 && errors.includes(userEditForm.phonenumber)"
                     danger-text="Invalid phone number."
-                    :success="validPhoneNum(phonenumber)"
+                    :success="validPhoneNum(userEditForm.phonenumber)"
                     name="phonenumber"
                     v-model="userEditForm.phonenumber"/>
         </div>
@@ -64,9 +64,9 @@
                     class="form-control"
                     name="dateofbirth"
                     v-model="userEditForm.dateofbirth"
-                    :danger="errors.includes(dateofbirth)"
+                    :danger="errors.includes(userEditForm.dateofbirth)"
                     danger-text="Enter date of birth"
-                    :success="(dateofbirth.length!==0)"
+                    :success="(userEditForm.dateofbirth.length!==0)"
                     min="1900-01-01"
                     :max="maxAllowedDoB"
                     label="Date of birth *"/>
@@ -84,9 +84,9 @@
           <vs-input type="password"
                     class="form-control"
                     label="Password *"
-                    :danger="password.length > 0 || errors.includes(password)"
+                    :danger="userEditForm.password.length > 0 || errors.includes(userEditForm.password)"
                     danger-text="Your password does not meet the requirements."
-                    :success="validPassword(password)"
+                    :success="validPassword(userEditForm.password)"
                     name="password (Required)"
                     v-model="userEditForm.password"/>
         </div>
@@ -96,7 +96,7 @@
                     label="Confirm Password *"
                     :danger="errors.includes(confirm_password)"
                     danger-text="Your password is invalid or do not match."
-                    :success="(confirm_password===password && confirm_password.length !== 0)"
+                    :success="(confirm_password===userEditForm.password && confirm_password.length !== 0)"
                     name="confirm_password (Required)"
                     v-model="confirm_password"/>
         </div>
@@ -134,7 +134,7 @@
                     @blur="suggestCountries = false;"
                     :danger="this.errors.includes('country')"
                     danger-text="Country required."
-                    :success="country.length > 0" @input="getCountriesFromPhoton()"
+                    :success="userEditForm.country.length > 0" @input="getCountriesFromPhoton()"
                     v-model="userEditForm.country"
                     class="form-control"
                     label="Country *"></vs-input>
@@ -258,45 +258,45 @@ export default {
      */
     checkForm: function () {
       this.errors = [];
-      if (this.firstname.length < 2 || this.firstname.length >= 20) {
-        this.errors.push(this.firstname);
+      if (this.userEditForm.firstname.length < 2 || this.userEditForm.firstname.length >= 20) {
+        this.errors.push(this.userEditForm.firstname);
       }
 
-      if (this.lastname.length < 2 || this.lastname.length >= 20) {
-        this.errors.push(this.lastname);
+      if (this.userEditForm.lastname.length < 2 || this.userEditForm.lastname.length >= 20) {
+        this.errors.push(this.userEditForm.lastname);
       }
 
-      if (!this.validEmail(this.email)) {
-        this.errors.push(this.email);
+      if (!this.validEmail(this.userEditForm.email)) {
+        this.errors.push(this.userEditForm.email);
       }
-      if (this.bio != null) {
-        if (this.bio.length > 40) {
+      if (this.userEditForm.bio != null) {
+        if (this.userEditForm.bio.length > 40) {
           this.errors.push(this.bio);
         }
       }
 
-      if (!this.validPassword(this.password)) {
-        this.errors.push(this.password);
+      if (!this.validPassword(this.userEditForm.password)) {
+        this.errors.push(this.userEditForm.password);
       }
 
-      if (this.confirm_password.length === 0 || this.password !== this.confirm_password) {
+      if (this.confirm_password.length === 0 || this.userEditForm.password !== this.confirm_password) {
         this.errors.push(this.confirm_password);
       }
-      if (this.dateofbirth.length === 0) {
-        this.errors.push(this.dateofbirth);
+      if (this.userEditForm.dateofbirth.length === 0) {
+        this.errors.push(this.userEditForm.dateofbirth);
       }
 
-      if (this.country.length === 0) {
+      if (this.userEditForm.country.length === 0) {
         this.errors.push('country');
       }
 
-      if (this.phonenumber !== null && this.phonenumber !== "" && !this.validPhoneNum(this.phonenumber)) {
-        this.errors.push(this.phonenumber);
+      if (this.userEditForm.phonenumber !== null && this.userEditForm.phonenumber !== "" && !this.validPhoneNum(this.userEditForm.phonenumber)) {
+        this.errors.push(this.userEditForm.phonenumber);
       }
 
       if (this.errors.length >= 1) {
         this.$vs.notify({title: 'Failed to modify', text: 'Required fields are missing.', color: 'danger'});
-        if (this.errors.includes(this.bio)) {
+        if (this.errors.includes(this.userEditForm.bio)) {
           this.$vs.notify({
             title: 'Failed to modify',
             text: 'Bio must be less that 40 characters.',
