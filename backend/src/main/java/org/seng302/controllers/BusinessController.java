@@ -395,6 +395,7 @@ public class BusinessController {
      * @return updated business object
      */
     private Business updateBusiness(NewBusinessRequest businessRequest, Business business) {
+        businessRequest.getAddress().setId(business.getAddress().getId());
         business.setBusinessType(businessRequest.getBusinessType());
         business.setAddress(businessRequest.getAddress());
         business.setName(businessRequest.getName());
