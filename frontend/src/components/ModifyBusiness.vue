@@ -133,6 +133,7 @@ export default {
         if (this.businessType === null) {
           this.businessType = this.business.businessType;
         }
+        this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
       }
     },
 
