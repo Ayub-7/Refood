@@ -402,7 +402,7 @@ describe('Listing notification functionality tests', () => {
 
         await button.trigger('click');
         expect(api.updateListingNotificationViewStatus).toBeCalled();
-    })
+    });
 
     test("Marking as read", async () => {
         await wrapper.vm.$nextTick();
@@ -414,3 +414,27 @@ describe('Listing notification functionality tests', () => {
         expect(api.updateListingNotificationViewStatus).toBeCalled();
     })
 });
+
+//
+// test all method routes to ensure properly working under all conditions
+//
+
+describe('HomePageMessages method tests', () => {
+    test("markAsRead method test, message input, return 200", async () => {
+        api.updateMessageViewStatus = jest.fn(() => {
+            return Promise.resolve({status: 200});
+        });
+
+        //notification.card (mock card)
+        listingNotifications[0].card = true;
+        wrapper.vm.markAsRead(listingNotifications[0])
+        await wrapper.vm.$nextTick();
+        expect(api.updateMessageViewStatus).toBeCalled();
+    });
+
+
+});
+
+
+
+//markAsRead test
