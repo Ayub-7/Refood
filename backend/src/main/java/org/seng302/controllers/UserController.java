@@ -145,7 +145,6 @@ public class UserController {
      */
     @PutMapping("/users/{id}")
     public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
-
         User user = userRepository.findUserById(Long.parseLong(id));
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         if (user == null) {
@@ -158,6 +157,11 @@ public class UserController {
         else {
             List<String> registrationErrors = registrationUserCheck(reqBody);
             if (registrationErrors.isEmpty()) { // No errors found.
+                if (reqBody.getNewPassword() != null
+                    || !Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect current password");
+                }
+                
                 user.setFirstName(reqBody.getFirstName());
                 user.setLastName(reqBody.getLastName());
                 user.setMiddleName(reqBody.getMiddleName());
