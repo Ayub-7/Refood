@@ -61,4 +61,18 @@ describe("Method tests", () => {
     expect(Object.keys(data).length).toBe(2);
   });
 
+  test("Correctly toggle between total sales and total value", async () => {
+    expect(wrapper.vm.toggleSales).toBe(true)
+    let button = wrapper.find("#toggle-sales")
+    button.trigger("click");
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.toggleSales).toBe(false);
+
+    const buttonSales = wrapper.find("#toggle-sales-value");
+    expect(buttonSales.exists()).toBe(true);
+
+  })
+
 });

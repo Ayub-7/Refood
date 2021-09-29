@@ -60,7 +60,8 @@
           <vs-tr :key="indextr" v-for="(tr, indextr) in data" class="data-row">
             <vs-td :data="data[indextr].firstName">{{data[indextr].firstName}}</vs-td>
             <vs-td :data="data[indextr].lastName">{{data[indextr].lastName}}</vs-td>
-            <vs-td :data="data[indextr].city">{{`${data[indextr].homeAddress.city}`}}</vs-td>
+            <vs-td :data="data[indextr].city" v-if="`${data[indextr].homeAddress.city}` === 'null'">{{ }}</vs-td>
+            <vs-td :data="data[indextr].city" v-else>{{`${data[indextr].homeAddress.city}`}}</vs-td>
             <vs-td :data="data[indextr].country" v-if="mobileMode==false">{{`${data[indextr].homeAddress.country}`}}</vs-td>
             <vs-td :data="data[indextr].email" v-if="mobileMode==false">{{data[indextr].email}}</vs-td>
             <vs-td>

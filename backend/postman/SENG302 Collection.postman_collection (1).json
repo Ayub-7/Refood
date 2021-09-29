@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b3742e01-56bf-43dc-90f6-2ed79f2855a3",
+		"_postman_id": "58c22a9e-b5a2-4d45-86d6-ad6c9f96dadb",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -238,6 +238,40 @@
 					"response": []
 				},
 				{
+					"name": "Modify Business",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Lumbridge General Store\",\r\n    \"description\": \"A one-stop shop for all your adventuring needs\",\r\n        \"address\": {\r\n        \"streetNumber\": \"3/24\",\r\n        \"streetName\": \"Ilam Road\",\r\n        \"suburb\": \"Upper Riccarton\",\r\n        \"city\": \"Christchurch\",\r\n        \"region\": \"Canterbury\",\r\n        \"country\": \"New Zealand\",\r\n        \"postcode\": \"90210\"\r\n    },\r\n    \"businessType\": \"Accommodation and Food Services\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/modify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"modify"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Find Business",
 					"request": {
 						"method": "GET",
@@ -436,8 +470,27 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Upload Image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
+				},
+				{
+					"name": "Change primary image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Users",
@@ -542,6 +595,47 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Modify User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Jeff\",\r\n  \"lastName\": \"Smith\",\r\n  \"middleName\": \"Hector\",\r\n  \"nickname\": \"Jonny\",\r\n  \"bio\": \"Likes long walks on the beach\",\r\n  \"email\": \"jsails0@go.com\",\r\n  \"dateOfBirth\": \"1999-04-27\",\r\n  \"phoneNumber\": \"+64 3 555 0129\",\r\n  \"homeAddress\": {\r\n    \"streetNumber\": \"3/24\",\r\n    \"streetName\": \"Ilam Road\",\r\n    \"suburb\": \"Upper Riccarton\",\r\n    \"city\": \"Christchurch\",\r\n    \"region\": \"Canterbury\",\r\n    \"country\": \"New Zealand\",\r\n    \"postcode\": \"90210\"\r\n  },\r\n  \"password\": \"1337-H%nt3r2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/users/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Must be logged in as the user who is about to be modified"
+					},
+					"response": []
 				}
 			]
 		},
@@ -630,7 +724,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Listings",
@@ -843,7 +938,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Products",
@@ -902,7 +998,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Cards",
@@ -1079,7 +1176,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Likes",
@@ -1135,7 +1233,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Listing Notification",
@@ -1254,7 +1353,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Notifications",
@@ -1292,7 +1392,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Wishlist",
@@ -1404,7 +1505,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
@@ -1429,9 +1531,11 @@
 	],
 	"variable": [
 		{
+			"id": "e569f71f-a3de-4ee1-9a7a-482e7d401e8e",
 			"key": "URL",
 			"value": "localhost:9499",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
