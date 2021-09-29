@@ -78,7 +78,7 @@ const BusinessImages = {
                 .then(async () => {
                     this.$emit("getBusiness");
                     this.$vs.notify({title:`Successfully Updated Primary Image`, color:'success'})
-                    location.reload();
+                    this.$emit("update");
                 })
                 .catch((error) => {
                     if (error.status !== 500) {

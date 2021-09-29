@@ -53,7 +53,14 @@ const mockBusiness = {
         "address": "123 Test Street",
         "businessType": "Accommodation and Food Services",
         "created": "2021-04-03 23:29:50",
-        "images": []
+        "primaryImagePath": "business_1/12.png",
+        "images": [
+            {
+                "name": "image1",
+                "id": "0",
+                "fileName": "business_1/12.png"
+            }
+        ]
 }
 
 const wishlist = [
@@ -94,6 +101,9 @@ api.removeBusinessFromWishlist = jest.fn().mockImplementation(() => {
 api.addBusinessToWishlist = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 201});
 });
+api.changeBusinessPrimaryImage = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200});
+})
 
 beforeEach(() => {
     wrapper = mount(Business, {
@@ -182,6 +192,27 @@ describe("Wishlist functionality tests", () => {
         await button.trigger("click");
         expect(wrapper.vm.inWishlist).toBe(true);
     });
+});
 
+describe("Business images tests", () => {
+    test("Filtered images function successfully filters out primary image", () => {
+        wrapper.vm.images.push({"fileName": "business_1/12.png"});
+        expect(wrapper.vm.images.length).toEqual(1);
+        let filteredImages = wrapper.vm.filteredImages();
+        expect(filteredImages.length).toEqual(0);
+    });
 
+    test("Filtered images function does not filter out non primary images", () => {
+        wrapper.vm.images.push({"fileName": "business_1/1234.png"})
+        wrapper.vm.images.push({"fileName": "business_1/12.png"});
+        expect(wrapper.vm.images.length).toEqual(2);
+        let filteredImages = wrapper.vm.filteredImages();
+        expect(filteredImages.length).toEqual(1);
+    });
+
+    test("Business is retrieved and updated after updating primary image", () => {
+        wrapper.vm.images = [];
+        wrapper.vm.updatePrimaryImage(1);
+        expect(wrapper.vm.business.images.length).toEqual(1);
+    })
 });
