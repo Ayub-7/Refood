@@ -133,13 +133,15 @@ export default actingAs;
 
 .acting-display {
   display: flex;
-  min-width: 150px;
+  min-width: auto;
+  margin-left: 10px;
+  margin-right: 5px;
   cursor: pointer;
 }
 
 span.user {
   font-size: 16px;
-  margin: auto 0 auto auto;
+  margin: auto auto auto auto;
   text-align: right;
 }
 
