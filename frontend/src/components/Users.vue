@@ -55,15 +55,23 @@
 
       <!-- Right Content Side -->
       <main>
-        <div class="sub-header" id="businesses-header">Businesses</div>
-        <ul id="business-list">
-          <li class="card" v-for="business in businesses" :key="business.id" v-bind:business="business" @click="goToBusinessPage(business)">
-            <div class="card-name">{{ business.name }}</div>
-            <div class="card-type">{{ business.businessType }}</div>
-            <div class="card-description">{{ business.description }}</div>
-          </li>
-        </ul>
+        <vs-tabs  alignment="fixed">
+          <vs-tab label="Businesses">
+          <div class="sub-header" id="businesses-header">Businesses</div>
+            <ul id="business-list">
+              <li class="card" v-for="business in businesses" :key="business.id" v-bind:business="business" @click="goToBusinessPage(business)">
+                <div class="card-name">{{ business.name }}</div>
+                <div class="card-type">{{ business.businessType }}</div>
+                <div class="card-description">{{ business.description }}</div>
+              </li>
+            </ul>
+          </vs-tab>
+          <vs-tab label="Images">
+            <UserImages :user="user" :primaryImage="user.primaryImagePath" :images="images"  @getUser="getUserInfo(user.id)" @update="reloadLocation"></UserImages>
+          </vs-tab>
+        </vs-tabs>
       </main>
+  
   </div>
 
     <!-- show users marketplace activity modal -->
@@ -110,12 +118,13 @@ import api from "../Api";
 import {store} from "../store";
 import MarketplaceGrid from '../components/MarketplaceGrid';
 import CardModal from "../components/CardModal";
+import UserImages from "../components/UserImages";
 const moment = require('moment');
 
 const Users = {
   name: "Profile",
   components: {
-    Modal, MarketplaceGrid, CardModal
+    Modal, MarketplaceGrid, CardModal, UserImages
   },
   data: function () {
     return {
@@ -130,6 +139,7 @@ const Users = {
       selectedBusiness: null,
       displayType: true,
       cards: [],
+      images: [],
 
       displayOptions: false,
     };
@@ -189,6 +199,13 @@ const Users = {
     },
 
     /**
+    * Reload the component
+    */
+    reloadLocation: function() {
+      location.reload();
+    },
+
+    /**
      * Called when the pop-up box has the OK button pressed. Add the user to the given business as an admin.
      */
     addUserToBusiness: function() {
@@ -242,6 +259,7 @@ const Users = {
             this.userViewingBusinesses = store.userBusinesses;
           }
           this.user = response.data;
+          this.images = this.user.images;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
         })
         .catch((err) => {

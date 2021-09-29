@@ -54,6 +54,7 @@ public class User implements Serializable {
     private Set<Image> images;
 
     private String primaryImagePath;
+    private String primaryThumbnailPath;
 
 
     protected User() {}
@@ -145,6 +146,14 @@ public class User implements Serializable {
      */
     public void addUserImage(Image image) {
         this.images.add(image);
+    }
+
+    /**
+     * Sets the path of the thumbnail of the primary image
+     * @param path The path to the image
+     */
+    public void setPrimaryThumbnailPath(String path) {
+        this.primaryThumbnailPath = path;
     }
 
     public void updatePrimaryImage(long id, String imageId, String imageExtension) {
