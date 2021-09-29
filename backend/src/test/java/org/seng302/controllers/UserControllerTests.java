@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.seng302.TestApplication;
 import org.seng302.finders.UserFinder;
 import org.seng302.models.Address;
+import org.seng302.models.Image;
 import org.seng302.models.Role;
 import org.seng302.models.User;
 import org.seng302.models.requests.LoginRequest;
@@ -58,14 +59,22 @@ class UserControllerTests {
     @MockBean
     private FileService fileService;
 
-    User user;
+    private User user;
     List<User> users;
+    private Image image1;
     MockMultipartFile userImage;
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException, IOException {
         Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        image1 = new Image("new image", "0", "../../../resources/media.images/testlettuce.jpeg", "");
+
         user = new User("John", "Smith", addr, "johnsmith99@gmail.com", "1337-H%nt3r2", Role.USER);
+        user.addUserImage(image1);
+        user.setId(1L);
+        userRepository.save(user);
+
+
         users = new ArrayList<User>();
         Address a1 = new Address("1", "Kropf Court", "Jequitinhonha", null, "Brazil", "39960-000");
         User user1 = new User("John", "Hector", "Smith", "Jonny",
@@ -77,6 +86,7 @@ class UserControllerTests {
         User user3 = new User("Oliver", "Alfred", "Smith", "Ollie",
                 "Likes long walks on the beach", "ollie69@gmail.com",
                 "1969-04-27", "+64 3 555 0129", a1, "1337-H%nt3r2");
+
         users.add(user1);
         users.add(user2);
         users.add(user3);
@@ -613,6 +623,26 @@ class UserControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    // User image tests
+    @Test
+    @WithMockUser(roles="USER")
+    void testBadImageIdSetUserImage() throws Exception {
+        // Wrong image id
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(put("/users/{id}/images/100/makeprimary", user.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testBadUserIdSetUserImage() throws Exception {
+        //wrong user id
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        mockMvc.perform(put("/users/50/images/{imageId}/makeprimary", image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user));
+    }
+
     @Test
     void testModifyUser_NotLoggedIn() throws Exception {
         Address minAddress = new Address(null, null, null, null, "Canada", null);
@@ -643,6 +673,56 @@ class UserControllerTests {
     }
 
     @Test
+    @WithMockUser(roles="USER")
+    void testForbiddenSetUserImage() throws Exception {
+        //forbidden user
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        user.addUserImage(image1);
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User forbidden = new User("test", "user", addr, "test@gmail.com", "password", Role.USER);
+        mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, forbidden))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void noAuthSetImage() throws Exception {
+    // no authentication
+    mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId()))
+            .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testSetProductImageSuccessful() throws Exception {
+        String prevPrimaryPath = user.getPrimaryImagePath();
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        user.addUserImage(image1);
+        mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isOk());
+        Assertions.assertNotEquals(prevPrimaryPath, userRepository.findUserById(user.getId()).getPrimaryImagePath());
+        Assertions.assertEquals(userRepository.findUserById(user.getId()).getPrimaryImagePath(), user.getPrimaryImagePath());
+    }
+
+    @Test
+    @WithMockUser(roles="USER")
+    void testSetProductImageDgaaSuccessful() throws Exception {
+        String prevPrimaryPath = user.getPrimaryImagePath();
+        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
+        user.addUserImage(image1);
+        // DGAA not owner of business
+        Address addr = new Address(null, null, null, null, null, "Australia", "12345");
+        User gaa = new User("test", "GAA", addr, "test@tester.com", "password", Role.GAA);
+        mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
+                .andExpect(status().isOk());
+        Assertions.assertNotEquals(prevPrimaryPath, userRepository.findUserById(user.getId()).getPrimaryImagePath());
+        Assertions.assertEquals(userRepository.findUserById(user.getId()).getPrimaryImagePath(), user.getPrimaryImagePath());
+
+    }
+
     @WithMockUser(username="johnsmith99@gmail.com", password="1337-H%nt3r2", roles="USER")
     void testModifyUser_undefinedReqBody() throws Exception {
         Address minAddress = new Address(null, null, null, null, "Canada", null);

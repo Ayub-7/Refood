@@ -26,6 +26,9 @@ public class Notification {
     @Column(name = "status")
     private NotificationStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private ViewStatus viewStatus;
+
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
@@ -41,6 +44,7 @@ public class Notification {
         this.title = title;
         this.displayPeriodEnd = displayPeriodEnd;
         this.status = NotificationStatus.EXPIRED;
+        this.viewStatus = ViewStatus.UNREAD;
         this.created = new Date();
     }
 
