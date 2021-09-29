@@ -131,12 +131,20 @@ export default {
     postBusinessImage: (id, image) => instance.post(`businesses/${id}/images`, image, {headers: {'Content-Type': 'multipart/form-data'}, withCredentials: true,}),
 
     /**
-     * Update the primary iamge of a business, send a put request
+     * Update the primary image of a business, send a put request
      * @param businessId ID of the business
      * @param imageId Id of the image
      * @returns {Promise<AxiosResponse<any>>} Relevant status code
      */
     changeBusinessPrimaryImage: (businessId, imageId) => instance.put(`businesses/${businessId}/images/${imageId}/makeprimary`, {}, {withCredentials: true}),
+
+    /**
+     * Delete the business image
+     * @param businessId Id of the business whos image is deleted
+     * @param imageId id of the image to delete
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteBusinessImage: (businessId, imageId) => instance.delete(`/businesses/${businessId}/images/${imageId}`, {withCredentials: true}),
 
     // ------ BUSINESSES
 

@@ -78,6 +78,7 @@ const BusinessImages = {
                 .then(async () => {
                     this.$emit("getBusiness");
                     this.$vs.notify({title:`Successfully Updated Primary Image`, color:'success'})
+                    location.reload();
                 })
                 .catch((error) => {
                     if (error.status !== 500) {
@@ -93,7 +94,18 @@ const BusinessImages = {
          * @param imageId
          */
         deleteImage(imageId) {
-            console.log(imageId);
+            api.deleteBusinessImage(this.business.id, imageId)
+                .then(() => {
+                    this.$emit('getBusiness');
+                    this.$vs.notify({title:`Image Has Been Successfully Removed`, color:'success'})
+                })
+                .catch((error) => {
+                    if (error.status !== 500) {
+                        this.$vs.notify({title:`Failed To Remove Image`, text: 'Error'+error, color:'danger'});
+                    } else if (error.status === 500) {
+                        this.$vs.notify({title:`Failed To Remove Image`, text: 'There was a problem with the server.', color:'danger'});
+                    }
+                });
         }
     },
 }

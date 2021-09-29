@@ -119,7 +119,7 @@ public class Business implements Serializable {
     }
 
     /**
-     * Removee the image from the images list for the business.
+     * Remove the image from the images list for the business and update the primary image if needed.
      * @param imageId Id of the image to remove
      */
     public void deleteBusinessImage(String imageId) {
@@ -132,5 +132,10 @@ public class Business implements Serializable {
             }
         }
         assert removeImage != null;
+        String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("business_"));
+        if ((primaryPath.equals(this.primaryImagePath.replace("/", "\\")) && System.getProperty("os.name").startsWith("Windows")) || primaryPath.equals(this.primaryImagePath)) {
+            this.primaryThumbnailPath = null;
+            this.primaryImagePath = null;
+        }
     }
 }
