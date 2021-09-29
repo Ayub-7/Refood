@@ -668,16 +668,20 @@ class UserControllerTests {
     @Test
     @WithMockUser(roles="USER")
     void testSetProductImageSuccessful() throws Exception {
+        String prevPrimaryPath = user.getPrimaryImagePath();
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         user.addUserImage(image1);
         mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
                 .andExpect(status().isOk());
+        Assertions.assertNotEquals(prevPrimaryPath, userRepository.findUserById(user.getId()).getPrimaryImagePath());
+        Assertions.assertEquals(userRepository.findUserById(user.getId()).getPrimaryImagePath(), user.getPrimaryImagePath());
     }
 
     @Test
     @WithMockUser(roles="USER")
     void testSetProductImageDgaaSuccessful() throws Exception {
+        String prevPrimaryPath = user.getPrimaryImagePath();
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         user.addUserImage(image1);
         // DGAA not owner of business
@@ -686,5 +690,7 @@ class UserControllerTests {
         mockMvc.perform(put("/users/{id}/images/{imageId}/makeprimary", user.getId(), image1.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, gaa))
                 .andExpect(status().isOk());
+        Assertions.assertNotEquals(prevPrimaryPath, userRepository.findUserById(user.getId()).getPrimaryImagePath());
+        Assertions.assertEquals(userRepository.findUserById(user.getId()).getPrimaryImagePath(), user.getPrimaryImagePath());
     }
 }

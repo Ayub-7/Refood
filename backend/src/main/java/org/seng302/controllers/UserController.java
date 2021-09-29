@@ -371,6 +371,7 @@ public class UserController {
      * Sets the primary image for a user from a previously saved image.
      * @param id unique identifier of the user that the image is relating to.
      * @param imageId a multipart image of the file
+     * @param session Current user session
      * @return ResponseEntity with the appropriate status codes - 200, 401, 403, 406.
      */
     @PutMapping("/users/{id}/images/{imageId}/makeprimary")
