@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "c6228287-d70e-411e-a55a-b6aecb57dbe8",
-		"name": "SENG302 Collection Copy",
+		"_postman_id": "58c22a9e-b5a2-4d45-86d6-ad6c9f96dadb",
+		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -238,6 +238,40 @@
 					"response": []
 				},
 				{
+					"name": "Modify Business",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Lumbridge General Store\",\r\n    \"description\": \"A one-stop shop for all your adventuring needs\",\r\n        \"address\": {\r\n        \"streetNumber\": \"3/24\",\r\n        \"streetName\": \"Ilam Road\",\r\n        \"suburb\": \"Upper Riccarton\",\r\n        \"city\": \"Christchurch\",\r\n        \"region\": \"Canterbury\",\r\n        \"country\": \"New Zealand\",\r\n        \"postcode\": \"90210\"\r\n    },\r\n    \"businessType\": \"Accommodation and Food Services\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/modify",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"modify"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Find Business",
 					"request": {
 						"method": "GET",
@@ -436,8 +470,27 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Upload Image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
+				},
+				{
+					"name": "Change primary image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Users",
@@ -671,7 +724,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Listings",
@@ -884,7 +938,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Products",
@@ -943,7 +998,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Cards",
@@ -1120,7 +1176,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Likes",
@@ -1176,7 +1233,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Listing Notification",
@@ -1295,7 +1353,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Notifications",
@@ -1332,33 +1391,9 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Delete extend card notification",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{URL}}/notifications/extenddisplayperiod/:cardId",
-							"host": [
-								"{{URL}}"
-							],
-							"path": [
-								"notifications",
-								"extenddisplayperiod",
-								":cardId"
-							],
-							"variable": [
-								{
-									"key": "cardId",
-									"value": "1291"
-								}
-							]
-						}
-					},
-					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Wishlist",
@@ -1470,7 +1505,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
@@ -1495,9 +1531,11 @@
 	],
 	"variable": [
 		{
+			"id": "e569f71f-a3de-4ee1-9a7a-482e7d401e8e",
 			"key": "URL",
 			"value": "localhost:9499",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

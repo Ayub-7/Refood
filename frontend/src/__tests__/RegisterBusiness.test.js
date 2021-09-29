@@ -53,7 +53,6 @@ const mockUser = {
 const $router = {
     push: jest.fn()
 }
-const checkAgeMethod = jest.spyOn(Business.methods, 'checkAge');
 beforeEach(() => {
     wrapper = mount(Business, {
         propsData: {},
@@ -129,10 +128,31 @@ describe('Business Register error checking', () => {
         registerBtn.trigger('click');
         expect(wrapper.vm.errors.length).toBe(3);
     })
+
+    test('Handles young users', () => {
+        wrapper.vm.businessName = 'bestBusiness';
+        wrapper.vm.businessType = 'Charitable Organisation';
+        const registerBtn = wrapper.find('.register-button')
+        registerBtn.trigger('click');
+        expect(wrapper.vm.errors.length).toBe(1);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    })
+
+
+    test('Handles long descriptions', () => {
+        wrapper.vm.businessName = 'bestBusiness';
+        wrapper.vm.businessType = 'Charitable Organisation';
+        wrapper.vm.store.userDateOfBirth = "1990-01-01"
+        wrapper.vm.description = 'EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE';
+        const registerBtn = wrapper.find('.register-button')
+        registerBtn.trigger('click');
+        expect(wrapper.vm.errors.includes("description")).toBe(true);
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    })
 });
 
 describe('Business Register user age checking', () => {
-    test('Handles to young user', () => {
+    test('Handles too young user', () => {
         wrapper.vm.store.userDateOfBirth = "2010-01-01"
         const registerBtn = wrapper.find('.register-button')
         registerBtn.trigger('click');
@@ -157,22 +177,26 @@ describe('Business registration method checking', () => {
 describe('Checking valid age to register a business', () => {
     test("Test empty date of birth", () => {
         wrapper.vm.store.userDateOfBirth = "";
-        expect(wrapper.vm.checkAge()).toBe(false);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(true);
     });
 
     test("Test successful age older than 16", () => {
         wrapper.vm.store.userDateOfBirth = "1980-01-01";
-        expect(wrapper.vm.checkAge()).toBe(true);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(false);
     });
 
     test("Test unsuccessful age younger than 16", () => {
         wrapper.vm.store.userDateOfBirth = "2020-01-01";
-        expect(wrapper.vm.checkAge("2020-01-01")).toBe(false);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(true);
     });
 
     test("Test date of birth of now to be invalid", () => {
         wrapper.vm.store.userDateOfBirth = Date.now().toString();
-        expect(wrapper.vm.checkAge()).toBe(false);
+        wrapper.vm.checkForm();
+        expect(wrapper.vm.errors.includes('dob')).toBe(true);
     });
 });
 

@@ -10,9 +10,7 @@ import org.seng302.utilities.Encrypter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Getter @Setter // generate setters and getters for all fields (lombok pre-processor)
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
@@ -53,7 +51,7 @@ public class User implements Serializable {
     private List<Business> businessesAdministered;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Image> images;
+    private Set<Image> images;
 
     private String primaryImagePath;
 
@@ -86,7 +84,7 @@ public class User implements Serializable {
         this.password = Encrypter.hashString(password);
         this.created = new Date();
         this.role = Role.USER;
-        this.images = new ArrayList<>();
+        this.images = new HashSet<>();
         this.primaryImagePath = null;
     }
 
@@ -106,7 +104,7 @@ public class User implements Serializable {
         this.phoneNumber = req.getPhoneNumber();
         this.homeAddress = req.getHomeAddress();
         this.password = req.getPassword();
-        this.images = new ArrayList<>();
+        this.images = new HashSet<>();
         this.primaryImagePath = null;
         newRegistration();
     }
@@ -128,7 +126,7 @@ public class User implements Serializable {
         this.role = role;
         this.created = new Date();
         this.password = Encrypter.hashString(password);
-        this.images = new ArrayList<>();
+        this.images = new HashSet<>();
         this.primaryImagePath = null;
     }
 

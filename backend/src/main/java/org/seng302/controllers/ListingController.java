@@ -85,8 +85,19 @@ public class ListingController {
      * Constructor used for cucumber testing.
      * @param listingRepository repository for listings
      */
-    public ListingController(ListingRepository listingRepository, ObjectMapper mapper) {
+    public ListingController(ListingRepository listingRepository, BusinessRepository businessRepository,
+                             UserRepository userRepository, InventoryRepository inventoryRepository,
+                             ListingLikeRepository listingLikeRepository, BoughtListingRepository boughtListingRepository,
+                             ListingNotificationRepository listingNotificationRepository, WishlistItemRepository wishlistItemRepository,
+                             ObjectMapper mapper) {
         this.listingRepository = listingRepository;
+        this.businessRepository = businessRepository;
+        this.userRepository = userRepository;
+        this.inventoryRepository = inventoryRepository;
+        this.listingLikeRepository = listingLikeRepository;
+        this.boughtListingRepository = boughtListingRepository;
+        this.listingNotificationRepository = listingNotificationRepository;
+        this.wishlistItemRepository = wishlistItemRepository;
         this.mapper = mapper;
     }
 

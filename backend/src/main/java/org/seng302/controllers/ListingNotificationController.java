@@ -1,6 +1,7 @@
 package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
 import org.seng302.models.requests.UpdateNotificationViewStatusRequest;
 import org.seng302.repositories.*;
@@ -40,6 +41,19 @@ public class ListingNotificationController {
     @Autowired
     private ProductRepository productRepository;
 
+
+    public ListingNotificationController(ListingRepository listingRepository, BusinessRepository businessRepository,
+                             UserRepository userRepository, ListingLikeRepository listingLikeRepository,
+                             BoughtListingRepository boughtListingRepository, ListingNotificationRepository listingNotificationRepository) {
+        this.listingRepository = listingRepository;
+        this.businessRepository = businessRepository;
+        this.userRepository = userRepository;
+        this.listingLikeRepository = listingLikeRepository;
+        this.boughtListingRepository = boughtListingRepository;
+        this.listingNotificationRepository = listingNotificationRepository;
+    }
+
+
     /**
      * Endpoint for creating a notification for a listing that's just been purchased.
      * @param listingId ID of the listing
@@ -61,7 +75,10 @@ public class ListingNotificationController {
         Business business = businessRepository.findBusinessById(boughtListing.getProduct().getBusinessId());
         List<ListingLike> userLikes = listingLikeRepository.findListingLikeByListingId(listingId);
         List<User> receivers = userLikes.stream().map(ListingLike::getUser).collect(Collectors.toList());
+
         for (User receiver : receivers) {
+            System.out.println(receiver.getId());
+
             if (receiver.getId() != currentUser.getId()) {
                 ListingNotification listingNotification = new ListingNotification(receiver, boughtListing, status);
                 listingNotificationRepository.save(listingNotification);

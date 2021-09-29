@@ -22,6 +22,7 @@
             <vs-button class="left-nav-item" id="bus-profile-btn" @click.native='goToProfile()'>Business Profile</vs-button>
             <vs-button class="left-nav-item" id="bus-catalogue-btn" @click.native='goToProductCatalogue()'>Product Catalogue</vs-button>
             <vs-button class="left-nav-item" @click.native='goToSalesHistory()'>Sales History</vs-button>
+            <vs-button class="left-nav-item" :to="'/businesses/'+getBusinessId()+'/modify'">Modify {{getBusinessName()}}</vs-button>
           </div>
           </div>
           <div class="userinfo-container" v-else>
@@ -36,7 +37,7 @@
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
           <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
-            <vs-tabs>
+            <vs-tabs alignment="fixed">
               <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
               <vs-tab id="wishlist-tab" @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
             </vs-tabs>
@@ -242,7 +243,7 @@ const Homepage = {
      * @param country country for which currency is going to be retrieved
      */
     setCurrency(country) {
-      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+      axios.get(`https://restcountries.com/v2/name/${country}`)
         .then(response => {
           this.currencySymbol = response.data[0].currencies[0].symbol;
         })
@@ -784,8 +785,6 @@ export default Homepage;
 
 .watchlist-title {
   font-size: 18px;
-  margin: auto auto auto 2px;
-  transition: 0.3s;
 }
 
 /* News feed styles. */
