@@ -1,12 +1,18 @@
 <template>
 
   <div>
-    <div v-if="isBusiness" class="businessImage" style="height: 50px;display: flex; overflow: hidden; justify-content: center; position: relative">
+    <div v-if="isThumbnail" class="businessImage" style="height: 25px; width: 33.33px; display: flex; overflow: hidden; justify-content: center; position: relative; border-radius: 50%">
+      <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/business_images/' + getImgUrl(this.imagePath))" alt="Business thumbnail"/>
+      <img v-else-if="this.imagePath != null && !isDevelopment()" v-bind:src="getImgUrl(this.imagePath)" alt="Business thumbnail"/>
+      <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Business thumbnail"/>
+      <img v-else-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="Business thumbnail"/>
+    </div>
+    <div v-else-if="isBusiness" class="businessImage" style="display: flex; overflow: hidden; justify-content: center; position: relative">
       <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/business_images/' + getImgUrl(this.imagePath))" alt="Business image"/>
       <img v-else-if="this.imagePath != null && !isDevelopment()" alt="Business Image" v-bind:src="getImgUrl(this.imagePath)"/>
       <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Business image"/>
       <img v-else-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="Business image"/>
-      <vs-dropdown v-if="!isThumbnail" class="edit-button" vs-trigger-click>
+      <vs-dropdown class="edit-button" vs-trigger-click>
         <vs-icon icon="edit" color="black" size="50px" name="avatar"></vs-icon>
         <vs-dropdown-menu id="dropdown">
           <vs-dropdown-item v-if="imagePath !== primaryImagePath" @click="emitUpdatePrimary" class="profileDropdown">
@@ -61,7 +67,7 @@ export default {
      */
     getPathStart() {
       let pathStart;
-      if (this.isBusiness) {
+      if (this.isBusiness || this.isThumbnail) {
         if (process.env.NODE_ENV === 'staging') {
           pathStart = '/test/business_images/';
         } else {
