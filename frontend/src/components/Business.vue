@@ -68,7 +68,7 @@
             <BusinessAdministrators :admins="adminList" :pAdminId="business.primaryAdministratorId"/>
           </vs-tab>
           <vs-tab class="business-nav-item" label="Images">
-            <BusinessImages v-on:update="reloadLocation" :images="images" :primaryImagePath="business.primaryImagePath" :business="business"></BusinessImages>
+            <BusinessImages v-on:getBusiness="getBusiness" v-on:update="reloadLocation" :images="images" :primaryImagePath="business.primaryImagePath" :business="business"></BusinessImages>
           </vs-tab>
         </vs-tabs>
       </main>
@@ -185,7 +185,7 @@ const Business = {
      * Reload the component
      */
     reloadLocation: function() {
-      //location.reload();
+      location.reload();
     },
 
     /**
@@ -353,7 +353,7 @@ export default Business;
   grid-row: 1;
 
   display: grid;
-  grid-template-columns: 2fr 1fr 2fr;
+  grid-template-columns: 2.5fr 1fr 1.5fr;
   grid-template-rows: auto auto;
   text-align: center;
   background-color: transparent;
@@ -385,6 +385,7 @@ export default Business;
   grid-row: 1 / 3;
   margin-left: auto;
   justify-content: flex-end;
+  margin-right: 20px;
 }
 
 .profileDropdown >>> .vs-dropdown--item-link {

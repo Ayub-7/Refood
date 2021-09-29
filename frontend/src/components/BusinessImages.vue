@@ -54,7 +54,7 @@ const BusinessImages = {
                 fd.append('filename', image, image.name);
                 await api.postBusinessImage(this.business.id, fd)
                     .then(() => { //On success
-                        location.reload();
+                        this.$emit("getBusiness");
                     })
                     .catch((error) => { //On fail
                         if (error.response.status === 400) {
@@ -76,7 +76,8 @@ const BusinessImages = {
         updatePrimaryImage: function(imageId) {
             api.changeBusinessPrimaryImage(this.business.id, imageId)
                 .then(async () => {
-                    this.$emit("update");
+                    this.$emit("getBusiness");
+                    this.$vs.notify({title:`Successfully Updated Primary Image`, color:'success'})
                 })
                 .catch((error) => {
                     if (error.status !== 500) {
