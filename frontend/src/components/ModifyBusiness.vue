@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h3 class="card-header">Create a ReFood Business Account</h3>
+    <h3 class="card-header">Modify your business' details</h3>
     <form autocomplete="off">
       <vs-input id="business-name"
                 :danger="this.errors.includes('businessName')"
@@ -55,18 +55,16 @@
         </div>
       </div>
 
-      <vs-button class="register-button" @click="checkForm(); createBusinessInfo()">Register</vs-button>
+      <vs-button class="modify-button" @click="checkForm()">Modify</vs-button>
     </form>
   </div>
 </template>
 
 <script>
 import api from "../Api";
-import {mutations, store} from "../store";
 import BusinessCommon from "./BusinessCommon";
-
-const BusinessRegister = {
-  name: "BusinessRegister",
+export default {
+  name: "ModifyBusiness",
   data: function () {
     return {
       availableBusinessTypes: [],
@@ -90,95 +88,62 @@ const BusinessRegister = {
       suggestCountries: false,
       suggestedCountries: [],
       minNumberOfCharacters: 3,
-      user: null
+      business: null
     };
   },
-  methods:{
+  methods: {
+
     /**
-     * The function checks the inputs of the registration form to ensure they are in the right format.
-     * Pushes name of error into an array, and display notification have errors exist.
+     * Method for checking the form is compliant for modifying businesses
      */
-    checkForm: function () {
-      this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
-      if (this.errors.length >= 1) {
-        if(this.errors.includes("dob") && this.errors.length === 1){
-          this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
-        } else if (this.errors.includes('description')) {
-          this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
-          this.$vs.notify({
-            title: 'Failed to create business',
-            text: 'description must be less that 140 characters.',
-            color: 'danger'
-          });
+    checkForm: function() {
+      if (this.businessName.length === 0 && this.streetNumber.length === 0 &&
+          this.streetAddress.length === 0 && this.suburb.length === 0 &&
+          this.postcode.length === 0 && this.city.length === 0 &&
+          this.region.length === 0 && this.country.length === 0 &&
+          this.description.length === 0 && this.businessType === null) {
+        this.$vs.notify({title:'Cannot modify business', text:'Required fields are missing.', color:'danger'});
+      } else {
+        if (this.businessName.length === 0) {
+          this.businessName = this.business.name;
+        }
+        if (this.streetAddress === null || this.streetAddress.length === 0) {
+          this.streetAddress = this.business.address.streetName;
+        }
+        if (this.streetNumber.length === 0) {
+          this.streetNumber = this.business.address.streetNumber;
+        }
+        if (this.suburb === null || this.suburb.length === 0) {
+          this.suburb = this.business.address.suburb;
+        }
+        if (this.postcode === null || this.postcode.length === 0) {
+          this.postcode = this.business.address.postcode;
+        }
+        if (this.region === null || this.region.length === 0) {
+          this.region = this.business.address.region;
+        }
+        if (this.city === null || this.city.length === 0) {
+          this.city = this.business.address.city;
+        }
+        if (this.country.length === 0) {
+          this.country = this.business.address.country;
+        }
+        if (this.description.length === 0) {
+          this.description = this.business.description;
+        }
+        if (this.businessType === null) {
+          this.businessType = this.business.businessType;
+        }
+        this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
+        if (this.errors.length === 0) {
+          this.$vs.notify({title:'Success', text:'The business have been successfully modified!', color:'success'});
         } else {
-          this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
+          for (let i = 0; i < this.errors.length; i++) {
+            this.$vs.notify({title:'Error', text:this.errors[i], color:'danger'});
+
+          }
         }
       }
-    },
-    /**
-     * Creates a POST request when user submits form, using the createUser function from Api.js
-     */
-    createBusinessInfo: function() {
-      // Use createUser function of API to POST user data to backend
-      if(this.errors.length === 0) {
-        let businessAddress = {
-          streetNumber: this.streetNumber,
-          streetName: this.streetAddress,
-          suburb: this.suburb,
-          city: this.city,
-          region: this.region,
-          country: this.country,
-          postcode: this.postcode,
-        };
-
-        api.createBusiness(this.businessName, this.description, businessAddress, this.businessType)
-          .then((response) => {
-            api.actAsBusiness(response.data.businessId)
-              .then((busResponse) => {
-                this.$log.debug("New business created:", busResponse.data);
-                mutations.setActingAsBusiness(response.data.businessId, this.businessName);
-                this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
-              })
-              .catch((error) => {
-                this.$log.debug(error.response.message);
-              });
-          })
-          .catch((error) => {
-            if(error.response) {
-              this.$log.debug(error.response.status);
-              this.$log.debug(error.response.message);
-              this.errors.push("Access token is missing/invalid");
-            }
-            this.$log.debug("Error Status:", error)
-          });
-      }},
-
-    /**
-     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest countries
-     */
-    getCountries: async function() {
-      let data = await BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
-      this.suggestCountries = data['0'];
-      this.suggestedCountries = data['1'];
-    },
-
-    /**
-     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest cities
-     */
-    getCities: async function() {
-      let data = await BusinessCommon.getCitiesFromPhoton(this.city, this.minNumberOfCharacters);
-      console.log(data)
-      this.suggestCities = data['0'];
-      this.suggestedCities = data['1'];
-    },
-
-    /**
-     * Set the city as the new city.
-     * @param selectedCity string to set as the new city.
-     */
-    setCity: function(selectedCity) {
-      this.city = selectedCity;
-      this.suggestCities = false;
     },
 
     /**
@@ -200,6 +165,33 @@ const BusinessRegister = {
     },
 
     /**
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest countries
+     */
+    getCountries: async function() {
+      let data = await BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
+      this.suggestCountries = data['0'];
+      this.suggestedCountries = data['1'];
+    },
+
+    /**
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest cities
+     */
+    getCities: async function() {
+      let data = await BusinessCommon.getCitiesFromPhoton(this.city, this.minNumberOfCharacters);
+      this.suggestCities = data['0'];
+      this.suggestedCities = data['1'];
+    },
+
+    /**
+     * Set the city as the new city.
+     * @param selectedCity string to set as the new city.
+     */
+    setCity: function(selectedCity) {
+      this.city = selectedCity;
+      this.suggestCities = false;
+    },
+
+    /**
      * Set the country as the new country.
      * @param selectedCountry the country string to set as.
      */
@@ -207,44 +199,18 @@ const BusinessRegister = {
       this.country = selectedCountry;
       this.suggestCountries = false;
     },
-
-    getUserInfo: function (userId) {
-      api.getUserFromID(userId)
-          .then((response) => {
-            this.user = response.data;
-          }).catch((err) => {
-        if (err.response.status === 401) {
-          this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-          this.$router.push({name: 'LoginPage'});
-        } else {
-          this.$log.error(err);
-        }
-
-      });
-    },
-
-    checkLoggedIn: function() {
-      if (store.loggedInUserId == null) {
-        this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
-        this.$router.push({name: 'LoginPage'});
-      }
-    },
   },
-
-  mounted: function () {
-    api.checkSession()
-        .then((response) => {
-          this.getUserInfo(response.data.id);
-        }).catch(() => {
-      this.$vs.notify({title:'Error', text:'ERROR trying to obtain user info from session:', color:'danger'});
-    });
+  mounted: async function () {
+    await api.getBusinessFromId(this.$route.params.id)
+        .then((res) => {
+          this.business = res.data;
+        })
+        .catch((error) => {
+          this.$log.error(error);
+        })
     this.getBusinessTypes();
-  }
-
-
+  },
 }
-export default BusinessRegister;
-
 </script>
 
 <style scoped>
@@ -277,7 +243,7 @@ export default BusinessRegister;
   margin: auto auto 0.5em auto;
 }
 
-.register-button {
+.modify-button {
   margin: 1em auto;
   width: 150px;
 }

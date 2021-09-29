@@ -1,6 +1,0 @@
-projectKey=team-900-client
-serverUrl=https://csse-s302g9.canterbury.ac.nz/sonarqube
-serverVersion=8.6.0.39681
-dashboardUrl=https://csse-s302g9.canterbury.ac.nz/sonarqube/dashboard?id=team-900-client
-ceTaskId=AXwNHBHUIilSC5Uz-pPl
-ceTaskUrl=https://csse-s302g9.canterbury.ac.nz/sonarqube/api/ce/task?id=AXwNHBHUIilSC5Uz-pPl
