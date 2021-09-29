@@ -37,6 +37,7 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +71,7 @@ class BusinessControllerTests {
     User user;
     Business business;
     MockMultipartFile businessImage;
+    Image image1;
 
     @BeforeEach
     public void setup() throws NoSuchAlgorithmException, IOException {
@@ -91,6 +93,8 @@ class BusinessControllerTests {
         assertThat(data).exists();
         byte[] bytes = FileCopyUtils.copyToByteArray(data);
         businessImage = new MockMultipartFile("filename", "test.jpg", MediaType.IMAGE_JPEG_VALUE, bytes);
+        image1 = new Image("test", "0", "fakepath", "fakethumbnailpath");
+        business.addBusinessImage(image1);
     }
 
     @Test
@@ -912,5 +916,32 @@ class BusinessControllerTests {
         Assertions.assertNotEquals(testBusiness.getDescription(), business.getDescription());
         Assertions.assertNotEquals(testBusiness.getBusinessType(), business.getBusinessType());
         Assertions.assertNotEquals(testBusiness.getAddress(), business.getAddress());
+    }
+
+    @Test
+    @WithMockUser
+    void removeBusinessImageBadImageId() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(delete("/businesses/{businessId}/images/{imageId}/", business.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void removeBusinessImageBadBusinessId() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(null);
+        mvc.perform(delete("/businesses/{businessId}/images/{imageId}/", business.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void removeBusinessImageWrongUser() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(delete("/businesses/{businessId}/images/{imageId}/", business.getId(), image1.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isForbidden());
     }
 }
