@@ -1,8 +1,11 @@
 <template>
-  <div id="main">
-
-    <p id="sign">Sign In</p>
-    <form>
+  <div>
+    <div id="logo-container">
+      <img src="refood-logo-2.png" id="logo"/>
+    </div>
+    <div id="main">
+      <p id="sign">Sign In</p>
+      <form>
         <vs-input class="form-control"
                   id="email" type="text"
                   v-model="email"
@@ -19,8 +22,8 @@
                   required></vs-input>
 
         <vs-button class="loginButton" @click="checkForm(); loginSubmit()">Sign in</vs-button>
-    </form>
-
+      </form>
+    </div>
   </div>
 </template>
 
@@ -165,5 +168,9 @@ form {
   margin: 0 0 2em 0;
 }
 
+#logo-container {
+  display: flex;
+  justify-content: center;
+}
 
 </style>

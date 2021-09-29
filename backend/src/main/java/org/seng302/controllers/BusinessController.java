@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.seng302.exceptions.InvalidImageExtensionException;
 import org.seng302.finders.BusinessFinder;
 import org.seng302.models.*;
 import org.seng302.models.responses.BusinessIdResponse;
@@ -13,7 +14,9 @@ import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.repositories.BoughtListingRepository;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
+import org.seng302.utilities.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,12 +25,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +58,12 @@ public class BusinessController {
 
     @Autowired
     private BusinessFinder businessFinder;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${media.image.business_images.directory}")
+    private String rootImageDir;
 
     /**
      * Get request mapping for getting business by id
@@ -208,7 +221,7 @@ public class BusinessController {
 
     /**
      * Creates a sort object to be used by pageRequest to sort search results.
-     * @param sortString
+     * @param sortString string determining the sort type
      * @return Sort sortBy Sort specification
      * @throws ResponseStatusException
      */
@@ -287,7 +300,7 @@ public class BusinessController {
         logger.debug("Removing businessesAdministered...");
         if (businesses != null) {
             for(Business business: businesses) {
-                List<User> admins = business.getAdministrators();
+                Set<User> admins = business.getAdministrators();
                 for(User admin: admins) {
                     admin.setBusinessesAdministered(null);
                 }
@@ -348,5 +361,249 @@ public class BusinessController {
         List<BoughtListing> sales = boughtListingRepository.findBoughtListingsByBusinessId(id);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(sales));
     }
+
+    /**
+     * Receives and saves a new image pertaining to a business
+     * @param businessId business' Id
+     * @param image multipart image
+     * @param session user's session
+     * @return 201 if successful, 400 if bad request, 401 if not logged in, 403 if user doesn't have permission,
+     *         406 if path is invalid (bad business Id)
+     * @throws InvalidImageExtensionException when file writing fails
+     * @throws IOException other input/output exceptions (fileService)
+     */
+    @PostMapping("/businesses/{businessId}/images")
+    public ResponseEntity<String> addBusinessImage(@PathVariable long businessId,
+                                                   @RequestPart(name="filename") MultipartFile image,
+                                                   HttpSession session)
+            throws InvalidImageExtensionException, IOException {
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Business business = businessRepository.findBusinessById(businessId);
+        if (business == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        String imageExtension;
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied");
+        }
+        try {
+            imageExtension = Image.getContentTypeExtension(Objects.requireNonNull(image.getContentType()));
+        } catch (InvalidImageExtensionException exception) {
+            throw new InvalidImageExtensionException(exception.getMessage());
+        }
+
+        File businessDir = new File(String.format("%sbusiness_%d", rootImageDir, businessId));
+        if (businessDir.mkdirs()) {
+            logger.info(String.format("Image of business directory did not exist - new directory created of %s", businessDir.getPath()));
+        }
+
+        String id = "";
+        boolean freeImage = false;
+        int count = 0;
+
+        while (!freeImage) {
+            id = String.valueOf(count);
+            File checkFile1 = new File(String.format("%s/%s.jpg", businessDir, id));
+            File checkFile2 = new File(String.format("%s/%s.png", businessDir, id));
+            File checkFile3 = new File(String.format("%s/%s.gif", businessDir, id));
+            if (checkFile1.exists() || checkFile2.exists() || checkFile3.exists()) {
+                count++;
+            }
+            else {
+                freeImage = true;
+            }
+        }
+
+        File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
+        File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
+        logger.info("Working Directory = " + System.getProperty("user.dir"));
+        logger.info(file.getAbsolutePath());
+        fileService.uploadImage(file, image.getBytes());
+        fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
+        String imageName = image.getOriginalFilename();
+        // Save into DB.
+        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
+        business.addBusinessImage(newImage);
+        if (business.getPrimaryImagePath() == null) {
+            if (System.getProperty("os.name").startsWith("windows")) {
+                business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, id, imageExtension));
+            } else {
+                business.setPrimaryImage(String.format("business_%d/%s%s", businessId, id, imageExtension));
+            }
+        }
+        businessRepository.save(business);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+    /**
+     * PUT request for updating business image
+     * @param businessId id of business that is going to be updated
+     * @param imageId id of image that is going to be set to primary
+     * @param session session of user, used to check if user is admin
+     * @return 200 is updated, 401 no auth, 403 if not admin, 406 if image of business doesn't exist
+     */
+    @PutMapping("/businesses/{businessId}/images/{imageId}/makeprimary")
+    public ResponseEntity<String> changePrimaryImage(@PathVariable long businessId, @PathVariable String imageId, HttpSession session) {
+        Business business = businessRepository.findBusinessById(businessId);
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if (business == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        //Check there is an image match
+        boolean validImage = business.getImages().stream().anyMatch(image -> imageId.equals(image.getId()));
+
+        if(!validImage) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+
+        String extension = getExtension(businessId, imageId);
+        business = setBusinessImage(business, businessId, imageId, extension);
+        businessRepository.save(business);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Sets primary image of business to image path
+     * @param businessId id of business, used in path
+     * @param imageId id of image, used in image path
+     * @param business business object, used to update primary image
+     * @param extension extension of image, used in image path
+     * @return business with primary image updated
+     */
+    private Business setBusinessImage(Business business, long businessId, String imageId, String extension) {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, imageId, extension));
+        } else {
+            business.setPrimaryImage(String.format("business_%d/%s%s", businessId, imageId, extension));
+        }
+
+        return business;
+    }
+
+    /**
+     * Gets extension of image by finding file that matches path with extension
+     * @param businessId id of business used to find extension from image path
+     * @param imageId id of image used to find extension from image path
+     * @return Value of extension for image
+     */
+    private String getExtension(long businessId, String imageId) {
+        String imageDir = rootImageDir + "/business_" + businessId + "/" + imageId;
+        String extension = "";
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext : extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                extension = ext;
+                break;
+            }
+        }
+
+        return extension;
+    }
+
+
+    /**
+     * Updates business
+     * @param id id of the business
+     * @param session Http session to get user session
+     * @return Response entity,
+     *         200 if successfully update
+     *         400 Error with given data
+     *         401 Missing auth token
+     *         403 if trying to modify business that isn't yours
+     *         406 if trying to access business that doesn't exist
+     */
+    @PutMapping("/businesses/{id}/modify")
+    public ResponseEntity<String> modifyBusiness(@RequestBody NewBusinessRequest request, @PathVariable long id, HttpSession session) {
+        Business business = businessRepository.findBusinessById(id);
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if(checkBusinessRequest(request)) { // If valid -> description < 140 & name < 30
+            if (business == null) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            }
+
+            ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+            if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            business = updateBusiness(request, business);
+            businessRepository.save(business);
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+
+    }
+
+
+    /**
+     * Updates business object to contain new data from request, used in modify business.
+     * @param businessRequest request containing new business information
+     * @param business the business that is going to be updated
+     * @return updated business object
+     */
+    private Business updateBusiness(NewBusinessRequest businessRequest, Business business) {
+        businessRequest.getAddress().setId(business.getAddress().getId());
+        business.setBusinessType(businessRequest.getBusinessType());
+        business.setAddress(businessRequest.getAddress());
+        business.setName(businessRequest.getName());
+        business.setDescription(businessRequest.getDescription());
+
+        return business;
+    }
+
+
+    /**
+     * Checks request and ensures request values are valid
+     * @param businessRequest request containing new business information
+     * @return True if valid, false otherwise
+     */
+    private boolean checkBusinessRequest(NewBusinessRequest businessRequest) {
+        int nameLength = businessRequest.getName().length();
+        int descriptionLength = businessRequest.getDescription().length();
+        String country = businessRequest.getAddress().getCountry();
+
+        if(businessRequest.getBusinessType() == null) {
+            return false;
+        }
+
+        //https://www.quora.com/Which-country-has-the-longest-name 🥴
+        if(country == null || country.length() < 1 || country.length() > 74) {
+            return false;
+        }
+        if(nameLength > 30 || nameLength < 1 || businessRequest.getName() == null) {
+            return false;
+        }
+        if(descriptionLength > 140) {
+            return false;
+        }
+
+        return true;
+
+
+    }
+
+
+
 
 }

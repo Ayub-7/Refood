@@ -131,7 +131,7 @@ export default {
      * @param country country for which currency is going to be retrieved
      */
     setCurrency(country) {
-      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+      axios.get(`https://restcountries.com/v2/name/${country}`)
         .then(response => {
           this.currency = { //need symbol and code
             symbol: response.data[0].currencies[0].symbol,

@@ -90,13 +90,14 @@ public class WishlistItemController {
     @PutMapping("/wishlist/{id}")
     public ResponseEntity<String> wishlistMutedStatusUpdate(@RequestBody MutedStatusRequest mutedStatusRequest, @PathVariable long id, HttpSession session) {
         User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         long userId = user.getId();
         MutedStatus mutedStatus = mutedStatusRequest.getMutedStatus();
         WishlistItem wishlist = wishlistItemRepository.findWishlistItemById(id);
         if (wishlist == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-        } else if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else if (wishlist.getUserId() != userId && user.getRole() == Role.USER) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

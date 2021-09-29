@@ -89,7 +89,7 @@ export default {
      * Sets display currency based on the user's home country.
      */
     setCurrency: function (country) {
-      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+      axios.get(`https://restcountries.com/v2/name/${country}`)
         .then(response => {
           this.currency = response.data[0].currencies[0].symbol;
         })
