@@ -204,6 +204,9 @@ const ModifyUser = {
     this.checkUserSession();
   },
   methods: {
+    /**
+     * Check's the user's session and gets the ID based off the currently logged in user
+     */
     checkUserSession: function() {
       api.checkSession()
           .then((response) => {
@@ -215,6 +218,9 @@ const ModifyUser = {
           });
     },
 
+    /**
+     * Get's the user object as a JSON
+     */
     getUserInfo: function(userId) {
       api.getUserFromID(userId)
           .then((response) => {
@@ -230,26 +236,28 @@ const ModifyUser = {
           })
     },
 
-  setCurrentUser: function(user) {
-    if (user !== undefined) {
-      this.userEditForm.firstname = user.firstName;
-      this.userEditForm.middlename = user.middleName;
-      this.userEditForm.lastname = user.lastName;
-      this.userEditForm.nickname = user.nickname;
-      this.userEditForm.bio = user.bio;
-      this.userEditForm.email = user.email;
-      this.userEditForm.dateofbirth = user.dateOfBirth;
-      if (user.phoneNumber != null) {
-        this.userEditForm.phonenumber = user.phoneNumber;
-      }
-
-      this.userEditForm.streetNumber = user.homeAddress.streetNumber;
-      this.userEditForm.streetName = user.homeAddress.streetName;
-      this.userEditForm.suburb = user.homeAddress.suburb;
-      this.userEditForm.postcode = user.homeAddress.postcode;
-      this.userEditForm.city = user.homeAddress.city;
-      this.userEditForm.region = user.homeAddress.region;
-      this.userEditForm.country = user.homeAddress.country;
+    /**
+     * Autofills the form with the user's details (all but the password)
+     */
+    setCurrentUser: function(user) {
+      if (user !== undefined) {
+        this.userEditForm.firstname = user.firstName;
+        this.userEditForm.middlename = user.middleName;
+        this.userEditForm.lastname = user.lastName;
+        this.userEditForm.nickname = user.nickname;
+        this.userEditForm.bio = user.bio;
+        this.userEditForm.email = user.email;
+        this.userEditForm.dateofbirth = user.dateOfBirth;
+        if (user.phoneNumber != null) {
+          this.userEditForm.phonenumber = user.phoneNumber;
+        }
+        this.userEditForm.streetNumber = user.homeAddress.streetNumber;
+        this.userEditForm.streetName = user.homeAddress.streetName;
+        this.userEditForm.suburb = user.homeAddress.suburb;
+        this.userEditForm.postcode = user.homeAddress.postcode;
+        this.userEditForm.city = user.homeAddress.city;
+        this.userEditForm.region = user.homeAddress.region;
+        this.userEditForm.country = user.homeAddress.country;
     }
   },
 
@@ -343,7 +351,7 @@ const ModifyUser = {
     },
 
     /**
-     * Creates a POST request when user submits form, using the createUser function from Api.js
+     * Creates a PUT request when user submits form, using the modifyUser function from Api.js
      */
     editUserInfo: function() {
       if(this.errors.length === 0){
@@ -385,6 +393,10 @@ const ModifyUser = {
     },
 
 
+
+    /**
+     * Retrieve a list of suggested cities using the photon open api.
+     */
     getCitiesFromPhoton: function() {
       if (this.city.length >= this.minNumberOfCharacters) {
 
