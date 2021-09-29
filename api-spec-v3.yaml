@@ -1213,7 +1213,7 @@ paths:
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
-  '/notifications/extenddisplayperiod/{cardId}':
+  '/cards/notifications/{cardId}':
     delete:
       tags:
         - 'U32 : Managing my feed'
