@@ -640,7 +640,8 @@ class UserControllerTests {
         //wrong user id
         Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
         mockMvc.perform(put("/users/50/images/{imageId}/makeprimary", image1.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user));
+    }
 
     @Test
     void testModifyUser_NotLoggedIn() throws Exception {
@@ -719,6 +720,8 @@ class UserControllerTests {
                 .andExpect(status().isOk());
         Assertions.assertNotEquals(prevPrimaryPath, userRepository.findUserById(user.getId()).getPrimaryImagePath());
         Assertions.assertEquals(userRepository.findUserById(user.getId()).getPrimaryImagePath(), user.getPrimaryImagePath());
+
+    }
 
     @WithMockUser(username="johnsmith99@gmail.com", password="1337-H%nt3r2", roles="USER")
     void testModifyUser_undefinedReqBody() throws Exception {
