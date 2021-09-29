@@ -9,7 +9,7 @@
                     :success="(userEditForm.firstname.length >= 2 && userEditForm.firstname.length < 20)"
                     class="form-control"
                     type="text"
-                    label="First Name *"
+                    label="First Name"
                     v-model="userEditForm.firstname"/>
         </div>
         <div id="middlename">
@@ -27,7 +27,7 @@
                     :success="(userEditForm.lastname.length >= 2 && userEditForm.lastname.length < 20)"
                     type="text"
                     class="form-control"
-                    label="Last name *"
+                    label="Last name"
                     v-model="userEditForm.lastname"/>
         </div>
         <div id="nickname">
@@ -43,7 +43,7 @@
         <div id="email">
           <vs-input type="email"
                     class="form-control"
-                    label="Email *"
+                    label="Email"
                     :danger="errors.includes(userEditForm.email) && emailInUse"
                     danger-text="Invalid email. (This email may already be in use)"
                     :success="validEmail(userEditForm.email) && !emailInUse"
@@ -69,7 +69,7 @@
                     :success="(userEditForm.dateofbirth.length!==0)"
                     min="1900-01-01"
                     :max="maxAllowedDoB"
-                    label="Date of birth *"/>
+                    label="Date of birth"/>
         </div>
         <div id="password-info">
           Password must be at least 8 characters long and must contain one of each of the following:
@@ -83,7 +83,7 @@
         <div id="password">
           <vs-input type="password"
                     class="form-control"
-                    label="Password *"
+                    label="Password"
                     :danger="userEditForm.password.length > 0 || errors.includes(userEditForm.password)"
                     danger-text="Your password does not meet the requirements."
                     :success="validPassword(userEditForm.password)"
@@ -93,12 +93,12 @@
         <div id="confirm-password">
           <vs-input type="password"
                     class="form-control"
-                    label="Confirm Password *"
+                    label="New Password"
                     :danger="errors.includes(confirm_password)"
                     danger-text="Your password is invalid or do not match."
-                    :success="(confirm_password===userEditForm.password && confirm_password.length !== 0)"
+                    :success="(new_password===userEditForm.password && new_password.length !== 0)"
                     name="confirm_password (Required)"
-                    v-model="confirm_password"/>
+                    v-model="new_password"/>
         </div>
       </div>
       <!-- ADDRESS -->
@@ -137,7 +137,7 @@
                     :success="userEditForm.country.length > 0" @input="getCountriesFromPhoton()"
                     v-model="userEditForm.country"
                     class="form-control"
-                    label="Country *"></vs-input>
+                    label="Country"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -184,7 +184,7 @@ const ModifyUser = {
       },
       emailInUse: false,
       errors: [],
-      confirm_password: "",
+      new_password: "",
 
       maxAllowedDoB: new Date(),
 
@@ -228,29 +228,28 @@ const ModifyUser = {
           })
     },
 
-    setCurrentUser: function(user) {
-      console.log(user)
-      // if (user !== undefined) {
-      //   this.userEditForm.firstname = user.firstname;
-      //   this.userEditForm.middlename = user.middlename;
-      //   this.userEditForm.lastname = user.lastname;
-      //   this.userEditForm.nickname = user.nickname;
-      //   this.userEditForm.bio = user.bio;
-      //   this.userEditForm.email = user.email;
-      //   this.userEditForm.password = user.password;
-      //   this.userEditForm.dateofbirth = user.dateofbirth;
-      //   this.userEditForm.phonenumber = user.phonenumber;
-      //
-      //   this.userEditForm.streetNumber = user.homeAddress.streetNumber;
-      //   this.userEditForm.streetName = user.homeAddress.streetName;
-      //   this.userEditForm.suburb = user.homeAddress.suburb;
-      //   this.userEditForm.postcode = user.homeAddress.postcode;
-      //   this.userEditForm.city = user.homeAddress.city;
-      //   this.userEditForm.region = user.homeAddress.region;
-      //   this.userEditForm.country = user.homeAddress.country;
-      //
-      // }
+  setCurrentUser: function(user) {
+    if (user !== undefined) {
+      this.userEditForm.firstname = user.firstName;
+      this.userEditForm.middlename = user.middleName;
+      this.userEditForm.lastname = user.lastName;
+      this.userEditForm.nickname = user.nickname;
+      this.userEditForm.bio = user.bio;
+      this.userEditForm.email = user.email;
+      this.userEditForm.dateofbirth = user.dateOfBirth;
+      this.userEditForm.phonenumber = user.phoneNumber;
+
+      this.userEditForm.streetNumber = user.homeAddress.streetNumber;
+      this.userEditForm.streetName = user.homeAddress.streetName;
+      this.userEditForm.suburb = user.homeAddress.suburb;
+      this.userEditForm.postcode = user.homeAddress.postcode;
+      this.userEditForm.city = user.homeAddress.city;
+      this.userEditForm.region = user.homeAddress.region;
+      this.userEditForm.country = user.homeAddress.country;
+
+    }
     },
+
 
     /**
      * The function checks the inputs of the modification form to ensure they are in the right format.
@@ -343,6 +342,7 @@ const ModifyUser = {
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
     editUserInfo: function() {
+      console.log(this.errors);
       if(this.errors.length === 0){
         this.emailInUse = false;
         const homeAddress = {
