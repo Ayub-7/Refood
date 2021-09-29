@@ -232,7 +232,6 @@ const ModifyUser = {
 
   setCurrentUser: function(user) {
     if (user !== undefined) {
-      console.log(user)
       this.userEditForm.firstname = user.firstName;
       this.userEditForm.middlename = user.middleName;
       this.userEditForm.lastname = user.lastName;
@@ -347,7 +346,6 @@ const ModifyUser = {
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
     editUserInfo: function() {
-      console.log(this.errors);
       if(this.errors.length === 0){
         this.emailInUse = false;
         const homeAddress = {
@@ -371,10 +369,14 @@ const ModifyUser = {
             this.userEditForm.new_password)
             .then((response) => {
               this.$log.debug("User modified:", response.data);
+              this.$vs.notify({title: 'Success!', text: 'Successfully modified user\'s details', color: 'success'});
             }).catch((error) => {
           if(error.response.status === 409) {
             this.emailInUse = true;
-            this.errors.push(this.email);
+            this.errors.push(this.userEditForm.email);
+          } else if (error.response.data === "Incorrect current password") {
+            this.errors.push(this.userEditForm.password);
+            this.$log.debug(error.response.data)
           }
         });
 
@@ -398,7 +400,7 @@ const ModifyUser = {
               });
             })
             .catch( error => {
-              console.log("Error with getting cities from photon." + error);
+              this.$log.error("Error with getting cities from photon." + error);
             });
       }
       else {
@@ -427,7 +429,7 @@ const ModifyUser = {
               this.suggestedCountries = res.data.features.map(location => location.properties.country);
             })
             .catch( error => {
-              console.log("Error with getting countries from photon." + error);
+              this.$log.error("Error with getting countries from photon." + error);
             });
       }
       else {

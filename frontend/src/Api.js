@@ -85,13 +85,14 @@ export default {
      * @param dateOfBirth new birthday
      * @param phoneNUmber new phone number
      * @param homeAddress new address
-     * @param password new password
+     * @param password current password
+     * @param newPassword new password
      * @returns {Promise<AxiosResponse<any>>} 200 if the user is properly updated, 400 if the supplied data is bad,
      * 409 if the user is attempted to change their email to an email that is already taken,
      * 406 if the user id does not exist, and 401 if the user is not logged in.
      */
-    modifyUser: async(userId, firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNUmber, homeAddress, password, newPassword) =>
-        instance.put(`/users/${userId}`, {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNUmber, homeAddress, password, newPassword},
+    modifyUser: async(userId, firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, newPassword) =>
+        instance.put(`/users/${userId}`, {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, newPassword},
             {withCredentials: true}),
 
     /**

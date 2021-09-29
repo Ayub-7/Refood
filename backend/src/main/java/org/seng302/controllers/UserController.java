@@ -158,9 +158,10 @@ public class UserController {
             List<String> registrationErrors = registrationUserCheck(reqBody, false);
             if (registrationErrors.isEmpty()) { // No errors found.
                 if (reqBody.getNewPassword() != null &&
-                !Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
+                        !Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect current password");
-                } else if (reqBody.getNewPassword() != null) {
+                } else if (reqBody.getNewPassword() != null &&
+                        Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
                     user.setPassword(Encrypter.hashString(reqBody.getNewPassword()));
                 }
                 
