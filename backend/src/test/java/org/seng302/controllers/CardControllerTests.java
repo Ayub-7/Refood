@@ -634,16 +634,16 @@ class CardControllerTests {
 
     @Test
     void testDeleteExtendCardNotificationById_noAuth_returnUnauthorized() throws Exception {
-        mvc.perform(delete("/notifications/extenddisplayperiod/{cardId}", card.getId()))
+        mvc.perform(delete("/cards/notifications/{cardId}", card.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser
     void testDeleteExtendCardNotification_wrongCreatorId_returnForbidden() throws Exception {
-        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(notification);
 
-        mvc.perform(delete("/notifications/extenddisplayperiod/{cardId}", card.getId())
+        mvc.perform(delete("/cards/notifications/{cardId}", card.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, anotherUser))
                 .andExpect(status().isForbidden());
     }
@@ -651,9 +651,9 @@ class CardControllerTests {
     @Test
     @WithMockUser
     void testDeleteExtendCardNotification_asCreator() throws Exception {
-        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(card);
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(notification);
 
-        mvc.perform(delete("/notifications/extenddisplayperiod/{cardId}", card.getId())
+        mvc.perform(delete("/cards/notifications/{cardId}", card.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isOk());
     }
@@ -661,9 +661,9 @@ class CardControllerTests {
     @Test
     @WithMockUser
     void testDeleteExtendCardNotification_badId_returnNotAcceptable() throws Exception {
-        Mockito.when(cardRepository.findCardById(card.getId())).thenReturn(null);
+        Mockito.when(notificationRepository.findNotificationByCardId(card.getId())).thenReturn(null);
 
-        mvc.perform(delete("/notifications/extenddisplayperiod/{cardId}", card.getId())
+        mvc.perform(delete("/cards/notifications/{cardId}", card.getId())
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUser))
                 .andExpect(status().isNotAcceptable());
     }
