@@ -18,10 +18,11 @@
               <vs-icon icon="add_box" style="margin: auto"></vs-icon>
               <div style="font-size: 12px; margin: auto">Add New Primary Image</div>
             </vs-dropdown-item>
-            <vs-dropdown-item class="profileDropdown">
-              <vs-icon icon="collections" style="margin: auto"></vs-icon>
-              <div style="font-size: 12px; margin: auto">Update With Existing</div>
-            </vs-dropdown-item>
+            <vs-dropdown-group class="profileDropdown" vs-collapse vs-icon="collections" vs-label="Update With Existing" style="font-size: 13px">
+              <vs-dropdown-item v-for="image in filteredImages()" :key="image.id" @click="updatePrimaryImage(image.id);">
+                {{image.name}}
+              </vs-dropdown-item>
+            </vs-dropdown-group>
           </vs-dropdown-menu>
         </vs-dropdown>
         <div id="business-name"  >{{ business.name }}</div>
@@ -67,7 +68,7 @@
             <BusinessAdministrators :admins="adminList" :pAdminId="business.primaryAdministratorId"/>
           </vs-tab>
           <vs-tab class="business-nav-item" label="Images">
-            <BusinessImages :images="images" :primaryImagePath="business.primaryImagePath" :business="business"></BusinessImages>
+            <BusinessImages v-on:update="reloadLocation" :images="images" :primaryImagePath="business.primaryImagePath" :business="business"></BusinessImages>
           </vs-tab>
         </vs-tabs>
       </main>
@@ -107,6 +108,20 @@ const Business = {
 
   methods: {
     /**
+     * Called by primary image dropdown component, filtering the primary image out so
+     * that only the non-primary images are displayed.
+     */
+    filteredImages: function() {
+      let filteredImages = [];
+      for (let image of this.images) {
+        if (image.fileName.match(/\d+/g)[1] !== this.business.primaryImagePath.match(/\d+/g)[1]) {
+          filteredImages.push(image);
+        }
+      }
+      return filteredImages;
+    },
+
+    /**
      * Trigger the file upload box to appear.
      * Used for when the actions dropdown add image action or add image button is clicked.
      */
@@ -124,26 +139,26 @@ const Business = {
       for (let image of e.target.files) {
         const fd = new FormData();
         fd.append('filename', image, image.name);
-        await api.postBusinessImage(this.business.id, fd)
-                .then((res) => { //On success
-                  this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
-                  let imageId = res.data.id;
-                  if (this.updatePrimary) {
-                    this.updatePrimaryImage(imageId);
-                  } else {
-                    location.reload();
-                  }
-                })
-                .catch((error) => { //On fail
-                  if (error.response.status === 400) {
-                    this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
-                  } else if (error.response.status === 500) {
-                    this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
-                  }
-                })
-                .finally(() => {
-                  this.$vs.loading.close();
-                });
+        api.postBusinessImage(this.business.id, fd)
+          .then((res) => { //On success
+            this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
+            let imageId = res.data.id;
+            if (this.updatePrimary) {
+              this.updatePrimaryImage(imageId);
+            } else {
+              this.reloadLocation();
+            }
+          })
+          .catch((error) => { //On fail
+            if (error.response.status === 400) {
+              this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
+            } else if (error.response.status === 500) {
+              this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+            }
+          })
+          .finally(() => {
+            this.$vs.loading.close();
+          });
       }
     },
 
@@ -151,11 +166,26 @@ const Business = {
      * Call api endpoint to update the primary image for the business.
      */
     updatePrimaryImage: function(imageId) {
-      //api.updatePrimaryImage(image);
-      console.log(imageId);
-      console.log(this.images);
-      console.log(this.business.primaryImagePath);
-      this.updatePrimary = false;
+      api.changeBusinessPrimaryImage(this.business.id, imageId)
+        .then(async () => {
+          await this.getBusiness();
+          this.updatePrimary = false;
+          this.reloadLocation();
+        })
+        .catch((error) => {
+          if (error.response.status === 400) {
+            this.$vs.notify({title:`Failed To Update Primary Image`, color:'danger'});
+          } else if (error.response.status === 500) {
+            this.$vs.notify({title:`Failed To Update Primary Image`, text: 'There was a problem with the server.', color:'danger'});
+          }
+        });
+    },
+
+    /**
+     * Reload the component
+     */
+    reloadLocation: function() {
+      //location.reload();
     },
 
     /**
@@ -223,7 +253,7 @@ const Business = {
     /**
      * Retrieves the business information including the administrators.
      */
-    getBusiness: function () {
+    getBusiness: async function () {
       api.getBusinessFromId(this.$route.params.id)
           .then((res) => {
             this.business = res.data;

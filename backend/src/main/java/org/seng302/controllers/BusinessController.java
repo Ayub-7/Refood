@@ -492,8 +492,10 @@ public class BusinessController {
     private Business setBusinessImage(Business business, long businessId, String imageId, String extension) {
         if (System.getProperty("os.name").startsWith("Windows")) {
             business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, imageId, extension));
+            business.setPrimaryThumbnailPath(String.format("business_%d\\%s_thumbnail%s", businessId, imageId, extension));
         } else {
             business.setPrimaryImage(String.format("business_%d/%s%s", businessId, imageId, extension));
+            business.setPrimaryThumbnailPath(String.format("business_%d/%s_thumbnail%s", businessId, imageId, extension));
         }
 
         return business;

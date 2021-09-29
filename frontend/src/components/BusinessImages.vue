@@ -33,14 +33,6 @@ const BusinessImages = {
         },
     },
 
-    data: function () {
-        return {
-        }
-    },
-
-    mounted() {
-    },
-
     methods: {
         /**
          * Trigger the file upload box to appear.
@@ -82,11 +74,17 @@ const BusinessImages = {
          * Call api endpoint to update the primary image for the business.
          */
         updatePrimaryImage: function(imageId) {
-            //api.updatePrimaryImage(image);
-            console.log(imageId);
-            console.log(this.images);
-            console.log(this.business.primaryImagePath);
-            this.updatePrimary = false;
+            api.changeBusinessPrimaryImage(this.business.id, imageId)
+                .then(async () => {
+                    this.$emit("update");
+                })
+                .catch((error) => {
+                    if (error.status !== 500) {
+                        this.$vs.notify({title:`Failed To Update Primary Image`, text: 'Error'+error, color:'danger'});
+                    } else if (error.status === 500) {
+                        this.$vs.notify({title:`Failed To Update Primary Image`, text: 'There was a problem with the server.', color:'danger'});
+                    }
+                });
         },
 
         /**
