@@ -106,7 +106,7 @@
           </p>
         </vs-button>
       </div>
-      <apexchart id="sales-graph-report" width="100%" height="80%" type="bar" :options="options" :series="series"></apexchart>
+      <apexchart ref="chart" id="sales-graph-report" width="100%" height="80%" type="bar" :options="options" :series="series"></apexchart>
     </div>
   </div>
 </template>
@@ -150,6 +150,15 @@ export default {
 
       options: {
         chart: {
+          toolbar: {
+            show: true,
+            tools: {
+              download: true
+            },
+          },
+          animations: {
+            enabled: true
+          },
           id: 'sales-graph-report',
         },
         title: {
@@ -197,20 +206,21 @@ export default {
         name: 'Total Sales',
         data: salesData,
       }];
+
+
     },
 
     /**
      * retrieve total Revenue
      */
-    getTotalRevenue: function() {
+    getTotalRevenue: async function() {
+
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
       let data = this.displaySalesData(this.boughtListings);
-    
       this.series = [{
         name: 'Total Value',
         data: data,
       }];
-
     },
 
     /**
@@ -298,6 +308,9 @@ export default {
         }
         i++;
       }
+
+
+
       return {'1': categories,
               '2': allData};
     },
@@ -345,8 +358,6 @@ export default {
       for (let day of Object.entries(processedData)) {
         allData.push(day[1]);
       }
-
-
 
 
       return {'1': this.generateDayLabels(processedData),
@@ -415,19 +426,13 @@ export default {
 
       data = data.filter(x => moment(x.sold).isBetween(this.dateStart, this.dateEnd, 'seconds', '[]'))
       if (this.granularity.toLowerCase() === "year") {
-        categories = this.displayYearlyData(data)['1'];
-        allData = this.displayYearlyData(data)['2'];
+        [categories, allData] = Object.values(this.displayYearlyData(data)) // Gets object's values as list from method call then destructs assignment
       } else if (this.granularity.toLowerCase() === "month") {
-        categories = this.displayMonthlyData(data)['1'];
-        allData = this.displayMonthlyData(data)['2'];
-      }
-      else if (this.granularity.toLowerCase() === "week") {
-        categories = this.displayWeeklyData(data)['1'];
-        allData = this.displayWeeklyData(data)['2'];
-      }
-      else if (this.granularity.toLowerCase() === "day") {
-        categories = this.displayDailyData(data)['1'];
-        allData = this.displayDailyData(data)['2'];
+        [categories, allData] = Object.values(this.displayMonthlyData(data))
+      } else if (this.granularity.toLowerCase() === "week") {
+        [categories, allData] = Object.values(this.displayWeeklyData(data))
+      } else if (this.granularity.toLowerCase() === "day") {
+        [categories, allData] = Object.values(this.displayDailyData(data))
       }
 
       //Updates the graph title accordingly
@@ -526,6 +531,12 @@ export default {
       }
       return processedData;
     },
+
+    updateSeries: function() {
+
+
+    },
+
     /**
      * Categorises and sums up data, splitting each bought listing into it's respective year and day.
      * @param data the bought listing data (i.e. the sold listings).
@@ -596,6 +607,7 @@ export default {
     },
     
     onPeriodChange: function(period) {
+      console.log('here')
       this.errors = [];
       this.activePeriodButton = period;// Changes the period button to be selected and disabled.
       switch (period) {
@@ -631,6 +643,7 @@ export default {
       else {
         this.getTotalSales();
       }
+
     },
 
     /**
