@@ -136,7 +136,7 @@ export default {
       activePeriodButton: "",
       title: "",
       barFormat: "category",
-      labelFormat: "dd-MMM",
+      labelFormat: "dd-MM",
       dateStart: null,
       dateEnd: null,
       pickedStart: null,
@@ -205,7 +205,7 @@ export default {
     getTotalRevenue: function() {
       // Categorises and sums up data, splitting each bought listing into it's respective year and month.
       let data = this.displaySalesData(this.boughtListings);
-
+    
       this.series = [{
         name: 'Total Value',
         data: data,
@@ -260,7 +260,7 @@ export default {
       this.title = "Yearly ";
       this.activeGranularityButton = "y";
       this.barFormat = "category";
-      this.labelFormat = "dd-MMM";
+      this.labelFormat = "dd-MM";
       let processedData = this.totalYearlyRevenue(data);
 
       // Flatten object into array.
@@ -311,6 +311,7 @@ export default {
       this.title = "Weekly ";
       this.activeGranularityButton = "w";
       this.barFormat = "datetime";
+      this.labelFormat = "MMMM dd";
       let processedData = this.totalWeeklyRevenue(data);
       let allData = [];
 
@@ -319,8 +320,11 @@ export default {
         let entries = Object.entries(year[1]).map(week => week[1]);
         allData = allData.concat(entries);
       }
+      
+      let categories = this.generateWeekLabels(processedData);
 
-      return {'1': this.generateWeekLabels(processedData),
+
+      return {'1': categories,
               '2': allData};
     },
 
@@ -334,12 +338,15 @@ export default {
       this.title = "Daily ";
       this.activeGranularityButton = "d";
       this.barFormat = "datetime";
+      this.labelFormat = "dd-mm";
       let processedData = this.totalDailyRevenue(data);
       let allData = [];
 
       for (let day of Object.entries(processedData)) {
         allData.push(day[1]);
       }
+
+
 
 
       return {'1': this.generateDayLabels(processedData),
@@ -433,7 +440,7 @@ export default {
       // Updates the plot options and inputs.
       // Reassigning entire variable allows chart to properly update and play animations.
       this.graphOptionsUpdater(categories)
-
+      
       return allData;
     },
 
