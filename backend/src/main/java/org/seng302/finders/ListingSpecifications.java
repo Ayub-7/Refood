@@ -59,5 +59,13 @@ public class ListingSpecifications {
         };
     }
 
-
+    /**
+     * Builds a new specification query to get listings that the owner's business type of the listing is present
+     * in the given array.
+     * @return a specification that the repository will use to query to the database with.
+     */
+    public Specification<Listing> hasBusinessTypes() {
+        return (root, cq, cb) -> cb.in(root.get("inventoryItem").get("product").get("business").get("businessType"))
+                                                .value(request.getBusinessTypes());
+    }
 }
