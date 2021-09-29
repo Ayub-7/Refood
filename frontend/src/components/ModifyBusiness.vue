@@ -3,6 +3,7 @@
     <h3 class="card-header">Modify your business' details</h3>
     <form autocomplete="off">
       <vs-input id="business-name"
+                :danger="this.errors.includes('businessName')"
                 type="text"
                 class="form-control"
                 label="Business Name *"
@@ -10,6 +11,7 @@
       <vs-select
           width="90%"
           id="business-type"
+          :danger="this.errors.includes('businessType')"
           class="form-control"
           label="Business Type *"
           v-model="businessType"
@@ -105,22 +107,22 @@ export default {
         if (this.businessName.length === 0) {
           this.businessName = this.business.name;
         }
-        if (this.streetAddress.length === 0) {
+        if (this.streetAddress === null || this.streetAddress.length === 0) {
           this.streetAddress = this.business.address.streetName;
         }
         if (this.streetNumber.length === 0) {
           this.streetNumber = this.business.address.streetNumber;
         }
-        if (this.suburb.length === 0) {
+        if (this.suburb === null || this.suburb.length === 0) {
           this.suburb = this.business.address.suburb;
         }
-        if (this.postcode.length === 0) {
+        if (this.postcode === null || this.postcode.length === 0) {
           this.postcode = this.business.address.postcode;
         }
-        if (this.region.length === 0) {
+        if (this.region === null || this.region.length === 0) {
           this.region = this.business.address.region;
         }
-        if (this.city.length === 0) {
+        if (this.city === null || this.city.length === 0) {
           this.city = this.business.address.city;
         }
         if (this.country.length === 0) {
@@ -133,7 +135,33 @@ export default {
           this.businessType = this.business.businessType;
         }
         this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
+        if (this.errors.length === 0) {
+          this.$vs.notify({title:'Success', text:'The business have been successfully modified!', color:'success'});
+        } else {
+          for (let i = 0; i < this.errors.length; i++) {
+            this.$vs.notify({title:'Error', text:this.errors[i], color:'danger'});
+
+          }
+        }
       }
+    },
+
+    /**
+     * Gets all business types from the database, to
+     * be used by business type filter
+     * */
+    getBusinessTypes: function() {
+      api.getBusinessTypes()
+          .then((response) => {
+            this.availableBusinessTypes = response.data
+          }).catch((err) => {
+        if(err.response.status === 401) {
+          this.$vs.notify({title:'Error', text:'Unauthorized', color:'danger'});
+        }
+        else {
+          this.$vs.notify({title:'Error', text:`Status Code ${err.response.status}`, color:'danger'});
+        }
+      });
     },
 
     /**
@@ -180,6 +208,7 @@ export default {
         .catch((error) => {
           this.$log.error(error);
         })
+    this.getBusinessTypes();
   },
 }
 </script>
