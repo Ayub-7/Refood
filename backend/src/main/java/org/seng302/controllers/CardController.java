@@ -306,33 +306,33 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     /**
-     * DELETE endpoint, deletes the "extends cards display period notification"
+     * DELETE endpoint, deletes the "Your marketplace card has expired notification"
      *
-     * Preconditions: User must be logged in, User must be the creator of the card, the card must exist, the card must
-     * be about to expire
-     * Postconditions: Card extend notification is deleted
+     * Preconditions: User must be logged in, User must be the creator of the card that triggered the notification,
+     * the notification must exist,
+     *
+     * Postconditions: Notification is deleted
      *
      * @param cardId Id of the card that the extend notification relates to
      * @param session User session of user that is deleting the extend notification
      * @return 200 if updated, 406 if ID does not exist, 401 if unauthorized, 403 if not creator or D/GAA
      * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
      */
-    @DeleteMapping("/notifications/extenddisplayperiod/{cardId}")
+    @DeleteMapping("/cards/notifications/{cardId}")
     public ResponseEntity<String> deleteExtendCardNotificationByCardId (@PathVariable Long cardId, HttpSession session) throws JsonProcessingException {
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
-        Card card = cardRepository.findCardById(cardId);
-        // Attempting to delete an extend notification of a card that does not exist
-        if (card == null) {
+        Notification notification = notificationRepository.findNotificationByCardId(cardId);
+        // Attempting to delete a notification that does not exist
+        if (notification == null) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
-        // Attempting to delete a card extend notification for somebody else.
-        if (card.getUser().getId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+        // Attempting to delete a notification to card that relates to somebody else.
+        if (notification.getUserId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         //Deletes cards notification (since display period is being extended)
-        Notification cardNotification = notificationRepository.findNotificationByCardId(cardId);
-        notificationRepository.delete(cardNotification);
+        notificationRepository.delete(notification);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
