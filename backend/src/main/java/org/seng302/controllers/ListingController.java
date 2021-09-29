@@ -131,6 +131,7 @@ public class ListingController {
                                                  @RequestParam("offset") int offset,
                                                  @RequestParam("sortDirection") String sortDirection,
                                                  HttpSession session) throws JsonProcessingException {
+        System.out.println(request);
         Sort sort;
         String sortBy = request.getSortBy();
         if (sortBy == null) {

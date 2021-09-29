@@ -476,7 +476,7 @@ export default {
     filterListingsQuery: async(businessQuery, productQuery, addressQuery, sortBy, businessTypes,
                           minPrice, maxPrice, minClosingDate, maxClosingDate, count, offset, sortDirection) =>
         instance.post('/businesses/listings', {businessQuery, productQuery, addressQuery, sortBy, businessTypes, minPrice, maxPrice, minClosingDate, maxClosingDate},
-            {params: {count: count, offset: offset, sortDirection: sortDirection}}, { withCredentials: true }),
+            {params: {count: count, offset: offset, sortDirection: sortDirection}, withCredentials: true }),
 
 
     /**

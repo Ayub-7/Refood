@@ -274,7 +274,7 @@ const SearchListings = {
       }
       if(this.checkForm()){
         if (this.selectedTypes.length === 0) {
-          api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.businessTypes, this.minPrice, this.maxPrice,
+          api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
               this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
               .then((response) => {
                 this.listings = response.data.content
