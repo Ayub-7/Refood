@@ -503,6 +503,14 @@ export default {
         instance.delete(`/notifications/${listingId}`, {withCredentials: true}),
 
     /**
+     * Deletes listing notification
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteCardExpiredNotification: (cardId) =>
+        instance.delete(`/cards/notifications/${cardId}`, {withCredentials: true}),
+
+    /**
      * Retrieves and returns a list of BUSINESSES that the user has wishlisted.
      * @param id unique identifier of the user.
      * @param session current active user session.
