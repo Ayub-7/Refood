@@ -60,7 +60,6 @@
 
 <script>
 import api from "../Api";
-import {store} from "../store";
 import BusinessCommon from "./BusinessCommon";
 export default {
   name: "ModifyBusiness",
@@ -173,8 +172,8 @@ export default {
       this.suggestCountries = false;
     },
   },
-  mounted: function () {
-    api.getBusinessFromId(store.actingAsBusinessId)
+  mounted: async function () {
+    await api.getBusinessFromId(this.$route.params.id)
         .then((res) => {
           this.business = res.data;
         })
