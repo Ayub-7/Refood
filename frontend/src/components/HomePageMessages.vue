@@ -298,7 +298,6 @@ export default {
       this.feedItems.sort(function(a, b) {
         return new Date(b.created) - new Date(a.created);
       });
-      console.log(this.feedItems);
     },
 
 
@@ -409,8 +408,6 @@ export default {
       api.getListingNotifications(store.loggedInUserId)
           .then((res) => {
             this.listingNotifications = res.data;
-            console.log("this.listingNotifications")
-            console.log(this.listingNotifications)
             if (this.combCount === 0) {
               this.combCount += 1
               this.combineFeedMessages();
@@ -466,6 +463,7 @@ export default {
     /**
      * Check the message contents
      * Simply check a blank message is not sent and the message is under the maximum character limit
+     * @return boolean true if message is valid
      */
     checkMessage() {
       if (this.message == null || this.message === "") {
@@ -521,7 +519,8 @@ export default {
   },
   computed: {
     /**
-     * Weird computed property to stop closing transition from happening when opening modal
+     * Computed property to stop closing transition from happening when opening modal
+     * @return boolean|boolean
      */
     showTransition: function() {
       return this.showing || !this.messaging;
