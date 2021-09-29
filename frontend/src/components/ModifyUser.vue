@@ -80,25 +80,26 @@
             <li>Special Character</li>
           </ul>
         </div>
+
         <div id="password">
           <vs-input type="password"
                     class="form-control"
-                    label="Password"
-                    :danger="userEditForm.password.length > 0 || errors.includes(userEditForm.password)"
+                    label="New Password"
+                    :danger="(userEditForm.password.length === 0 && userEditForm.new_password.length > 0) || errors.includes(userEditForm.new_password)"
                     danger-text="Your password does not meet the requirements."
-                    :success="validPassword(userEditForm.password)"
-                    name="password (Required)"
-                    v-model="userEditForm.password"/>
+                    :success="validPassword(userEditForm.new_password)"
+                    name="New password"
+                    v-model="userEditForm.new_password"/>
         </div>
         <div id="confirm-password">
           <vs-input type="password"
                     class="form-control"
-                    label="New Password"
-                    :danger="errors.includes(confirm_password)"
+                    label="Password"
+                    :danger="errors.includes(userEditForm.password)"
                     danger-text="Your password is invalid or do not match."
-                    :success="(new_password===userEditForm.password && new_password.length !== 0)"
-                    name="confirm_password (Required)"
-                    v-model="new_password"/>
+                    :success="(userEditForm.new_password > 0 && userEditForm.password > 0)"
+                    name="Password (Required if changing password)"
+                    v-model="userEditForm.password"/>
         </div>
       </div>
       <!-- ADDRESS -->
@@ -171,6 +172,7 @@ const ModifyUser = {
         bio: null,
         email: "",
         password: "",
+        new_password: "",
         dateofbirth: "",
         phonenumber: "",
 
@@ -184,7 +186,6 @@ const ModifyUser = {
       },
       emailInUse: false,
       errors: [],
-      new_password: "",
 
       maxAllowedDoB: new Date(),
 
@@ -279,9 +280,10 @@ const ModifyUser = {
         this.errors.push(this.userEditForm.password);
       }
 
-      if (this.confirm_password.length === 0 || this.userEditForm.password !== this.confirm_password) {
-        this.errors.push(this.confirm_password);
+      if (this.userEditForm.new_password.length != 0 && this.userEditForm.password.length === 0) {
+        this.errors.push(this.userEditForm.password);
       }
+
       if (this.userEditForm.dateofbirth.length === 0) {
         this.errors.push(this.userEditForm.dateofbirth);
       }
