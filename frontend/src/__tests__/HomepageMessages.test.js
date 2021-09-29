@@ -26,65 +26,65 @@ let $vs = {
 }
 
 let oneMessage = [{
-  "id": 3,
-  "sender": {
-    "id": 8186,
-    "firstName": "Tricia",
-    "middleName": "Xenos",
-    "lastName": "Vergo",
-    "nickname": "fault-tolerant",
-    "bio": "In eleifend quam a odio.",
-    "email": "xvergo4l@vkontakte.ru",
-    "dateOfBirth": "1977-11-24",
-    "phoneNumber": "+31 637 443 9610",
-    "homeAddress": {
-      "streetNumber": null,
-      "streetName": null,
-      "suburb": null,
-      "city": null,
-      "region": null,
-      "country": "Poland",
-      "postcode": null
+    "id": 3,
+    "sender": {
+        "id": 8186,
+        "firstName": "Tricia",
+        "middleName": "Xenos",
+        "lastName": "Vergo",
+        "nickname": "fault-tolerant",
+        "bio": "In eleifend quam a odio.",
+        "email": "xvergo4l@vkontakte.ru",
+        "dateOfBirth": "1977-11-24",
+        "phoneNumber": "+31 637 443 9610",
+        "homeAddress": {
+            "streetNumber": null,
+            "streetName": null,
+            "suburb": null,
+            "city": null,
+            "region": null,
+            "country": "Poland",
+            "postcode": null
+        },
+        "created": "2020-03-05 04:37:27",
+        "role": "USER",
+        "businessesAdministered": null
     },
-    "created": "2020-03-05 04:37:27",
-    "role": "USER",
-    "businessesAdministered": null
-  },
-  "card": {
-    "id": 6134,
-    "user": 8186,
-    "title": "7up Diet, 355 Ml",
-    "description": "Ut at dolor quis odio consequat varius.",
-    "created": "2021-07-13 01:01:38",
-    "displayPeriodEnd": "2021-08-03 01:01:38",
-    "keywords": "sapien iaculis",
-    "section": "ForSale"
-  },
-  "receiver": {
-    "id": 83,
-    "firstName": "Allegra",
-    "middleName": "Jaquith",
-    "lastName": "King",
-    "nickname": "Visionary",
-    "bio": "In eleifend quam a odio. In hac habitasse platea dictumst.",
-    "email": "jking1q@printfriendly.com",
-    "dateOfBirth": "1983-07-29",
-    "phoneNumber": "+380 600 119 0770",
-    "homeAddress": {
-      "streetNumber": "33005",
-      "streetName": "Cascade",
-      "suburb": null,
-      "city": "Xingou",
-      "region": null,
-      "country": "China",
-      "postcode": null
+    "card": {
+        "id": 6134,
+        "user": 8186,
+        "title": "7up Diet, 355 Ml",
+        "description": "Ut at dolor quis odio consequat varius.",
+        "created": "2021-07-13 01:01:38",
+        "displayPeriodEnd": "2021-08-03 01:01:38",
+        "keywords": "sapien iaculis",
+        "section": "ForSale"
     },
-    "created": "2020-05-30 04:08:45",
-    "role": "USER",
-    "businessesAdministered": null
-  },
-  "description": "asdsaddas",
-  "sent": "2021-07-23 13:09:52"
+    "receiver": {
+        "id": 83,
+        "firstName": "Allegra",
+        "middleName": "Jaquith",
+        "lastName": "King",
+        "nickname": "Visionary",
+        "bio": "In eleifend quam a odio. In hac habitasse platea dictumst.",
+        "email": "jking1q@printfriendly.com",
+        "dateOfBirth": "1983-07-29",
+        "phoneNumber": "+380 600 119 0770",
+        "homeAddress": {
+            "streetNumber": "33005",
+            "streetName": "Cascade",
+            "suburb": null,
+            "city": "Xingou",
+            "region": null,
+            "country": "China",
+            "postcode": null
+        },
+        "created": "2020-05-30 04:08:45",
+        "role": "USER",
+        "businessesAdministered": null
+    },
+    "description": "asdsaddas",
+    "sent": "2021-07-23 13:09:52"
 }];
 
 let listingNotifications = [
@@ -110,7 +110,8 @@ let listingNotifications = [
                     country: "New Zealand"
                 },
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 2,
@@ -125,7 +126,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 4,
@@ -140,7 +142,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 5,
@@ -172,7 +175,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 6,
@@ -204,7 +208,8 @@ let listingNotifications = [
                     },
                 }
             }
-        }
+        },
+        viewStatus: "Unread"
     },
     {
         id: 7,
@@ -230,14 +235,16 @@ api.deleteMessage = jest.fn(() => {
 });
 
 api.getListingNotifications = jest.fn( () => {
-    return Promise.resolve({status: 200, data: listingNotifications});
+   return Promise.resolve({status: 200, data: listingNotifications});
 });
 
 api.deleteListingNotification = jest.fn(() => {
     return Promise.resolve({status: 200});
 });
 
-api.updateListingNotificationViewStatus = jest.fn().mockResolvedValue({status: 200});
+api.updateListingNotificationViewStatus = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
 
 beforeEach(() => {
     wrapper = mount(HomepageMessages, {
@@ -321,8 +328,8 @@ describe('Listing notification methods tests', () => {
             country: "New Zealand"
         };
 
-    expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
-  });
+        expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
+    });
 });
 
 describe('Listing notification functionality tests', () => {
@@ -370,22 +377,40 @@ describe('Listing notification functionality tests', () => {
         button = wrapper.get("#delete-purchased-listing-notification-button");
         expect(deleteUndo).toBeTruthy();
 
-  });
+    });
 
-  test("Bought listings are shown", () => {
-    expect(wrapper.find(".bought-listing-notification-card")).toBeTruthy();
-  });
+    test("Delete listing notification buttons call delete notification function", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+        let button = wrapper.get("#delete-liked-listing-notification-button");
+        expect(button).toBeTruthy();
 
-  test("Liked listings notifications are shown", () => {
-    expect(wrapper.find(".liked-listing-notification")).toBeTruthy();
-  });
+        await button.trigger('click');
+        //expect(api.deleteListingNotification).toBeCalled();
+    })
+    test("Toggle listing notification as important", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
 
-  test("Liked listing view button redirects to listing page on click", async () => {
-    await wrapper.vm.$nextTick();
-    let button = wrapper.find("#view-listing-button");
-    expect(button).toBeTruthy();
+        let button = wrapper.get("#important-listing-notification-button");
+        expect(button).toBeTruthy();
 
-    await button.trigger('click');
-    expect(wrapper.vm.$router.push).toBeCalled();
-  });
+        await button.trigger('click');
+        expect(api.updateListingNotificationViewStatus).toBeCalled();
+        button = wrapper.get("#important-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(api.updateListingNotificationViewStatus).toBeCalled();
+    })
+
+    test("Marking as read", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+
+        let boughtNotif = wrapper.get(".liked-listing-container");
+        expect(boughtNotif).toBeTruthy();
+        await boughtNotif.trigger('mouseenter');
+        expect(api.updateListingNotificationViewStatus).toBeCalled();
+    })
 });

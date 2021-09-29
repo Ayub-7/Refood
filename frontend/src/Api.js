@@ -503,12 +503,12 @@ export default {
         instance.delete(`/notifications/${listingId}`, {withCredentials: true}),
 
     /**
-     * Updates the view status of a listing notification.
-     * @param notificationId the unique id of the notification
-     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
-     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     * Deletes listing notification
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
      */
-    updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+    deleteCardExpiredNotification: (cardId) =>
+        instance.delete(`/cards/notifications/${cardId}`, {withCredentials: true}),
 
     /**
      * Retrieves and returns a list of BUSINESSES that the user has wishlisted.
@@ -518,6 +518,13 @@ export default {
      * 200 otherwise, may return an empty list (because the user has nothing in their item wishlist).
      */
     getUsersWishlistedBusinesses: (userId) => instance.get(`/users/${userId}/wishlist`, {withCredentials: true}),
+  /**
+   * Retrieves the user's business wishlist
+   * @param userId id of the user
+   * @returns {Promise<AxiosResponse<any>>} 400 if there was a problem with the data supplied,
+   * 401 if unauthed, 406 if the user does not exist, 200 otherwise.
+   */
+  getUserBusinessWishlist: (userId) => instance.get(`/users/${userId}/wishlist`, {withCredentials: true}),
 
     /**
      * Adds business to user's wishlist, creating a wishlistItem object
@@ -546,8 +553,34 @@ export default {
 
     /**
      * Returns a list of all the business' sales.
-     * @param businessId
+     * @param businessIdupdateListingNotificationViewStatus
      * @return {Promise<AxiosResponse<any>>}
      */
     getBusinessSales: (businessId) => instance.get(`/businesses/${businessId}/sales`, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a listing notification.
+     * @param notificationId the unique id of the notification
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a message notification.
+     * @param messageId the unique id of the message
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the message does not belong to the current user, 406 if the message id does not exist.
+     */
+    updateMessageViewStatus: (messageId, status) => instance.put(`/messages/${messageId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a marketplace card notification.
+     * @param notificationId the unique id of the notification
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    updateNotificationViewStatus: (notificationId, status) => instance.put(`/cards/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+
 }
