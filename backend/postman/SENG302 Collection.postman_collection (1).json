@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "064a5d84-6a80-4099-9200-a3e6ba2dd186",
-		"name": "SENG302 Collection",
+		"_postman_id": "c6228287-d70e-411e-a55a-b6aecb57dbe8",
+		"name": "SENG302 Collection Copy",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -206,8 +206,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Business",
@@ -438,8 +437,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Users",
@@ -586,8 +584,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Inventory",
@@ -674,8 +671,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Listings",
@@ -888,8 +884,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Products",
@@ -948,8 +943,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Cards",
@@ -1126,8 +1120,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Likes",
@@ -1183,8 +1176,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Listing Notification",
@@ -1303,8 +1295,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Notifications",
@@ -1341,9 +1332,33 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete extend card notification",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/notifications/extenddisplayperiod/:cardId",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"notifications",
+								"extenddisplayperiod",
+								":cardId"
+							],
+							"variable": [
+								{
+									"key": "cardId",
+									"value": "1291"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Wishlist",
@@ -1455,8 +1470,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
 	],
 	"event": [
@@ -1481,11 +1495,9 @@
 	],
 	"variable": [
 		{
-			"id": "e569f71f-a3de-4ee1-9a7a-482e7d401e8e",
 			"key": "URL",
 			"value": "localhost:9499",
 			"type": "string"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
