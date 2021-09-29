@@ -420,6 +420,27 @@ describe('Listing notification functionality tests', () => {
 //
 
 describe('HomePageMessages method tests', () => {
+    test("removeId method splices id from array", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+
+        wrapper.vm.undoId = [0,1,2,3,5,7,9];
+
+        wrapper.vm.removeId(5)
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.undoId).toStrictEqual([0,1,2,3,7,9]);
+    });
+
+    test("spliceMessage removes feeditem", async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+
+        wrapper.vm.feedItems = [{fid:0},{fid:1},{fid:5},{fid:6},{fid:7}];
+        wrapper.vm.spliceMessage(5);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.feedItems).toStrictEqual([{fid:0},{fid:1},{fid:6},{fid:7}]);
+    });
+
     test("markAsRead method test, message input, return 200", async () => {
         api.updateMessageViewStatus = jest.fn(() => {
             return Promise.resolve({status: 200});
@@ -431,14 +452,6 @@ describe('HomePageMessages method tests', () => {
         await wrapper.vm.$nextTick();
         expect(api.updateMessageViewStatus).toBeCalled();
     });
-
-    test("undoId method splices id from array", async () => {
-        wrapper.vm.undoId = [0,1,2,3,5,7,9];
-        wrapper.vm.removeId(5)
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.undoId).toBe([0,1,2,3,7,9]);
-    });
-
 });
 
 
