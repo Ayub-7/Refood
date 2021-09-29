@@ -432,6 +432,12 @@ describe('HomePageMessages method tests', () => {
         expect(api.updateMessageViewStatus).toBeCalled();
     });
 
+    test("undoId method splices id from array", async () => {
+        wrapper.vm.undoId = [0,1,2,3,5,7,9];
+        wrapper.vm.removeId(5)
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.undoId).toBe([0,1,2,3,7,9]);
+    });
 
 });
 
