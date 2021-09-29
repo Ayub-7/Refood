@@ -305,6 +305,37 @@ public class CardController {
         cardRepository.save(card);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+    /**
+     * DELETE endpoint, deletes the "Your marketplace card has expired notification"
+     *
+     * Preconditions: User must be logged in, User must be the creator of the card that triggered the notification,
+     * the notification must exist,
+     *
+     * Postconditions: Notification is deleted
+     *
+     * @param cardId Id of the card that the extend notification relates to
+     * @param session User session of user that is deleting the extend notification
+     * @return 200 if updated, 406 if ID does not exist, 401 if unauthorized, 403 if not creator or D/GAA
+     * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
+     */
+    @DeleteMapping("/cards/notifications/{cardId}")
+    public ResponseEntity<String> deleteExtendCardNotificationByCardId (@PathVariable Long cardId, HttpSession session) throws JsonProcessingException {
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        Notification notification = notificationRepository.findNotificationByCardId(cardId);
+        // Attempting to delete a notification that does not exist
+        if (notification == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        // Attempting to delete a notification to card that relates to somebody else.
+        if (notification.getUserId() != currentUser.getId() && !Role.isGlobalApplicationAdmin(currentUser.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        //Deletes cards notification (since display period is being extended)
+        notificationRepository.delete(notification);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 
     /**
@@ -317,7 +348,7 @@ public class CardController {
      * @param cardId ID of card to be retrieved from DB
      * @param session the current user session
      * @return 401 if not logged in (handled by spring sec), 403 if creatorId, session user Id do not match or if not a D/GAA,
-     * 400 if there are errors with data, 200 otherwise.
+     * 200 otherwise.
      * @throws JsonProcessingException if mapper to convert the response into a JSON string fails.
      */
     @DeleteMapping("/cards/{cardId}")

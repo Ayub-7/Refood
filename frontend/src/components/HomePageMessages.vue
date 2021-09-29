@@ -90,7 +90,7 @@
                   <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
                 </div>
                 <div>
-                  <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, false, true);
+                  <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, false, true, 'Deleted');
               undoClick=true" icon="close"></vs-button>
                 </div>
               </div>
@@ -443,19 +443,19 @@ export default {
      * @param fid
      * @param isMessage
      **/
-    undo: function (id, fid, isMessage, isExpiry) {
+    undo: function (id, fid, isMessage, isExpiry, title="") {
       this.undoId.push(fid)
       let timer = setInterval(() => {
         if(this.undoCount <= 0 || this.$route.path !== "/home") {
           clearInterval(timer)
           if(isMessage===true) {
+            console.log(id);
             this.deleteMessage(id, fid)
             this.undoCount = 10
             this.undoClick = false
             this.undoDelete = false
           } else if (isExpiry == true) {
-            console.log("sap")
-            this.deleteCard(id, fid)
+            this.deleteCard(id, title)
             this.undoCount = 10
             this.undoClick = false
             this.undoDelete = false
@@ -759,14 +759,24 @@ export default {
      * @param title card title for notification
      */
     deleteCard(cardId, title) {
-      console.log("delete card")
-      api.deleteCard(cardId)
-          .then(() => {
-            this.getNotifications();
-            this.$vs.notify({title:'Card Deleted', text:`Card ${title} was deleted`, color:'success'});
-          }).catch(() => {
-        this.$vs.notify({title:'Error', text:`Card ${title} could not be deleted due to an error`, color:'danger'});
-      })
+      if(title == 'Deleted'){
+        api.deleteCardExpiredNotification(cardId)
+            .then(() => {
+              this.getNotifications();
+              this.$vs.notify({title:'Deleted', text:`Notification deleted`, color:'success'});
+            }).catch(() => {
+          this.$vs.notify({title:'Error', text:`Notification ${cardId} could not be deleted due to an error`, color:'danger'});
+        })
+      } else {
+        api.deleteCard(cardId)
+            .then(() => {
+              this.getNotifications();
+              this.$vs.notify({title:'Card Deleted', text:`Card ${title} was deleted`, color:'success'});
+            }).catch(() => {
+          this.$vs.notify({title:'Error', text:`Card ${title} could not be deleted due to an error`, color:'danger'});
+        })
+      }
+
     },
 
     /**
