@@ -42,6 +42,11 @@ api.getBusinessFromId = jest.fn(() => {
     return Promise.resolve({data: mockBusiness, status: 200}).catch({message: "Error", status: 400});
 });
 
+const $route = {
+    params: {
+        id: 1
+    },
+};
 
 let $vs = {
     notify: jest.fn()
@@ -50,10 +55,11 @@ let $vs = {
 let $log = {
     debug: jest.fn()
 }
+
 beforeEach(() => {
     wrapper = mount(ModifyBusiness, {
         propsData: {},
-        mocks: {$vs, store, $log},
+        mocks: {$vs, store, $log, $route},
         stubs: [],
         methods: {},
         localVue,
