@@ -156,7 +156,6 @@
 <script>
 import api from "@/Api";
 import axios from "axios";
-import {store} from "@/store";
 
 const ModifyUser = {
   name: "ModifyUser",
@@ -230,26 +229,27 @@ const ModifyUser = {
     },
 
     setCurrentUser: function(user) {
-      if (user !== undefined) {
-        this.userEditForm.firstname = user.firstname;
-        this.userEditForm.middlename = user.middlename;
-        this.userEditForm.lastname = user.lastname;
-        this.userEditForm.nickname = user.nickname;
-        this.userEditForm.bio = user.bio;
-        this.userEditForm.email = user.email;
-        this.userEditForm.password = user.password;
-        this.userEditForm.dateofbirth = user.dateofbirth;
-        this.userEditForm.phonenumber = user.phonenumber;
-
-        this.userEditForm.streetNumber = user.homeAddress.streetNumber;
-        this.userEditForm.streetName = user.homeAddress.streetName;
-        this.userEditForm.suburb = user.homeAddress.suburb;
-        this.userEditForm.postcode = user.homeAddress.postcode;
-        this.userEditForm.city = user.homeAddress.city;
-        this.userEditForm.region = user.homeAddress.region;
-        this.userEditForm.country = user.homeAddress.country;
-
-      }
+      console.log(user)
+      // if (user !== undefined) {
+      //   this.userEditForm.firstname = user.firstname;
+      //   this.userEditForm.middlename = user.middlename;
+      //   this.userEditForm.lastname = user.lastname;
+      //   this.userEditForm.nickname = user.nickname;
+      //   this.userEditForm.bio = user.bio;
+      //   this.userEditForm.email = user.email;
+      //   this.userEditForm.password = user.password;
+      //   this.userEditForm.dateofbirth = user.dateofbirth;
+      //   this.userEditForm.phonenumber = user.phonenumber;
+      //
+      //   this.userEditForm.streetNumber = user.homeAddress.streetNumber;
+      //   this.userEditForm.streetName = user.homeAddress.streetName;
+      //   this.userEditForm.suburb = user.homeAddress.suburb;
+      //   this.userEditForm.postcode = user.homeAddress.postcode;
+      //   this.userEditForm.city = user.homeAddress.city;
+      //   this.userEditForm.region = user.homeAddress.region;
+      //   this.userEditForm.country = user.homeAddress.country;
+      //
+      // }
     },
 
     /**
@@ -354,7 +354,7 @@ const ModifyUser = {
           country: this.country,
           postcode: this.postcode
         }
-        this.userId = store.loggedInUserId;
+        this.userId = this.user.id;
 
         api.modifyUser(this.userId, this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, homeAddress, this.password)
             .then((response) => {
