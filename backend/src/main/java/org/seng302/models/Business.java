@@ -117,4 +117,20 @@ public class Business implements Serializable {
     public void setPrimaryThumbnailPath(String path) {
         this.primaryThumbnailPath = path;
     }
+
+    /**
+     * Removee the image from the images list for the business.
+     * @param imageId Id of the image to remove
+     */
+    public void deleteBusinessImage(String imageId) {
+        Image removeImage = null;
+        for (Image image: this.images) {
+            if (image.getId().equals(imageId)) {
+                this.images.remove(image);
+                removeImage = image;
+                break;
+            }
+        }
+        assert removeImage != null;
+    }
 }
