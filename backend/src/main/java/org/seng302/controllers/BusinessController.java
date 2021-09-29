@@ -427,7 +427,7 @@ public class BusinessController {
         String filename = "";
         String thumbnailFilename = "";
         // Save into DB.
-        if (System.getProperty("os.name").startsWith("windows")) {
+        if (System.getProperty("os.name").startsWith("Windows")) {
             filename = (String.format("business_%d\\%s%s", businessId, id, imageExtension));
             thumbnailFilename = (String.format("business_%d\\%s_thumbnail%s", businessId, id, imageExtension));
         } else {
