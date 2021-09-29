@@ -208,7 +208,7 @@ export default {
 
       this.series = [{
         name: 'Total Value',
-        data: data.slice(0, 10),
+        data: data,
       }];
 
     },
@@ -282,7 +282,6 @@ export default {
       this.labelFormat = "MMMM yyyy";
       let processedData = this.totalMonthlyRevenue(data);
       let allData = [];
-
       // Flatten object into array.
       for (let year of Object.entries(processedData)) allData = allData.concat(year[1]);
 
@@ -404,7 +403,6 @@ export default {
      * @param data bought listings sales data
      */
     displaySalesData: function(data) {
-      // Categorises and sums up data, splitting each bought listing into it's respective year and         this.updatePeriod(1 ,'week');month.
       let allData = [];
       let categories = [];
 
