@@ -53,7 +53,7 @@
           <vs-input type="tel"
                     class="form-control"
                     label="Phone number"
-                    :danger="phonenumber.length>0 && errors.includes(phonenumber)"
+                    :danger="phonenumber.length > 0 && errors.includes(phonenumber)"
                     danger-text="Invalid phone number."
                     :success="validPhoneNum(phonenumber)"
                     name="phonenumber"
@@ -67,6 +67,8 @@
                     :danger="errors.includes(dateofbirth)"
                     danger-text="Enter date of birth"
                     :success="(dateofbirth.length!==0)"
+                    min="1900-01-01"
+                    :max="maxAllowedDoB"
                     label="Date of birth *"/>
         </div>
         <div id="password-info">
@@ -82,7 +84,7 @@
           <vs-input type="password"
                     class="form-control"
                     label="Password *"
-                    :danger="errors.includes(password)"
+                    :danger="password.length > 0 || errors.includes(password)"
                     danger-text="Your password does not meet the requirements."
                     :success="validPassword(password)"
                     name="password (Required)"
@@ -181,6 +183,7 @@ const Register = {
       city: "",
       region: "",
       country: "",
+      maxAllowedDoB: new Date(),
 
       suggestCities: false,
       suggestedCities: [],
@@ -191,6 +194,10 @@ const Register = {
 
 
     };
+  },
+  mounted() {
+    this.maxAllowedDoB.setFullYear(this.maxAllowedDoB.getFullYear()-13);
+    this.maxAllowedDoB = this.maxAllowedDoB.toISOString().split('T')[0];
   },
   methods:{
     /**
@@ -224,7 +231,7 @@ const Register = {
       if (this.confirm_password.length === 0 || this.password !== this.confirm_password) {
         this.errors.push(this.confirm_password);
       }
-      if (this.dateofbirth.length === 0 || !this.validAge(this.dateofbirth)) {
+      if (this.dateofbirth.length === 0) {
         this.errors.push(this.dateofbirth);
       }
 
@@ -247,19 +254,6 @@ const Register = {
         }
       }
     },
-
-
-    /**
-     * from https://stackoverflow.com/questions/14231381/to-check-if-age-is-not-less-than-13-years-in-javascript
-     * @param birthDateString string of date inputted by user
-     * @returns {Boolean} True if user is 13 and above false if below
-     */
-
-    validAge: function(birthDateString) {
-      let years = new Date(new Date() - new Date(birthDateString)).getFullYear() - 1970;
-      return (years >= 13);
-    },
-
 
 
     /**

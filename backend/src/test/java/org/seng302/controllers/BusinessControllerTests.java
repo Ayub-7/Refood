@@ -19,19 +19,17 @@ import org.seng302.models.User;
 import org.seng302.models.requests.BusinessIdRequest;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
+import org.seng302.repositories.BoughtListingRepository;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.util.LinkedMultiValueMap;
 
 
@@ -54,6 +52,8 @@ class BusinessControllerTests {
     BusinessRepository businessRepository;
     @MockBean
     UserRepository userRepository;
+    @MockBean
+    BoughtListingRepository boughtListingRepository;
     @Autowired
     ObjectMapper mapper;
     @MockBean
@@ -473,5 +473,38 @@ class BusinessControllerTests {
         mvc.perform(get("/businesses/types")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, ownerUser))
                 .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    void getSales_noAuth_returns401() throws Exception {
+        mvc.perform(get("/businesses/{id}/sales", business.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void getSales_badId_returns406() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(99)).thenReturn(null);
+        mvc.perform(get("/businesses/{id}/sales", 99))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void getSales_AsAdmin_returns200() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(get("/businesses/{id}/sales", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, adminUser))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void getSales_notAdmin_returns403() throws Exception {
+        Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
+        mvc.perform(get("/businesses/{id}/sales", business.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
+                .andExpect(status().isForbidden());
     }
 }

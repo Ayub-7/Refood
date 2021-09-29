@@ -26,65 +26,65 @@ let $vs = {
 }
 
 let oneMessage = [{
-    "id": 3,
-    "sender": {
-        "id": 8186,
-        "firstName": "Tricia",
-        "middleName": "Xenos",
-        "lastName": "Vergo",
-        "nickname": "fault-tolerant",
-        "bio": "In eleifend quam a odio.",
-        "email": "xvergo4l@vkontakte.ru",
-        "dateOfBirth": "1977-11-24",
-        "phoneNumber": "+31 637 443 9610",
-        "homeAddress": {
-            "streetNumber": null,
-            "streetName": null,
-            "suburb": null,
-            "city": null,
-            "region": null,
-            "country": "Poland",
-            "postcode": null
-        },
-        "created": "2020-03-05 04:37:27",
-        "role": "USER",
-        "businessesAdministered": null
+  "id": 3,
+  "sender": {
+    "id": 8186,
+    "firstName": "Tricia",
+    "middleName": "Xenos",
+    "lastName": "Vergo",
+    "nickname": "fault-tolerant",
+    "bio": "In eleifend quam a odio.",
+    "email": "xvergo4l@vkontakte.ru",
+    "dateOfBirth": "1977-11-24",
+    "phoneNumber": "+31 637 443 9610",
+    "homeAddress": {
+      "streetNumber": null,
+      "streetName": null,
+      "suburb": null,
+      "city": null,
+      "region": null,
+      "country": "Poland",
+      "postcode": null
     },
-    "card": {
-        "id": 6134,
-        "user": 8186,
-        "title": "7up Diet, 355 Ml",
-        "description": "Ut at dolor quis odio consequat varius.",
-        "created": "2021-07-13 01:01:38",
-        "displayPeriodEnd": "2021-08-03 01:01:38",
-        "keywords": "sapien iaculis",
-        "section": "ForSale"
+    "created": "2020-03-05 04:37:27",
+    "role": "USER",
+    "businessesAdministered": null
+  },
+  "card": {
+    "id": 6134,
+    "user": 8186,
+    "title": "7up Diet, 355 Ml",
+    "description": "Ut at dolor quis odio consequat varius.",
+    "created": "2021-07-13 01:01:38",
+    "displayPeriodEnd": "2021-08-03 01:01:38",
+    "keywords": "sapien iaculis",
+    "section": "ForSale"
+  },
+  "receiver": {
+    "id": 83,
+    "firstName": "Allegra",
+    "middleName": "Jaquith",
+    "lastName": "King",
+    "nickname": "Visionary",
+    "bio": "In eleifend quam a odio. In hac habitasse platea dictumst.",
+    "email": "jking1q@printfriendly.com",
+    "dateOfBirth": "1983-07-29",
+    "phoneNumber": "+380 600 119 0770",
+    "homeAddress": {
+      "streetNumber": "33005",
+      "streetName": "Cascade",
+      "suburb": null,
+      "city": "Xingou",
+      "region": null,
+      "country": "China",
+      "postcode": null
     },
-    "receiver": {
-        "id": 83,
-        "firstName": "Allegra",
-        "middleName": "Jaquith",
-        "lastName": "King",
-        "nickname": "Visionary",
-        "bio": "In eleifend quam a odio. In hac habitasse platea dictumst.",
-        "email": "jking1q@printfriendly.com",
-        "dateOfBirth": "1983-07-29",
-        "phoneNumber": "+380 600 119 0770",
-        "homeAddress": {
-            "streetNumber": "33005",
-            "streetName": "Cascade",
-            "suburb": null,
-            "city": "Xingou",
-            "region": null,
-            "country": "China",
-            "postcode": null
-        },
-        "created": "2020-05-30 04:08:45",
-        "role": "USER",
-        "businessesAdministered": null
-    },
-    "description": "asdsaddas",
-    "sent": "2021-07-23 13:09:52"
+    "created": "2020-05-30 04:08:45",
+    "role": "USER",
+    "businessesAdministered": null
+  },
+  "description": "asdsaddas",
+  "sent": "2021-07-23 13:09:52"
 }];
 
 let listingNotifications = [
@@ -126,7 +126,101 @@ let listingNotifications = [
                 }
             }
         }
-    }
+    },
+    {
+        id: 4,
+        status: "Unliked",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
+    {
+        id: 5,
+        boughtListing: {name: "bought listing",
+            buyer: 10,
+            product: {
+                name: "Garlic",
+                business: {
+                    name: "Dabshots",
+                    address: {
+                        streetNumber: "88",
+                        streetName: "Ilam Road",
+                        suburb: "Ilam",
+                        city: "Christchurch",
+                        region: "Canterbury",
+                        country: "New Zealand"
+                    },
+                }
+            }
+        },
+        status: "Bought",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
+    {
+        id: 6,
+        boughtListing: {name: "bought listing",
+            buyer: 83,
+            product: {
+                name: "Garlic",
+                business: {
+                    name: "Dabshots",
+                    address: {
+                        streetNumber: "88",
+                        streetName: "Ilam Road",
+                        suburb: "Ilam",
+                        city: "Christchurch",
+                        region: "Canterbury",
+                        country: "New Zealand"
+                    },
+                }
+            }
+        },
+        status: "Bought",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
+    {
+        id: 7,
+        status: "Wishlist",
+        created: "2021-08-17 10:03:43",
+        listing: {
+            inventoryItem: {
+                product: {
+                    name: "Pastry",
+                    business: {
+                        id: 1
+                    },
+                }
+            }
+        }
+    },
 ];
 
 api.getMessages = jest.fn().mockResolvedValue({data: oneMessage});
@@ -136,8 +230,14 @@ api.deleteMessage = jest.fn(() => {
 });
 
 api.getListingNotifications = jest.fn( () => {
-   return Promise.resolve({status: 200, data: listingNotifications});
+    return Promise.resolve({status: 200, data: listingNotifications});
 });
+
+api.deleteListingNotification = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+
+api.updateListingNotificationViewStatus = jest.fn().mockResolvedValue({status: 200});
 
 beforeEach(() => {
     wrapper = mount(HomepageMessages, {
@@ -221,8 +321,8 @@ describe('Listing notification methods tests', () => {
             country: "New Zealand"
         };
 
-        expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
-    });
+    expect(wrapper.vm.createAddressString(address)).toBe("88 Ilam Road, Ilam, Christchurch, Canterbury, New Zealand");
+  });
 });
 
 describe('Listing notification functionality tests', () => {
@@ -242,4 +342,50 @@ describe('Listing notification functionality tests', () => {
         await button.trigger('click');
         expect(wrapper.vm.$router.push).toBeCalled();
     });
+
+    test("Delete listing notification buttons call undo function which deletes notification", async () => {
+        const deleteUndo = jest.spyOn(wrapper.vm, 'undo')
+        await wrapper.vm.$nextTick();
+        wrapper.vm.currentUserId = 83;
+        let button = wrapper.get("#delete-liked-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
+
+        button = wrapper.get("#delete-liked-purchased-listing-notification-button");
+        expect(button).toBeTruthy();
+
+        await button.trigger('click');
+        expect(deleteUndo).toBeCalled();
+        // expect undo modal to open i.e undoClick is true
+        expect(wrapper.vm.undoClick).toBe(true);
+        // time undo is visible should be 10secs
+        expect(wrapper.vm.undoCount).toBe(10);
+
+        button = wrapper.get("#delete-purchased-listing-notification-button");
+        expect(deleteUndo).toBeTruthy();
+
+  });
+
+  test("Bought listings are shown", () => {
+    expect(wrapper.find(".bought-listing-notification-card")).toBeTruthy();
+  });
+
+  test("Liked listings notifications are shown", () => {
+    expect(wrapper.find(".liked-listing-notification")).toBeTruthy();
+  });
+
+  test("Liked listing view button redirects to listing page on click", async () => {
+    await wrapper.vm.$nextTick();
+    let button = wrapper.find("#view-listing-button");
+    expect(button).toBeTruthy();
+
+    await button.trigger('click');
+    expect(wrapper.vm.$router.push).toBeCalled();
+  });
 });

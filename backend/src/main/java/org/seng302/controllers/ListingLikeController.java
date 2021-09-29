@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -93,6 +94,7 @@ public class ListingLikeController {
         }
 
         List<ListingLike> likedListings = listingLikeRepository.findListingLikesByUserId(id);
+        likedListings.sort(Comparator.comparing(o -> o.getListing().getCloses()));
         List<Listing> listings = likedListings.stream().map(ListingLike::getListing).collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(listings);
@@ -122,7 +124,9 @@ public class ListingLikeController {
 
         //Remove old liked notification
         ListingNotification oldNotification = listingNotificationRepository.findListingNotificationsByUserIdAndListing(sessionUser.getId(), listing);
-        listingNotificationRepository.delete(oldNotification);
+        if (oldNotification != null) {
+            listingNotificationRepository.delete(oldNotification);
+        }
 
         //Add new liked notification
         ListingNotification notification = new ListingNotification(sessionUser, listing, NotificationStatus.UNLIKED);

@@ -27,8 +27,8 @@
           <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
           <p vs-justify="left"><b>Price:</b> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
           <p><b>Quantity:</b> {{listing.quantity}}</p>
-          <p><b>Closes:</b> {{listing.created}}</p>
-          <p><b>Created:</b> {{listing.closes}}</p>
+          <p><b>Created:</b> {{listing.created}}</p>
+          <p><b>Closes:</b> {{listing.closes}}</p>
           <p id="listing-moreInfo">{{listing.moreInfo}}</p>
           <p><b>Likes:</b> {{listing.likes}}</p>
           <div class="">
@@ -239,11 +239,22 @@ export default {
     },
 
     /**
-     * Calls the post notification and delete listing endpoints after the buy buton is clicked
+     * Calls the post notification and delete listing endpoints after the buy button is clicked
      */
     buy() {
       api.postListingNotification(this.listingId)
               .then((response) => {
+                //wait until we have successfully bought the listing before we delete it
+                //to avoid race conditions where the listing is half bought before we delete it
+                api.deleteListing(this.listingId)
+                .catch(err => {
+                  if (err.response.status === 406) {
+                    this.$vs.notify({title: 'Purchase Failed', text: '406 Not Acceptable', color: 'danger'})
+                  } else {
+                    this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
+                  }
+                });
+
                 this.$vs.notify({title:'Success', text:`Successfully purchased!\n${response.status}`, color:'success'})
                 this.$router.push({path: `/home`});
               })
@@ -256,14 +267,6 @@ export default {
                   this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
                 }
               });
-      api.deleteListing(this.listingId)
-              .catch(err => {
-        if (err.response.status === 406) {
-          this.$vs.notify({title: 'Purchase Failed', text: '406 Not Acceptable', color: 'danger'})
-        } else {
-          this.$vs.notify({title:'Purchase Failed', text:`Status Code ${err.response.status}`, color:'danger'})
-        }
-      });
     }
   }
 

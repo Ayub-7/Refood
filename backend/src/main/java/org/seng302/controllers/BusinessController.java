@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.finders.BusinessFinder;
-import org.seng302.models.Business;
-import org.seng302.models.BusinessType;
-import org.seng302.models.Role;
-import org.seng302.models.User;
+import org.seng302.models.*;
 import org.seng302.models.responses.BusinessIdResponse;
 import org.seng302.models.requests.NewBusinessRequest;
 import org.seng302.models.requests.UserIdRequest;
 import org.seng302.models.requests.BusinessIdRequest;
+import org.seng302.repositories.BoughtListingRepository;
 import org.seng302.repositories.BusinessRepository;
 import org.seng302.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Class with endpoints for searching, adding, modifying, or deleting businesses.
@@ -42,6 +42,9 @@ public class BusinessController {
 
     @Autowired
     private BusinessRepository businessRepository;
+
+    @Autowired
+    private BoughtListingRepository boughtListingRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -316,6 +319,34 @@ public class BusinessController {
     public List<BusinessType> getAllTypes() {
         logger.debug("Retrieving all business types...");
         return Arrays.asList(BusinessType.values());
+    }
+
+
+    /**
+     * Gets all sales from a business with given id
+     * @param id id of the business
+     * @param session Http session to get user of session
+     * @return Response entity with 200 if ok, 403 if not admin of business, and 406 if business doesn't exist
+     * @throws JsonProcessingException
+     */
+    @GetMapping("/businesses/{id}/sales")
+    public ResponseEntity<String> getBusinessSales(@PathVariable long id, HttpSession session) throws JsonProcessingException {
+
+        Business business = businessRepository.findBusinessById(id);
+
+        if (business == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        ArrayList<Long> adminIds = business.getAdministrators().stream().map(User::getId).collect(Collectors.toCollection(ArrayList::new));
+        User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+
+        if (!(adminIds.contains(currentUser.getId()) || Role.isGlobalApplicationAdmin(currentUser.getRole()))) { // User is not authorized to add products
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<BoughtListing> sales = boughtListingRepository.findBoughtListingsByBusinessId(id);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(mapper.writeValueAsString(sales));
     }
 
 }

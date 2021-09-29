@@ -424,8 +424,8 @@ export default {
 
     /**
      * Post api endpoint to post listing notification for particular listing
+     * Status of the listing is set to bought
      * @param listingId ID of the listing
-     * @param status Status of the listing (bought)
      * @returns {Promise<AxiosResponse<any>>}
      *          201 if created
      *          400 if bad request
@@ -493,4 +493,61 @@ export default {
      */
     getBusinessListingNotifications: (businessId) =>
         instance.get(`/businesses/${businessId}/notifications`, {withCredentials: true}),
+
+    /**
+     * Deletes listing notification
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteListingNotification: (listingId) =>
+        instance.delete(`/notifications/${listingId}`, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a listing notification.
+     * @param notificationId the unique id of the notification
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Retrieves and returns a list of BUSINESSES that the user has wishlisted.
+     * @param id unique identifier of the user.
+     * @param session current active user session.
+     * @return 401 if unauthorized, 406 if the user does not exist.
+     * 200 otherwise, may return an empty list (because the user has nothing in their item wishlist).
+     */
+    getUsersWishlistedBusinesses: (userId) => instance.get(`/users/${userId}/wishlist`, {withCredentials: true}),
+
+    /**
+     * Adds business to user's wishlist, creating a wishlistItem object
+     * @param businessId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    addBusinessToWishlist: (businessId) =>
+        instance.post(`/businesses/${businessId}/wishlist`, {}, {withCredentials: true}),
+
+    /**
+     * Updates whether the wishlisted business is muted or not
+     * @param wishlistId id of the wishlist relationship object
+     * @param mutedStatus true or false, muted or not
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    updateWishlistMuteStatus: (wishlistId, mutedStatus) =>
+        instance.put(`/wishlist/${wishlistId}`, {mutedStatus: mutedStatus}, {withCredentials: true}),
+
+    /**
+     * Removes business from user's wishlist by removing the relevant wishlistItem object
+     * @param wishlistItemId
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    removeBusinessFromWishlist: (wishlistItemId) =>
+        instance.delete(`/wishlist/${wishlistItemId}`, {withCredentials: true}),
+
+    /**
+     * Returns a list of all the business' sales.
+     * @param businessId
+     * @return {Promise<AxiosResponse<any>>}
+     */
+    getBusinessSales: (businessId) => instance.get(`/businesses/${businessId}/sales`, {withCredentials: true}),
 }

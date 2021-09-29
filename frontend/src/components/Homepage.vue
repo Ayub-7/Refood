@@ -26,66 +26,142 @@
           </div>
           <div class="userinfo-container" v-else>
             <div id="userinfo-content">
-              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()'>Profile</vs-button>
-              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" >Marketplace</vs-button>
-              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()">My Cards</vs-button>
-              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'">Browse Listings</vs-button>
+              <vs-button class="left-nav-item" id="user-profile-btn" @click.native='goToProfile()' icon="account_box">Profile</vs-button>
+              <vs-button class="left-nav-item" id="marketplace-btn" :to="'/marketplace'" icon="store">Marketplace</vs-button>
+              <vs-button class="left-nav-item" id="cards-btn" @click="openMarketModal()" icon="style">My Cards</vs-button>
+              <vs-button class="left-nav-item" id="listings-btn" :to="'/search-listings'" icon="search">Browse Listings</vs-button>
             </div>
           </div>
         </div>
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
-        <div id="watchlist-container" class="sub-container">
-          <div id="watchlist-header-container">
-            <div style="display: flex;">
-              <vs-icon icon="favorite_border" class="msg-icon"></vs-icon>
-              <div class="watchlist-title">
-                Watchlist
+        <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
+          <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
+            <vs-tabs>
+              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
+              <vs-tab id="wishlist-tab" @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
+            </vs-tabs>
+          </div>
+          <div v-if="watchlist">
+            <div v-if="likedItem.length > 0" style="margin-top: -40px">
+              <div v-for="(item, index) in likedItem" :key="item.id" >
+                <vs-card style="margin-top: -10px" id="message-notification-card" actionable>
+                  <div  id="likes-notification-container">
+                    <vs-row v-if="item.likes != 0">
+                      <vs-col vs-type="flex" vs-align="center">
+                        <vs-tooltip text="Unlike">
+                          <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
+                        </vs-tooltip>
+                        <div @click="viewListing(item.inventoryItem.product.business.id, item.id)" style="width: 100%; color: white;">
+                          p
+                        </div>
+                      </vs-col>
+                    </vs-row>
+                    <vs-row v-else>
+                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                        <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" @click="unlike(item.id, index)"></vs-icon>
+                      </vs-col>
+                    </vs-row>
+                    <div @click="viewListing(item.inventoryItem.product.business.id, item.id)">
+                      <div id="product-name">{{item.inventoryItem.product.name}}</div>
+                      <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
+                      <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+                    </div>
+                  </div>
+                </vs-card>
               </div>
             </div>
-            <span style="margin: auto 0;">{{likes}}</span>
+            <div v-else>
+              <em style="font-size: 12px;">
+                You currently have no liked listings
+              </em>
+            </div>
           </div>
-          <vs-divider style="margin-top: -30px"></vs-divider>
-          <div v-for="(item, index) in likedItem" :key="item.id" >
-            <vs-card style="margin-top: -40px" id="message-notification-card" actionable>
-              <div id="likes-notification-container">
-                <vs-row v-if="item.likes != 0">
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-tooltip text="View Listing">
-                      <vs-icon id="view-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    </vs-tooltip>
-                    <vs-tooltip text="Unlike">
-                      <vs-icon id="like-icon" icon="favorite" class="msg-icon" color="red" @click="unlike(item.id, index); item.likes = 0"></vs-icon>
-                    </vs-tooltip>
-                  </vs-col>
-                </vs-row>
-                <vs-row v-else>
-                  <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
-                    <vs-icon id="view-unlike-icon" icon="visibility" class="msg-icon" @click="viewListing(item.inventoryItem.product.business.id, item.id)"></vs-icon>
-                    <vs-icon id="unlike-icon" icon="favorite_border" class="msg-icon" color="red" ></vs-icon>
-                  </vs-col>
-                </vs-row>
-                <div id="product-name">{{item.inventoryItem.product.name}}</div>
-                <div id="product-seller"><strong>Seller: </strong>{{item.inventoryItem.product.business.name}}</div>
-                <div id="product-closes" slot="footer"><strong>Closes: </strong>{{item.closes}}</div>
+          <div v-if="!watchlist">
+            <div v-if="wishlist.length > 0">
+              <vs-tooltip :text="allMuted ? 'Unmute all' : 'Mute all'">
+                <vs-button id="mute-all-btn" @click="toggleMuteAll" v-if="allMuted == true" style="width: 100%; margin-bottom: 20px" color="grey">
+                  <vs-icon icon="notifications_off" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+                <vs-button v-else class="mute-all-btn" @click="toggleMuteAll" style="width: 100%; margin-bottom: 20px" color="grey">
+                  <vs-icon icon="notifications" class="msg-icon" color="white"></vs-icon>
+                </vs-button>
+              </vs-tooltip>
+            </div>
+            <div v-if="wishlist.length > 0">
+              <div v-for="wish in wishlist" :key="wish.id" >
+                <vs-card style="margin-top: -10px"  actionable>
+                  <div>
+                    <vs-row>
+                      <vs-col vs-type="flex" vs-align="center" vs-justify="space-between">
+                        <vs-tooltip text="Remove from wishlist">
+                          <vs-icon id="wishlist-icon" icon="star" class="msg-icon" color="red" @click="removeFromWishlist(wish.id)"></vs-icon>
+                        </vs-tooltip>
+                        <div @click="viewBusiness(wish.business.id)" style="width: 90%; color: white;">
+                          p
+                        </div>
+                        <vs-tooltip v-if="!isMuted(wish.mutedStatus)" text="Mute this business">
+                          <vs-icon icon="notifications" class="msg-icon" color="grey" @click="toggleMuteBusiness(wish)"></vs-icon>
+                        </vs-tooltip>
+                        <vs-tooltip v-if="isMuted(wish.mutedStatus)" text="Unmute this business">
+                          <vs-icon icon="notifications_off" class="msg-icon" color="grey" @click="toggleMuteBusiness(wish)"></vs-icon>
+                        </vs-tooltip>
+
+                      </vs-col>
+                    </vs-row>
+                    <div @click="viewBusiness(wish.business.id)" id="business-card">
+                      <div id="business-title">{{wish.business.name}}</div>
+                      <div id="business-type">{{wish.business.businessType}}</div>
+                    </div>
+                  </div>
+                </vs-card>
               </div>
-            </vs-card>
+            </div>
+            <em v-else style="font-size: 12px">
+              You currently have no wishlisted businesses
+            </em>
           </div>
         </div>
       </div>
 
-        <!-- Main element that will display the user a personalized news feed when further features have been implemented -->
-        <main>
-          <nav id="newsfeed-navbar">
-            <div class="newsfeed-title">
-              <span style="display: inline-block; vertical-align: middle;">
-                <vs-icon icon="feed" />
-              </span>
-               News Feed
-            </div>
-          </nav>
-          <vs-divider style="padding: 0 1em;"/>
-          <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
-        </main>
+      <main v-if="getBusinessId() == null">
+        <nav id="newsfeed-navbar">
+          <div class="newsfeed-title">
+            <span style="display: inline-block; vertical-align: middle;">
+              <vs-icon icon="feed" />
+            </span>
+             News Feed
+          </div>
+        </nav>
+        <vs-divider style="padding: 0 1em;"/>
+        <HomePageMessages v-if="getBusinessId() == null" :currency="currencySymbol"></HomePageMessages>
+      </main>
+
+      <div v-else-if="graphMode" class="business-main" >
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="leaderboard" size="32px" style="margin: auto 0"></vs-icon>
+            <div class="title">Sales Report Graph</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Data</vs-button>
+          </div>
+          <vs-divider/>
+          <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
+        </vs-card>
+      </div>
+      <div v-else class="business-main">
+        <vs-card>
+          <div class="header-container">
+            <vs-icon icon="summarize" size="32px" style="margin: auto 0"></vs-icon>
+            <div class="title">Sales Report</div>
+            <div class="title-business"> - {{getBusinessName()}}</div>
+            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
+          </div>
+          <vs-divider/>
+          <BusinessSalesReport :businessId="actingAsBusinessId" />
+        </vs-card>
+      </div>
+
+
 
     <vs-popup title="Your Cards" :active.sync="showMarketModal" id="market-card-modal">
       <div v-if="cards.length > 0" class="container">
@@ -107,10 +183,12 @@ import HomePageMessages from "./HomePageMessages.vue";
 import MarketplaceGrid from "./MarketplaceGrid";
 import ListingDetail from "./ListingDetail";
 import axios from "axios";
+import BusinessSalesReport from "./BusinessSalesReport";
+import BusinessSalesGraph from "./BusinessSalesGraph";
 
 const Homepage = {
   name: "Homepage",
-  components: {ListingDetail, HomePageMessages, MarketplaceGrid},
+  components: {BusinessSalesReport, BusinessSalesGraph, ListingDetail, HomePageMessages, MarketplaceGrid},
   data: function () {
     return {
       unliked: false,
@@ -126,6 +204,26 @@ const Homepage = {
       currentCardPage: 1,
       user: null,
       currencySymbol: "$",
+      watchlist: true,
+      wishlist: [],
+      graphMode: true,
+      series: [{
+        name: 'Number of sales',
+        data: [30, 40, 20, 50, 49, 10, 70, 40, 55, 57, 53, 44]
+      }],
+      options: {
+        chart: {
+          id: 'sales-graph-report'
+        },
+        xaxis: {
+          categories: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+            'September', 'October', 'November', 'December']
+        },
+        dataLabels: {
+          enabled: false,
+        }
+      },
+      allMuted: false,
     }
   },
   /**
@@ -135,6 +233,7 @@ const Homepage = {
   mounted() {
     this.checkUserSession();
     this.getLikes(this.userId);
+    this.getWishlist(this.userId);
   },
 
   methods: {
@@ -153,14 +252,134 @@ const Homepage = {
     },
 
     /**
-     * open listing
+     * Calculate whether allMuted is true or not
+     * This function sets the Mute All button to either mute or unmute
+     * It is called every time a Wishlisted Business is added or removed and during page load
+     * If all Wishlisted Business' are manually/individually muted, set the button to 'Unmute All'
+     * If any single Wishlisted Business is unmuted, set the button to "Mute All'
+     */
+    calculateAllMuted: function () {
+      this.allMuted = true;
+
+      for (let wishlistedBusiness of this.wishlist) {
+        if(wishlistedBusiness.mutedStatus === "Unmuted")
+          this.allMuted = false;
+      }
+    },
+
+
+    /**
+     * Checks whether a business has been muted or not
+     * @param muteStatus
+     * @return Boolean whether muteStatus is equal the string "Muted" or not
+     */
+    isMuted: function (muteStatus) {
+      return muteStatus === "Muted";
+    },
+
+    /**
+     * Mutes a single wishlisted business
+     * To updateWishlistMuteStatus, the current mutedStatus needs to be called.
+     * Ie if we were to unmute a currently muted wishlisted business, we must send the status 'Muted' as a parameter
+     * @param wishlistedBusinessItem the business to toggle mute on
+     */
+    toggleMuteBusiness: function (wishlistedBusinessItem) {
+      api.updateWishlistMuteStatus(wishlistedBusinessItem.id, wishlistedBusinessItem.mutedStatus)
+          .then(() => {
+            this.getWishlist(this.userId);
+            this.$vs.notify({title: "Business successfully unmuted", color: "success"});
+          })
+          .catch(() => {
+            this.$vs.notify({title: "Error muting business", color: "danger"});
+          });
+
+    },
+
+
+    /**
+     * Calls the api endpoint, updating the mute status of all the wishlist items
+     */
+    toggleMuteAll: async function () {
+      //toggle the 'Mute All' button
+      let muteStatus;
+      if (!this.allMuted) {
+        this.allMuted = true;
+        muteStatus = "Unmuted";
+      } else {
+        muteStatus = "Muted";
+        this.allMuted = false;
+      }
+
+      //Set the mute/unmute state for every business in the wishlist
+      for (let wish of this.wishlist) {
+        api.updateWishlistMuteStatus(wish.id, muteStatus)
+            .catch(() => {
+              this.$vs.notify({title: "Error updating wishlist mute/unmute", color: "danger"});
+            });
+      }
+      await this.getWishlist(this.userId);
+      this.$vs.notify({title: "All businesses successfully muted/unmuted", color: "success"});
+
+    },
+
+    /**
+     * Call the api function and retrieve wishlisted businesses
+     * @param userId ID of user who is currently logged in
+     */
+    getWishlist: function (userId) {
+      api.getUsersWishlistedBusinesses(userId)
+        .then((res) => {
+          this.wishlist = res.data;
+          this.calculateAllMuted();
+
+        })
+        .catch((error) => {
+          if (error.response) {
+            this.$vs.notify({title: "Error retrieving wishlist", color: "danger"});
+          }
+        })
+    },
+
+    /**
+     * Call api function to remove business from user's wishlist
+     * @param wishlistItemId ID of the business that the user 'Wishlisted'
+     */
+    removeFromWishlist: function (wishlistItemId) {
+      api.removeBusinessFromWishlist(wishlistItemId)
+              .then(() => {
+                this.getWishlist(this.userId);
+                this.calculateAllMuted();
+                this.$vs.notify({title: "Successfully  removed business from wishlist", color: "success"});
+              })
+              .catch((error) => {
+                if (error.response) {
+                  this.$vs.notify({title: "Error removing business", color: "danger"});
+                }
+                this.$log.debug(error);
+              })
+    },
+
+    /**
+     * Go to business profile
+     * @param businessId Id of the business in 'Wishlisted Businesses'
+     */
+    viewBusiness: function (businessId) {
+      this.$router.push({name: "Business", params: {id: businessId}})
+    },
+
+    /**
+     * Open listing
+     * @param businessId ID of the business owning the selected listing
+     * @param listingId The selected listing's ID
      */
     viewListing: function (businessId, listingId) {
       this.$router.push({name: "Listing", params: {businessId: businessId, listingId: listingId}})
     },
 
     /**
-     * unlike an item
+     * Unlike an item
+     * @param id ID of user who is currently logged in
+     * @param index Location of the Listing in,this.likedItem, that the user unliked
      */
     unlike: function (id, index) {
       this.likes -= 1;
@@ -175,26 +394,53 @@ const Homepage = {
         }
         this.$log.debug(error);
       })
-
     },
+
     /**
-     * Retrieves all the cards that the user has liked.
+     * Retrieves all the listings that the user has liked.
+     * @param userId ID of user who is currently logged in
      */
     getLikes: function(userId) {
       api.getUserLikedListings(userId)
         .then((res) => {
-          this.likedItem = res.data;
-          this.likes = res.data.length;
+          let temp = [];
+          for (let data of res.data) {
+            if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+              temp.push(data);
+            } else {
+              api.removeLikeFromListing(data["id"]);
+            }
+          }
+          this.likedItem = temp;
+          this.likes = temp.length;
         })
         .catch((error) => {
           if (error.response) {
             this.$vs.notify({title: "Error retrieving likes", color: "danger"});
           }
-        })
+        });
+
+      setInterval(() => {
+        api.getUserLikedListings(userId)
+            .then((res) => {
+              let temp = [];
+              for (let data of res.data) {
+                if (new Date(data["closes"]).getTime() > new Date().getTime()) {
+                  temp.push(data);
+                } else {
+                  api.removeLikeFromListing(data["id"]);
+                }
+              }
+              this.likedItem = temp;
+              this.likes = temp.length;
+            })
+      }, 100);
+
     },
 
     /**
      * Retrieves all the cards that the user has created.
+     * @param id ID of user who is currently logged in
      */
     getUserCards: function(id) {
       this.$vs.loading({
@@ -204,9 +450,9 @@ const Homepage = {
       api.getUserCards(id)
         .then((res) => {
           this.cards = res.data;
-          for(let i = 0; i < this.cards.length; i++){
-            if(!this.cards[i].user.homeAddress){
-              this.cards[i].user = this.user;
+          for(let card of this.cards){
+            if(!card.user.homeAddress){
+              card.user = this.user;
             }
           }
         })
@@ -226,7 +472,7 @@ const Homepage = {
      * Also sets the users details in store.js, so the users session can be maintained
      * as they navigate throughout the applications and 'act' as a business
      *
-     * @param userId ID of user who is currently viewing page.
+     * @param userId ID of user who is currently logged in
      */
     getUserDetails: function(userId) {
       api.getUserFromID(userId)
@@ -239,6 +485,7 @@ const Homepage = {
             mutations.setUserName(response.data.firstName + " " + response.data.lastName);
             mutations.setUserCountry(response.data.homeAddress.country);
             mutations.setUserBusinesses(this.businesses);
+            this.setCurrency(response.data.homeAddress.country);
           }).catch((err) => {
         if (err.response.status === 401) {
           this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
@@ -274,7 +521,7 @@ const Homepage = {
      * Sends an api request to get a business object from a business Id
      * Sets this components business variable to this object
      *
-     * @param id business id
+     * @param id business' id
      */
     getBusiness: function(id) {
       api.getBusinessFromId(id)
@@ -302,6 +549,7 @@ const Homepage = {
 
     /**
      * Gets the name of the business the user is acting as from the store
+     * @return business the user is acting as
      */
     getBusinessName: function() {
       return store.actingAsBusinessName;
@@ -309,6 +557,7 @@ const Homepage = {
 
     /**
      * Gets the username of the logged in user from the store
+     * @return Username of the logged in user
      */
     getUserName: function() {
       return store.userName;
@@ -317,6 +566,7 @@ const Homepage = {
     /**
      * Gets the logged in users id from the store, and assigns this components
      * userId variable equal to it.
+     * @return Id of the logged in user
      */
     getLoggedInUserId: function() {
       this.userId = store.loggedInUserId;
@@ -371,7 +621,24 @@ export default Homepage;
   margin-bottom: 4px;
 }
 
+.toggle-button {
+  width: 150px;
+}
+
+.header-container {
+  display: flex;
+  margin: auto;
+  padding-bottom: 0.5em;
+  padding-top: 1em;
+}
+
 #product-name {
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#business-title {
   text-align: left;
   font-size: 12px;
   font-weight: bold;
@@ -381,11 +648,16 @@ export default Homepage;
   font-size: 12px;
 }
 
+
 #view-icon {
   font-size: 16px;
   margin-left: -1px;
   cursor: pointer;
   transition: font-size 0.3s;
+}
+
+#wishlist-icon {
+  font-size: 16px;
 }
 
 #view-unlike-icon {
@@ -432,7 +704,7 @@ export default Homepage;
 
 #container {
   display: grid;
-  grid-template-columns: 0.5fr 1fr 4fr 0.5fr;
+  grid-template-columns: 0.6fr 1.8fr 4fr 0.6fr;
   grid-template-rows: 1fr auto;
   grid-column-gap: 1em;
   margin: auto;
@@ -449,7 +721,7 @@ export default Homepage;
   border-radius: 4px;
   margin: 8px 0 0 0;
 
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
 }
 
 .name {
@@ -461,6 +733,16 @@ export default Homepage;
 #business-name {
   font-size: 32px;
   margin: auto;
+}
+
+.title {
+  font-size: 30px;
+  margin: auto 8px auto 4px;
+}
+.title-business {
+  font-size: 30px;
+  font-weight: bold;
+  margin: auto auto auto 0;
 }
 
 .newsfeed-title {
@@ -482,7 +764,7 @@ export default Homepage;
 .sub-container {
   padding: 2em;
   border-radius: 4px;
-  box-shadow: 0px 4px 25px 0px rgba(0,0,0,.1);
+  box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
   background-color: #FFFFFF;
 }
 
@@ -523,6 +805,16 @@ main {
   font-size: 18px;
   padding-top: 1em;
   padding-left: 4px;
+}
+
+.business-main {
+  grid-column: 3;
+  grid-row: 2;
+  margin-top: 1em;
+}
+
+.business-main >>> .vs-card--content {
+  width: 100%;
 }
 
 /* left navigation panel styling */
@@ -578,8 +870,7 @@ main {
   .watchlist-title {
     font-size: 18px;
     margin-left: 4px;
-    transition: 0.3s;
+    transition: 0.1s;
   }
-
 }
 </style>

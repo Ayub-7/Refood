@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8d308419-9ed5-443e-b240-ad264e37ed7e",
+		"_postman_id": "064a5d84-6a80-4099-9200-a3e6ba2dd186",
 		"name": "SENG302 Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -37,10 +37,25 @@
 				{
 					"name": "Login (admin)",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"dgaa@refood.com\",\r\n    \"password\": \"dgaapassword123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": ""
+							"raw": "{{URL}}/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"login"
+							]
 						}
 					},
 					"response": []
@@ -191,7 +206,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Business",
@@ -396,8 +412,34 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Wishlist business",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:id/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Users",
@@ -467,8 +509,85 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Add user image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "filename",
+									"type": "file",
+									"src": "jeRhbyY7I/GUITime.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}/users/:id/images",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"images"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Jeff\",\r\n  \"lastName\": \"Smith\",\r\n  \"middleName\": \"Hector\",\r\n  \"nickname\": \"Jonny\",\r\n  \"bio\": \"Likes long walks on the beach\",\r\n  \"email\": \"jsails0@go.com\",\r\n  \"dateOfBirth\": \"1999-04-27\",\r\n  \"phoneNumber\": \"+64 3 555 0129\",\r\n  \"homeAddress\": {\r\n    \"streetNumber\": \"3/24\",\r\n    \"streetName\": \"Ilam Road\",\r\n    \"suburb\": \"Upper Riccarton\",\r\n    \"city\": \"Christchurch\",\r\n    \"region\": \"Canterbury\",\r\n    \"country\": \"New Zealand\",\r\n    \"postcode\": \"90210\"\r\n  },\r\n  \"password\": \"1337-H%nt3r2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/users/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Must be logged in as the user who is about to be modified"
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Inventory",
@@ -536,20 +655,27 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}/businesses/1/inventory",
+							"raw": "{{URL}}/businesses/:id/inventory",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
 								"businesses",
-								"1",
+								":id",
 								"inventory"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
 							]
 						}
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Listings",
@@ -727,8 +853,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Create new listing",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"inventoryItemId\": 101,\r\n  \"quantity\": 3,\r\n  \"price\": 17.99,\r\n  \"moreInfo\": \"Seller may be willing to consider near offers\",\r\n  \"closes\": \"2021-07-21T23:59:00Z\",\r\n  \"likes\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/businesses/:id/listings",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":id",
+								"listings"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Products",
@@ -787,7 +948,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Cards",
@@ -964,7 +1126,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Likes",
@@ -1020,7 +1183,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Listing Notification",
@@ -1139,7 +1303,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Notifications",
@@ -1177,7 +1342,121 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Wishlist",
+			"item": [
+				{
+					"name": "Remove business from wishlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/wishlist/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wishlist",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user's wishlisted businesses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/users/:id/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add business to user's wishlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/businesses/:businessId/wishlist",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"businesses",
+								":businessId",
+								"wishlist"
+							],
+							"variable": [
+								{
+									"key": "businessId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update MutedStatus",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"mutedStatus\": \"Muted\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/wishlist/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wishlist",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
@@ -1202,9 +1481,11 @@
 	],
 	"variable": [
 		{
+			"id": "e569f71f-a3de-4ee1-9a7a-482e7d401e8e",
 			"key": "URL",
 			"value": "localhost:9499",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
