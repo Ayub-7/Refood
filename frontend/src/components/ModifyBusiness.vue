@@ -104,42 +104,18 @@ export default {
           this.description.length === 0 && this.businessType === null) {
         this.$vs.notify({title:'Cannot modify business', text:'Required fields are missing.', color:'danger'});
       } else {
-        if (this.businessName.length === 0) {
-          this.businessName = this.business.name;
-        }
-        if (this.streetAddress === null || this.streetAddress.length === 0) {
-          this.streetAddress = this.business.address.streetName;
-        }
-        if (this.streetNumber.length === 0) {
-          this.streetNumber = this.business.address.streetNumber;
-        }
-        if (this.suburb === null || this.suburb.length === 0) {
-          this.suburb = this.business.address.suburb;
-        }
-        if (this.postcode === null || this.postcode.length === 0) {
-          this.postcode = this.business.address.postcode;
-        }
-        if (this.region === null || this.region.length === 0) {
-          this.region = this.business.address.region;
-        }
-        if (this.city === null || this.city.length === 0) {
-          this.city = this.business.address.city;
-        }
-        if (this.country.length === 0) {
-          this.country = this.business.address.country;
-        }
-        if (this.description.length === 0) {
-          this.description = this.business.description;
-        }
-        if (this.businessType === null) {
-          this.businessType = this.business.businessType;
-        }
         this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
         if (this.errors.length === 0) {
           this.$vs.notify({title:'Success', text:'The business have been successfully modified!', color:'success'});
         } else {
-          for (let i = 0; i < this.errors.length; i++) {
-            this.$vs.notify({title:'Error', text:this.errors[i], color:'danger'});
+          if (this.errors.includes("country")) {
+            this.$vs.notify({title:'Error', text:'Country field is required', color:'danger'});
+          }
+          if (this.errors.includes("businessName")) {
+            this.$vs.notify({title:'Error', text:'Business name is required', color:'danger'});
+          }
+          if (this.errors.includes("description")) {
+            this.$vs.notify({title:'Error', text:'Description too long', color:'danger'});
 
           }
         }
@@ -208,6 +184,16 @@ export default {
         .catch((error) => {
           this.$log.error(error);
         })
+    this.businessName = this.business.name;
+    this.streetAddress = this.business.address.streetName;
+    this.streetNumber = this.business.address.streetNumber;
+    this.suburb = this.business.address.suburb;
+    this.postcode = this.business.address.postcode;
+    this.region = this.business.address.region;
+    this.city = this.business.address.city;
+    this.country = this.business.address.country;
+    this.description = this.business.description;
+    this.businessType = this.business.businessType;
     this.getBusinessTypes();
   },
 }
