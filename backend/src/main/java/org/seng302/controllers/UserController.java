@@ -155,11 +155,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         else {
-            List<String> registrationErrors = registrationUserCheck(reqBody);
+            List<String> registrationErrors = registrationUserCheck(reqBody, false);
             if (registrationErrors.isEmpty()) { // No errors found.
-                if (reqBody.getNewPassword() != null
-                    || !Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
+                if (reqBody.getNewPassword() != null &&
+                !Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect current password");
+                } else if (reqBody.getNewPassword() != null) {
+                    user.setPassword(Encrypter.hashString(reqBody.getNewPassword()));
                 }
                 
                 user.setFirstName(reqBody.getFirstName());
@@ -172,7 +174,6 @@ public class UserController {
                 user.setPhoneNumber(reqBody.getPhoneNumber());
                 user.setFirstName(reqBody.getFirstName());
                 user.setHomeAddress(reqBody.getHomeAddress());
-                user.setPassword(Encrypter.hashString(reqBody.getPassword()));
                 userRepository.save(user);
 
                 UserIdResponse res = new UserIdResponse(user);
@@ -194,7 +195,7 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
-            List<String> registrationErrors = registrationUserCheck(user);
+            List<String> registrationErrors = registrationUserCheck(user, true);
             if (registrationErrors.isEmpty()) { // No errors found.
                 User newUser = new User(user);
                 userRepository.save(newUser);
@@ -221,7 +222,7 @@ public class UserController {
      * @param user The user to check the validity of
      * @return list of errors with the new registration request - if there is any.
      */
-    public List<String> registrationUserCheck(UserRequest user) throws ParseException {
+    public List<String> registrationUserCheck(UserRequest user, boolean passwordUpdate) throws ParseException {
         List<String> errors = new ArrayList<>();
 
         if (user.getFirstName() == null || (user.getFirstName() != null && user.getFirstName().length() == 0)) {
@@ -233,7 +234,7 @@ public class UserController {
         if (user.getEmail() == null || !this.isValidEmail(user.getEmail()) || (user.getEmail() != null && user.getEmail().length() == 0)) {
             errors.add("Email");
         }
-        if (user.getPassword() == null || (user.getPassword() != null && user.getPassword().length() == 0)) {
+        if (passwordUpdate && (user.getPassword() == null || (user.getPassword() != null && user.getPassword().length() == 0))) {
             errors.add("Password");
         }
         if (user.getDateOfBirth() == null || !this.isNotUnderage(user.getDateOfBirth()) || (user.getDateOfBirth() != null && user.getDateOfBirth().length() == 0)) {

@@ -79,6 +79,7 @@
             <li>Number</li>
             <li>Special Character</li>
           </ul>
+          Current password is needed <b>only</b> if changing passwords to new password.
         </div>
 
         <div id="password">
@@ -94,9 +95,9 @@
         <div id="confirm-password">
           <vs-input type="password"
                     class="form-control"
-                    label="Password"
+                    label="Current Password"
                     :danger="errors.includes(userEditForm.password)"
-                    danger-text="Your password is invalid or do not match."
+                    danger-text="Your password is invalid."
                     :success="(userEditForm.new_password > 0 && userEditForm.password > 0)"
                     name="Password (Required if changing password)"
                     v-model="userEditForm.password"/>
@@ -231,6 +232,7 @@ const ModifyUser = {
 
   setCurrentUser: function(user) {
     if (user !== undefined) {
+      console.log(user)
       this.userEditForm.firstname = user.firstName;
       this.userEditForm.middlename = user.middleName;
       this.userEditForm.lastname = user.lastName;
@@ -238,7 +240,9 @@ const ModifyUser = {
       this.userEditForm.bio = user.bio;
       this.userEditForm.email = user.email;
       this.userEditForm.dateofbirth = user.dateOfBirth;
-      this.userEditForm.phonenumber = user.phoneNumber;
+      if (user.phoneNumber != null) {
+        this.userEditForm.phonenumber = user.phoneNumber;
+      }
 
       this.userEditForm.streetNumber = user.homeAddress.streetNumber;
       this.userEditForm.streetName = user.homeAddress.streetName;
@@ -247,9 +251,8 @@ const ModifyUser = {
       this.userEditForm.city = user.homeAddress.city;
       this.userEditForm.region = user.homeAddress.region;
       this.userEditForm.country = user.homeAddress.country;
-
     }
-    },
+  },
 
 
     /**
@@ -276,8 +279,8 @@ const ModifyUser = {
         }
       }
 
-      if (!this.validPassword(this.userEditForm.password)) {
-        this.errors.push(this.userEditForm.password);
+      if (this.userEditForm.new_password.length != 0 && !this.validPassword(this.userEditForm.new_password)) {
+        this.errors.push(this.userEditForm.new_password);
       }
 
       if (this.userEditForm.new_password.length != 0 && this.userEditForm.password.length === 0) {
@@ -348,25 +351,34 @@ const ModifyUser = {
       if(this.errors.length === 0){
         this.emailInUse = false;
         const homeAddress = {
-          streetNumber: this.streetNumber,
-          streetName: this.streetName,
-          suburb: this.suburb,
-          city:this.city,
-          region: this.region,
-          country: this.country,
-          postcode: this.postcode
+          streetNumber: this.userEditForm.streetNumber,
+          streetName: this.userEditForm.streetName,
+          suburb: this.userEditForm.suburb,
+          city:this.userEditForm.city,
+          region: this.userEditForm.region,
+          country: this.userEditForm.country,
+          postcode: this.userEditForm.postcode
         }
         this.userId = this.user.id;
 
-        api.modifyUser(this.userId, this.firstname, this.middlename, this.lastname, this.nickname, this.bio, this.email, this.dateofbirth, this.phonenumber, homeAddress, this.password)
+        if (this.userEditForm.new_password.length === 0) {
+          this.userEditForm.new_password = null;
+        }
+
+        api.modifyUser(this.userId, this.userEditForm.firstname, this.userEditForm.middlename,
+            this.userEditForm.lastname, this.userEditForm.nickname, this.userEditForm.bio, this.userEditForm.email,
+            this.userEditForm.dateofbirth, this.userEditForm.phonenumber, homeAddress, this.userEditForm.password,
+            this.userEditForm.new_password)
             .then((response) => {
               this.$log.debug("User modified:", response.data);
             }).catch((error) => {
-          if(error.response.status === 409){
+          if(error.response.status === 409) {
             this.emailInUse = true;
             this.errors.push(this.email);
           }
         });
+
+        this.userEditForm.new_password = "";
       }
     },
 

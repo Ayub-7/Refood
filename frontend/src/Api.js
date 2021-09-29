@@ -90,8 +90,8 @@ export default {
      * 409 if the user is attempted to change their email to an email that is already taken,
      * 406 if the user id does not exist, and 401 if the user is not logged in.
      */
-    modifyUser: async(userId, firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNUmber, homeAddress, password) =>
-        instance.put(`/users/${userId}`, {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNUmber, homeAddress, password},
+    modifyUser: async(userId, firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNUmber, homeAddress, password, newPassword) =>
+        instance.put(`/users/${userId}`, {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNUmber, homeAddress, password, newPassword},
             {withCredentials: true}),
 
     /**
