@@ -157,6 +157,30 @@ public class User implements Serializable {
         }
     }
 
+    public void deleteUserImage(String imageId) {
+        Image removeImage = null;
+        for (Image image: this.images) {
+            if (image.getId().equals(imageId)) {
+                this.images.remove(image);
+                removeImage = image;
+                break;
+            }
+        }
+        assert removeImage != null;
+        String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("user_"));
+        if ((primaryPath.equals(this.primaryImagePath.replace("/", "\\")) && System.getProperty("os.name").startsWith("Windows")) || primaryPath.equals(this.primaryImagePath)) {
+            if (this.images.isEmpty()) {
+                Image primary = this.images.iterator().next();
+                String primaryFilename = primary.getFileName();
+                int sliceIndex = primaryFilename.indexOf("user_");
+                String primaryFile = primaryFilename.substring(sliceIndex);
+                this.setPrimaryImage(primaryFile);
+            } else {
+                this.primaryImagePath = null;
+            }
+        }
+    }
+
     public String getPrimaryImagePath() {return this.primaryImagePath;}
 
     public void setPrimaryImage(String path) {
