@@ -52,7 +52,8 @@ const mockBusiness = {
         "description": "Test Business 1",
         "address": "123 Test Street",
         "businessType": "Accommodation and Food Services",
-        "created": "2021-04-03 23:29:50"
+        "created": "2021-04-03 23:29:50",
+        "images": []
 }
 
 const wishlist = [
@@ -117,7 +118,7 @@ describe('Business tests', () => {
             wrapper.vm.user = mockAdmin;
             wrapper.vm.business = mockBusiness;
             wrapper.vm.adminList = mockBusiness.administrators;
-
+            wrapper.vm.images = [];
         });
 
         const getUserMethod = jest.spyOn(Business.methods, 'getUserInfo');

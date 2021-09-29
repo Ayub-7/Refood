@@ -101,7 +101,7 @@ const Business = {
 
       inWishlist: false, // i.e. is it in the user's wishlist.
       wishlistId: null,
-      images: null,
+      images: [],
       updatePrimary: false,
     };
   },
