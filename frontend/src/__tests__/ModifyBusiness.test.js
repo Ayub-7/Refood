@@ -42,6 +42,10 @@ api.getBusinessFromId = jest.fn(() => {
     return Promise.resolve({data: mockBusiness, status: 200}).catch({message: "Error", status: 400});
 });
 
+api.getBusinessTypes = jest.fn(() => {
+    return Promise.resolve({status: 200});
+});
+
 const $route = {
     params: {
         id: 1
