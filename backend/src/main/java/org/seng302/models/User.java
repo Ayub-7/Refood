@@ -87,6 +87,7 @@ public class User implements Serializable {
         this.role = Role.USER;
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
     }
 
     /**
@@ -107,6 +108,7 @@ public class User implements Serializable {
         this.password = req.getPassword();
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
         newRegistration();
     }
 
@@ -129,6 +131,7 @@ public class User implements Serializable {
         this.password = Encrypter.hashString(password);
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
     }
 
     /**
@@ -148,13 +151,30 @@ public class User implements Serializable {
         this.images.add(image);
     }
 
-    /**
-     * Sets the path of the thumbnail of the primary image
-     * @param path The path to the image
+
+   /**
+     * Deletes a users image and assigns a new primary
+     * image if required
+     * @param imageId
      */
-    public void setPrimaryThumbnailPath(String path) {
-        this.primaryThumbnailPath = path;
+    public void deleteUserImage(String imageId) {
+        Image removeImage = null;
+        for (Image image: this.images) {
+            if (image.getId().equals(imageId)) {
+                this.images.remove(image);
+                removeImage = image;
+                break;
+            }
+        }
+        assert removeImage != null;
+        String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("user_"));
+        if ((primaryPath.equals(this.primaryImagePath.replace("/", "\\")) && System.getProperty("os.name").startsWith("Windows")) || primaryPath.equals(this.primaryImagePath)) {
+            this.primaryThumbnailPath = null;
+            this.primaryImagePath = null;
+        }
     }
+
+
 
     public void updatePrimaryImage(long id, String imageId, String imageExtension) {
         if (this.primaryImagePath == null) {
@@ -166,10 +186,25 @@ public class User implements Serializable {
         }
     }
 
+
+
     public String getPrimaryImagePath() {return this.primaryImagePath;}
 
+    /**
+     * Sets the path of the primary image
+     * @param path The path to the image
+     */
     public void setPrimaryImage(String path) {
         this.primaryImagePath = path;
     }
+
+    /**
+     * Sets the path of the thumbnail of the primary image
+     * @param path The path to the image
+     */
+    public void setPrimaryThumbnailPath(String path) {
+        this.primaryThumbnailPath = path;
+    }
+
 
 }

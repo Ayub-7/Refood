@@ -29,7 +29,7 @@
                     </div>
 
                   <!-- If listing has been purchased -->
-                  <div class="cardContainer" v-else-if="validPurchaseNotification(notification)" >
+                  <div class="cardContainer" v-else-if="validPurchaseNotification(notification) && validBoughtListingNotification(notification)" >
                     <p>
                       {{notification.boughtListing.product.name}} has been purchased
                       <br>
@@ -37,7 +37,7 @@
                     </p>
                   </div>
 
-                  <div class="cardContainer" v-else-if="!validPurchaseNotification(notification)" >
+                  <div class="cardContainer" v-else-if="!validPurchaseNotification(notification) && validBoughtListingNotification(notification)" >
                     <p>
                       You have purchased {{notification.boughtListing.product.name}}
                       <br>
@@ -77,6 +77,7 @@ export default {
     methods: {
       /**
        * Check if the listing has been bought by the user
+       * @param notification A user's notification
        */
       validPurchaseNotification(notification) {
         if (notification.status === this.bought && this.userId !== notification.boughtListing.buyer) {
@@ -84,6 +85,17 @@ export default {
         }
         return false;
       },
+      /**
+       * Check if the notification is from an item being bought
+       * @param notification A user's notification
+       */
+      validBoughtListingNotification(notification) {
+        if (notification.boughtListing !== null) {
+          return true;
+        }
+        return false;
+      },
+
 
       /**
        * Converts a regular date to day month year

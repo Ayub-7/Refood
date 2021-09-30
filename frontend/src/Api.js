@@ -476,8 +476,8 @@ export default {
 
     /**
      * Post api endpoint to post listing notification for particular listing
+     * Status of the listing is set to bought
      * @param listingId ID of the listing
-     * @param status Status of the listing (bought)
      * @returns {Promise<AxiosResponse<any>>}
      *          201 if created
      *          400 if bad request

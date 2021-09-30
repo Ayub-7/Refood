@@ -298,6 +298,7 @@ export default {
       this.feedItems.sort(function(a, b) {
         return new Date(b.created) - new Date(a.created);
       });
+      console.log(this.feedItems);
     },
 
 
@@ -408,6 +409,8 @@ export default {
       api.getListingNotifications(store.loggedInUserId)
           .then((res) => {
             this.listingNotifications = res.data;
+            console.log("this.listingNotifications")
+            console.log(this.listingNotifications)
             if (this.combCount === 0) {
               this.combCount += 1
               this.combineFeedMessages();
