@@ -102,8 +102,8 @@ import Login from "./components/Login";
 import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
 import AddToCatalogue from "./components/AddToCatalogue";
-import {store, mutations} from "./store"
-import api from "./Api"
+import {store, mutations} from "./store";
+import api from "./Api";
 import 'vuesax';
 import 'vuesax/dist/vuesax.css';
 // Vue app instance

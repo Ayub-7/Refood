@@ -71,16 +71,15 @@ const ActingAs =  {
 
   async mounted() {
     await this.getUser();
-
-
   },
+
   methods: {
     /**
      * Retreive the current userName and loggedInUserId of acting as account
      * @returns the acting name
      */
     getUserName() {
-      this.userName = store.userName;
+      this.userName = this.user.firstName + " " + this.user.lastName;
       this.loggedInUserId = store.loggedInUserId;
       return this.userName;
     },
@@ -96,27 +95,27 @@ const ActingAs =  {
       return this.role;
     },
 
-
-
-
-    getUser() {
-      api.getUserFromID(store.loggedInUserId)
-      .then((response) => {
-        this.user = response.data;
-        this.getBusinesses();
-      }).catch((err) => {
-        console.log("Error " + err);
-      })
-
-    },
-
     getActingAs() {
       return this.businesses.filter(x => x.id == store.actingAsBusinessId)[0];
     },
 
 
     /**
-     * Retrieve the businesses administrated by currnet acting as account, or all business less the current business
+     * Returns the user currently logged in
+     */
+    getUser() {
+      api.getUserFromID(store.loggedInUserId)
+          .then((response) => {
+            this.user = response.data;
+            this.getBusinesses();
+          }).catch((err) => {
+        console.log("Error " + err);
+      })
+
+    },
+
+    /**
+     * Retrieve the businesses administrated by current acting as account, or all business less the current business
      * if currently acting as a business account
      * @returns filtered list of businesses
      */

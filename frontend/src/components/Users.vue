@@ -487,7 +487,9 @@ export default Users;
   grid-column: 2;
 }
 
-
+.profileDropdown >>> .vs-dropdown--item-link {
+  display: flex;
+}
 
 /* Left Profile Side */
 #profile {

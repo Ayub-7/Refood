@@ -501,10 +501,10 @@ export default {
       for(let item of this.feedItems) {
         switch (item.viewStatus) {
           case ('Important'):
-            item.counter = 2;
+            item.counter = 1;
             break;
           case ('Unread'):
-            item.counter = 1;
+            item.counter = 2;
             break;
           case ('Read'):
             item.counter = 3;
