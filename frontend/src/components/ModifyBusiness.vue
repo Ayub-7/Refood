@@ -94,6 +94,21 @@ export default {
   methods: {
 
     /**
+     * method to update business
+     * @param businessId ID of business
+     */
+    modifyBusiness: function (id) {
+      api.updateBusiness(id)
+          .then(() => {
+            this.$vs.notify({title:'Success',
+              text:'The business have been successfully modified!',
+              color:'success'});
+          }).catch(() => {
+        this.$vs.notify({title:'Error', text:'Error modifying business'});
+      })
+    },
+
+    /**
      * Method for checking the form is compliant for modifying businesses
      */
     checkForm: function() {
@@ -106,7 +121,7 @@ export default {
       } else {
         this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
         if (this.errors.length === 0) {
-          this.$vs.notify({title:'Success', text:'The business have been successfully modified!', color:'success'});
+          this.modifyBusiness(this.$route.params.id);
         } else {
           if (this.errors.includes("country")) {
             this.$vs.notify({title:'Error', text:'Country field is required', color:'danger'});
