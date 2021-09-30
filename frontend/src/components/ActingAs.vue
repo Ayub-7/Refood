@@ -41,7 +41,7 @@
 import {store, mutations} from "../store";
 import api from "../Api";
 import ReImage from "./ReImage";
-// import { bus } from "../main";
+import { bus } from "../main";
 
 const ActingAs =  {
   name: "actingAs",
@@ -61,12 +61,12 @@ const ActingAs =  {
   },
 
   created() {
-    // bus.$on('updatedUserPicture', () => {
-    //   this.getUser();
-    // })
-    // bus.$on('updatedBusinessPicture', () => {
-    //   this.getBusinesses();
-    // })
+    bus.$on('updatedUserPicture', () => {
+      this.getUser();
+    })
+    bus.$on('updatedBusinessPicture', () => {
+      this.getBusinesses();
+    })
   },
 
   async mounted() {
