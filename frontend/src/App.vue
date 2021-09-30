@@ -236,7 +236,7 @@ export default app;
 }
 
 #navbar-logo {
-  height: 40px;
+  height: 30px;
   margin-top: 4px;
 }
 
