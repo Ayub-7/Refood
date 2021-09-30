@@ -59,6 +59,14 @@ const mockBusinesses = [
     }
 ];
 
+jest.mock("../main.js", () => ({
+    eventBus: {
+        $on: jest.fn(),
+        $off: jest.fn(),
+        $emit: jest.fn()
+    }
+}));
+
 let mockCard = {
     id: 1,
     user: {},
