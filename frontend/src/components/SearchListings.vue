@@ -147,7 +147,7 @@ const SearchListings = {
       errors: [],
       toggle: [1,1,1,1,1],
       filteredListings: [],
-      currencySymbol: "",
+      currencySymbol: "$",
       selected: "",
       sortOptions:[
         {text: 'Price', value: "price"},
@@ -256,7 +256,7 @@ const SearchListings = {
      * @param country the country to obtain the currency symbol from.
      **/
     setCurrency: function (country) {
-      axios.get(`https://restcountries.com/name/${country}`)
+      axios.get(`https://restcountries.com/v2/name/${country}`)
         .then( response => {
           this.currencySymbol = response.data[0].currencies[0].symbol;
         }).catch( err => {
@@ -267,8 +267,8 @@ const SearchListings = {
     /**
      * Helper function to reduce duplication
      **/
-    filterListingsHelper: function(biz) {
-      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, biz, this.minPrice, this.maxPrice,
+    filterListingsHelper: function() {
+      api.filterListingsQuery(this.businessQuery, this.productQuery, this.addressQuery, this.sortBy, this.selectedTypes, this.minPrice, this.maxPrice,
           this.minClosingDate,  this.maxClosingDate, this.numListings, this.pageNum-1, this.sortDirection)
           .then((response) => {
             this.listings = response.data.content
@@ -294,15 +294,10 @@ const SearchListings = {
         this.minClosingDate = Date.now()
       }
       if(this.checkForm()){
-        if (this.selectedTypes.length === 0) {
-          this.filterListingsHelper(this.businessTypes);
-        } else {
-          this.filterListingsHelper(this.selectedTypes);
-        }
-
+        this.filterListingsHelper();
       }
-
     },
+
     /**
      * Redirects the user to either the business profile page, if acting as a business,
      * or the user profile page, if acting as an individual
