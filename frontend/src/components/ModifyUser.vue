@@ -79,7 +79,7 @@
             <li>Number</li>
             <li>Special Character</li>
           </ul>
-          Current password is needed <b>only</b> if changing passwords to new password.
+          Current password is needed <strong>only</strong> if changing passwords to new password.
         </div>
 
         <div id="password">

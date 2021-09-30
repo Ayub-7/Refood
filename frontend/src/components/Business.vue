@@ -30,11 +30,8 @@
       </div>
       <!-- Left Side Business Information Panel -->
       <div id="business-container">
-        <div class="sub-container">
-          <vs-button v-if="(actingAsBusiness !== null && actingAsBusiness !== business.id) && !adminList.contains(user.id)" id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
-            {{ inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
-          </vs-button>
-          <vs-button disabled v-else id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%">
+        <div v-if="getActingAsBusinessId() !== business.id" class="sub-container">
+          <vs-button id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
             {{ inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
           </vs-button>
         </div>
@@ -88,7 +85,7 @@ import BusinessAdministrators from "./BusinessAdministrators";
 import BusinessListings from "./BusinessListings";
 import BusinessImages from "./BusinessImages";
 import ReImage from "./ReImage";
-import store from "../store";
+import {store} from "../store";
 
 const Business = {
   name: "Business",
@@ -107,7 +104,6 @@ const Business = {
       wishlistId: null,
       images: [],
       updatePrimary: false,
-      actingAsBusiness: null,
     };
   },
 
@@ -165,6 +161,13 @@ const Business = {
             this.$vs.loading.close();
           });
       }
+    },
+
+    /**
+     * Gets business id user is acting as
+     **/
+    getActingAsBusinessId() {
+      return store.actingAsBusinessId;
     },
 
     /**
@@ -330,7 +333,6 @@ const Business = {
 
   mounted() {
     this.checkUserSession();
-    this.actingAsBusiness = store.actingAsBusinessId;
   },
 
   watch: {
