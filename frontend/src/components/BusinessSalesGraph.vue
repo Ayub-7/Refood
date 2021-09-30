@@ -49,10 +49,9 @@
         <div id="custom-period-container">
           <div class="options-header">Custom</div>
           <vs-input type="date" size="small" class="date-input" style="grid-column: 1" v-model="pickedStart" label="Start"
-                    danger-text="Date can not be in the future or after the end date"/>
-          <p style="margin: auto auto 0">-</p>
+                    :danger="checkErrors('start')" :danger-text="getError('start')"/>
           <vs-input type="date" size="small" class="date-input" v-model="pickedEnd" label="End"
-                    danger-text="Date can not be in the future or after the end date" style="grid-column: 3"/>
+                    :danger="checkErrors('end')" :danger-text="getError('end')" style="grid-column: 3"/>
           <vs-button type="border" size="small" style="grid-column: 1/4; width: 100px; margin: auto;" @click="onPeriodChange('custom')">Go</vs-button>
 
         </div>
@@ -297,7 +296,7 @@ export default {
 
       // Generates the x-axis labels of each month, for each year.
       let categories = this.generateMonthLabels(Object.keys(processedData));
-    
+
       // Removes months with no sales up to the first month of sales.
       let i = 0;
       while (i < allData.length) {
@@ -333,7 +332,7 @@ export default {
         let entries = Object.entries(year[1]).map(week => week[1]);
         allData = allData.concat(entries);
       }
-      
+
       let categories = this.generateWeekLabels(processedData);
 
 
@@ -445,7 +444,7 @@ export default {
       // Updates the plot options and inputs.
       // Reassigning entire variable allows chart to properly update and play animations.
       this.graphOptionsUpdater(categories)
-      
+
       return allData;
     },
 
@@ -605,7 +604,7 @@ export default {
     generateDayLabels: function(processedData) {
       return Object.entries(processedData).map(day => day[0]);
     },
-    
+
     onPeriodChange: function(period) {
       console.log('here')
       this.errors = [];
@@ -687,6 +686,41 @@ export default {
 
       return true;
 
+    },
+
+    /**
+     * Checks if error contains type
+     * @param type either start or end, this will be used to filter errors to see if it contains relevant errors
+     * @returns boolean, true if contains type, false otherwise
+     */
+    checkErrors: function(type) {
+      return this.errors.filter(error => error.includes(type)).length > 0
+    },
+
+
+    /**
+     * Returns appropriate error message depending on what is in errors
+     * @param type either start or end, this will be used to show errors for start or end
+     * @returns string containing appropriate error message
+     */
+    getError: function(type) {
+      if (type == 'start') {
+        if (this.errors.includes('no-start')) {
+          return 'No start date'
+        } else if (this.errors.includes('bad-start-date')) {
+          return 'Start date must be before tomorrow and after 1970'
+        }
+      }
+
+      if(type == 'end') {
+        if (this.errors.includes('no-end')) {
+          return 'No end date'
+        } else if (this.errors.includes('bad-end-date')) {
+          return 'End date must be before tomorrow and after 1970'
+        } else if (this.errors.includes('end-before-begin')) {
+          return 'End date must be after start date'
+        }
+      }
     },
 
     /**
