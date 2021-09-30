@@ -74,9 +74,11 @@ const BusinessImages = {
          * Call api endpoint to update the primary image for the business.
          */
         updatePrimaryImage: function(imageId) {
+            this.$vs.loading();
             api.changeBusinessPrimaryImage(this.business.id, imageId)
                 .then(async () => {
                     this.$emit("getBusiness");
+                    this.$vs.loading.close();
                     this.$vs.notify({title:`Successfully Updated Primary Image`, color:'success'})
                     this.$emit("update");
                 })
@@ -94,9 +96,11 @@ const BusinessImages = {
          * @param imageId
          */
         deleteImage(imageId) {
+            this.$vs.loading();
             api.deleteBusinessImage(this.business.id, imageId)
                 .then(() => {
                     this.$emit('getBusiness');
+                    this.$vs.loading.close();
                     this.$vs.notify({title:`Image Has Been Successfully Removed`, color:'success'})
                 })
                 .catch((error) => {
@@ -109,7 +113,6 @@ const BusinessImages = {
         }
     },
 }
-
 export default BusinessImages;
 </script>
 <style scoped>

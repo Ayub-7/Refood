@@ -45,6 +45,7 @@ const mockBusiness = {
 
 const $vs = {
     notify: jest.fn(),
+    loading: jest.fn(),
 };
 
 const $log = {
@@ -64,6 +65,10 @@ api.changeBusinessPrimaryImage = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 200});
 })
 
+api.deleteBusinessImage = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200});
+})
+
 beforeEach(() => {
     wrapper = mount(BusinessImages, {
         propsData: {},
@@ -80,8 +85,15 @@ afterEach(() => {
 });
 
 describe("Business images tests", () => {
-    test("Business is retrieved and updated after updating primary image", () => {
+    test("Primary image updated successfully", () => {
+        wrapper.vm.$vs.loading.close = jest.fn();
         wrapper.vm.updatePrimaryImage(1);
-        expect(api.changeBusinessPrimaryImage).toBeCalled();
+        expect(wrapper.vm.$vs.loading).toBeCalled();
+    })
+
+    test("Delete image called successfully", () => {
+        wrapper.vm.$vs.loading.close = jest.fn();
+        wrapper.vm.deleteImage(1);
+        expect(wrapper.vm.$vs.loading).toBeCalled();
     })
 });
