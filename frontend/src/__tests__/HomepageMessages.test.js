@@ -547,6 +547,29 @@ describe('HomePageMessages method tests', () => {
 
 
 
+
+
+    test("markAsRead method test, Notification input, return 200", async () => {
+        api.updateNotificationViewStatus = jest.fn(() => {
+            return Promise.resolve({status: 200});
+        });
+
+        //notification.card (mock card)
+        listingNotifications[0].card = false;
+        listingNotifications[0].displayPeriodEnd = true;
+        listingNotifications[0].id = 12;
+        listingNotifications[0].viewStatus = "Unread";
+
+        wrapper.vm.markAsRead(listingNotifications[0]);
+
+        await wrapper.vm.$nextTick();
+        expect(api.updateNotificationViewStatus).toBeCalled();
+        expect(listingNotifications[0].viewStatus).toBe("Read");
+
+    });
+});
+
+describe('HomePageMessages method tests 2', () => {
     test("markAsRead method test, message input, return 200", async () => {
         api.updateMessageViewStatus = jest.fn(() => {
             return Promise.resolve({status: 200});
@@ -554,10 +577,16 @@ describe('HomePageMessages method tests', () => {
 
         //notification.card (mock card)
         listingNotifications[0].card = true;
-        wrapper.vm.markAsRead(listingNotifications[0])
+        listingNotifications[0].displayPeriodEnd = false;
+        listingNotifications[0].id = 12;
+        listingNotifications[0].viewStatus = "Unread";
+
+        wrapper.vm.markAsRead(listingNotifications[0]);
         await wrapper.vm.$nextTick();
         expect(api.updateMessageViewStatus).toBeCalled();
+        expect(listingNotifications[0].viewStatus).toBe("Read");
     });
+
 
 
     //id is underfined if placed here
