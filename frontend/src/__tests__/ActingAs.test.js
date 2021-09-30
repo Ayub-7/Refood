@@ -613,10 +613,10 @@ let user = {
 }
 
 let store = {
-    loggedInUserId: 22,
+    loggedInUserId: 1,
     role: "USER",
     userName: "Wileen Tisley",
-    userBusinesses: [],
+    userBusinesses: [business],
     actingAsBusinessId: 1,
     actingAsBusinessName: "Dabshots"
 }
@@ -638,50 +638,52 @@ let $log = {
     debug: jest.fn()
 }
 
-beforeEach(() => {
-    wrapper = shallowMount(ActingAs, {
-        propsData: {},
-        mocks: {store, $log, $router, mutations, sessionStorage},
-        stubs: ['router-link', 'router-view'],
-        methods: {},
-        localVue,
-    });
-
-    wrapper.vm.business = business;
-    wrapper.vm.user = user;
-
-
-    mutations = {
-        setActingAsBusiness: jest.fn(),
-        setActingAsUser: jest.fn()
-    };
-
-    sessionStorage = {
-        getItem: jest.fn(),
-        removeItem: jest.fn()
-    };
-
-    $router = {
-        push: jest.fn()
-    }
-
-    const getUserRoleMethod = jest.spyOn(ActingAs.methods, 'getUserRole')
-    getUserRoleMethod.mockImplementation(() => {
-        wrapper.vm.role = "USER";
-        return wrapper.vm.role;
-    });
-
-    const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
-    getUserNameMethod.mockImplementation(() => {
-        return store.userName;
-    });
-});
-
-afterEach(() => {
-    wrapper.destroy();
-});
 
 describe('User acting as tests', () => {
+    beforeEach(() => {
+        wrapper = shallowMount(ActingAs, {
+            propsData: {},
+            mocks: {store, $log, $router, mutations, sessionStorage},
+            stubs: ['router-link', 'router-view'],
+            methods: {},
+            localVue,
+        });
+    
+        wrapper.vm.businesses = [business];
+        wrapper.vm.user = user;
+    
+    
+        mutations = {
+            setActingAsBusiness: jest.fn(),
+            setActingAsUser: jest.fn()
+        };
+    
+        sessionStorage = {
+            getItem: jest.fn(),
+            removeItem: jest.fn()
+        };
+    
+        $router = {
+            push: jest.fn()
+        }
+    
+        const getUserRoleMethod = jest.spyOn(ActingAs.methods, 'getUserRole')
+        getUserRoleMethod.mockImplementation(() => {
+            wrapper.vm.role = "USER";
+            return wrapper.vm.role;
+        });
+    
+        const getUserNameMethod = jest.spyOn(ActingAs.methods, 'getUserName');
+        getUserNameMethod.mockImplementation(() => {
+            return store.userName;
+        });
+    });
+    
+    afterEach(() => {
+        wrapper.destroy();
+    });
+
+
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
     });
@@ -721,13 +723,18 @@ describe('User acting as tests', () => {
 
 describe( 'Backend error checking tests', () => {
     beforeEach(() => {
-        wrapper = mount(ActingAs, {
+        wrapper = shallowMount(ActingAs, {
             propsData: {},
             mocks: {store, $log, $router, mutations, sessionStorage},
             stubs: ['router-link', 'router-view'],
             methods: {},
             localVue,
         });
+
+        wrapper.vm.businesses = [business];
+        wrapper.vm.user = user;
+
+    
 
         sessionStorage = {
             getItem: jest.fn(),
@@ -753,6 +760,7 @@ describe( 'Backend error checking tests', () => {
         wrapper.vm.refreshCachedItems = jest.fn();
         wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
 
+
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.refreshCachedItems).toBeCalled();
@@ -761,7 +769,7 @@ describe( 'Backend error checking tests', () => {
 
     test('When setActingAsBusinessId returns an unspecified error (500), the problem is printed to debug', async () => {
         api.actAsBusiness = jest.fn(() => {
-            return Promise.reject({response: {status: 500}});
+            return Promise.reject({response: {status: 500, message: "unspecified error"}});
         });
 
         wrapper.vm.setActingAsBusinessId(store.actingAsBusinessId, store.actingAsBusinessName);
