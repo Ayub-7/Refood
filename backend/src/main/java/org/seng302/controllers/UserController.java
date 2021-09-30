@@ -40,6 +40,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -145,7 +148,6 @@ public class UserController {
      */
     @PutMapping("/users/{id}")
     public ResponseEntity<String> modifyUser(@RequestBody ModifyUserRequest reqBody, @PathVariable String id, HttpSession session) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
-
         User user = userRepository.findUserById(Long.parseLong(id));
         User currentUser = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
         if (user == null) {
@@ -156,8 +158,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         else {
-            List<String> registrationErrors = registrationUserCheck(reqBody);
+            List<String> registrationErrors = registrationUserCheck(reqBody, false);
             if (registrationErrors.isEmpty()) { // No errors found.
+                if (reqBody.getNewPassword() != null &&
+                        !Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect current password");
+                } else if (reqBody.getNewPassword() != null &&
+                        Encrypter.hashString(reqBody.getPassword()).equals(user.getPassword())) {
+                    user.setPassword(Encrypter.hashString(reqBody.getNewPassword()));
+                }
+                
                 user.setFirstName(reqBody.getFirstName());
                 user.setLastName(reqBody.getLastName());
                 user.setMiddleName(reqBody.getMiddleName());
@@ -168,7 +178,6 @@ public class UserController {
                 user.setPhoneNumber(reqBody.getPhoneNumber());
                 user.setFirstName(reqBody.getFirstName());
                 user.setHomeAddress(reqBody.getHomeAddress());
-                user.setPassword(Encrypter.hashString(reqBody.getPassword()));
                 userRepository.save(user);
 
                 UserIdResponse res = new UserIdResponse(user);
@@ -190,7 +199,7 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<String> registerUser(@RequestBody NewUserRequest user) throws JsonProcessingException, NoSuchAlgorithmException, ParseException {
         if (userRepository.findUserByEmail(user.getEmail()) == null) {
-            List<String> registrationErrors = registrationUserCheck(user);
+            List<String> registrationErrors = registrationUserCheck(user, true);
             if (registrationErrors.isEmpty()) { // No errors found.
                 User newUser = new User(user);
                 userRepository.save(newUser);
@@ -217,7 +226,7 @@ public class UserController {
      * @param user The user to check the validity of
      * @return list of errors with the new registration request - if there is any.
      */
-    public List<String> registrationUserCheck(UserRequest user) throws ParseException {
+    public List<String> registrationUserCheck(UserRequest user, boolean passwordUpdate) throws ParseException {
         List<String> errors = new ArrayList<>();
 
         if (user.getFirstName() == null || (user.getFirstName() != null && user.getFirstName().length() == 0)) {
@@ -229,7 +238,7 @@ public class UserController {
         if (user.getEmail() == null || !this.isValidEmail(user.getEmail()) || (user.getEmail() != null && user.getEmail().length() == 0)) {
             errors.add("Email");
         }
-        if (user.getPassword() == null || (user.getPassword() != null && user.getPassword().length() == 0)) {
+        if (passwordUpdate && (user.getPassword() == null || (user.getPassword() != null && user.getPassword().length() == 0))) {
             errors.add("Password");
         }
         if (user.getDateOfBirth() == null || !this.isNotUnderage(user.getDateOfBirth()) || (user.getDateOfBirth() != null && user.getDateOfBirth().length() == 0)) {
@@ -399,8 +408,65 @@ public class UserController {
         user.addUserImage(newImage);
         user.updatePrimaryImage(id, imageId, imageExtension);
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(newImage.getId()));
     }
+
+
+    /**
+     * Sets the primary image for a user from a previously saved image.
+     * @param id unique identifier of the user that the image is relating to.
+     * @param imageId a multipart image of the file
+     * @param session Current user session
+     * @return ResponseEntity with the appropriate status codes - 200, 401, 403, 406.
+     */
+    @PutMapping("/users/{id}/images/{imageId}/makeprimary")
+    public ResponseEntity<List<byte[]>> setPrimaryImage(@PathVariable long id, @PathVariable String imageId, HttpSession session) {
+        User user = userRepository.findUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        User userSession = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (userSession == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if( userSession.getId() != user.getId() && !Role.isGlobalApplicationAdmin(userSession.getRole())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        boolean validImage = false;
+        if (user != null) {
+            for (Image image: user.getImages()) {
+                if (imageId.equals(image.getId())) {
+                    validImage = true;
+                    break;
+                }
+            }
+        }
+        if (user == null || !validImage) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        String imageDir = rootImageDir + "/user_" + id + "/" + imageId;
+        String extension = "";
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext: extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                extension = ext;
+                break;
+            }
+        }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            user.setPrimaryImage(String.format("user_%d\\%s%s", id, imageId, extension));
+        } else {
+            user.setPrimaryImage(String.format("user_%d/%s%s", id, imageId, extension));
+        }
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
     // -- ADMIN REQUESTS
 

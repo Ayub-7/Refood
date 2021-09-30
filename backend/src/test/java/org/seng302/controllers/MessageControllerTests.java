@@ -19,6 +19,7 @@ import org.seng302.repositories.CardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -283,6 +284,69 @@ class MessageControllerTests {
         Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(message);
 
         mvc.perform(delete("/messages/{messageId}", message.getId())
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
+                .andExpect(status().isOk());
+    }
+
+
+    //
+    // PUT - Notification View Status
+    //
+    @Test
+    void testPutNotificationViewStatus_notLoggedIn_returnUnauthorized() throws Exception {
+        mvc.perform(put("/messages/{messageId}", 1))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_invalidViewStatusInput_returnBadRequest() throws Exception {
+        mvc.perform(put("/messages/{messageId}", message.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Donda\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_notUserAndNotDgaa_returnForbidden() throws Exception {
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(message);
+        mvc.perform(put("/messages/{messageId}", message.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_noNotificationWithId_returnNotAcceptable() throws Exception {
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(null);
+        mvc.perform(put("/messages/{messageId}", message.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}"))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_validRequest_returnOk() throws Exception {
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(message);
+        mvc.perform(put("/messages/{messageId}", message.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}")
+                .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserA))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    void testPutNotificationViewStatus_asGaa_returnOk() throws Exception {
+        Mockito.when(messageRepository.findMessageById(message.getId())).thenReturn(message);
+        testUserB.setRole(Role.GAA);
+        mvc.perform(put("/messages/{messageId}", message.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"viewStatus\": \"Read\"}")
                 .sessionAttr(User.USER_SESSION_ATTRIBUTE, testUserB))
                 .andExpect(status().isOk());
     }

@@ -27,17 +27,17 @@ afterEach(() => {
 describe("ReImage tests", () => {
     test("Default product item image url is retrieved - dev", () => {
         process.env.NODE_ENV = "development";
-        expect(wrapper.vm.getImgUrl(null)).toEqual('../../public/ProductShoot.jpg')
+        expect(wrapper.vm.getImgUrl(null)).toEqual('../../public/placeholder.png')
     });
 
     test("Default product item image url is retrieved - staging", () => {
         process.env.NODE_ENV = "staging";
-        expect(wrapper.vm.getImgUrl(null)).toEqual('../../public/ProductShoot.jpg')
+        expect(wrapper.vm.getImgUrl(null)).toEqual('../../public/placeholder.png')
     });
 
     test("Default product item image url is retrieved - production", () => {
         process.env.NODE_ENV = "production";
-        expect(wrapper.vm.getImgUrl(null)).toEqual('../../public/ProductShoot.jpg')
+        expect(wrapper.vm.getImgUrl(null)).toEqual('../../public/placeholder.png')
     });
 
     test("Item image url is retrieved - development", async () => {

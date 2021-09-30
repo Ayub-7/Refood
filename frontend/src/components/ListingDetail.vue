@@ -23,17 +23,27 @@
       <!-- Listing details (closing date, business, etc) -->
       <vs-col vs-w="6" vs-sm="12" vs-xs="12" id="listing-info-area">
         <div id="listing-info-container">
-          <div id="business-name"><b>Business:</b> {{listing.inventoryItem.product.business.name}}</div>
+          <div id="business-name"><strong>Business:</strong> {{listing.inventoryItem.product.business.name}}</div>
           <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
-          <p vs-justify="left"><b>Price:</b> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
-          <p><b>Quantity:</b> {{listing.quantity}}</p>
-          <p><b>Created:</b> {{listing.created}}</p>
-          <p><b>Closes:</b> {{listing.closes}}</p>
+          <p vs-justify="left"><strong>Price:</strong> {{currency.symbol}}{{listing.price}} {{currency.code}}</p>
+          <p><strong>Quantity:</strong> {{listing.quantity}}</p>
+          <p><strong>Created:</strong> {{listing.created}}</p>
+          <p><strong>Closes:</strong> {{listing.closes}}</p>
           <p id="listing-moreInfo">{{listing.moreInfo}}</p>
-          <p><b>Likes:</b> {{listing.likes}}</p>
+          <p><strong>Likes:</strong> {{listing.likes}}</p>
           <div class="">
-            <vs-button v-if="!likedListingsIds.includes(listing.id)" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">Like listing</vs-button>
-            <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">Unlike listing</vs-button>
+            <vs-button v-if="!likedListingsIds.includes(listing.id)"  class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">
+              <vs-col vs-type="flex" vs-align="flex-start">
+                <vs-icon icon="favorite" size="32px"/>
+                <p class="like-listing-text">Like listing <br> Add to watchlist</p>
+              </vs-col>
+            </vs-button>
+            <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">
+              <vs-col vs-type="flex" vs-align="flex-start">
+                <vs-icon icon="favorite_border" size="32px"/>
+                <p class="like-listing-text">Unlike listing <br> Remove from watchlist</p>
+              </vs-col>
+              </vs-button>
           </div>
           <div>
             <vs-button class="listing-detail-btn" @click="buy()">Buy</vs-button>
@@ -47,11 +57,11 @@
       <vs-col vs-w="12">
         <div id="product-info-area">
           <p id="listing-name">{{listing.inventoryItem.product.name}}</p>
-          <p><b>Manufacturer:</b> {{listing.inventoryItem.product.manufacturer}} </p>
-          <p v-if="listing.inventoryItem.manufactured"><b>Manufactured:</b> {{listing.inventoryItem.manufactured}}</p>
-          <p v-if="listing.inventoryItem.sellBy"><b>Sell By:</b> {{listing.inventoryItem.sellBy}}</p>
-          <p v-if="listing.inventoryItem.bestBefore"><b>Best Before:</b> {{listing.inventoryItem.bestBefore}}</p>
-          <p v-if="listing.inventoryItem.expires"><b>Expires:</b> {{listing.inventoryItem.expires}}</p>
+          <p><strong>Manufacturer:</strong> {{listing.inventoryItem.product.manufacturer}} </p>
+          <p v-if="listing.inventoryItem.manufactured"><strong>Manufactured:</strong> {{listing.inventoryItem.manufactured}}</p>
+          <p v-if="listing.inventoryItem.sellBy"><strong>Sell By:</strong> {{listing.inventoryItem.sellBy}}</p>
+          <p v-if="listing.inventoryItem.bestBefore"><strong>Best Before:</strong> {{listing.inventoryItem.bestBefore}}</p>
+          <p v-if="listing.inventoryItem.expires"><strong>Expires:</strong> {{listing.inventoryItem.expires}}</p>
           <p>{{listing.inventoryItem.product.description}}</p>
         </div>
       </vs-col>
@@ -131,7 +141,7 @@ export default {
      * @param country country for which currency is going to be retrieved
      */
     setCurrency(country) {
-      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+      axios.get(`https://restcountries.com/v2/name/${country}`)
         .then(response => {
           this.currency = { //need symbol and code
             symbol: response.data[0].currencies[0].symbol,
@@ -208,7 +218,7 @@ export default {
       api.addLikeToListing(listingId)
           .then(() => {
             this.likedListingsIds.push(listingId);
-            this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+            this.$vs.notify({text: `${listingName} has been liked and added to your watchlist!`, color: 'success'});
           })
           .catch((err) => {
             throw new Error(`Error trying to like listing ${listingId}: ${err}`);
@@ -231,7 +241,7 @@ export default {
       api.removeLikeFromListing(listingId)
           .then(() => {
             this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
-            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+            this.$vs.notify({text: `${listingName} has been unliked and deleted from your watchlist!`, color: 'success'});
           })
           .catch((err) => {
             throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
@@ -354,6 +364,10 @@ p {
   margin-left: 50px;
 }
 
+.like-listing-text {
+  text-align: center;
+  margin-left: 20px;
+}
 
 @media screen and (max-width: 1300px) {
   #listing-image > img {

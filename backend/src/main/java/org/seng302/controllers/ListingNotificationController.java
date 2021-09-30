@@ -40,6 +40,19 @@ public class ListingNotificationController {
     @Autowired
     private ProductRepository productRepository;
 
+
+    public ListingNotificationController(ListingRepository listingRepository, BusinessRepository businessRepository,
+                             UserRepository userRepository, ListingLikeRepository listingLikeRepository,
+                             BoughtListingRepository boughtListingRepository, ListingNotificationRepository listingNotificationRepository) {
+        this.listingRepository = listingRepository;
+        this.businessRepository = businessRepository;
+        this.userRepository = userRepository;
+        this.listingLikeRepository = listingLikeRepository;
+        this.boughtListingRepository = boughtListingRepository;
+        this.listingNotificationRepository = listingNotificationRepository;
+    }
+
+
     /**
      * Endpoint for creating a notification for a listing that's just been purchased.
      * @param listingId ID of the listing

@@ -77,7 +77,7 @@ public class BusinessFinder {
      * @param query search query, will be split up into terms and processed
      * @return Specification<Product> resulting specification that will contain all predicates
      */
-    private Specification<Business> buildBusinessSpec(String query, String type) throws ResponseStatusException {
+    private Specification<Business> buildBusinessSpec(String query, String type) {
         ArrayList<String> terms = searchQueryKeywords(query);
         Specification<Business> specification;
         if (!terms.isEmpty()) {
@@ -123,7 +123,7 @@ public class BusinessFinder {
      * @param query The search query to be used to filter search results
      * @return Will return all products if query is blank, otherwise will filter according to what is in the query
      */
-    public Specification<Business> findBusinesses(String query, String type) throws ResponseStatusException {
+    public Specification<Business> findBusinesses(String query, String type) {
         return buildBusinessSpec(query, type);
     }
 }

@@ -32,6 +32,9 @@ public class Message {
 
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private ViewStatus viewStatus;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT+12")
     private Date sent;
 
@@ -49,6 +52,7 @@ public class Message {
         this.card = card;
         this.description = description;
         this.sent = sent;
+        this.viewStatus = ViewStatus.UNREAD;
     }
 
     /**
@@ -72,6 +76,7 @@ public class Message {
                 this.card = card;
                 this.description = newMessageRequest.getDescription();
                 this.sent = new Date();
+                this.viewStatus = ViewStatus.UNREAD;
             }
         }
         catch (ValidationException exception) {

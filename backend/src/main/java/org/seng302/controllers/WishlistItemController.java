@@ -29,6 +29,13 @@ public class WishlistItemController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    public WishlistItemController(UserRepository userRepository, BusinessRepository businessRepository, WishlistItemRepository wishlistItemRepository) {
+        this.wishlistItemRepository = wishlistItemRepository;
+        this.userRepository = userRepository;
+        this.businessRepository = businessRepository;
+    }
+
     /**
      * GET request called to get the businesses on a users wishlist. Error response returned when user is not
      * logged in

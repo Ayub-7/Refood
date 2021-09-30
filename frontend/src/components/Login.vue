@@ -1,8 +1,11 @@
 <template>
-  <div id="main">
-
-    <p id="sign">Sign In</p>
-    <form>
+  <div>
+    <div id="logo-container">
+      <img :src="`${publicPath}refood-logo-recycle.png`" alt="refood-logo" id="logo"/>
+    </div>
+    <div id="main">
+      <p id="sign">Sign In</p>
+      <form>
         <vs-input class="form-control"
                   id="email" type="text"
                   v-model="email"
@@ -19,8 +22,9 @@
                   required></vs-input>
 
         <vs-button class="loginButton" @click="checkForm(); loginSubmit()">Sign in</vs-button>
-    </form>
+      </form>
 
+    </div>
   </div>
 </template>
 
@@ -35,6 +39,8 @@ const Login = {
       errors: [],
       email: "",
       password: "",
+
+      publicPath: process.env.BASE_URL
     };
   },
   methods: {
@@ -163,6 +169,22 @@ form {
   grid-column: 1;
 
   margin: 0 0 2em 0;
+}
+
+#logo-container {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+#logo {
+  width: 15%;
+}
+
+@media screen and (max-width: 800px) {
+  #logo {
+    width: 30%;
+  }
 }
 
 

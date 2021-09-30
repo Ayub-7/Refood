@@ -36,8 +36,8 @@
         <!-- Watchlist div, will show users 'Favourited' products and businesses when further features have been implemented -->
         <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
           <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
-            <vs-tabs>
-              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
+            <vs-tabs alignment="fixed">
+              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist (My Likes)" icon="favorite_border" color="red"></vs-tab>
               <vs-tab id="wishlist-tab" @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
             </vs-tabs>
           </div>
@@ -140,9 +140,9 @@
         <vs-card>
           <div class="header-container">
             <vs-icon icon="leaderboard" size="32px" style="margin: auto 0"></vs-icon>
-            <div class="title">Sales Report Graph</div>
+            <div class="title">Sales Graph</div>
             <div class="title-business"> - {{getBusinessName()}}</div>
-            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Data</vs-button>
+            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Sales Report</vs-button>
           </div>
           <vs-divider/>
           <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
@@ -154,7 +154,7 @@
             <vs-icon icon="summarize" size="32px" style="margin: auto 0"></vs-icon>
             <div class="title">Sales Report</div>
             <div class="title-business"> - {{getBusinessName()}}</div>
-            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
+            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Sales Graph</vs-button>
           </div>
           <vs-divider/>
           <BusinessSalesReport :businessId="actingAsBusinessId" />
@@ -242,7 +242,7 @@ const Homepage = {
      * @param country country for which currency is going to be retrieved
      */
     setCurrency(country) {
-      axios.get(`https://restcountries.eu/rest/v2/name/${country}`)
+      axios.get(`https://restcountries.com/v2/name/${country}`)
         .then(response => {
           this.currencySymbol = response.data[0].currencies[0].symbol;
         })
@@ -284,13 +284,20 @@ const Homepage = {
      * @param wishlistedBusinessItem the business to toggle mute on
      */
     toggleMuteBusiness: function (wishlistedBusinessItem) {
+
+      //correct error message
+      let status = "Muted";
+      if (wishlistedBusinessItem.mutedStatus === "Muted") {
+        status = "Unmuted"
+      }
+
       api.updateWishlistMuteStatus(wishlistedBusinessItem.id, wishlistedBusinessItem.mutedStatus)
           .then(() => {
             this.getWishlist(this.userId);
-            this.$vs.notify({title: "Business successfully unmuted", color: "success"});
+            this.$vs.notify({title: "Business successfully "+status, color: "success"});
           })
           .catch(() => {
-            this.$vs.notify({title: "Error muting business", color: "danger"});
+            this.$vs.notify({title: "Error, business not"+status, color: "danger"});
           });
 
     },
@@ -309,17 +316,22 @@ const Homepage = {
         muteStatus = "Muted";
         this.allMuted = false;
       }
+      //correct error message
+      let status = "Muted";
+      if (muteStatus === "Muted") {
+        status = "Unmuted"
+      }
 
       //Set the mute/unmute state for every business in the wishlist
       for (let wish of this.wishlist) {
-        api.updateWishlistMuteStatus(wish.id, muteStatus)
-            .catch(() => {
-              this.$vs.notify({title: "Error updating wishlist mute/unmute", color: "danger"});
-            });
+        await api.updateWishlistMuteStatus(wish.id, muteStatus)
+          .catch(() => {
+            this.$vs.notify({title: "Error updating wishlist "+status, color: "danger"});
+          });
       }
-      await this.getWishlist(this.userId);
-      this.$vs.notify({title: "All businesses successfully muted/unmuted", color: "success"});
 
+      this.getWishlist(this.userId);
+      this.$vs.notify({title: "All businesses successfully "+status, color: "success"});
     },
 
     /**
@@ -784,8 +796,6 @@ export default Homepage;
 
 .watchlist-title {
   font-size: 18px;
-  margin: auto auto auto 2px;
-  transition: 0.3s;
 }
 
 /* News feed styles. */

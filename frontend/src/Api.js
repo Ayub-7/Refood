@@ -33,8 +33,8 @@ import axios from 'axios'
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const instance = axios.create({
-  baseURL: SERVER_URL,
-  timeout: 10000
+    baseURL: SERVER_URL,
+    timeout: 10000
 });
 
 
@@ -54,7 +54,7 @@ export default {
 
     checkBusinessSession: () => instance.get('checkbusinesssession', {withCredentials: true}),
 
-  // user POST create new user account data
+    // user POST create new user account data
     /**
      * Create a new user by storing their data to the database
      * @param firstName Their firstname
@@ -71,7 +71,29 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     createUser: async(firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password) =>
-  instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password}),
+        instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password}),
+
+    /**
+     * Modifies a user by setting their details to the ones sent here
+     * @param userId user's ID
+     * @param firstName user's new firstname
+     * @param middleName user's new middlename
+     * @param lastName user's new lastname
+     * @param nickname user's new nickname
+     * @param bio new bio
+     * @param email new email
+     * @param dateOfBirth new birthday
+     * @param phoneNUmber new phone number
+     * @param homeAddress new address
+     * @param password current password
+     * @param newPassword new password
+     * @returns {Promise<AxiosResponse<any>>} 200 if the user is properly updated, 400 if the supplied data is bad,
+     * 409 if the user is attempted to change their email to an email that is already taken,
+     * 406 if the user id does not exist, and 401 if the user is not logged in.
+     */
+    modifyUser: async(userId, firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, newPassword) =>
+        instance.put(`/users/${userId}`, {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, newPassword},
+            {withCredentials: true}),
 
     /**
      * Get a specific user via their unique ID number
@@ -120,18 +142,43 @@ export default {
     revokeUserAdmin: async(id) =>
         instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
 
+    // ------ BUSINESS IMAGES
+
+    /**
+     * Create a new business image
+     * @param id Business's id
+     * @param image Image to save
+     * @returns {Promise<AxiosResponse<any>>} Relevant status code and the newly created image entity in the body as a string
+     */
+    postBusinessImage: (id, image) => instance.post(`businesses/${id}/images`, image, {headers: {'Content-Type': 'multipart/form-data'}, withCredentials: true,}),
+
+    /**
+     * Update the primary image of a business, send a put request
+     * @param businessId ID of the business
+     * @param imageId Id of the image
+     * @returns {Promise<AxiosResponse<any>>} Relevant status code
+     */
+    changeBusinessPrimaryImage: (businessId, imageId) => instance.put(`businesses/${businessId}/images/${imageId}/makeprimary`, {}, {withCredentials: true}),
+
+    /**
+     * Delete the business image
+     * @param businessId Id of the business whos image is deleted
+     * @param imageId id of the image to delete
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteBusinessImage: (businessId, imageId) => instance.delete(`/businesses/${businessId}/images/${imageId}`, {withCredentials: true}),
 
     // ------ BUSINESSES
 
     /**
-     * Create a new business by storin their data in the database
+     * Create a new business by storing their data in the database
      * @param name business name
      * @param description business description
      * @param address business address
      * @param businessType business type
      */
     createBusiness: async(name, description, address, businessType) =>
-    instance.post('businesses', {name, description, address, businessType}, {withCredentials: true}),
+        instance.post('businesses', {name, description, address, businessType}, {withCredentials: true}),
 
     /**
      * Retrieve a single business with their unique id.
@@ -251,10 +298,10 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} a response with appropriate status code.
      */
     postProductImage: (businessId, productId, image) => instance.post(`businesses/${businessId}/products/${productId}/images`, image, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      withCredentials: true,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true,
     }),
 
     /**
@@ -303,11 +350,11 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} 200 with (a potentially empty) array of cards. 400, 401 otherwise.
      */
     getCardsBySection: (section, pageNum, resultsPerPage, sortBy, reverse) => instance.get(`/cards`,
-                                                            {params:{section: section,
-                                                                     pageNum: pageNum,
-                                                                     resultsPerPage: resultsPerPage,
-                                                                     sortBy: sortBy,
-                                                                     reverse: reverse}, withCredentials: true}),
+        {params:{section: section,
+                pageNum: pageNum,
+                resultsPerPage: resultsPerPage,
+                sortBy: sortBy,
+                reverse: reverse}, withCredentials: true}),
 
     /**
      * Deletes a community marketplace card.
@@ -451,7 +498,7 @@ export default {
     addLikeToListing: (listingId) =>
         instance.post(`/businesses/listings/${listingId}/like`, {}, {withCredentials: true}),
 
-   /**
+    /**
      * Retrieves and returns a list of LISTINGS that the user has liked.
      * @param id unique identifier of the user.
      * @param session current active user session.
@@ -474,9 +521,9 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     filterListingsQuery: async(businessQuery, productQuery, addressQuery, sortBy, businessTypes,
-                          minPrice, maxPrice, minClosingDate, maxClosingDate, count, offset, sortDirection) =>
+                               minPrice, maxPrice, minClosingDate, maxClosingDate, count, offset, sortDirection) =>
         instance.post('/businesses/listings', {businessQuery, productQuery, addressQuery, sortBy, businessTypes, minPrice, maxPrice, minClosingDate, maxClosingDate},
-            {params: {count: count, offset: offset, sortDirection: sortDirection}}, { withCredentials: true }),
+            {params: {count: count, offset: offset, sortDirection: sortDirection}, withCredentials: true }),
 
 
     /**
@@ -503,12 +550,12 @@ export default {
         instance.delete(`/notifications/${listingId}`, {withCredentials: true}),
 
     /**
-     * Updates the view status of a listing notification.
-     * @param notificationId the unique id of the notification
-     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
-     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     * Deletes listing notification
+     * @param listingId
+     * @returns {Promise<AxiosResponse<any>>}
      */
-    updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+    deleteCardExpiredNotification: (cardId) =>
+        instance.delete(`/cards/notifications/${cardId}`, {withCredentials: true}),
 
     /**
      * Retrieves and returns a list of BUSINESSES that the user has wishlisted.
@@ -518,6 +565,13 @@ export default {
      * 200 otherwise, may return an empty list (because the user has nothing in their item wishlist).
      */
     getUsersWishlistedBusinesses: (userId) => instance.get(`/users/${userId}/wishlist`, {withCredentials: true}),
+    /**
+     * Retrieves the user's business wishlist
+     * @param userId id of the user
+     * @returns {Promise<AxiosResponse<any>>} 400 if there was a problem with the data supplied,
+     * 401 if unauthed, 406 if the user does not exist, 200 otherwise.
+     */
+    getUserBusinessWishlist: (userId) => instance.get(`/users/${userId}/wishlist`, {withCredentials: true}),
 
     /**
      * Adds business to user's wishlist, creating a wishlistItem object
@@ -546,8 +600,52 @@ export default {
 
     /**
      * Returns a list of all the business' sales.
-     * @param businessId
+     * @param businessIdupdateListingNotificationViewStatus
      * @return {Promise<AxiosResponse<any>>}
      */
     getBusinessSales: (businessId) => instance.get(`/businesses/${businessId}/sales`, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a listing notification.
+     * @param notificationId the unique id of the notification
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    updateListingNotificationViewStatus: (notificationId, status) => instance.put(`/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a message notification.
+     * @param messageId the unique id of the message
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the message does not belong to the current user, 406 if the message id does not exist.
+     */
+    updateMessageViewStatus: (messageId, status) => instance.put(`/messages/${messageId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Updates the view status of a marketplace card notification.
+     * @param notificationId the unique id of the notification
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     */
+    updateNotificationViewStatus: (notificationId, status) => instance.put(`/cards/notifications/${notificationId}`, {viewStatus: status}, {withCredentials: true}),
+
+    /**
+     * Updates the business
+     * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
+     * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     * @param name
+     * @param description
+     * @param streetNumber
+     * @param streetName
+     * @param suburb
+     * @param city
+     * @param region
+     * @param country
+     * @param postcode
+     * @param businessType
+     * @param id
+     */
+    updateBusiness: (name, description, streetNumber, streetName, suburb, city, region, country, postcode, businessType, id) => instance.put(`/businesses/${id}/modify`, {name, description,
+        address: {streetNumber, streetName, suburb, city, region, country, postcode}, businessType}, {withCredentials: true})
+
 }
