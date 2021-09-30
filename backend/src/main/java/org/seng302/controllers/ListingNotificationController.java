@@ -1,7 +1,6 @@
 package org.seng302.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seng302.models.*;
 import org.seng302.models.requests.UpdateNotificationViewStatusRequest;
 import org.seng302.repositories.*;
