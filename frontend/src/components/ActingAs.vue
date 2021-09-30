@@ -95,20 +95,6 @@ const ActingAs =  {
       return this.role;
     },
 
-
-
-
-    getUser() {
-      api.getUserFromID(store.loggedInUserId)
-      .then((response) => {
-        this.user = response.data;
-        this.getBusinesses();
-      }).catch((err) => {
-        console.log("Error " + err);
-      })
-
-    },
-
     getActingAs() {
       return this.businesses.filter(x => x.id == store.actingAsBusinessId)[0];
     },
