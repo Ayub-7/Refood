@@ -197,7 +197,7 @@ public class CardController {
         logger.info("Checking for expired cards");
         Date date = new Date();
         List<Card> expiredCards = cardRepository.findAllByDisplayPeriodEndBefore(date);
-        System.out.println(expiredCards);
+        logger.debug(expiredCards);
         for (Card card: expiredCards) {
             Notification exists = notificationRepository.findNotificationByCardId(card.getId());
             if (exists == null) {

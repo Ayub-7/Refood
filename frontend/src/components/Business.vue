@@ -31,8 +31,11 @@
       <!-- Left Side Business Information Panel -->
       <div id="business-container">
         <div class="sub-container">
-          <vs-button id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
+          <vs-button v-if="getActingAsBusinessId() !== business.id" id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
             {{ inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
+          </vs-button>
+          <vs-button v-else id="wishlist-button" icon="settings" style="width: 100%" :to="'/businesses/'+business.id+'/modify'">
+            Modify {{business.name}}
           </vs-button>
         </div>
 
@@ -85,6 +88,7 @@ import BusinessAdministrators from "./BusinessAdministrators";
 import BusinessListings from "./BusinessListings";
 import BusinessImages from "./BusinessImages";
 import ReImage from "./ReImage";
+import {store} from "../store";
 
 const Business = {
   name: "Business",
@@ -160,6 +164,13 @@ const Business = {
             this.$vs.loading.close();
           });
       }
+    },
+
+    /**
+     * Gets business id user is acting as
+     **/
+    getActingAsBusinessId() {
+      return store.actingAsBusinessId;
     },
 
     /**
