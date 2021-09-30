@@ -3,7 +3,7 @@
     <div class="container">
       <div class="title-container">
         <vs-icon icon="local_offer" style="margin: auto 0;"/>
-        <h1 id="title" class="title-left title" >Community Marketplace</h1>
+        <h1 id="title" class="title-left title" style="color: #4d4d4d !important; font-family: Ubuntu, sans-serif !important;">Community Marketplace</h1>
         <div class="title-right">
           <div style="display: flex;">
             <vs-tooltip text="Grid View">
@@ -276,6 +276,7 @@ export default {
 
 .title {
   font-size: 30px;
+
 }
 
 .con-select {
