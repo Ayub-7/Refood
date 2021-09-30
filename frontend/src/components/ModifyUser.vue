@@ -156,7 +156,7 @@
 </template>
 
 <script>
-import api from "@/Api";
+import api from "../Api";
 import axios from "axios";
 
 const ModifyUser = {
