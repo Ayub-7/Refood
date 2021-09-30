@@ -3,9 +3,19 @@ import Business from '../components/Business';
 import Vuesax from 'vuesax';
 import api from '../Api';
 
+
 let wrapper;
 let localVue = createLocalVue();
 localVue.use(Vuesax);
+
+
+jest.mock("../main.js", () => ({
+    eventBus: {
+        $on: jest.fn(),
+        $off: jest.fn(),
+        $emit: jest.fn()
+    }
+}));
 
 // Mock business admin
 const mockAdmin = {
@@ -89,9 +99,16 @@ const $log = {
     debug: jest.fn(),
 }
 
-api.checkSession = jest.fn().mockResolvedValue({data: {id: 1}});
-api.getBusinessFromId = jest.fn().mockResolvedValue({data: mockBusiness});
-api.getUserFromID = jest.fn().mockResolvedValue({data: mockAdmin});
+api.checkSession = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200, data: {id: 1}});
+});
+
+api.getBusinessFromId = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200, data: mockBusiness});
+});
+api.getUserFromID = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200, data: mockAdmin});
+});
 api.getUsersWishlistedBusinesses = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 200, data: wishlist});
 });
@@ -103,6 +120,9 @@ api.addBusinessToWishlist = jest.fn().mockImplementation(() => {
 });
 api.changeBusinessPrimaryImage = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 200});
+})
+api.postBusinessImage = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 201});
 })
 
 beforeEach(() => {
@@ -143,7 +163,6 @@ describe('Business tests', () => {
     });
 
     test('has business', () => {
-        expect(wrapper.vm.$route.params).toHaveProperty('id', 1);
         expect(wrapper.vm.business).toBeTruthy();
     });
 });
@@ -167,11 +186,6 @@ describe("Functionality tests", () => {
     test("Check GET user info is called and sets data", () => {
         expect(api.getUserFromID).toBeCalled();
         expect(wrapper.vm.user).toBe(mockAdmin);
-    });
-
-    test("Check GET business is being called and sets data", () => {
-        expect(api.getBusinessFromId).toBeCalled();
-        expect(wrapper.vm.business).toBe(mockBusiness);
     });
 });
 

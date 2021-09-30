@@ -20,6 +20,7 @@ const mockUser = {
     "dateOfBirth": "2006-03-30",
     "phoneNumber": "+7 684 622 5902",
     "homeAddress": "44 Ramsey Court",
+    "images": [],
     "created": "2021-04-05 00:11:04",
     "role": "USER",
     "businessesAdministered": [
@@ -57,6 +58,14 @@ const mockBusinesses = [
         "created": "2021-04-07 01:09:35"
     }
 ];
+
+jest.mock("../main.js", () => ({
+    eventBus: {
+        $on: jest.fn(),
+        $off: jest.fn(),
+        $emit: jest.fn()
+    }
+}));
 
 let mockCard = {
     id: 1,

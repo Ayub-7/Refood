@@ -1,30 +1,33 @@
 <template>
-  <div class="userInfo">
+  <div v-if="dataReady" class="userInfo">
     <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
 
-    <div>
+    <div id="container">
       <vs-dropdown vs-trigger-click>
         <div v-if="getActingAsBusinessName() == null" class="acting-display">
           <span class="user">{{getUserName()}}</span>
-          <vs-avatar v-if="getUserName() !== null" size="30" name="avatar"></vs-avatar>
+          <ReImage v-if="user.primaryImagePath != null" :imagePath="user.primaryImagePath"  :isUserThumbnail="true" ></ReImage>
+          <vs-avatar v-else icon="person" size="30" name="avatar" />
         </div>
         <div v-else class="acting-display">
           <span class="user">{{getActingAsBusinessName()}}</span>
-          <vs-avatar v-if="getUserName() !== null" icon="store" size="30" name="avatar">
+          <ReImage v-if="getActingAs().primaryImagePath !== null" :imagePath="getActingAs().primaryImagePath" :isThumbnail="true" style="border: 1px solid #ddd; border-radius: 50%; padding: 2px;"></ReImage>
+          <vs-avatar v-else-if="getUserName() !== null" icon="store" size="30" name="avatar">
           </vs-avatar>
         </div>
 
         <vs-dropdown-menu class="user-menu">
           <vs-dropdown-item class="dropdown-item" @click="setActingAsUser()" v-if="getActingAsBusinessName()">
-            <div class="dropdown-item-name" >{{ getUserName() }} </div>
-            <vs-avatar class="dropdown-item-avatar" v-if="getUserName() !== null" size="small">
+              <div class="dropdown-item-name" >{{ getUserName() }} </div>
+              <ReImage v-if="user.primaryImagePath != null" :imagePath="user.primaryImagePath" :isUserThumbnail="true" style="border: 1px solid #ddd; border-radius: 50%; padding: 2px;"></ReImage>
+              <vs-avatar v-else class="dropdown-item-avatar" size="small">
             </vs-avatar>
           </vs-dropdown-item>
 
           <vs-dropdown-group vs-label="Businesses" id="businessList">
-            <vs-dropdown-item class="dropdown-item" v-for="business in getBusinesses()" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
-              <div class="dropdown-item-name">{{business.name}} <span v-if="business.primaryAdministratorId === loggedInUserId">(P)</span></div>
-              <ReImage v-if="business.primaryThumbnailPath !== null" :imagePath="business.primaryThumbnailPath" :isThumbnail="true" style="border: 1px solid #ddd; border-radius: 50%; padding: 2px;"></ReImage>
+            <vs-dropdown-item class="dropdown-item" v-for="business in this.businesses" :key="business.id" v-on:click="setActingAsBusinessId(business.id, business.name)">
+              <div class="dropdown-item-name">{{business.name}} </div>
+              <ReImage v-if="business.primaryImagePath !== null" :imagePath="business.primaryImagePath" :isThumbnail="true" style="border: 1px solid #ddd; border-radius: 50%; padding: 2px;"></ReImage>
               <vs-avatar v-else class="dropdown-item-avatar" icon="store" size="small"></vs-avatar>
             </vs-dropdown-item>
           </vs-dropdown-group>
@@ -40,7 +43,7 @@ import api from "../Api";
 import ReImage from "./ReImage";
 import { bus } from "../main";
 
-const actingAs =  {
+const ActingAs =  {
   name: "actingAs",
   components: {ReImage},
   data: function () {
@@ -53,14 +56,16 @@ const actingAs =  {
       actingAsBusinessId: null,
       actingAsBusinessName: null,
       user: null,
+      dataReady: false,
     }
   },
 
   created() {
-    bus.$on('updatedUserInfo', () => {
-      console.log("Called")
+    bus.$on('updatedUserPicture', () => {
       this.getUser();
-      console.log(this.user)
+    })
+    bus.$on('updatedBusinessPicture', () => {
+      this.getBusinesses();
     })
   },
 
@@ -79,6 +84,8 @@ const actingAs =  {
       return this.userName;
     },
 
+
+
     /**
      * Retreives the acting account
      * @returns role of the acting account
@@ -87,6 +94,25 @@ const actingAs =  {
       this.role = store.role;
       return this.role;
     },
+
+
+
+
+    getUser() {
+      api.getUserFromID(store.loggedInUserId)
+      .then((response) => {
+        this.user = response.data;
+        this.getBusinesses();
+      }).catch((err) => {
+        console.log("Error " + err);
+      })
+
+    },
+
+    getActingAs() {
+      return this.businesses.filter(x => x.id == store.actingAsBusinessId)[0];
+    },
+
 
     /**
      * Returns the user currently logged in
@@ -108,14 +134,19 @@ const actingAs =  {
      * @returns filtered list of businesses
      */
     getBusinesses(){
-      this.userBusinesses = store.userBusinesses;
-      let filteredBusinesses = [];
-      for (let business of this.userBusinesses) {
-        if (business.id !== store.actingAsBusinessId) {
-          filteredBusinesses.push(business);
-        }
+
+      for(let business of this.user.businessesAdministered) {
+        api.getBusinessFromId(business.id)
+        .then((response) => {
+          console.log(response)
+          this.businesses.push(response.data);
+
+        }).catch((err) => {
+          console.log(err);
+        })
       }
-      return filteredBusinesses;
+
+      this.dataReady = true;
     },
 
     /**
@@ -151,9 +182,9 @@ const actingAs =  {
             mutations.setActingAsUser();
             this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
           }).catch((error) => {
-        if(error.response) {
-          this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
-        }
+            if(error.response) {
+              this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
+            }
 
         this.$log.debug("Error Status:", error)
       });
@@ -194,7 +225,7 @@ const actingAs =  {
     }
   },
 }
-export default actingAs;
+export default ActingAs;
 </script>
 
 <style scoped>
@@ -203,13 +234,27 @@ export default actingAs;
   cursor: pointer;
 }
 
+#container {
+  height: 100%;
+}
+
+
+.parent-dropdown {
+  height: 100%;
+}
+
 .acting-display {
+  text-align: center;
   display: flex;
   min-width: auto;
   margin-left: 10px;
   margin-right: 5px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   cursor: pointer;
 }
+
 
 span.user {
   font-size: 16px;
