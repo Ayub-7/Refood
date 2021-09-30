@@ -3,9 +3,19 @@ import Business from '../components/Business';
 import Vuesax from 'vuesax';
 import api from '../Api';
 
+
 let wrapper;
 let localVue = createLocalVue();
 localVue.use(Vuesax);
+
+
+jest.mock("../main.js", () => ({
+    eventBus: {
+        $on: jest.fn(),
+        $off: jest.fn(),
+        $emit: jest.fn()
+    }
+}));
 
 // Mock business admin
 const mockAdmin = {
@@ -103,6 +113,9 @@ api.addBusinessToWishlist = jest.fn().mockImplementation(() => {
 });
 api.changeBusinessPrimaryImage = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 200});
+})
+api.postBusinessImage = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 201});
 })
 
 beforeEach(() => {
