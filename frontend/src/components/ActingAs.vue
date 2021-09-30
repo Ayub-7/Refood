@@ -1,5 +1,5 @@
 <template>
-  <div class="userInfo">
+  <div v-if="user && businesses" class="userInfo">
     <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
 
     <div>
@@ -42,7 +42,7 @@ import {store, mutations} from "../store";
 import api from "../Api";
 import ReImage from "./ReImage";
 
-const actingAs =  {
+const ActingAs =  {
   name: "actingAs",
   components: {ReImage},
   data: function () {
@@ -199,7 +199,7 @@ const actingAs =  {
     }
   },
 }
-export default actingAs;
+export default ActingAs;
 </script>
 
 <style scoped>

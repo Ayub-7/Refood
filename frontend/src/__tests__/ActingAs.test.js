@@ -1,5 +1,5 @@
 import {createLocalVue, mount, shallowMount} from '@vue/test-utils';
-import actingAs from '../components/ActingAs';
+import ActingAs from '../components/ActingAs';
 import Vuesax from 'vuesax';
 import api from "../Api";
 
@@ -639,7 +639,7 @@ let $log = {
 }
 
 beforeEach(() => {
-    wrapper = shallowMount(actingAs, {
+    wrapper = shallowMount(ActingAs, {
         propsData: {},
         mocks: {store, $log, $router, mutations, sessionStorage},
         stubs: ['router-link', 'router-view'],
@@ -647,7 +647,7 @@ beforeEach(() => {
         localVue,
     });
 
-    wrapper.vm.business =
+    wrapper.vm.business = business;
     wrapper.vm.user = user;
 
 
@@ -677,15 +677,11 @@ beforeEach(() => {
     });
 });
 
-
+afterEach(() => {
+    wrapper.destroy();
+});
 
 describe('User acting as tests', () => {
-    
-
-    afterEach(() => {
-        wrapper.destroy();
-    });
-
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
     });
