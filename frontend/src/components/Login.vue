@@ -3,28 +3,26 @@
     <div id="logo-container">
       <img :src="`${publicPath}refood-logo-recycle.png`" alt="refood-logo" id="logo"/>
     </div>
-    <div id="main">
+    <vs-card id="main">
       <p id="sign">Sign In</p>
       <form>
-        <vs-input class="form-control"
-                  id="email" type="text"
+        <vs-input id="email" type="text"
+                  class="form-control"
                   v-model="email"
                   label="Enter Email"
                   :danger="this.errors.message != null"
                   :danger-text="this.errors.message"
-                  required></vs-input>
-        <vs-input class="form-control"
-                  id="password" type="password"
+                  required/>
+        <vs-input id="password" type="password"
+                  class="form-control"
                   v-model="password"
                   label="Enter Password"
                   :danger="this.errors.message != null"
                   :danger-text="this.errors.message"
-                  required></vs-input>
-
+                  required/>
         <vs-button class="loginButton" @click="checkForm(); loginSubmit()">Sign in</vs-button>
       </form>
-
-    </div>
+    </vs-card>
   </div>
 </template>
 
@@ -105,20 +103,16 @@ export default Login;
 <style scoped>
 
 #main {
-  font-family: 'Ubuntu', sans-serif;
+  max-width: 400px;
+  margin: 1em auto;
+  padding: 0.5em 0 0.5em 0;
+}
 
+#main >>> .vs-card--content {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto;
   grid-row-gap: 1em;
-
-  max-width: 400px;
-  background-color: white;
-  margin: 1em auto;
-  padding: 0.5em 0 0.5em 0;
-  border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.02);
-  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 }
 
 /* First Header Row */
@@ -129,7 +123,7 @@ export default Login;
   margin: 0;
   padding: 0.5em 0;
 
-  color: #385898;
+  color: #1F74FF;
   font-weight: bold;
   font-size: 24px;
   text-align: center;
@@ -143,19 +137,17 @@ form {
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, auto);
   grid-row-gap: 1em;
-
-  margin: auto;
-
 }
 
 .form-control {
-  font-family: 'Ubuntu', sans-serif;
+  margin: auto;
 }
 
 #email {
   grid-row: 1;
   grid-column: 1;
-
+  margin: auto;
+  background-color: black;
 }
 
 #password {
@@ -163,12 +155,12 @@ form {
   grid-column: 1;
 }
 
-
 .loginButton {
   grid-row: 3;
   grid-column: 1;
 
-  margin: 0 0 2em 0;
+  width: 200px;
+  margin: 1em auto;
 }
 
 #logo-container {

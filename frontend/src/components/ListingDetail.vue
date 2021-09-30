@@ -3,9 +3,10 @@
     <div v-if="fromSearch" class="return-button">
       <vs-button @click="returnToSearch()" title="Go Back">Return To Search</vs-button>
     </div>
-    <vs-row>
+
+    <div id="content-container">
       <!-- Image area -->
-      <vs-col vs-w="6" vs-sm="12" vs-xs="12" vs-justify="center" id="image-area">
+      <div id="image-area">
         <div id="listing-image-container">
           <transition name="slide-fade" mode="out-in">
             <ReImage id="listing-image" :key="currentImage" :imagePath="currentImage"></ReImage>
@@ -19,9 +20,9 @@
             </vs-button>
         </div>
         </div>
-      </vs-col>
+      </div>
       <!-- Listing details (closing date, business, etc) -->
-      <vs-col vs-w="6" vs-sm="12" vs-xs="12" id="listing-info-area">
+      <div id="listing-info-area">
         <div id="listing-info-container">
           <div id="business-name"><strong>Business:</strong> {{listing.inventoryItem.product.business.name}}</div>
           <vs-button id="business-profile-button" @click="goToBusinessProfile(listing.inventoryItem.product.business.id)">To profile</vs-button>
@@ -31,26 +32,21 @@
           <p><strong>Closes:</strong> {{listing.closes}}</p>
           <p id="listing-moreInfo">{{listing.moreInfo}}</p>
           <p><strong>Likes:</strong> {{listing.likes}}</p>
-          <div class="">
-            <vs-button v-if="!likedListingsIds.includes(listing.id)"  class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">
-              <vs-col vs-type="flex" vs-align="flex-start">
-                <vs-icon icon="favorite" size="32px"/>
-                <p class="like-listing-text">Like listing <br> Add to watchlist</p>
-              </vs-col>
+
+          <div class="button-group">
+            <vs-button v-if="!likedListingsIds.includes(listing.id)" icon="favorite" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">
+              <p class="like-listing-text">Like Listing</p>
+              <p class="like-listing-text" style="font-size: 11px">Add to watchlist</p>
             </vs-button>
-            <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">
-              <vs-col vs-type="flex" vs-align="flex-start">
-                <vs-icon icon="favorite_border" size="32px"/>
-                <p class="like-listing-text">Unlike listing <br> Remove from watchlist</p>
-              </vs-col>
+            <vs-button v-else color="danger" class="listing-detail-btn" icon="favorite_border" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">
+              <p class="like-listing-text">Unlike Listing</p>
+              <p class="like-listing-text" style="font-size: 11px">Remove from watchlist</p>
               </vs-button>
-          </div>
-          <div>
             <vs-button class="listing-detail-btn" @click="buy()">Buy</vs-button>
           </div>
         </div>
-      </vs-col>
-    </vs-row>
+      </div>
+    </div>
 
     <vs-row>
       <!-- Product & Inventory details (manufacturer, description, inventory dates, etc) -->
@@ -303,6 +299,11 @@ export default {
   opacity: 0;
 }
 
+#content-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 50%);
+}
+
 #listing-detail-container {
   height: 100%;
   width: 60%;
@@ -312,21 +313,20 @@ export default {
 #listing-info-area {
   text-align: center;
   font-size: 15px;
+  margin: 0 1em;
 }
 
 #listing-image-container {
-  margin: auto;
-  width: 80%;
 }
 
 #listing-image >>> img {
-  width:  400px;
-  height: 300px;
+  width: 100%;
   object-fit: cover;
 }
 
 #product-info-area {
-  margin-top: 3em;
+  margin-top: 1em;
+  margin-left: 1em;
   text-align: center;
   font-size: 15px;
   padding-bottom: 2em;
@@ -334,7 +334,6 @@ export default {
 
 p {
   text-align: left;
-  margin-left: 75px;
 }
 
 #business-name {
@@ -356,20 +355,26 @@ p {
   margin-bottom: 10px;
 }
 
-
-.listing-detail-btn {
-  margin-top: 5px;
-  width: 40%;
-  text-align: center;
-  margin-left: 50px;
-}
-
 .like-listing-text {
   text-align: center;
-  margin-left: 20px;
+}
+
+.listing-detail-btn {
+  width: 45%;
+  text-align: center;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1em;
 }
 
 @media screen and (max-width: 1300px) {
+  #content-container {
+    grid-template-columns: 1fr;
+  }
+
   #listing-image > img {
     width:  300px;
     height: 200px;
@@ -380,8 +385,7 @@ p {
     text-align: center;
     font-size: 12px;
     padding-bottom: 2em;
-    margin-top: 5px;
-    width: 150px;
+    margin-top: 2em;
   }
 
   #listing-info-area {
@@ -394,15 +398,13 @@ p {
     margin-bottom: 5px;
   }
 
-
   #business-name {
     font-size: 20px;
-    margin-top: 1em;
     margin-bottom: 0.5em;
   }
 
   #listing-image {
-        margin: auto;
+    margin: auto;
   }
 
   #listing-image-container {
