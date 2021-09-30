@@ -24,6 +24,14 @@
       <vs-divider style="grid-row: 4;"></vs-divider>
       <div class="label-control">Address</div>
 
+      <div v-if="currencyAlert">
+        <vs-alert active="true"
+                  icon="priority_high"
+                  style="grid-row: 4; grid-column: 1/4; height: fit-content; width: 100%; text-align: center">
+          Changing your current country will change your currency for associated listings and products.
+        </vs-alert>
+      </div>
+
       <div id="address-container">
         <div id="street-number">
           <vs-input v-model="streetNumber" class="form-control" label="Street Number"></vs-input>
@@ -48,7 +56,7 @@
           <vs-input v-model="region" class="form-control" label="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountries()" v-model="country" class="form-control" label="Country *"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountries(); checkUpdateCurrency()" v-model="country" class="form-control" label="Country *"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -89,10 +97,22 @@ export default {
       suggestCountries: false,
       suggestedCountries: [],
       minNumberOfCharacters: 3,
-      business: null
+      business: null,
+      currencyAlert: false
     };
   },
   methods: {
+
+    /**
+     * Check whether the country has changed, if so
+     * ask the user if they want to change the currency
+     */
+    checkUpdateCurrency: function() {
+      if(this.country !== this.business.address.country) {
+        this.currencyAlert = true;
+      }
+    },
+
 
     /**
      * method to update business
@@ -309,6 +329,7 @@ form {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(auto-fit, auto);
   margin: 0 1.5em;
+  margin-top: 1.5em;
 }
 
 input {
