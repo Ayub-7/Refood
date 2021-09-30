@@ -37,14 +37,14 @@ public class Image {
      */
     public static String getContentTypeExtension(String contentType) throws InvalidImageExtensionException {
         switch (contentType) {
-            default:
-                throw new InvalidImageExtensionException("Unsupported extension type.");
             case "image/png":
                 return ".png";
             case "image/jpeg":
                 return ".jpg";
             case "image/gif":
                 return ".gif";
+            default:
+                throw new InvalidImageExtensionException("Unsupported extension type.");
         }
     }
 

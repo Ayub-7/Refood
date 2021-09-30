@@ -33,18 +33,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     void updateInventoryQuantity(@Param(value = "newQuantity") int newQuantity,
                        @Param(value = "inventoryId") long inventoryId);
 
-    //Do when modifying inventory required
-//    @Modifying(clearAutomatically = true)
-//    @Transactional
-//    @Query("UPDATE Inventory p SET id = :newId, name = :name, description = :description, recommended_retail_price = :rrp where id = :prevId")
-//    void updateProduct(@Param(value = "newId") String newId,
-//                       @Param(value = "name") String name,
-//                       @Param(value = "description") String description,
-//                       @Param(value = "rrp") Double rrp,
-//                       @Param(value = "prevId") String prevId);
-
-
-
 
 
 }

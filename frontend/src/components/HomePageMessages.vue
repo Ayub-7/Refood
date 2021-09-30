@@ -66,10 +66,10 @@
             </div>
             <div class="lln-button-group" style="margin-top: 24px;">
               <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
-                <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
               </div>
               <div v-else style="margin-right: 10px;">
-                <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
               </div>
               <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, item.fid, false, true); undoClick=true"  icon="close" style="margin-top: 5px;"></vs-button>
             </div>
@@ -77,22 +77,24 @@
           </div>
 
           <div class="card-container" v-else-if="item.status == 'Deleted'">
-            <p class="sub-header">MARKETPLACE - {{item.created}}</p>
+            <div class="pln-top-row">
+              <p class="sub-header">MARKETPLACE - {{item.created}}</p>
+              <div class="lln-button-group">
+                <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
+                  <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <div v-else style="margin-right: 10px;">
+                  <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+              </div>
+              <div>
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, false, true, 'Deleted');
+              undoClick=true" icon="close"></vs-button>
+              </div>
+            </div>
             <div style="display: flex; justify-content: space-between">
               <div class="lln-description">
                 Your marketplace card {{item.title}} has been removed
-              </div>
-              <div class="lln-button-group">
-                <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
-                  <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-                </div>
-                <div v-else style="margin-right: 10px;">
-                  <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-                </div>
-                <div>
-                  <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, false, true, 'Deleted');
-              undoClick=true" icon="close"></vs-button>
-                </div>
               </div>
             </div>
           </div>
@@ -118,23 +120,23 @@
       <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
         <div v-if="!undoId.includes(item.fid)">
         <div @click="openDetailedModal(item)">
-            <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
+          <p class="sub-header">MARKETPLACE - {{item.sent}}</p>
           <div style="display: flex; justify-content: space-between">
-          <div class="lln-description">
-            <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
-          </div>
-          <div class="lln-button-group">
-            <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
-              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            <div class="lln-description">
+              <div id="message-text">New message from {{users[item.sender.id || item.sender].firstName}} {{users[item.sender.id || item.sender].lastName}} about <strong>{{item.card.title}}</strong></div>
             </div>
-            <div v-else style="margin-right: 10px;">
-              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            <div class="lln-button-group">
+              <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
+                <vs-button icon="flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <div v-else style="margin-right: 10px;">
+                <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <div>
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true, false);
+                undoClick=true" icon="close"></vs-button>
+              </div>
             </div>
-            <div>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true, false);
-              undoClick=true" icon="close"></vs-button>
-            </div>
-          </div>
           </div>
         </div>
         </div>
@@ -155,32 +157,32 @@
       <div v-else-if="item.boughtListing && item.boughtListing.buyer === currentUserId" @mouseenter="markAsRead(item)" class="bought-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'notification-card', 'bought-listing-notification']">
           <div v-if="!undoId.includes(item.fid)">
-          <div class="pln-top-row">
-            <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
-          </div>
-          <h3>{{ item.boughtListing.product.name }}</h3>
-          <h5>{{ item.boughtListing.product.business.name }}</h5>
-          <div class="pln-bottom-row">
-            <h4>
-              {{ currency }}
-              {{ item.boughtListing.price }}
-            </h4>
-            <div>
-              Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
+            <div class="pln-top-row">
+              <p class="sub-header">BOUGHT LISTING - {{ item.created }}</p>
+              <div class="lln-button-group">
+                <div v-if="item.viewStatus == 'Important'">
+                  <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <div v-else>
+                  <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+              </div>
+              <div>
+                <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
+              undoClick=true"></vs-button>
+              </div>
             </div>
-          </div>
-          <div class="lln-button-group">
-            <div v-if="item.viewStatus == 'Important'">
-              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            <h3>{{ item.boughtListing.product.name }}</h3>
+            <h5>{{ item.boughtListing.product.business.name }}</h5>
+            <div class="pln-bottom-row">
+              <h4>
+                {{ currency }}
+                {{ item.boughtListing.price }}
+              </h4>
+              <div>
+                Collect your purchase at <strong>{{ createAddressString(item.boughtListing.product.business.address) }}</strong>
+              </div>
             </div>
-            <div v-else>
-              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-            </div>
-            <div>
-              <vs-button color="danger" icon="close" id="delete-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
-            undoClick=true"></vs-button>
-            </div>
-          </div>
           </div>
           <div v-else>
             <div style="display: flex">
@@ -201,19 +203,19 @@
           <div v-if="!undoId.includes(item.fid)">
           <div class="pln-top-row">
             <p class="sub-header">LIKED LISTING - {{ item.created }}</p>
-          </div>
-          <div class="lln-description">
-            <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
-          </div>
-          <div class="lln-button-group">
-            <div v-if="item.viewStatus == 'Important'">
-              <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-            </div>
-            <div v-else>
-              <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+            <div class="lln-button-group">
+              <div v-if="item.viewStatus == 'Important'">
+                <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
+              <div v-else>
+                <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+              </div>
             </div>
             <vs-button color="danger"  icon="close" id="delete-liked-purchased-listing-notification-button" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
             undoClick=true"></vs-button>
+          </div>
+          <div class="lln-description">
+            <strong>{{ item.boughtListing.product.name }}</strong>, by {{ item.boughtListing.product.business.name }} was purchased by someone else, and is no longer available.
           </div>
           </div>
           <div v-else>
@@ -233,7 +235,19 @@
       <div v-else-if="item.listing" @mouseenter="markAsRead(item)" class="liked-listing-container">
         <vs-card v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <div v-if="!undoId.includes(item.fid)">
-          <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
+            <div class="pln-top-row">
+              <p class="sub-header">{{ item.status.toUpperCase() }} LISTING - {{ item.created }}</p>
+              <div class="lln-button-group">
+                <div v-if="item.viewStatus == 'Important'">
+                  <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <div v-else>
+                  <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
+            undoClick=true"></vs-button>
+              </div>
+            </div>
           <div style="display: flex">
             <div class="lln-description">
               <span v-if="item.status === 'Liked'">You have liked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
@@ -241,15 +255,7 @@
               <span v-else>You have unliked <strong>{{ item.listing.inventoryItem.product.name }}</strong>.</span>
             </div>
             <div class="lln-button-group">
-              <div v-if="item.viewStatus == 'Important'">
-                <vs-button icon="star" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-              </div>
-              <div v-else>
-                <vs-button icon="star_border" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-              </div>
               <vs-button id="view-listing-button" class="lln-delete-button view-listing-button" @click="goToListing(item.listing)"> View Listing </vs-button>
-              <vs-button id="delete-liked-listing-notification-button" color="danger" icon="close" class="lln-delete-button delete-button" @click="undo(item.id, item.fid, false, false);
-            undoClick=true"></vs-button>
             </div>
           </div>
           </div>
@@ -477,7 +483,8 @@ export default {
 
     /**
      * Combines the different news feed item types into a single list.
-     * Sorts the list by newest messages first.
+     * Sorts the list by unread notifications, then flagged notifications then read
+     * with newest messages first in each sub group.
      */
     combineFeedMessages: function() {
       this.feedItems = this.messages.concat(this.listingNotifications.concat(this.notifications));
@@ -489,7 +496,22 @@ export default {
       this.feedItems.sort(function(a, b) {
         return new Date(a.created) - new Date(b.created);
       });
-    this.feedItems.sort((a, b) => (b.viewStatus > a.viewStatus) ? 1 : -1)
+      for(let item of this.feedItems) {
+        switch (item.viewStatus) {
+          case ('Important'):
+            item.counter = 2;
+            break;
+          case ('Unread'):
+            item.counter = 1;
+            break;
+          case ('Read'):
+            item.counter = 3;
+            break;
+          default:
+            item.counter = 3;
+        }
+      }
+      this.feedItems.sort((a, b) => (b.counter < a.counter) ? 1 : -1)
     },
 
 
@@ -901,6 +923,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  margin-bottom: 5px;
 }
 
 .pln-delete-button {

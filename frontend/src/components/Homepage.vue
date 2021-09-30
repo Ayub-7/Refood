@@ -37,7 +37,7 @@
         <div id="watchlist-container" class="sub-container" v-if="getBusinessId() == null" >
           <div style="display: flex;" class="watchlist-title" id="watchlist-header-container">
             <vs-tabs alignment="fixed">
-              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist" icon="favorite_border" color="red"></vs-tab>
+              <vs-tab id="watchlist-tab" @click="watchlist=true" label="Watchlist (My Likes)" icon="favorite_border" color="red"></vs-tab>
               <vs-tab id="wishlist-tab" @click="watchlist=false" label="Wishlist" icon="star_border"></vs-tab>
             </vs-tabs>
           </div>

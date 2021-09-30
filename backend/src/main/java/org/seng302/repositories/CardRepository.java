@@ -21,16 +21,15 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     /**
      * Get Card by it's ID
      *
-     * @param id
-     * @return Card
+     * @param id unique identifier of the card
+     * @return Card that matches the id (if any).
      */
     Card findCardById(long id);
 
     /**
      * Gets cards with a matching keywords string
-     * todo: get matches for single keywords instead of exact matches
      *
-     * @param keywords
+     * @param keywords a string of space separated list of keywords.
      * @return List<Card> a list of cards matching keywords
      */
     List<Card> findCardsByKeywords(String keywords);
@@ -57,7 +56,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     /**
      * Delete a Card by it's ID
      *
-     * @param id
+     * @param id unique identifier of the card
      * @return long number of records deleted
      */
     @Transactional

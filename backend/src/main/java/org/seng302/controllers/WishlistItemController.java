@@ -1,6 +1,5 @@
 package org.seng302.controllers;
 
-import org.seng302.finders.UserFinder;
 import org.seng302.models.*;
 import org.seng302.models.requests.MutedStatusRequest;
 import org.seng302.repositories.*;

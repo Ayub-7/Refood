@@ -32,8 +32,18 @@
           <p id="listing-moreInfo">{{listing.moreInfo}}</p>
           <p><strong>Likes:</strong> {{listing.likes}}</p>
           <div class="">
-            <vs-button v-if="!likedListingsIds.includes(listing.id)" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">Like listing</vs-button>
-            <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">Unlike listing</vs-button>
+            <vs-button v-if="!likedListingsIds.includes(listing.id)"  class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">
+              <vs-col vs-type="flex" vs-align="flex-start">
+                <vs-icon icon="favorite" size="32px"/>
+                <p class="like-listing-text">Like listing <br> Add to watchlist</p>
+              </vs-col>
+            </vs-button>
+            <vs-button v-else color="danger" class="listing-detail-btn" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">
+              <vs-col vs-type="flex" vs-align="flex-start">
+                <vs-icon icon="favorite_border" size="32px"/>
+                <p class="like-listing-text">Unlike listing <br> Remove from watchlist</p>
+              </vs-col>
+              </vs-button>
           </div>
           <div>
             <vs-button class="listing-detail-btn" @click="buy()">Buy</vs-button>
@@ -208,7 +218,7 @@ export default {
       api.addLikeToListing(listingId)
           .then(() => {
             this.likedListingsIds.push(listingId);
-            this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+            this.$vs.notify({text: `${listingName} has been liked and added to your watchlist!`, color: 'success'});
           })
           .catch((err) => {
             throw new Error(`Error trying to like listing ${listingId}: ${err}`);
@@ -231,7 +241,7 @@ export default {
       api.removeLikeFromListing(listingId)
           .then(() => {
             this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
-            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+            this.$vs.notify({text: `${listingName} has been unliked and deleted from your watchlist!`, color: 'success'});
           })
           .catch((err) => {
             throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
@@ -354,6 +364,10 @@ p {
   margin-left: 50px;
 }
 
+.like-listing-text {
+  text-align: center;
+  margin-left: 20px;
+}
 
 @media screen and (max-width: 1300px) {
   #listing-image > img {

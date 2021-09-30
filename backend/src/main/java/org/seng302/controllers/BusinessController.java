@@ -596,10 +596,7 @@ public class BusinessController {
         if(nameLength > 30 || nameLength < 1 || businessRequest.getName() == null) {
             return false;
         }
-        if(descriptionLength > 140) {
-            return false;
-        }
-        return true;
+        return descriptionLength <= 200;
     }
 
     /**
