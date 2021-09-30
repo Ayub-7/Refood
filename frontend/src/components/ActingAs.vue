@@ -67,6 +67,9 @@ const ActingAs =  {
     bus.$on('updatedBusinessPicture', () => {
       this.getBusinesses();
     })
+    bus.$on('updatedUserInfo', () => {
+      this.getUser();
+    })
   },
 
   async mounted() {
@@ -93,20 +96,6 @@ const ActingAs =  {
     getUserRole() {
       this.role = store.role;
       return this.role;
-    },
-
-
-
-
-    getUser() {
-      api.getUserFromID(store.loggedInUserId)
-      .then((response) => {
-        this.user = response.data;
-        this.getBusinesses();
-      }).catch((err) => {
-        console.log("Error " + err);
-      })
-
     },
 
     getActingAs() {
