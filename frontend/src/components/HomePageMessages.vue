@@ -55,7 +55,18 @@
         <vs-card id="message-notification-card" class="notification-card" actionable v-bind:class="[{'unread-notification': item.viewStatus === 'Unread'}, 'liked-listing-notification', 'notification-card']">
           <div v-if="!undoId.includes(item.fid)">
           <div class="card-container" v-if="item.status === 'Expired'">
-            <p class="sub-header">MARKETPLACE - {{item.created}}</p>
+            <div class="pln-top-row">
+              <p class="sub-header">MARKETPLACE - {{item.created}}</p>
+              <div class="lln-button-group" style="margin-top: 24px;">
+                <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
+                  <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <div v-else style="margin-right: 10px;">
+                  <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
+                </div>
+                <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, item.fid, false, true); undoClick=true"  icon="close" style="margin-top: 5px;"></vs-button>
+              </div>
+            </div>
             <div style="display: flex; justify-content: space-between">
             <div class="lln-description">
               Your marketplace card {{item.title}} has expired
@@ -63,15 +74,6 @@
                 <vs-button class="notificationButtons" @click="extendCard(item.cardId, item.title)">Extend</vs-button>
                 <vs-button class="notificationButtons" @click="deleteCard(item.cardId, item.title)">Delete card</vs-button>
               </div>
-            </div>
-            <div class="lln-button-group" style="margin-top: 24px;">
-              <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
-                <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-              </div>
-              <div v-else style="margin-right: 10px;">
-                <vs-button icon="outlined_flag" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
-              </div>
-              <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="undo(item.id, item.fid, false, true); undoClick=true"  icon="close" style="margin-top: 5px;"></vs-button>
             </div>
           </div>
           </div>
@@ -105,7 +107,7 @@
                 <span><strong>Notification has been deleted</strong>.</span>
               </div>
               <div class="lln-button-group">
-                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+                <vs-icon style="cursor: pointer" icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
               </div>
             </div>
           </div>
@@ -146,7 +148,7 @@
               <span><strong>Notification has been deleted</strong>.</span>
             </div>
             <div class="lln-button-group">
-              <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+              <vs-icon style="cursor: pointer" icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
             </div>
           </div>
         </div>
@@ -190,7 +192,7 @@
                 <span><strong>Notification has been deleted</strong>.</span>
               </div>
               <div class="lln-button-group">
-                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+                <vs-icon style="cursor: pointer" icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
               </div>
             </div>
           </div>
@@ -224,7 +226,7 @@
                 <span><strong>Notification has been deleted</strong>.</span>
               </div>
               <div class="lln-button-group">
-                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+                <vs-icon style="cursor: pointer" icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
               </div>
             </div>
           </div>
@@ -265,7 +267,7 @@
                 <span><strong>Notification has been deleted</strong>.</span>
               </div>
               <div class="lln-button-group">
-                <vs-icon icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
+                <vs-icon style="cursor: pointer" icon="undo" @click="undoDelete=true; removeId(item.fid)"></vs-icon>
               </div>
             </div>
           </div>
