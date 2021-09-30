@@ -163,6 +163,21 @@ public class User implements Serializable {
                 this.images.remove(image);
                 removeImage = image;
                 break;
+
+    /**
+     * Sets the path of the thumbnail of the primary image
+     * @param path The path to the image
+     */
+    public void setPrimaryThumbnailPath(String path) {
+        this.primaryThumbnailPath = path;
+    }
+
+    public void updatePrimaryImage(long id, String imageId, String imageExtension) {
+        if (this.primaryImagePath == null) {
+            if (System.getProperty("os.name").startsWith("windows")) {
+                this.setPrimaryImage(String.format("business_%d\\%s%s", id, imageId, imageExtension));
+            } else {
+                this.setPrimaryImage(String.format("business_%d/%s%s", id, imageId, imageExtension));
             }
         }
         assert removeImage != null;

@@ -262,8 +262,8 @@ public class ProductController {
 
         File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
         File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        System.out.println(file.getAbsolutePath());
+        logger.info(String.format("Working Directory = %s", System.getProperty("user.dir")));
+        logger.info(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
@@ -393,9 +393,7 @@ public class ProductController {
             productRepository.save(product);
             Files.delete(Paths.get(businessDir + "/" + imageId + imageExtension));
             Files.delete(Paths.get(businessDir + "/" + imageId + "_thumbnail" + imageExtension));
-            System.out.println("File "
-            + checkFile.toString()
-            + " successfully removed");
+            logger.info(String.format("File %s successfully removed", checkFile.toString()));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
         }

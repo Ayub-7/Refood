@@ -394,6 +394,9 @@ public class UserController {
         logger.info(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
+
+        // Save into DB.
+        
         String imageName = image.getOriginalFilename();
         String filename = "";
         String thumbnailFilename = "";
@@ -413,8 +416,7 @@ public class UserController {
         Image newImage = new Image(imageName, imageId, filename, thumbnailFilename);
         user.addUserImage(newImage);
         userRepository.save(user);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(newImage));
+        return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(newImage.getId()));
     }
 
 

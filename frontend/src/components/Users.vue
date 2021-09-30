@@ -10,6 +10,22 @@
       </div>
 
       <div id="name-container">
+        <vs-dropdown class="title-image" vs-trigger-click>
+          <ReImage :imagePath="user.primaryImagePath" :isUser="true" class="title-image" v-if="user.primaryImagePath"></ReImage>
+          <vs-avatar v-else icon="store" color="#1F74FF" size="100px" name="avatar" class="title-image"></vs-avatar>
+          <vs-dropdown-menu>
+            <vs-dropdown-item @click="updatePrimary=true; openImageUpload()" class="profileDropdown">
+              <vs-icon icon="add_box" style="margin: auto"></vs-icon>
+              <div style="font-size: 12px; margin: auto">Add New Primary Image</div>
+            </vs-dropdown-item>
+            <vs-dropdown-group v-if="images.length > 1" class="profileDropdown" vs-collapse vs-icon="collections" vs-label="Update With Existing" style="font-size: 13px">
+              <vs-dropdown-item v-for="image in filteredImages()" :key="image.id" @click="updatePrimaryImage(image.id);">
+                {{image.name}}
+              </vs-dropdown-item>
+            </vs-dropdown-group>
+          </vs-dropdown-menu>
+        </vs-dropdown>
+
         <div id="full-name"> {{ this.user.firstName }} {{ this.user.middleName }} {{ this.user.lastName }} </div>
         <div id="nickname"> {{ this.user.nickname }} </div>
       </div>
@@ -55,15 +71,23 @@
 
       <!-- Right Content Side -->
       <main>
-        <div class="sub-header" id="businesses-header">Businesses</div>
-        <ul id="business-list">
-          <li class="card" v-for="business in businesses" :key="business.id" v-bind:business="business" @click="goToBusinessPage(business)">
-            <div class="card-name">{{ business.name }}</div>
-            <div class="card-type">{{ business.businessType }}</div>
-            <div class="card-description">{{ business.description }}</div>
-          </li>
-        </ul>
+        <vs-tabs  alignment="fixed">
+          <vs-tab label="Businesses">
+          <div class="sub-header" id="businesses-header">Businesses</div>
+            <ul id="business-list">
+              <li class="card" v-for="business in businesses" :key="business.id" v-bind:business="business" @click="goToBusinessPage(business)">
+                <div class="card-name">{{ business.name }}</div>
+                <div class="card-type">{{ business.businessType }}</div>
+                <div class="card-description">{{ business.description }}</div>
+              </li>
+            </ul>
+          </vs-tab>
+          <vs-tab label="Images">
+            <UserImages :user="user" :primaryImage="user.primaryImagePath" :images="images"  @getUser="getUserInfo(user.id)" @update="reloadLocation"></UserImages>
+          </vs-tab>
+        </vs-tabs>
       </main>
+  
   </div>
 
     <!-- show users marketplace activity modal -->
@@ -109,13 +133,15 @@ import Modal from "./Modal";
 import api from "../Api";
 import {store} from "../store";
 import MarketplaceGrid from '../components/MarketplaceGrid';
+import ReImage from "../components/ReImage";
 import CardModal from "../components/CardModal";
+import UserImages from "../components/UserImages";
 const moment = require('moment');
 
 const Users = {
   name: "Profile",
   components: {
-    Modal, MarketplaceGrid, CardModal
+    Modal, MarketplaceGrid, CardModal, UserImages, ReImage
   },
   data: function () {
     return {
@@ -130,6 +156,7 @@ const Users = {
       selectedBusiness: null,
       displayType: true,
       cards: [],
+      images: [],
 
       displayOptions: false,
     };
@@ -181,11 +208,34 @@ const Users = {
       this.getUserCards(this.user.id);
     },
 
+
+        /**
+     * Called by primary image dropdown component, filtering the primary image out so
+     * that only the non-primary images are displayed.
+     */
+    filteredImages: function() {
+      let filteredImages = [];
+      for (let image of this.images) {
+        if (this.user.primaryImagePath && image.fileName.match(/\d+/g)[1] !== this.user.primaryImagePath.match(/\d+/g)[1]) {
+          filteredImages.push(image);
+        }
+      }
+      return filteredImages;
+    },
+
+
     /**
      * Close the pop-up box with no consequences.
      */
     closeModal: function() {
       this.showModal = false;
+    },
+
+    /**
+    * Reload the component
+    */
+    reloadLocation: function() {
+      location.reload();
     },
 
     /**
@@ -242,6 +292,7 @@ const Users = {
             this.userViewingBusinesses = store.userBusinesses;
           }
           this.user = response.data;
+          this.images = this.user.images;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
         })
         .catch((err) => {
@@ -323,17 +374,33 @@ export default Users;
 
 /* Name Header */
 #name-container {
+
   grid-column: 2 / 4;
+  grid-row: 1;
 
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1.5fr;
+  grid-template-rows: auto auto;
   text-align: center;
-
-  background-color: #FFFFFF;
+  background-color: transparent;
   padding: 0.5em 0 0.5em 0;
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.02);
   margin: 8px 0 0 0;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 
+}
+
+.title-image {
+  height: 100px;
+  width: 200px;
+  object-fit: cover;
+  display: flex;
+  grid-column: 1;
+  grid-row: 1 / 3;
+  margin-left: auto;
+  justify-content: flex-end;
+  margin-right: 20px;
 }
 
 #full-name {
@@ -344,7 +411,10 @@ export default Users;
 #nickname {
   font-size: 16px;
   padding: 0 0 0.5em 0;
+  grid-column: 2;
 }
+
+
 
 /* Left Profile Side */
 #profile {
