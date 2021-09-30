@@ -441,6 +441,90 @@ describe('HomePageMessages method tests', () => {
         expect(wrapper.vm.feedItems).toStrictEqual([{fid:0},{fid:1},{fid:6},{fid:7}]);
     });
 
+    test("if undo message, click and delete are set to false and delete message is called", async () => {
+        wrapper.vm.deleteMessage = jest.fn();
+        wrapper.vm.undo(5, 0, true, false, "title");
+        expect(wrapper.vm.undoCount).toBeTruthy(); //undo count is set to greater than zero
+        expect(wrapper.vm.undoClick).toBeFalsy();
+        expect(wrapper.vm.undoDelete).toBeFalsy();
+        //expect(wrapper.vm.deleteMessage).toBeCalled();
+    });
+
+    test("if undo expiry message, deleteCard is called", async () => {
+        wrapper.vm.deleteCard = jest.fn();
+        wrapper.vm.undo(5, 0, false, true, "title");
+        expect(wrapper.vm.undoCount).toBeTruthy(); //undo count is set to greater than zero
+        expect(wrapper.vm.undoClick).toBeFalsy();
+        expect(wrapper.vm.undoDelete).toBeFalsy();
+        //expect(wrapper.vm.deleteCard).toBeCalled();
+    });
+
+    test("When a notification is deleted, user is notified", async () => {
+        api.deleteListingNotification = jest.fn(() => {
+            return Promise.resolve({status: 200});
+        });
+        wrapper.vm.spliceMessage = jest.fn();
+        wrapper.vm.getListingNotifications = jest.fn();
+
+
+        wrapper.vm.deleteNotification(0, 0);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.polling).toBeTruthy();
+    });
+
+    test("When a notification fails to delete, user is notified and debug is called", async () => {
+        api.deleteListingNotification = jest.fn(() => {
+            return Promise.reject({response: {status: 500}});
+        });
+
+        wrapper.vm.deleteNotification(0, 0);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.$log.debug).toBeCalled();
+    });
+
+    test("When listings get fails, the user is notified and error written to debug", async () => {
+        api.getListingNotifications = jest.fn(() => {
+            return Promise.reject({response: {status: 500}});
+        });
+        wrapper.vm.getListingNotifications(0, 0);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.$log.debug).toBeCalled();
+    });
+
+
+    test("When a message is deleted, user is notified", async () => {
+        api.deleteMessage = jest.fn(() => {
+            return Promise.resolve({status: 200});
+        });
+        wrapper.vm.spliceMessage = jest.fn();
+        wrapper.vm.getMessages = jest.fn();
+
+
+        wrapper.vm.deleteMessage(0, 0);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+    });
+
+    test("When a message fails to delete, user is notified and debug is called", async () => {
+        api.deleteMessage = jest.fn(() => {
+            return Promise.reject({response: {status: 500}});
+        });
+
+        wrapper.vm.deleteMessage(0, 0);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.$log.debug).toBeCalled();
+    });
+
+
     test("markAsRead method test, message input, return 200", async () => {
         api.updateMessageViewStatus = jest.fn(() => {
             return Promise.resolve({status: 200});
@@ -452,6 +536,8 @@ describe('HomePageMessages method tests', () => {
         await wrapper.vm.$nextTick();
         expect(api.updateMessageViewStatus).toBeCalled();
     });
+
+    //id is underfined if placed here
 });
 
 
