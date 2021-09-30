@@ -124,7 +124,8 @@
           <div class="stat-subheader">Average Sale</div>
           <h2 style="padding-left: 12px">{{currency + currentYearReport.averageSale}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <vs-icon v-if="increaseFromLastYear(currentYearReport.averageSale, lastYearReport.averageSale) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.averageSale, lastYearReport.averageSale)}}% from last year</div>
           </div>
           <div class="sub-header stat-date"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
@@ -133,7 +134,8 @@
           <div class="stat-subheader">Average Price Per Item</div>
           <h2 style="padding-left: 12px">{{currency + currentYearReport.averagePricePerItem}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
+            <vs-icon v-if="increaseFromLastYear(currentYearReport.averagePricePerItem, lastYearReport.averagePricePerItem) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.averagePricePerItem, lastYearReport.averagePricePerItem)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
@@ -142,7 +144,8 @@
           <div class="stat-subheader">Average Items Per Sale</div>
           <h2 style="padding-left: 12px">{{currentYearReport.averageItemsPerSale}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
+            <vs-icon v-if="increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale)}}% from last year</div>
           </div>
           <div class="sub-header stat-date"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
@@ -151,7 +154,8 @@
           <div class="stat-subheader">Total Sale Value</div>
           <h2 style="padding-left: 12px">{{currency + currentYearReport.totalSaleValue}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
+            <vs-icon v-if="increaseFromLastYear(currentYearReport.totalSaleValue, lastYearReport.totalSaleValue) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.totalSaleValue, lastYearReport.totalSaleValue)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
@@ -160,7 +164,8 @@
           <div class="stat-subheader">Total Items Sold</div>
           <h2 style="padding-left: 12px">{{currentYearReport.totalItems}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
+            <vs-icon v-if="increaseFromLastYear(currentYearReport.totalItems, lastYearReport.totalItems) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.totalItems, lastYearReport.totalItems)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
@@ -169,7 +174,8 @@
           <div class="stat-subheader">Total Sales</div>
           <h2 style="padding-left: 12px">{{currentYearReport.totalSales}}</h2>
           <div class="sub-header stat-change">
-            <vs-icon color="red" icon="arrow_drop_down" class="stat-change-icon"/>
+            <vs-icon v-if="increaseFromLastYear(currentYearReport.totalSales, lastYearReport.totalSales) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
+            <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.totalSales, lastYearReport.totalSales)}}% from last year</div>
           </div>
           <div class="sub-header stat-date" style="padding-left: 12px;"> {{this.formatDate(dateStart)}} - {{this.formatDate(dateEnd)}}</div>
@@ -472,6 +478,8 @@ export default {
      * @param lastyear The previous year's figure
      */
     increaseFromLastYear(thisYear, lastYear) {
+      console.log(lastYear);
+
       if (lastYear === 0) {
         return 100;
       }
