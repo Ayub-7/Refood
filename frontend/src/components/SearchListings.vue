@@ -388,7 +388,7 @@ const SearchListings = {
       api.addLikeToListing(listingId)
           .then(() => {
             this.likedListingsIds.push(listingId);
-            this.$vs.notify({text: `${listingName} has been added to your watchlist!`, color: 'success'});
+            this.$vs.notify({text: `${listingName} has been  liked and added to your watchlist!`, color: 'success'});
           })
           .catch((err) => {
             throw new Error(`Error trying to like listing ${listingId}: ${err}`);
@@ -404,7 +404,7 @@ const SearchListings = {
       api.removeLikeFromListing(listingId)
           .then(() => {
             this.likedListingsIds.splice(this.likedListingsIds.indexOf(listingId),1);
-            this.$vs.notify({text: `${listingName} has been deleted from your watchlist!`, color: 'success'});
+            this.$vs.notify({text: `${listingName} has been unliked and deleted from your watchlist!`, color: 'success'});
           })
           .catch((err) => {
             throw new Error(`Error trying to delete listing ${listingId} from your watchlist: ${err}`);
