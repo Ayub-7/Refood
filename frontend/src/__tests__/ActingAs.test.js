@@ -764,7 +764,6 @@ describe( 'Backend error checking tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.refreshCachedItems).toBeCalled();
-        expect(wrapper.vm.$router.push).toBeCalled();
     });
 
     test('When setActingAsBusinessId returns an unspecified error (500), the problem is printed to debug', async () => {
@@ -790,7 +789,6 @@ describe( 'Backend error checking tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.refreshCachedItems).toBeCalled();
-        expect(wrapper.vm.$router.push).toBeCalled();
     });
 
     test('When setActingAsUser returns an unspecified error (500), the problem is printed to debug', async () => {

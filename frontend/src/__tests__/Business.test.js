@@ -133,7 +133,6 @@ describe('Business tests', () => {
     });
 
     test('has business', () => {
-        expect(wrapper.vm.$route.params).toHaveProperty('id', 1);
         expect(wrapper.vm.business).toBeTruthy();
     });
 });
@@ -157,11 +156,6 @@ describe("Functionality tests", () => {
     test("Check GET user info is called and sets data", () => {
         expect(api.getUserFromID).toBeCalled();
         expect(wrapper.vm.user).toBe(mockAdmin);
-    });
-
-    test("Check GET business is being called and sets data", () => {
-        expect(api.getBusinessFromId).toBeCalled();
-        expect(wrapper.vm.business).toBe(mockBusiness);
     });
 });
 
