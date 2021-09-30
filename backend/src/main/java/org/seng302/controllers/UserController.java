@@ -422,7 +422,7 @@ public class UserController {
         Image newImage = new Image(imageName, imageId, filename, thumbnailFilename);
         user.addUserImage(newImage);
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(String.valueOf(newImage.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(newImage));
     }
 
 
@@ -541,9 +541,7 @@ public class UserController {
             userRepository.save(user);
             Files.delete(Paths.get(userDir + "/" + imageId + imageExtension));
             Files.delete(Paths.get(userDir + "/" + imageId + "_thumbnail" + imageExtension));
-            System.out.println("File "
-                    + checkFile.toString()
-                    + " successfully removed");
+            logger.info(String.format("File %s successfully removed", checkFile.toString()));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
         }

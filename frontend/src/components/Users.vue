@@ -124,7 +124,7 @@
         </button>
       </div>
     </Modal>
-
+    <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
   </div>
 </template>
 
@@ -138,6 +138,7 @@ import ReImage from "../components/ReImage";
 import CardModal from "../components/CardModal";
 import ModifyUser from "../components/ModifyUser";
 import UserImages from "../components/UserImages";
+import {bus} from "../main";
 const moment = require('moment');
 
 const Users = {
@@ -168,6 +169,69 @@ const Users = {
 
   methods: {
     /**
+     * Trigger the file upload box to appear.
+     * Used for when the actions dropdown add image action or add image button is clicked.
+     */
+    openImageUpload: function() {
+      this.$refs.fileUpload.click();
+    },
+
+    /**
+     * Upload user image when image is uploaded on web page
+     * @param e Event object which contains file uploaded
+     */
+    uploadImage: async function(e) {
+      //Setup FormData object to send in request
+      this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
+      for (let image of e.target.files) {
+        const fd = new FormData();
+        fd.append('filename', image, image.name);
+        api.postUserImage(this.user.id, fd)
+                .then((res) => { //On success
+                  this.$vs.notify({title:`Image for ${this.user.firstName} was uploaded`, color:'success'});
+                  let imageId = res.data.id;
+                  if (this.updatePrimary) {
+                    this.updatePrimaryImage(imageId);
+                  } else {
+                    this.reloadLocation();
+                  }
+
+                  bus.$emit("updateUserPicture", "updated");
+
+                })
+                .catch((error) => { //On fail
+                  if (error.response.status === 400) {
+                    this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
+                  } else if (error.response.status === 500) {
+                    this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+                  }
+                })
+                .finally(() => {
+                  this.$vs.loading.close();
+                });
+      }
+    },
+
+    /**
+     * Call api endpoint to update the primary image for the user.
+     */
+    updatePrimaryImage: function(imageId) {
+      api.changeUserPrimaryImage(this.user.id, imageId)
+              .then(async () => {
+                this.updatePrimary = false;
+                bus.$emit("updatedUserPicture", "updated");
+                this.reloadLocation();
+              })
+              .catch((error) => {
+                if (error.response.status === 400) {
+                  this.$vs.notify({title:`Failed To Update Primary Image`, color:'danger'});
+                } else if (error.response.status === 500) {
+                  this.$vs.notify({title:`Failed To Update Primary Image`, text: 'There was a problem with the server.', color:'danger'});
+                }
+              });
+    },
+
+    /**
      * Show the modal box.
      * Having a separate function to just open the modal is good for testing.
      */
@@ -186,9 +250,9 @@ const Users = {
       api.getUserCards(id)
           .then((res) => {
             this.cards = res.data;
-            for(let i = 0; i < this.cards.length; i++){
-              if(!this.cards[i].user.homeAddress){
-                this.cards[i].user = this.user;
+            for(let card of this.cards){
+              if(!card.user.homeAddress){
+                card.user = this.user;
               }
             }
           })
