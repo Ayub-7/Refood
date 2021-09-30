@@ -63,6 +63,7 @@
 <script>
 import api from "../Api";
 import BusinessCommon from "./BusinessCommon";
+import ActingAs from "./ActingAs";
 export default {
   name: "ModifyBusiness",
   data: function () {
@@ -105,6 +106,7 @@ export default {
               text:'The business have been successfully modified!',
               color:'success'});
             this.$router.push({ path: '/home' })
+            ActingAs.methods.setActingAsBusinessId(id, this.businessName);
           }).catch(() => {
         this.$vs.notify({title:'Error', text:'Error modifying business'});
       })

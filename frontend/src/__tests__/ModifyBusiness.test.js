@@ -9,37 +9,44 @@ const localVue = createLocalVue();
 localVue.use(Vuesax);
 
 
-// Mock Business
-const mockBusiness = {
-    "id": 1,
-    "administrators": [
-        {
-            "id": 9,
-            "firstName": "Joete",
-            "middleName": "YEP",
-            "lastName": "Stopps",
-            "nickname": "Multi-layered",
-            "bio": "responsive capacity",
-            "email": "jstopps7@flickr.com",
-            "dateOfBirth": "1984-10-14",
-            "phoneNumber": "+36 694 564 9090",
-            "homeAddress": "34 Mendota Avenue",
-            "created": "2021-04-03 23:29:50",
-            "role": "USER",
-            "businessesAdministered": [
-                1
-            ]
-        }
-    ],
-    "name": "Business1",
-    "description": "Test Business 1",
-    "address": "123 Test Street",
-    "businessType": "Accommodation and Food Services",
-    "created": "2021-04-03 23:29:50"
+// Mock Businesess
+
+let mockBusinessUnedited = {
+    "name": "testBusiness",
+    "description": "A one-stop shop for all your adventuring needs",
+    "address": {
+        "streetNumber": "3/24",
+        "streetName": "Ilam Road",
+        "suburb": "Upper Riccarton",
+        "city": "Christchurch",
+        "region": "Canterbury",
+        "country": "New Zealand",
+        "postcode": "90210"
+    },
+    "businessType": "Accommodation and Food Services"
+}
+
+let mockBusinessEdited = {
+    "name": "realBusiness",
+    "description": "fun business",
+    "address": {
+        "streetNumber": "3/24",
+        "streetName": "Ilam Road",
+        "suburb": "Upper Riccarton",
+        "city": "spain",
+        "region": "china",
+        "country": "New Zealand",
+        "postcode": "90210"
+    },
+    "businessType": "Accommodation and Food Services"
 }
 
 api.getBusinessFromId = jest.fn(() => {
-    return Promise.resolve({data: mockBusiness, status: 200}).catch({message: "Error", status: 400});
+    return Promise.resolve({data: mockBusinessUnedited, status: 200});
+});
+
+api.updateBusiness = jest.fn(() => {
+    return Promise.resolve({data: mockBusinessEdited, status: 200});
 });
 
 api.getBusinessTypes = jest.fn(() => {
@@ -247,5 +254,25 @@ describe('Form checking', () => {
         wrapper.vm.businessType = "Charitable organisation";
         wrapper.vm.checkForm();
         expect(wrapper.vm.businessType).toBe("Charitable organisation");
+    });
+});
+
+describe('Modifying business', () => {
+    test('successful edit', async () => {
+        await wrapper.vm.$nextTick();
+        wrapper.vm.businessName = "edited";
+        wrapper.vm.streetNumber = "12";
+        wrapper.vm.streetAddress = "Vernon Place";
+        wrapper.vm.suburb = "shirley";
+        wrapper.vm.postcode = "8013";
+        wrapper.vm.city = "christchurch";
+        wrapper.vm.region = "canterbury";
+        wrapper.vm.country = "new zealand";
+        wrapper.vm.description = "fun business";
+        wrapper.vm.businessType = "Charitable organisation";
+        wrapper.vm.checkForm();
+        let button = wrapper.get(".modify-button");
+        await button.trigger('click');
+        expect(api.updateBusiness).toBeCalled();
     });
 });
