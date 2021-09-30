@@ -19,7 +19,7 @@
         <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
       </vs-select>
 
-      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description" :counter="140"/>
+      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description" :counter="200"/>
 
       <vs-divider style="grid-row: 4;"></vs-divider>
       <div class="label-control">Address</div>
@@ -95,14 +95,16 @@ export default {
 
     /**
      * method to update business
-     * @param businessId ID of business
+     * @param id
      */
     modifyBusiness: function (id) {
-      api.updateBusiness(id)
+      api.updateBusiness(this.businessName, this.description, this.streetNumber, this.streetAddress,this.suburb,
+          this.city, this.region, this.country, this.postcode, this.businessType ,id)
           .then(() => {
             this.$vs.notify({title:'Success',
               text:'The business have been successfully modified!',
               color:'success'});
+            this.$router.push({ path: '/home' })
           }).catch(() => {
         this.$vs.notify({title:'Error', text:'Error modifying business'});
       })

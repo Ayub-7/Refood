@@ -584,9 +584,19 @@ export default {
 
     /**
      * Updates the business
-     * @param Id the unique id of the business
      * @returns {Promise<AxiosResponse<any>>} 400 if request value is invalid, 401 if unauthorized,
      * 403 if the notification does not belong to the current user, 406 if the notification id does not exist.
+     * @param name
+     * @param description
+     * @param streetNumber
+     * @param streetName
+     * @param suburb
+     * @param city
+     * @param region
+     * @param country
+     * @param postcode
+     * @param businessType
+     * @param id
      */
     updateBusiness: (name, description, streetNumber, streetName, suburb, city, region, country, postcode, businessType, id) => instance.put(`/businesses/${id}/modify`, {name, description,
         address: {streetNumber, streetName, suburb, city, region, country, postcode}, businessType}, {withCredentials: true})
