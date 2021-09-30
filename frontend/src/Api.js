@@ -120,11 +120,36 @@ export default {
     revokeUserAdmin: async(id) =>
         instance.put('/users/'+id+'/revokeAdmin',{}, {withCredentials: true}),
 
+    // ------ BUSINESS IMAGES
+
+    /**
+     * Create a new business image
+     * @param id Business's id
+     * @param image Image to save
+     * @returns {Promise<AxiosResponse<any>>} Relevant status code and the newly created image entity in the body as a string
+     */
+    postBusinessImage: (id, image) => instance.post(`businesses/${id}/images`, image, {headers: {'Content-Type': 'multipart/form-data'}, withCredentials: true,}),
+
+    /**
+     * Update the primary image of a business, send a put request
+     * @param businessId ID of the business
+     * @param imageId Id of the image
+     * @returns {Promise<AxiosResponse<any>>} Relevant status code
+     */
+    changeBusinessPrimaryImage: (businessId, imageId) => instance.put(`businesses/${businessId}/images/${imageId}/makeprimary`, {}, {withCredentials: true}),
+
+    /**
+     * Delete the business image
+     * @param businessId Id of the business whos image is deleted
+     * @param imageId id of the image to delete
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    deleteBusinessImage: (businessId, imageId) => instance.delete(`/businesses/${businessId}/images/${imageId}`, {withCredentials: true}),
 
     // ------ BUSINESSES
 
     /**
-     * Create a new business by storin their data in the database
+     * Create a new business by storing their data in the database
      * @param name business name
      * @param description business description
      * @param address business address

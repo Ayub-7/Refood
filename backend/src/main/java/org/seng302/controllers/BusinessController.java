@@ -419,24 +419,30 @@ public class BusinessController {
 
         File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
         File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
-        logger.info("Working Directory = " + System.getProperty("user.dir"));
+        logger.info(String.format("Working Directory = %s", System.getProperty("user.dir")));
         logger.info(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
+        String filename = "";
+        String thumbnailFilename = "";
         // Save into DB.
-        Image newImage = new Image(imageName, id, file.toString(), thumbnailFile.toString());
-        business.addBusinessImage(newImage);
-        if (business.getPrimaryImagePath() == null) {
-            if (System.getProperty("os.name").startsWith("windows")) {
-                business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, id, imageExtension));
-            } else {
-                business.setPrimaryImage(String.format("business_%d/%s%s", businessId, id, imageExtension));
-            }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            filename = (String.format("business_%d\\%s%s", businessId, id, imageExtension));
+            thumbnailFilename = (String.format("business_%d\\%s_thumbnail%s", businessId, id, imageExtension));
+        } else {
+            filename = (String.format("business_%d/%s%s", businessId, id, imageExtension));
+            thumbnailFilename = (String.format("business_%d/%s_thumbnail%s", businessId, id, imageExtension));
         }
+        if (business.getPrimaryImagePath() == null) {
+            business.setPrimaryImage(filename);
+            business.setPrimaryThumbnailPath(thumbnailFilename);
+        }
+        Image newImage = new Image(imageName, id, filename, thumbnailFilename);
+        business.addBusinessImage(newImage);
         businessRepository.save(business);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(newImage));
     }
 
 
@@ -486,8 +492,10 @@ public class BusinessController {
     private Business setBusinessImage(Business business, long businessId, String imageId, String extension) {
         if (System.getProperty("os.name").startsWith("Windows")) {
             business.setPrimaryImage(String.format("business_%d\\%s%s", businessId, imageId, extension));
+            business.setPrimaryThumbnailPath(String.format("business_%d\\%s_thumbnail%s", businessId, imageId, extension));
         } else {
             business.setPrimaryImage(String.format("business_%d/%s%s", businessId, imageId, extension));
+            business.setPrimaryThumbnailPath(String.format("business_%d/%s_thumbnail%s", businessId, imageId, extension));
         }
 
         return business;
@@ -516,7 +524,6 @@ public class BusinessController {
 
         return extension;
     }
-
 
     /**
      * Updates business
@@ -551,10 +558,7 @@ public class BusinessController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-
     }
-
 
     /**
      * Updates business object to contain new data from request, used in modify business.
@@ -572,7 +576,6 @@ public class BusinessController {
         return business;
     }
 
-
     /**
      * Checks request and ensures request values are valid
      * @param businessRequest request containing new business information
@@ -586,7 +589,6 @@ public class BusinessController {
         if(businessRequest.getBusinessType() == null) {
             return false;
         }
-
         //https://www.quora.com/Which-country-has-the-longest-name 🥴
         if(country == null || country.length() < 1 || country.length() > 74) {
             return false;
@@ -597,13 +599,55 @@ public class BusinessController {
         if(descriptionLength > 140) {
             return false;
         }
-
         return true;
-
-
     }
 
-
-
-
+    /**
+     * Deletes a business image
+     * @param businessId unique identifier of the business that the image is relating to.
+     * @param imageId Id of the image to remove
+     * @return ResponseEntity<String> Status identifying completion result
+     * @throws IOException
+     */
+    @DeleteMapping("/businesses/{businessId}/images/{imageId}")
+    public ResponseEntity<String> deleteBusinessImage(@PathVariable long businessId, @PathVariable String imageId, HttpSession session) throws IOException {
+        String imageExtension = "";
+        Business business = businessRepository.findBusinessById(businessId);
+        //check if the business exists
+        if (business == null)  {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+        //check if user is an administrator for the business
+        User user = (User) session.getAttribute(User.USER_SESSION_ATTRIBUTE);
+        if (!business.collectAdministratorIds().contains(user.getId()) && !Role.isGlobalApplicationAdmin(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        //finds correct image path
+        String imageDir = rootImageDir + "business_" + businessId + "/" + imageId;
+        boolean pathExists = false;
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".png");
+        extensions.add(".jpg");
+        extensions.add(".gif");
+        for (String ext: extensions) {
+            Path path = Paths.get(imageDir + ext);
+            if (Files.exists(path)) {
+                pathExists = true;
+                imageExtension = ext;
+                break;
+            }
+        }
+        File businessDir = new File(rootImageDir + "business_" + businessId);
+        File checkFile = new File(String.format("%s/%s%s", businessDir, imageId, imageExtension));
+        if (pathExists) {
+            business.deleteBusinessImage(imageId);
+            businessRepository.save(business);
+            Files.delete(Paths.get(businessDir + "/" + imageId + imageExtension));
+            Files.delete(Paths.get(businessDir + "/" + imageId + "_thumbnail" + imageExtension));
+            logger.info(String.format("File %s successfully removed", checkFile.toString()));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image does not exist.");
+        }
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
