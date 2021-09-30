@@ -27,6 +27,7 @@ function updateSessionOnRouterChange(router) {
             } else {
                 sendToLogin(to, next);
             }
+        
             setStoreValues(response);
             next();
 
@@ -40,6 +41,7 @@ function updateSessionOnRouterChange(router) {
  */
 function setStoreValues(response) {
     mutations.setUserLoggedIn(response.data.id, response.data.role);
+    console.log('aaaaaaaaaa', response.data.businessesAdministered)
     mutations.setUserBusinesses(response.data.businessesAdministered);
     mutations.setUserName(response.data.firstName + " " + response.data.lastName);
 }
