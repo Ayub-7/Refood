@@ -22,7 +22,6 @@
             <vs-button class="left-nav-item" id="bus-profile-btn" @click.native='goToProfile()'>Business Profile</vs-button>
             <vs-button class="left-nav-item" id="bus-catalogue-btn" @click.native='goToProductCatalogue()'>Product Catalogue</vs-button>
             <vs-button class="left-nav-item" @click.native='goToSalesHistory()'>Sales History</vs-button>
-            <vs-button class="left-nav-item" :to="'/businesses/'+getBusinessId()+'/modify'">Modify {{getBusinessName()}}</vs-button>
           </div>
           </div>
           <div class="userinfo-container" v-else>
