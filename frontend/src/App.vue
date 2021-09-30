@@ -10,8 +10,8 @@
         active-text-color="#FFFFFF">
       <div slot="title">
         <router-link @click.native="refreshCachedItems" :to="{path: '/home'}">
-          <vs-navbar-title style="color: white">
-            ReFood
+          <vs-navbar-title style="color: white" id="navbar-title">
+            <img src="refood-text-white.png" alt="ReFood" id="navbar-logo"/>
           </vs-navbar-title>
         </router-link>
 
@@ -233,6 +233,11 @@ export default app;
 
 .navbar-group >>> li, #logout-nav  {
   margin: auto; /* Fixes tab height issue */
+}
+
+#navbar-logo {
+  height: 40px;
+  margin-top: 4px;
 }
 
 @media screen and (max-width: 800px) {
