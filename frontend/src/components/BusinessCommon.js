@@ -20,7 +20,7 @@ export default {
         }
 
         if (description != null) {
-            if (description.length > 140) {
+            if (description.length > 200) {
                 errors.push('description');
             }
         }

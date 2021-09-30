@@ -19,7 +19,7 @@
         <vs-select-item v-for="type in availableBusinessTypes" :key="type" :text="type" :value="type"/>
       </vs-select>
 
-      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description" :counter="140"/>
+      <vs-textarea type="text" class="form-control text-areas" label="Business Description" v-model="description" :counter="200"/>
 
       <vs-divider style="grid-row: 4;"></vs-divider>
       <div class="label-control">Address</div>
@@ -63,6 +63,7 @@
 <script>
 import api from "../Api";
 import BusinessCommon from "./BusinessCommon";
+import ActingAs from "./ActingAs";
 export default {
   name: "ModifyBusiness",
   data: function () {
@@ -94,6 +95,24 @@ export default {
   methods: {
 
     /**
+     * method to update business
+     * @param id
+     */
+    modifyBusiness: function (id) {
+      api.updateBusiness(this.businessName, this.description, this.streetNumber, this.streetAddress,this.suburb,
+          this.city, this.region, this.country, this.postcode, this.businessType ,id)
+          .then(() => {
+            this.$vs.notify({title:'Success',
+              text:'The business have been successfully modified!',
+              color:'success'});
+            this.$router.push({ path: '/home' })
+            ActingAs.methods.setActingAsBusinessId(id, this.businessName);
+          }).catch(() => {
+        this.$vs.notify({title:'Error', text:'Error modifying business'});
+      })
+    },
+
+    /**
      * Method for checking the form is compliant for modifying businesses
      */
     checkForm: function() {
@@ -106,7 +125,7 @@ export default {
       } else {
         this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
         if (this.errors.length === 0) {
-          this.$vs.notify({title:'Success', text:'The business have been successfully modified!', color:'success'});
+          this.modifyBusiness(this.$route.params.id);
         } else {
           if (this.errors.includes("country")) {
             this.$vs.notify({title:'Error', text:'Country field is required', color:'danger'});

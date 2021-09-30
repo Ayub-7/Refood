@@ -596,7 +596,7 @@ public class BusinessController {
         if(nameLength > 30 || nameLength < 1 || businessRequest.getName() == null) {
             return false;
         }
-        if(descriptionLength > 140) {
+        if(descriptionLength > 200) {
             return false;
         }
         return true;
