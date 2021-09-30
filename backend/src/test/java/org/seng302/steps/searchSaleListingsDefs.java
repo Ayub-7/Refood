@@ -108,7 +108,9 @@ public class searchSaleListingsDefs extends CucumberSpringConfiguration {
         listingRepository = Mockito.mock(ListingRepository.class);
         listingSpecifications = Mockito.mock(ListingSpecifications.class);
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new ListingController(listingRepository, mapper)).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(        listingController = new ListingController(listingRepository, businessRepository, userRepository,
+                inventoryRepository, null, null, null,
+                null, mapper)).build();
     }
 
     @Given("there are sale listings available")

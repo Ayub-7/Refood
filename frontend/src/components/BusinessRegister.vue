@@ -39,7 +39,7 @@
         </div>
         <div id="city">
           <!-- If wanting to test/check suggested item tiles, remove blur. -->
-          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCitiesFromPhoton()" class="form-control" label="City"></vs-input>
+          <vs-input autocomplete="none" @blur="suggestCities = false;" v-model="city" @input="getCities()" class="form-control" label="City"></vs-input>
           <ul v-if="this.suggestCities" class="suggested-box">
             <li v-for="suggested in this.suggestedCities" @mousedown="setCity(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -48,7 +48,7 @@
           <vs-input v-model="region" class="form-control" label="Region"></vs-input>
         </div>
         <div id="country">
-          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountriesFromPhoton()" v-model="country" class="form-control" label="Country *"></vs-input>
+          <vs-input @blur="suggestCountries = false;" :danger="this.errors.includes('country')" @input="getCountries()" v-model="country" class="form-control" label="Country *"></vs-input>
           <ul v-if="this.suggestCountries" class="suggested-box">
             <li v-for="suggested in this.suggestedCountries" @mousedown="setCountry(suggested)" :key="suggested" :value="suggested" class="suggested-item">{{suggested}}</li>
           </ul>
@@ -62,8 +62,8 @@
 
 <script>
 import api from "../Api";
-import axios from "axios"
 import {mutations, store} from "../store";
+import BusinessCommon from "./BusinessCommon";
 
 const BusinessRegister = {
   name: "BusinessRegister",
@@ -98,31 +98,8 @@ const BusinessRegister = {
      * The function checks the inputs of the registration form to ensure they are in the right format.
      * Pushes name of error into an array, and display notification have errors exist.
      */
-    checkForm: function() {
-      this.errors = [];
-
-      if (this.businessName.length === 0) {
-        this.errors.push('businessName');
-      }
-
-      if (this.description != null) {
-        if (this.description.length > 140) {
-          this.errors.push('description');
-        }
-      }
-
-      if (this.country.length === 0) {
-        this.errors.push('country');
-      }
-
-      if (!this.checkAge()){
-        this.errors.push('dob');
-      }
-
-      if (!this.businessType) {
-        this.errors.push('businessType');
-      }
-
+    checkForm: function () {
+      this.errors = BusinessCommon.businessCheckForm(this.businessName, this.description, this.country, this.businessType);
       if (this.errors.length >= 1) {
         if(this.errors.includes("dob") && this.errors.length === 1){
           this.$vs.notify({title:'Failed to create business', text:'You are too young to create a ReFood account.', color:'danger'});
@@ -136,10 +113,8 @@ const BusinessRegister = {
         } else {
           this.$vs.notify({title:'Failed to create business', text:'Required fields are missing.', color:'danger'});
         }
-
       }
     },
-
     /**
      * Creates a POST request when user submits form, using the createUser function from Api.js
      */
@@ -179,36 +154,22 @@ const BusinessRegister = {
       }},
 
     /**
-     * Returns the years since the user was born. No rounding is done in the function.
-     * @param enteredDate The user's birthdate
-     * @returns {boolean} Whether the user is old enough, 16, to register a business.
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest countries
      */
-    checkAge: function() {
-      let enteredDate = store.userDateOfBirth;
-      let years = new Date(new Date() - new Date(enteredDate)).getFullYear() - 1970;
-      return (years >= 16);
+    getCountries: async function() {
+      let data = await BusinessCommon.getCountriesFromPhoton(this.country, this.minNumberOfCharacters);
+      this.suggestCountries = data['0'];
+      this.suggestedCountries = data['1'];
     },
 
-
     /**
-     * Retrieve a list of suggested cities using the photon open api.
+     * Utilises BusinessCommon.js' getCountriesFromPhoton to suggest cities
      */
-    getCitiesFromPhoton: function() {
-      if (this.city.length >= this.minNumberOfCharacters) {
-
-        this.suggestCities = true;
-        axios.get(`https://photon.komoot.io/api/?q=${this.city}&osm_tag=place:city&lang=en`)
-            .then( res => {
-              this.suggestedCities = res.data.features.map(location => location.properties.name);
-              this.suggestedCities = this.suggestedCities.filter(city => city != null);
-            })
-            .catch( error => {
-              console.log("Error with getting cities from photon." + error);
-            });
-      }
-      else {
-        this.suggestCities = false;
-      }
+    getCities: async function() {
+      let data = await BusinessCommon.getCitiesFromPhoton(this.city, this.minNumberOfCharacters);
+      console.log(data)
+      this.suggestCities = data['0'];
+      this.suggestedCities = data['1'];
     },
 
     /**
@@ -218,26 +179,6 @@ const BusinessRegister = {
     setCity: function(selectedCity) {
       this.city = selectedCity;
       this.suggestCities = false;
-    },
-
-    /**
-     * Retrieve a list of suggested countries using the photon open api.
-     */
-    getCountriesFromPhoton: function() {
-      if (this.country.length >= this.minNumberOfCharacters) {
-
-        this.suggestCountries = true;
-        axios.get(`https://photon.komoot.io/api/?q=${this.country}&osm_tag=place:country&lang=en`)
-            .then( res => {
-              this.suggestedCountries = res.data.features.map(location => location.properties.country);
-            })
-            .catch( error => {
-              this.$log.error(error)
-            });
-      }
-      else {
-        this.suggestCountries = false;
-      }
     },
 
     /**
