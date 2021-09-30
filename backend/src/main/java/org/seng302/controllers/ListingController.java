@@ -127,9 +127,7 @@ public class ListingController {
     public ResponseEntity<String> getAllListings(@RequestBody BusinessListingSearchRequest request,
                                                  @RequestParam("count") int count,
                                                  @RequestParam("offset") int offset,
-                                                 @RequestParam("sortDirection") String sortDirection,
-                                                 HttpSession session) throws JsonProcessingException {
-        System.out.println(request);
+                                                 @RequestParam("sortDirection") String sortDirection) throws JsonProcessingException {
         Sort sort;
         String sortBy = request.getSortBy();
         if (sortBy == null) {
@@ -255,8 +253,8 @@ public class ListingController {
      * Delete Listing endpoint, called when a listing is purchased. Deletes notifications and likes related to listing
      * and creates new notification for the boughtListing object. Deletes the inventory item if the listing was the final
      * listing for the item.
-     * @param id
-     * @return
+     * @param id unique number identifier of the listing.
+     * @return response: 401 (handled by spring sec), 406 if listing not available, 200 otherwise.
      */
     @DeleteMapping("/businesses/listings/{id}")
     public ResponseEntity<String> deleteListing(@PathVariable long id) {
