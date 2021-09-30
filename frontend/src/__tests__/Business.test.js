@@ -99,9 +99,16 @@ const $log = {
     debug: jest.fn(),
 }
 
-api.checkSession = jest.fn().mockResolvedValue({data: {id: 1}});
-api.getBusinessFromId = jest.fn().mockResolvedValue({data: mockBusiness});
-api.getUserFromID = jest.fn().mockResolvedValue({data: mockAdmin});
+api.checkSession = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200, data: {id: 1}});
+});
+
+api.getBusinessFromId = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200, data: mockBusiness});
+});
+api.getUserFromID = jest.fn().mockImplementation(() => {
+    return Promise.resolve({status: 200, data: mockAdmin});
+});
 api.getUsersWishlistedBusinesses = jest.fn().mockImplementation(() => {
     return Promise.resolve({status: 200, data: wishlist});
 });
