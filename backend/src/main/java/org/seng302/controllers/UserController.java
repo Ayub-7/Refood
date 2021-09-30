@@ -125,7 +125,6 @@ public class UserController {
     @GetMapping("/checksession")
     public ResponseEntity<User> checksession(HttpServletRequest req, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        businessREpo
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
