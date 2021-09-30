@@ -123,7 +123,7 @@
         <div class="stat-box">
           <div class="stat-subheader">Average Sale</div>
           <h2 style="padding-left: 12px">{{currency + currentYearReport.averageSale}}</h2>
-          <div class="sub-header stat-change">
+          <div v-if="this.activePeriodButton !== `all`" class="sub-header stat-change">
             <vs-icon v-if="increaseFromLastYear(currentYearReport.averageSale, lastYearReport.averageSale) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
             <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.averageSale, lastYearReport.averageSale)}}% from last year</div>
@@ -133,7 +133,7 @@
         <div class="stat-box">
           <div class="stat-subheader">Average Price Per Item</div>
           <h2 style="padding-left: 12px">{{currency + currentYearReport.averagePricePerItem}}</h2>
-          <div class="sub-header stat-change">
+          <div v-if="this.activePeriodButton !== `all`" class="sub-header stat-change">
             <vs-icon v-if="increaseFromLastYear(currentYearReport.averagePricePerItem, lastYearReport.averagePricePerItem) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
             <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.averagePricePerItem, lastYearReport.averagePricePerItem)}}% from last year</div>
@@ -143,7 +143,7 @@
         <div class="stat-box">
           <div class="stat-subheader">Average Items Per Sale</div>
           <h2 style="padding-left: 12px">{{currentYearReport.averageItemsPerSale}}</h2>
-          <div class="sub-header stat-change">
+          <div v-if="this.activePeriodButton !== `all`" class="sub-header stat-change">
             <vs-icon v-if="increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
             <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.averageItemsPerSale, lastYearReport.averageItemsPerSale)}}% from last year</div>
@@ -153,7 +153,7 @@
         <div class="stat-box">
           <div class="stat-subheader">Total Sale Value</div>
           <h2 style="padding-left: 12px">{{currency + currentYearReport.totalSaleValue}}</h2>
-          <div class="sub-header stat-change">
+          <div v-if="this.activePeriodButton !== `all`" class="sub-header stat-change">
             <vs-icon v-if="increaseFromLastYear(currentYearReport.totalSaleValue, lastYearReport.totalSaleValue) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
             <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.totalSaleValue, lastYearReport.totalSaleValue)}}% from last year</div>
@@ -163,7 +163,7 @@
         <div class="stat-box">
           <div class="stat-subheader">Total Items Sold</div>
           <h2 style="padding-left: 12px">{{currentYearReport.totalItems}}</h2>
-          <div class="sub-header stat-change">
+          <div v-if="this.activePeriodButton !== `all`" class="sub-header stat-change">
             <vs-icon v-if="increaseFromLastYear(currentYearReport.totalItems, lastYearReport.totalItems) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
             <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.totalItems, lastYearReport.totalItems)}}% from last year</div>
@@ -173,7 +173,7 @@
         <div class="stat-box">
           <div class="stat-subheader">Total Sales</div>
           <h2 style="padding-left: 12px">{{currentYearReport.totalSales}}</h2>
-          <div class="sub-header stat-change">
+          <div v-if="this.activePeriodButton !== `all`" class="sub-header stat-change">
             <vs-icon v-if="increaseFromLastYear(currentYearReport.totalSales, lastYearReport.totalSales) < 0" id="iconAverageSale" color="red" icon="arrow_drop_down" class="stat-change-icon"/> <!-- decrease icon -->
             <vs-icon v-else color="green" icon="arrow_drop_up" class="stat-change-icon"/> <!-- increase icon -->
             <div>{{increaseFromLastYear(currentYearReport.totalSales, lastYearReport.totalSales)}}% from last year</div>
@@ -471,19 +471,19 @@ export default {
     },
 
     /**
-     * Calculates the percentage increase from last year
+     * Calculates the percentage increase from last year as a percentage
      * If last year had no sales, return 100% increase
      *
      * @param thisyear The current year's figure
      * @param lastyear The previous year's figure
      */
     increaseFromLastYear(thisYear, lastYear) {
-      console.log(lastYear);
-
       if (lastYear === 0) {
         return 100;
       }
-      return (thisYear - lastYear) / lastYear;
+      let percentage = (thisYear - lastYear) / lastYear*100;
+      return Math.round(percentage)
+      ;
     },
 
     /**
@@ -544,10 +544,10 @@ export default {
     calculateReport: function() {
       let start = moment(new Date(this.dateStart));
       let end = moment(new Date(this.dateEnd));
-      this.currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale.sold).isBetween(start, end, 'days', '[]'));
+      this.currentYearSalesHistory = this.salesHistory.filter(sale => moment(sale.sold).isBetween(start, end));
       start = start.subtract(1,'year');
       end = end.subtract(1,'year');
-      let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale).isBetween(start, end));
+      let lastYearSalesHistory = this.salesHistory.filter(sale => moment(sale.sold).isBetween(start, end));
       this.currentYearReport = this.calculateSummary(this.currentYearSalesHistory, "Current Period's Report");
       this.lastYearReport = this.calculateSummary(lastYearSalesHistory, "Last period's Report");
     },
