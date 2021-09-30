@@ -395,12 +395,26 @@ public class UserController {
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();
+        String filename = "";
+        String thumbnailFilename = "";
         // Save into DB.
-        Image newImage = new Image(imageName, imageId, file.toString(), thumbnailFile.toString());
+
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            filename = (String.format("user_%d\\%s%s", id, imageId, imageExtension));
+            thumbnailFilename = (String.format("user_%d\\%s_thumbnail%s", id, imageId, imageExtension));
+        } else {
+            filename = (String.format("user_%d/%s%s", id, imageId, imageExtension));
+            thumbnailFilename = (String.format("user_%d/%s_thumbnail%s", id, imageId, imageExtension));
+        }
+        if (user.getPrimaryImagePath() == null) {
+            user.setPrimaryImage(filename);
+            user.setPrimaryThumbnailPath(thumbnailFilename);
+        }
+        Image newImage = new Image(imageName, imageId, filename, thumbnailFilename);
         user.addUserImage(newImage);
-        user.updatePrimaryImage(id, imageId, imageExtension);
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.writeValueAsString(newImage));
     }
 
 
@@ -452,8 +466,10 @@ public class UserController {
         }
         if (System.getProperty("os.name").startsWith("Windows")) {
             user.setPrimaryImage(String.format("user_%d\\%s%s", id, imageId, extension));
+            user.setPrimaryThumbnailPath(String.format("user_%d\\%s_thumbnail%s", id, imageId, extension));
         } else {
             user.setPrimaryImage(String.format("user_%d/%s%s", id, imageId, extension));
+            user.setPrimaryThumbnailPath(String.format("user_%d/%s_thumbnail%s", id, imageId, extension));
         }
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.OK).build();

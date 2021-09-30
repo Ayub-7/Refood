@@ -54,6 +54,7 @@ public class User implements Serializable {
     private Set<Image> images;
 
     private String primaryImagePath;
+    private String primaryThumbnailPath;
 
 
     protected User() {}
@@ -86,6 +87,7 @@ public class User implements Serializable {
         this.role = Role.USER;
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
     }
 
     /**
@@ -106,6 +108,7 @@ public class User implements Serializable {
         this.password = req.getPassword();
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
         newRegistration();
     }
 
@@ -128,6 +131,7 @@ public class User implements Serializable {
         this.password = Encrypter.hashString(password);
         this.images = new HashSet<>();
         this.primaryImagePath = null;
+        this.primaryThumbnailPath = null;
     }
 
     /**
@@ -147,16 +151,11 @@ public class User implements Serializable {
         this.images.add(image);
     }
 
-    public void updatePrimaryImage(long id, String imageId, String imageExtension) {
-        if (this.primaryImagePath == null) {
-            if (System.getProperty("os.name").startsWith("windows")) {
-                this.setPrimaryImage(String.format("business_%d\\%s%s", id, imageId, imageExtension));
-            } else {
-                this.setPrimaryImage(String.format("business_%d/%s%s", id, imageId, imageExtension));
-            }
-        }
-    }
-
+    /**
+     * Deletes a users image and assigns a new primary
+     * image if required
+     * @param imageId
+     */
     public void deleteUserImage(String imageId) {
         Image removeImage = null;
         for (Image image: this.images) {
@@ -169,22 +168,29 @@ public class User implements Serializable {
         assert removeImage != null;
         String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("user_"));
         if ((primaryPath.equals(this.primaryImagePath.replace("/", "\\")) && System.getProperty("os.name").startsWith("Windows")) || primaryPath.equals(this.primaryImagePath)) {
-            if (this.images.isEmpty()) {
-                Image primary = this.images.iterator().next();
-                String primaryFilename = primary.getFileName();
-                int sliceIndex = primaryFilename.indexOf("user_");
-                String primaryFile = primaryFilename.substring(sliceIndex);
-                this.setPrimaryImage(primaryFile);
-            } else {
-                this.primaryImagePath = null;
-            }
+            this.primaryThumbnailPath = null;
+            this.primaryImagePath = null;
         }
     }
 
+
     public String getPrimaryImagePath() {return this.primaryImagePath;}
 
+    /**
+     * Sets the path of the primary image
+     * @param path The path to the image
+     */
     public void setPrimaryImage(String path) {
         this.primaryImagePath = path;
     }
+
+    /**
+     * Sets the path of the thumbnail of the primary image
+     * @param path The path to the image
+     */
+    public void setPrimaryThumbnailPath(String path) {
+        this.primaryThumbnailPath = path;
+    }
+
 
 }

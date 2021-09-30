@@ -755,39 +755,6 @@ class UserControllerTests {
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-    @WithMockUser
-    void removeUserImageSuccessOnlyPrimary() throws Exception {
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        mockMvc.perform(delete("/users/{id}/images/{imageId}", user.getId(), image1.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser
-    void removeUserImageSuccessMoreThanOneExistNonPrimary() throws Exception {
-        Image image2 = new Image("test", "1", "fakepath", "fakethumbnailpath");
-        user.addUserImage(image2);
-        userRepository.save(user);
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        mockMvc.perform(delete("/users/{id}/images/{imageId}", user.getId(), image2.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser
-    void removeUserImageSuccessMoreThanOneExistPrimary() throws Exception {
-        Image image2 = new Image("test", "1", "fakepath", "fakethumbnailpath");
-        user.addUserImage(image2);
-        userRepository.save(user);
-        Mockito.when(userRepository.findUserById(user.getId())).thenReturn(user);
-        mockMvc.perform(delete("/users/{id}/images/{imageId}", user.getId(), image1.getId())
-                .sessionAttr(User.USER_SESSION_ATTRIBUTE, user))
-                .andExpect(status().isOk());
-        Assertions.assertEquals(userRepository.findUserById(user.getId()).getPrimaryImagePath(), image2.getFileName());
-    }
 
     @WithMockUser(username="johnsmith99@gmail.com", password="1337-H%nt3r2", roles="USER")
     void testModifyUser_undefinedReqBody() throws Exception {
