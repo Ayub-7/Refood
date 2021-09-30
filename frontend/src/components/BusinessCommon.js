@@ -59,6 +59,7 @@ export default {
     getCitiesFromPhoton: async function(city, minNumOfChars) {
         if (city.length >= minNumOfChars) {
             let suggestedCities = [];
+            let final = [];
             await axios.get(`https://photon.komoot.io/api/?q=${city}&osm_tag=place:city&lang=en`)
                 .then( res => {
                     suggestedCities = res.data.features.map(location => location.properties.name);
@@ -67,8 +68,13 @@ export default {
                 .catch( error => {
                     console.log("Error with getting cities from photon." + error);
                 });
+            for (let i = 0; i < suggestedCities.length; i++) {
+                if (!final.includes(suggestedCities[i])) {
+                    final.push(suggestedCities[i]);
+                }
+            }
             return {'0': true,
-                    '1': suggestedCities};
+                    '1': final};
         }
         else {
             return {'0': false,
