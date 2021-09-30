@@ -285,13 +285,20 @@ const Homepage = {
      * @param wishlistedBusinessItem the business to toggle mute on
      */
     toggleMuteBusiness: function (wishlistedBusinessItem) {
+
+      //correct error message
+      let status = "Muted";
+      if (wishlistedBusinessItem.mutedStatus === "Muted") {
+        status = "Unmuted"
+      }
+
       api.updateWishlistMuteStatus(wishlistedBusinessItem.id, wishlistedBusinessItem.mutedStatus)
           .then(() => {
             this.getWishlist(this.userId);
-            this.$vs.notify({title: "Business successfully unmuted", color: "success"});
+            this.$vs.notify({title: "Business successfully "+status, color: "success"});
           })
           .catch(() => {
-            this.$vs.notify({title: "Error muting business", color: "danger"});
+            this.$vs.notify({title: "Error, business not"+status, color: "danger"});
           });
 
     },
@@ -310,17 +317,22 @@ const Homepage = {
         muteStatus = "Muted";
         this.allMuted = false;
       }
+      //correct error message
+      let status = "Muted";
+      if (muteStatus === "Muted") {
+        status = "Unmuted"
+      }
 
       //Set the mute/unmute state for every business in the wishlist
       for (let wish of this.wishlist) {
-        api.updateWishlistMuteStatus(wish.id, muteStatus)
-            .catch(() => {
-              this.$vs.notify({title: "Error updating wishlist mute/unmute", color: "danger"});
-            });
+        await api.updateWishlistMuteStatus(wish.id, muteStatus)
+          .catch(() => {
+            this.$vs.notify({title: "Error updating wishlist "+status, color: "danger"});
+          });
       }
-      await this.getWishlist(this.userId);
-      this.$vs.notify({title: "All businesses successfully muted/unmuted", color: "success"});
 
+      this.getWishlist(this.userId);
+      this.$vs.notify({title: "All businesses successfully "+status, color: "success"});
     },
 
     /**
