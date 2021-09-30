@@ -16,6 +16,15 @@ let store = {
     actingAsBusinessName: "Dabshots"
 }
 
+
+api.getUserFromID = jest.fn(() => {
+    return Promise.resolve({data:{}, status: 200});
+});
+
+api.getBusinessFromId = jest.fn(() => {
+    return Promise.resolve({data:{}, status: 200});
+});
+
 let $router;
 let mutations;
 let sessionStorage;
