@@ -488,7 +488,7 @@ export default {
         return item;
       });
       this.feedItems.sort(function(a, b) {
-        return new Date(b.created) - new Date(a.created);
+        return new Date(a.created) - new Date(b.created);
       });
     this.feedItems.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
     },
