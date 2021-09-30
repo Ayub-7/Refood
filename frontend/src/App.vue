@@ -10,8 +10,8 @@
         active-text-color="#FFFFFF">
       <div slot="title">
         <router-link @click.native="refreshCachedItems" :to="{path: '/home'}">
-          <vs-navbar-title style="color: white">
-            ReFood
+          <vs-navbar-title style="color: white" id="navbar-title">
+            <img src="refood-text-white.png" alt="ReFood" id="navbar-logo"/>
           </vs-navbar-title>
         </router-link>
 
@@ -64,7 +64,6 @@
           </vs-navbar-item>
         </div>
         <div class="userDetail" v-if="getLoggedInUser() != null">
-          <CardNotifications></CardNotifications>
           <ActingAs/>
         </div>
 
@@ -103,7 +102,6 @@ import Login from "./components/Login";
 import ProductCatalogue from "./components/ProductCatalogue";
 import BusinessRegister from "./components/BusinessRegister";
 import AddToCatalogue from "@/components/AddToCatalogue";
-import CardNotifications from "./components/CardNotifications";
 import {store, mutations} from "./store"
 import api from "./Api"
 import 'vuesax';
@@ -117,7 +115,7 @@ const app = {
   components: {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
-    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue, CardNotifications
+    Login, Register, BusinessRegister, ActingAs, AddToCatalogue, ProductCatalogue
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
@@ -235,6 +233,11 @@ export default app;
 
 .navbar-group >>> li, #logout-nav  {
   margin: auto; /* Fixes tab height issue */
+}
+
+#navbar-logo {
+  height: 30px;
+  margin-top: 4px;
 }
 
 @media screen and (max-width: 800px) {

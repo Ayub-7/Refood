@@ -1,5 +1,6 @@
 package org.seng302.models.requests;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.seng302.models.BusinessType;
 
@@ -21,7 +22,9 @@ public class BusinessListingSearchRequest {
     private Double minPrice;
     private Double maxPrice;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date minClosingDate;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date maxClosingDate;
 
 }
