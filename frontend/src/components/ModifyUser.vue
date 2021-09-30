@@ -108,6 +108,11 @@
       <div class="label-control">Address</div>
 
       <div id="address-field">
+        <vs-alert active="true"
+                  icon="priority_high"
+                  style="grid-row: 1; grid-column: 1/4; height: fit-content; width: 100%; text-align: center">
+          Changing your current country will change your currency for associated listings and products.
+        </vs-alert>
         <div id="street-number">
           <vs-input v-model="userEditForm.streetNumber" class="form-control" label="Street Number"></vs-input>
         </div>
@@ -378,6 +383,7 @@ const ModifyUser = {
             .then((response) => {
               this.$log.debug("User modified:", response.data);
               this.$vs.notify({title: 'Success!', text: 'Successfully modified user\'s details', color: 'success'});
+              this.$router.push(`/users/${response.data.userId}`);
             }).catch((error) => {
           if(error.response.status === 409) {
             this.emailInUse = true;
@@ -646,22 +652,22 @@ Label styling.
 }
 
 #street-number {
-  grid-row: 1;
+  grid-row: 2;
   grid-column: 1;
 }
 
 #street-name {
-  grid-row: 1;
+  grid-row: 2;
   grid-column: 2;
 }
 
 #suburb {
-  grid-row: 1;
+  grid-row: 2;
   grid-column: 3;
 }
 
 #city {
-  grid-row: 2;
+  grid-row: 3;
   grid-column: 2/4;
   margin: auto 1em auto 0;
 }
@@ -671,12 +677,12 @@ Label styling.
 }
 
 #region {
-  grid-row: 3;
+  grid-row: 4;
   grid-column: 1;
 }
 
 #country {
-  grid-row: 3;
+  grid-row: 4;
   grid-column: 2/4;
   margin: auto 1em auto 0;
 }
@@ -686,7 +692,7 @@ Label styling.
 }
 
 #postcode {
-  grid-row: 2;
+  grid-row: 3;
   grid-column: 1 / 3;
 }
 
