@@ -454,7 +454,7 @@ export default {
             this.undoCount = 10
             this.undoClick = false
             this.undoDelete = false
-          } else if (isExpiry == true) {
+          } else if (isExpiry) {
             this.deleteCard(id, title)
             this.undoCount = 10
             this.undoClick = false
@@ -490,7 +490,7 @@ export default {
       this.feedItems.sort(function(a, b) {
         return new Date(a.created) - new Date(b.created);
       });
-    this.feedItems.sort((a, b) => (a.viewStatus > b.viewStatus) ? 1 : -1)
+    this.feedItems.sort((a, b) => (b.viewStatus > a.viewStatus) ? 1 : -1)
     },
 
 
