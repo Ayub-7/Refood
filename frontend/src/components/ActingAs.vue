@@ -98,7 +98,7 @@ const actingAs =  {
           .then(() => {
             this.refreshCachedItems();
             mutations.setActingAsBusiness(businessId, businessName)
-            this.$router.push({path: `/home`}).catch(() => {console.log("NavigationDuplicated Warning: same route.")});
+            this.$router.push({path: `/home`}).catch(() => this.$router.go());
           }).catch((error) => {
         if(error.response) {
           this.$log.debug("Error Status:", error.response.status, ":", error.response.message)
