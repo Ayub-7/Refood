@@ -55,6 +55,7 @@ const BusinessImages = {
                 await api.postBusinessImage(this.business.id, fd)
                     .then(() => { //On success
                         this.$emit("getBusiness");
+                        this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
                     })
                     .catch((error) => { //On fail
                         if (error.response.status === 400) {
@@ -65,7 +66,6 @@ const BusinessImages = {
                     })
                     .finally(() => {
                         this.$vs.loading.close();
-                        this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
                     });
             }
         },
