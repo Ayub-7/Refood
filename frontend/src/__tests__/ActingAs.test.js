@@ -7,6 +7,14 @@ const localVue = createLocalVue();
 let wrapper;
 localVue.use(Vuesax);
 
+jest.mock("../main.js", () => ({
+    bus: {
+        $on: jest.fn(),
+        $off: jest.fn(),
+        $emit: jest.fn(),
+    }
+}));
+
 let store = {
     loggedInUserId: 22,
     role: "USER",
