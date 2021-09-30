@@ -190,13 +190,13 @@ describe('Sales report tests', () => {
 
     test('Get earliest date returns earliest', () => {
         let date = wrapper.vm.getEarliestDate();
-        expect(date).toEqual(wrapper.vm.currentYearSalesHistory[0].sold)
+        expect(date).toEqual("2021-09-16 13:05:28");
     })
 
     
     test('Get latest date returns latest', () => {
         let date = wrapper.vm.getLatestDate();
-        expect(date).toEqual(wrapper.vm.currentYearSalesHistory[1].sold)
+        expect(date).toEqual("2021-09-16 13:05:37");
     })
 
     test('onPeriodChange by day correctly alters start date', () => {
@@ -222,7 +222,7 @@ describe('Sales report tests', () => {
 
     test('onPeriodChange by all correctly alters start date', () => {
         wrapper.vm.onPeriodChange('all');
-        expect(wrapper.vm.dateStart).toEqual(wrapper.vm.currentYearSalesHistory[0].sold);
+        expect(wrapper.vm.dateStart).toEqual("2021-09-16 13:05:28");
     })
 
     test('onPeriodChange by custom correctly alters start date and end date', () => {
