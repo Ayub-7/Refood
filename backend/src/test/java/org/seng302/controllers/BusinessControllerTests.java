@@ -809,7 +809,7 @@ class BusinessControllerTests {
     @Test
     @WithMockUser
     void modifyBusiness_longDescription_returns400() throws Exception {
-        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", business.getAddress(), BusinessType.RETAIL_TRADE);
+        NewBusinessRequest testBusiness = new NewBusinessRequest("Updated", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", business.getAddress(), BusinessType.RETAIL_TRADE);
 
         Mockito.when(businessRepository.findBusinessById(1)).thenReturn(business);
         mvc.perform(put("/businesses/{id}/modify", business.getId())
