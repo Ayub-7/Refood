@@ -55,7 +55,18 @@
         </div>
       </div>
 
-      <vs-button class="modify-button" @click="checkForm()">Modify</vs-button>
+      <vs-button class="modify-button" @click="checkUpdateCurrency()">Modify</vs-button>
+
+      <vs-popup title="Updated Country" :active.sync="currencyAlert" id="currency-alert-modal">
+        <div>
+          You have modified you business' country from {{this.country}} to {{this.business.address.country}}
+        </div>
+        <div>
+          Your currency will be changed from <br>
+          {{ }}
+        </div>
+      </vs-popup>
+
     </form>
   </div>
 </template>
@@ -89,10 +100,25 @@ export default {
       suggestCountries: false,
       suggestedCountries: [],
       minNumberOfCharacters: 3,
-      business: null
+      business: null,
+      currencyAlert: false
     };
   },
   methods: {
+
+    /**
+     * Check whether the country has changed, if so
+     * ask the user if they want to change the currency
+     */
+    checkUpdateCurrency: function() {
+      if(this.country !== this.business.address.country) {
+        console.log(this.business.address.country)
+        console.log(this.country)
+
+        this.currencyAlert = true;
+      }
+    },
+
 
     /**
      * method to update business

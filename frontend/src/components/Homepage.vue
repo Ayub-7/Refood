@@ -141,9 +141,9 @@
         <vs-card>
           <div class="header-container">
             <vs-icon icon="leaderboard" size="32px" style="margin: auto 0"></vs-icon>
-            <div class="title">Sales Report Graph</div>
+            <div class="title">Sales Graph</div>
             <div class="title-business"> - {{getBusinessName()}}</div>
-            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Data</vs-button>
+            <vs-button icon="summarize" class="toggle-button" id="bus-sales-report" @click="graphMode = !graphMode" >Sales Report</vs-button>
           </div>
           <vs-divider/>
           <BusinessSalesGraph :businessId="actingAsBusinessId" :currencySymbol="currencySymbol" />
@@ -155,7 +155,7 @@
             <vs-icon icon="summarize" size="32px" style="margin: auto 0"></vs-icon>
             <div class="title">Sales Report</div>
             <div class="title-business"> - {{getBusinessName()}}</div>
-            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Graph</vs-button>
+            <vs-button icon="leaderboard" class="toggle-button" id="bus-sales-graph" @click="graphMode = !graphMode">Sales Graph</vs-button>
           </div>
           <vs-divider/>
           <BusinessSalesReport :businessId="actingAsBusinessId" />
