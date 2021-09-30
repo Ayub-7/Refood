@@ -49,6 +49,8 @@ import CommunityMarketplace from "./components/CommunityMarketplace";
 import BusinessInventory from "./components/BusinessInventory";
 import BusinessSalesHistory from "./components/BusinessSalesHistory";
 import ListingDetail from "./components/ListingDetail";
+import ModifyBusiness from "./components/ModifyBusiness";
+import ModifyUser from "./components/ModifyUser";
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
 import { updateSessionOnRouterChange } from './utilities/UpdateSession';

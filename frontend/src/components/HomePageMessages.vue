@@ -57,7 +57,7 @@
           <div class="card-container" v-if="item.status === 'Expired'">
             <div class="pln-top-row">
               <p class="sub-header">MARKETPLACE - {{item.created}}</p>
-              <div class="lln-button-group" style="margin-top: 24px;">
+              <div class="lln-button-group">
                 <div v-if="item.viewStatus == 'Important'" style="margin-right: 10px;">
                   <vs-button icon="flag" color="#c3ad32" id="important-listing-notification-button" class="important-button" @click.stop.prevent="markAsImportant(item);"></vs-button>
                 </div>
