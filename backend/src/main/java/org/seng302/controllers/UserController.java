@@ -495,7 +495,7 @@ public class UserController {
           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
       }
       String imageExtension = "";
-      String imageDir = rootImageDir + "/user_" + id + "/" + imageId;
+      String imageDir = rootImageDir + "user_" + id + "/" + imageId;
       boolean pathExists = false;
       List<String> extensions = new ArrayList<>();
       extensions.add(".png");
