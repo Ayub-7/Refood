@@ -74,6 +74,28 @@ export default {
   instance.post('users', {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password}),
 
     /**
+     * Modifies a user by setting their details to the ones sent here
+     * @param userId user's ID
+     * @param firstName user's new firstname
+     * @param middleName user's new middlename
+     * @param lastName user's new lastname
+     * @param nickname user's new nickname
+     * @param bio new bio
+     * @param email new email
+     * @param dateOfBirth new birthday
+     * @param phoneNUmber new phone number
+     * @param homeAddress new address
+     * @param password current password
+     * @param newPassword new password
+     * @returns {Promise<AxiosResponse<any>>} 200 if the user is properly updated, 400 if the supplied data is bad,
+     * 409 if the user is attempted to change their email to an email that is already taken,
+     * 406 if the user id does not exist, and 401 if the user is not logged in.
+     */
+    modifyUser: async(userId, firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, newPassword) =>
+        instance.put(`/users/${userId}`, {firstName, middleName, lastName, nickname, bio, email, dateOfBirth, phoneNumber, homeAddress, password, newPassword},
+            {withCredentials: true}),
+
+    /**
      * Get a specific user via their unique ID number
      * @param userId The user's unique ID number
      * @returns {Promise<AxiosResponse<any>>}
