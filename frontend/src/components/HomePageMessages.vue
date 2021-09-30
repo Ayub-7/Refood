@@ -134,7 +134,6 @@
               <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click="undo(item.id, item.fid, true, false);
               undoClick=true" icon="close"></vs-button>
             </div>
-<!--            <vs-button color="danger" id="delete-btn" class="message-button delete-button" @click.stop.prevent="deleteMessage(item.id)" icon="close" style="margin-top: 5px;"></vs-button>-->
           </div>
           </div>
         </div>
