@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user && businesses" class="userInfo">
+  <div v-if="dataReady" class="userInfo">
     <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
 
     <div id="container">
@@ -41,7 +41,7 @@
 import {store, mutations} from "../store";
 import api from "../Api";
 import ReImage from "./ReImage";
-import { bus } from "../main";
+// import { bus } from "../main";
 
 const ActingAs =  {
   name: "actingAs",
@@ -55,19 +55,24 @@ const ActingAs =  {
       businesses: [],
       actingAsBusinessId: null,
       actingAsBusinessName: null,
-      user: null
+      user: null,
+      dataReady: false,
     }
   },
 
+  created() {
+    // bus.$on('updatedUserPicture', () => {
+    //   this.getUser();
+    // })
+    // bus.$on('updatedBusinessPicture', () => {
+    //   this.getBusinesses();
+    // })
+  },
+
   async mounted() {
-    bus.$on('updatedUserPicture', () => {
-      this.getUser();
-    })
-    bus.$on('updatedBusinessPicture', () => {
-      this.getBusinesses();
-    })
-    this.getUser();
-    await this.getBusinesses();
+    await this.getUser();
+
+
   },
   methods: {
     /**
@@ -98,6 +103,7 @@ const ActingAs =  {
       api.getUserFromID(store.loggedInUserId)
       .then((response) => {
         this.user = response.data;
+        this.getBusinesses();
       }).catch((err) => {
         console.log("Error " + err);
       })
@@ -115,19 +121,19 @@ const ActingAs =  {
      * @returns filtered list of businesses
      */
     getBusinesses(){
-      this.userBusinesses = store.userBusinesses;
 
-      for(let business of this.userBusinesses) {
-        console.log(business.id)
+      for(let business of this.user.businessesAdministered) {
         api.getBusinessFromId(business.id)
         .then((response) => {
-          console.log(response.data)
+          console.log(response)
           this.businesses.push(response.data);
     
         }).catch((err) => {
           console.log(err);
         })
       }
+
+      this.dataReady = true;
     },
 
     /**
