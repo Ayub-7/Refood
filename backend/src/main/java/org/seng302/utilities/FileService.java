@@ -19,8 +19,8 @@ public class FileService {
 
     private static final Logger logger = LogManager.getLogger(FileService.class.getName());
 
-    private static final int THUMBNAIL_SCALE_HEIGHT = 4;
-    private static final int THUMBNAIL_SCALE_WIDTH = 4;
+    private static final int THUMBNAIL_SCALE_HEIGHT = 10;
+    private static final int THUMBNAIL_SCALE_WIDTH = 10;
 
     /**
      * Uploads an image to a given directory.
@@ -56,7 +56,6 @@ public class FileService {
         bufferedImage.createGraphics().drawImage(img, 0, 0, img.getWidth() / THUMBNAIL_SCALE_WIDTH, img.getHeight() / THUMBNAIL_SCALE_HEIGHT, null);
         ImageIO.write(bufferedImage, imageExtension, thumbnailLocation);
     }
-
 
     public byte[] getImage(File file) throws IOException {
         logger.info(String.format("Retrieving Image from %s", file));

@@ -11,7 +11,7 @@
       <div slot="title">
         <router-link @click.native="refreshCachedItems" :to="{path: '/home'}">
           <vs-navbar-title style="color: white" id="navbar-title">
-            <img src="refood-text-white.png" alt="ReFood" id="navbar-logo"/>
+            <img :src="`${publicPath}refood-text-white.png`" alt="ReFood" id="navbar-logo"/>
           </vs-navbar-title>
         </router-link>
 
@@ -121,7 +121,9 @@ const app = {
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
     return {
-      indexActive: 0
+      indexActive: 0,
+
+      publicPath: process.env.BASE_URL
     };
   },
   methods: {

@@ -101,8 +101,8 @@ public class Product {
         assert removeImage != null;
         String primaryPath = removeImage.getFileName().substring(removeImage.getFileName().indexOf("business_"));
         if ((primaryPath.equals(this.primaryImagePath.replace("/", "\\")) && System.getProperty("os.name").startsWith("Windows")) || primaryPath.equals(this.primaryImagePath)) {
-            if (this.images.isEmpty()) {
-                Image primary = this.images.get(0);
+            if (!this.images.isEmpty()) {
+                Image primary = this.images.iterator().next();
                 String primaryFilename = primary.getFileName();
                 int sliceIndex = primaryFilename.indexOf("business_");
                 String primaryFile = primaryFilename.substring(sliceIndex);

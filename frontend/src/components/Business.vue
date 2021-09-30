@@ -8,12 +8,27 @@
     </div>
 
     <div id="container" v-if="this.business != null">
-      <!-- Left Side Business Information Panel -->
+      <!-- Top Component Title -->
       <div id="business-name-container">
+        <vs-dropdown class="title-image" vs-trigger-click>
+          <ReImage :imagePath="business.primaryImagePath" :isBusiness="true" class="title-image" v-if="business.primaryImagePath"></ReImage>
+          <vs-avatar v-else icon="store" color="#1F74FF" size="100px" name="avatar" class="title-image"></vs-avatar>
+          <vs-dropdown-menu>
+            <vs-dropdown-item @click="updatePrimary=true; openImageUpload()" class="profileDropdown">
+              <vs-icon icon="add_box" style="margin: auto"></vs-icon>
+              <div style="font-size: 12px; margin: auto">Add New Primary Image</div>
+            </vs-dropdown-item>
+            <vs-dropdown-group v-if="images.length > 1" class="profileDropdown" vs-collapse vs-icon="collections" vs-label="Update With Existing" style="font-size: 13px">
+              <vs-dropdown-item v-for="image in filteredImages()" :key="image.id" @click="updatePrimaryImage(image.id);">
+                {{image.name}}
+              </vs-dropdown-item>
+            </vs-dropdown-group>
+          </vs-dropdown-menu>
+        </vs-dropdown>
         <div id="business-name"  >{{ business.name }}</div>
         <div id="business-type">{{ business.businessType }}</div>
       </div>
-
+      <!-- Left Side Business Information Panel -->
       <div id="business-container">
         <div class="sub-container">
           <vs-button id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
@@ -52,10 +67,14 @@
           <vs-tab class="business-nav-item" label="Administrators">
             <BusinessAdministrators :admins="adminList" :pAdminId="business.primaryAdministratorId"/>
           </vs-tab>
+          <vs-tab class="business-nav-item" label="Images">
+            <BusinessImages v-on:getBusiness="getBusiness" v-on:update="reloadLocation" :images="images" :primaryImagePath="business.primaryImagePath" :business="business"></BusinessImages>
+          </vs-tab>
         </vs-tabs>
       </main>
 
     </div>
+    <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
   </div>
 </template>
 
@@ -64,10 +83,12 @@
 import api from "../Api";
 import BusinessAdministrators from "./BusinessAdministrators";
 import BusinessListings from "./BusinessListings";
+import BusinessImages from "./BusinessImages";
+import ReImage from "./ReImage";
 
 const Business = {
   name: "Business",
-  components: {BusinessListings, BusinessAdministrators},
+  components: {BusinessListings, BusinessAdministrators, BusinessImages, ReImage},
 
   // App's initial state.
   data: function () {
@@ -80,10 +101,93 @@ const Business = {
 
       inWishlist: false, // i.e. is it in the user's wishlist.
       wishlistId: null,
+      images: [],
+      updatePrimary: false,
     };
   },
 
   methods: {
+    /**
+     * Called by primary image dropdown component, filtering the primary image out so
+     * that only the non-primary images are displayed.
+     */
+    filteredImages: function() {
+      let filteredImages = [];
+      for (let image of this.images) {
+        if (this.business.primaryImagePath && image.fileName.match(/\d+/g)[1] !== this.business.primaryImagePath.match(/\d+/g)[1]) {
+          filteredImages.push(image);
+        }
+      }
+      return filteredImages;
+    },
+
+    /**
+     * Trigger the file upload box to appear.
+     * Used for when the actions dropdown add image action or add image button is clicked.
+     */
+    openImageUpload: function() {
+      this.$refs.fileUpload.click();
+    },
+
+    /**
+     * Upload business image when image is uploaded on web page
+     * @param e Event object which contains file uploaded
+     */
+    uploadImage: async function(e) {
+      //Setup FormData object to send in request
+      this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
+      for (let image of e.target.files) {
+        const fd = new FormData();
+        fd.append('filename', image, image.name);
+        api.postBusinessImage(this.business.id, fd)
+          .then((res) => { //On success
+            this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
+            let imageId = res.data.id;
+            if (this.updatePrimary) {
+              this.updatePrimaryImage(imageId);
+            } else {
+              this.reloadLocation();
+            }
+          })
+          .catch((error) => { //On fail
+            if (error.response.status === 400) {
+              this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
+            } else if (error.response.status === 500) {
+              this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+            }
+          })
+          .finally(() => {
+            this.$vs.loading.close();
+          });
+      }
+    },
+
+    /**
+     * Call api endpoint to update the primary image for the business.
+     */
+    updatePrimaryImage: function(imageId) {
+      api.changeBusinessPrimaryImage(this.business.id, imageId)
+        .then(async () => {
+          await this.getBusiness();
+          this.updatePrimary = false;
+          this.reloadLocation();
+        })
+        .catch((error) => {
+          if (error.response.status === 400) {
+            this.$vs.notify({title:`Failed To Update Primary Image`, color:'danger'});
+          } else if (error.response.status === 500) {
+            this.$vs.notify({title:`Failed To Update Primary Image`, text: 'There was a problem with the server.', color:'danger'});
+          }
+        });
+    },
+
+    /**
+     * Reload the component
+     */
+    reloadLocation: function() {
+      location.reload();
+    },
+
     /**
      * Adds or removes the current business from the user's wishlist.
      */
@@ -133,9 +237,9 @@ const Business = {
     getUserWishlist: function() {
       api.getUsersWishlistedBusinesses(this.user.id)
         .then((res) => {
-          for (let i = 0; i < res.data.length; i++) {
-            if (this.business.id === res.data[i].business.id) {
-              this.wishlistId = res.data[i].id;
+          for (let data of res.data) {
+            if (this.business.id === data.business.id) {
+              this.wishlistId = data.id;
               this.inWishlist = true;
               break;
             }
@@ -149,11 +253,12 @@ const Business = {
     /**
      * Retrieves the business information including the administrators.
      */
-    getBusiness: function () {
+    getBusiness: async function () {
       api.getBusinessFromId(this.$route.params.id)
           .then((res) => {
             this.business = res.data;
             this.adminList = JSON.parse(JSON.stringify(this.business.administrators)); // It just works?
+            this.images = this.business.images;
           })
           .catch((error) => {
             if (error) {
@@ -247,6 +352,9 @@ export default Business;
   grid-column: 2 / 4;
   grid-row: 1;
 
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1.5fr;
+  grid-template-rows: auto auto;
   text-align: center;
   background-color: transparent;
   padding: 0.5em 0 0.5em 0;
@@ -259,13 +367,30 @@ export default Business;
 #business-name {
   font-size: 32px;
   padding: 0.5em 0 0.5em 0;
+  grid-column: 2;
 }
 
 #business-type {
   font-size: 16px;
   padding: 0 0 0.5em 0;
+  grid-column: 2;
 }
 
+.title-image {
+  height: 100px;
+  width: 200px;
+  object-fit: cover;
+  display: flex;
+  grid-column: 1;
+  grid-row: 1 / 3;
+  margin-left: auto;
+  justify-content: flex-end;
+  margin-right: 20px;
+}
+
+.profileDropdown >>> .vs-dropdown--item-link {
+  display: flex;
+}
 /* === LEFT SIDE INFO PANEL === */
 #business-container {
   grid-column: 2;
@@ -334,11 +459,13 @@ main {
 #business-navbar {
   grid-column: 2;
   grid-row: 1;
+  height: 98%;
 }
 
 .business-nav-item {
   padding: 0 1em;
   font-size: 14px;
+  height: 100%;
 }
 
 #business-navbar >>> .vs-tabs--li { /* Targets individual tab */

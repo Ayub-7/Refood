@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="logo-container">
-      <img src="refood-logo-recycle.png" alt="refood-logo" id="logo"/>
+      <img :src="`${publicPath}refood-logo-recycle.png`" alt="refood-logo" id="logo"/>
     </div>
     <div id="main">
       <p id="sign">Sign In</p>
@@ -39,6 +39,8 @@ const Login = {
       errors: [],
       email: "",
       password: "",
+
+      publicPath: process.env.BASE_URL
     };
   },
   methods: {

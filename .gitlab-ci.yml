@@ -119,7 +119,11 @@ deploy-staging-frontend:
     policy: pull
   script:
     - mkdir -p /home/gitlab-runner/staging-frontend/dist/prod_images
+    - mkdir -p /home/gitlab-runner/staging-frontend/dist/business_images
+    - mkdir -p /home/gitlab-runner/staging-frontend/dist/user_images
     - mv -f /home/gitlab-runner/staging-frontend/dist/prod_images /home/gitlab-runner
+    - mv -f /home/gitlab-runner/staging-frontend/dist/business_images /home/gitlab-runner
+    - mv -f /home/gitlab-runner/staging-frontend/dist/user_images /home/gitlab-runner
     - cd frontend
     - export NODE_ENV=staging
     - npm run build
@@ -131,6 +135,8 @@ deploy-staging-frontend:
     - chmod u+x /home/gitlab-runner/staging-frontend.sh
     - sudo systemctl restart seng302-staging-frontend
     - mv -f /home/gitlab-runner/prod_images /home/gitlab-runner/staging-frontend/dist
+    - mv -f /home/gitlab-runner/business_images /home/gitlab-runner/staging-frontend/dist
+    - mv -f /home/gitlab-runner/user_images /home/gitlab-runner/staging-frontend/dist
   artifacts:
     paths:
       - frontend/dist
@@ -170,7 +176,11 @@ deploy-production-frontend:
     policy: pull
   script:
     - mkdir -p /home/gitlab-runner/production-frontend/dist/prod_images
+    - mkdir -p /home/gitlab-runner/production-frontend/dist/business_images
+    - mkdir -p /home/gitlab-runner/production-frontend/dist/user_images
     - mv -f /home/gitlab-runner/production-frontend/dist/prod_images /home/gitlab-runner
+    - mv -f /home/gitlab-runner/production-frontend/dist/business_images /home/gitlab-runner
+    - mv -f /home/gitlab-runner/production-frontend/dist/user_images /home/gitlab-runner
     - cd frontend
     - export NODE_ENV=production
     - npm run build-prod
@@ -181,6 +191,8 @@ deploy-production-frontend:
     - chmod u+x /home/gitlab-runner/production-frontend.sh
     - sudo systemctl restart seng302-production-frontend
     - mv -f /home/gitlab-runner/prod_images /home/gitlab-runner/production-frontend/dist
+    - mv -f /home/gitlab-runner/business_images /home/gitlab-runner/production-frontend/dist
+    - mv -f /home/gitlab-runner/user_images /home/gitlab-runner/production-frontend/dist
 
   artifacts:
     paths:
