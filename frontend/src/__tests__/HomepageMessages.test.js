@@ -525,6 +525,28 @@ describe('HomePageMessages method tests', () => {
     });
 
 
+    test("When a message is sent, user is notified and debug is called", async () => {
+        wrapper.vm.checkMessage = jest.fn(() => {
+            return true;
+        });
+
+        api.postMessage = jest.fn(() => {
+            return Promise.resolve({status: 200});
+        });
+
+        let oneMessageOriginal = oneMessage;
+        oneMessageOriginal.sender = {id: 44};
+        oneMessageOriginal.card = {id: 44};
+
+        wrapper.vm.sendMessage(oneMessageOriginal, oneMessage);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.$vs.notify).toBeCalled();
+        expect(wrapper.vm.message).toBe("");
+    });
+
+
+
     test("markAsRead method test, message input, return 200", async () => {
         api.updateMessageViewStatus = jest.fn(() => {
             return Promise.resolve({status: 200});
@@ -536,6 +558,7 @@ describe('HomePageMessages method tests', () => {
         await wrapper.vm.$nextTick();
         expect(api.updateMessageViewStatus).toBeCalled();
     });
+
 
     //id is underfined if placed here
 });
