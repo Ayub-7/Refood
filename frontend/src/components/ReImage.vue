@@ -128,11 +128,9 @@ export default {
 }
 </script>
 <style scoped>
-  .profileDropdown >>> .vs-dropdown--item-link {
-    display: flex;
-  }
 
   .profileDropdown >>> .vs-dropdown--item-link {
+    display: flex;
     transition: .1s ease;
   }
 

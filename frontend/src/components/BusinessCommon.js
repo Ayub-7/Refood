@@ -62,7 +62,7 @@ export default {
             await axios.get(`https://photon.komoot.io/api/?q=${city}&osm_tag=place:city&lang=en`)
                 .then( res => {
                     suggestedCities = res.data.features.map(location => location.properties.name);
-                    suggestedCities = suggestedCities.filter(city => city != null);
+                    suggestedCities = suggestedCities.filter(city != null);
                 })
                 .catch( error => {
                     console.log("Error with getting cities from photon." + error);
