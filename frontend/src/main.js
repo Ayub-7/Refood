@@ -111,7 +111,7 @@ const router = new VueRouter({
 
 updateSessionOnRouterChange(router);
 
-
+export const bus = new Vue();
 
 /* eslint-disable no-new */
 new Vue({

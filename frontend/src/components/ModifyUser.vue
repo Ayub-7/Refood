@@ -163,6 +163,7 @@
 <script>
 import api from "../Api";
 import axios from "axios";
+import { bus } from "../main";
 
 const ModifyUser = {
   name: "ModifyUser",
@@ -383,6 +384,7 @@ const ModifyUser = {
             .then((response) => {
               this.$log.debug("User modified:", response.data);
               this.$vs.notify({title: 'Success!', text: 'Successfully modified user\'s details', color: 'success'});
+              bus.$emit('updatedUserInfo', 'user updated')
               this.$router.push(`/users/${response.data.userId}`);
             }).catch((error) => {
           if(error.response.status === 409) {

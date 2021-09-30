@@ -38,6 +38,7 @@
 import {store, mutations} from "../store";
 import api from "../Api";
 import ReImage from "./ReImage";
+import { bus } from "../main";
 
 const actingAs =  {
   name: "actingAs",
@@ -48,17 +49,32 @@ const actingAs =  {
       userName: null,
       role: null,
       userBusinesses: [],
+      businesses: [],
       actingAsBusinessId: null,
       actingAsBusinessName: null,
+      user: null,
     }
   },
+
+  created() {
+    bus.$on('updatedUserInfo', () => {
+      console.log("Called")
+      this.getUser();
+      console.log(this.user)
+    })
+  },
+
+  async mounted() {
+    await this.getUser();
+  },
+
   methods: {
     /**
      * Retreive the current userName and loggedInUserId of acting as account
      * @returns the acting name
      */
     getUserName() {
-      this.userName = store.userName;
+      this.userName = this.user.firstName + " " + this.user.lastName;
       this.loggedInUserId = store.loggedInUserId;
       return this.userName;
     },
@@ -73,7 +89,21 @@ const actingAs =  {
     },
 
     /**
-     * Retrieve the businesses administrated by currnet acting as account, or all business less the current business
+     * Returns the user currently logged in
+     */
+    getUser() {
+      api.getUserFromID(store.loggedInUserId)
+          .then((response) => {
+            this.user = response.data;
+            this.getBusinesses();
+          }).catch((err) => {
+        console.log("Error " + err);
+      })
+
+    },
+
+    /**
+     * Retrieve the businesses administrated by current acting as account, or all business less the current business
      * if currently acting as a business account
      * @returns filtered list of businesses
      */
