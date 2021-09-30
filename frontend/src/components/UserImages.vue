@@ -14,6 +14,7 @@
 
 import ReImage from "./ReImage";
 import api from "../Api";
+import { bus } from "../main";
 
 const UserImages = {
     name: "UserImages",
@@ -47,7 +48,6 @@ const UserImages = {
          * @param e Event object which contains file uploaded
          */
         uploadImage: async function(e) {
-            console.log(this.user)
             //Setup FormData object to send in request
             this.$vs.loading(); //Loading spinning circle while image is uploading (can remove if not wanted)
             for (let image of e.target.files) {
@@ -67,6 +67,7 @@ const UserImages = {
                     .finally(() => {
                         this.$vs.loading.close();
                         this.$vs.notify({title:`Image for ${this.user.firstName} was uploaded`, color:'success'});
+                        bus.$emit('updatedUserPicture', 'pic updated')
                     });
             }
         },
@@ -79,6 +80,7 @@ const UserImages = {
                 .then(async () => {
                     this.$emit("getUser");
                     this.$vs.notify({title:`Successfully Updated Primary Image`, color:'success'})
+                    bus.$emit('updatedUserPicture', 'pic updated')
                     location.reload();
                 })
                 .catch((error) => {
@@ -97,6 +99,7 @@ const UserImages = {
         deleteImage(imageId) {
             api.deleteUserImage(this.user.id, imageId) // !! TODO !! Change to user endpoint
                 .then(() => {
+                    bus.$emit('updatedUserPicture', 'pic updated')
                     this.$emit('getUser');
                     this.$vs.notify({title:`Image Has Been Successfully Removed`, color:'success'})
                 })

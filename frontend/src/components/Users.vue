@@ -6,7 +6,7 @@
       <div id="options-bar">
         <div class="sub-header" style="text-align: center"> Options </div>
         <vs-button class="options-card" id="option-view-cards" @click="openMarketModal()">Marketplace Cards</vs-button>
-        <vs-button class="options-card" id="option-add-to-business" v-if="this.userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
+        <vs-button class="options-card" id="option-add-to-business" v-if="userViewingBusinesses.length >= 1" @click="openModal()"> Add to Business </vs-button>
       </div>
 
       <div id="name-container">
@@ -405,6 +405,7 @@ export default Users;
 
 #full-name {
   font-size: 32px;
+  line-height: 30px;
   padding: 0.5em 0 0.5em 0;
 }
 

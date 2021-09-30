@@ -2,7 +2,7 @@
   <div v-if="user && businesses" class="userInfo">
     <h2 class = "dgaa" v-if="getUserRole() === 'DGAA' || getUserRole() === 'GAA'"><span>{{getUserRole()}}</span></h2>
 
-    <div>
+    <div id="container">
       <vs-dropdown vs-trigger-click>
         <div v-if="getActingAsBusinessName() == null" class="acting-display">
           <span class="user">{{getUserName()}}</span>
@@ -41,6 +41,7 @@
 import {store, mutations} from "../store";
 import api from "../Api";
 import ReImage from "./ReImage";
+import { bus } from "../main";
 
 const ActingAs =  {
   name: "actingAs",
@@ -59,6 +60,12 @@ const ActingAs =  {
   },
 
   async mounted() {
+    bus.$on('updatedUserPicture', () => {
+      this.getUser();
+    })
+    bus.$on('updatedBusinessPicture', () => {
+      this.getBusinesses();
+    })
     this.getUser();
     await this.getBusinesses();
   },
@@ -206,6 +213,10 @@ export default ActingAs;
 
 .userInfo >>> .vs-con-dropdown {
   cursor: pointer;
+}
+
+#container {
+  height: 100%;
 }
 
 
