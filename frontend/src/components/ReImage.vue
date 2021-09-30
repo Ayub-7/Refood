@@ -2,10 +2,16 @@
 
   <div>
     <div v-if="isThumbnail" class="businessImage" style="height: 25px; width: 33.33px; display: flex; overflow: hidden; justify-content: center; position: relative; border-radius: 50%">
-      <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/business_images/' + getImgUrl(this.imagePath))" alt="Business thumbnail"/>
+      <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/business_images/' + getImgUrl(this.imagePath))" alt="User thumbnail"/>
       <img v-else-if="this.imagePath != null && !isDevelopment()" v-bind:src="getImgUrl(this.imagePath)" alt="Business thumbnail"/>
       <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Business thumbnail"/>
       <img v-else-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="Business thumbnail"/>
+    </div>
+    <div v-else-if="isUserThumbnail" class="businessImage" style="height: 25px; width: 33.33px; display: flex; overflow: hidden; justify-content: center; position: relative; border-radius: 50%">
+      <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/users/' + getImgUrl(this.imagePath))" alt="User thumbnail"/>
+      <img v-else-if="this.imagePath != null && !isDevelopment()" v-bind:src="getImgUrl(this.imagePath)" alt="User thumbnail"/>
+      <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="User thumbnail"/>
+      <img v-else-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="User thumbnail"/>
     </div>
     <div v-else-if="isBusiness" class="businessImage" style="display: flex; overflow: hidden; justify-content: center; position: relative">
       <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/business_images/' + getImgUrl(this.imagePath))" alt="Business image"/>
@@ -26,6 +32,27 @@
         </vs-dropdown-menu>
       </vs-dropdown>
     </div>
+
+    <div v-else-if="isUser" class="businessImage" style="display: flex; overflow: hidden; justify-content: center; position: relative">
+      <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/users/' + getImgUrl(this.imagePath))" alt="User image"/>
+      <img v-else-if="this.imagePath != null && !isDevelopment()" alt="User Image" v-bind:src="getImgUrl(this.imagePath)"/>
+      <img v-else-if="!this.imagePath && isDevelopment()" src="placeholder.png" alt="Business image"/>
+      <img v-else-if="!isDevelopment() && !this.imagePath" :src="getImgUrl(true)" alt="Business image"/>
+      <vs-dropdown class="edit-button" vs-trigger-click>
+        <vs-icon icon="edit" color="black" size="50px" name="avatar"></vs-icon>
+        <vs-dropdown-menu id="dropdown">
+          <vs-dropdown-item v-if="imagePath !== primaryImagePath" @click="emitUpdatePrimary" class="profileDropdown">
+            <vs-icon icon="collections" size="30px" style="margin: auto; grid-column: 0"></vs-icon>
+            <div style="font-size: 16px; margin: auto; grid-column: 1">Make Image Primary</div>
+          </vs-dropdown-item>
+          <vs-dropdown-item @click="emitDelete" class="profileDropdown">
+            <vs-icon icon="delete" size="30px" style="margin: auto"></vs-icon>
+            <div style="font-size: 16px; margin: auto">Delete Image</div>
+        </vs-dropdown-item>
+        </vs-dropdown-menu>
+      </vs-dropdown>
+    </div>
+
     <div v-else>
       <img v-if="this.imagePath != null && isDevelopment()" v-bind:src="require('../../../backend/src/main/resources/media/images/businesses/' + getImgUrl(this.imagePath))" alt="Product image"/>
       <img v-else-if="this.imagePath != null && !isDevelopment()" alt="Product Image" v-bind:src="getImgUrl(this.imagePath)"/>
@@ -48,6 +75,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    isUser: {
+      type: Boolean,
+      default: false
+    },
+    isUserThumbnail: {
+      type: Boolean,
+      default: false
+    },
     primaryImagePath: {
       type: String,
       default: null
@@ -58,7 +93,9 @@ export default {
     }
   },
 
+
   methods: {
+    
     /**
      * Return the string of the beginning of the image path.
      * This differs depending on whether the application is running
@@ -89,6 +126,7 @@ export default {
      * @return a string link to the product image, or the default image if it doesn't have a product.
      **/
     getImgUrl(product) {
+
       if (product === true && process.env.NODE_ENV !== 'staging') {
         return '/prod/placeholder.png';
       } else if (product === true) {

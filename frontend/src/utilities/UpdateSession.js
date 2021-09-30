@@ -27,6 +27,7 @@ function updateSessionOnRouterChange(router) {
             } else {
                 sendToLogin(to, next);
             }
+        
             setStoreValues(response);
             next();
 

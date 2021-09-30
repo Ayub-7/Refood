@@ -43,14 +43,12 @@ import Search from "./components/Search.vue";
 import SearchListings from "./components/SearchListings.vue"
 import Business from "./components/Business.vue";
 import Homepage from "./components/Homepage"
-import ProductCatalogue from "@/components/ProductCatalogue";
+import ProductCatalogue from "./components/ProductCatalogue";
 import AddToCatalogue from "./components/AddToCatalogue";
-import CommunityMarketplace from "@/components/CommunityMarketplace";
-import BusinessInventory from "@/components/BusinessInventory";
-import BusinessSalesHistory from "@/components/BusinessSalesHistory";
-import ListingDetail from "@/components/ListingDetail";
-import ModifyUser from "./components/ModifyUser";
-import ModifyBusiness from './components/ModifyBusiness';
+import CommunityMarketplace from "./components/CommunityMarketplace";
+import BusinessInventory from "./components/BusinessInventory";
+import BusinessSalesHistory from "./components/BusinessSalesHistory";
+import ListingDetail from "./components/ListingDetail";
 import 'vuesax/dist/vuesax.css';
 import 'material-icons/iconfont/material-icons.css'; // used with vuesax.
 import { updateSessionOnRouterChange } from './utilities/UpdateSession';
@@ -111,6 +109,7 @@ const router = new VueRouter({
 
 updateSessionOnRouterChange(router);
 
+export const bus = new Vue();
 
 
 /* eslint-disable no-new */

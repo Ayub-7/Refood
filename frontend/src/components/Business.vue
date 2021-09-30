@@ -89,6 +89,7 @@ import BusinessListings from "./BusinessListings";
 import BusinessImages from "./BusinessImages";
 import ReImage from "./ReImage";
 import {store} from "../store";
+import { bus } from "../main";
 
 const Business = {
   name: "Business",
@@ -152,6 +153,9 @@ const Business = {
             } else {
               this.reloadLocation();
             }
+
+            bus.$emit("updateBusinessPicture", "updated");
+
           })
           .catch((error) => { //On fail
             if (error.response.status === 400) {
@@ -181,6 +185,7 @@ const Business = {
         .then(async () => {
           await this.getBusiness();
           this.updatePrimary = false;
+          bus.$emit("updateBusinessPicture", "updated");
           this.reloadLocation();
         })
         .catch((error) => {
