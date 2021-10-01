@@ -9,7 +9,7 @@
         <vs-card v-for="image in images" :key="image.id" id="images-list" style="padding: 0px">
             <ReImage v-on:delete="deleteImage(image.id)" v-on:updatePrimary="updatePrimaryImage(image.id)" :imagePath="image.fileName" :isBusiness="true" :primaryImagePath="primaryImagePath" class="title-image"></ReImage>
         </vs-card>
-        <input v-if="store.actingAsBusinessId == business.id" type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
+        <input v-if="getActingAsBusiness() == business.id" type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
     </div>
 </template>
 <script>
@@ -46,6 +46,10 @@ const BusinessImages = {
          */
         openImageUpload: function() {
             this.$refs.fileUpload.click();
+        },
+
+        getActingAsBusiness() {
+            return store.actingAsBusinessId
         },
 
         /**

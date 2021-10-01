@@ -7,7 +7,7 @@
         <vs-card v-for="image in images" :key="image.id" id="images-list" style="padding: 0px">
             <ReImage v-on:delete="deleteImage(image.id)" v-on:updatePrimary="updatePrimaryImage(image.id)" :imagePath="image.fileName" :isUser="true" :primaryImagePath="primaryImagePath" class="title-image"></ReImage>
         </vs-card>
-        <input v-if="store.loggedInUserId == user.id" type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
+        <input v-if="getLoggedInUser() == user.id" type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
     </div>
 </template>
 <script>
@@ -15,10 +15,11 @@
 import ReImage from "./ReImage";
 import api from "../Api";
 import { bus } from "../main";
+import {store} from "../store";
 
 const UserImages = {
     name: "UserImages",
-    components: {ReImage},
+    components: { ReImage },
     props: {
         images: {
             type: Array,
@@ -41,6 +42,10 @@ const UserImages = {
          */
         openImageUpload: function() {
             this.$refs.fileUpload.click();
+        },
+
+        getLoggedInUser: function() {
+            return store.loggedInUserId;
         },
 
         /**
