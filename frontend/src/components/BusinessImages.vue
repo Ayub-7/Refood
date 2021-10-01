@@ -9,7 +9,7 @@
         <vs-card v-for="image in images" :key="image.id" id="images-list" style="padding: 0px">
             <ReImage v-on:delete="deleteImage(image.id)" v-on:updatePrimary="updatePrimaryImage(image.id)" :imagePath="image.fileName" :isBusiness="true" :primaryImagePath="primaryImagePath" class="title-image"></ReImage>
         </vs-card>
-        <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
+        <input v-if="getActingAsBusiness() == business.id" type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
     </div>
 </template>
 <script>
@@ -48,6 +48,10 @@ const BusinessImages = {
             this.$refs.fileUpload.click();
         },
 
+        getActingAsBusiness() {
+            return store.actingAsBusinessId
+        },
+
         /**
          * Upload business image when image is uploaded on web page
          * @param e Event object which contains file uploaded
@@ -68,6 +72,8 @@ const BusinessImages = {
                             this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
                         } else if (error.response.status === 500) {
                             this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+                        } else if (error.response.status === 413) {
+                            this.$vs.notify({title:`Failed To Upload Image`, text: 'The image is too large.', color:'danger'});
                         }
                     })
                     .finally(() => {

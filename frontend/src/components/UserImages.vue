@@ -7,7 +7,7 @@
         <vs-card v-for="image in images" :key="image.id" id="images-list" style="padding: 0px">
             <ReImage v-on:delete="deleteImage(image.id)" v-on:updatePrimary="updatePrimaryImage(image.id)" :imagePath="image.fileName" :isUser="true" :primaryImagePath="primaryImagePath" class="title-image"></ReImage>
         </vs-card>
-        <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
+        <input v-if="getLoggedInUser() == user.id" type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
     </div>
 </template>
 <script>
@@ -15,10 +15,11 @@
 import ReImage from "./ReImage";
 import api from "../Api";
 import { bus } from "../main";
+import {store} from "../store";
 
 const UserImages = {
     name: "UserImages",
-    components: {ReImage},
+    components: { ReImage },
     props: {
         images: {
             type: Array,
@@ -43,6 +44,10 @@ const UserImages = {
             this.$refs.fileUpload.click();
         },
 
+        getLoggedInUser: function() {
+            return store.loggedInUserId;
+        },
+
         /**
          * Upload business image when image is uploaded on web page
          * @param e Event object which contains file uploaded
@@ -56,18 +61,20 @@ const UserImages = {
                 await api.postUserImage(this.user.id, fd) //!! TODO !! Change to user image endpoint
                     .then(() => { //On success
                         this.$emit("getUser");
+                        this.$vs.notify({title:`Image for ${this.user.firstName} was uploaded`, color:'success'});
+                        bus.$emit('updatedUserPicture', 'pic updated')
                     })
                     .catch((error) => { //On fail
                         if (error.response.status === 400) {
                             this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
                         } else if (error.response.status === 500) {
                             this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+                        } else if (error.response.status === 413) {
+                            this.$vs.notify({title:`Failed To Upload Image`, text: 'The image is too large.', color:'danger'});
                         }
                     })
                     .finally(() => {
                         this.$vs.loading.close();
-                        this.$vs.notify({title:`Image for ${this.user.firstName} was uploaded`, color:'success'});
-                        bus.$emit('updatedUserPicture', 'pic updated')
                     });
             }
         },

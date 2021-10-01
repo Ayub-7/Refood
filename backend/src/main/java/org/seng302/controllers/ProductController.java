@@ -226,7 +226,6 @@ public class ProductController {
         }
 
         String imageExtension;
-
         if (image.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image supplied.");
         }
@@ -263,7 +262,6 @@ public class ProductController {
         File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
         File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
         logger.info(String.format("Working Directory = %s", System.getProperty("user.dir")));
-        logger.info(file.getAbsolutePath());
         fileService.uploadImage(file, image.getBytes());
         fileService.createAndUploadThumbnailImage(file, thumbnailFile, imageExtension);
         String imageName = image.getOriginalFilename();

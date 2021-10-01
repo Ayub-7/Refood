@@ -3,6 +3,7 @@ import BusinessImages from '../components/BusinessImages';
 import Vuesax from 'vuesax';
 import api from '../Api';
 
+
 let wrapper;
 let localVue = createLocalVue();
 localVue.use(Vuesax);
@@ -48,6 +49,10 @@ const $vs = {
     loading: jest.fn(),
 };
 
+const store = {
+    actingAsBusinessId: 1
+}
+
 const $log = {
     error: jest.fn(),
     debug: jest.fn(),
@@ -72,7 +77,7 @@ api.deleteBusinessImage = jest.fn().mockImplementation(() => {
 beforeEach(() => {
     wrapper = mount(BusinessImages, {
         propsData: {},
-        mocks: {$vs, $log, $refs, $emit, location},
+        mocks: {store, $vs, $log, $refs, $emit, location},
         stubs: ['router-link', 'router-view'],
         methods: {},
         localVue
