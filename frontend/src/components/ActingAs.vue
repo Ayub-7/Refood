@@ -67,6 +67,9 @@ const ActingAs =  {
     bus.$on('updatedBusinessPicture', () => {
       this.getBusinesses();
     })
+    bus.$on('updatedUserInfo', () => {
+      this.getUser();
+    })
   },
 
   async mounted() {
