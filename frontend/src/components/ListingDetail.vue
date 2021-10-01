@@ -34,11 +34,11 @@
           <p><strong>Likes:</strong> {{listing.likes}}</p>
 
           <div class="button-group">
-            <vs-button v-if="!likedListingsIds.includes(listing.id)" icon="favorite" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">
+            <vs-button v-if="!likedListingsIds.includes(listing.id)" icon="favorite_border" class="listing-detail-btn" @click="sendLike(listing.id, listing.inventoryItem.product.name)">
               <p class="like-listing-text">Like Listing</p>
               <p class="like-listing-text" style="font-size: 11px">Add to watchlist</p>
             </vs-button>
-            <vs-button v-else color="danger" class="listing-detail-btn" icon="favorite_border" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">
+            <vs-button v-else color="danger" class="listing-detail-btn" icon="favorite" @click="deleteLike(listing.id, listing.inventoryItem.product.name)">
               <p class="like-listing-text">Unlike Listing</p>
               <p class="like-listing-text" style="font-size: 11px">Remove from watchlist</p>
               </vs-button>
