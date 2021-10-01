@@ -383,7 +383,7 @@ public class UserController {
         boolean freeImage = false;
         int count = 0;
         while (!freeImage) {
-            imageId = "user_" + String.valueOf(count);
+            imageId = "user_" +  String.valueOf(id) + "_" + String.valueOf(count);
             File checkFile1 = new File(String.format("%s/%s.jpg", userDir, imageId));
             File checkFile2 = new File(String.format("%s/%s.png", userDir, imageId));
             File checkFile3 = new File(String.format("%s/%s.gif", userDir, imageId));

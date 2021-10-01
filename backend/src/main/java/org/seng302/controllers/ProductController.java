@@ -248,7 +248,7 @@ public class ProductController {
         int count = 0;
 
         while (!freeImage) {
-            id = "product_ " + String.valueOf(count);
+            id = "product_" + productId + "_" + String.valueOf(businessId) + "_" + String.valueOf(count);
             File checkFile1 = new File(String.format("%s/%s.jpg", businessDir, id));
             File checkFile2 = new File(String.format("%s/%s.png", businessDir, id));
             File checkFile3 = new File(String.format("%s/%s.gif", businessDir, id));
