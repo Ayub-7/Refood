@@ -1,7 +1,9 @@
 <template>
     <div>
         <vs-row style="display: flex; justify-content: flex-end">
-            <vs-button icon="add_box" id="add-button" @click="openImageUpload" label="Upload Images">Upload Images</vs-button>
+            <div v-if="getActingAsBusinessId() == this.business.id">
+              <vs-button icon="add_box" id="add-button" @click="openImageUpload" label="Upload Images">Upload Images</vs-button>
+            </div>
         </vs-row>
         <!-- Image Card -->
         <vs-card v-for="image in images" :key="image.id" id="images-list" style="padding: 0px">
@@ -14,6 +16,7 @@
 
 import ReImage from "./ReImage";
 import api from "../Api";
+import {store} from "../store"
 
 const BusinessImages = {
     name: "BusinessImages",
@@ -34,6 +37,9 @@ const BusinessImages = {
     },
 
     methods: {
+        getActingAsBusinessId: function(){
+          return store.actingAsBusinessId;
+        },
         /**
          * Trigger the file upload box to appear.
          * Used for when the actions dropdown add image action or add image button is clicked.
