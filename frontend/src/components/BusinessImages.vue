@@ -1,5 +1,5 @@
 <template>
-    <div>
+     <div v-if="business">
         <vs-row style="display: flex; justify-content: flex-end">
             <div v-if="getActingAsBusinessId() == this.business.id">
               <vs-button icon="add_box" id="add-button" @click="openImageUpload" label="Upload Images">Upload Images</vs-button>
