@@ -56,18 +56,20 @@ const UserImages = {
                 await api.postUserImage(this.user.id, fd) //!! TODO !! Change to user image endpoint
                     .then(() => { //On success
                         this.$emit("getUser");
+                        this.$vs.notify({title:`Image for ${this.user.firstName} was uploaded`, color:'success'});
+                        bus.$emit('updatedUserPicture', 'pic updated')
                     })
                     .catch((error) => { //On fail
                         if (error.response.status === 400) {
                             this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
                         } else if (error.response.status === 500) {
                             this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+                        } else if (error.response.status === 413) {
+                            this.$vs.notify({title:`Failed To Upload Image`, text: 'The image is too large.', color:'danger'});
                         }
                     })
                     .finally(() => {
                         this.$vs.loading.close();
-                        this.$vs.notify({title:`Image for ${this.user.firstName} was uploaded`, color:'success'});
-                        bus.$emit('updatedUserPicture', 'pic updated')
                     });
             }
         },
