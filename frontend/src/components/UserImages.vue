@@ -1,13 +1,11 @@
 <template>
-     <div v-if="business">
+    <div>
         <vs-row style="display: flex; justify-content: flex-end">
-            <div v-if="getActingAsBusinessId() == this.business.id">
-              <vs-button icon="add_box" id="add-button" @click="openImageUpload" label="Upload Images">Upload Images</vs-button>
-            </div>
+            <vs-button icon="add_box" id="add-button" @click="openImageUpload" label="Upload Images">Upload Images</vs-button>
         </vs-row>
         <!-- Image Card -->
         <vs-card v-for="image in images" :key="image.id" id="images-list" style="padding: 0px">
-            <ReImage v-on:delete="deleteImage(image.id)" v-on:updatePrimary="updatePrimaryImage(image.id)" :imagePath="image.fileName" :isBusiness="true" :primaryImagePath="primaryImagePath" class="title-image"></ReImage>
+            <ReImage v-on:delete="deleteImage(image.id)" v-on:updatePrimary="updatePrimaryImage(image.id)" :imagePath="image.fileName" :isUser="true" :primaryImagePath="primaryImagePath" class="title-image"></ReImage>
         </vs-card>
         <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
     </div>
@@ -16,10 +14,10 @@
 
 import ReImage from "./ReImage";
 import api from "../Api";
-import {store} from "../store"
+import { bus } from "../main";
 
-const BusinessImages = {
-    name: "BusinessImages",
+const UserImages = {
+    name: "UserImages",
     components: {ReImage},
     props: {
         images: {
@@ -30,16 +28,13 @@ const BusinessImages = {
             type: String,
             default: null,
         },
-        business: {
+        user: {
             type: Object,
             default: null
         },
     },
 
     methods: {
-        getActingAsBusinessId: function(){
-          return store.actingAsBusinessId;
-        },
         /**
          * Trigger the file upload box to appear.
          * Used for when the actions dropdown add image action or add image button is clicked.
@@ -58,10 +53,9 @@ const BusinessImages = {
             for (let image of e.target.files) {
                 const fd = new FormData();
                 fd.append('filename', image, image.name);
-                await api.postBusinessImage(this.business.id, fd)
+                await api.postUserImage(this.user.id, fd) //!! TODO !! Change to user image endpoint
                     .then(() => { //On success
-                        this.$emit("getBusiness");
-                        this.$vs.notify({title:`Image for ${this.business.name} was uploaded`, color:'success'});
+                        this.$emit("getUser");
                     })
                     .catch((error) => { //On fail
                         if (error.response.status === 400) {
@@ -72,6 +66,8 @@ const BusinessImages = {
                     })
                     .finally(() => {
                         this.$vs.loading.close();
+                        this.$vs.notify({title:`Image for ${this.user.firstName} was uploaded`, color:'success'});
+                        bus.$emit('updatedUserPicture', 'pic updated')
                     });
             }
         },
@@ -80,13 +76,12 @@ const BusinessImages = {
          * Call api endpoint to update the primary image for the business.
          */
         updatePrimaryImage: function(imageId) {
-            this.$vs.loading();
-            api.changeBusinessPrimaryImage(this.business.id, imageId)
+            api.changeUserPrimaryImage(this.user.id, imageId)
                 .then(async () => {
-                    this.$emit("getBusiness");
-                    this.$vs.loading.close();
+                    this.$emit("getUser");
                     this.$vs.notify({title:`Successfully Updated Primary Image`, color:'success'})
-                    this.$emit("update");
+                    bus.$emit('updatedUserPicture', 'pic updated')
+                    location.reload();
                 })
                 .catch((error) => {
                     if (error.status !== 500) {
@@ -102,11 +97,10 @@ const BusinessImages = {
          * @param imageId
          */
         deleteImage(imageId) {
-            this.$vs.loading();
-            api.deleteBusinessImage(this.business.id, imageId)
+            api.deleteUserImage(this.user.id, imageId) // !! TODO !! Change to user endpoint
                 .then(() => {
-                    this.$emit('getBusiness');
-                    this.$vs.loading.close();
+                    bus.$emit('updatedUserPicture', 'pic updated')
+                    this.$emit('getUser');
                     this.$vs.notify({title:`Image Has Been Successfully Removed`, color:'success'})
                 })
                 .catch((error) => {
@@ -119,7 +113,8 @@ const BusinessImages = {
         }
     },
 }
-export default BusinessImages;
+
+export default UserImages;
 </script>
 <style scoped>
     #images-list {

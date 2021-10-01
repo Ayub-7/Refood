@@ -89,6 +89,7 @@ import BusinessListings from "./BusinessListings";
 import BusinessImages from "./BusinessImages";
 import ReImage from "./ReImage";
 import {store} from "../store";
+import { bus } from "../main";
 
 const Business = {
   name: "Business",
@@ -152,12 +153,17 @@ const Business = {
             } else {
               this.reloadLocation();
             }
+
+            bus.$emit("updateBusinessPicture", "updated");
+
           })
           .catch((error) => { //On fail
-            if (error.response.status === 400) {
-              this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
-            } else if (error.response.status === 500) {
-              this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+            if (error.response) {
+              if (error.response.status === 400) {
+                this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
+              } else if (error.response.status === 500) {
+                this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+              }
             }
           })
           .finally(() => {
@@ -181,13 +187,16 @@ const Business = {
         .then(async () => {
           await this.getBusiness();
           this.updatePrimary = false;
+          bus.$emit("updateBusinessPicture", "updated");
           this.reloadLocation();
         })
         .catch((error) => {
-          if (error.response.status === 400) {
-            this.$vs.notify({title:`Failed To Update Primary Image`, color:'danger'});
-          } else if (error.response.status === 500) {
-            this.$vs.notify({title:`Failed To Update Primary Image`, text: 'There was a problem with the server.', color:'danger'});
+          if(error.response) {
+            if (error.response.status === 400) {
+              this.$vs.notify({title:`Failed To Update Primary Image`, color:'danger'});
+            } else if (error.response.status === 500) {
+              this.$vs.notify({title:`Failed To Update Primary Image`, text: 'There was a problem with the server.', color:'danger'});
+            }
           }
         });
     },
@@ -272,7 +281,7 @@ const Business = {
             this.images = this.business.images;
           })
           .catch((error) => {
-            if (error) {
+            if (error.response) {
               if (error.response.status === 406) {
                 this.$vs.notify({title:'Error', text:'This business does not exist.', color:'danger', position:'top-center'})
               }
@@ -292,7 +301,7 @@ const Business = {
           this.getUserWishlist();
         })
         .catch((err) => {
-          if (err) {
+          if (err.response) {
             if (err.response.status === 401) {
               this.$vs.notify({title:'Unauthorized Action', text:'You must login first.', color:'danger'});
               this.$router.push({name: 'LoginPage'});

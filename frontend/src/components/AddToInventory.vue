@@ -375,13 +375,13 @@ export default {
   grid-template-columns: 1fr 1fr;
 }
 
-.full-image > img {
+.full-image > div img {
   height: 210px;
   border-radius: 4px;
   object-fit: cover;
 }
 
-.image > img {
+.image > div img {
   margin: auto;
   width: 150px;
   height: 100px;

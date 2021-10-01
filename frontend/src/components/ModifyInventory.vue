@@ -410,7 +410,7 @@ export default {
   margin-bottom: 15px;
 }
 
-.full-image >>> img {
+.full-image >>> div img {
   height: 210px;
   border-radius: 4px;
   object-fit: cover;

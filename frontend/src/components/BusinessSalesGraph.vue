@@ -12,37 +12,37 @@
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-d'}, 'options-button']"
                      type="border"
                      style="grid-column: 1;"
-                     @click="onPeriodChange('1-d')">
+                     @click="onPeriodChange('1-d'); changeGranularity('day')">
             1 Day
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-w'}, 'options-button']"
                      type="border"
                      style="grid-column: 3;"
-                     @click="onPeriodChange('1-w')">
+                     @click="onPeriodChange('1-w'); changeGranularity('day')">
             1 Week
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-m'}, 'options-button']"
                      type="border"
                      style="grid-column: 1;"
-                     @click="onPeriodChange('1-m')">
+                     @click="onPeriodChange('1-m'); changeGranularity('week')">
             1 Month
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '6-m'}, 'options-button']"
                      type="border"
                      style="grid-column: 3;"
-                     @click="onPeriodChange('6-m')">
+                     @click="onPeriodChange('6-m'); changeGranularity('month')">
             6 Months
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === '1-y'}, 'options-button']"
                      type="border"
                      style="grid-column: 1;"
-                     @click="onPeriodChange('1-y')">
+                     @click="onPeriodChange('1-y'); changeGranularity('month')">
             1 Year
           </vs-button>
           <vs-button v-bind:class="[{'active-button': activePeriodButton === 'all'}, 'options-button']"
                      type="border"
                      style="grid-column: 3;"
-                     @click="onPeriodChange('all')">
+                     @click="onPeriodChange('all');  changeGranularity('year')">
             All
           </vs-button>
         </div>

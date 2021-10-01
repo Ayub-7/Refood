@@ -518,9 +518,9 @@ export default {
     white-space: normal;
   }
 
-  .inventory-image >>> img {
+  .inventory-image >>> div img {
     cursor: pointer;
-    width: 100px;
+    max-width: 100px;
     border-radius: 4px;
     object-fit: cover;
   }
@@ -531,7 +531,7 @@ export default {
   }
 
 
-  .image >>> img {
+  .image >>> div img {
     margin: auto;
     width: 150px;
     height: 100px;
@@ -546,6 +546,7 @@ export default {
   .row {
     margin: auto;
   }
+
 
 
   @media screen and (max-width: 850px) {

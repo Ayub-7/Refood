@@ -205,10 +205,6 @@
             </vs-table>
         </div>
       </div>
-
-    <footer>
-      "Product shoot" by Aameerule is licensed under CC BY 2.0
-    </footer>
     <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
     <AddToInventory ref="addToInventoryModal" />
   </vs-card>
