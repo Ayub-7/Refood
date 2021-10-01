@@ -224,9 +224,8 @@ public class BusinessController {
      * Creates a sort object to be used by pageRequest to sort search results.
      * @param sortString string determining the sort type
      * @return Sort sortBy Sort specification
-     * @throws ResponseStatusException
      */
-    private Sort getSortType(String sortString) throws ResponseStatusException {
+    private Sort getSortType(String sortString) {
         Sort sortBy = Sort.by(Sort.Order.asc("id").ignoreCase());
         switch (sortString) {
             case "id":
