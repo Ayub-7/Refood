@@ -104,7 +104,13 @@ export default {
      */
     getPathStart() {
       let pathStart;
-      if (this.isBusiness || this.isThumbnail) {
+      if (this.isUser || this.isUserThumbnail) {
+        if (process.env.NODE_ENV === 'staging') {
+          pathStart = '/test/user_images/';
+        } else {
+          pathStart = '/prod/user_images/';
+        }
+      } else if (this.isBusiness || this.isThumbnail) {
         if (process.env.NODE_ENV === 'staging') {
           pathStart = '/test/business_images/';
         } else {

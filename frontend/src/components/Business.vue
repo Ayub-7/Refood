@@ -18,7 +18,7 @@
               <vs-icon icon="add_box" style="margin: auto"></vs-icon>
               <div style="font-size: 12px; margin: auto">Add New Primary Image</div>
             </vs-dropdown-item>
-            <vs-dropdown-group v-if="images.length > 1" class="profileDropdown" vs-collapse vs-icon="collections" vs-label="Update With Existing" style="font-size: 13px">
+            <vs-dropdown-group v-if="images.length > 1 && getActingAsBusinessId() == business.id" class="profileDropdown" vs-collapse vs-icon="collections" vs-label="Update With Existing" style="font-size: 13px">
               <vs-dropdown-item v-for="image in filteredImages()" :key="image.id" @click="updatePrimaryImage(image.id);">
                 {{image.name}}
               </vs-dropdown-item>
