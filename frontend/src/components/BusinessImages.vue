@@ -68,6 +68,8 @@ const BusinessImages = {
                             this.$vs.notify({title:`Failed To Upload Image`, text: "The supplied file is not a valid image.", color:'danger'});
                         } else if (error.response.status === 500) {
                             this.$vs.notify({title:`Failed To Upload Image`, text: 'There was a problem with the server.', color:'danger'});
+                        } else if (error.response.status === 413) {
+                            this.$vs.notify({title:`Failed To Upload Image`, text: 'The image is too large.', color:'danger'});
                         }
                     })
                     .finally(() => {
