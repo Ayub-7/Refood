@@ -30,11 +30,14 @@
       </div>
       <!-- Left Side Business Information Panel -->
       <div id="business-container">
-        <div class="sub-container">
-          <vs-button v-if="getActingAsBusinessId() !== business.id" id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
+        <div v-if="getActingAsBusinessId() === null" class="sub-container">
+          <vs-button id="wishlist-button" :icon="inWishlist ? 'star' : 'star_outline'" style="width: 100%" @click="toggleWishlist()">
             {{ inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
           </vs-button>
-          <vs-button v-else id="wishlist-button" icon="settings" style="width: 100%" :to="'/businesses/'+business.id+'/modify'">
+        </div>
+
+        <div v-if="getActingAsBusinessId() === business.id" class="sub-container">
+          <vs-button id="wishlist-button" icon="settings" style="width: 100%" :to="'/businesses/'+business.id+'/modify'">
             Modify {{business.name}}
           </vs-button>
         </div>
