@@ -14,7 +14,7 @@
         <vs-dropdown class="title-image" vs-trigger-click>
           <ReImage :imagePath="user.primaryImagePath" :isUser="true" class="title-image" v-if="user.primaryImagePath"></ReImage>
           <vs-avatar v-else icon="store" color="#1F74FF" size="100px" name="avatar" class="title-image"></vs-avatar>
-          <vs-dropdown-menu>
+          <vs-dropdown-menu v-if="this.curUserId == this.user.id">
             <vs-dropdown-item @click="updatePrimary=true; openImageUpload()" class="profileDropdown">
               <vs-icon icon="add_box" style="margin: auto"></vs-icon>
               <div style="font-size: 12px; margin: auto">Add New Primary Image</div>
