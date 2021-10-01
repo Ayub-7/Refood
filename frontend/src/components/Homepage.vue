@@ -716,7 +716,7 @@ export default Homepage;
 
 #container {
   display: grid;
-  grid-template-columns: 0.6fr 1.8fr 4fr 0.6fr;
+  grid-template-columns: 0.6fr 1.2fr 4fr 0.6fr;
   grid-template-rows: 1fr auto;
   grid-column-gap: 1em;
   margin: auto;

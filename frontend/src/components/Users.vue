@@ -104,26 +104,23 @@
     </vs-popup>
 
     <!-- Add user to business as admin modal -->
-    <Modal v-if="showModal">
-      <div slot="header">
-        Add user to business:
+    <vs-popup title="Add User to Business" :active.sync="showModal">
+      <div style="margin: 2em 0; text-align: center;">
+        Select a Business
+        <vs-select class="business-dropdown" v-model="selectedBusiness">
+          <vs-select-item v-for="business in userViewingBusinesses" :key="business.id" :text="business.name" :value="business"/>
+        </vs-select>
       </div>
 
-      <div slot="body">
-          <vs-select class="business-dropdown" v-model="selectedBusiness">
-            <vs-select-item v-for="business in userViewingBusinesses" :key="business.id" :text="business.name" :value="business"/>
-          </vs-select>
-      </div>
-
-      <div id="modal-footer" slot="footer">
-        <button class="modal-button modal-cancel-button" @click="closeModal()">
+      <div id="modal-footer">
+        <vs-button type="flat" class="modal-button modal-cancel-button" @click="closeModal()">
           Cancel
-        </button>
-        <button class="modal-button modal-ok-button" id="add-user" @click="addUserToBusiness()">
+        </vs-button>
+        <vs-button class="modal-button modal-ok-button" id="add-user" @click="addUserToBusiness()">
           Add
-        </button>
+        </vs-button>
       </div>
-    </Modal>
+    </vs-popup>
     <input type="file" id="fileUpload" ref="fileUpload" style="display: none;" multiple @change="uploadImage($event)"/>
   </div>
 </template>
@@ -360,10 +357,11 @@ const Users = {
     getUserInfo: function(userId) {
       api.getUserFromID(userId) //Get user data
         .then((response) => {
+          this.user = response.data;
           if(store.userBusinesses != null){
             this.userViewingBusinesses = store.userBusinesses;
+            this.userViewingBusinesses = this.userViewingBusinesses.filter(business => business.primaryAdministratorId === this.curUserId);
           }
-          this.user = response.data;
           this.images = this.user.images;
           this.businesses = JSON.parse(JSON.stringify(this.user.businessesAdministered));
         })
@@ -639,45 +637,28 @@ main {
   font-size: 14px;
   text-decoration: none;
 
-  width: 100%;
+  width: 75%;
+  margin: auto;
   padding: 12px 16px;
 }
 
 #modal-footer {
+  text-align: center;
   margin: auto;
-}
-
-.modal-button:hover {
-  box-shadow: 0 0.25em 1em rgba(0,1,1,.25);
 }
 
 .modal-ok-button {
   text-align: center;
-  color: white;
-
   width: 100px;
   margin: 0 1em;
   padding: 10px 20px;
-  background: #dbe0dd linear-gradient(to right, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
-  background-size: 500%;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-
 }
 
 .modal-cancel-button {
   text-align: center;
-  color: white;
-
   width: 100px;
   margin: 0 1em;
   padding: 10px 20px;
-  background: #dbe0dd linear-gradient(to left, #abd9c1 10%, #fceeb5 50%, #ee786e 100%);
-  background-size: 500%;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
 
