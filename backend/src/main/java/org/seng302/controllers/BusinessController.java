@@ -56,6 +56,7 @@ public class BusinessController {
     @Autowired
     private UserRepository userRepository;
 
+
     @Autowired
     private BusinessFinder businessFinder;
 
@@ -405,7 +406,7 @@ public class BusinessController {
         int count = 0;
 
         while (!freeImage) {
-            id = String.valueOf(count);
+            id = "business_" + String.valueOf(count);
             File checkFile1 = new File(String.format("%s/%s.jpg", businessDir, id));
             File checkFile2 = new File(String.format("%s/%s.png", businessDir, id));
             File checkFile3 = new File(String.format("%s/%s.gif", businessDir, id));
@@ -416,6 +417,7 @@ public class BusinessController {
                 freeImage = true;
             }
         }
+
 
         File file = new File(String.format("%s/%s%s", businessDir, id, imageExtension));
         File thumbnailFile = new File(String.format("%s/%s_thumbnail%s", businessDir, id, imageExtension));
