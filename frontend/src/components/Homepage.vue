@@ -446,7 +446,7 @@ const Homepage = {
               this.likedItem = temp;
               this.likes = temp.length;
             })
-      }, 100000);
+      }, 3000);
 
     },
 
