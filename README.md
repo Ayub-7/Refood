@@ -6,6 +6,9 @@ The idea for this site is to allow businesses to advertise products that are goi
 For detailed information about our site and how to use it please refer to our [wiki](https://eng-git.canterbury.ac.nz/seng302-2021/team-900/-/wikis/home), which contains a user manual and our design decisions
 
 You can find our deployed site here: [https://csse-s302g9.canterbury.ac.nz/prod](https://csse-s302g9.canterbury.ac.nz/prod/)
+or
+Watch our demo here: https://www.youtube.com/watch?v=Oyu4smc5dHY
+
 
 Sample user for demo purposes:
 - Username: jsails0@go.com
