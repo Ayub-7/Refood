@@ -7,7 +7,7 @@ For detailed information about our site and how to use it please refer to our [w
 
 You can find our deployed site here: [https://csse-s302g9.canterbury.ac.nz/prod](https://csse-s302g9.canterbury.ac.nz/prod/)
 or
-Watch our demo here: https://www.youtube.com/watch?v=Oyu4smc5dHY
+Watch our demo here: https://youtu.be/oyN1ziklAb0
 
 
 Sample user for demo purposes:
@@ -53,7 +53,7 @@ Running on: http://localhost:9499/ by default
 ## Contributors
 
 - SENG302 teaching team
-- Ayub Momahamed
+- Ayub Abdi
 - Dan Bublik
 - Jackie Chen
 - Kye Oldham
